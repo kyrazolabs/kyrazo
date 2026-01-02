@@ -1,0 +1,55 @@
+<div class="bg-gradient-to-br from-primary-600 to-primary-900 rounded-2xl p-6 text-white relative overflow-hidden" *ngIf="progress < 100">
+     <!-- Background Decor -->
+    <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+    <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+
+    <div class="relative z-10">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h3 class="font-bold text-xl">Getting Started</h3>
+                <p class="text-primary-100 text-sm">Complete your setup to start processing events.</p>
+            </div>
+             <div class="w-12 h-12 rounded-full border-4 border-white/20 flex items-center justify-center text-sm font-bold bg-white/10 backdrop-blur-sm">
+                 {{ progress.toFixed(0) }}%
+             </div>
+        </div>
+
+        <div class="space-y-3">
+             <!-- Step 1: Source -->
+            <div class="flex items-center gap-3 p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors backdrop-blur-sm border border-white/5">
+                <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0" 
+                     [ngClass]="state.hasSource ? 'bg-green-400 text-white' : 'bg-white/20 text-white/50 border border-white/30'">
+                    <i class="pi" [ngClass]="state.hasSource ? 'pi-check text-xs' : 'pi-circle-fill text-[8px]'"></i>
+                </div>
+                 <div class="flex-1">
+                    <span class="font-medium text-sm" [ngClass]="{'line-through opacity-70': state.hasSource}">Create a Source</span>
+                </div>
+                 <p-button *ngIf="!state.hasSource" label="Create" size="small" [text]="true" styleClass="text-white hover:bg-white/10 px-2 py-1 h-auto" routerLink="/dashboard/events/ingest/sources/new"></p-button>
+            </div>
+
+             <!-- Step 2: Target -->
+            <div class="flex items-center gap-3 p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors backdrop-blur-sm border border-white/5">
+                <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0" 
+                     [ngClass]="state.hasTarget ? 'bg-green-400 text-white' : 'bg-white/20 text-white/50 border border-white/30'">
+                    <i class="pi" [ngClass]="state.hasTarget ? 'pi-check text-xs' : 'pi-circle-fill text-[8px]'"></i>
+                </div>
+                 <div class="flex-1">
+                    <span class="font-medium text-sm" [ngClass]="{'line-through opacity-70': state.hasTarget}">Add a Destination</span>
+                </div>
+                 <p-button *ngIf="!state.hasTarget" label="Add" size="small" [text]="true" styleClass="text-white hover:bg-white/10 px-2 py-1 h-auto" routerLink="/dashboard/events/dispatch/targets/new"></p-button>
+            </div>
+
+             <!-- Step 3: First Event -->
+            <div class="flex items-center gap-3 p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors backdrop-blur-sm border border-white/5">
+                <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0" 
+                     [ngClass]="state.hasEvent ? 'bg-green-400 text-white' : 'bg-white/20 text-white/50 border border-white/30'">
+                    <i class="pi" [ngClass]="state.hasEvent ? 'pi-check text-xs' : 'pi-circle-fill text-[8px]'"></i>
+                </div>
+                 <div class="flex-1">
+                    <span class="font-medium text-sm" [ngClass]="{'line-through opacity-70': state.hasEvent}">Receive First Event</span>
+                </div>
+                 <p-button *ngIf="!state.hasEvent" label="Test" size="small" [text]="true" styleClass="text-white hover:bg-white/10 px-2 py-1 h-auto" routerLink="/dashboard/events/ingest/test"></p-button>
+            </div>
+        </div>
+    </div>
+</div>

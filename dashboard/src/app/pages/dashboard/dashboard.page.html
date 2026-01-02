@@ -1,0 +1,191 @@
+<div class="flex flex-col w-full mx-auto gap-8 flex-1 p-2 animate-fade-in">
+    
+    <!-- Header Section -->
+    <div class="flex flex-col gap-6">
+        <app-welcome-widget />
+    </div>
+
+    <!-- Quick Actions Hero -->
+    <div class="w-full">
+        <app-quick-actions-widget (actionClick)="handleQuickAction($event)" />
+    </div>
+
+    <!-- Control Center Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        @for (card of navCards; track card.title) {
+            <div class="group relative bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 rounded-2xl p-6 hover:shadow-sm hover:border-surface-300 dark:hover:border-surface-600 transition-all duration-300 cursor-pointer flex flex-col h-full"
+                 [routerLink]="card.route">
+                
+                <!-- Icon & Header -->
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors" [ngClass]="card.bg">
+                        <i class="pi text-xl" [ngClass]="[card.icon, card.color]"></i>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="flex flex-col gap-2 mb-8 flex-1">
+                    <h3 class="font-bold text-xl text-surface-900 dark:text-surface-0 group-hover:text-primary-500 transition-colors">
+                        {{ card.title }}
+                    </h3>
+                    <p class="text-sm font-medium text-surface-400 dark:text-surface-500 uppercase tracking-wider">
+                        {{ card.subtitle }}
+                    </p>
+                    <p class="text-surface-600 dark:text-surface-300 text-sm leading-relaxed mt-1">
+                        {{ card.description }}
+                    </p>
+                </div>
+
+                <!-- Action Footer -->
+                <div class="mt-auto flex items-center text-sm font-semibold text-primary-500 group-hover:translate-x-1 transition-transform">
+                    <span>{{ card.actionLabel }}</span>
+                    <i class="pi pi-arrow-right ml-2 text-xs"></i>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Documentation & Help (Optional Footer) -->
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-linear-to-r from-surface-0 to-surface-50 dark:from-surface-900 dark:to-surface-800 border border-surface-200 dark:border-surface-700 rounded-xl p-6 flex items-center justify-between">
+            <div class="flex flex-col gap-1">
+                <span class="font-bold text-surface-900 dark:text-surface-0">Read the Docs</span>
+                <span class="text-sm text-surface-500">Learn how to integrate Webhooks</span>
+            </div>
+            <a href="https://docs.kyrazo.io" target="_blank" pButton icon="pi pi-book" label="Documentation" class="p-button-outlined p-button-secondary rounded-xl!"></a>
+        </div>
+        
+        <div class="bg-linear-to-r from-surface-0 to-surface-50 dark:from-surface-900 dark:to-surface-800 border border-surface-200 dark:border-surface-700 rounded-xl p-6 flex items-center justify-between">
+             <div class="flex flex-col gap-1">
+                <span class="font-bold text-surface-900 dark:text-surface-0">Need Support?</span>
+                <span class="text-sm text-surface-500">Join our community or contact us</span>
+            </div>
+            <p-button label="Contact us" icon="icon-[hugeicons--bubble-chat-question] size-5 mr-2"  variant="outlined" [outlined]="true" severity="secondary" (click)="openContactDialog()" styleClass="rounded-xl!" />
+        </div>
+    </div>
+
+</div>
+<p-toast />
+
+<!-- Create Project Dialog -->
+<p-dialog header="Create Project" styleClass="rounded-2xl!" [(visible)]="projectDialogVisible" [modal]="true" [style]="{ width: '40rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [draggable]="false" [resizable]="false">
+    <div class="flex flex-col gap-4 pt-2">
+         <div class="flex flex-col gap-2">
+            <label for="pname" class="font-medium">Project Name</label>
+            <input pInputText id="pname" [(ngModel)]="projectForm.name" placeholder="e.g. Acme Production" autofocus />
+        </div>
+        <div class="flex flex-col gap-2">
+            <label for="pdesc" class="font-medium">Description</label>
+            <textarea pInputTextarea id="pdesc" [(ngModel)]="projectForm.description" rows="3" placeholder="Brief description of this project environment..." class="resize-none"></textarea>
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <p-button label="Cancel" [text]="true" severity="secondary" (click)="projectDialogVisible = false" styleClass="rounded-xl!" />
+        <p-button label="Create Project" [loading]="isCreating" (click)="createProject()" [disabled]="!projectForm.name" styleClass="rounded-xl!" />
+    </ng-template>
+</p-dialog>
+
+
+<p-dialog
+    [(visible)]="contactDialogVisible"
+    [modal]="true"
+    [style]="{ width: '500px' }"
+    [draggable]="false"
+    [resizable]="false"
+    header="Contact Us"
+    appendTo="body"
+    styleClass="rounded-2xl!">
+    <div class="space-y-6">
+        <!-- Description -->
+        <div class="text-center">
+            <p class="text-surface-600 dark:text-surface-400 text-sm">
+                Have a question or need help? We'd love to hear from you!
+            </p>
+        </div>
+
+        <!-- Contact Form -->
+        <form class="space-y-4" (ngSubmit)="submitContactForm()">
+            <!-- Name Field -->
+            <div class="flex flex-col gap-2">
+                <label for="contactName" class="text-sm font-medium text-surface-900 dark:text-surface-0">
+                    Name <span class="text-red-500">*</span>
+                </label>
+                <input
+                    pInputText
+                    id="contactName"
+                    [(ngModel)]="contactForm.name"
+                    name="name"
+                    placeholder="Your full name"
+                    class="w-full rounded-xl!"
+                    required />
+            </div>
+
+            <!-- Email Field -->
+            <div class="flex flex-col gap-2">
+                <label for="contactEmail" class="text-sm font-medium text-surface-900 dark:text-surface-0">
+                    Email <span class="text-red-500">*</span>
+                </label>
+                <input
+                    pInputText
+                    id="contactEmail"
+                    type="email"
+                    [(ngModel)]="contactForm.email"
+                    name="email"
+                    placeholder="your.email@example.com"
+                    class="w-full rounded-xl!"
+                    required />
+            </div>
+
+            <!-- Subject Field -->
+            <div class="flex flex-col gap-2">
+                <label for="contactSubject" class="text-sm font-medium text-surface-900 dark:text-surface-0">
+                    Subject
+                </label>
+                <input
+                    pInputText
+                    id="contactSubject"
+                    [(ngModel)]="contactForm.subject"
+                    name="subject"
+                    placeholder="What's this about?"
+                    class="w-full rounded-xl!" />
+            </div>
+
+            <!-- Message Field -->
+            <div class="flex flex-col gap-2">
+                <label for="contactMessage" class="text-sm font-medium text-surface-900 dark:text-surface-0">
+                    Message <span class="text-red-500">*</span>
+                </label>
+                <textarea
+                    pInputTextarea
+                    id="contactMessage"
+                    [(ngModel)]="contactForm.message"
+                    name="message"
+                    rows="4"
+                    placeholder="Tell us how we can help you..."
+                    class="w-full rounded-xl!"
+                    required></textarea>
+            </div>
+        </form>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="flex justify-end gap-3">
+            <p-button
+                label="Cancel"
+                icon="pi pi-times"
+                [outlined]="true"
+                severity="secondary"
+                styleClass="rounded-xl!"
+                (onClick)="closeContactDialog()">
+            </p-button>
+            <p-button
+                label="Send Message"
+                icon="pi pi-send"
+                styleClass="rounded-xl!"
+                [loading]="contactSubmitting"
+                [disabled]="!contactForm.name || !contactForm.email || !contactForm.message"
+                (onClick)="submitContactForm()">
+            </p-button>
+        </div>
+    </ng-template>
+</p-dialog>

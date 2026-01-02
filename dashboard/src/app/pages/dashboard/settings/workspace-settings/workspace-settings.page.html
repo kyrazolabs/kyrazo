@@ -1,0 +1,327 @@
+<div class="space-y-2 mb-4">
+
+    <!-- Header -->
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <!-- Left section -->
+        <div>
+            <h1 class="text-2xl font-bold">Workspace Settings</h1>
+            <p class="opacity-80">Manage your workspace details and team members</p>
+        </div>
+
+        <!-- Right section -->
+        <div class="flex items-center gap-4">
+            <p-button label="Invite Member" icon="pi pi-user-plus" styleClass="rounded-2xl!"
+                (onClick)="openInviteDialog()" [disabled]="!canInviteMembers()" />
+            <p-button label="Save Changes" icon="pi pi-save" styleClass="rounded-2xl!" (onClick)="saveWorkspace()"
+                [disabled]="workspaceForm.invalid || isSaving" [loading]="isSaving" />
+        </div>
+    </div>
+
+    <div class="overflow-y-auto">
+        <ul class="list-none flex flex-row py-2 m-0">
+            <li>
+                <ul class="list-none p-0 m-0 space-y-1 overflow-hidden">
+                    <li>
+                        <ul class="list-none py-0 pr-0 m-0 flex flex-row gap-4 overflow-y-hidden transition-all duration-400 ease-in-out">
+                            <li>
+                                <a pRipple [routerLink]="'/dashboard/settings/profile'"
+                                    class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
+                                    [class]="'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                    <i class="icon-[hugeicons--user] size-5 mr-2"></i>
+                                    <span class="font-medium">Profile</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a pRipple [routerLink]="'/dashboard/settings/workspace'"
+                                    class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
+                                    [class]="'text-primary-50 bg-primary hover:bg-primary/90 dark:text-primary-950 dark:bg-primary-50 dark:hover:bg-primary-50/90'">
+                                    <i class="icon-[hugeicons--dashboard-square-setting] size-5 mr-2"></i>
+                                    <span class="font-medium">Workspace</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a pRipple [routerLink]="'/dashboard/settings/notifications'"
+                                    class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
+                                    [class]="'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                    <i class="icon-[hugeicons--notification-01] size-5 mr-2"></i>
+                                    <span class="font-medium">Notifications</span>
+                                </a>
+                            </li>
+                            <!-- <li>
+                                <a pRipple [routerLink]="'/dashboard/settings/billing'"
+                                    class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
+                                    [class]="'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                    <i class="icon-[hugeicons--credit-card] size-5 mr-2"></i>
+                                    <span class="font-medium">Billing</span>
+                                </a>
+                            </li> -->
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Workspace Settings Form -->
+    <form [formGroup]="workspaceForm" (ngSubmit)="saveWorkspace()" class="flex flex-col gap-6">
+
+        <!-- Basic Information -->
+        <p-card header="Basic Information" class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Workspace Name -->
+                <div class="flex flex-col gap-2">
+                    <label class="font-semibold text-surface-900 dark:text-surface-0">Workspace Name</label>
+                    <input pInputText type="text" formControlName="name" placeholder="Enter workspace name"
+                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800"
+                        [class.border-red-500]="workspaceForm.get('name')?.invalid && workspaceForm.get('name')?.touched"
+                        [readonly]="!canEditWorkspace()" />
+                    <small *ngIf="workspaceForm.get('name')?.invalid && workspaceForm.get('name')?.touched" class="text-red-500 text-sm">
+                        Workspace name is required and must be at least 2 characters
+                    </small>
+                </div>
+
+                <!-- Workspace Description -->
+                <div class="flex flex-col gap-2">
+                    <label class="font-semibold text-surface-900 dark:text-surface-0">Description</label>
+                    <textarea pInputTextarea formControlName="description" rows="3"
+                        placeholder="Enter workspace description (optional)"
+                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800 resize-none"
+                        [readonly]="!canEditWorkspace()"></textarea>
+                    <small class="text-surface-600 dark:text-surface-400 text-sm">
+                        {{workspaceForm.get('description')?.value?.length || 0}}/2000 characters
+                    </small>
+                </div>
+            </div>
+        </p-card>
+
+        <!-- Workspace Information -->
+        <p-card header="Workspace Information" class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Workspace ID -->
+                <div class="flex flex-col gap-2">
+                    <label class="font-semibold text-surface-900 dark:text-surface-0">Workspace ID</label>
+                    <div class="flex items-center gap-2">
+                        <div class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700 flex-1 font-mono text-sm">
+                            {{workspace?._id || 'N/A'}}
+                        </div>
+                        <p-button icon="pi pi-copy" [outlined]="true" size="small" styleClass="rounded-xl!"
+                            pTooltip="Copy Workspace ID" tooltipStyleClass="text-xs! rounded-xl!" tooltipPosition="top"
+                            (onClick)="copyToClipboard(workspace?._id || '')" />
+                    </div>
+                </div>
+
+                <!-- Created Date -->
+                <div class="flex flex-col gap-2">
+                    <label class="font-semibold text-surface-900 dark:text-surface-0">Created</label>
+                    <div class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700">
+                        {{workspace?.createdAt ? formatDate(workspace!.createdAt) : 'N/A'}}
+                    </div>
+                </div>
+
+                <!-- Status -->
+                <div class="flex flex-col gap-2">
+                    <label class="font-semibold text-surface-900 dark:text-surface-0">Status</label>
+                    <div class="flex items-center pt-2">
+                        <p-tag [value]="workspace?.isArchived ? 'Archived' : 'Active'"
+                            [severity]="workspace?.isArchived ? 'warn' : 'success'" class="text-sm font-medium" [rounded]="true" />
+                    </div>
+                </div>
+            </div>
+        </p-card>
+
+        <!-- Team Members -->
+        <p-card header="Team Members" class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+            <p-table [value]="members" [paginator]="true" [rows]="10" responsiveLayout="scroll"
+                [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} members">
+
+                <ng-template #header>
+                    <tr>
+                        <th class="text-left rounded-xl! border-none!">Member</th>
+                        <th class="text-left rounded-xl! border-none!">Role</th>
+                        <th class="text-left rounded-xl! border-none!">Joined</th>
+                        <th class="text-left rounded-xl! border-none!" *ngIf="canEditWorkspace()">Actions</th>
+                    </tr>
+                </ng-template>
+
+                <ng-template #body let-member>
+                    <tr class="hover:bg-surface-50 dark:hover:bg-surface-800">
+                        <!-- Member Info -->
+                        <td>
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
+                                    <span class="text-primary-600 dark:text-primary-400 font-semibold text-sm">
+                                        {{member.user?.firstName?.charAt(0) || '?'}}{{member.user?.lastName?.charAt(0) || '?'}}
+                                    </span>
+                                </div>
+                                <div>
+                                    <div class="font-medium text-surface-900 dark:text-surface-0">
+                                        {{member.user?.firstName}} {{member.user?.lastName}}
+                                    </div>
+                                    <div class="text-sm text-surface-600 dark:text-surface-400">
+                                        {{member.user?.email}}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Role -->
+                        <td>
+                            <div class="flex items-center gap-2" *ngIf="canManageMember(member)">
+                                <p-select [ngModel]="member.role" [options]="roleOptions"
+                                    optionLabel="label" optionValue="value"
+                                    (onChange)="updateMemberRole(member, $event.value)"
+                                    styleClass="w-32 rounded-xl!" panelStyleClass="rounded-xl!" />
+                            </div>
+                            <p-tag *ngIf="!canManageMember(member)" [value]="member.role | titlecase"
+                                [severity]="getRoleSeverity(member.role)" class="text-sm font-medium" />
+                        </td>
+
+                        <!-- Joined Date -->
+                        <td>
+                            <div class="text-sm text-surface-600 dark:text-surface-400">
+                                {{member.invitationAcceptedAt ? formatDate(member.invitationAcceptedAt) : 'Pending'}}
+                            </div>
+                        </td>
+
+                        <!-- Actions -->
+                        <td *ngIf="canEditWorkspace()">
+                            <div class="flex gap-2">
+                                <p-button icon="pi pi-trash" [outlined]="true" size="small" severity="danger"
+                                    styleClass="rounded-xl!" pTooltip="Remove member" tooltipPosition="top"
+                                    tooltipStyleClass="text-xs! rounded-xl!"
+                                    (onClick)="removeMember(member)"
+                                    [disabled]="member.role === 'owner' || getMemberUserId(member) === currentUserId" />
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+
+                <ng-template  pTemplate="emptymessage">
+                    <tr>
+                        <td colspan="4" class="text-center py-12">
+                            <div class="flex flex-col items-center gap-4 my-10">
+                                <i class="pi pi-users text-6xl text-surface-400 dark:text-surface-500"></i>
+                                <div>
+                                    <h3 class="text-lg font-medium text-surface-900 dark:text-surface-0 mb-2">
+                                        No team members found
+                                    </h3>
+                                    <p class="text-surface-600 dark:text-surface-400 mb-4">
+                                        Invite team members to collaborate on this workspace.
+                                    </p>
+                                    <p-button *ngIf="canInviteMembers()" label="Invite First Member" icon="pi pi-user-plus"
+                                        (onClick)="openInviteDialog()" styleClass="rounded-xl!" />
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </p-card>
+        <!-- Danger Zone -->
+        <p-card header="Danger Zone" *ngIf="currentUserRole === 'owner'"
+            class="rounded-2xl! p-2! bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 shadow-none!">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                <div>
+                    <h3 class="text-lg font-bold text-red-700 dark:text-red-500">Delete Workspace</h3>
+                    <p class="text-red-600 dark:text-red-400 text-sm">
+                        Permanently delete this workspace and all its data. This action cannot be undone.
+                    </p>
+                </div>
+                <p-button label="Delete Workspace" icon="pi pi-trash" severity="danger" styleClass="rounded-xl!"
+                    (onClick)="deleteWorkspace()" />
+            </div>
+        </p-card>
+    </form>
+
+
+</div>
+<!-- Invite Member Dialog -->
+<p-dialog [(visible)]="showInviteDialog" modal="true" header="Invite Team Member"
+    styleClass="rounded-2xl!" [style]="{'width': '500px'}" [closable]="true" [closeOnEscape]="true">
+
+    <form [formGroup]="inviteForm" (ngSubmit)="inviteMember()" class="flex flex-col gap-4">
+        <!-- Email -->
+        <div class="flex flex-col gap-2">
+            <label class="font-semibold text-surface-900 dark:text-surface-0">Email Address</label>
+            <input pInputText type="email" formControlName="email" placeholder="Enter email address"
+                class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800"
+                [class.border-red-500]="inviteForm.get('email')?.invalid && inviteForm.get('email')?.touched" />
+            <small *ngIf="inviteForm.get('email')?.invalid && inviteForm.get('email')?.touched" class="text-red-500 text-sm">
+                Please enter a valid email address
+            </small>
+        </div>
+
+        <!-- Role -->
+        <div class="flex flex-col gap-2">
+            <label class="font-semibold text-surface-900 dark:text-surface-0">Role</label>
+            <p-select formControlName="role" [options]="roleOptions" optionLabel="label" optionValue="value"
+                placeholder="Select role" class="w-full rounded-xl!" panelStyleClass="rounded-xl!" />
+        </div>
+
+        <!-- Message -->
+        <div class="flex flex-col gap-2">
+            <label class="font-semibold text-surface-900 dark:text-surface-0">Message (Optional)</label>
+            <textarea pInputTextarea formControlName="message" rows="3"
+                placeholder="Add a personal message to the invitation..."
+                class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800 resize-none"></textarea>
+            <small class="text-surface-600 dark:text-surface-400 text-sm">
+                {{inviteForm.get('message')?.value?.length || 0}}/2000 characters
+            </small>
+        </div>
+    </form>
+
+    <ng-template #footer>
+        <div class="flex justify-end gap-2">
+            <p-button label="Cancel" icon="pi pi-times" [outlined]="true" severity="secondary"
+                styleClass="rounded-xl!" (onClick)="closeInviteDialog()" />
+            <p-button label="Send Invitation" icon="pi pi-send" styleClass="rounded-xl!"
+                (onClick)="inviteMember()" [disabled]="inviteForm.invalid || isInviting" [loading]="isInviting" />
+        </div>
+    </ng-template>
+</p-dialog>
+
+<!-- Toast for notifications -->
+<p-toast />
+
+<!-- Confirm Dialog -->
+<p-confirmDialog #cd styleClass="rounded-2xl!">
+    <ng-template #headless let-message let-onAccept="onAccept" let-onReject="onReject">
+        <div
+            class="flex flex-col items-center p-8 bg-surface-0 dark:bg-surface-900 rounded-2xl! border border-surface-200 dark:border-surface-700 shadow-lg max-w-md mx-auto">
+            <!-- Danger Icon Circle -->
+            <div
+                class="rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 inline-flex justify-center items-center h-20 w-20 -mt-16">
+                <i class="pi pi-exclamation-triangle text-4xl!"></i>
+            </div>
+
+            <!-- Header -->
+            <h3 class="font-bold text-2xl text-surface-900 dark:text-surface-0 text-center mb-2 mt-6">
+                {{ message.header || 'Confirm Delete' }}
+            </h3>
+
+            <!-- Message -->
+            <p class="text-surface-600 dark:text-surface-400 text-center mb-6 leading-relaxed">
+                {{ message.message || 'Are you sure you want to delete this item? This action cannot be undone.' }}
+            </p>
+
+            <!-- Warning Box -->
+            <div
+                class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6 w-full">
+                <div class="flex items-start gap-3">
+                    <i class="pi pi-info-circle text-red-600 dark:text-red-400 mt-0.5 shrink-0"></i>
+                    <div class="text-sm text-red-800 dark:text-red-300">
+                        <p class="font-medium mb-1">This action is irreversible</p>
+                        <p class="opacity-90">All associated data, projects, and members will be permanently removed.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-between w-full gap-6 mt-6">
+                <p-button label="Delete" icon="pi pi-trash" severity="danger" (onClick)="onAccept()"
+                    styleClass="w-40 rounded-xl!"></p-button>
+                <p-button label="Cancel" icon="pi pi-times" [outlined]="true" severity="secondary"
+                    (onClick)="onReject()" styleClass="w-40 rounded-xl!"></p-button>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmDialog>

@@ -1,0 +1,110 @@
+<div class="bg-surface-50 dark:bg-surface-950 min-h-screen w-full flex items-center justify-center p-4">
+    <app-config class="hidden" />
+    <p-card class="bg-transparent shadow-lg rounded-2xl w-full max-w-md mx-auto">
+        <ng-template pTemplate="header">
+            <div class="text-center pt-6 pb-2">
+                <!-- <img src="/demo/images/blocks/logos/hyper.svg" alt="Logo" height="50" class="mb-4 mx-auto"
+                    loading="lazy"> -->
+                <div class="text-surface-900 dark:text-surface-0 text-3xl font-semibold mb-2">
+                    Welcome Back
+                </div>
+                <p class="text-surface-600 dark:text-surface-300 text-sm mb-4">
+                    login to your account to continue
+                </p>
+                <div class="text-surface-600 dark:text-surface-300 text-sm">
+                    Don't have an account?
+                    <a class="font-medium no-underline ml-1 text-primary hover:text-primary-600 cursor-pointer transition-colors duration-200"
+                        [routerLink]="'/auth/register'">
+                        Create one today
+                    </a>
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="content">
+            <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+
+                <!-- Email -->
+                <div class="space-y-1">
+                    <label for="email" class="block text-surface-900 dark:text-surface-0 font-medium text-sm">
+                        Email Address *
+                    </label>
+                    <input pInputText id="email" formControlName="email" type="email"
+                        placeholder="Enter your email address" autocomplete="email" class="w-full rounded-xl!"
+                        [class.p-invalid]="isFieldInvalid('email')"
+                        [attr.aria-describedby]="isFieldInvalid('email') ? 'email-error' : null" />
+                    <small *ngIf="isFieldInvalid('email')" id="email-error" class="p-error block mt-1 text-xs">
+                        {{ getFieldErrorMessage('email') }}
+                    </small>
+                </div>
+
+                <!-- Password -->
+                <div class="space-y-1">
+                    <label for="password" class="block text-surface-900 dark:text-surface-0 font-medium text-sm">
+                        Password *
+                    </label>
+                        <p-password id="password" formControlName="password"
+                            placeholder="Enter your password"
+                            autocomplete="off" inputStyleClass="w-full rounded-xl!" class="w-full" [feedback]="false"  [toggleMask]="true"
+                            [class.p-invalid]="isFieldInvalid('password')"
+                            [attr.aria-describedby]="isFieldInvalid('password') ? 'password-error' : null">
+                        </p-password>
+                        <small *ngIf="isFieldInvalid('password')" id="password-error" class="p-error block mt-1 text-xs">
+                            {{ getFieldErrorMessage('password') }}
+                        </small>
+                </div>
+
+                <!-- Remember Me & Forgot Password -->
+                <div class="flex items-center justify-between py-2">
+                    <div class="flex items-center space-x-2">
+                        <p-checkbox formControlName="rememberMe" inputId="rememberMe" [binary]="true"></p-checkbox>
+                        <label for="rememberMe" class="text-surface-900 dark:text-surface-0 text-sm cursor-pointer">
+                            Remember me
+                        </label>
+                    </div>
+                    <button type="button"
+                        class="font-medium no-underline text-primary hover:text-primary-600 text-sm cursor-pointer transition-colors duration-200"
+                        (click)="onForgotPassword()">
+                        Forgot password?
+                    </button>
+                </div>
+
+                <!-- Submit Button -->
+                <p-button type="submit" label="Sign In" icon="pi pi-sign-in" [loading]="loading()"
+                    [disabled]="loading()" styleClass="w-full rounded-xl! font-medium" />
+
+                    
+
+                <!-- Social Login Options (Optional) -->
+                
+          <div class="mt-6">
+            <div class="relative">
+              <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-surface-300 dark:border-surface-600"></div>
+              </div>
+              <div class="relative flex justify-center text-sm">
+                <span class="px-2 bg-surface-0 text-surface-500 dark:text-surface-400">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+            
+            <div class="mt-4 space-y-2">
+              <p-button 
+                id="g_id_onload"
+                type="button"
+                label="Continue with Google"
+                icon="pi pi-google"
+                severity="secondary"
+                outlined="true"
+                styleClass="w-full rounded-xl! font-medium"
+                (onClick)="googleLogin()"
+              ></p-button>
+            </div>
+          </div>
+         
+
+            </form>
+        </ng-template>
+    </p-card>
+    </div>

@@ -1,0 +1,40 @@
+<div class="font-mono text-sm text-surface-900 dark:text-surface-0 bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 rounded-xl p-4">
+  <ng-container *ngFor="let key of getKeys(parsed)">
+    <div class="ml-2 border-l border-surface-300 dark:border-surface-600 pl-3">
+
+      <div class="flex items-start gap-1">
+
+        <span class="text-blue-600 dark:text-blue-400">{{ key }}</span>:
+
+        <ng-container *ngIf="!isComplex(parsed[key]); else complexBlock">
+          <span class="text-emerald-600 dark:text-emerald-400">
+            {{ formatPrimitive(parsed[key]) }}
+          </span>
+        </ng-container>
+
+        <ng-template #complexBlock>
+
+          <details class="group" [open]="true">
+            <summary class="cursor-pointer select-none inline-flex items-center gap-1">
+
+              <ng-container *ngIf="isObject(parsed[key])">
+                <span class="text-purple-600 dark:text-purple-400">{{'{'}}</span> <span class="text-surface-500 dark:text-zinc-500 group-open:hidden">…</span> <span class="text-purple-600 dark:text-purple-400 group-open:hidden">{{ '}' }}</span>
+              </ng-container>
+
+              <ng-container *ngIf="isArray(parsed[key])">
+                <span class="text-orange-600 dark:text-orange-400">{{'['}}</span> <span class="text-surface-500 dark:text-zinc-500 group-open:hidden">…</span> <span class="text-orange-600 dark:text-orange-400 group-open:hidden">{{']'}}</span>
+              </ng-container>
+            </summary>
+
+            <div class="ml-4 border-l border-surface-300 dark:border-surface-600 pl-3">
+              <json-viewer [data]="parsed[key]"></json-viewer>
+            </div>
+          </details>
+
+        </ng-template>
+
+      </div>
+
+    </div>
+  </ng-container>
+</div>

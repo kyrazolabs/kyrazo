@@ -1,0 +1,147 @@
+<div class="space-y-6">
+    <!-- Header -->
+    <div
+        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+        <!-- Left section -->
+        <div>
+            <h1 class="text-2xl font-bold">Targets</h1>
+            <p class="opacity-80">Manage your event dispatch targets</p>
+        </div>
+        <div class="flex gap-2">
+            <p-button label="Add Target" icon="pi pi-plus" routerLink="create" size="small" styleClass="rounded-xl!" />
+        </div>
+    </div>
+
+    <!-- Filter and Search -->
+    <p-card class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+        <div class="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+            <p-iconfield iconPosition="left" class="w-full md:w-auto">
+                <p-inputicon>
+                    <i class="pi pi-search"></i>
+                </p-inputicon>
+                <input pInputText type="text" (input)="onSearchInput($event)" [value]="searchQuery"
+                    placeholder="Search targets..." class="w-full md:w-80 rounded-xl!" />
+            </p-iconfield>
+
+            <div class="flex gap-2">
+                <p-button label="Active" [outlined]="activeFilter !== true" severity="success" size="small"
+                    styleClass="rounded-xl!" (onClick)="filterByStatus('active')" />
+                <p-button label="Inactive" [outlined]="activeFilter !== false" severity="danger" size="small"
+                    styleClass="rounded-xl!" (onClick)="filterByStatus('inactive')" />
+                <p-button label="All" [outlined]="activeFilter !== undefined" severity="secondary" size="small"
+                    styleClass="rounded-xl!" (onClick)="filterByStatus('all')" />
+            </div>
+        </div>
+    </p-card>
+
+    <!-- Data Table -->
+    <p-card class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+        <p-table #dt 
+                [value]="targets" 
+                [lazy]="true" 
+                [paginator]="true" 
+                [scrollable]="true"
+                [rows]="rows" 
+                [rowsPerPageOptions]="[10,20,50,100]"
+                [totalRecords]="totalRecords" 
+                (onLazyLoad)="loadTargetsLazy($event)"
+                dataKey="_id">
+            <ng-template #header>
+                <tr>
+                    <th class="rounded-xl! border-none!" style="min-width:200px">
+                        Name 
+                        <!-- <p-sortIcon field="name" /> -->
+                    </th>
+                    <th class="rounded-xl! border-none!" style="min-width:300px">
+                        URL 
+                        <!-- <p-sortIcon field="url" /> -->
+                    </th>
+                    <th class="rounded-xl! border-none!" style="max-width:100px">Status</th>
+                    <th class="rounded-xl! border-none! text-center!">Config</th>
+                    <th class="rounded-xl! border-none! text-center!">Actions</th>
+                </tr>
+            </ng-template>
+
+            <ng-template #body let-target>
+                <tr class="hover:bg-surface-50! dark:hover:bg-surface-800!">
+                    <td [routerLink]="[target._id]" class="cursor-pointer">
+                        <div class="flex flex-col">
+                            <span class="font-semibold text-surface-900 dark:text-surface-0">{{ target.name }}</span>
+                            <span class="text-xs text-surface-500 dark:text-surface-400" *ngIf="target.description">{{ target.description }}</span>
+                        </div>
+                    </td>
+                    <td class="break-all">
+                        <span class="font-mono text-sm text-surface-700 dark:text-surface-300">{{ target.url }}</span>
+                    </td>
+                    <td>
+                        <p-tag [severity]="target.enabled ? 'success' : 'danger'" [value]="target.enabled ? 'Active' : 'Inactive'"  [rounded]="true" class="uppercase text-xs! font-bold" />
+                    </td>
+                    <td class="text-center!">
+                        <div class="flex justify-center flex-wrap gap-2 text-xs">
+                            <div class="flex items-center gap-1 bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 rounded-xl text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800" pTooltip="Timeout" tooltipPosition="top">
+                                <i class="icon-[hugeicons--time-04] text-sm!"></i>
+                                <span class="font-medium font-mono">{{ target.config.timeout / 1000 }}s</span>
+                            </div>
+                            <div class="flex items-center gap-1 bg-sky-100 dark:bg-sky-900/30 px-2 py-0.5 rounded-xl text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800" pTooltip="Retries" tooltipPosition="top">
+                                <i class="icon-[hugeicons--arrow-reload-horizontal] text-sm!"></i>
+                                <span class="font-medium font-mono">{{ target.config.retryCount }}</span>
+                            </div>
+                             @if (target.config.rateLimit) {
+                                <div class="flex items-center gap-1 bg-purple-100 dark:bg-purple-900/30 px-2 py-0.5 rounded-xl text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800" pTooltip="Rate Limit" tooltipPosition="top">
+                                    <i class="icon-[hugeicons--zap] text-sm!"></i>
+                                    <span class="font-medium font-mono">{{ target.config.rateLimit }}/s</span>
+                                </div>
+                            }
+                        </div>
+                    </td>
+                    <td class="text-center!">
+                        <div class="flex justify-center  gap-2">
+                             <p-button [icon]="target.enabled ? 'pi pi-pause' : 'pi pi-play'"
+                                [outlined]="true" size="small" 
+                                [severity]="target.enabled ? 'warn' : 'success'" 
+                                (onClick)="toggleStatus(target)" 
+                                [pTooltip]="target.enabled ? 'Pause Target' : 'Activate Target'" tooltipPosition="top"
+                                styleClass="rounded-xl!" tooltipStyleClass="text-xs! rounded-xl!" />
+                            <p-button icon="pi pi-pencil" [outlined]="true" size="small" severity="secondary" 
+                                [routerLink]="[target._id, 'edit']" pTooltip="Edit Target" tooltipPosition="top"
+                                styleClass="rounded-xl!" tooltipStyleClass="text-xs! rounded-xl!" />
+                            <p-button icon="pi pi-trash" [outlined]="true" size="small" severity="danger" 
+                                (onClick)="deleteTarget(target)" pTooltip="Delete Target" tooltipPosition="top"
+                                styleClass="rounded-xl!" tooltipStyleClass="text-xs! rounded-xl!" />
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template  pTemplate="emptymessage">
+                <tr>
+                    <td colspan="5" class="text-center py-12">
+                        <div class="flex flex-col items-center gap-4 my-10">
+                            <i class="icon-[hugeicons--target-02] text-6xl text-surface-400"></i>
+                            <div class="text-center">
+                                <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-2">No targets found</h3>
+                                <p class="text-surface-500 dark:text-surface-400 mb-4">
+                                    {{ searchQuery || activeFilter !== undefined ? 'Try adjusting your filters' : 'Start by creating your first dispatch target' }}
+                                </p>
+                                <div class="flex gap-2 justify-center">
+                                    <p-button label="Clear Filters" icon="pi pi-filter-slash" severity="secondary"
+                                        size="small" [outlined]="true" (onClick)="refreshTargets()"
+                                        *ngIf="searchQuery || activeFilter !== undefined" />
+                                    <p-button label="Create Target" icon="pi pi-plus"
+                                        routerLink="create" size="small" styleClass="rounded-xl!" />
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+        
+    </p-card>
+</div>
+
+<!-- Confirmation Dialog -->
+<p-confirmDialog [style]="{width: '450px'}" styleClass="rounded-2xl!" acceptButtonStyleClass="rounded-xl! p-button-danger" rejectButtonStyleClass="rounded-xl! p-button-text" />
+
+<!-- Toast Messages -->
+<p-toast />

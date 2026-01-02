@@ -1,0 +1,169 @@
+<div class="space-y-6">
+    <!-- Header -->
+    <div
+        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+        <!-- Left section -->
+        <div>
+            <h1 class="text-2xl font-bold">Endpoints</h1>
+            <p class="opacity-80">Manage your ingest endpoints and their configurations</p>
+        </div>
+
+        <!-- Right section -->
+        <div class="flex items-center gap-4">
+            <p-button label="Refresh" icon="pi pi-refresh" size="small" severity="secondary" [outlined]="true"
+                (onClick)="refreshEndpoints()" [loading]="loader.loading$ | async" styleClass="rounded-xl!" />
+            <p-button label="Add Endpoint" icon="pi pi-plus" size="small" routerLink="/dashboard/events/ingest/endpoints/create"
+                styleClass="rounded-xl!" />
+        </div>
+    </div>
+
+    <!-- Filter and Search -->
+    <p-card class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+        <div class="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+            <p-iconfield iconPosition="left" class="w-full md:w-auto">
+                <p-inputicon>
+                    <i class="pi pi-search"></i>
+                </p-inputicon>
+                <input pInputText type="text" (input)="onSearchInput($event)" [value]="searchQuery"
+                    placeholder="Search endpoints..." class="w-full md:w-80 rounded-xl!" />
+            </p-iconfield>
+
+            <div class="flex gap-2">
+                <p-button label="Active" [outlined]="activeFilter !== 'active'" severity="success" size="small"
+                    styleClass="rounded-xl!" (onClick)="filterByStatus('active')" />
+                <p-button label="Inactive" [outlined]="activeFilter !== 'inactive'" severity="danger" size="small"
+                    styleClass="rounded-xl!" (onClick)="filterByStatus('inactive')" />
+                <p-button label="All" [outlined]="activeFilter !== 'all'" severity="secondary" size="small"
+                    styleClass="rounded-xl!" (onClick)="filterByStatus('all')" />
+            </div>
+        </div>
+    </p-card>
+
+    <!-- Data Table -->
+    <p-card class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+        <p-table #dt 
+                [value]="endpoints" 
+                [lazy]="true" 
+                [paginator]="true" 
+                [rows]="rows" 
+                [rowsPerPageOptions]="[10,20,50,100]"
+                [totalRecords]="totalRecords" 
+                (onLazyLoad)="loadEndpointsLazy($event)"
+                dataKey="_id">
+            <ng-template #header>
+                <tr>
+                    <th class="rounded-xl! border-none!">
+                        Name
+                    </th>
+                    <th class="rounded-xl! border-none!">
+                        URL
+                    </th>
+                    <th class="rounded-xl! border-none!">Method</th>
+                    <th class="rounded-xl! border-none!">
+                        Status
+                    </th>
+                    <th class="rounded-xl! border-none!">Enabled</th>
+                    <th class="rounded-xl! border-none!">
+                        Created
+                    </th>
+                    <th class="rounded-xl! border-none!">Actions</th>
+                </tr>
+            </ng-template>
+
+            <ng-template #body let-endpoint>
+                <tr>
+                    <td>
+                        <div class="flex flex-col">
+                            <span class="font-semibold text-surface-900 dark:text-surface-0">
+                                {{ endpoint.name }}
+                            </span>
+                            <span class="text-sm text-surface-600 dark:text-surface-400" *ngIf="endpoint.description">
+                                {{ endpoint.description }}
+                            </span>
+                            <span class="text-xs text-surface-500 dark:text-surface-500">
+                                ID: {{ endpoint._id }}
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        <code
+                            class="text-sm bg-surface-100 dark:bg-surface-800 px-2 py-1 rounded text-surface-900 dark:text-surface-0 break-all">
+                            {{ endpoint.url }}
+                        </code>
+                    </td>
+                    <td>
+                        <p-tag [rounded]="true" [value]="endpoint.method" severity="info" class="text-xs!" />
+                    </td>
+                    <td>
+                        <p-tag [value]="endpoint.status | titlecase"
+                            [severity]="endpoint.status === 'active' ? 'success' : 'danger'" [rounded]="true" />
+                    </td>
+                    <td>
+                        <p-tag [value]="endpoint.enabled ? 'Yes' : 'No'"
+                            [severity]="endpoint.enabled ? 'success' : 'warn'" [rounded]="true" />
+                    </td>
+                    <td>
+                        <span class="text-sm text-surface-600 dark:text-surface-400">
+                            {{ endpoint.createdAt | date:'short' }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="flex gap-2">
+                            <p-button icon="pi pi-eye" [outlined]="true" size="small" severity="info"
+                                [routerLink]="['/dashboard/events/ingest/endpoints', endpoint._id]" pTooltip="View Details"
+                                styleClass="rounded-xl!" tooltipStyleClass="text-xs! rounded-xl!" />
+                            <p-button icon="pi pi-pencil" [outlined]="true" size="small" severity="secondary"
+                                [routerLink]="['/dashboard/events/ingest/endpoints', endpoint._id, 'edit']" pTooltip="Edit Endpoint"
+                                styleClass="rounded-xl!" tooltipStyleClass="text-xs! rounded-xl!" />
+                            <p-button [icon]="endpoint.status === 'active' ? 'pi pi-pause' : 'pi pi-play'"
+                                [outlined]="true" size="small"
+                                [severity]="endpoint.status === 'active' ? 'warn' : 'success'"
+                                (onClick)="toggleEndpointStatus(endpoint)"
+                                [pTooltip]="endpoint.status === 'active' ? 'Pause Endpoint' : 'Activate Endpoint'"
+                                styleClass="rounded-xl!" tooltipStyleClass="text-xs! rounded-xl!" />
+                            <p-button icon="pi pi-trash" [outlined]="true" size="small" severity="danger"
+                                (onClick)="deleteEndpoint(endpoint)" pTooltip="Delete Endpoint"
+                                styleClass="rounded-xl!" tooltipStyleClass="text-xs! rounded-xl!" />
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template  pTemplate="emptymessage">
+                <tr>
+                    <td colspan="7" class="text-center py-12">
+                        <div class="flex flex-col items-center gap-4 my-10">
+                            <i class="pi pi-link text-6xl text-surface-400"></i>
+                            <div>
+                                <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-2">
+                                    {{ searchQuery ? 'No endpoints found' :
+                                    activeFilter === 'all' ? 'No endpoints found' :
+                                    'No ' + activeFilter + ' endpoints' }}
+                                </h3>
+                                <p class="text-surface-600 dark:text-surface-400 mb-4">
+                                    {{ searchQuery ? 'Try adjusting your search terms' :
+                                    activeFilter === 'all' ? 'Get started by creating your first endpoint' :
+                                    'Try adjusting your filters or create a new endpoint' }}
+                                </p>
+                                <div class="flex gap-2">
+                                    <p-button label="Clear Filters" icon="pi pi-filter-slash" severity="secondary"
+                                        size="small" [outlined]="true" (onClick)="refreshEndpoints()"
+                                        *ngIf="searchQuery || activeFilter !== 'all'" />
+                                    <p-button label="Add Endpoint" icon="pi pi-plus"
+                                        routerLink="/dashboard/endpoints/create" size="small" />
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+        
+    </p-card>
+</div>
+
+<!-- Confirmation Dialog -->
+<p-confirmDialog />
+
+<!-- Toast Messages -->
+<p-toast />

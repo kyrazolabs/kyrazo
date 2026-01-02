@@ -1,0 +1,171 @@
+<div class="space-y-2">
+    <!-- Header -->
+    <div
+        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <!-- Left section -->
+        <div>
+            <h1 class="text-2xl font-bold">Notification Settings</h1>
+            <p class="opacity-80">Configure how and when you receive notifications</p>
+        </div>
+
+        <!-- Right section -->
+        <div class="flex items-center gap-4">
+            <p-button label="Reset to Default" icon="pi pi-refresh" [outlined]="true" severity="secondary"
+                styleClass="rounded-2xl!" (onClick)="resetToDefaults()" [disabled]="isLoading" />
+            <p-button label="Save Settings" icon="pi pi-save" styleClass="rounded-2xl!"
+                (onClick)="saveNotifications()" [loading]="isLoading" />
+        </div>
+    </div>
+
+    <div class="overflow-y-auto">
+        <ul class="list-none flex flex-row py-2 m-0">
+            <li>
+                <ul class="list-none p-0 m-0 space-y-1 overflow-hidden">
+                    <li>
+                        <ul
+                            class="list-none py-0 pr-0 m-0 flex flex-row gap-4 overflow-y-hidden transition-all duration-400 ease-in-out">
+                            <li>
+                                <a pRipple [routerLink]="'/dashboard/settings/profile'"
+                                    class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
+                                    [class]="'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                    <i class="icon-[hugeicons--user] size-5 mr-2"></i>
+                                    <span class="font-medium">Profile</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a pRipple [routerLink]="'/dashboard/settings/workspace'"
+                                    class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
+                                    [class]="'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                    <i class="icon-[hugeicons--dashboard-square-setting] size-5 mr-2"></i>
+                                    <span class="font-medium">Workspace</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a pRipple [routerLink]="'/dashboard/settings/notifications'"
+                                    class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
+                                    [class]="'text-primary-50 bg-primary hover:bg-primary/90 dark:text-primary-950 dark:bg-primary-50 dark:hover:bg-primary-50/90'">
+                                    <i class="icon-[hugeicons--notification-01] size-5 mr-2"></i>
+                                    <span class="font-medium">Notifications</span>
+                                </a>
+                            </li>
+                            <!-- <li>
+                                <a pRipple [routerLink]="'/dashboard/settings/billing'"
+                                    class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
+                                    [class]="'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                    <i class="icon-[hugeicons--credit-card] size-5 mr-2"></i>
+                                    <span class="font-medium">Billing</span>
+                                </a>
+                            </li> -->
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Email Notifications -->
+    <form [formGroup]="notificationForm" class="space-y-6 mb-6">
+        <p-card header="Email Notifications"
+            class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+            <div class="space-y-6">
+                <!-- Webhook Failures -->
+                <div
+                    class="flex items-start justify-between p-4 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="pi pi-exclamation-triangle text-red-500"></i>
+                            <h4 class="font-semibold text-surface-900 dark:text-surface-0">Event Failures</h4>
+                            <p-tag value="Critical" severity="danger" [rounded]="true" class="text-xs" />
+                        </div>
+                        <p class="text-sm text-surface-600 dark:text-surface-400">
+                            Get a report when event deliveries fail or timeout
+                        </p>
+                    </div>
+                    <div class="flex items-center ml-4">
+                        <p-toggleswitch formControlName="webhookFailures" styleClass="rounded-full!" />
+                    </div>
+                </div>
+
+                <!-- Daily Summary -->
+                <div
+                    class="flex items-start justify-between p-4 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="pi pi-chart-line text-blue-500"></i>
+                            <h4 class="font-semibold text-surface-900 dark:text-surface-0">Daily Summary</h4>
+                            <p-tag value="Optional" severity="info" [rounded]="true" class="text-xs" />
+                        </div>
+                        <p class="text-sm text-surface-600 dark:text-surface-400">
+                            Receive daily reports with webhook delivery statistics and performance metrics
+                        </p>
+                    </div>
+                    <div class="flex items-center ml-4">
+                        <p-toggleswitch formControlName="dailySummary" styleClass="rounded-full!" />
+                    </div>
+                </div>
+
+                <!-- Security Alerts -->
+                <div
+                    class="flex items-start justify-between p-4 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="pi pi-shield text-orange-500"></i>
+                            <h4 class="font-semibold text-surface-900 dark:text-surface-0">Security Alerts</h4>
+                            <p-tag value="Required" severity="warn" [rounded]="true" class="text-xs" />
+                        </div>
+                        <p class="text-sm text-surface-600 dark:text-surface-400">
+                            Important security notifications including login attempts and API key changes
+                        </p>
+                    </div>
+                    <div class="flex items-center ml-4">
+                        <p-toggleswitch formControlName="securityAlerts" styleClass="rounded-full!" />
+                    </div>
+                </div>
+
+                <!-- Weekly Reports -->
+                <div
+                    class="flex items-start justify-between p-4 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="pi pi-calendar text-green-500"></i>
+                            <h4 class="font-semibold text-surface-900 dark:text-surface-0">Weekly Reports</h4>
+                            <p-tag value="Optional" severity="info" [rounded]="true" class="text-xs" />
+                        </div>
+                        <p class="text-sm text-surface-600 dark:text-surface-400">
+                            Comprehensive weekly analytics and insights about your webhook performance
+                        </p>
+                    </div>
+                    <div class="flex items-center ml-4">
+                        <p-toggleswitch formControlName="weeklyReports" styleClass="rounded-full!" />
+                    </div>
+                </div>
+            </div>
+        </p-card>
+
+        <!-- Notification Preferences -->
+        <p-card header="Notification Preferences"
+            class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Email Frequency -->
+                <div class="flex flex-col gap-2">
+                    <label class="font-semibold text-surface-900 dark:text-surface-0">Email Frequency</label>
+                    <p-select formControlName="emailFrequency" [options]="frequencyOptions" optionLabel="label"
+                        optionValue="value" placeholder="Select frequency" styleClass="w-full rounded-xl!"
+                        panelStyleClass="rounded-xl!" />
+                </div>
+
+                <!-- Quiet Hours -->
+                <div class="flex flex-col gap-2">
+                    <label class="font-semibold text-surface-900 dark:text-surface-0">Quiet Hours</label>
+                    <p-select formControlName="quietHours" [options]="quietHoursOptions" optionLabel="label"
+                        optionValue="value" placeholder="Select quiet hours" styleClass="w-full rounded-xl!"
+                        panelStyleClass="rounded-xl!" />
+                </div>
+            </div>
+        </p-card>
+    </form>
+
+</div>
+
+<!-- Toast for notifications -->
+<p-toast />

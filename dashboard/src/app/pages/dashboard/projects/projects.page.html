@@ -1,0 +1,179 @@
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+        <div>
+            <h1 class="text-2xl font-bold">Projects</h1>
+            <p class="opacity-80">Manage your workspace projects and environments</p>
+        </div>
+        <div class="flex items-center gap-4">
+             <p-button 
+                label="Refresh" 
+                icon="pi pi-refresh" 
+                size="small" 
+                severity="secondary" 
+                [outlined]="true" 
+                (onClick)="loadProjects()" 
+                [loading]="loading"
+                styleClass="rounded-xl!" />
+             <p-button 
+                label="New Project" 
+                icon="pi pi-plus" 
+                size="small" 
+                (onClick)="openNew()"
+                styleClass="rounded-xl!" />
+        </div>
+    </div>
+
+    <!-- Filter and Search -->
+    <!-- <p-card class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+        <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+             <p-iconfield iconPosition="left" class="w-full md:w-auto">
+                <p-inputicon>
+                    <i class="pi pi-search"></i>
+                </p-inputicon>
+                <input 
+                    pInputText 
+                    type="text" 
+                    [(ngModel)]="searchQuery" 
+                    (input)="onSearch()" 
+                    placeholder="Search projects..." 
+                    class="w-full md:w-80 rounded-xl!" />
+            </p-iconfield>
+        </div>
+    </p-card> -->
+
+    <!-- Table -->
+    <p-card class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+        <p-table [value]="projects" [loading]="loading" [rowHover]="true" [paginator]="true" [rows]="10" dataKey="_id">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="name" class="rounded-xl! border-none!">
+                        <div class="flex items-center gap-2">Name <p-sortIcon field="name" /></div>
+                    </th>
+                     <th class="rounded-xl! border-none!">Description</th>
+                    <th pSortableColumn="createdAt" class="rounded-xl! border-none!">
+                        <div class="flex items-center gap-2">Created <p-sortIcon field="createdAt" /></div>
+                    </th>
+                    <th class="rounded-xl! border-none! text-center" style="width: 150px">Actions</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-project>
+                <tr>
+                    <td>
+                        <span class="font-bold text-surface-900 dark:text-surface-0">{{ project.name }}</span>
+                    </td>
+                    <td>
+                        <span class="text-surface-600 dark:text-surface-400">{{ project.description || '-' }}</span>
+                    </td>
+                     <td>
+                        <span class="text-sm text-surface-500">{{ project.createdAt | date:'mediumDate' }}</span>
+                    </td>
+                    <td>
+                        <div class="flex justify-center gap-2">
+                            <p-button 
+                                icon="pi pi-pencil" 
+                                [outlined]="true" 
+                                size="small" 
+                                severity="secondary" 
+                                styleClass="rounded-xl!" 
+                                (onClick)="editProject(project)" 
+                                pTooltip="Edit" />
+                            <p-button 
+                                icon="pi pi-trash" 
+                                [outlined]="true" 
+                                size="small" 
+                                severity="danger" 
+                                styleClass="rounded-xl!" 
+                                (onClick)="deleteProject(project)" 
+                                pTooltip="Delete" />
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+             <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="4" class="text-center py-12!">
+                        <div class="flex flex-col items-center gap-4">
+                            <i class="icon-[hugeicons--dashboard-square-01] text-6xl! text-surface-400"></i>
+                            <div class="text-lg! font-semibold text-surface-500">No projects found.</div>
+                            <p-button label="Create Project" severity="primary" styleClass="rounded-xl!" size="small" (onClick)="openNew()" />
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </p-card>
+</div>
+
+<!-- Create/Edit Dialog -->
+<p-dialog 
+    [(visible)]="projectDialog" 
+    [style]="{ width: '450px' }" 
+    [header]="isEdit ? 'Edit Project' : 'New Project'" 
+    [modal]="true" 
+    styleClass="p-fluid rounded-2xl!"
+    [draggable]="false"
+    [resizable]="false">
+    <ng-template pTemplate="content">
+        <div class="flex flex-col gap-4 mt-2">
+            <div class="flex flex-col gap-2">
+                <label for="name" class="font-bold">Name</label>
+                <input type="text" pInputText id="name" [(ngModel)]="projectForm.name" required autofocus />
+                <small class="text-red-500" *ngIf="!projectForm.name">Name is required.</small>
+            </div>
+            <div class="flex flex-col gap-2">
+                <label for="description" class="font-bold">Description</label>
+                <textarea id="description" pInputTextarea [(ngModel)]="projectForm.description" required rows="3" cols="20"></textarea>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <p-button label="Cancel" icon="pi pi-times" [text]="true" severity="secondary" (onClick)="hideDialog()" styleClass="rounded-xl!" />
+        <p-button label="Save" icon="pi pi-check" (onClick)="saveProject()" [disabled]="!projectForm.name" styleClass="rounded-xl!" />
+        <!-- <p-button label="Cancel" icon="pi pi-times" [text]="true" (onClick)="hideDialog()" />
+        <p-button label="Save" icon="pi pi-check" [text]="true" (onClick)="saveProject()" [disabled]="!projectForm.name" /> -->
+    </ng-template>
+</p-dialog>
+
+<p-confirmDialog #cd styleClass="rounded-2xl!">
+    <ng-template #headless let-message let-onAccept="onAccept" let-onReject="onReject">
+        <div
+            class="flex flex-col items-center p-8 bg-surface-0 dark:bg-surface-900 rounded-2xl! border border-surface-200 dark:border-surface-700 shadow-lg max-w-md mx-auto">
+            <!-- Danger Icon Circle -->
+            <div
+                class="rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 inline-flex justify-center items-center h-20 w-20 -mt-16">
+                <i class="pi pi-exclamation-triangle text-4xl!"></i>
+            </div>
+
+            <!-- Header -->
+            <h3 class="font-bold text-2xl text-surface-900 dark:text-surface-0 text-center mb-2 mt-6">
+                {{ message.header || 'Confirm Delete' }}
+            </h3>
+
+            <!-- Message -->
+            <p class="text-surface-600 dark:text-surface-400 text-center mb-6 leading-relaxed">
+                {{ message.message || 'Are you sure you want to delete this item? This action cannot be undone.' }}
+            </p>
+
+            <!-- Warning Box -->
+            <div
+                class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6 w-full">
+                <div class="flex items-start gap-3">
+                    <i class="pi pi-info-circle text-red-600 dark:text-red-400 mt-0.5 shrink-0"></i>
+                    <div class="text-sm text-red-800 dark:text-red-300">
+                        <p class="font-medium mb-1">This action is irreversible</p>
+                        <p class="opacity-90">All associated data, sources, and targets will be permanently removed.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-between w-full gap-6 mt-6">
+                <p-button label="Delete" icon="pi pi-trash" severity="danger" (onClick)="onAccept()"
+                    styleClass="w-40 rounded-xl!"></p-button>
+                <p-button label="Cancel" icon="pi pi-times" [outlined]="true" severity="secondary"
+                    (onClick)="onReject()" styleClass="w-40 rounded-xl!"></p-button>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmDialog>
+<p-toast />

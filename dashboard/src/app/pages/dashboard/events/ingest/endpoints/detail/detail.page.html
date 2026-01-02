@@ -1,0 +1,250 @@
+<div class="space-y-6">
+    <!-- Header -->
+    <div
+        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+        <!-- Left section -->
+        <div>
+            <h1 class="text-2xl font-bold">Endpoint Details</h1>
+            <p class="opacity-80">View and manage your endpoint configuration</p>
+        </div>
+
+        <!-- Right section -->
+        <div class="flex items-center gap-4">
+            <p-button label="Edit" icon="icon-[hugeicons--edit-03] size-5" styleClass="rounded-2xl!"
+                [routerLink]="'/dashboard/endpoints/' + endpoint()._id + '/edit'" />
+            <p-button label="Back" icon="pi pi-arrow-left" [outlined]="true" severity="secondary"
+                styleClass="rounded-2xl!" routerLink="/dashboard/events/ingest/endpoints" />
+        </div>
+    </div>
+
+    <!-- Basic Information -->
+    <p-card header="Basic Information"
+        class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Name -->
+            <div class="flex flex-col gap-2">
+                <label class="font-semibold text-surface-900 dark:text-surface-0">Name</label>
+                <div
+                    class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700">
+                    {{endpoint().name}}
+                </div>
+            </div>
+
+            <!-- Status -->
+            <div class="flex flex-col gap-2">
+                <label class="font-semibold text-surface-900 dark:text-surface-0">Status</label>
+                <div class="flex items-center">
+                    <p-tag [value]="endpoint().status" [severity]="getStatusSeverity(endpoint().status || '')"
+                        class="text-sm font-medium" [rounded]="true" />
+                </div>
+            </div>
+
+            <!-- URL -->
+            <div class="flex flex-col gap-2 md:col-span-2">
+                <label class="font-semibold text-surface-900 dark:text-surface-0">URL</label>
+                <div class="flex items-center gap-2">
+                    <div
+                        class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700 flex-1 font-mono text-sm break-all">
+                        {{endpoint().url}}
+                    </div>
+                    <p-button icon="pi pi-copy" [outlined]="true" size="small" styleClass="rounded-xl!"
+                        pTooltip="Copy URL" tooltipStyleClass="text-xs! rounded-xl!" tooltipPosition="top"
+                        (onClick)="copyToClipboard(endpoint().url || '')" />
+                </div>
+            </div>
+        </div>
+    </p-card>
+
+    <!-- Configuration Details -->
+    <p-card header="Configuration Details"
+        class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Method -->
+            <div class="flex flex-col gap-2">
+                <label class="font-semibold text-surface-900 dark:text-surface-0">Method</label>
+                <p-tag [value]="endpoint().method" severity="info" class="text-sm font-medium w-fit"
+                    [rounded]="true" />
+            </div>
+
+            <!-- Timeout -->
+            <div class="flex flex-col gap-2">
+                <label class="font-semibold text-surface-900 dark:text-surface-0">Timeout</label>
+                <div
+                    class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700">
+                    {{endpoint().config?.timeout}} ms
+                </div>
+            </div>
+
+            <!-- Retry Count -->
+            <div class="flex flex-col gap-2">
+                <label class="font-semibold text-surface-900 dark:text-surface-0">Retry Count</label>
+                <div
+                    class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700">
+                    {{endpoint().config?.retryCount}} attempts
+                </div>
+            </div>
+
+            <!-- Rate Limit -->
+            <div class="flex flex-col gap-2">
+                <label class="font-semibold text-surface-900 dark:text-surface-0">Rate Limit</label>
+                <div
+                    class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700">
+                    {{endpoint().config?.rateLimit || 'Not set'}}{{endpoint().config?.rateLimit ? '/min' : ''}}
+                </div>
+            </div>
+
+            <!-- Enabled Status -->
+            <div class="flex flex-col gap-2">
+                <label class="font-semibold text-surface-900 dark:text-surface-0">Enabled</label>
+                <div class="flex items-center">
+                    <p-tag [value]="endpoint().enabled ? 'Yes' : 'No'"
+                        [severity]="endpoint().enabled ? 'success' : 'danger'" class="text-sm font-medium"
+                        [rounded]="true" />
+                </div>
+            </div>
+
+            <!-- Created Date -->
+            <div class="flex flex-col gap-2">
+                <label class="font-semibold text-surface-900 dark:text-surface-0">Created</label>
+                <div
+                    class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700">
+                    {{formatDate(endpoint().createAt || '')}}
+                </div>
+            </div>
+        </div>
+
+        <!-- Description -->
+        <div class="flex flex-col gap-2 mt-6" *ngIf="endpoint().description">
+            <label class="font-semibold text-surface-900 dark:text-surface-0">Description</label>
+            <div
+                class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700">
+                {{endpoint().description}}
+            </div>
+        </div>
+    </p-card>
+
+    <!-- Custom Headers -->
+    <p-card header="Custom Headers"
+        class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!"
+        *ngIf="endpoint().customHeaders && (endpoint().customHeaders | keyvalue)?.length !== 0">
+        <div class="space-y-4">
+            <div *ngFor="let header of endpoint().customHeaders | keyvalue"
+                class="flex gap-3 items-center p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700">
+                <div class="flex-1">
+                    <div class="font-semibold text-surface-900 dark:text-surface-0 text-sm mb-1">{{header.key}}</div>
+                    <div class="text-surface-600 dark:text-surface-400 text-sm font-mono break-all">{{header.value}}
+                    </div>
+                </div>
+                <p-button icon="pi pi-copy" [outlined]="true" size="small" styleClass="rounded-xl!"
+                    pTooltip="Copy header value" tooltipPosition="left" tooltipStyleClass="text-xs! rounded-xl!"
+                    (onClick)="copyToClipboard(header.value)" />
+            </div>
+        </div>
+    </p-card>
+
+    <!-- Empty state for headers -->
+    <p-card header="Custom Headers"
+        class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!"
+        *ngIf="!endpoint().customHeaders || (endpoint().customHeaders | keyvalue)?.length === 0">
+        <div class="text-center py-8">
+            <i class="pi pi-info-circle text-4xl text-surface-400 dark:text-surface-500 mb-4"></i>
+            <p class="text-surface-600 dark:text-surface-400 mb-4">No custom headers configured</p>
+            <p-button label="Add Headers" icon="pi pi-plus" [outlined]="true" styleClass="rounded-xl!"
+                [routerLink]="'/dashboard/endpoints/' + endpoint()._id + '/edit'" />
+        </div>
+    </p-card>
+
+    <!-- Recent Activity/Stats - Commented out as requested -->
+    <!--
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" *ngIf="endpoint()?.stats">
+        Total Requests Card
+        <div
+            class="p-6 rounded-2xl bg-surface-0 dark:bg-surface-950 border border-surface-200 dark:border-surface-700 flex flex-col gap-2">
+            <div class="flex items-start gap-2 justify-between">
+                <span class="text-xl font-light leading-tight">
+                    Total Requests
+                </span>
+                <span
+                    class="shrink-0 bg-primary-100 dark:bg-primary-400/20 text-primary rounded-lg w-8 h-8 flex items-center justify-center border border-primary-200 dark:border-primary-400/40">
+                    <i class="pi pi-chart-bar text-xl! leading-none!"></i>
+                </span>
+            </div>
+            <div class="flex flex-col gap-1 w-full">
+                <div class="text-3xl font-medium leading-tight">
+                    {{endpoint()?.stats?.totalRequests}}
+                </div>
+                <div class="text-surface-600 dark:text-surface-400 text-sm leading-tight">
+                    {{ endpoint()?.stats?.totalRequests === 1 ? 'Request processed' : 'Requests processed' }}
+                </div>
+            </div>
+        </div>
+
+        Successful Requests Card
+        <div
+            class="p-6 rounded-2xl bg-surface-0 dark:bg-surface-950 border border-surface-200 dark:border-surface-700 flex flex-col gap-2">
+            <div class="flex items-start gap-2 justify-between">
+                <span class="text-xl font-light leading-tight">
+                    Successful
+                </span>
+                <span
+                    class="shrink-0 bg-green-100 dark:bg-green-400/20 text-green-600 dark:text-green-400 rounded-lg w-8 h-8 flex items-center justify-center border border-green-200 dark:border-green-400/40">
+                    <i class="pi pi-check-circle text-xl! leading-none!"></i>
+                </span>
+            </div>
+            <div class="flex flex-col gap-1 w-full">
+                <div class="text-3xl font-medium leading-tight">
+                    {{endpoint()?.stats?.successfulRequests}}
+                </div>
+                <div class="text-surface-600 dark:text-surface-400 text-sm leading-tight">
+                    {{getSuccessRate()}}% success rate
+                </div>
+            </div>
+        </div>
+
+        Failed Requests Card
+        <div
+            class="p-6 rounded-2xl bg-surface-0 dark:bg-surface-950 border border-surface-200 dark:border-surface-700 flex flex-col gap-2">
+            <div class="flex items-start gap-2 justify-between">
+                <span class="text-xl font-light leading-tight">
+                    Failed
+                </span>
+                <span
+                    class="shrink-0 bg-red-100 dark:bg-red-400/20 text-red-600 dark:text-red-400 rounded-lg w-8 h-8 flex items-center justify-center border border-red-200 dark:border-red-400/40">
+                    <i class="pi pi-times-circle text-xl! leading-none!"></i>
+                </span>
+            </div>
+            <div class="flex flex-col gap-1 w-full">
+                <div class="text-3xl font-medium leading-tight">
+                    {{endpoint()?.stats?.failedRequests}}
+                </div>
+                <div class="text-surface-600 dark:text-surface-400 text-sm leading-tight">
+                    {{ endpoint()?.stats?.failedRequests === 1 ? 'Request failed' : 'Requests failed' }}
+                </div>
+            </div>
+        </div>
+
+        Average Response Time Card
+        <div
+            class="p-6 rounded-2xl bg-surface-0 dark:bg-surface-950 border border-surface-200 dark:border-surface-700 flex flex-col gap-2">
+            <div class="flex items-start gap-2 justify-between">
+                <span class="text-xl font-light leading-tight">
+                    Avg Response
+                </span>
+                <span
+                    class="shrink-0 bg-blue-100 dark:bg-blue-400/20 text-blue-600 dark:text-blue-400 rounded-lg w-8 h-8 flex items-center justify-center border border-blue-200 dark:border-blue-400/40">
+                    <i class="pi pi-clock text-xl! leading-none!"></i>
+                </span>
+            </div>
+            <div class="flex flex-col gap-1 w-full">
+                <div class="text-3xl font-medium leading-tight">
+                    {{endpoint()?.stats?.avgResponseTime}}ms
+                </div>
+                <div class="text-surface-600 dark:text-surface-400 text-sm leading-tight">
+                    Average response time
+                </div>
+            </div>
+        </div>
+    </div>
+    -->
+</div>
+  

@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=Dosis:wght@200..800&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Quicksand:wght@300..700&display=swap');
+@import "tailwindcss";
+@import "tailwindcss-primeui";
+
+@custom-variant dark (&:where(.p-dark, .p-dark *));
+
+:root {
+  --p-inputtext-border-radius: 12px !important;
+}
+@layer base {
+  html, :host {
+    font-family: "Quicksand", "sans-serif" !important;
+  }
+  
+}
+
+.p-datatable-mask {
+  @apply backdrop-blur-sm! bg-surface-0/20! dark:bg-surface-900/20!;
+}
+
+.p-datatable-loading-icon {
+  @apply text-primary!;
+}
+
+@theme {
+  --font-weight-semibold: 700 !important;
+  --font-weight-medium: 600  !important;
+  --font-weight-base: 500 !important;
+}
