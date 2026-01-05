@@ -1,0 +1,120 @@
+import { randomUUID } from "crypto";
+import * as dotenv from "dotenv";
+import { AckPolicy, DeliverPolicy } from "nats";
+
+// Load environment variables
+dotenv.config();
+
+// Validate required environment variables
+const requiredEnvVars = ["MONGODB_URI", "REDIS_HOST", "REDIS_PORT"];
+
+const missingEnvVars = requiredEnvVars.filter((envVar) => !process.env[envVar]);
+
+if (missingEnvVars.length > 0) {
+    throw new Error(
+        `Missing required environment variables: ${missingEnvVars.join(", ")}`,
+    );
+}
+
+/**
+ * @title Worker Configuration
+ * @description Worker-wide configuration object, including server, security, upload, and other settings. Loaded from environment variables.
+ *
+ * @example
+ * import { config } from '@/config';
+ * console.log(config.server.port);
+ */
+export const config = {
+    // Database Configuration
+    database: {
+        uri: process.env.MONGODB_URI!,
+        dbName: process.env.DB_NAME!,
+    },
+
+    clickhouse: {
+        url: process.env.CLICKHOUSE_URL || "http://127.0.0.1:8123",
+        username: process.env.CLICKHOUSE_USERNAME || "nxion",
+        password: process.env.CLICKHOUSE_PASSWORD || "password",
+        database: process.env.CLICKHOUSE_DATABASE || "default",
+    },
+
+    // Redis Configuration
+    redis: {
+        url: process.env.REDIS_URL,
+        host: process.env.REDIS_HOST!,
+        port: parseInt(process.env.REDIS_PORT!),
+        password: process.env.REDIS_PASSWORD,
+        db: parseInt(process.env.REDIS_DB || "0"),
+        queue: {
+            url: process.env.QUEUE_REDIS_URL || process.env.REDIS_URL!,
+            host: process.env.QUEUE_REDIS_HOST || process.env.REDIS_HOST!,
+            port: parseInt(
+                process.env.QUEUE_REDIS_PORT || process.env.REDIS_PORT!,
+            ),
+            password:
+                process.env.QUEUE_REDIS_PASSWORD || process.env.REDIS_PASSWORD,
+            db: parseInt(process.env.QUEUE_REDIS_DB || "1"),
+        },
+    },
+
+    encryptions: {
+        key: process.env.ENCRYPT_KEY!,
+    },
+
+    // NATS Configuration
+    nats: {
+        servers: process.env.NATS_SERVERS?.split(",") || [
+            "nats://localhost:4222",
+        ],
+        user: process.env.NATS_USER || "worker",
+        password: process.env.NATS_PASSWORD || "workerPass",
+        maxReconnectAttempts: parseInt(
+            process.env.NATS_MAX_RECONNECT_ATTEMPTS || "10",
+        ),
+        reconnectTimeWait: parseInt(
+            process.env.NATS_RECONNECT_TIME_WAIT || "2000",
+        ),
+        timeout: parseInt(process.env.NATS_TIMEOUT || "20000"),
+    },
+
+    // Logging Configuration
+    logging: {
+        level: process.env.LOG_LEVEL || "info",
+        file: process.env.LOG_FILE,
+        errorFile: process.env.ERROR_LOG_FILE,
+    },
+
+    // Development Configuration
+    isDevelopment: process.env.NODE_ENV === "development",
+    isProduction: process.env.NODE_ENV === "production",
+    isTest: process.env.NODE_ENV === "test",
+};
+
+/**
+ * @title Validate Worker Configuration
+ * @description Validates the application configuration and throws an error if any required config is missing or invalid.
+ * @returns {void}
+ * @throws {Error} If configuration is invalid.
+ * @example
+ * validateConfig();
+ */
+export function validateConfig(): void {
+    const errors: string[] = [];
+
+    // Validate Redis port
+    if (
+        isNaN(config.redis.port) ||
+        config.redis.port < 1 ||
+        config.redis.port > 65535
+    ) {
+        errors.push("Invalid Redis port");
+    }
+
+    if (errors.length > 0) {
+        throw new Error(
+            `Configuration validation failed: ${errors.join(", ")}`,
+        );
+    }
+}
+
+export default config;

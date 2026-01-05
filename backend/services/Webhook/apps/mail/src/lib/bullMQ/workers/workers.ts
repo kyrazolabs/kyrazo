@@ -1,0 +1,1 @@
+import "./paypal/worker.js";

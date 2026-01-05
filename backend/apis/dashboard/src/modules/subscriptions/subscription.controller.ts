@@ -1,0 +1,428 @@
+import { AppContext } from '@/core/middlewares/auth.middleware';
+import { IErrorResponse } from '@kyrazo/shared';
+import { logger } from '@/configs';
+import { subscriptionService } from './subscription.service';
+import { paymentService } from '../payments/payment.service';
+import { planService } from '../plans/plan.service';
+import {
+    CreateSubscriptionInput,
+    ChangePlanInput,
+    CancelSubscriptionInput,
+    GetSubscriptionByIdInput,
+} from './subscription.dto';
+
+export class SubscriptionController {
+    static async createSubscription(c: AppContext): Promise<Response> {
+        try {
+            const userId = c.user?.userId;
+            const workspace = c.workspace;
+
+            if (!userId || !workspace) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'UNAUTHORIZED_USER',
+                            message: 'Unauthorized user',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    401
+                );
+            }
+
+            const body = await c.req.json();
+            const valid = body as CreateSubscriptionInput;
+
+            const subscription =
+                await subscriptionService.createSubscriptionCheckout(
+                    workspace.workspaceId.toString(),
+                    userId,
+                    valid
+                );
+
+            return c.json(
+                {
+                    success: true,
+                    message: 'Subscription created successfully',
+                    data: subscription,
+                },
+                201
+            );
+        } catch (error: unknown) {
+            logger.error(
+                'Unexpected error in SubscriptionController.createSubscription',
+                error as Error
+            );
+
+            const message =
+                error instanceof Error
+                    ? error.message
+                    : 'Failed to create subscription';
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'CREATE_SUBSCRIPTION_FAILED',
+                        message,
+                        requestId: c.get('requestId'),
+                    },
+                },
+                500
+            );
+        }
+    }
+
+    static async getSubscription(c: AppContext): Promise<Response> {
+        try {
+            const workspace = c.workspace;
+            const { id } = c.req.param() as GetSubscriptionByIdInput;
+
+            if (!workspace) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'UNAUTHORIZED_USER',
+                            message: 'Unauthorized user',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    401
+                );
+            }
+
+            const subscription =
+                await subscriptionService.getSubscriptionById(id);
+
+            if (!subscription) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'SUBSCRIPTION_NOT_FOUND',
+                            message: 'Subscription not found',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    404
+                );
+            }
+
+            // Check if subscription belongs to workspace
+            if (
+                subscription.workspaceId.toString() !==
+                workspace.workspaceId.toString()
+            ) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'ACCESS_DENIED',
+                            message: 'Access denied',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    403
+                );
+            }
+
+            return c.json(
+                {
+                    success: true,
+                    data: subscription,
+                },
+                200
+            );
+        } catch (error: unknown) {
+            logger.error(
+                'Unexpected error in SubscriptionController.getSubscription',
+                error as Error
+            );
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'GET_SUBSCRIPTION_FAILED',
+                        message: 'Failed to get subscription',
+                        requestId: c.get('requestId'),
+                    },
+                },
+                500
+            );
+        }
+    }
+
+    static async getWorkspaceSubscriptions(c: AppContext): Promise<Response> {
+        try {
+            const workspace = c.workspace;
+
+            if (!workspace) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'UNAUTHORIZED_USER',
+                            message: 'Unauthorized user',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    401
+                );
+            }
+
+            const subscriptions =
+                await subscriptionService.getWorkspaceSubscriptions(
+                    workspace.workspaceId.toString()
+                );
+
+            return c.json(
+                {
+                    success: true,
+                    data: subscriptions,
+                },
+                200
+            );
+        } catch (error: unknown) {
+            logger.error(
+                'Unexpected error in SubscriptionController.getWorkspaceSubscriptions',
+                error as Error
+            );
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'GET_SUBSCRIPTIONS_FAILED',
+                        message: 'Failed to get subscriptions',
+                        requestId: c.get('requestId'),
+                    },
+                },
+                500
+            );
+        }
+    }
+
+    static async changePlan(c: AppContext): Promise<Response> {
+        try {
+            const workspace = c.workspace;
+            const { id } = c.req.param();
+
+            if (!workspace) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'UNAUTHORIZED_USER',
+                            message: 'Unauthorized user',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    401
+                );
+            }
+
+            const body = await c.req.json();
+            const valid = body as ChangePlanInput;
+
+            const subscription = await subscriptionService.changePlan(
+                id,
+                valid
+            );
+
+            if (!subscription) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'SUBSCRIPTION_NOT_FOUND',
+                            message: 'Subscription not found',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    404
+                );
+            }
+
+            // If the NEW plan is a paid plan, we should generate an invoice/payment link
+            let paymentUrl: string | undefined;
+            if (subscription.planSnapshot?.priceCents > 0) {
+                try {
+                    const invoice = await paymentService.createRenewalInvoice(
+                        workspace.workspaceId.toString(),
+                        subscription._id.toString(),
+                        [
+                            {
+                                amount: subscription.planSnapshot.priceCents,
+                                description: `Upgrade to ${subscription.planSnapshot.name} Plan`,
+                            },
+                        ]
+                    );
+                    paymentUrl = (invoice as any).hosted_invoice_url;
+                } catch (payError) {
+                    logger.error(
+                        'Failed to generate upgrade invoice:',
+                        payError as Error
+                    );
+                }
+            }
+
+            const resData: any = subscription.toJSON
+                ? subscription.toJSON()
+                : subscription;
+
+            return c.json(
+                {
+                    success: true,
+                    message: 'Plan changed successfully',
+                    data: {
+                        ...resData,
+                        paymentUrl,
+                    },
+                },
+                200
+            );
+        } catch (error: unknown) {
+            logger.error(
+                'Unexpected error in SubscriptionController.changePlan',
+                error as Error
+            );
+
+            const message =
+                error instanceof Error
+                    ? error.message
+                    : 'Failed to change plan';
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'CHANGE_PLAN_FAILED',
+                        message,
+                        requestId: c.get('requestId'),
+                    },
+                },
+                500
+            );
+        }
+    }
+
+    static async cancelSubscription(c: AppContext): Promise<Response> {
+        try {
+            const workspace = c.workspace;
+            const { id } = c.req.param();
+
+            if (!workspace) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'UNAUTHORIZED_USER',
+                            message: 'Unauthorized user',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    401
+                );
+            }
+
+            const body = await c.req.json();
+            const valid = body as CancelSubscriptionInput;
+
+            const subscription = await subscriptionService.cancelSubscription(
+                id,
+                valid
+            );
+
+            if (!subscription) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'SUBSCRIPTION_NOT_FOUND',
+                            message: 'Subscription not found',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    404
+                );
+            }
+
+            return c.json(
+                {
+                    success: true,
+                    message: 'Subscription canceled successfully',
+                    data: subscription,
+                },
+                200
+            );
+        } catch (error: unknown) {
+            logger.error(
+                'Unexpected error in SubscriptionController.cancelSubscription',
+                error as Error
+            );
+
+            const message =
+                error instanceof Error
+                    ? error.message
+                    : 'Failed to cancel subscription';
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'CANCEL_SUBSCRIPTION_FAILED',
+                        message,
+                        requestId: c.get('requestId'),
+                    },
+                },
+                500
+            );
+        }
+    }
+
+    static async checkLimits(c: AppContext): Promise<Response> {
+        try {
+            const workspace = c.workspace;
+
+            if (!workspace) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'UNAUTHORIZED_USER',
+                            message: 'Unauthorized user',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    401
+                );
+            }
+
+            const limits = await subscriptionService.checkWorkspaceLimits(
+                workspace.workspaceId.toString()
+            );
+
+            return c.json(
+                {
+                    success: true,
+                    data: { limits },
+                },
+                200
+            );
+        } catch (error: unknown) {
+            logger.error(
+                'Unexpected error in SubscriptionController.checkLimits',
+                error as Error
+            );
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'CHECK_LIMITS_FAILED',
+                        message: 'Failed to check limits',
+                        requestId: c.get('requestId'),
+                    },
+                },
+                500
+            );
+        }
+    }
+}

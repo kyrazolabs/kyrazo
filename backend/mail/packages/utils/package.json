@@ -1,0 +1,26 @@
+{
+  "name": "@mailq/utils",
+  "version": "0.0.1",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./build/index.js",
+      "type": "./build/index.d.ts"
+    },
+    "./zod": {
+      "import": "./build/lib/zod/index.js",
+      "type": "./build/lib/zod/index.d.ts"
+    }
+  },
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc && tsc-alias"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "tsc-alias": "^1.8.16",
+    "tsx": "^4.20.4",
+    "typescript": "^5.9.2",
+    "zod": "^4.0.17"
+  }
+}

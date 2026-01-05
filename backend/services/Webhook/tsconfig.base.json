@@ -1,0 +1,40 @@
+{
+  // The "compilerOptions" section configures how TypeScript compiles your code.
+  "compilerOptions": {
+    // Sets the JavaScript version for output files. "ES2020" enables modern JS features.
+    "target": "ES2020",
+
+    // Specifies the module system. "NodeNext" supports both ES modules and CommonJS, matching Node.js behavior.
+    "module": "NodeNext",
+
+    // Determines how modules are resolved. "NodeNext" aligns with Node.js's resolution for both ESM and CommonJS.
+    "moduleResolution": "NodeNext",
+
+    // Enables all strict type-checking options for safer, more predictable code.
+    "strict": true,
+
+    // Required for project references. Generates additional metadata for incremental builds.
+    // "composite": true,
+
+    // Generates .d.ts files for type declarations, allowing type sharing between packages.
+    "declaration": true,
+
+    // Generates .d.ts.map files for declaration files, enabling editors to map types back to source for better navigation and debugging.
+    "declarationMap": true,
+
+    // Emits .js.map files for debugging, letting you trace errors back to TypeScript source in debuggers.
+    "sourceMap": true,
+
+    // Improves compatibility with CommonJS modules, allowing default imports from modules without a default export.
+    "esModuleInterop": true,
+
+    // Skips type-checking of declaration files from node_modules, speeding up compilation.
+    "skipLibCheck": true,
+
+    // Ensures file imports use consistent casing, preventing OS-specific bugs (e.g., between Windows and Linux).
+    "forceConsistentCasingInFileNames": true,
+
+    // Sets the root directory for module resolution, simplifying import paths.
+    "baseUrl": ".",
+  }
+}

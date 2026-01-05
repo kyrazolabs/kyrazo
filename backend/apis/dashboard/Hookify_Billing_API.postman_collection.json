@@ -1,0 +1,479 @@
+{
+	"info": {
+		"_postman_id": "dashboard-api-collection",
+		"name": "Hookify Dashboard API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Plans",
+			"item": [
+				{
+					"name": "Create Plan",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Pro Plan\",\n    \"slug\": \"pro-plan\",\n    \"description\": \"Professional plan for growing teams\",\n    \"priceCents\": 2900,\n    \"currency\": \"USD\",\n    \"interval\": \"month\",\n    \"features\": {\n        \"sso\": true,\n        \"audit_logs\": true\n    },\n    \"limits\": {\n        \"eventsPerSecond\": 100,\n        \"eventsPerMonth\": 100000,\n        \"maxProjects\": 10,\n        \"maxMembers\": 5,\n        \"maxConnectors\": 20,\n        \"maxIntegrations\": 20,\n        \"maxConcurrent\": 50\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base}}/v1/plans",
+							"host": [
+								"{{base}}"
+							],
+							"path": [
+								"plans"
+							]
+						}
+					}
+				},
+				{
+					"name": "List Plans",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base}}/v1/plans?active=true&limit=10&offset=0",
+							"host": [
+								"{{base}}"
+							],
+							"path": [
+								"plans"
+							],
+							"query": [
+								{
+									"key": "active",
+									"value": "true"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Plan by Slug",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base}}/v1/plans/:slug",
+							"host": [
+								"{{base}}"
+							],
+							"path": [
+								"plans",
+								":slug"
+							],
+							"variable": [
+								{
+									"key": "slug",
+									"value": "pro-plan"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Plan",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Pro Plan Updated\",\n    \"priceCents\": 3900\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base}}/v1/plans/:id",
+							"host": [
+								"{{base}}"
+							],
+							"path": [
+								"plans",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "plan_id_here"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Plan",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base}}/v1/plans/:id",
+							"host": [
+								"{{base}}"
+							],
+							"path": [
+								"plans",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "plan_id_here"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Regenerate Stripe Price",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base}}/v1/plans/:id/regenerate-stripe-price",
+							"host": [
+								"{{base}}"
+							],
+							"path": [
+								"plans",
+								":id",
+								"regenerate-stripe-price"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "plan_id_here"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Fix All Stripe Prices",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base}}/v1/plans/fix-stripe-prices",
+							"host": [
+								"{{base}}"
+							],
+							"path": [
+								"plans",
+								"fix-stripe-prices"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Subscriptions",
+			"item": [
+				{
+					"name": "Create Subscription (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"planId\": \"plan_id_here\",\n    \"quantity\": 1,\n    \"metadata\": {}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base}}/v1/subscriptions",
+							"host": [
+								"{{base}}"
+							],
+							"path": [
+								"subscriptions"
+							]
+						}
+					}
+				},
+				{
+					"name": "List Subscriptions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base}}/v1/subscriptions",
+							"host": [
+								"{{base}}"
+							],
+							"path": [
+								"subscriptions"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Subscription Limits",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base}}/v1/subscriptions/limits",
+							"host": [
+								"{{base}}"
+							],
+							"path": [
+								"subscriptions",
+								"limits"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Subscription",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base}}/v1/subscriptions/:id",
+							"host": [
+								"{{base}}"
+							],
+							"path": [
+								"subscriptions",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "sub_id_here"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Change Plan",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"planId\": \"new_plan_id_here\",\n    \"prorate\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base}}/v1/subscriptions/:id/change-plan",
+							"host": [
+								"{{base}}"
+							],
+							"path": [
+								"subscriptions",
+								":id",
+								"change-plan"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "sub_id_here"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Cancel Subscription",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cancelAtPeriodEnd\": false,\n    \"reason\": \"No longer needed\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base}}/v1/subscriptions/:id/cancel",
+							"host": [
+								"{{base}}"
+							],
+							"path": [
+								"subscriptions",
+								":id",
+								"cancel"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "sub_id_here"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Payments",
+			"item": [
+				{
+					"name": "Subscribe (Start Payment)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"planId\": \"plan_id_here\",\n    \"quantity\": 1,\n    \"metadata\": {}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base}}/v1/payments/subscribe",
+							"host": [
+								"{{base}}"
+							],
+							"path": [
+								"payments",
+								"subscribe"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Billing Portal Session",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"returnUrl\": \"http://localhost:4200/dashboard/settings\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base}}/v1/payments/portal",
+							"host": [
+								"{{base}}"
+							],
+							"path": [
+								"payments",
+								"portal"
+							]
+						}
+					}
+				},
+				{
+					"name": "Webhook (Stripe)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Stripe-Signature",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"evt_test_webhook\",\n    \"object\": \"event\",\n    \"type\": \"payment_intent.succeeded\",\n    \"data\": {\n        \"object\": {\n            \"id\": \"pi_test\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base}}/v1/payments/webhook",
+							"host": [
+								"{{base}}"
+							],
+							"path": [
+								"payments",
+								"webhook"
+							]
+						}
+					}
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"pm.request.headers.add({key: 'x-workspace-id', value: pm.environment.get('workspaceId') });"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base",
+			"value": "http://localhost:3000/v1",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "workspaceId",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

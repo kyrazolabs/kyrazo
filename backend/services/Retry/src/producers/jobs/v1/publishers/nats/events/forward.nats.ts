@@ -1,0 +1,191 @@
+import { natsConfig } from '@/configs/nats';
+import { config, logger } from '@/configs';
+import { IForwardedEvent } from '@/types';
+import { signatureCrypto } from '@/utils/libs/crypto';
+import { CreateForwardEvent } from '@/utils/libs/zod';
+
+/**
+ * @title ForwardEventPublisher
+ * @description Professional NATS JetStream-based event publisher with ACK support.
+ * Replaces BullMQ with NATS JetStream for reliable event delivery.
+ */
+export class ForwardEventPublisher {
+    private static instance: ForwardEventPublisher;
+    private isInitialized = false;
+
+    /**
+     * @title ForwardEventPublisher Constructor
+     * @description Private constructor to enforce singleton pattern.
+     */
+    private constructor() {}
+
+    /**
+     * @title Get ForwardEventPublisher Instance
+     * @description Returns the singleton instance of ForwardEventPublisher.
+     * @returns {ForwardEventPublisher} The singleton instance.
+     */
+    public static getInstance(): ForwardEventPublisher {
+        if (!ForwardEventPublisher.instance) {
+            ForwardEventPublisher.instance = new ForwardEventPublisher();
+        }
+        return ForwardEventPublisher.instance;
+    }
+
+    /**
+     * @title Initialize Publisher
+     * @description Ensures NATS connection is established and JetStream is ready.
+     * @returns {Promise<void>} Resolves when initialization is complete.
+     */
+    private async initialize(): Promise<void> {
+        if (this.isInitialized) {
+            return;
+        }
+
+        try {
+            if (!natsConfig.getConnectionStatus()) {
+                await natsConfig.connect();
+            }
+
+            await this.ensureJetStreamSetup();
+
+            this.isInitialized = true;
+            logger.info('NATS Event Publisher initialized successfully');
+        } catch (error: unknown) {
+            logger.error('Failed to initialize NATS Event Publisher ', error as Error);
+            throw error;
+        }
+    }
+
+    /**
+     * @title Ensure JetStream Setup
+     * @description Creates JetStream stream and consumer if they don't exist.
+     * @returns {Promise<void>} Resolves when setup is complete.
+     */
+    private async ensureJetStreamSetup(): Promise<void> {
+        try {
+            const jsm = natsConfig.getJetStreamManager();
+            // const js = natsConfig.getJetStreamClient();
+
+            try {
+                await jsm.streams.add({
+                    name: config.nats.consumer.stream,
+                    subjects: ['webhooks.>'],
+                });
+                logger.info('Created EVENTS JetStream stream');
+            } catch (error: unknown) {
+                const errorMessage =
+                    error instanceof Error ? error.message : 'Unknown error';
+                if (!errorMessage.includes('already exists')) {
+                    throw error;
+                }
+                logger.debug('WEBHOOKS stream already exists');
+            }
+        } catch (error: unknown) {
+            logger.error('Failed to setup JetStream ', error as Error);
+            throw error;
+        }
+    }
+
+    /**
+     * @title Forward Event
+     * @description Forwards a received event to target URL using NATS.
+     * @param {IForwardedEvent} data - The forward event data.
+     * @returns {Promise<{ success: boolean }>} The forward result.
+     */
+    public async forward(
+        data: Omit<
+            CreateForwardEvent,
+            'producerId' | 'meta' | 'associatedEventId' | 'processingStatus'
+        >
+    ): Promise<{ success: boolean }> {
+        await this.initialize();
+
+        try {
+            const js = natsConfig.getJetStreamClient();
+            const subject = `webhooks.forward.${data.source.toLowerCase()}`;
+
+            const event: Omit<
+                CreateForwardEvent,
+                'producerId' | 'meta' | 'associatedEventId' | 'processingStatus'
+            > = {
+                eventId: data.eventId,
+                source: data.source,
+                webhookType: 'forward',
+                webhookId: data.webhookId,
+                workspaceId: data.workspaceId,
+                ingressId: data.ingressId,
+                userId: data.userId,
+
+                headers: data.headers,
+                body: data.body,
+
+                targets: data.targets,
+                authenticating: data.authenticating,
+            };
+
+            const { signature, timestamp, nonce } = signatureCrypto.signMessage(
+                JSON.stringify(event),
+                config.security.encryptions.key!
+            );
+            const message = { event, signature, timestamp, nonce };
+
+            const publishResult = await js.publish(
+                subject,
+                JSON.stringify(message)
+            );
+
+            logger.info(`Forwarded event ${data.eventId} to JetStream`, {
+                subject,
+                targets: data.targets,
+                stream: publishResult.stream,
+                sequence: publishResult.seq,
+            });
+
+            return { success: true };
+        } catch (error: unknown) {
+            logger.error('Failed to send forward event via NATS ', error as Error);
+            throw error;
+        }
+    }
+
+    /**
+     * @title Get Publisher Health
+     * @description Returns the health status of the NATS publisher.
+     * @returns {Promise<{ status: string; details: Record<string, unknown> }>} Health status and details.
+     */
+    public async getHealth(): Promise<{
+        status: string;
+        details: Record<string, unknown>;
+    }> {
+        try {
+            const natsHealth = await natsConfig.healthCheck();
+            const isConnected = natsConfig.getConnectionStatus();
+
+            return {
+                status: isConnected ? 'healthy' : 'unhealthy',
+                details: {
+                    nats: natsHealth,
+                    initialized: this.isInitialized,
+                    timestamp: new Date().toISOString(),
+                },
+            };
+        } catch (error) {
+            return {
+                status: 'unhealthy',
+                details: {
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                    timestamp: new Date().toISOString(),
+                },
+            };
+        }
+    }
+}
+
+/**
+ * @title natsEventPublisher Singleton
+ * @description Exported singleton instance for use throughout the application.
+ */
+export const forwardEventPublisher = ForwardEventPublisher.getInstance();

@@ -1,0 +1,14 @@
+import { pgTable, uuid, text, integer, timestamp } from 'drizzle-orm/pg-core';
+
+export const servers = pgTable('servers', {
+    server_id: uuid('server_id').defaultRandom().primaryKey(),
+    api_key: text('api_key').notNull(), // Secret key for authentication
+    cores: integer('cores').notNull(),
+    max_workers: integer('max_workers').notNull(), // Capacity
+    active_workers: integer('active_workers').default(0).notNull(), // Current load
+    status: text('status', { enum: ['active', 'draining', 'down'] })
+        .default('active')
+        .notNull(),
+    last_heartbeat: timestamp('last_heartbeat').defaultNow().notNull(),
+    created_at: timestamp('created_at').defaultNow(),
+});

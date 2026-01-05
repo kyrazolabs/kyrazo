@@ -1,0 +1,357 @@
+{
+    "createSourceRequests": {
+        "generalServiceHMAC": {
+            "name": "Test General Source HMAC",
+            "description": "Test source with HMAC authentication for general service",
+            "type": "receive",
+            "service": "general",
+            "status": "active",
+            "forwarding": false,
+            "endpoints": [],
+            "eventTypes": [
+                "user.created",
+                "user.updated",
+                "order.placed"
+            ],
+            "retryPolicy": {
+                "maxAttempts": 3
+            },
+            "authentication": {
+                "enabled": true,
+                "type": "hmac",
+                "hmac": {
+                    "algorithm": "sha256",
+                    "encoding": "base64",
+                    "signatureHeaderKey": "X-Hook-Signature",
+                    "signingSecret": "test_source_secret_key_12345"
+                }
+            }
+        },
+        "paypalServiceAuth": {
+            "name": "PayPal Payment Source",
+            "description": "PayPal payment notifications source",
+            "type": "receive",
+            "service": "paypal",
+            "status": "active",
+            "forwarding": false,
+            "endpoints": [],
+            "eventTypes": [
+                "payment.completed",
+                "payment.failed"
+            ],
+            "retryPolicy": {
+                "maxAttempts": 5
+            },
+            "authentication": {
+                "enabled": true,
+                "type": "service",
+                "service": {
+                    "secret": "paypal_source_verification_token"
+                }
+            }
+        },
+        "stripeServiceAuth": {
+            "name": "Stripe Events Source",
+            "description": "Stripe source for payment events",
+            "type": "receive",
+            "service": "stripe",
+            "status": "active",
+            "forwarding": true,
+            "endpoints": [
+                "60f7b3b3b3b3b3b3b3b3b3b3"
+            ],
+            "eventTypes": [
+                "customer.subscription.created",
+                "invoice.payment_succeeded"
+            ],
+            "retryPolicy": {
+                "maxAttempts": 3
+            },
+            "authentication": {
+                "enabled": true,
+                "type": "service",
+                "service": {
+                    "secret": "whsec_stripe_source_secret"
+                }
+            }
+        },
+        "githubServiceAuth": {
+            "name": "GitHub Repository Events",
+            "description": "GitHub source for repository events",
+            "type": "receive",
+            "service": "github",
+            "status": "active",
+            "forwarding": false,
+            "endpoints": [],
+            "eventTypes": [
+                "push",
+                "pull_request",
+                "issues"
+            ],
+            "retryPolicy": {
+                "maxAttempts": 3
+            },
+            "authentication": {
+                "enabled": true,
+                "type": "service",
+                "service": {
+                    "secret": "github_source_secret_token"
+                }
+            }
+        },
+        "generalServiceAPIKey": {
+            "name": "API Key Authenticated Source",
+            "description": "Test source with API key authentication",
+            "type": "receive",
+            "service": "general",
+            "status": "active",
+            "forwarding": false,
+            "endpoints": [],
+            "eventTypes": [
+                "api.called",
+                "data.processed"
+            ],
+            "retryPolicy": {
+                "maxAttempts": 3
+            },
+            "authentication": {
+                "enabled": true,
+                "type": "api_key",
+                "apiKey": {
+                    "headerKey": "X-API-Key",
+                    "apiKey": "sk_test_api_key_123456789"
+                }
+            }
+        },
+        "generalServiceBasicAuth": {
+            "name": "Basic Auth Source",
+            "description": "Test source with basic authentication",
+            "type": "receive",
+            "service": "general",
+            "status": "active",
+            "forwarding": false,
+            "endpoints": [],
+            "eventTypes": [
+                "auth.test"
+            ],
+            "retryPolicy": {
+                "maxAttempts": 3
+            },
+            "authentication": {
+                "enabled": true,
+                "type": "basic_auth",
+                "basicAuth": {
+                    "username": "source_user",
+                    "password": "secure_password_123"
+                }
+            }
+        },
+        "publishSource": {
+            "name": "Publish Events Source",
+            "description": "Source for publishing events to external systems",
+            "type": "publish",
+            "service": "general",
+            "status": "active",
+            "forwarding": false,
+            "endpoints": [
+                "60f7b3b3b3b3b3b3b3b3b3b3"
+            ],
+            "eventTypes": [
+                "notification.send",
+                "email.deliver"
+            ],
+            "retryPolicy": {
+                "maxAttempts": 5
+            }
+        },
+        "forwardSource": {
+            "name": "Forward Source",
+            "description": "Source that forwards events to multiple endpoints",
+            "type": "forward",
+            "service": "stripe",
+            "status": "active",
+            "forwarding": true,
+            "endpoints": [
+                "60f7b3b3b3b3b3b3b3b3b3b3",
+                "60f7b3b3b3b3b3b3b3b3b3b4"
+            ],
+            "eventTypes": [
+                "payment.succeeded",
+                "payment.failed"
+            ],
+            "retryPolicy": {
+                "maxAttempts": 3
+            },
+            "authentication": {
+                "enabled": true,
+                "type": "service",
+                "service": {
+                    "secret": "forward_source_secret"
+                }
+            }
+        }
+    },
+    "updateSourceRequests": {
+        "updateGeneralSource": {
+            "id": "60f7b3b3b3b3b3b3b3b3b3b3",
+            "name": "Updated General Source",
+            "description": "Updated description for the source",
+            "status": "paused",
+            "type": "receive",
+            "eventTypes": [
+                "user.created",
+                "user.updated",
+                "user.deleted"
+            ],
+            "retryPolicy": {
+                "maxAttempts": 5
+            }
+        },
+        "updateAuthentication": {
+            "id": "60f7b3b3b3b3b3b3b3b3b3b3",
+            "authentication": {
+                "enabled": true,
+                "type": "hmac",
+                "hmac": {
+                    "algorithm": "sha256",
+                    "encoding": "hex",
+                    "signatureHeaderKey": "X-Signature-256",
+                    "signingSecret": "updated_secret_key_12345"
+                }
+            }
+        },
+        "partialUpdate": {
+            "id": "60f7b3b3b3b3b3b3b3b3b3b3",
+            "name": "Partially Updated Source",
+            "status": "active"
+        }
+    },
+    "invalidRequests": {
+        "missingRequiredFields": {
+            "description": "Missing required name and type fields"
+        },
+        "invalidAuthentication": {
+            "name": "Invalid Auth Source",
+            "description": "Multiple authentication types enabled",
+            "type": "receive",
+            "service": "general",
+            "status": "active",
+            "authentication": {
+                "enabled": true,
+                "type": "hmac",
+                "hmac": {
+                    "algorithm": "sha256",
+                    "encoding": "base64",
+                    "signatureHeaderKey": "X-Hook-Signature",
+                    "signingSecret": "test_secret"
+                },
+                "apiKey": {
+                    "headerKey": "X-API-Key",
+                    "apiKey": "test_api_key"
+                }
+            }
+        },
+        "invalidEventTypes": {
+            "name": "Invalid Event Types",
+            "description": "Event types too short",
+            "type": "receive",
+            "service": "general",
+            "status": "active",
+            "eventTypes": [
+                "ab",
+                "cd"
+            ]
+        },
+        "invalidServiceAuth": {
+            "name": "Invalid Service Auth",
+            "description": "Wrong auth type for service",
+            "type": "receive",
+            "service": "stripe",
+            "status": "active",
+            "authentication": {
+                "enabled": true,
+                "type": "hmac",
+                "hmac": {
+                    "algorithm": "sha256",
+                    "encoding": "base64",
+                    "signatureHeaderKey": "X-Hook-Signature",
+                    "signingSecret": "test_secret"
+                }
+            }
+        }
+    },
+    "edgeCases": {
+        "minimalSource": {
+            "name": "Min",
+            "type": "receive",
+            "service": "general",
+            "status": "active",
+            "eventTypes": [
+                "event"
+            ],
+            "retryPolicy": {
+                "maxAttempts": 1
+            },
+            "authentication": {
+                "enabled": false
+            }
+        },
+        "maximalSource": {
+            "name": "Source with maximum allowed length name for testing purposes",
+            "description": "This is a very long description that tests the maximum character limit for source descriptions in the system validation process and ensures proper handling of large text inputs",
+            "type": "receive",
+            "service": "general",
+            "status": "active",
+            "eventTypes": [
+                "very_long_event_type_name_that_tests_maximum_length"
+            ],
+            "retryPolicy": {
+                "maxAttempts": 10
+            },
+            "authentication": {
+                "enabled": true,
+                "type": "hmac",
+                "hmac": {
+                    "algorithm": "sha256",
+                    "encoding": "base64",
+                    "signatureHeaderKey": "X-Hook-Signature-256",
+                    "signingSecret": "very_long_signing_secret_that_tests_maximum_length_validation_123456789"
+                }
+            }
+        },
+        "noAuthSource": {
+            "name": "No Authentication Source",
+            "description": "Source without authentication",
+            "type": "receive",
+            "service": "general",
+            "status": "active",
+            "eventTypes": [
+                "public.event"
+            ],
+            "retryPolicy": {
+                "maxAttempts": 3
+            },
+            "authentication": {
+                "enabled": false
+            }
+        }
+    },
+    "searchAndFilter": {
+        "searchQuery": {
+            "q": "payment",
+            "status": "active",
+            "limit": 10,
+            "page": 1
+        },
+        "filterByStatus": {
+            "status": "paused",
+            "limit": 5,
+            "page": 1
+        },
+        "filterByService": {
+            "service": "stripe",
+            "limit": 10,
+            "page": 1
+        }
+    }
+}

@@ -1,0 +1,15 @@
+Stream Name EVENTS
+Subjects workspace.*.events.>
+Storage file
+Replication 3
+Retention Policy Work Queue
+Discard Policy Old
+Stream Messages Limit -1
+Per Subject Messages Limit -1
+Total Stream Size 2GB depenend on the server disk space
+Message TTL 72h
+Max Message Size 512KB
+Duplicate tracking time window 5m0s
+Allow message Roll-ups No
+Allow message deletion Yes
+Allow purging subjects or the entire stream Yes

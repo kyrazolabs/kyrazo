@@ -1,0 +1,51 @@
+{
+  "name": "scheduler",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "start": "bun run dist/index.js",
+    "dev": "bun run --hot src/index.ts",
+    "migrations:generate": "drizzle-kit generate",
+    "migrations:push": "drizzle-kit push",
+    "migrate": "drizzle-kit push",
+    "build": "tsc -p tsconfig.json",
+    "build:watch": "bun run build && bun run watch",
+    "watch": "concurrently -k -n TSC -c blue \"tsc -p tsconfig.json -w\"",
+    "rebuild": "rm -rf dist && bun run build",
+    "clean": "rm -rf dist && echo 'Done.'",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "private": true,
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@types/bun": "latest",
+    "concurrently": "^9.2.1",
+    "drizzle-kit": "^0.31.8",
+    "eslint": "^9.39.2",
+    "globals": "^16.5.0",
+    "prettier": "3.7.4",
+    "tsx": "^4.21.0",
+    "typescript-eslint": "^8.50.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@hono/zod-validator": "^0.7.5",
+    "@kyrazo/shared": "file:../../shared",
+    "@types/uuid": "^11.0.0",
+    "crypto": "^1.0.1",
+    "dotenv": "^17.2.3",
+    "drizzle-orm": "^0.45.1",
+    "hono": "^4.11.1",
+    "node-cron": "^4.2.1",
+    "pg": "^8.16.3",
+    "postgres": "^3.4.7",
+    "uuid": "^13.0.0",
+    "zod": "^4.2.1"
+  }
+}
