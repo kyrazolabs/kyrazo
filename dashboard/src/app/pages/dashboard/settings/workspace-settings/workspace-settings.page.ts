@@ -308,11 +308,12 @@ export class WorkspaceSettingsPage implements OnInit {
     }
 
     const updateData: UpdateWorkspaceMemberRoleRequest = {
+      userId: member.userId,
       role: newRole,
     };
 
     this.workspaceService
-      .updateUserRole(this.workspace._id, member.userId, updateData)
+      .updateUserRole(this.workspace._id, updateData)
       .subscribe({
         next: (response) => {
           if (response.success) {

@@ -87,7 +87,7 @@ export class SourcePage implements OnInit, AfterViewInit {
   private route = inject(ActivatedRoute);
   private sourceService = inject(SourceService);
 
-  public messageService = inject(MessageService);
+  public mes = inject(MessageService);
   private sentry = inject(SentryService);
 
   // Signals for reactive data
@@ -171,7 +171,7 @@ export class SourcePage implements OnInit, AfterViewInit {
     this.sourceService.update(source._id, { status: newStatus }).subscribe({
       next: (updatedSource) => {
         this.source.set(updatedSource.data.source);
-        this.messageService.add({
+        this.mes.add({
           severity: "success",
           summary: "Success",
           detail: `Source ${
@@ -182,7 +182,7 @@ export class SourcePage implements OnInit, AfterViewInit {
       error: (error) => {
         this.sentry.captureException(error);
         console.error("Error updating source status:", error);
-        this.messageService.add({
+        this.mes.add({
           severity: "error",
           summary: "Error",
           detail: "Failed to update source status",
@@ -361,5 +361,22 @@ export class SourcePage implements OnInit, AfterViewInit {
       minute: "2-digit",
       hour12: true,
     });
+  }
+
+  async copyToClipboard(value: string) {
+    try {
+      await navigator.clipboard.writeText(value);
+      this.mes.add({
+        severity: "success",
+        summary: "Copied to clipboard",
+        life: 2000,
+      });
+    } catch {
+      this.mes.add({
+        severity: "error",
+        summary: "Failed to copy",
+        life: 2000,
+      });
+    }
   }
 }

@@ -57,7 +57,7 @@ export class WorkspaceService {
     payload: UpdateWorkspaceRequest
   ): Observable<UpdateWorkspaceResponse> {
     return this.http
-      .put<UpdateWorkspaceResponse>(
+      .patch<UpdateWorkspaceResponse>(
         environment.workspace.update(workspaceId),
         payload
       )
@@ -158,12 +158,11 @@ export class WorkspaceService {
   // Update User Role in Workspace
   updateUserRole(
     workspaceId: string,
-    userId: string,
     payload: UpdateWorkspaceMemberRoleRequest
   ): Observable<WorkspaceActionResponse> {
     return this.http
-      .put<WorkspaceActionResponse>(
-        environment.workspace.updateMemberRole(workspaceId, userId),
+      .patch<WorkspaceActionResponse>(
+        environment.workspace.updateMemberRole(workspaceId),
         payload
       )
       .pipe(catchError(this.handleError));

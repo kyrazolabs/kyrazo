@@ -86,14 +86,6 @@ export const eventsRoutes: Routes = [
     data: { title: "New Source", animation: "ingest-targets" },
   },
   {
-    path: "ingest/sources/create/:type",
-    loadComponent: () =>
-      import("./ingest/sources/source/create/create.page").then(
-        (p) => p.CreatePage
-      ),
-    data: { title: "New Source", animation: "ingest-targets" },
-  },
-  {
     path: "ingest/sources/view/:id",
     loadComponent: () =>
       import("./ingest/sources/source/source.page").then((p) => p.SourcePage),

@@ -1,5 +1,5 @@
 // Workspace Role Enum
-export type WorkspaceRole = 'owner' | 'admin' | 'member' | 'viewer';
+export type WorkspaceRole = "owner" | "admin" | "member" | "viewer";
 
 // Workspace Interface
 export interface IWorkspace {
@@ -52,6 +52,7 @@ export interface InviteWorkspaceMemberRequest {
 }
 
 export interface UpdateWorkspaceMemberRoleRequest {
+  userId: string;
   role: WorkspaceRole;
 }
 

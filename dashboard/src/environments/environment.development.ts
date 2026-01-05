@@ -89,8 +89,8 @@ export const environment = {
       `${baseUrl}/v1/workspaces/invitations/${token}/reject`,
     removeMember: (workspaceId: string, userId: string) =>
       `${baseUrl}/v1/workspaces/${workspaceId}/members/${userId}`,
-    updateMemberRole: (workspaceId: string, userId: string) =>
-      `${baseUrl}/v1/workspaces/${workspaceId}/members/${userId}/role`,
+    updateMemberRole: (workspaceId: string) =>
+      `${baseUrl}/v1/workspaces/${workspaceId}/members/role`,
     getMembers: (id: string) => `${baseUrl}/v1/workspaces/${id}/members`,
     getInvitationDetails: (token: string) =>
       `${baseUrl}/v1/workspaces/invitations/details/${token}`,

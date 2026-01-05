@@ -97,6 +97,8 @@ export interface UpdateSourceRequest {
 
   type?: SourceType;
   eventTypes?: Array<string>;
+  forwarding?: boolean;
+  endpoints?: Array<string>;
 
   retryPolicy?: {
     maxAttempts?: number;

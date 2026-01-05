@@ -102,12 +102,6 @@ export class CreatePage implements OnInit {
 
   servicesItem = [
     {
-      label: "General",
-      value: "general",
-      icon: "icon-[lucide--webhook]",
-      subLabel: "Receive webhooks from any service",
-    },
-    {
       label: "Paypal",
       value: "paypal",
       icon: "icon-[logos--paypal]",
@@ -286,7 +280,21 @@ export class CreatePage implements OnInit {
       description: source.description || "",
       status: source.status,
       type: source.type,
+      service: source.service,
+      forwarding: source.forwarding,
+      endpoints: source.endpoints?.map((e) => e._id) || [],
     });
+
+    // Populate authentication if available (though it won't be updated)
+    if ((source as any).authentication?.service?.secret) {
+      this.sourceForm
+        .get("authentication.secret")
+        ?.patchValue((source as any).authentication.service.secret);
+    }
+
+    // Disable fields that cannot be updated
+    this.sourceForm.get("service")?.disable();
+    this.sourceForm.get("authentication.secret")?.disable();
   }
 
   addEventType() {
@@ -315,7 +323,9 @@ export class CreatePage implements OnInit {
         description: formValue.description || "",
         status: formValue.status as SourceStatus,
         type: formValue.type as SourceType,
-        eventTypes: formValue.eventTypes,
+        eventTypes: formValue.eventTypes.filter((et: string) => et.trim()),
+        forwarding: formValue.forwarding,
+        endpoints: formValue.endpoints,
       };
 
       this.sourceService.update(this.sourceId!, updateData).subscribe({
