@@ -1,16 +1,14 @@
 {
     "name": "@dashboard/api",
     "scripts": {
+        "start": "bun run src/index.ts",
         "dev": "bun run --hot src/index.ts",
-        "docs": "bun @rcmade/hono-docs generate --config ./src/hono-docs.ts",
         "tunnel": "bun run src/tunnel.ts",
-        "build:prod": "bun build --production --target=bun --outdir=dist ./src",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "format": "prettier --write .",
         "format:check": "prettier --check .",
-        "test": "bun test",
-        "clean": "rm -rf dist && echo 'Done.'"
+        "test": "bun test"
     },
     "dependencies": {
         "@arcjet/bun": "^1.0.0-beta.10",
