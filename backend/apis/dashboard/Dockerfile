@@ -53,7 +53,6 @@ RUN chown -R bun:bun /app
 # Run as non-root user for security
 USER bun
 
-
 # Expose the application port
 EXPOSE 3000
 
