@@ -53,9 +53,6 @@ RUN chown -R bun:bun /app
 # Run as non-root user for security
 USER bun
 
-# Expose the application port
-EXPOSE 3000
-
 # Healthcheck
 HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
     CMD wget -qO- http://localhost:3000/v1/health || exit 1
