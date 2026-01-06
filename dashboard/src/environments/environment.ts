@@ -1,6 +1,6 @@
 import { EndpointStatus } from "@models/endpoint.types";
 
-const baseUrl = "http://localhost:3003";
+const baseUrl = "https://kyrazo.com/api";
 
 export const environment = {
   production: true,

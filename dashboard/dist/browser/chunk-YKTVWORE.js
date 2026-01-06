@@ -1,0 +1,1 @@
+import{a as n}from"./chunk-R7ENU6SP.js";import{T as r,n as s}from"./chunk-73PELQKU.js";var d=t=>{let o=r(n),e=t.paramMap.get("id");return o.get(e).pipe(s(p=>p.data))},l=t=>r(n).gets().pipe(s(e=>e)),R=t=>{let o=r(n),e=t.paramMap.get("eventId");return o.getIngestEventById(e).pipe(s(p=>p.data))};export{d as a,l as b,R as c};
