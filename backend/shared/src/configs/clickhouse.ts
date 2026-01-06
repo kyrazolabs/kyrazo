@@ -41,7 +41,7 @@ export class ClickHouseConfig {
                 throw new Error('ClickHouse configuration is incomplete');
             }
 
-            this.client = createClient({ url, username, password, database });
+            this.client = createClient({ url });
             logger.info('ClickHouse client created, testing connection...');
 
             // Test connection

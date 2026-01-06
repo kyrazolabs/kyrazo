@@ -3,12 +3,7 @@ import { logger as honoLogger } from 'hono/logger';
 import { requestId as RequestId } from 'hono/request-id';
 import { cors } from 'hono/cors';
 
-import {
-    redisConfig,
-    logger,
-    config,
-    natsConfig /* clickhouseConfig */,
-} from './configs';
+import { redisConfig, logger, config } from './configs';
 
 import cron from 'node-cron';
 import { billingJob } from './jobs/billing.job';
@@ -85,10 +80,6 @@ const initializeConnections = async () => {
         await clickhouseConfig.connect();
         logger.info('ClickHouse connected successfully');
 
-        await natsConfig.connect().then(() => {
-            logger.info('NATS connected successfully');
-        });
-
         const serverAdapter = new HonoAdapter(serveStatic);
 
         createBullBoard({
@@ -136,15 +127,6 @@ const gracefulShutdown = async (signal: string) => {
         })
         .catch(error => {
             logger.error('Error closing Redis connection:', error);
-        });
-
-    natsConfig
-        .disconnect()
-        .then(() => {
-            logger.info('NATS connection closed');
-        })
-        .catch(error => {
-            logger.error('Error closing NATS connection:', error);
         });
 
     // Close ClickHouse connection

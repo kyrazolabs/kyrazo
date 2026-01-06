@@ -94,37 +94,6 @@ export const config = {
         },
     },
 
-    // NATS Configuration
-    nats: {
-        servers: process.env.NATS_SERVERS?.split(',') || [
-            'nats://localhost:4222',
-        ],
-        user: process.env.NATS_USER || 'admin',
-        password: process.env.NATS_PASSWORD || 'adminPass',
-        maxReconnectAttempts: parseInt(
-            process.env.NATS_MAX_RECONNECT_ATTEMPTS || '10'
-        ),
-        reconnectTimeWait: parseInt(
-            process.env.NATS_RECONNECT_TIME_WAIT || '2000'
-        ),
-        timeout: parseInt(process.env.NATS_TIMEOUT || '20000'),
-        jetstream: {
-            maxMemoryStore: process.env.NATS_JS_MAX_MEMORY_STORE || '2GB',
-            maxFileStore: process.env.NATS_JS_MAX_FILE_STORE || '10GB',
-            storeDir: process.env.NATS_JS_STORE_DIR || './data/jetstream',
-        },
-
-        consumer: {
-            stream: process.env.NATS_STREAM!,
-            group: process.env.NATS_CONSUMER_GROUP!,
-            ackPolicy: process.env.NATS_CONSUMER_ACK_POLICY! as AckPolicy,
-            maxAckPending: parseInt(process.env.NATS_CONSUMER_MAX_ACK_PENDING!),
-            maxDeliver: parseInt(process.env.NATS_CONSUMER_MAX_DELIVER!),
-            deliverPolicy: process.env
-                .NATS_CONSUMER_DELIVER_POLICY! as DeliverPolicy,
-        },
-    },
-
     // JWT Configuration
     jwt: {
         secrets: {
@@ -148,8 +117,7 @@ export const config = {
         },
 
         bcryptRounds: parseInt(process.env.BCRYPT_ROUNDS || '12'),
-        sessionSecret: process.env.SESSION_SECRET || process.env.JWT_SECRET!,
-        corsOrigin: /*process.env.CORS_ORIGIN?.split(',') ||*/ [
+        corsOrigin: process.env.CORS_ORIGIN?.split(',') || [
             'http://localhost:3000',
             'http://localhost:8080/',
             'http://localhost:4200',
