@@ -53,8 +53,6 @@ RUN chown -R bun:bun /app
 # Run as non-root user for security
 USER bun
 
-ENV NODE_ENV=production
-ENV PORT=3000
 
 # Expose the application port
 EXPOSE 3000
