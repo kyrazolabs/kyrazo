@@ -24,7 +24,6 @@ import { PasswordModule } from "primeng/password";
 import { AuthService } from "@core/auth/auth.service";
 import { LayoutService } from "@components/service/layout.service";
 import { DividerModule } from "primeng/divider";
-import { environment } from "environments/environment";
 import { AppConfig } from "@components/app.config";
 
 declare const google: any;
