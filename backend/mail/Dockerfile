@@ -61,11 +61,11 @@ WORKDIR /app/apps/mail
 ENV NODE_ENV=production
 
 # Expose the health check port
-EXPOSE 4040
+EXPOSE ${PORT}
 
 # Health check
 HEALTHCHECK --start-period=10s --interval=30s --timeout=3s --retries=3 \
-    CMD wget -qO- http://localhost:4040/health || exit 1
+    CMD wget -qO- http://localhost:${PORT}/health || exit 1
 
 # Start the application
 CMD ["bun", "run", "start"]
