@@ -1,0 +1,187 @@
+---
+title: "Signature Verification"
+description: "Verify that incoming webhooks are authentic and untampered"
+---
+
+To ensure that webhooks delivered to your targets or endpoints are actually sent by Kyrazo, you should verify the **HMAC signature** included in the request headers.
+
+## Verification Logic
+
+The signature is a `hex` encoded HMAC-SHA256 hash. The "signed payload" is constructed by concatenating the following components with a dot (`.`) separator:
+
+`version.timestamp.nonce.body`
+
+-   **version**: Currently `v1`.
+-   **timestamp**: The Unix timestamp from the `X-Webhook-Timestamp` header.
+-   **nonce**: The unique string from the `X-Webhook-Nonce` header.
+-   **body**: The raw, unparsed request body string.
+
+---
+
+## Code Examples
+
+Select your preferred language to see a verification implementation.
+
+<Tabs>
+  <Tab title="TypeScript">
+    ```typescript
+    import * as crypto from 'crypto';
+
+    interface WebhookHeaders {
+      'x-webhook-signature': string;
+      'x-webhook-timestamp': string;
+      'x-webhook-nonce': string;
+      'x-webhook-version': string;
+      [key: string]: string | undefined;
+    }
+
+    function verifySignature(
+      requestBody: string,
+      headers: WebhookHeaders,
+      secret: string
+    ): boolean {
+      const signatureHeader = headers['x-webhook-signature'];
+      const timestamp = headers['x-webhook-timestamp'];
+      const nonce = headers['x-webhook-nonce'];
+      const version = headers['x-webhook-version'];
+
+      if (!signatureHeader || !timestamp || !nonce || !version) {
+        return false;
+      }
+
+      // signature format is "v1={hash}"
+      const signature = signatureHeader.split('=')[1];
+      if (!signature) return false;
+
+      // Construct payload: version.timestamp.nonce.body
+      const payload = `${version}.${timestamp}.${nonce}.${requestBody}`;
+
+      const expectedSignature = crypto
+        .createHmac('sha256', secret)
+        .update(payload)
+        .digest('hex');
+
+      return crypto.timingSafeEqual(
+        Buffer.from(signature),
+        Buffer.from(expectedSignature)
+      );
+    }
+    ```
+  </Tab>
+  <Tab title="Node.js">
+    ```javascript
+    const crypto = require('crypto');
+
+    function verifySignature(requestBody, headers, secret) {
+      const signatureHeader = headers['x-webhook-signature']; // e.g. "v1=..."
+      const timestamp = headers['x-webhook-timestamp'];
+      const nonce = headers['x-webhook-nonce'];
+      const version = headers['x-webhook-version'];
+
+      if (!signatureHeader || !timestamp || !nonce || !version) {
+        return false;
+      }
+
+      // Extract the signature value after the "v1=" prefix
+      const signature = signatureHeader.split('=')[1];
+
+      // Construct the signed string
+      const signedPayload = `${version}.${timestamp}.${nonce}.${requestBody}`;
+
+      // Compute the expected HMAC
+      const expectedSignature = crypto
+        .createHmac('sha256', secret)
+        .update(signedPayload)
+        .digest('hex');
+
+      // Use timing-safe comparison to prevent timing attacks
+      return crypto.timingSafeEqual(
+        Buffer.from(signature),
+        Buffer.from(expectedSignature)
+      );
+    }
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    import hmac
+    import hashlib
+
+    def verify_signature(request_body, headers, secret):
+        signature_header = headers.get('X-Webhook-Signature')
+        timestamp = headers.get('X-Webhook-Timestamp')
+        nonce = headers.get('X-Webhook-Nonce')
+        version = headers.get('X-Webhook-Version')
+
+        if not all([signature_header, timestamp, nonce, version]):
+            return False
+
+        # Extract signature value (v1=...)
+        signature = signature_header.split('=')[1]
+
+        # Construct payload
+        signed_payload = f"{version}.{timestamp}.{nonce}.{request_body}"
+
+        # Compute HMAC
+        expected_signature = hmac.new(
+            secret.encode(),
+            signed_payload.encode(),
+            hashlib.sha256
+        ).hexdigest()
+
+        # Timing safe comparison
+        return hmac.compare_digest(signature, expected_signature)
+    ```
+  </Tab>
+  <Tab title="Go">
+    ```go
+    import (
+    	"crypto/hmac"
+    	"crypto/sha256"
+    	"encoding/hex"
+    	"fmt"
+    	"strings"
+    )
+
+    func VerifySignature(body []byte, headers map[string]string, secret string) bool {
+    	sigHeader := headers["X-Webhook-Signature"]
+    	timestamp := headers["X-Webhook-Timestamp"]
+    	nonce := headers["X-Webhook-Nonce"]
+    	version := headers["X-Webhook-Version"]
+
+    	if sigHeader == "" || timestamp == "" || nonce == "" || version == "" {
+    		return false
+    	}
+
+    	// signature format is "v1=hash"
+    	parts := strings.Split(sigHeader, "=")
+    	if len(parts) != 2 {
+    		return false
+    	}
+    	signature := parts[1]
+
+    	// Construct payload: version.timestamp.nonce.body
+    	payload := fmt.Sprintf("%s.%s.%s.%s", version, timestamp, nonce, string(body))
+
+    	h := hmac.New(sha256.New, []byte(secret))
+    	h.Write([]byte(payload))
+    	expectedSignature := hex.EncodeToString(h.Sum(nil))
+
+    	return hmac.Equal([]byte(signature), []byte(expectedSignature))
+    }
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## Important Considerations
+
+### Timing Attacks
+Always use a **constant-time comparison** function (like `crypto.timingSafeEqual` in Node.js or `hmac.compare_digest` in Python). A simple string equality check (`==`) can leak information about the signature to an attacker through small differences in execution time.
+
+### Raw Request Body
+Ensure you use the **raw, unparsed** request body when constructing the signed payload. If your web framework automatically parses JSON into an object, re-stringifying it might result in different white-spacing or key order, causing verification to fail.
+
+### Secret Management
+Your **Target Secret** is a sensitive credential. Store it securely (e.g., in environment variables or a vault) and never commit it to source control.

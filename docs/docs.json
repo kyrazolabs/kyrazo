@@ -1,0 +1,120 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "aspen",
+  "name": "Kyrazo",
+  "colors": {
+    "primary": "#09090b",
+    "dark": "#09090b",
+    "light": "#fafafa"
+  },
+  "favicon": "/favicon.ico",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Getting started",
+            "pages": [
+              "index",
+              "quickstart",
+              "essentials/concepts",
+              "essentials/architecture",
+              "essentials/use-cases",
+              "essentials/security"
+            ]
+          },
+          {
+            "group": "Dispatch",
+            "pages": [
+              "essentials/dispatch-overview",
+              "essentials/target-management",
+              "essentials/webhooks-verification"
+            ]
+          },
+          {
+            "group": "Ingest",
+            "pages": [
+              "essentials/ingest-overview",
+              "essentials/sources",
+              "essentials/endpoints"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api-reference/introduction",
+              "api-reference/ratelimiter"
+            ]
+          },
+          {
+            "group": "Dispatch Events",
+            "pages": [
+              {
+                "group": "Events",
+                "pages": [
+                  "api-reference/integration/publish-event",
+                  "api-reference/integration/publish-events-batch"
+                ]
+              },
+              {
+                "group": "Targets",
+                "pages": [
+                  "api-reference/integration/list-targets",
+                  "api-reference/integration/create-target",
+                  "api-reference/integration/get-target",
+                  "api-reference/integration/update-target",
+                  "api-reference/integration/update-target-status",
+                  "api-reference/integration/delete-target",
+                  "api-reference/integration/get-target-secret"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "global": {}
+  },
+  "logo": {
+    "light": "/logo/light.png",
+    "dark": "/logo/dark.png"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "mailto:support@kyrazo.com"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Dashboard",
+      "href": "https://kyrazo.com/dashboard"
+    }
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
+  },
+  "footer": {
+    "socials": {
+      "x": "https://x.com/kyrazohq",
+      "github": "https://github.com/kyrazo",
+      "linkedin": "https://linkedin.com/company/kyrazo"
+    }
+  }
+}

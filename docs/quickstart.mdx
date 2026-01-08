@@ -1,0 +1,72 @@
+---
+title: "Quickstart"
+description: "Dispatch your first event in under 5 minutes"
+---
+
+Welcome to Kyrazo! This guide will help you get your first event dispatched from your system to a webhook target.
+
+## 1. Get your API Key
+
+To authenticate your requests, you'll need an API Key.
+
+1.  Log in to the [Kyrazo Dashboard](https://kyrazo.com/dashboard).
+2.  Navigate to the **Secrets Page** in the sidebar.
+3.  Click **Generate New Key**.
+4.  Give it a name and select the necessary **Scopes** (e.g., `Dispatch Event`).
+5.  Copy and securely store your **API Key**. You won't be able to see it again!
+
+<Note>
+  Keep your API Key secure. If it's ever compromised, you can rotate it from the settings page.
+</Note>
+
+## 2. Create a Target
+
+A Target is where Kyrazo will deliver your events.
+
+1.  In the dashboard, go to the **Targets** section.
+2.  Click **Create Target**.
+3.  Enter a name (e.g., "My API") and a destination URL. If you don't have one yet, you can use a tool like [Webhook.site](https://webhook.site) to test.
+4.  Save the target and note down its **Target ID**.
+
+## 3. Dispatch your first event
+
+Now you're ready to send data. Use the following `curl` command (replace the placeholders with your actual values):
+
+```bash
+curl -X POST "https://api.kyrazo.com/v1/projects/{PROJECT_ID}/publish" \
+     -H "x-api-key: {YOUR_API_KEY}" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "eventType": "user.signup",
+       "data": {
+         "userId": "123",
+         "email": "user@example.com"
+       },
+       "targets": [
+         { "targetId": "{YOUR_TARGET_ID}" }
+       ]
+     }'
+```
+
+## 4. Verify Delivery
+
+Once you send the request, you can verify the result:
+
+1.  Check your destination URL (or Webhook.site) to see the incoming payload.
+2.  In the Kyrazo Dashboard, navigate to the **Dispatch/Ingest Logs** for your project.
+3.  You should see your event listed with a status of `Queued` or `Delivered`, along with detailed logs for the delivery attempt.
+
+---
+
+## Next Steps
+
+Now that you've sent your first event, explore more advanced features:
+
+<CardGroup cols={2}>
+  <Card title="Key Concepts" icon="book-open" href="/essentials/concepts">
+    Learn more about Dispatch, Events, and Targets.
+  </Card>
+  <Card title="Management API" icon="code" href="/api-reference/introduction">
+    Automate your integration management via our REST API.
+  </Card>
+</CardGroup>

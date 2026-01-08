@@ -1,0 +1,40 @@
+---
+title: "Dispatch Overview"
+description: "Learn how to publish events from your system to external targets"
+---
+
+**Dispatch** is the process of pushing events from your application to Kyrazo, which then handles the reliable delivery to any number of configured [Targets](/essentials/target-management).
+
+## How Dispatch Works
+
+When an event occurs in your system (e.g., a new user signs up), you publish that event to the Kyrazo Integration API. Kyrazo asynchronously delivers that event to all active targets associated with your project.
+
+### 1. The Event Payload
+
+Every event sent to Kyrazo follows a standard structure to ensure consistency across all your integrations.
+
+- **`eventType`**: A unique string identifying the action (e.g., `invoice.paid`).
+- **`data`**: The current state of the object related to the event.
+- **`previous`**: (Optional) The previous state of the object, allowing your users to track changes.
+- **`metadata`**: Additional context such as `timestamp` and `eventId`.
+
+### 2. Idempotency
+
+Reliability is built into the core of Kyrazo. We support **Idempotency Keys** for all publish requests. 
+
+By including the `X-Idempotency-Key` header, you can safely retry requests without fear of creating duplicate events. If a request with the same key is received multiple times within a 24-hour window, Kyrazo will return the original response without processing the event again.
+
+## Scalability & Performance
+
+Kyrazo is built with a decoupled architecture:
+
+1.  **Fast Ingestion**: The API validates and acknowledges your event in milliseconds.
+2.  **Distributed Processing**: Background workers pick up the event and prepare it for delivery.
+3.  **Concurrency Control**: Deliver events to thousands of targets simultaneously without affecting your system's performance.
+
+## Getting Started with Dispatch
+
+To start dispatching events, you'll need:
+1.  An **API Key** from your Project settings.
+2.  One or more [Targets](/essentials/target-management) configured to receive the data.
+3.  A call to the `/publish` endpoint in our [Integration API](/api-reference/integration-introduction).

@@ -1,0 +1,52 @@
+---
+title: "Target Management"
+description: "Configure and secure your event destinations"
+---
+
+A **Target** is an external HTTP destination (webhook) that Kyrazo delivers your events to.
+
+## Configuration
+
+Targets are highly configurable to match the requirements of any destination service:
+
+- **URL & Method**: The destination endpoint and the preferred HTTP method (default is `POST`).
+- **Custom Headers**: Add static headers like `Authorization` or `X-Client-ID` to every request.
+- **Retry Policy**: Configure how many times Kyrazo should retry if the target is unavailable (default is 3).
+- **Timeout**: Control how long Kyrazo waits for a response before timing out a delivery attempt.
+
+## Security (HMAC Signatures)
+
+Kyrazo secures event delivery using HMAC-SHA256 signatures. This allows the receiving target to verify that the event truly came from your system via Kyrazo and hasn't been tampered with.
+
+### Verification Headers
+
+Every request delivered to a target includes the following security headers:
+
+| Header | Description |
+| :--- | :--- |
+| `X-Webhook-Signature` | The HMAC-SHA256 signature (prefixed with `v1=`). |
+| `X-Webhook-Timestamp` | The Unix timestamp when the request was generated. |
+| `X-Webhook-Nonce` | A unique string for each request to prevent replay attacks. |
+| `X-Webhook-Version` | The signature version (e.g., `v1`). |
+
+### How to Verify
+
+To verify the signature:
+1.  Concatenate the version, timestamp, nonce, and raw request body using a dot (`.`) as a separator:
+    `v1.timestamp.nonce.body`
+2.  Hash this string using HMAC-SHA256 with your **Target Secret** as the key.
+3.  Compare the resulting hex-encoded hash with the value provided in the `X-Webhook-Signature` header.
+
+<Card title="Code Examples" icon="code" href="/essentials/webhooks-verification">
+  View code examples for Node.js, Python, and Go to help you implement verification in your own service.
+</Card>
+
+## Secret Rotation
+
+To maintain high security, Kyrazo supports multiple secrets per target. You can add a new secret as "active" and keep the old one as "inactive" during a transition period. This allows the receiver to rotate keys without any downtime or missed events.
+
+---
+
+<Tip>
+  You can find and manage your Target Secrets in the **Security** tab of any target in the Kyrazo Dashboard.
+</Tip>

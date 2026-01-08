@@ -1,0 +1,45 @@
+---
+title: "Key Concepts"
+description: "Understand the core building blocks of the Kyrazo platform"
+---
+
+To effectively use Kyrazo, it's important to understand the three fundamental concepts that power the platform: **Dispatch**, **Events**, and **Targets**.
+
+## 1. Dispatch
+
+The **Dispatch** layer is the orchestration heart of Kyrazo. It responsible for receiving incoming events and ensuring they are reliably delivered to the correct destinations.
+
+- **High-Performance Architecture**: Kyrazo uses a high-concurrency orchestration engine for message queuing. This allows for extremely high throughput while maintaining strong delivery guarantees.
+- **Reliability**: Once an event is accepted by the Dispatch API, Kyrazo guarantees at-least-once delivery.
+- **Automatic Retries**: If a delivery fails, the Dispatcher automatically retries based on configurable policies (e.g., exponential backoff).
+- **Concurrency Control**: Kyrazo manages the delivery rate to prevent overwhelming your targets.
+
+## 2. Events
+
+An **Event** is the core unit of data in Kyrazo. It represents something that happened in your system that you want to share with external integration targets.
+
+- **Event Type**: A descriptive string (e.g., `user.created`, `order.completed`) that helps targets identify what happened.
+- **Payload**: The actual data associated with the event. Kyrazo supports standard JSON payloads.
+  - **`data`**: The current state of the object.
+  - **`previous`**: (Optional) The state of the object before the event occurred, useful for tracking changes.
+- **Metadata**: Every event includes metadata for tracking and control, such as a unique `eventId`, a `timestamp`, and an `idempotencyKey` to prevent duplicate processing.
+
+## 3. Targets
+
+A **Target** is a destination where Kyrazo delivers your events. In most cases, this is a webhook URL provided by your users or secondary systems.
+
+- **Project-Based**: Targets are grouped within **Projects**, allowing you to isolate integrations for different environments or product lines.
+- **Delivery Protocol**: Standard HTTP(S) requests (POST, PUT, PATCH, etc.).
+- **Security**: kyrazo provides professional-grade security for targets:
+  - **Signing Secrets**: Every target can have a unique secret used to generate HMAC signatures, allowing the receiver to verify the payload's integrity.
+  - **Custom Headers**: You can configure static headers (e.g., `Authorization`) for each target.
+- **Management**: Targets can be enabled or disabled at any time via the API or the Kyrazo Management Dashboard.
+
+---
+
+### How they work together
+
+1. Your system **publishes** an **Event** to Kyrazo.
+2. The **Dispatch** layer validates the event and queues it for high-performance delivery.
+3. Kyrazo identifies all active **Targets** associated with the project.
+4. The Dispatcher delivers the event to each **Target**, handling retries and security signatures automatically.

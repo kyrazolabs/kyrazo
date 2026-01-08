@@ -1,0 +1,557 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Kyrazo Integration API",
+        "description": "High-performance API for publishing events and managing webhook targets.",
+        "version": "1.0.0",
+        "license": {
+            "name": "MIT"
+        }
+    },
+    "servers": [
+        {
+            "url": "https://api.kyrazo.com",
+            "description": "Production API server"
+        }
+    ],
+    "security": [
+        {
+            "apiKeyAuth": []
+        }
+    ],
+    "paths": {
+        "/v1/events/{projectId}/publish": {
+            "post": {
+                "summary": "Publish Event",
+                "description": "Publishes a single event to the specified project and its associated targets.",
+                "operationId": "publishEvent",
+                "tags": [
+                    "Events"
+                ],
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true,
+                        "description": "The unique identifier of the project.",
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[0-9a-fA-F]{24}$"
+                        }
+                    },
+                    {
+                        "$ref": "#/components/parameters/IdempotencyKey"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PublishEvent"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Event successfully queued",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/v1/events/{projectId}/publish/batch": {
+            "post": {
+                "summary": "Batch Publish Events",
+                "description": "Publishes multiple events in a single request.",
+                "operationId": "publishEventsBatch",
+                "tags": [
+                    "Events"
+                ],
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true,
+                        "description": "The unique identifier of the project.",
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[0-9a-fA-F]{24}$"
+                        }
+                    },
+                    {
+                        "$ref": "#/components/parameters/IdempotencyKey"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/PublishEvent"
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Events successfully queued",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/targets/{projectId}": {
+            "get": {
+                "summary": "List Targets",
+                "description": "Retrieves a paginated list of targets for the specified project.",
+                "operationId": "listTargets",
+                "tags": [
+                    "Targets"
+                ],
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of targets"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create Target",
+                "description": "Creates a new webhook target for the specified project.",
+                "operationId": "createTarget",
+                "tags": [
+                    "Targets"
+                ],
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateTarget"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Target created"
+                    }
+                }
+            }
+        },
+        "/v1/targets/{projectId}/{targetId}": {
+            "get": {
+                "summary": "Get Target",
+                "description": "Retrieves details of a specific target.",
+                "operationId": "getTarget",
+                "tags": [
+                    "Targets"
+                ],
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "targetId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Target details"
+                    }
+                }
+            },
+            "patch": {
+                "summary": "Update Target",
+                "description": "Updates properties of a specific target.",
+                "operationId": "updateTarget",
+                "tags": [
+                    "Targets"
+                ],
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "targetId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateTarget"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Target updated"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update Target Status",
+                "description": "Enables or disables a specific target.",
+                "operationId": "updateTargetStatus",
+                "tags": [
+                    "Targets"
+                ],
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "targetId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "enabled": {
+                                        "type": "boolean"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Status updated"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete Target",
+                "description": "Permanently deletes a specific target.",
+                "operationId": "deleteTarget",
+                "tags": [
+                    "Targets"
+                ],
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "targetId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Target deleted"
+                    }
+                }
+            }
+        },
+        "/v1/targets/{projectId}/{targetId}/secret": {
+            "get": {
+                "summary": "Get Target Secret",
+                "description": "Retrieves the signing secret for the target.",
+                "operationId": "getTargetSecret",
+                "tags": [
+                    "Targets"
+                ],
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "targetId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Target secret"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "PublishEvent": {
+                "type": "object",
+                "required": [
+                    "eventType",
+                    "payload",
+                    "targets"
+                ],
+                "properties": {
+                    "eventType": {
+                        "type": "string",
+                        "description": "Type of event being published."
+                    },
+                    "payload": {
+                        "type": "object",
+                        "description": "The data associated with the event."
+                    },
+                    "previous": {
+                        "type": "object",
+                        "description": "Optional previous state of the object."
+                    },
+                    "targets": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "targetId"
+                            ],
+                            "properties": {
+                                "targetId": {
+                                    "type": "string",
+                                    "pattern": "^[0-9a-fA-F]{24}$"
+                                }
+                            }
+                        }
+                    },
+                    "meta": {
+                        "type": "object",
+                        "properties": {
+                            "priority": {
+                                "type": "string",
+                                "enum": [
+                                    "low",
+                                    "normal",
+                                    "high",
+                                    "urgent"
+                                ],
+                                "default": "normal"
+                            },
+                            "maxRetries": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 10,
+                                "default": 3
+                            }
+                        }
+                    }
+                }
+            },
+            "CreateTarget": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "url"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 3,
+                        "maxLength": 100
+                    },
+                    "url": {
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "method": {
+                        "type": "string",
+                        "enum": [
+                            "POST",
+                            "PUT",
+                            "PATCH",
+                            "GET",
+                            "DELETE"
+                        ],
+                        "default": "POST"
+                    },
+                    "description": {
+                        "type": "string",
+                        "maxLength": 500
+                    },
+                    "enabled": {
+                        "type": "boolean",
+                        "default": true
+                    },
+                    "config": {
+                        "type": "object",
+                        "properties": {
+                            "timeout": {
+                                "type": "integer",
+                                "minimum": 100,
+                                "maximum": 60000,
+                                "default": 5000
+                            },
+                            "retryCount": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 10,
+                                "default": 3
+                            }
+                        }
+                    },
+                    "customHeaders": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "UpdateTarget": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/CreateTarget"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {}
+                    }
+                ]
+            },
+            "ApiResponse": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "data": {
+                        "type": "object"
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "apiKeyAuth": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "x-api-key"
+            }
+        },
+        "parameters": {
+            "IdempotencyKey": {
+                "name": "Idempotency-Key",
+                "in": "header",
+                "description": "A unique identifier for the request to prevent duplicate processing.",
+                "required": false,
+                "schema": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

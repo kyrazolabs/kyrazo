@@ -1,0 +1,53 @@
+---
+title: "Integration API"
+description: "Documentation for the Kyrazo Integration API"
+---
+
+## Overview
+
+The Integration API allows you to programmatically publish events and manage webhook targets within your projects. It is designed for high-performance and reliable event delivery.
+
+<CardGroup cols={2}>
+  <Card
+    title="Publish Events"
+    icon="bolt"
+    href="/api-reference/integration/publish-event"
+  >
+    Learn how to send events to your targets.
+  </Card>
+  <Card
+    title="Manage Targets"
+    icon="gears"
+    href="/api-reference/integration/create-target"
+  >
+    Configure where your events should be delivered.
+  </Card>
+</CardGroup>
+
+## Authentication
+
+All API endpoints are authenticated using the **x-api-key** header. You can manage your API keys within the [Kyrazo Dashboard](https://kyrazo.com/dashboard) under the **Secrets Page**.
+
+```bash
+x-api-key: <your_api_key>
+```
+
+### Idempotency
+
+To prevent duplicate processing of the same request (e.g., due to network retries), you can provide an optional `X-Idempotency-Key` header. Kyrazo ensures that requests with the same key are processed only once.
+
+```bash
+X-Idempotency-Key: <unique_key>
+```
+
+## Base URL
+
+The production base URL for the Kyrazo Integration API is:
+
+```http
+https://api.kyrazo.com
+```
+
+<Note>
+  Ensure you are using the correct Project ID from your dashboard when constructing the publish URL: `https://api.kyrazo.com/v1/events/{projectId}/publish`
+</Note>

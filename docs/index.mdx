@@ -1,0 +1,79 @@
+---
+title: "Introduction"
+description: "High-performance webhook gateway and event orchestration platform"
+---
+
+Kyrazo is a professional event orchestration platform designed to help teams reliably receive, process, and route events between systems. It acts as a central nervous system for your integrations, ensuring that every event reaches its destination—no matter what.
+
+## Why Kyrazo?
+
+Building a reliable webhook infrastructure is deceptively complex. As your system grows, you quickly encounter challenges that go far beyond a simple HTTP POST request.
+
+### The Problem: Webhooks are Hard
+
+Implementing webhooks manually often leads to several recurring pain points:
+
+<CardGroup cols={2}>
+  <Card title="Reliability & Retries" icon="rotate">
+    Managing exponential backoff, jitter, and persistent delivery failures is a heavy engineering lift.
+  </Card>
+  <Card title="Cryptographic Security" icon="shield-check">
+    Generating and verifying webhook signatures correctly is critical but error-prone.
+  </Card>
+  <Card title="Zero Observability" icon="eye-slash">
+    When a delivery fails in a custom implementation, it often disappears into a black hole without logs.
+  </Card>
+  <Card title="Developer Experience" icon="user-gear">
+    Building internal tools to manage and monitor integration targets is an additional burden on your team.
+  </Card>
+</CardGroup>
+
+### The Solution: Kyrazo
+
+Kyrazo abstracts this complexity into a single, high-performance API. By offloading your event delivery to Kyrazo, you gain:
+
+- **Bulletproof Delivery**: Automatic retries with configurable policies.
+- **Enterprise Security**: Standardized HMAC signatures and payload integrity checks.
+- **Full Traceability**: Monitoring and detailed delivery logs for every event.
+- **Ready-to-use Dashboard**: A professional interface to manage and monitor all your integration targets.
+
+## Core Concepts
+
+Understand the building blocks of the Kyrazo platform.
+
+<CardGroup cols={2}>
+  <Card
+    title="Events"
+    icon="bolt"
+    href="/api-reference/integration/publish-event"
+  >
+    The core unit of data sent from your system.
+  </Card>
+  <Card
+    title="Targets"
+    icon="location-crosshairs"
+    href="/essentials/target-management"
+  >
+    The destinations (webhooks) where your events are delivered.
+  </Card>
+  <Card
+    title="Security"
+    icon="shield-keyhole"
+    href="/essentials/security"
+  >
+    Manage API keys and verify event integrity.
+  </Card>
+</CardGroup>
+
+## Getting Started
+
+Ready to start dispatching events?
+
+<Card
+  title="Quickstart Guide"
+  icon="rocket"
+  href="/quickstart"
+  horizontal
+>
+  Get your first event dispatched in under 5 minutes.
+</Card>

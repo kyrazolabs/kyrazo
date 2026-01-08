@@ -1,0 +1,34 @@
+---
+title: "Sources"
+description: "Configure input channels for your incoming webhooks"
+---
+
+A **Source** represents a specific input channel in Kyrazo. It is the "entry point" for external data.
+
+## The Ingress URL
+
+When you create a Source, Kyrazo generates a unique **Ingress URL**. This is the URL you provide to your 3rd-party service (e.g., in the Stripe or PayPal developer dashboard).
+
+Format:
+`https://api.kyrazo.com/v1/ingest/{ingressId}`
+
+## Configuration Options
+
+### 1. Service Type
+You can select a specific service type (like `PayPal`) or use a `General` source for custom webhooks. Choosing a specific service allows Kyrazo to use specialized detectors and transformers to handle that service's unique payload formats.
+
+### 2. Authentication
+Security is paramount for inbound webhooks. Kyrazo supports several authentication methods to verify that incoming requests are legitimate:
+
+- **API Key**: Verifies a specific header and key provided by the source.
+- **Basic Auth**: Standard username and password authentication.
+- **Service Specific**: Specialized verification logic for providers that use unique signing methods.
+
+### 3. Forwarding & Endpoints
+The primary job of a Source is to route data. By enabling **Forwarding**, you can link a Source to one or more [Endpoints](/essentials/endpoints). When an event is received by the Source, Kyrazo automatically enqueues it for delivery to all linked active Endpoints.
+
+## Best Practices
+
+- **Use Unique Sources**: Create a separate Source for each external service (e.g., "Stripe Production", "Stripe Staging").
+- **Enable Authentication**: Never leave a Source unauthenticated if the provider supports verification.
+- **Isolate by Project**: Group related Sources within the same Project for better organization and security isolation.

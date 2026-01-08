@@ -1,0 +1,31 @@
+---
+title: "Endpoints"
+description: "Configure internal destinations for your ingested events"
+---
+
+An **Endpoint** is an internal destination within your infrastructure where Kyrazo delivers ingested events.
+
+## Endpoint Configuration
+
+Endpoints are managed at the Project level. When an event is received by a **Source**, Kyrazo looks up the linked **Endpoints** and dispatches the data to them.
+
+### Key Attributes
+
+- **URL**: The HTTP(S) destination where your service is listening.
+- **Method**: The HTTP method to use for delivery (typically `POST`).
+- **Status**: Endpoints can be toggled between `Active` and `Inactive`. Events will not be delivered to inactive endpoints.
+
+## Security & Reliability
+
+### Signing Secrets
+Kyrazo can sign outgoing requests to your endpoints using HMAC. This allows your internal service to verify that the request truly came from Kyrazo.
+
+### Custom Headers
+You can configure static custom headers (e.g., `Authorization: Bearer <token>`) that Kyrazo will include in every request sent to the endpoint.
+
+### Retry Policy
+If your endpoint is temporarily unavailable, Kyrazo's background workers will automatically retry the delivery based on the configured retry count.
+
+## Differences from Targets
+
+While **Targets** (used in Dispatch) are often managed dynamically for end-user integrations, **Endpoints** (used in Ingest) are typically static destinations within your own infrastructure or VPC that you configure once.

@@ -1,0 +1,34 @@
+---
+title: "Ingest Overview"
+description: "Understand how Kyrazo receives and routes external webhooks"
+---
+
+While **Dispatch** handles outbound events from your system, **Ingest** is designed to handle the opposite: receiving events from external 3rd-party services (like Stripe, PayPal, or custom webhooks) and routing them to your internal infrastructure.
+
+## What is Ingest?
+
+Ingest acts as a secure, highly-available gateway for incoming webhooks. Instead of exposing your internal services directly to the public internet, you point your 3rd-party webhooks to Kyrazo.
+
+<CardGroup cols={2}>
+  <Card title="Dispatch (Outbound)" icon="paper-plane">
+    Your system &rarr; Kyrazo &rarr; External Targets
+  </Card>
+  <Card title="Ingest (Inbound)" icon="inbox-in">
+    3rd-Party Service &rarr; Kyrazo &rarr; Your Endpoints
+  </Card>
+</CardGroup>
+
+## Why use Kyrazo for Ingest?
+
+1.  **Uniform Security**: Standardize how you verify webhooks from multiple different providers in one place.
+2.  **Reliability**: Kyrazo buffers incoming bursts of traffic and ensures events are delivered to your internal endpoints, even if they are temporarily down.
+3.  **Auditability**: Maintain a complete history of every 3rd-party event received, including raw payloads and delivery attempts.
+4.  **Decoupling**: Shield your internal services from the direct complexity of 3rd-party webhook protocols.
+
+## High-Level Flow
+
+1.  **3rd-Party Service** (e.g., Stripe) sends a webhook to your unique Kyrazo **Ingress URL**.
+2.  Kyrazo **ingests** the event, validates authentication, and acknowledges receipt.
+3.  The event is placed in a **Distributed Queue** for background processing.
+4.  Kyrazo identifies the associated **Source** configuration and identifies which **Endpoints** should receive the data.
+5.  Kyrazo **dispatches** the processed event to your internal **Endpoints**.
