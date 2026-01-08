@@ -3,11 +3,20 @@ import { config } from '../../../../configs';
 
 export class HasherCrypto {
     private static instance: HasherCrypto;
-
-    private key = Buffer.from(config.security.encryptions.key!, 'hex');
+    private key: Buffer;
     private ivLength = 12; // 96-bit IV for GCM
 
-    constructor() {}
+    private constructor() {
+        if (
+            !config.security.encryptions.key ||
+            config.security.encryptions.key.length !== 32
+        ) {
+            throw new Error(
+                'ENCRYPTION_KEY environment variable must be set and be 32 characters long.'
+            );
+        }
+        this.key = Buffer.from(config.security.encryptions.key, 'hex');
+    }
 
     public static getInstance(): HasherCrypto {
         if (!HasherCrypto.instance) {

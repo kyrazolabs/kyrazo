@@ -12,6 +12,7 @@ const requiredEnvVars = [
     'CLICKHOUSE_URL',
     'CLICKHOUSE_USERNAME',
     'CLICKHOUSE_DATABASE',
+    'ENCRYPTION_KEY',
 ];
 
 console.log('Checking required env vars:');
@@ -86,7 +87,7 @@ export const config = {
 
     security: {
         encryptions: {
-            key: process.env.ENCRYPT_KEY,
+            key: process.env.ENCRYPTION_KEY,
         },
     },
 

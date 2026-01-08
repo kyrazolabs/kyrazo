@@ -86,7 +86,7 @@ export const config = {
     },
 
     encryptions: {
-        key: process.env.ENCRYPT_KEY!,
+        key: process.env.ENCRYPTION_KEY!,
     },
 
     // NATS Configuration

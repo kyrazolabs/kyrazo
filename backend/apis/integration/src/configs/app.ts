@@ -7,12 +7,8 @@ dotenv.config({ path: './backend/api/.env' });
 // Validate required environment variables
 const requiredEnvVars = [
     'MONGODB_URI',
-    'JWT_SECRET',
-    'JWT_ACCESS_SECRET',
-    'JWT_REFRESH_SECRET',
     'REDIS_HOST',
     'REDIS_PORT',
-    'ENCRYPT_KEY',
     'ENCRYPTION_KEY',
 ];
 
@@ -43,20 +39,6 @@ export const config = {
         port: parseInt(process.env.PORT || '3003'),
         env: process.env.NODE_ENV || 'development',
         host: process.env.HOST || '0.0.0.0',
-    },
-
-    // Database Configuration
-    database: {
-        uri: process.env.MONGODB_URI!,
-        dbName: process.env.DB_NAME!,
-        encKey: process.env.ENCRYPTION_KEY!,
-    },
-
-    clickhouse: {
-        url: process.env.CLICKHOUSE_URL || 'http://127.0.0.1:8123',
-        username: process.env.CLICKHOUSE_USERNAME || 'default',
-        password: process.env.CLICKHOUSE_PASSWORD || '',
-        database: process.env.CLICKHOUSE_DATABASE || 'default',
     },
 
     // Redis Configuration
@@ -145,7 +127,7 @@ export const config = {
         corsCredentials: process.env.CORS_CREDENTIALS === 'true',
 
         encryptions: {
-            key: process.env.ENCRYPT_KEY,
+            key: process.env.ENCRYPTION_KEY,
         },
 
         rateLimiter: {

@@ -8,7 +8,6 @@ import {
     logger,
     config,
     natsConfig /* clickhouseConfig */,
-    loggerStream,
 } from './configs';
 
 // import { arcjetMiddleware } from '@/middlewares/arcjet.middleware'
