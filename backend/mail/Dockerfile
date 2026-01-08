@@ -48,7 +48,6 @@ COPY --from=builder /app/packages /app/packages
 COPY --from=builder /app/apps/mail/package.json /app/apps/mail/package.json
 COPY --from=builder /app/apps/mail/dist /app/apps/mail/dist
 COPY --from=builder /app/apps/mail/src /app/apps/mail/src
-COPY --from=builder /app/apps/mail/node_modules /app/apps/mail/node_modules
 
 # Ensure everything is owned by the bun user
 RUN chown -R bun:bun /app
