@@ -3,11 +3,11 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "bun run --workspaces --parallel --aggregate-output dev",
-    "build": "bun run --workspaces build"
+    "build": "bun run --workspaces build",
+    "start": "bun run --filter @mailq/mail start"
   },
-  "author": "Abdullah (nx2io)",
   "workspaces": [
     "packages/*",
-    "apps/mediatr"
+    "apps/*"
   ]
 }

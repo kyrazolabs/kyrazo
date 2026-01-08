@@ -11,7 +11,9 @@
     },
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "rootDir": "src"
   },
-  "exclude": ["node_modules"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "vitest.config.ts", "dist"]
 }
