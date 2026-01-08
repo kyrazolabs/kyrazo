@@ -5,7 +5,7 @@
   "exports": {
     ".": {
       "import": "./build/index.js",
-      "type": "./build/index.d.ts"
+      "types": "./build/index.d.ts"
     }
   },
   "scripts": {

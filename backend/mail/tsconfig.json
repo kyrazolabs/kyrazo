@@ -13,8 +13,6 @@
     // Reference to the utils package (e.g., shared utility functions/types).
     // This allows other packages/apps to depend on and use types from utils.
     { "path": "./apps/mail" }, // For actual mail sending server
-    { "path": "./apps/mediatr" }, // Mediatr server works like api gateway
-    // { "path": "./apps/web" }, // Web client
     { "path": "./packages/bullmq" }, // Shared configs of bullmq
     { "path": "./packages/utils" }, // Shared configs of utils
   ]

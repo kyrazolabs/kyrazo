@@ -5,11 +5,11 @@
   "exports": {
     ".": {
       "import": "./build/index.js",
-      "type": "./build/index.d.ts"
+      "types": "./build/index.d.ts"
     },
     "./zod": {
       "import": "./build/lib/zod/index.js",
-      "type": "./build/lib/zod/index.d.ts"
+      "types": "./build/lib/zod/index.d.ts"
     }
   },
   "scripts": {

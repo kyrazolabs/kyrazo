@@ -22,7 +22,14 @@ COPY packages ./packages
 COPY apps ./apps
 COPY tsconfig.json tsconfig.base.json ./
 
-# 5. Build all packages
+# 5. Build packages sequentially to avoid race conditions
+WORKDIR /app/packages/utils
+RUN bun run build
+
+WORKDIR /app/packages/bullmq
+RUN bun run build
+
+WORKDIR /app/apps/mail
 RUN bun run build
 
 # Stage 2: Production runner
@@ -34,14 +41,10 @@ COPY --from=builder /app/package.json /app/package.json
 COPY --from=builder /app/bun.lock /app/bun.lock
 COPY --from=builder /app/node_modules /app/node_modules
 
-COPY --from=builder /app/packages/utils/package.json /app/packages/utils/package.json
-COPY --from=builder /app/packages/utils/build /app/packages/utils/build
-COPY --from=builder /app/packages/utils/node_modules /app/packages/utils/node_modules
+# Copy built packages
+COPY --from=builder /app/packages /app/packages
 
-COPY --from=builder /app/packages/bullmq/package.json /app/packages/bullmq/package.json
-COPY --from=builder /app/packages/bullmq/build /app/packages/bullmq/build
-COPY --from=builder /app/packages/bullmq/node_modules /app/packages/bullmq/node_modules
-
+# Copy built app
 COPY --from=builder /app/apps/mail/package.json /app/apps/mail/package.json
 COPY --from=builder /app/apps/mail/dist /app/apps/mail/dist
 COPY --from=builder /app/apps/mail/src /app/apps/mail/src
