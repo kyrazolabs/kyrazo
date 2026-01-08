@@ -1,6 +1,6 @@
 import { workspaceRepository } from './workspace.repo';
-import { IWorkspace, IUserWorkspace } from '@kyrazo/shared';
-import { config, logger } from '@/configs';
+import { IWorkspace, IUserWorkspace, logger } from '@kyrazo/shared';
+import { config } from '@/configs';
 import { limitService } from '@/shared/services/limit.service';
 import { mailQueues } from '@/producers/jobs/v1/publishers';
 import { renderWorkspaceInvitationEmail } from '@/templates/emails';

@@ -1,7 +1,6 @@
-import { config, logger } from '@/configs';
 import { AppContext } from '@/core/middlewares/auth.middleware';
 
-import { Key, IErrorResponse } from '@kyrazo/shared';
+import { Key, IErrorResponse, logger } from '@kyrazo/shared';
 import { keyCrypto, secretCrypto } from '@kyrazo/shared';
 import { ICheckScopes, ICreateKey, IGetKey, IRevokeKey } from './key.schema';
 

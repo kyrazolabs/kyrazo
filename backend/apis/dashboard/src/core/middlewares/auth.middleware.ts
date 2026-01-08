@@ -4,10 +4,11 @@ import {
     IErrorResponse,
     IProject,
     IUserWorkspace,
+    logger,
     Project,
     UserWorkspace,
 } from '@kyrazo/shared';
-import { config, logger } from '@/configs';
+import { config } from '@/configs';
 import { getSignedCookie } from 'hono/cookie';
 import { authUtils, JWTPayload } from '@/core/utils/libs/jwt';
 import { Types } from 'mongoose';

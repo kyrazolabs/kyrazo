@@ -1,7 +1,8 @@
 import Redis from 'ioredis';
 import * as dotenv from 'dotenv';
 
-import { config, logger } from '@/configs';
+import { config } from '@/configs';
+import { logger } from '@kyrazo/shared';
 dotenv.config();
 
 /**
@@ -24,7 +25,7 @@ export class RedisConfig {
      * @title RedisConfig Constructor
      * @description Private constructor to enforce singleton pattern.
      */
-    private constructor() { }
+    private constructor() {}
 
     /**
      * @title Get RedisConfig Instance
@@ -48,7 +49,11 @@ export class RedisConfig {
      * await redis.connect();
      */
     public async connect(): Promise<void> {
-        if (this.isConnected && this.client?.status === 'ready' && this.queueClient?.status === 'ready') {
+        if (
+            this.isConnected &&
+            this.client?.status === 'ready' &&
+            this.queueClient?.status === 'ready'
+        ) {
             logger.info('Redis already connected');
             return;
         }
@@ -77,15 +82,11 @@ export class RedisConfig {
                 queueRedisClientOptions = config.redis.queue.url;
             } else {
                 queueRedisClientOptions = {
-                    host:
-                        config.redis.queue.host ||
-                        config.redis.host,
-                    port: config.redis.queue.port ||
-                        config.redis.port,
-                    password: config.redis.queue.password ||
-                        config.redis.password,
-                    db: config.redis.queue.db ||
-                        config.redis.db,
+                    host: config.redis.queue.host || config.redis.host,
+                    port: config.redis.queue.port || config.redis.port,
+                    password:
+                        config.redis.queue.password || config.redis.password,
+                    db: config.redis.queue.db || config.redis.db,
                     maxRetriesPerRequest: 20, // Essential for BullMQ
                 };
             }
@@ -149,7 +150,7 @@ export class RedisConfig {
                         this.queueClient?.once('ready', onReady);
                         this.queueClient?.once('error', onError);
                     }
-                })
+                }),
             ]);
 
             this.isConnected = true;
@@ -231,7 +232,9 @@ export class RedisConfig {
      * const isConnected = redis.getConnectionStatus();
      */
     public getConnectionStatus(): boolean {
-        return this.isConnected && !!this.client && this.client.status === 'ready';
+        return (
+            this.isConnected && !!this.client && this.client.status === 'ready'
+        );
     }
 
     /**

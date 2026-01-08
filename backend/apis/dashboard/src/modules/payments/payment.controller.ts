@@ -1,6 +1,5 @@
 import { AppContext } from '@/core/middlewares/auth.middleware';
-import { IErrorResponse } from '@kyrazo/shared';
-import { logger } from '@/configs';
+import { IErrorResponse, logger } from '@kyrazo/shared';
 import { paymentService } from './payment.service';
 import {
     CreateSubscriptionPaymentInput,

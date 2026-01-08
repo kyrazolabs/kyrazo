@@ -2,7 +2,7 @@ import arcjet, { shield, detectBot, tokenBucket } from '@arcjet/bun';
 import { config } from '@/configs/app';
 
 export const aj = arcjet({
-    key: config.arcjet.ARCJET_KEY!, // Get your site key from https://app.arcjet.com
+    key: config.security.arcjet.ARCJET_KEY!, // Get your site key from https://app.arcjet.com
     rules: [
         // Shield protects your app from common attacks e.g. SQL injection
         shield({ mode: 'LIVE' }),
@@ -15,7 +15,7 @@ export const aj = arcjet({
                 // Uncomment to allow these other common bot categories
                 // See the full list at https://arcjet.com/bot-list
                 //"CATEGORY:MONITOR", // Uptime monitoring services
-                //"CATEGORY:PREVIEW", // Link previews e.g. Slack, Discord
+                'CATEGORY:PREVIEW', // Link previews e.g. Slack, Discord
             ],
         }),
         // Create a token bucket rate limit. Other algorithms are supported.
@@ -26,7 +26,7 @@ export const aj = arcjet({
             //characteristics: ["ip.src"],
             refillRate: 5, // Refill 5 tokens per interval
             interval: 10, // Refill every 10 seconds
-            capacity: 10, // Bucket capacity of 10 tokens
+            capacity: 60, // Bucket capacity of 10 tokens
         }),
     ],
 });

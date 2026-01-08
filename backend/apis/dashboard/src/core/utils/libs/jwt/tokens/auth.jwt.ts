@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
-import { config, logger } from '@/configs';
+import { config } from '@/configs';
+import { logger } from '@kyrazo/shared';
 
 export interface JWTPayload {
     userId: string;
@@ -102,14 +103,17 @@ export class AuthJWT {
      * @returns {JWTPayload} The decoded payload.
      * @throws {Error} If the token is invalid.
      */
-    public verifyAccessToken(token: string): { valid: true; payload: JWTPayload }
+    public verifyAccessToken(
+        token: string
+    ):
+        | { valid: true; payload: JWTPayload }
         | { valid: false; reason: 'expired' | 'invalid' } {
         try {
             const decoded = jwt.verify(token, config.jwt.secrets.access, {
                 issuer: config.app.name,
                 audience: config.app.url,
             }) as JWTPayload;
-            return { valid: true, payload: decoded }
+            return { valid: true, payload: decoded };
         } catch (error: unknown) {
             if (error.name === 'TokenExpiredError') {
                 return { valid: false, reason: 'expired' };

@@ -1,8 +1,8 @@
 import { Next } from 'hono';
 import { AppContext } from './auth.middleware';
-import { logger, redisConfig } from '@/configs';
+import { redisConfig } from '@/configs';
 import { GetWorkspaceByIdInput } from '@/modules/v1/workspace/workspace.schema';
-import { IErrorResponse, UserWorkspace } from '@kyrazo/shared';
+import { IErrorResponse, logger, UserWorkspace } from '@kyrazo/shared';
 
 /**
  * @title requireWorkspaceMembership Middleware

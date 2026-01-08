@@ -1,5 +1,5 @@
-import { logger, redisConfig } from '@/configs';
-import { IErrorResponse, IProject, Project } from '@kyrazo/shared';
+import { redisConfig } from '@/configs';
+import { IErrorResponse, IProject, logger, Project } from '@kyrazo/shared';
 import { Next } from 'hono';
 import { Types } from 'mongoose';
 import { AppContext } from './auth.middleware';

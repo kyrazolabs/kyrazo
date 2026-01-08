@@ -1,6 +1,5 @@
 import { AppContext } from '@/core/middlewares/auth.middleware';
-import { IErrorResponse, IPlan, User } from '@kyrazo/shared';
-import { logger } from '@/configs';
+import { IErrorResponse, IPlan, logger, User } from '@kyrazo/shared';
 import { planService } from './plan.service';
 import {
     CreatePlanInput,

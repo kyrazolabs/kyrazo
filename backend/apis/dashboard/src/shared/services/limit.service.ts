@@ -1,7 +1,6 @@
 import { redisConfig } from '@/configs/redis';
 import { subscriptionRepository } from '@/modules/subscriptions/subscription.repo';
-import { IPlanLimits } from '@kyrazo/shared';
-import { logger } from '@/configs';
+import { IPlanLimits, logger } from '@kyrazo/shared';
 
 export const FREE_PLAN_LIMITS: IPlanLimits = {
     eventsPerSecond: 25,

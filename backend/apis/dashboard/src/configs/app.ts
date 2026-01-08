@@ -12,7 +12,6 @@ const requiredEnvVars = [
     'JWT_REFRESH_SECRET',
     'REDIS_HOST',
     'REDIS_PORT',
-    'ENCRYPT_KEY',
     'ENCRYPTION_KEY',
     'STRIPE_SECRET_KEY',
     'STRIPE_WEBHOOK_SECRET',
@@ -44,7 +43,6 @@ if (missingEnvVars.length > 0) {
  */
 export const config = {
     // Server Configuration
-
     server: {
         port: parseInt(process.env.PORT || '3003'),
         env: process.env.NODE_ENV || 'development',
@@ -57,13 +55,6 @@ export const config = {
         version: process.env.APP_VERSION || '1.0.0',
         url: process.env.APP_URL || 'http://localhost:3003',
         frontendUrl: process.env.FRONTEND_URL || 'http://localhost:4200',
-    },
-
-    // Database Configuration
-    database: {
-        uri: process.env.MONGODB_URI!,
-        dbName: process.env.DB_NAME!,
-        encKey: process.env.ENCRYPTION_KEY!,
     },
 
     clickhouse: {
@@ -132,106 +123,6 @@ export const config = {
             issuer: process.env.TWO_FA_ISSUER || 'B2B Todo',
             window: 2, // Allow 2 time steps before and after current time
         },
-
-        rateLimiter: {
-            auth: {
-                login: {
-                    points: 5, // 5req/min
-                    duration: 60, // every minute
-                    blockDuration: 0,
-
-                    bots: {
-                        points: 10,
-                        duration: 60 * 60, // every hour to block bots
-                        blockDuration: 0,
-                        keyPrefix: (ip: string) => `ratelimit:login:ip:${ip}`,
-                    },
-                },
-                register: {
-                    points: 3, // 3req/min
-                    duration: 60, //  every minute
-                    blockDuration: 0,
-                    keyPrefix: (ip: string) => `rate:register:ip:${ip}`,
-
-                    bots: {
-                        points: 10, // 10req/h
-                        duration: 60 * 60, // every hour to block bots
-                        blockDuration: 0,
-                        keyPrefix: (ip: string) => `rate:register:ip:${ip}`,
-                    },
-                },
-                token: {
-                    refresh: {
-                        points: 5, // req/20min
-                        duration: 60 * 20, // every 20 min
-                        blockDuration: 0,
-                        keyPrefix: (ip: string) => `ratelimit:refresh:ip:${ip}`,
-                    },
-                },
-                password: {
-                    forgot: {
-                        points: 3, // 3req/h per email
-                        duration: 60 * 60, // every hour
-                        blockDuration: 0,
-                        keyPrefix: (email: string) =>
-                            `ratelimit:password:forgot:${email}`,
-                    },
-                    reset: {
-                        points: 10, // 10req/h
-                        duration: 60 * 60, // every hour
-                        blockDuration: 0,
-                        keyPrefix: (ip: string) =>
-                            `ratelimit:password:reset:${ip}`,
-                    },
-                    change: {
-                        points: 10, // 10req/h
-                        duration: 60 * 60, // every hour
-                        blockDuration: 0,
-                        keyPrefix: (userId: string) =>
-                            `ratelimit:password:reset:${userId}`,
-                    },
-                },
-                email: {
-                    verify: {
-                        points: 3, // 3req/h per email
-                        duration: 60 * 60, // every hour
-                        blockDuration: 0,
-                        keyPrefix: (email: string) =>
-                            `ratelimit:email:verify:${email}`,
-                    },
-                },
-                multiFa: {
-                    points: 5, // 5req/10min
-                    duration: 60 * 10, // every 10 min
-                    blockDuration: 0,
-                    keyPrefix: (userId: string) =>
-                        `ratelimit:2fa:user:${userId}`,
-                },
-            },
-            protected: {
-                normal: {
-                    points: 60, // 60 requests per minute
-                    duration: 60,
-                    blockDuration: 0,
-                    keyPrefix: (userId: string) =>
-                        `ratelimit:protected:normal:${userId}`,
-                },
-                medium: {
-                    points: 40, // 40 requests per minute
-                    duration: 60,
-                    blockDuration: 60, // 1 minute block
-                    keyPrefix: (userId: string) =>
-                        `ratelimit:protected:medium:${userId}`,
-                },
-                sensitive: {
-                    points: 20, // 20 requests per minute
-                    duration: 60,
-                    blockDuration: 300, // 5 minutes block
-                    keyPrefix: (userId: string) =>
-                        `ratelimit:protected:sensitive:${userId}`,
-                },
-            },
-        },
     },
 
     // Email Configuration
@@ -249,7 +140,7 @@ export const config = {
         },
         from: {
             email: process.env.FROM_EMAIL || 'delivered@resend.dev',
-            name: process.env.FROM_NAME || 'Hookify',
+            name: process.env.FROM_NAME || 'Kyrazo',
         },
     },
 
@@ -259,22 +150,6 @@ export const config = {
         mainProduct: process.env.STRIPE_MAIN_PRODUCT_ID!,
         baseUrl: process.env.BILLING_BASE_URL || 'http://localhost:3003',
         adminEmail: process.env.BILLING_ADMIN_EMAIL || 'admin@hookify.com',
-    },
-
-    // File Upload Configuration
-    upload: {
-        maxFileSize: parseInt(process.env.MAX_FILE_SIZE || '5242880'), // 5MB
-        uploadPath: process.env.UPLOAD_PATH || 'uploads/',
-        allowedMimeTypes: [
-            'image/jpeg',
-            'image/png',
-            'image/gif',
-            'image/webp',
-            'application/pdf',
-            'text/plain',
-            'application/msword',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        ],
     },
 
     // Logging Configuration
@@ -297,36 +172,6 @@ export const config = {
         abuse: process.env.ABUSE_EMAIL || 'abuse@yourdomain.com',
         partnerships:
             process.env.PARTNERSHIPS_EMAIL || 'partners@yourdomain.com',
-    },
-
-    // Background Jobs Configuration
-    queue: {
-        defaultJobOptions: {
-            removeOnComplete: 10,
-            removeOnFail: 5,
-            attempts: 3,
-            backoff: {
-                type: 'exponential',
-                delay: 2000,
-            },
-        },
-        notification: {
-            batchSize: parseInt(process.env.NOTIFICATION_BATCH_SIZE || '50'),
-            retryAttempts: parseInt(
-                process.env.NOTIFICATION_RETRY_ATTEMPTS || '3'
-            ),
-            retryDelay: parseInt(
-                process.env.NOTIFICATION_RETRY_DELAY || '5000'
-            ),
-        },
-    },
-
-    // Activity Log Configuration
-    activityLog: {
-        retentionDays: parseInt(
-            process.env.ACTIVITY_LOG_RETENTION_DAYS || '90'
-        ),
-        batchSize: parseInt(process.env.ACTIVITY_LOG_BATCH_SIZE || '100'),
     },
 
     // Development Configuration

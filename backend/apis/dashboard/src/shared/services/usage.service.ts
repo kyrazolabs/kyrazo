@@ -1,7 +1,6 @@
 import { Queue, Worker } from 'bullmq';
 import { redisConfig } from '@/configs/redis';
-import { Usage } from '@kyrazo/shared';
-import { logger } from '@/configs';
+import { logger, Usage } from '@kyrazo/shared';
 import { Types } from 'mongoose';
 import { subscriptionService } from '@/modules/subscriptions/subscription.service';
 import stripe from '@/configs/stripe';

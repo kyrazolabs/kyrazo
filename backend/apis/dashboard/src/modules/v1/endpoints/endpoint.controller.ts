@@ -1,5 +1,5 @@
 import { AppContext } from '@/core/middlewares/auth.middleware';
-import { IEndpoint, IErrorResponse } from '@kyrazo/shared';
+import { IEndpoint, IErrorResponse, logger } from '@kyrazo/shared';
 import {
     CreateEndpointResponse,
     DeleteEndpointResponse,
@@ -15,7 +15,6 @@ import {
     UpdateEndpointInput,
     UpdateEndpointStatusInput,
 } from './endpoint.schema';
-import { logger } from '@/configs';
 import { endpointService } from './endpoint.service';
 
 export class EndpointController {

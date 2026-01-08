@@ -1,8 +1,7 @@
 import { planRepository } from './plan.repo';
-import { IPlan } from '@kyrazo/shared';
+import { IPlan, logger } from '@kyrazo/shared';
 import { CreatePlanInput, UpdatePlanInput } from './plan.dto';
 import { stripe } from '@/configs/stripe';
-import { config, logger } from '@/configs';
 
 export class PlanService {
     async createPlan(planData: CreatePlanInput): Promise<IPlan> {

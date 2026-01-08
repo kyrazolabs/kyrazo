@@ -10,6 +10,7 @@ import {
     IProject,
     RestoreProjectResponse,
     UpdateProjectResponse,
+    logger,
 } from '@kyrazo/shared';
 import {
     CreateProjectInput,
@@ -17,7 +18,6 @@ import {
     GetProjectByIdInput,
     UpdateProjectInput,
 } from './project.schema';
-import { logger } from '@/configs';
 import { limitService } from '@/shared/services/limit.service';
 
 export class ProjectController {

@@ -3,7 +3,7 @@ import { logger as honoLogger } from 'hono/logger';
 import { requestId as RequestId } from 'hono/request-id';
 import { cors } from 'hono/cors';
 
-import { redisConfig, logger, config } from './configs';
+import { redisConfig, config } from './configs';
 
 import cron from 'node-cron';
 import { billingJob } from './jobs/billing.job';
@@ -13,6 +13,7 @@ import {
     clickhouseConfig,
     Endpoint,
     postgresConfig,
+    logger,
 } from '@kyrazo/shared';
 // import { arcjetMiddleware } from '@/core/middlewares/arcjet.middleware'
 import { errorHandler } from 'hono-error-handler';

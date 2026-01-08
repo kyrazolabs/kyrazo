@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { IErrorResponse, ISource, Source } from '@kyrazo/shared';
+import { IErrorResponse, ISource, logger, Source } from '@kyrazo/shared';
 import {
     CreateSourceResponse,
     DeleteSourceResponse,
@@ -7,7 +7,6 @@ import {
     GetSourcesResponse,
     UpdateSourceResponse,
 } from './source.type';
-import { logger } from '@/configs';
 import { generateIngressId, decryptSourceSecrets } from '@kyrazo/shared';
 import { AppContext } from '@/core/middlewares/auth.middleware';
 import {

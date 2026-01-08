@@ -1,5 +1,4 @@
 import { AppContext } from '@/core/middlewares/auth.middleware';
-import { logger } from '@/configs';
 import {
     CreateWorkspaceInput,
     GetWorkspaceByIdInput,
@@ -9,7 +8,7 @@ import {
     UpdateWorkspaceMemberRoleInput,
     WorkspaceMemberInput,
 } from './workspace.schema';
-import { IErrorResponse } from '@kyrazo/shared';
+import { IErrorResponse, logger } from '@kyrazo/shared';
 import { workspaceService } from './workspace.service';
 import {
     CreateWorkspaceResponse,

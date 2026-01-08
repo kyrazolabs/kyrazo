@@ -1,7 +1,6 @@
 import { AppContext } from '@/core/middlewares/auth.middleware';
 import { RateLimiterRedis } from 'rate-limiter-flexible';
 import { config, redisConfig } from '@/configs';
-import { logger } from '@/configs';
 
 /**
  * @title Rate Limiter Configuration
@@ -123,7 +122,6 @@ export function createRateLimitMiddleware(
     };
 }
 
-
 /**
  * @title Publish Endpoint Rate Limiter Middleware
  * @description Token bucket rate limiter for publish endpoints (30 req/s default)
@@ -183,7 +181,8 @@ export function createSDKsRateLimiter(
  */
 
 // Lazy initialization for SDK rate limiter
-let _sdksRateLimiter: ReturnType<typeof createRateLimitMiddleware> | null = null;
+let _sdksRateLimiter: ReturnType<typeof createRateLimitMiddleware> | null =
+    null;
 
 export const getSDKsRateLimiter = () => {
     if (!_sdksRateLimiter) {

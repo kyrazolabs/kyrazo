@@ -1,5 +1,4 @@
 import { AppContext } from '@/core/middlewares/auth.middleware';
-import { logger } from '@/configs';
 import {
     GetDeliveryByIdInput,
     GetDeliveriesBySourceIdInput,
@@ -18,6 +17,7 @@ import {
     IGetReceivedEventsResponse,
     IGetTargetsResponse,
     IngestRepo,
+    logger,
 } from '@kyrazo/shared';
 
 export class DeliveryController {

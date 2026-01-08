@@ -1,7 +1,7 @@
 import { AppContext } from '@/core/middlewares/auth.middleware';
-import { logger, redisConfig } from '@/configs';
+import { redisConfig } from '@/configs';
 import { OverviewFilterInput, TargetQueryInput } from '@/core/utils/libs/zod';
-import { IErrorResponse, Source, Target } from '@kyrazo/shared';
+import { IErrorResponse, logger, Source, Target } from '@kyrazo/shared';
 import { AnalyticsService } from './analytics.service';
 import {
     IAnalyticsDispatchResponse,

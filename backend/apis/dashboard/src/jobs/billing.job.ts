@@ -3,7 +3,7 @@ import { subscriptionService } from '@/modules/subscriptions/subscription.servic
 import { paymentService } from '@/modules/payments/payment.service';
 import { planService } from '@/modules/plans/plan.service';
 import { usageService } from '@/shared/services/usage.service';
-import { logger } from '@/configs';
+import { logger } from '@kyrazo/shared';
 
 export class BillingJob {
     /**

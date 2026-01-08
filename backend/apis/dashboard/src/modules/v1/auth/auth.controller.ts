@@ -2,7 +2,7 @@ import { TokenPayload } from 'google-auth-library';
 import { getConnInfo } from 'hono/bun';
 import { ConnInfo } from 'hono/conninfo';
 import { deleteCookie, setSignedCookie, getSignedCookie } from 'hono/cookie';
-import { config, logger } from '@/configs';
+import { config } from '@/configs';
 import {
     AuthActionsResponse,
     AuthRefreshResponse,
@@ -13,6 +13,7 @@ import {
     RefreshToken,
     User,
     PreferencesActionsResponse,
+    logger,
 } from '@kyrazo/shared';
 import {
     ChangePasswordInput,
@@ -105,7 +106,7 @@ export class AuthController {
             await preference.save();
 
             try {
-                const verificationUrl = `${config.app.frontendUrl}/verify-email?token=${saved.emailVerificationToken}`;
+                const verificationUrl = `${config.app.frontendUrl}/auth/verify-email/${saved.emailVerificationToken}`;
 
                 const body = renderEmailVerificationEmail({
                     firstName: saved.firstName as string,
@@ -169,9 +170,11 @@ export class AuthController {
                 tokens.access,
                 config.jwt.secrets.key,
                 {
+                    domain: config.app.frontendUrl,
+                    httpOnly: true,
                     path: '/',
                     secure: true,
-                    domain: config.app.frontendUrl,
+                    sameSite: 'strict',
                 }
             );
             await setSignedCookie(
@@ -180,9 +183,11 @@ export class AuthController {
                 tokens.refresh,
                 config.jwt.secrets.key,
                 {
+                    domain: config.app.frontendUrl,
+                    httpOnly: true,
                     path: '/',
                     secure: true,
-                    domain: config.app.frontendUrl,
+                    sameSite: 'strict',
                 }
             );
             return c.json<AuthResponse>(
