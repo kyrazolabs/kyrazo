@@ -2,12 +2,12 @@ import { Hono, Context } from 'hono';
 import z from 'zod';
 import { zValidator } from '@hono/zod-validator';
 import { ingestController } from './ingest.controller';
-import { logger, redisConfig } from '@/configs';
+import { redisConfig } from '@/configs';
 import {
     getIngestRateLimiter,
     createWorkspaceRateLimiter,
 } from '@/core/middlewares/rate-limiter.middleware';
-import { Source } from '@kyrazo/shared';
+import { logger, Source } from '@kyrazo/shared';
 
 // Helper to resolve IEId to WorkspaceId
 const resolveWorkspaceId = async (c: Context): Promise<string | undefined> => {

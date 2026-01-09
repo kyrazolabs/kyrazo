@@ -9,9 +9,6 @@ const requiredEnvVars = [
     'REDIS_HOST',
     'REDIS_PORT',
     'QUEUE_REDIS_URL',
-    'CLICKHOUSE_URL',
-    'CLICKHOUSE_USERNAME',
-    'CLICKHOUSE_DATABASE',
     'ENCRYPTION_KEY',
 ];
 

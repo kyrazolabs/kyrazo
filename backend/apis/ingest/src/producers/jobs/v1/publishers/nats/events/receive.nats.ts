@@ -1,7 +1,7 @@
 import { natsConfig } from '@/configs/nats';
-import { config, logger } from '@/configs';
+import { config } from '@/configs';
 import type { IReceivedEvent } from '@kyrazo/shared';
-import { signatureCrypto } from '@kyrazo/shared';
+import { logger, signatureCrypto } from '@kyrazo/shared';
 import { DiscardPolicy, RetentionPolicy, StorageType, StringCodec } from 'nats';
 
 /**

@@ -34,9 +34,15 @@ if (missingEnvVars.length > 0) {
  * console.log(config.server.port);
  */
 export const config = {
+    // Application Configuration
+    app: {
+        name: process.env.APP_NAME || 'Kyrazo Ingest',
+        version: process.env.APP_VERSION || '1.0.0',
+    },
+
     // Server Configuration
     server: {
-        port: parseInt(process.env.PORT || '3003'),
+        port: parseInt(process.env.PORT || '9000'),
         env: process.env.NODE_ENV || 'development',
         host: process.env.HOST || '0.0.0.0',
     },
@@ -91,12 +97,6 @@ export const config = {
         error: {
             exitOnError: false,
         },
-    },
-
-    // Application Configuration
-    app: {
-        name: process.env.APP_NAME || 'Kyrazo Ingest',
-        version: process.env.APP_VERSION || '1.0.0',
     },
 
     // Development Configuration

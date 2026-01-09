@@ -3,7 +3,7 @@ import { logger as honoLogger } from 'hono/logger';
 import { requestId as RequestId } from 'hono/request-id';
 import { cors } from 'hono/cors';
 
-import { redisConfig, logger, config, natsConfig } from './configs';
+import { redisConfig, config, natsConfig } from './configs';
 
 // import { arcjetMiddleware } from '@/middlewares/arcjet.middleware'
 import { errorHandler } from 'hono-error-handler';
@@ -21,7 +21,7 @@ import {
 // import { redisMongoSynchronizer } from '@/events/sync/redisToMongo';
 
 import v1Router from './modules';
-import { databaseConfig } from '@kyrazo/shared';
+import { databaseConfig, logger } from '@kyrazo/shared';
 
 const app = new Hono();
 
@@ -39,7 +39,15 @@ const app = new Hono();
 // Global middleware
 app.use('*', RequestId());
 app.use(honoLogger());
-
+app.use(
+    '*',
+    cors({
+        origin: '*',
+        allowMethods: ['POST', 'GET', 'OPTIONS'],
+        maxAge: 600,
+        credentials: true,
+    })
+);
 app.use('*', zodErrorHandler); // قبل errorHandler
 
 // Security middleware
@@ -152,7 +160,7 @@ const startServer = async () => {
         // Start HTTP server
         const server = Bun.serve({
             port: config.server.port,
-            hostname: '0.0.0.0',
+            hostname: config.server.host,
             fetch: app.fetch,
         });
 

@@ -4,7 +4,7 @@ import ingestRouter from './v1/ingest/ingest.routes';
 const router = new Hono();
 
 // Mount ingest routes
-router.route('/ingest', ingestRouter);
+router.route('/', ingestRouter);
 
 // Health check endpoint
 router.get('/health', (c: Context) => {
@@ -12,7 +12,6 @@ router.get('/health', (c: Context) => {
         success: true,
         message: 'Server is running',
         timestamp: new Date().toISOString(),
-        version: '1.0.0',
     });
 });
 

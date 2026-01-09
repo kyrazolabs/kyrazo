@@ -7,8 +7,8 @@ import {
 } from 'nats';
 import * as dotenv from 'dotenv';
 
-import { logger } from './logger';
 import config from './app';
+import { logger } from '@kyrazo/shared';
 
 dotenv.config();
 

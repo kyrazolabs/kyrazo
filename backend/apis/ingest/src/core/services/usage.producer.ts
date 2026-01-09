@@ -1,7 +1,8 @@
 import { Queue } from 'bullmq';
 import { bullmqConfig } from '@/configs/bullmq';
-import { config, redisConfig, logger } from '@/configs';
+import { redisConfig } from '@/configs';
 import { Subscription, Customer } from '@kyrazo/shared';
+import { logger } from '@kyrazo/shared';
 
 const USAGE_QUEUE_NAME = 'usage-tracking';
 

@@ -1,7 +1,7 @@
 import { redisConfig } from '@/configs';
-import { logger } from '@/configs';
 
 import { subscriptionRepository } from '../../repositories/subscription.repo';
+import { logger } from '@kyrazo/shared';
 
 const FREE_PLAN_LIMITS = {
     eventsPerSecond: 10,

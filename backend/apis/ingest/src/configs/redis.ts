@@ -1,7 +1,8 @@
 import Redis from 'ioredis';
 import * as dotenv from 'dotenv';
 
-import { config, logger } from '@/configs';
+import { config } from '@/configs';
+import { logger } from '@kyrazo/shared';
 dotenv.config();
 
 /**
