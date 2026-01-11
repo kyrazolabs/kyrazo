@@ -67,9 +67,9 @@ export class NatsConfig {
             this.nc = await connect({
                 servers: config.nats.servers,
                 tls: {
-                    certFile: '/data/nats/certs/nats-4.pem',
-                    keyFile: '/data/nats/certs/nats-4.key',
-                    caFile: '/data/nats/certs/ca.pem',
+                    certFile: config.nats.tls.certFile,
+                    keyFile: config.nats.tls.keyFile,
+                    caFile: config.nats.tls.caFile,
                 },
                 user: config.nats.user,
                 pass: config.nats.password,
