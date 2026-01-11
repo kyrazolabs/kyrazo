@@ -73,6 +73,11 @@ export const config = {
         servers: process.env.NATS_SERVERS?.split(',') || [
             'nats://localhost:4222',
         ],
+        tls: {
+            certFile: process.env.NATS_CERT_FILE,
+            keyFile: process.env.NATS_KEY_FILE,
+            caFile: process.env.NATS_CA_FILE,
+        },
         user: process.env.NATS_USER || 'admin',
         password: process.env.NATS_PASSWORD || 'adminPass',
         maxReconnectAttempts: parseInt(

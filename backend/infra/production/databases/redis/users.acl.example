@@ -1,8 +1,0 @@
-# Disable the default user entirely
-user default off
-
-# Grant “insight” full permissions for monitoring
-user ... on >... ~* +@all
-
-# Grant “appuser” full permissions for your application
-user ... on >... ~* +@all

@@ -66,6 +66,11 @@ export class NatsConfig {
             // Connect to NATS
             this.nc = await connect({
                 servers: config.nats.servers,
+                tls: {
+                    certFile: '/data/nats/certs/nats-4.pem',
+                    keyFile: '/data/nats/certs/nats-4.key',
+                    caFile: '/data/nats/certs/ca.pem',
+                },
                 user: config.nats.user,
                 pass: config.nats.password,
                 maxReconnectAttempts: config.nats.maxReconnectAttempts,

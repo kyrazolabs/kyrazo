@@ -1,0 +1,27 @@
+services:
+  nats:
+    image: 'nats:latest'
+    container_name: nats
+    ports:
+      - '4222:4222'
+      - '6222:6222'
+      - '8222:8222'
+    volumes:
+      - '/data/nats/nats:/data'
+      - '/data/nats/certs:/etc/nats/certs:ro'
+      - '/data/nats/nats-x.conf:/etc/nats/nats-server.conf:ro'
+    command:
+      - '-c'
+      - /etc/nats/nats-server.conf
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - '--spider'
+        - '-q'
+        - 'http://127.0.0.1:8222/healthz'
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
