@@ -25,7 +25,7 @@ import {
 // import { redisMongoSynchronizer } from '@/events/sync/redisToMongo';
 
 import v1Router from './modules';
-import { clickhouseConfig, logger, databaseConfig } from '@kyrazo/shared';
+import { logger, databaseConfig } from '@kyrazo/shared';
 
 const app = new Hono();
 
@@ -72,9 +72,6 @@ const initializeConnections = async () => {
 
         await redisConfig.connect();
         logger.info('Redis connected successfully');
-
-        await clickhouseConfig.connect();
-        logger.info('ClickHouse connected successfully');
 
         await natsConfig.connect().then(() => {
             logger.info('NATS connected successfully');
@@ -125,10 +122,6 @@ const gracefulShutdown = async (signal: string) => {
         .catch(error => {
             logger.error('Error closing NATS connection:', error as Error);
         });
-
-    // Close ClickHouse connection
-    clickhouseConfig.getClient(); // فقط للتأكد client موجود
-    logger.info('ClickHouse connection closed (client reference cleared)');
 
     // Close event workers
     // if (userMetricsWorker) {
