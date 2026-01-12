@@ -53,15 +53,12 @@ RUN chown -R bun:bun /app
 # Run as non-root user for security
 USER bun
 
-ENV NODE_ENV=production
-ENV PORT=4000
-
 # Expose the application port
-EXPOSE 4000
+EXPOSE ${PORT}
 
 # Healthcheck
 HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
-    CMD wget -qO- http://localhost:3000/v1/health || exit 1
+    CMD wget -qO- http://localhost:3000/v1/${PORT} || exit 1
 
 # Start the application
 CMD ["bun", "run", "src/index.ts"]
