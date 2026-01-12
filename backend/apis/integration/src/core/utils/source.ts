@@ -1,5 +1,4 @@
-import { logger } from '@/configs';
-import { secretCrypto } from '@kyrazo/shared';
+import { logger, secretCrypto } from '@kyrazo/shared';
 import type { ISource } from '@kyrazo/shared';
 
 /**

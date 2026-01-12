@@ -7,7 +7,7 @@ import {
 } from 'nats';
 import * as dotenv from 'dotenv';
 
-import { logger } from './logger';
+import { logger } from '@kyrazo/shared';
 import config from './app';
 
 dotenv.config();
@@ -66,6 +66,11 @@ export class NatsConfig {
             // Connect to NATS
             this.nc = await connect({
                 servers: config.nats.servers,
+                tls: {
+                    certFile: config.nats.tls.certFile,
+                    keyFile: config.nats.tls.keyFile,
+                    caFile: config.nats.tls.caFile,
+                },
                 user: config.nats.user,
                 pass: config.nats.password,
                 maxReconnectAttempts: config.nats.maxReconnectAttempts,

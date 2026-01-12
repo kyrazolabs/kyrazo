@@ -1,9 +1,9 @@
 import { RateLimiterRedis } from 'rate-limiter-flexible';
 import { LimitChecker } from '../services/limit.checker';
 import { config, redisConfig } from '@/configs';
-import { logger } from '@/configs';
 import { Context } from 'hono';
 import { getConnInfo } from 'hono/bun';
+import { logger } from '@kyrazo/shared';
 
 /**
  * @title Rate Limiter Configuration

@@ -1,8 +1,7 @@
 import { Types } from 'mongoose';
 import type { CreateTargetInput, UpdateTargetInput } from './target.schema';
-import { logger } from '@/configs';
 import { targetRepository } from './target.repo';
-import { secretCrypto } from '@kyrazo/shared';
+import { secretCrypto, logger } from '@kyrazo/shared';
 import type { ITarget } from '@kyrazo/shared';
 
 export class TargetService {

@@ -1,4 +1,4 @@
-import { logger } from '@/configs';
+import { logger } from '@kyrazo/shared';
 
 /**
  * Performance timer utility

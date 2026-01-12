@@ -3,9 +3,9 @@ import pLimit from 'p-limit';
 
 import { natsConfig } from '@/configs/nats';
 import { redisConfig, REDIS_KEYS } from '@/configs/redis';
-import { config, logger } from '@/configs';
+import { config } from '@/configs';
 import type { IPublishedEvent } from '@kyrazo/shared';
-import { signatureCrypto } from '@kyrazo/shared';
+import { signatureCrypto, logger } from '@kyrazo/shared';
 import type {
     BatchCreatePublishedEvent,
     CreatePublishedEvent,

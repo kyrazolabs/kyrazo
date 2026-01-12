@@ -1,8 +1,8 @@
 import type { AppContext } from '@/core/middlewares/auth.middleware';
 import { v4 as uuidv4 } from 'uuid';
-import { logger, redisConfig } from '@/configs';
+import { redisConfig } from '@/configs';
 import { PerformanceTimer } from '@/core/utils';
-import type { IErrorResponse } from '@kyrazo/shared';
+import { logger, type IErrorResponse } from '@kyrazo/shared';
 import { publishEventPublisher } from '@/producers/jobs/v1/publishers';
 import {
     type BatchCreatePublishedEvent,

@@ -1,6 +1,5 @@
-import { logger } from '@/configs';
 import type { AppContext } from '@/core/middlewares/auth.middleware';
-import type { IErrorResponse } from '@kyrazo/shared';
+import { logger, type IErrorResponse } from '@kyrazo/shared';
 import { targetService } from './target.service';
 import type {
     CreateTargetResponse,

@@ -5,7 +5,6 @@ import { cors } from 'hono/cors';
 
 import {
     redisConfig,
-    logger,
     config,
     natsConfig /* clickhouseConfig */,
 } from './configs';
@@ -26,7 +25,7 @@ import {
 // import { redisMongoSynchronizer } from '@/events/sync/redisToMongo';
 
 import v1Router from './modules';
-import { clickhouseConfig, databaseConfig } from '@kyrazo/shared';
+import { clickhouseConfig, logger, databaseConfig } from '@kyrazo/shared';
 
 const app = new Hono();
 
