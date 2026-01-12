@@ -34,6 +34,7 @@ export class AuthService {
   }
 
   register(payload: RegisterRequest): Observable<RegisterResponse> {
+    console.log(environment.baseUrl);
     return this.http
       .post<RegisterResponse>(environment.auth.register, payload)
       .pipe(tap((res) => this.handleAuthSuccess(res)));
