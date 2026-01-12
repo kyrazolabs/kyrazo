@@ -58,7 +58,7 @@ EXPOSE ${PORT}
 
 # Healthcheck
 HEALTHCHECK --start-period=20s --interval=30s --timeout=3s --retries=3 \
-    CMD wget -qO- http://localhost:3000/v1/${PORT} || exit 1
+    CMD wget -qO- http://localhost:${PORT}/v1/health || exit 1
 
 # Start the application
 CMD ["bun", "run", "src/index.ts"]
