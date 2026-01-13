@@ -103,6 +103,80 @@ export const config = {
     // Security Configuration
     security: {
         rateLimiter: {
+            auth: {
+                login: {
+                    points: 5, // 5req/min
+                    duration: 60, // every minute
+                    blockDuration: 0,
+
+                    bots: {
+                        points: 10,
+                        duration: 60 * 60, // every hour to block bots
+                        blockDuration: 0,
+                        keyPrefix: (ip: string) => `ratelimit:login:ip:${ip}`,
+                    },
+                },
+                register: {
+                    points: 3, // 3req/min
+                    duration: 60, //  every minute
+                    blockDuration: 0,
+                    keyPrefix: (ip: string) => `rate:register:ip:${ip}`,
+
+                    bots: {
+                        points: 10, // 10req/h
+                        duration: 60 * 60, // every hour to block bots
+                        blockDuration: 0,
+                        keyPrefix: (ip: string) => `rate:register:ip:${ip}`,
+                    },
+                },
+                token: {
+                    refresh: {
+                        points: 5, // req/20min
+                        duration: 60 * 20, // every 20 min
+                        blockDuration: 0,
+                        keyPrefix: (ip: string) => `ratelimit:refresh:ip:${ip}`,
+                    },
+                },
+                password: {
+                    forgot: {
+                        points: 3, // 3req/h per email
+                        duration: 60 * 60, // every hour
+                        blockDuration: 0,
+                        keyPrefix: (email: string) =>
+                            `ratelimit:password:forgot:${email}`,
+                    },
+                    reset: {
+                        points: 10, // 10req/h
+                        duration: 60 * 60, // every hour
+                        blockDuration: 0,
+                        keyPrefix: (ip: string) =>
+                            `ratelimit:password:reset:${ip}`,
+                    },
+                    change: {
+                        points: 10, // 10req/h
+                        duration: 60 * 60, // every hour
+                        blockDuration: 0,
+                        keyPrefix: (userId: string) =>
+                            `ratelimit:password:reset:${userId}`,
+                    },
+                },
+                email: {
+                    verify: {
+                        points: 3, // 3req/h per email
+                        duration: 60 * 60, // every hour
+                        blockDuration: 0,
+                        keyPrefix: (email: string) =>
+                            `ratelimit:email:verify:${email}`,
+                    },
+                },
+                multiFa: {
+                    points: 5, // 5req/10min
+                    duration: 60 * 10, // every 10 min
+                    blockDuration: 0,
+                    keyPrefix: (userId: string) =>
+                        `ratelimit:2fa:user:${userId}`,
+                },
+            },
             protected: {
                 normal: {
                     points: 60, // 60 requests per minute
