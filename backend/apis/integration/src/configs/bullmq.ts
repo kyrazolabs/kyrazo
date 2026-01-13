@@ -42,7 +42,6 @@ export class BullmqConfig {
             });
         }
 
-
         this.redisClient.on('connect', () => {
             console.info('[Redis BullMQ] Connection established');
         });
@@ -64,7 +63,7 @@ export class BullmqConfig {
         });
         this.bullmqOptions = {
             connection: this.redisClient,
-            prefix: 'mailq',
+            prefix: '{mailq}',
             defaultJobOptions: {
                 attempts: 10, // 10 retry
                 backoff: {
