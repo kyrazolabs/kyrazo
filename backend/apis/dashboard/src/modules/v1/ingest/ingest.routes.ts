@@ -154,3 +154,5 @@ ingest.get(
     ),
     IngestController.getIngestEventById
 );
+
+export default ingest;

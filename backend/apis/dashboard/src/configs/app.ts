@@ -102,6 +102,31 @@ export const config = {
 
     // Security Configuration
     security: {
+        rateLimiter: {
+            protected: {
+                normal: {
+                    points: 60, // 60 requests per minute
+                    duration: 60,
+                    blockDuration: 0,
+                    keyPrefix: (userId: string) =>
+                        `ratelimit:protected:normal:${userId}`,
+                },
+                medium: {
+                    points: 40, // 40 requests per minute
+                    duration: 60,
+                    blockDuration: 60, // 1 minute block
+                    keyPrefix: (userId: string) =>
+                        `ratelimit:protected:medium:${userId}`,
+                },
+                sensitive: {
+                    points: 20, // 20 requests per minute
+                    duration: 60,
+                    blockDuration: 300, // 5 minutes block
+                    keyPrefix: (userId: string) =>
+                        `ratelimit:protected:sensitive:${userId}`,
+                },
+            },
+        },
         arcjet: {
             ARCJET_ENV: process.env.ARCJET_ENV || 'development',
             ARCJET_KEY: process.env.ARCJET_KEY || '',

@@ -13,6 +13,7 @@ import paymentsRouter from './payments';
 // import planRouter from './v1/plan/plan.routes';
 import projectRouter from './v1/project/project.routes';
 import targetRouter from './v1/target/target.routes';
+import ingestRouter from './v1/ingest/ingest.routes';
 
 const router = new Hono();
 
@@ -40,6 +41,9 @@ router.route('/deliveries', deliveryRouter);
 
 // Mount analytics routes
 router.route('/analytics', analyticsRouter);
+
+// Mount ingest routes
+router.route('/ingest', ingestRouter);
 
 // Mount billing routes
 router.route('/plans', plansRouter);
