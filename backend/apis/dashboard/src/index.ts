@@ -39,16 +39,15 @@ app.use(honoLogger());
 app.use(
     '*',
     cors({
-        origin: ['http://192.168.8.231:4200', 'http://localhost:4200'], // Add your frontend URLs
+        origin: config.security.corsOrigin, // Add your frontend URLs
         allowMethods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
         allowHeaders: [
             'Content-Type',
             'Authorization',
-            'x-api-key',
             'x-workspace-id',
             'x-project-id',
         ],
-        credentials: true,
+        credentials: config.security.corsCredentials,
     })
 );
 app.use('*', zodErrorHandler); // قبل errorHandler
