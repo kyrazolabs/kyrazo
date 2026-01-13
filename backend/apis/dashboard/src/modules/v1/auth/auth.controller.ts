@@ -31,7 +31,7 @@ import {
     renderEmailVerificationEmail,
     renderPasswordResetEmail,
 } from '@/templates/emails';
-import { mailQueues } from '@/producers/jobs/v1/publishers';
+import { mailQueues, mailQueuesName } from '@/producers/jobs/v1/publishers';
 import { UserPreference } from '@kyrazo/shared';
 import { authUtils } from '@/core/utils/libs/jwt';
 import { AppContext } from '@/core/middlewares/auth.middleware';
@@ -118,9 +118,10 @@ export class AuthController {
                     brandName: config.app.name,
                     supportEmail: config.contacts.support,
                 });
+                await mailQueues.sendMailHighPriorityQueue.waitUntilReady();
 
                 await mailQueues.sendMailHighPriorityQueue.add(
-                    'high-priority-mail',
+                    mailQueuesName.sendMailHighPriorityQueueName,
                     {
                         to: saved.email as string,
                         subject: `Verify your ${config.app.name} email address`,
