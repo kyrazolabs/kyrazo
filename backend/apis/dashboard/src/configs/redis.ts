@@ -68,7 +68,7 @@ export class RedisConfig {
                     host: config.redis.host,
                     port: config.redis.port,
                     db: config.redis.db,
-                    maxRetriesPerRequest: 20, // Essential for BullMQ
+                    maxRetriesPerRequest: null, // Essential for BullMQ
                 };
                 if (config.redis.password) {
                     redisClientOptions.password = config.redis.password;
@@ -87,7 +87,7 @@ export class RedisConfig {
                     password:
                         config.redis.queue.password || config.redis.password,
                     db: config.redis.queue.db || config.redis.db,
-                    maxRetriesPerRequest: 20, // Essential for BullMQ
+                    maxRetriesPerRequest: null, // Essential for BullMQ
                 };
             }
             this.queueClient = new Redis(queueRedisClientOptions);

@@ -70,11 +70,14 @@ export class AuthController {
                 ...info,
                 userAgent,
                 passwordHash: valid.password,
+                emailVerificationToken: crypto.randomUUID(),
             };
             // Create new user with hashed password
             const user = new User(data);
 
             const saved = await user.save();
+            // Manually set the token back to the saved object because it's [select: false] in the schema
+            saved.emailVerificationToken = data.emailVerificationToken;
             if (!saved) {
                 return c.json<IErrorResponse>(
                     {
@@ -125,17 +128,25 @@ export class AuthController {
                     }
                 );
             } catch (mailError: unknown) {
+                const error = mailError as any;
                 logger.error(
                     'Unexpected error on sending verification mail in AuthController.register',
-                    mailError as Error
+                    error
                 );
                 return c.json<IErrorResponse>(
                     {
                         success: false,
                         error: {
                             code: 'SEND_VERIFICATION_FAILED',
-                            message: 'Failed to send verification mail',
-                            details: mailError,
+                            message:
+                                error.message ||
+                                'Failed to send verification mail',
+                            details: {
+                                message: error.message,
+                                name: error.name,
+                                command: error.command,
+                                stack: error.stack,
+                            },
                             requestId: c.get('requestId'),
                         },
                     },

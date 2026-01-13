@@ -13,7 +13,7 @@ export class BullmqConfig {
     constructor(redisUrl: string) {
         this.redisUrl = redisUrl;
         this.redisClient = new Redis(this.redisUrl, {
-            maxRetriesPerRequest: 20,
+            maxRetriesPerRequest: null,
             enableOfflineQueue: true,
             reconnectOnError: (err: Error) => {
                 const targetError = 'READONLY';
