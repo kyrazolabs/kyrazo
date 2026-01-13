@@ -1,1 +1,0 @@
-import{O as r,g as t}from"./chunk-73PELQKU.js";var o=class e{messageSource=new t(null);message$=this.messageSource.asObservable();showMessage(s,a){this.messageSource.next({type:s,data:a})}clear(){this.messageSource.next(null)}static \u0275fac=function(a){return new(a||e)};static \u0275prov=r({token:e,factory:e.\u0275fac,providedIn:"root"})};export{o as a};

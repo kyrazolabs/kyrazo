@@ -1,1 +1,0 @@
-import{O as t,g as o}from"./chunk-73PELQKU.js";var a=class e{_loading=new o(!1);loading$=this._loading.asObservable();show(){this._loading.next(!0)}hide(){this._loading.next(!1)}static \u0275fac=function(i){return new(i||e)};static \u0275prov=t({token:e,factory:e.\u0275fac,providedIn:"root"})};export{a};
