@@ -14,7 +14,7 @@ import { isPlatformBrowser } from "@angular/common";
 import { CommonModule } from "@angular/common";
 import { ButtonModule } from "primeng/button";
 import { RippleModule } from "primeng/ripple";
-import { RouterLink } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
 import { PostHogService } from "@core/3rd-party/posthog";
 
 interface BlobState {
@@ -41,6 +41,8 @@ export class HeroComponent implements AfterViewInit, OnDestroy {
   @ViewChild("blob1") blob1Ref!: ElementRef<HTMLElement>;
   @ViewChild("blob2") blob2Ref!: ElementRef<HTMLElement>;
 
+  private router = inject(Router);
+
   private blobs: BlobState[] = [];
   private animationFrameId: number | null = null;
   private mouseX = -9999;
@@ -59,6 +61,7 @@ export class HeroComponent implements AfterViewInit, OnDestroy {
 
   trackDocs() {
     this.posthog.capture("hero_docs_clicked");
+    window.open("https://docs.kyrazo.com", "_blank", "noopener,noreferrer");
     // If it's an external link, we might want to window.open or just let the landing handles it
     // For now just tracking the click
   }

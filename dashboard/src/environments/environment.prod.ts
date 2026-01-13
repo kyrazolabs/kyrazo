@@ -1,130 +1,113 @@
 import { EndpointStatus } from "@models/endpoint.types";
 
+const baseUrl = "https://kyrazo.com/api";
 export const environment = {
   production: true,
-  baseUrl: "https://api.kyrazo.com/dashboard",
   auth: {
-    login: `https://api.kyrazo.com/dashboard/v1/auth/login`,
-    googleLogin: `https://api.kyrazo.com/dashboard/v1/auth/google`,
-    register: `https://api.kyrazo.com/dashboard/v1/auth/register`,
-    forgetPassword: `https://api.kyrazo.com/dashboard/v1/auth/forgot-password`,
-    verifyEmail: `https://api.kyrazo.com/dashboard/v1/auth/verify-email`,
-    changePassword: `https://api.kyrazo.com/dashboard/v1/auth/change-password`,
-    resetPassword: `https://api.kyrazo.com/dashboard/v1/auth/reset-password`,
-    refreshToken: `https://api.kyrazo.com/dashboard/v1/auth/refresh-token`,
+    login: `${baseUrl}/v1/auth/login`,
+    googleLogin: `${baseUrl}/v1/auth/google`,
+    register: `${baseUrl}/v1/auth/register`,
+    forgetPassword: `${baseUrl}/v1/auth/forgot-password`,
+    verifyEmail: `${baseUrl}/v1/auth/verify-email`,
+    changePassword: `${baseUrl}/v1/auth/change-password`,
+    resetPassword: `${baseUrl}/v1/auth/reset-password`,
+    refreshToken: `${baseUrl}/v1/auth/refresh-token`,
   },
   source: {
-    create: `https://api.kyrazo.com/dashboard/v1/sources`,
-    get: (id: string) => `https://api.kyrazo.com/dashboard/v1/sources/${id}`,
-    gets: `https://api.kyrazo.com/dashboard/v1/sources`,
-    update: (id: string) => `https://api.kyrazo.com/dashboard/v1/sources/${id}`,
-    delete: (id: string) => `https://api.kyrazo.com/dashboard/v1/sources/${id}`,
+    create: `${baseUrl}/v1/sources`,
+    get: (id: string) => `${baseUrl}/v1/sources/${id}`,
+    gets: `${baseUrl}/v1/sources`,
+    update: (id: string) => `${baseUrl}/v1/sources/${id}`,
+    delete: (id: string) => `${baseUrl}/v1/sources/${id}`,
   },
   target: {
-    create: `https://api.kyrazo.com/dashboard/v1/targets`,
-    getAll: `https://api.kyrazo.com/dashboard/v1/targets`,
-    getOne: (id: string) => `https://api.kyrazo.com/dashboard/v1/targets/${id}`,
-    update: (id: string) => `https://api.kyrazo.com/dashboard/v1/targets/${id}`,
-    updateStatus: (id: string) =>
-      `https://api.kyrazo.com/dashboard/v1/targets/${id}`,
-    delete: (id: string) => `https://api.kyrazo.com/dashboard/v1/targets/${id}`,
+    create: `${baseUrl}/v1/targets`,
+    getAll: `${baseUrl}/v1/targets`,
+    getOne: (id: string) => `${baseUrl}/v1/targets/${id}`,
+    update: (id: string) => `${baseUrl}/v1/targets/${id}`,
+    updateStatus: (id: string) => `${baseUrl}/v1/targets/${id}`,
+    delete: (id: string) => `${baseUrl}/v1/targets/${id}`,
   },
   endpoint: {
-    create: `https://api.kyrazo.com/dashboard/v1/endpoints`,
-    get: (id: string) => `https://api.kyrazo.com/dashboard/v1/endpoints/${id}`,
-    gets: `https://api.kyrazo.com/dashboard/v1/endpoints`,
-    update: (id: string) =>
-      `https://api.kyrazo.com/dashboard/v1/endpoints/${id}`,
+    create: `${baseUrl}/v1/endpoints`,
+    get: (id: string) => `${baseUrl}/v1/endpoints/${id}`,
+    gets: `${baseUrl}/v1/endpoints`,
+    update: (id: string) => `${baseUrl}/v1/endpoints/${id}`,
     updateStatus: (id: string, status: EndpointStatus) =>
-      `https://api.kyrazo.com/dashboard/v1/endpoints/${id}/${status}`,
-    delete: (id: string) =>
-      `https://api.kyrazo.com/dashboard/v1/endpoints/${id}`,
+      `${baseUrl}/v1/endpoints/${id}/${status}`,
+    delete: (id: string) => `${baseUrl}/v1/endpoints/${id}`,
   },
   delivery: {
-    get: (id: string) => `https://api.kyrazo.com/dashboard/v1/deliveries/${id}`,
-    gets: `https://api.kyrazo.com/dashboard/v1/deliveries`,
-    getTargets: `https://api.kyrazo.com/dashboard/v1/deliveries/targets`,
+    get: (id: string) => `${baseUrl}/v1/deliveries/${id}`,
+    gets: `${baseUrl}/v1/deliveries`,
+    getTargets: `${baseUrl}/v1/deliveries/targets`,
     getByTarget: (target: string) =>
-      `https://api.kyrazo.com/dashboard/v1/deliveries/targets/${target}`,
-    getBySource: (id: string) =>
-      `https://api.kyrazo.com/dashboard/v1/deliveries/webhook/${id}`,
-    getStats: `https://api.kyrazo.com/dashboard/v1/deliveries/stats`,
+      `${baseUrl}/v1/deliveries/targets/${target}`,
+    getBySource: (id: string) => `${baseUrl}/v1/deliveries/webhook/${id}`,
+    getStats: `${baseUrl}/v1/deliveries/stats`,
     getStatsByTarget: (target: string) =>
-      `https://api.kyrazo.com/dashboard/v1/deliveries/targets/${target}/overview`,
+      `${baseUrl}/v1/deliveries/targets/${target}/overview`,
   },
   key: {
-    create: `https://api.kyrazo.com/dashboard/v1/keys`,
-    gets: `https://api.kyrazo.com/dashboard/v1/keys`,
-    checkScopes: (id: string) =>
-      `https://api.kyrazo.com/dashboard/v1/keys/check-scopes/${id}`,
-    revoke: (id: string) => `https://api.kyrazo.com/dashboard/v1/keys/${id}`,
+    create: `${baseUrl}/v1/keys`,
+    gets: `${baseUrl}/v1/keys`,
+    checkScopes: (id: string) => `${baseUrl}/v1/keys/check-scopes/${id}`,
+    revoke: (id: string) => `${baseUrl}/v1/keys/${id}`,
   },
   profile: {
-    get: `https://api.kyrazo.com/dashboard/v1/auth/profile`,
-    update: `https://api.kyrazo.com/dashboard/v1/auth/profile`,
+    get: `${baseUrl}/v1/auth/profile`,
+    update: `${baseUrl}/v1/auth/profile`,
     preference: {
-      get: `https://api.kyrazo.com/dashboard/v1/auth/profile/preferences`,
-      update: `https://api.kyrazo.com/dashboard/v1/auth/profile/preferences`,
+      get: `${baseUrl}/v1/auth/profile/preferences`,
+      update: `${baseUrl}/v1/auth/profile/preferences`,
     },
   },
   subscription: {
-    base: `https://api.kyrazo.com/dashboard/v1/subscriptions`,
-    plans: `https://api.kyrazo.com/dashboard/v1/plans`,
-    changePlan: (id: string) =>
-      `https://api.kyrazo.com/dashboard/v1/subscriptions/${id}/change-plan`,
-    cancel: (id: string) =>
-      `https://api.kyrazo.com/dashboard/v1/subscriptions/${id}/cancel`,
+    base: `${baseUrl}/v1/subscriptions`,
+    plans: `${baseUrl}/v1/plans`,
+    changePlan: (id: string) => `${baseUrl}/v1/subscriptions/${id}/change-plan`,
+    cancel: (id: string) => `${baseUrl}/v1/subscriptions/${id}/cancel`,
   },
   payment: {
-    subscribe: `https://api.kyrazo.com/dashboard/v1/payments/subscribe`,
-    portal: `https://api.kyrazo.com/dashboard/v1/payments/portal`,
+    subscribe: `${baseUrl}/v1/payments/subscribe`,
+    portal: `${baseUrl}/v1/payments/portal`,
   },
   workspace: {
-    create: `https://api.kyrazo.com/dashboard/v1/workspaces`,
-    gets: `https://api.kyrazo.com/dashboard/v1/workspaces`,
-    get: (id: string) => `https://api.kyrazo.com/dashboard/v1/workspaces/${id}`,
-    update: (id: string) =>
-      `https://api.kyrazo.com/dashboard/v1/workspaces/${id}`,
-    delete: (id: string) =>
-      `https://api.kyrazo.com/dashboard/v1/workspaces/${id}`,
-    restore: (id: string) =>
-      `https://api.kyrazo.com/dashboard/v1/workspaces/${id}/restore`,
-    archive: (id: string) =>
-      `https://api.kyrazo.com/dashboard/v1/workspaces/${id}/archive`,
-    unarchive: (id: string) =>
-      `https://api.kyrazo.com/dashboard/v1/workspaces/${id}/unarchive`,
-    invite: (id: string) =>
-      `https://api.kyrazo.com/dashboard/v1/workspaces/${id}/invitations`,
+    create: `${baseUrl}/v1/workspaces`,
+    gets: `${baseUrl}/v1/workspaces`,
+    get: (id: string) => `${baseUrl}/v1/workspaces/${id}`,
+    update: (id: string) => `${baseUrl}/v1/workspaces/${id}`,
+    delete: (id: string) => `${baseUrl}/v1/workspaces/${id}`,
+    restore: (id: string) => `${baseUrl}/v1/workspaces/${id}/restore`,
+    archive: (id: string) => `${baseUrl}/v1/workspaces/${id}/archive`,
+    unarchive: (id: string) => `${baseUrl}/v1/workspaces/${id}/unarchive`,
+    invite: (id: string) => `${baseUrl}/v1/workspaces/${id}/invitations`,
     acceptInvitation: (token: string) =>
-      `https://api.kyrazo.com/dashboard/v1/workspaces/invitations/${token}/accept`,
+      `${baseUrl}/v1/workspaces/invitations/${token}/accept`,
     rejectInvitation: (token: string) =>
-      `https://api.kyrazo.com/dashboard/v1/workspaces/invitations/${token}/reject`,
+      `${baseUrl}/v1/workspaces/invitations/${token}/reject`,
     removeMember: (workspaceId: string, userId: string) =>
-      `https://api.kyrazo.com/dashboard/v1/workspaces/${workspaceId}/members/${userId}`,
+      `${baseUrl}/v1/workspaces/${workspaceId}/members/${userId}`,
     updateMemberRole: (workspaceId: string) =>
-      `https://api.kyrazo.com/dashboard/v1/workspaces/${workspaceId}/members/role`,
-    getMembers: (id: string) =>
-      `https://api.kyrazo.com/dashboard/v1/workspaces/${id}/members`,
+      `${baseUrl}/v1/workspaces/${workspaceId}/members/role`,
+    getMembers: (id: string) => `${baseUrl}/v1/workspaces/${id}/members`,
     getInvitationDetails: (token: string) =>
-      `https://api.kyrazo.com/dashboard/v1/workspaces/invitations/details/${token}`,
+      `${baseUrl}/v1/workspaces/invitations/details/${token}`,
   },
 
   project: {
-    create: `https://api.kyrazo.com/dashboard/v1/projects`,
-    getWorkspaceProjects: `https://api.kyrazo.com/dashboard/v1/projects/workspace`,
-    get: (id: string) => `https://api.kyrazo.com/dashboard/v1/projects/${id}`,
-    update: (id: string) =>
-      `https://api.kyrazo.com/dashboard/v1/projects/${id}`,
-    delete: (id: string) =>
-      `https://api.kyrazo.com/dashboard/v1/projects/${id}`,
-    restore: (id: string) =>
-      `https://api.kyrazo.com/dashboard/v1/projects/${id}/restore`,
+    create: `${baseUrl}/v1/projects`,
+    getWorkspaceProjects: `${baseUrl}/v1/projects/workspace`,
+    get: (id: string) => `${baseUrl}/v1/projects/${id}`,
+    update: (id: string) => `${baseUrl}/v1/projects/${id}`,
+    delete: (id: string) => `${baseUrl}/v1/projects/${id}`,
+    restore: (id: string) => `${baseUrl}/v1/projects/${id}/restore`,
   },
   analytics: {
-    dispatchUsage: `https://api.kyrazo.com/dashboard/v1/analytics/dispatch/usage`,
-    ingestUsage: `https://api.kyrazo.com/dashboard/v1/analytics/ingest/usage`,
+    dispatchUsage: `${baseUrl}/v1/analytics/dispatch/usage`,
+    ingestUsage: `${baseUrl}/v1/analytics/ingest/usage`,
     targetOverview: (target: string) =>
-      `https://api.kyrazo.com/dashboard/v1/analytics/targets/${target}/overview`,
+      `${baseUrl}/v1/analytics/targets/${target}/overview`,
   },
   sentry: {
     dsn: "https://c3803071d2f195c52eb7a5e915b895fc@o4510640976625664.ingest.de.sentry.io/4510640978657360",
