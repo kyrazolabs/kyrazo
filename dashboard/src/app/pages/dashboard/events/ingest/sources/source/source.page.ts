@@ -137,7 +137,7 @@ export class SourcePage implements OnInit, AfterViewInit {
 
         if (response.data.ingressId) {
           this.ingressUrl.set(
-            `${environment.baseUrl}/v1/ingest/${response.data.ingressId}`
+            environment.ingest.ingress(response.data.ingressId)
           );
         }
 

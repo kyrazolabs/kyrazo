@@ -280,18 +280,13 @@ export class DeliveryService {
     }
 
     return this.http
-      .get<ApiResponse<IngestEvent[]>>(
-        `${environment.baseUrl}/v1/deliveries/ingest/events`,
-        { params }
-      )
+      .get<ApiResponse<IngestEvent[]>>(environment.ingest.gets, { params })
       .pipe(catchError(this.handleError));
   }
 
   getIngestEventById(eventId: string): Observable<ApiResponse<IngestEvent>> {
     return this.http
-      .get<ApiResponse<IngestEvent>>(
-        `${environment.baseUrl}/v1/deliveries/ingest/events/${eventId}`
-      )
+      .get<ApiResponse<IngestEvent>>(environment.ingest.get(eventId))
       .pipe(catchError(this.handleError));
   }
 
@@ -312,7 +307,7 @@ export class DeliveryService {
 
     return this.http
       .get<ApiResponse<IngestEvent[]>>(
-        `${environment.baseUrl}/v1/deliveries/ingest/webhook/${sourceId}`,
+        environment.ingest.getBySource(sourceId),
         { params }
       )
       .pipe(catchError(this.handleError));

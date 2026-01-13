@@ -118,4 +118,10 @@ export const environment = {
     key: "phc_3YHwJQbSU1f4xiVk8uPVtArvWAhGh55nZOQ3Oc49Cy2",
     host: "https://eu.i.posthog.com",
   },
+  ingest: {
+    gets: `${baseUrl}/v1/ingest/events`,
+    get: (id: string) => `${baseUrl}/v1/ingest/events/${id}`,
+    getBySource: (id: string) => `${baseUrl}/v1/ingest/source/${id}`,
+    ingress: (id: string) => `${baseUrl}/v1/ingest/${id}`,
+  },
 };

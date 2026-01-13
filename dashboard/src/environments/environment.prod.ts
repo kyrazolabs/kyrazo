@@ -1,8 +1,9 @@
 import { EndpointStatus } from "@models/endpoint.types";
 
-const baseUrl = "https://kyrazo.com/api";
+const baseUrl = "https://api.kyrazo.com/dashboard";
 export const environment = {
   production: true,
+  baseUrl,
   auth: {
     login: `${baseUrl}/v1/auth/login`,
     googleLogin: `${baseUrl}/v1/auth/google`,
@@ -116,5 +117,11 @@ export const environment = {
   posthog: {
     key: "phc_3YHwJQbSU1f4xiVk8uPVtArvWAhGh55nZOQ3Oc49Cy2",
     host: "https://eu.i.posthog.com",
+  },
+  ingest: {
+    gets: `${baseUrl}/v1/ingest/events`,
+    get: (id: string) => `${baseUrl}/v1/ingest/events/${id}`,
+    getBySource: (id: string) => `${baseUrl}/v1/ingest/source/${id}`,
+    ingress: (id: string) => `${baseUrl}/v1/ingest/${id}`,
   },
 };
