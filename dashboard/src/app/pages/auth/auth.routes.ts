@@ -33,10 +33,4 @@ export const AuthRoutes: Routes = [
       ),
     data: { animation: "ResetPassword" },
   },
-  {
-    path: "verify-email",
-    loadComponent: () =>
-      import("./verify-email/verify-email.page").then((m) => m.VerifyEmailPage),
-    data: { animation: "VerifyEmail" },
-  },
 ];

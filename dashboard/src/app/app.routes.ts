@@ -133,6 +133,14 @@ export const routes: Routes = [
     data: { animation: "InvitationPage" },
   },
   {
+    path: "verify-email/:token",
+    loadComponent: () =>
+      import("@pages/auth/verify-email/verify-email.page").then(
+        (m) => m.VerifyEmailPage
+      ),
+    data: { animation: "VerifyEmail" },
+  },
+  {
     path: "not-found",
     loadComponent: () =>
       import("@shared/ui/not-found/not-found.component").then(
