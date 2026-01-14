@@ -162,13 +162,28 @@ export const authenticate = async (c: AppContext, next: Next) => {
 
         const project = await Project.findById(projectId);
 
+        if (!project) {
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'INVALID_PROJECT',
+                        message: 'Project not found',
+                        requestId: c.get('requestId'),
+                    },
+                },
+                404
+            );
+        }
+
         const owner = workspace.workspace;
         const workspacePayload: { workspaceId: Types.ObjectId } = {
             workspaceId: owner._id,
         };
 
         c.workspace = workspacePayload;
-        c.project = project;
+        // @ts-ignore - project is IProject & { projectId: Types.ObjectId }
+        c.project = Object.assign(project, { projectId: project._id });
         c.userId = workspace.createBy.toString();
         c.key = {
             name: workspace.name,
