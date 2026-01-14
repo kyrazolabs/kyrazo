@@ -133,7 +133,7 @@ export const routes: Routes = [
     data: { animation: "InvitationPage" },
   },
   {
-    path: "verify-email/:token",
+    path: "verify-email",
     loadComponent: () =>
       import("@pages/auth/verify-email/verify-email.page").then(
         (m) => m.VerifyEmailPage

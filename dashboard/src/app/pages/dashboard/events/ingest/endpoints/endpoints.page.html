@@ -133,8 +133,8 @@
                 <tr>
                     <td colspan="7" class="text-center py-12">
                         <div class="flex flex-col items-center gap-4 my-10">
-                            <i class="pi pi-link text-6xl text-surface-400"></i>
-                            <div>
+                            <i class="pi pi-link text-6xl! text-surface-400"></i>
+                            <div class="text-center flex flex-col justify-center">
                                 <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-2">
                                     {{ searchQuery ? 'No endpoints found' :
                                     activeFilter === 'all' ? 'No endpoints found' :
@@ -145,12 +145,12 @@
                                     activeFilter === 'all' ? 'Get started by creating your first endpoint' :
                                     'Try adjusting your filters or create a new endpoint' }}
                                 </p>
-                                <div class="flex gap-2">
+                                <div class="flex justify-center gap-2">
                                     <p-button label="Clear Filters" icon="pi pi-filter-slash" severity="secondary"
-                                        size="small" [outlined]="true" (onClick)="refreshEndpoints()"
+                                        size="small" [outlined]="true" (onClick)="refreshEndpoints()" styleClass="rounded-xl!"
                                         *ngIf="searchQuery || activeFilter !== 'all'" />
                                     <p-button label="Add Endpoint" icon="pi pi-plus"
-                                        routerLink="/dashboard/events/ingest/endpoints/create" size="small" />
+                                        routerLink="/dashboard/events/ingest/endpoints/create" size="small" styleClass="rounded-xl!" />
                                 </div>
                             </div>
                         </div>
