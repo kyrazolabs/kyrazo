@@ -25,8 +25,9 @@ export class DispatchAggregator {
                 continue;
             }
 
-            const projectId = parts[2];
+            const projectId = parts[2]!;
             const minuteIso = parts[4];
+            if (!minuteIso) continue;
             const targetId = parts[5];
             const eventType = parts[6];
             const responseCode = parseInt(parts[7] || '0', 10);
@@ -44,7 +45,7 @@ export class DispatchAggregator {
             // "2023-12-26T16-39-26.000Z" -> split 'T', take first part.
             // That is enough for bucketDay!
 
-            const bucketDayStr = minuteIso.split('T')[0]; // YYYY-MM-DD
+            const bucketDayStr = minuteIso.split('T')[0]!; // YYYY-MM-DD
 
             // Composite key for in-memory grouping
             const compositeKey = `${projectId}|${bucketDayStr}|${targetId}|${eventType}|${responseCode}`;
@@ -82,11 +83,11 @@ export class DispatchAggregator {
             const latencySum = parseInt(snapshot['latency_sum'] || '0', 10);
             const latencyCount = parseInt(snapshot['latency_count'] || '0', 10);
 
-            // @ts-expect-error - Adding temporary properties for aggregation
-            existing._latencySum = (existing._latencySum || 0) + latencySum;
-            // @ts-expect-error - Adding temporary properties for aggregation
-            existing._latencyCount =
-                (existing._latencyCount || 0) + latencyCount;
+            const aggExisting = existing as any;
+            aggExisting._latencySum =
+                (aggExisting._latencySum || 0) + latencySum;
+            aggExisting._latencyCount =
+                (aggExisting._latencyCount || 0) + latencyCount;
 
             existing.totalDeliveries =
                 (existing.totalDeliveries as number) + total;
@@ -101,17 +102,14 @@ export class DispatchAggregator {
         }
 
         const valuesToInsert = Array.from(aggMap.values()).map(val => {
+            const aggVal = val as any;
             // Calculate initial average for the insert
-            // @ts-expect-error - accessing temp properties
-            const count = val._latencyCount;
-            // @ts-expect-error - accessing temp properties
-            const sum = val._latencySum;
+            const count = aggVal._latencyCount;
+            const sum = aggVal._latencySum;
 
             // Clean up temp properties
-            // @ts-expect-error - accessing temp properties
-            delete val._latencyCount;
-            // @ts-expect-error - accessing temp properties
-            delete val._latencySum;
+            delete aggVal._latencyCount;
+            delete aggVal._latencySum;
 
             return {
                 ...val,
