@@ -3,28 +3,6 @@ import * as dotenv from 'dotenv';
 // Load environment variables
 dotenv.config();
 
-// Validate required environment variables
-const requiredEnvVars = [
-    'MONGODB_URI',
-    'REDIS_HOST',
-    'REDIS_PORT',
-    'QUEUE_REDIS_URL',
-    'ENCRYPTION_KEY',
-];
-
-console.log('Checking required env vars:');
-requiredEnvVars.forEach(envVar => {
-    console.log(`${envVar}: ${process.env[envVar] ? 'present' : 'MISSING'}`);
-});
-
-const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
-
-if (missingEnvVars.length > 0) {
-    throw new Error(
-        `Missing required environment variables: ${missingEnvVars.join(', ')}`
-    );
-}
-
 /**
  * @title App Configuration
  * @description Application-wide configuration object, including server, security, upload, and other settings. Loaded from environment variables.
