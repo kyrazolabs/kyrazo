@@ -75,7 +75,7 @@ export class ReceiveEventPublisher {
                     name: 'EVENTS',
                     subjects: ['workspace.>'],
                     storage: StorageType.File,
-                    num_replicas: config.isDevelopment ? 1 : 3,
+                    num_replicas: config.isDevelopment ? 1 : 2,
                     retention: RetentionPolicy.Workqueue,
                     discard: DiscardPolicy.Old,
                     max_msgs: -1,
