@@ -13,6 +13,10 @@ RUN bun install --frozen-lockfile
 # 2. Copy source code
 COPY . .
 
+# 3. Build the application and run migrations
+# NOTE: This requires DATABASE_URL to be set if migrations are run during build
+RUN bun run prod
+
 # Stage 2: Production runner
 FROM oven/bun:${BUN_VERSION}-alpine AS runner
 WORKDIR /app
@@ -23,7 +27,8 @@ COPY --from=builder /app/node_modules /app/node_modules
 # Copy analytics package binaries and config
 COPY --from=builder /app/package.json /app/package.json
 COPY --from=builder /app/tsconfig.json /app/tsconfig.json
-COPY --from=builder /app/src /app/src
+COPY --from=builder /app/dist /app/dist
+COPY --from=builder /app/drizzle /app/drizzle
 
 # Ensure everything is owned by the bun user before switching
 RUN chown -R bun:bun /app
@@ -39,4 +44,4 @@ HEALTHCHECK --start-period=20s --interval=30s --timeout=3s --retries=3 \
     CMD wget -qO- http://localhost:${PORT}/v1/health || exit 1
 
 # Start the application
-CMD ["bun", "run", "src/index.ts"]
+CMD ["bun", "run", "start"]
