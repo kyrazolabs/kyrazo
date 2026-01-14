@@ -80,7 +80,6 @@ export const authenticate = async (c: AppContext, next: Next) => {
                     kid: key.parts.kid,
                 })
                     .populate('workspace', ['_id'])
-                    .populate('createBy', ['_id'])
                     .select('+key +kid');
             },
             60
@@ -170,7 +169,7 @@ export const authenticate = async (c: AppContext, next: Next) => {
 
         c.workspace = workspacePayload;
         c.project = project;
-        c.userId = workspace.createBy._id.toString();
+        c.userId = workspace.createBy.toString();
         c.key = {
             name: workspace.name,
             permissions: workspace.scopes,
