@@ -82,9 +82,12 @@ export class RedisSnapshotConsumer {
 
                             // Attach the key itself for parsing context later if needed (e.g. valid timestamps in key)
                             // key format: analytics:rt:{projectId}:{type}:{minuteBucket}:...
-                            data['_key'] = keys[index];
+                            const key = keys[index];
+                            if (!key) return;
 
-                            const keyParts = keys[index].split(':');
+                            data['_key'] = key;
+
+                            const keyParts = key.split(':');
                             // keyParts[0] = analytics
                             // keyParts[1] = rt
                             // keyParts[2] = projectId

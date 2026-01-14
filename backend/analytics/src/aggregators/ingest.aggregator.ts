@@ -38,9 +38,10 @@ export class IngestAggregator {
                 continue;
             }
 
-            const projectId = parts[2];
+            const projectId = parts[2]!;
             const minuteIso = parts[4];
-            const sourceId = parts[5];
+            if (!minuteIso) continue;
+            const sourceId = parts[5]!;
             const statusStr = parts[6];
 
             let processingStatus = 0;
@@ -49,7 +50,7 @@ export class IngestAggregator {
                 processingStatus = 2;
 
             // Derive bucketDay
-            const bucketDayStr = minuteIso.split('T')[0];
+            const bucketDayStr = minuteIso.split('T')[0]!;
 
             const compositeKey = `${projectId}|${bucketDayStr}|${sourceId}|${processingStatus}`;
 
