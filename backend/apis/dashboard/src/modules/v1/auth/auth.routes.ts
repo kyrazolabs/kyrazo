@@ -515,6 +515,17 @@ auth.post(
     AuthController.logout
 );
 
+auth.get(
+    '/email-verification-status',
+    profileReadRateLimiter,
+    AuthController.getEmailVerificationStatus
+);
+auth.post(
+    '/resend-verification',
+    profileUpdateRateLimiter,
+    AuthController.resendEmailVerification
+);
+
 // Admin routes (admin role required)
 // auth.use('/admin/*', authenticate, requireAdmin);
 

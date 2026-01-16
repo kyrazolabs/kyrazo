@@ -89,6 +89,7 @@ const userSchema = new Schema<IUser>(
 userSchema.index({ isActive: 1 });
 userSchema.index({ createdAt: -1 });
 userSchema.index({ lastLogin: -1 });
+userSchema.index({ emailVerificationToken: 1 });
 userSchema.index({
     firstName: 'text',
     lastName: 'text',

@@ -1200,31 +1200,21 @@ export class AuthController {
         try {
             const valid: VerifyEmailInput = c.req.valid('json');
 
-            const decoded = authUtils.verifyVerificationToken(valid.token);
-            if (decoded.type !== 'email_verification') {
-                return c.json<IErrorResponse>({
-                    success: false,
-                    error: {
-                        code: 'INVALID_TOKEN',
-                        message: 'Invalid verification token',
-                        requestId: c.get('requestId'),
-                    },
-                });
-            }
-
-            const user = await User.findByEmail(decoded.email);
+            const user = await User.findOne({
+                emailVerificationToken: valid.token,
+            });
 
             if (!user || !user.isActive) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
                         error: {
-                            code: 'USER_NOT_FOUND',
-                            message: 'User not found or inactive',
+                            code: 'INVALID_TOKEN',
+                            message: 'Invalid or expired verification token',
                             requestId: c.get('requestId'),
                         },
                     },
-                    404
+                    400
                 );
             }
 
@@ -1265,6 +1255,187 @@ export class AuthController {
                     error: {
                         code: 'VERIFY_EMAIL_FAILED',
                         message: 'Failed to verify email',
+                        requestId: c.get('requestId'),
+                    },
+                },
+                500
+            );
+        }
+    }
+
+    /**
+     * Get email verification status
+     */
+    static async getEmailVerificationStatus(c: AppContext): Promise<Response> {
+        try {
+            const userId = c.user?.userId;
+            if (!userId) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'UNAUTHORIZED',
+                            message: 'Authentication required',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    401
+                );
+            }
+
+            const user = await User.findById(userId);
+
+            if (!user || !user.isActive) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'USER_NOT_FOUND',
+                            message: 'User not found or inactive',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    404
+                );
+            }
+
+            return c.json(
+                {
+                    success: true,
+                    data: {
+                        emailVerified: user.emailVerified,
+                    },
+                },
+                200
+            );
+        } catch (error: unknown) {
+            logger.error(
+                'Unexpected error in AuthController.getEmailVerificationStatus',
+                error as Error
+            );
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'VERIFICATION_STATUS_FAILED',
+                        message: 'Failed to fetch verification status',
+                        requestId: c.get('requestId'),
+                    },
+                },
+                500
+            );
+        }
+    }
+
+    /**
+     * Resend verification email
+     */
+    static async resendEmailVerification(c: AppContext): Promise<Response> {
+        try {
+            const userId = c.user?.userId;
+            if (!userId) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'UNAUTHORIZED',
+                            message: 'Authentication required',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    401
+                );
+            }
+
+            const user = await User.findById(userId);
+
+            if (!user || !user.isActive) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'USER_NOT_FOUND',
+                            message: 'User not found or inactive',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    404
+                );
+            }
+
+            if (user.emailVerified) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'EMAIL_ALREADY_VERIFIED',
+                            message: 'Email is already verified',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    400
+                );
+            }
+
+            const token = crypto.randomUUID();
+            user.emailVerificationToken = token;
+            await user.save();
+
+            try {
+                const verificationUrl = `${config.app.frontendUrl}/auth/verify-email/${token}`;
+
+                const body = renderEmailVerificationEmail({
+                    firstName: user.firstName as string,
+                    email: user.email as string,
+                    verificationUrl,
+                    brandName: config.app.name,
+                    supportEmail: config.contacts.support,
+                });
+
+                await mailQueues.sendMailHighPriorityQueue.add(
+                    mailQueuesName.sendMailHighPriorityQueueName,
+                    {
+                        to: user.email as string,
+                        subject: `Verify your ${config.app.name} email address`,
+                        html: body,
+                    }
+                );
+            } catch (mailError: unknown) {
+                logger.error(
+                    'Unexpected error on sending verification mail in AuthController.resendEmailVerification',
+                    mailError as Error
+                );
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'SEND_VERIFICATION_FAILED',
+                            message: 'Failed to send verification mail',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    500
+                );
+            }
+
+            return c.json<AuthActionsResponse>(
+                {
+                    success: true,
+                    message: 'Verification email resent successfully',
+                },
+                200
+            );
+        } catch (error: unknown) {
+            logger.error(
+                'Unexpected error in AuthController.resendEmailVerification',
+                error as Error
+            );
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'RESEND_VERIFICATION_FAILED',
+                        message: 'Failed to resend verification email',
                         requestId: c.get('requestId'),
                     },
                 },
