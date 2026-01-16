@@ -107,8 +107,6 @@ export const EMAIL_TEMPLATES = {
     PASSWORD_RESET: 'password-reset',
     EMAIL_VERIFICATION: 'email-verification',
     WORKSPACE_INVITATION: 'workspace-invitation',
-    WEBHOOK_FAILURE: 'source-failure',
-    DAILY_SUMMARY: 'daily-summary',
 } as const;
 
 export type EmailTemplateType =
@@ -154,62 +152,6 @@ export function renderEmailVerificationEmail(
 }
 
 /**
- * @title Render Source Failure Email
- * @description Renders the source failure notification template
- */
-export function renderSourceFailureEmail(
-    data: Pick<
-        EmailTemplateData,
-        | 'firstName'
-        | 'email'
-        | 'sourceName'
-        | 'sourceUrl'
-        | 'statusCode'
-        | 'timestamp'
-        | 'attemptNumber'
-        | 'maxAttempts'
-        | 'errorMessage'
-        | 'responseBody'
-        | 'sourceDetailsUrl'
-        | 'retryUrl'
-        | 'logsUrl'
-        | 'settingsUrl'
-        | 'brandName'
-        | 'supportEmail'
-    >
-): string {
-    return loadEmailTemplate(EMAIL_TEMPLATES.WEBHOOK_FAILURE, data);
-}
-
-/**
- * @title Render Daily Summary Email
- * @description Renders the daily summary email template
- */
-export function renderDailySummaryEmail(
-    data: Pick<
-        EmailTemplateData,
-        | 'firstName'
-        | 'email'
-        | 'date'
-        | 'totalDeliveries'
-        | 'successfulDeliveries'
-        | 'failedDeliveries'
-        | 'successRate'
-        | 'successRateClass'
-        | 'averageResponseTime'
-        | 'mostActiveSource'
-        | 'peakHour'
-        | 'totalDataTransferred'
-        | 'dashboardUrl'
-        | 'settingsUrl'
-        | 'topFailures'
-        | 'brandName'
-    >
-): string {
-    return loadEmailTemplate(EMAIL_TEMPLATES.DAILY_SUMMARY, data);
-}
-
-/**
  * @title Render Workspace Invitation Email
  * @description Renders the workspace invitation email template
  */
@@ -237,7 +179,5 @@ export default {
     renderPasswordResetEmail,
     renderEmailVerificationEmail,
     renderWorkspaceInvitationEmail,
-    renderSourceFailureEmail,
-    renderDailySummaryEmail,
     EMAIL_TEMPLATES,
 };

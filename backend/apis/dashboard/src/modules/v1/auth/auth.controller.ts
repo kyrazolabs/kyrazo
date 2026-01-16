@@ -109,7 +109,7 @@ export class AuthController {
             await preference.save();
 
             try {
-                const verificationUrl = `${config.app.frontendUrl}/auth/verify-email/${saved.emailVerificationToken}`;
+                const verificationUrl = `${config.app.frontendUrl}/verify-email?token=${saved.emailVerificationToken}`;
 
                 const body = renderEmailVerificationEmail({
                     firstName: saved.firstName as string,
