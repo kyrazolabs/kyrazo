@@ -1067,7 +1067,7 @@ export class AuthController {
             const token = authUtils.generateResetToken(payload);
 
             try {
-                const resetUrl = `${config.app.frontendUrl}/reset-password?token=${token}`;
+                const resetUrl = `${config.app.frontendUrl}/auth/reset-password?token=${token}`;
                 const body = renderPasswordResetEmail({
                     firstName: user.firstName,
                     email: user.email,
