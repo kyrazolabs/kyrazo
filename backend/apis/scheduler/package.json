@@ -11,6 +11,7 @@
     "migrate": "drizzle-kit push",
     "build": "tsc -p tsconfig.json",
     "build:watch": "bun run build && bun run watch",
+    "prod": "bun run build && bun run migrate",
     "watch": "concurrently -k -n TSC -c blue \"tsc -p tsconfig.json -w\"",
     "rebuild": "rm -rf dist && bun run build",
     "clean": "rm -rf dist && echo 'Done.'",

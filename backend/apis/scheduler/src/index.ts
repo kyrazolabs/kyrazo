@@ -24,6 +24,8 @@ app.use('*', logger());
 app.onError(globalErrorHandler);
 
 // --- Public Routes ---
+app.get('/v1/health', c => c.json({ status: 'ok' }));
+
 // app.post(
 //     '/servers/register',
 //     zValidator('json', RegisterServerSchema),

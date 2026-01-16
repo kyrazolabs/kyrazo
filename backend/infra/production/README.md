@@ -25,9 +25,6 @@
 ## 2️⃣ إنشاء CA (مرة واحدة)
 
 ```bash
-mkdir -p /etc/nats/pki
-cd /etc/nats/pki
-
 openssl genrsa -out ca.key 4096
 openssl req -x509 -new -nodes -key ca.key \
   -sha256 -days 3650 \
@@ -61,7 +58,7 @@ extendedKeyUsage = serverAuth, clientAuth
 subjectAltName = @alt_names
 
 [alt_names]
-IP.1 = 10.8.0.3
+IP.1 = 10.8.10.1
 DNS.1 = nats-3
 EOF
 ```

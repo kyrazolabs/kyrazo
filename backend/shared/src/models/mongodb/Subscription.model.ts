@@ -121,7 +121,6 @@ const subscriptionSchema = new Schema<ISubscription>(
         currentPeriodEnd: {
             type: Date,
             required: [true, 'Current period end is required'],
-            index: true,
         },
         trialEnd: {
             type: Date,

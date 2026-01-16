@@ -11,12 +11,10 @@ const sourceEventsProcessedSchema = new Schema<IWebhookEventProcessed>(
             type: String,
             required: [true, 'Event ID is required'],
             unique: true,
-            index: true,
         },
         eventType: {
             type: String,
             required: [true, 'Event type is required'],
-            index: true,
         },
         processedAt: {
             type: Date,
