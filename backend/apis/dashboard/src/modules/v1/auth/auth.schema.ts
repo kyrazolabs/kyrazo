@@ -35,7 +35,14 @@ export const RegisterSchema = z.object({
         .default('en'),
 });
 
-export const LoginSchema = RegisterSchema.pick({ email: true, password: true });
+export const LoginSchema = z.object({
+    email: z
+        .string()
+        .min(1, 'Email is required')
+        .email('Invalid email format')
+        .regex(emailRegex, 'Invalid email format'),
+    password: z.string().min(1, 'Password is required'),
+});
 
 export const GoogleLoginSchema = z
     .object({
