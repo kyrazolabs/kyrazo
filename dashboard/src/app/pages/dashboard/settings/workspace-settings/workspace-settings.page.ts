@@ -157,7 +157,7 @@ export class WorkspaceSettingsPage implements OnInit {
               if (profileResponse.success && profileResponse.data) {
                 this.currentUserId = profileResponse.data.id;
                 const currentUserMember = this.members.find(
-                  (m) => this.getMemberUserId(m) === this.currentUserId
+                  (m) => this.getMemberUserId(m) === this.currentUserId,
                 );
                 this.currentUserRole = currentUserMember?.role || "member";
               }

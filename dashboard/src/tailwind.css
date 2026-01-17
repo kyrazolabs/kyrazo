@@ -4,9 +4,7 @@
 
 @custom-variant dark (&:where(.p-dark, .p-dark *));
 
-:root {
-  --p-inputtext-border-radius: 12px !important;
-}
+
 @layer base {
   html, :host {
     font-family: "Quicksand", "sans-serif" !important;

@@ -46,7 +46,6 @@ import { TooltipModule } from "primeng/tooltip";
     PopoverModule,
     TooltipModule,
     InputGroupAddonModule,
-    StyleClass,
     ButtonModule,
     DialogModule,
     InputTextModule,
@@ -191,13 +190,22 @@ export class SidebarComponent implements OnInit, AfterViewInit {
 
   // Method to update dropdown states based on active routes
   private updateDropdownStates(): void {
-    // Dispatch dropdown should be open if any dispatch route is active
-    this.dispatchDropdownOpen = this.isRouteActive(
-      "/dashboard/events/dispatch"
-    );
+    // Only open if active. Do NOT auto-close strictly on route change to prevent "snap close".
+    if (this.isRouteActive("/dashboard/events/dispatch")) {
+      this.dispatchDropdownOpen = true;
+    }
 
-    // Ingest dropdown should be open if any ingest route is active
-    this.ingestDropdownOpen = this.isRouteActive("/dashboard/events/ingest");
+    if (this.isRouteActive("/dashboard/events/ingest")) {
+      this.ingestDropdownOpen = true;
+    }
+  }
+
+  toggleDispatch() {
+    this.dispatchDropdownOpen = !this.dispatchDropdownOpen;
+  }
+
+  toggleIngest() {
+    this.ingestDropdownOpen = !this.ingestDropdownOpen;
   }
 
   toggleHelp(event: Event) {

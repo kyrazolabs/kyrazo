@@ -12,10 +12,10 @@ import { InputTextModule } from "primeng/inputtext";
 import { LoaderService } from "@core/services/loader.service";
 import { DeliveryService } from "@core/services/delivery.service";
 import { IDeliveryAttempt } from "@models/delivery.types";
-import { NgxJsonViewerModule } from 'ngx-json-viewer';
+import { NgxJsonViewerModule } from "ngx-json-viewer";
 
 @Component({
-  selector: 'app-log.page',
+  selector: "app-log.page",
   imports: [
     CommonModule,
     RouterModule,
@@ -25,10 +25,10 @@ import { NgxJsonViewerModule } from 'ngx-json-viewer';
     DividerModule,
     ScrollPanelModule,
     InputTextModule,
-    NgxJsonViewerModule
+    NgxJsonViewerModule,
   ],
-  templateUrl: './log.page.html',
-  styleUrl: './log.page.scss',
+  templateUrl: "./log.page.html",
+  styleUrl: "./log.page.scss",
 })
 export class LogPage {
   private readonly das = inject(DeliveryService);
@@ -89,13 +89,13 @@ export class LogPage {
   }
 
   getResponseCodeSeverity(
-    responseCode?: number,
+    responseCode?: number | null,
   ): "success" | "info" | "warn" | "danger" {
-    if (!responseCode) return "info";
+    if (responseCode === undefined || responseCode === null) return "info";
 
     if (responseCode >= 200 && responseCode < 300) {
       return "success";
-    } else if (responseCode >= 300 && responseCode < 4700) {
+    } else if (responseCode >= 300 && responseCode < 400) {
       return "info";
     } else if (responseCode >= 400 && responseCode < 500) {
       return "warn";
@@ -115,7 +115,7 @@ export class LogPage {
       await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
       // Optionally show a message, but for now just copy
     } catch (err) {
-      console.error('Failed to copy: ', err);
+      console.error("Failed to copy: ", err);
     }
   }
 }

@@ -16,7 +16,7 @@
 
     <form [formGroup]="form" class="space-y-6">
         <!-- Basic Info -->
-        <p-card header="Basic Information" styleClass="rounded-2xl! shadow-none! border border-surface-200 dark:border-surface-700">
+        <p-card header="Basic Information" styleClass="card-panel">
             <div class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="flex flex-col gap-2">
@@ -52,14 +52,14 @@
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <p-checkbox id="enabled" formControlName="enabled" [binary]="true" class="rounded-xl!"></p-checkbox>
+                    <p-checkbox id="enabled" formControlName="enabled" [binary]="true" class="rounded!"></p-checkbox>
                     <label for="enabled" class="cursor-pointer select-none text-surface-900 dark:text-surface-0">Enable this target</label>
                 </div>
             </div>
         </p-card>
 
         <!-- Configuration -->
-        <p-card header="Configuration" styleClass="rounded-2xl! shadow-none! border border-surface-200 dark:border-surface-700">
+        <p-card header="Configuration" styleClass="card-panel">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6" formGroupName="config">
                 <div class="flex flex-col gap-2">
                     <label class="font-medium text-surface-900 dark:text-surface-0">Timeout (ms)</label>
@@ -85,7 +85,7 @@
         </p-card>
 
         <!-- Custom Headers -->
-        <p-card header="Custom Headers" styleClass="rounded-2xl! shadow-none! border border-surface-200 dark:border-surface-700">
+        <p-card header="Custom Headers" styleClass="card-panel">
             <div class="space-y-4">
                 <div formArrayName="customHeaders" class="space-y-3">
                     <div *ngFor="let header of customHeaders.controls; let i=index" [formGroupName]="i" 

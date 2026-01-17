@@ -22,7 +22,7 @@
     <form [formGroup]="sourceForm" (ngSubmit)="onSubmit()">
     
         <!-- Basic Information Card -->
-        <p-card class="mb-4 rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+        <p-card class="mb-4 card-panel">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Name Field -->
                 <div class="flex flex-col gap-2">
@@ -43,7 +43,7 @@
                         Status
                     </label>
                     <p-select id="status" formControlName="status" [options]="statusOptions" placeholder="Select status"
-                        optionLabel="label" optionValue="value" class="w-full rounded-xl!" panelStyleClass="rounded-xl!" />
+                        optionLabel="label" optionValue="value" class="w-full rounded-xl!" panelStyleClass="rounded-xl!" size="small" />
                 </div>
             </div>
     
@@ -71,6 +71,7 @@
                     styleClass="w-full rounded-xl!" 
                     panelStyleClass="rounded-xl!"
                     display="chip"
+                    size="small"
                     [filter]="true">
                 </p-multiSelect>
                 <small class="text-surface-500">Select endpoints where received events will be forwarded to.</small>
@@ -84,7 +85,7 @@
                         <label for="service" class="font-semibold text-surface-900 dark:text-surface-0">
                             Service <span class="text-red-500">*</span>
                         </label>
-                        <p-select  id="service" formControlName="service" [options]="servicesItem" placeholder="Select Services" optionLabel="label" filterBy="label" [filterFields]="['label']" filterPlaceHolder="Search ..." optionValue="value" class="w-full md:w-80 rounded-xl!" panelStyleClass="rounded-xl! col-span-5!"  fluid >
+                        <p-select  id="service" formControlName="service" [options]="servicesItem" placeholder="Select Services" optionLabel="label" filterBy="label" [filterFields]="['label']" filterPlaceHolder="Search ..." optionValue="value" class="w-full md:w-80 rounded-xl!" panelStyleClass="rounded-xl! col-span-5!"  fluid size="small" >
                             <ng-template #selectedItem let-selectedOption>
                                 @if (selectedOption) {
                                     <div class="flex items-center gap-2">

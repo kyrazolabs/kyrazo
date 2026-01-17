@@ -29,7 +29,7 @@
         <!-- Basic Event Info -->
         <p-card
             header="Event Information"
-            class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none! h-full"
+            class="card-panel h-full"
         >
             <div class="space-y-4">
                 <div>
@@ -196,7 +196,7 @@
         <!-- Request Details -->
         <p-card
             header="Request Details"
-            class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none! h-full!"
+            class="card-panel h-full!"
         >
             <div class="flex static flex-col gap-4 h-full!">
                 <div class="flex-1 flex flex-col">
@@ -212,7 +212,7 @@
                             [disabled]="!ingestEvent.headers || ingestEvent.headers === '{}'"
                         />
                     </div>
-                    <div class="bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 rounded-xl p-4 min-h-[132px] max-h-[132px] overflow-y-auto scrollbar-thin scrollbar-thumb-surface-300 dark:scrollbar-thumb-surface-600 scrollbar-track-surface-100 dark:scrollbar-track-surface-800 scroll-smooth">
+                    <div class="card-panel min-h-[132px] max-h-[132px] overflow-y-auto scrollbar-thin scrollbar-thumb-surface-300 dark:scrollbar-thumb-surface-600 scrollbar-track-surface-100 dark:scrollbar-track-surface-800 scroll-smooth">
                         <ngx-json-viewer
                             *ngIf="!rawView && ingestEvent.headers && ingestEvent.headers !== '{}'"
                             [json]="parseJson(ingestEvent.headers)"
@@ -241,7 +241,7 @@
                             [disabled]="!ingestEvent.body || ingestEvent.body === '{}'"
                         />
                     </div>
-                    <div class="bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 rounded-xl p-4 min-h-[132px] max-h-[132px] overflow-y-auto scrollbar-thin scrollbar-thumb-surface-300 dark:scrollbar-thumb-surface-600 scrollbar-track-surface-100 dark:scrollbar-track-surface-800 scroll-smooth">
+                    <div class="card-panel min-h-[132px] max-h-[132px] overflow-y-auto scrollbar-thin scrollbar-thumb-surface-300 dark:scrollbar-thumb-surface-600 scrollbar-track-surface-100 dark:scrollbar-track-surface-800 scroll-smooth">
                         <ngx-json-viewer
                             *ngIf="!rawView && ingestEvent.body && ingestEvent.body !== '{}'"
                             [json]="parseJson(ingestEvent.body)"

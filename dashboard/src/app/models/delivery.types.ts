@@ -9,27 +9,35 @@ export enum TargetStatus {
 }
 
 export interface IDeliveryAttempt {
-  delivery_id: string;
+  delivery_id: string; // UUID
+
   workspace_id: string;
-  producer_id: string;
-  webhook_type: SourceType;
-  event_id: string;
+  project_id: string;
+
+  event_id: string; // UUID
   event_type: string;
-  event_model: "PublishedEvent" | "ReceivedEvent" | "RoutedEvent";
-  webhook_id: string; // Keeping API key
-  endpoint_id?: string;
-  target: string;
+
+  source_id: string | null;
+  source_type: string | null;
+
+  target_id: string;
+  target_url: string;
+
   status: TargetStatus;
   attempt_number: number;
+
   request_header: string;
   request_body: string;
-  response_code?: number;
+
+  response_code: number | null;
   response_header: string;
   response_body: string;
-  response_time_ms?: number;
-  scheduled_at: string;
-  processed_at: string;
-  error: string;
+  response_time_ms: number | null;
+
+  scheduled_at: string; // DateTime64
+  processed_at: string | null; // DateTime64
+
+  error: string | null;
 }
 
 export interface GetDAResponse {

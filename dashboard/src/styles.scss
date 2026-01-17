@@ -13,6 +13,44 @@ html {
 }
 @plugin "@iconify/tailwind4";
 
+@layer components {
+  /* Select & MultiSelect Alignment */
+  .p-select-sm .p-select-label {
+    --p-select-sm-font-size: 1rem !important;
+  }
+  .p-multiselect-sm .p-multiselect-label {
+    --p-multiselect-sm-font-size: 1rem !important;
+  }
+  
+  :root, :host {
+      /* Density */
+      --p-inputtext-padding-y: 0.375rem !important; /* 6px */
+      --p-inputtext-padding-x: 0.625rem !important; /* 10px */
+      
+      --p-button-padding-y: 0.375rem !important;
+      --p-button-padding-x: 0.75rem !important;
+      
+      --p-card-content-padding: 1rem !important;
+      --p-panel-content-padding: 1rem !important;
+      
+      --p-datatable-header-padding: 0.5rem 1rem !important;
+      --p-datatable-body-cell-padding: 0.5rem 1rem !important;
+      
+      --p-menu-item-content-padding: 0.375rem 0.5rem !important;
+      
+      --p-inputtext-border-radius: 12px !important;
+      --p-button-border-radius: 12px !important;
+      --p-card-border-radius: 16px !important;
+      --p-card-body-padding: 4px !important;
+
+      /* Font size adjustments if needed */
+      --p-content-detailed-line-height: 1.2 !important; 
+  }
+  .card-panel {
+    @apply rounded-xl! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none! p-4!;
+  }
+}
+
 // Global Animations
 
 // Fade In Up

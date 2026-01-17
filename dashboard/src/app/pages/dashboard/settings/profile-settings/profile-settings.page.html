@@ -11,8 +11,8 @@
         <!-- Right section -->
         <div class="flex items-center gap-4">
             <p-button label="Reset" icon="pi pi-refresh" [outlined]="true" severity="secondary"
-                styleClass="rounded-2xl!" (onClick)="resetProfile()" />
-            <p-button label="Save Changes" icon="pi pi-save" styleClass="rounded-2xl!" (onClick)="saveProfile()"
+                styleClass="rounded-xl!" (onClick)="resetProfile()" />
+            <p-button label="Save Changes" icon="pi pi-save" styleClass="rounded-xl!" (onClick)="saveProfile()"
                 [disabled]="profileForm.invalid || isSaving" [loading]="isSaving" />
         </div>
     </div>
@@ -66,7 +66,7 @@
     <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="flex flex-col gap-6">
         <!-- Basic Information -->
         <p-card header="Basic Information"
-            class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+            class="card-panel">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- First Name -->
                 <div class="flex flex-col gap-2">
@@ -116,14 +116,14 @@
 
         <!-- Account Settings -->
         <p-card header="Account Settings"
-            class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+            class="card-panel">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Time Zone -->
                 <div class="flex flex-col gap-2">
                     <label class="font-semibold text-surface-900 dark:text-surface-0">Time Zone</label>
                     <p-select formControlName="timeZone" [options]="timezoneOptions" optionLabel="label"
                         optionValue="value" [filter]="true" filterBy="label" filterPlaceholder="Search ..."
-                        placeholder="Select timezone" class="w-full rounded-xl!" panelStyleClass="rounded-xl!" />
+                        placeholder="Select timezone" class="w-full rounded-xl!" panelStyleClass="rounded-xl!" size="small" />
                 </div>
 
                 <!-- Language -->
@@ -131,7 +131,7 @@
                     <label class="font-semibold text-surface-900 dark:text-surface-0">Language</label>
                     <p-select formControlName="language" [options]="languageOptions" optionLabel="label"
                         optionValue="value" placeholder="Select language" styleClass="w-full rounded-xl!"
-                        panelStyleClass="rounded-xl!" />
+                        panelStyleClass="rounded-xl!" size="small" />
                 </div>
 
                 <!-- Account Status -->
@@ -180,7 +180,7 @@
         
         <!-- Change Password -->
         <p-card header="Security & Password"
-            class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+            class="card-panel">
             <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Current Password -->
                 <div class="flex flex-col gap-2">

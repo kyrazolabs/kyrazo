@@ -28,7 +28,11 @@ import { ToastModule } from "primeng/toast";
 
 import { DeliveryService } from "@core/services/delivery.service";
 import { LoaderService } from "@core/services/loader.service";
-import { GetDAResponse, TargetStatus } from "@models/delivery.types";
+import {
+  GetDAResponse,
+  TargetStatus,
+  IDeliveryAttempt,
+} from "@models/delivery.types";
 import { TargetService, ITarget } from "@core/services/target.service";
 
 interface Delivery {
@@ -109,7 +113,7 @@ export class TargetPage implements OnInit, AfterViewInit {
   statusCodeChartOptions: any;
 
   // Core data arrays
-  deliveries: GetDAResponse[] = [];
+  deliveries: IDeliveryAttempt[] = [];
   filteredDeliveries: Delivery[] = [];
 
   // Stats data
@@ -203,7 +207,7 @@ export class TargetPage implements OnInit, AfterViewInit {
 
   updateChartGradients() {
     const lineCanvas = document.getElementById(
-      "lineChart"
+      "lineChart",
     ) as HTMLCanvasElement;
     if (lineCanvas && this.lineChartData) {
       const ctx = lineCanvas.getContext("2d")!;
@@ -358,7 +362,7 @@ export class TargetPage implements OnInit, AfterViewInit {
           label: "Event Count",
           data: this.overview?.topEventTypes.map((m) => m.total),
           backgroundColor: this.overview?.topEventTypes.map(
-            (_, i) => colors[i % colors.length]
+            (_, i) => colors[i % colors.length],
           ),
           borderRadius: 8,
           borderSkipped: false,
@@ -410,7 +414,7 @@ export class TargetPage implements OnInit, AfterViewInit {
         {
           data: statusCodes.map((sc) => sc.total),
           backgroundColor: statusCodes.map((sc) =>
-            this.getStatusCodeColor(sc.response_code)
+            this.getStatusCodeColor(sc.response_code),
           ),
           borderWidth: 0,
           hoverOffset: 4,
@@ -436,7 +440,7 @@ export class TargetPage implements OnInit, AfterViewInit {
             label: function (context: any) {
               const total = context.dataset.data.reduce(
                 (a: number, b: number) => a + b,
-                0
+                0,
               );
               const percentage = ((context.parsed / total) * 100).toFixed(1);
               return `${context.label}: ${context.parsed} (${percentage}%)`;
@@ -456,26 +460,26 @@ export class TargetPage implements OnInit, AfterViewInit {
     this.loadStats();
   }
 
-  // Convert GetDAResponse to Delivery for display
-  private mapToDelivery(da: GetDAResponse): Delivery {
+  // Convert IDeliveryAttempt to Delivery for display
+  private mapToDelivery(da: IDeliveryAttempt): Delivery {
     return {
       _id: da.delivery_id,
       id: da.delivery_id,
       delivery_id: da.delivery_id,
-      endpoint: da.target,
+      endpoint: da.target_url, // Mapped from target_url
       eventType: da.event_type ? da.event_type : "Unknown Event",
       status: da.status,
       responseCode: da.response_code ? da.response_code.toString() : "-",
-      latencyMs: da.response_time_ms,
+      latencyMs: da.response_time_ms || 0,
       attempts: da.attempt_number,
       timestamp: da.processed_at || da.scheduled_at || "",
-      webhookId: da.webhook_id,
-      webhook_type: da.webhook_type || "unknown",
-      target: da.target,
+      webhookId: da.source_id || "", // Mapped from source_id
+      webhook_type: da.source_type || "unknown", // Mapped from source_type
+      target: da.target_url, // Mapped from target_url
       attempt_number: da.attempt_number,
-      processed_at: da.processed_at,
-      response_time_ms: da.response_time_ms,
-      response_code: da.response_code,
+      processed_at: da.processed_at || undefined,
+      response_time_ms: da.response_time_ms || undefined,
+      response_code: da.response_code || undefined,
     };
   }
 
@@ -483,7 +487,7 @@ export class TargetPage implements OnInit, AfterViewInit {
     page: number = 1,
     limit: number = 10,
     search?: string,
-    status?: TargetStatus
+    status?: TargetStatus,
   ) {
     if (!this.targetUrl) return;
 
@@ -531,14 +535,14 @@ export class TargetPage implements OnInit, AfterViewInit {
               const days = this.getDaysFromRange(this.selectedTimeRange);
               this.overview.deliveryTrends = this.fillMissingDays(
                 this.overview.deliveryTrends,
-                days
+                days,
               );
               if (
                 this.selectedTimeRange === "last180days" ||
                 this.selectedTimeRange === "last360days"
               ) {
                 this.overview.deliveryTrends = this.aggregateByMonth(
-                  this.overview.deliveryTrends
+                  this.overview.deliveryTrends,
                 );
               }
               this.initCharts();
@@ -560,7 +564,7 @@ export class TargetPage implements OnInit, AfterViewInit {
     // Apply status filter
     if (this.activeFilter !== "all") {
       filtered = filtered.filter(
-        (delivery) => delivery.status === (this.activeFilter as TargetStatus)
+        (delivery) => delivery.status === (this.activeFilter as TargetStatus),
       );
     }
 
@@ -570,10 +574,10 @@ export class TargetPage implements OnInit, AfterViewInit {
       filtered = filtered.filter(
         (delivery) =>
           delivery.delivery_id.toLowerCase().includes(query) ||
-          delivery.target.toLowerCase().includes(query) ||
+          delivery.target_url.toLowerCase().includes(query) ||
           delivery.event_id.toLowerCase().includes(query) ||
           (delivery.response_code?.toString().toLowerCase().includes(query) ??
-            false)
+            false),
       );
     }
 
@@ -590,7 +594,7 @@ export class TargetPage implements OnInit, AfterViewInit {
       this.searchTerm,
       this.activeFilter === "all"
         ? undefined
-        : (this.activeFilter as TargetStatus)
+        : (this.activeFilter as TargetStatus),
     );
   }
 
@@ -600,7 +604,7 @@ export class TargetPage implements OnInit, AfterViewInit {
       1,
       this.rows,
       this.searchTerm,
-      status === "all" ? undefined : (status as TargetStatus)
+      status === "all" ? undefined : (status as TargetStatus),
     );
   }
 
@@ -612,7 +616,7 @@ export class TargetPage implements OnInit, AfterViewInit {
       this.searchTerm,
       this.activeFilter === "all"
         ? undefined
-        : (this.activeFilter as TargetStatus)
+        : (this.activeFilter as TargetStatus),
     );
   }
 
@@ -624,7 +628,7 @@ export class TargetPage implements OnInit, AfterViewInit {
       this.searchTerm,
       this.activeFilter === "all"
         ? undefined
-        : (this.activeFilter as TargetStatus)
+        : (this.activeFilter as TargetStatus),
     );
   }
 
@@ -657,7 +661,7 @@ export class TargetPage implements OnInit, AfterViewInit {
     console.log("Retrying delivery:", deliveryId);
     // Simulate retry
     const deliveryIndex = this.deliveries.findIndex(
-      (d) => d.delivery_id === deliveryId
+      (d) => d.delivery_id === deliveryId,
     );
     if (deliveryIndex !== -1) {
       this.deliveries[deliveryIndex] = {
@@ -801,7 +805,7 @@ export class TargetPage implements OnInit, AfterViewInit {
     deliveryTrends.forEach((item) => {
       const date = new Date(item.day);
       const monthKey = `${date.getFullYear()}-${String(
-        date.getMonth() + 1
+        date.getMonth() + 1,
       ).padStart(2, "0")}`;
       if (!monthMap.has(monthKey)) {
         monthMap.set(monthKey, { successful: 0, failed: 0, count: 0 });

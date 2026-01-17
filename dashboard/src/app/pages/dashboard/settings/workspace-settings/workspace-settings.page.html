@@ -10,9 +10,9 @@
 
         <!-- Right section -->
         <div class="flex items-center gap-4">
-            <p-button label="Invite Member" icon="pi pi-user-plus" styleClass="rounded-2xl!"
+            <p-button label="Invite Member" icon="pi pi-user-plus" styleClass="rounded-xl!"
                 (onClick)="openInviteDialog()" [disabled]="!canInviteMembers()" />
-            <p-button label="Save Changes" icon="pi pi-save" styleClass="rounded-2xl!" (onClick)="saveWorkspace()"
+            <p-button label="Save Changes" icon="pi pi-save" styleClass="rounded-xl!" (onClick)="saveWorkspace()"
                 [disabled]="workspaceForm.invalid || isSaving" [loading]="isSaving" />
         </div>
     </div>
@@ -66,7 +66,7 @@
     <form [formGroup]="workspaceForm" (ngSubmit)="saveWorkspace()" class="flex flex-col gap-6">
 
         <!-- Basic Information -->
-        <p-card header="Basic Information" class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+        <p-card header="Basic Information" class="card-panel">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Workspace Name -->
                 <div class="flex flex-col gap-2">
@@ -95,7 +95,7 @@
         </p-card>
 
         <!-- Workspace Information -->
-        <p-card header="Workspace Information" class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+        <p-card header="Workspace Information" class="card-panel">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Workspace ID -->
                 <div class="flex flex-col gap-2">
@@ -130,7 +130,7 @@
         </p-card>
 
         <!-- Team Members -->
-        <p-card header="Team Members" class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+        <p-card header="Team Members" class="card-panel">
             <p-table [value]="members" [paginator]="true" [rows]="10" responsiveLayout="scroll"
                 [showCurrentPageReport]="true"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} members">
@@ -171,7 +171,7 @@
                                 <p-select [ngModel]="member.role" [options]="roleOptions"
                                     optionLabel="label" optionValue="value"
                                     (onChange)="updateMemberRole(member, $event.value)"
-                                    styleClass="w-32 rounded-xl!" panelStyleClass="rounded-xl!" />
+                                    styleClass="w-32 rounded-xl!" panelStyleClass="rounded-xl!" size="small" />
                             </div>
                             <p-tag *ngIf="!canManageMember(member)" [value]="member.role | titlecase"
                                 [severity]="getRoleSeverity(member.role)" class="text-sm font-medium" />
@@ -220,7 +220,7 @@
         </p-card>
         <!-- Danger Zone -->
         <p-card header="Danger Zone" *ngIf="currentUserRole === 'owner'"
-            class="rounded-2xl! p-2! bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 shadow-none!">
+            class="rounded-xl! p-2! bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 shadow-none!">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                 <div>
                     <h3 class="text-lg font-bold text-red-700 dark:text-red-500">Delete Workspace</h3>
@@ -238,7 +238,7 @@
 </div>
 <!-- Invite Member Dialog -->
 <p-dialog [(visible)]="showInviteDialog" modal="true" header="Invite Team Member"
-    styleClass="rounded-2xl!" [style]="{'width': '500px'}" [closable]="true" [closeOnEscape]="true">
+    styleClass="rounded-xl!" [style]="{'width': '500px'}" [closable]="true" [closeOnEscape]="true">
 
     <form [formGroup]="inviteForm" (ngSubmit)="inviteMember()" class="flex flex-col gap-4">
         <!-- Email -->
@@ -256,7 +256,7 @@
         <div class="flex flex-col gap-2">
             <label class="font-semibold text-surface-900 dark:text-surface-0">Role</label>
             <p-select formControlName="role" [options]="roleOptions" optionLabel="label" optionValue="value"
-                placeholder="Select role" class="w-full rounded-xl!" panelStyleClass="rounded-xl!" />
+                placeholder="Select role" class="w-full rounded-xl!" panelStyleClass="rounded-xl!" size="small" />
         </div>
 
         <!-- Message -->
@@ -285,10 +285,10 @@
 <p-toast />
 
 <!-- Confirm Dialog -->
-<p-confirmDialog #cd styleClass="rounded-2xl!">
+<p-confirmDialog #cd styleClass="rounded-xl!">
     <ng-template #headless let-message let-onAccept="onAccept" let-onReject="onReject">
         <div
-            class="flex flex-col items-center p-8 bg-surface-0 dark:bg-surface-900 rounded-2xl! border border-surface-200 dark:border-surface-700 shadow-lg max-w-md mx-auto">
+            class="flex flex-col items-center p-6 bg-surface-0 dark:bg-surface-900 rounded-xl! border border-surface-200 dark:border-surface-700 shadow-lg max-w-md mx-auto">
             <!-- Danger Icon Circle -->
             <div
                 class="rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 inline-flex justify-center items-center h-20 w-20 -mt-16">

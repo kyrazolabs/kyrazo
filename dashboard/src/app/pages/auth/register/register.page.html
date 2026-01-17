@@ -78,7 +78,7 @@
                     </label>
                     <p-select [options]="jobTitles" formControlName="jobTitle" inputId="jobTitle"
                         placeholder="Select your job title"
-                        styleClass="w-full rounded-xl!" class="w-full"
+                        styleClass="w-full rounded-xl!" class="w-full" size="small"
                         [class.p-invalid]="isFieldInvalid('jobTitle')"
                         [attr.aria-describedby]="isFieldInvalid('jobTitle') ? 'jobTitle-error' : null"></p-select>
                     <small *ngIf="isFieldInvalid('jobTitle')" id="jobTitle-error" class="p-error block mt-1 text-xs">

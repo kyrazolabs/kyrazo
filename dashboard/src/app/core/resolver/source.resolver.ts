@@ -4,7 +4,7 @@ import { SourceService } from "@core/services/source.service"; // Renamed servic
 import { ISource } from "@models/source.types"; // Renamed model
 import { map } from "rxjs/operators";
 import { DeliveryService } from "@core/services/delivery.service";
-import { GetDAWResponse } from "@models/delivery.types";
+import { GetDAWResponse, IDeliveryAttempt } from "@models/delivery.types";
 
 export const sourcesResolver: ResolveFn<ISource[]> = (route, state) => {
   const sourceService = inject(SourceService);
@@ -22,8 +22,8 @@ export const sourceResolver: ResolveFn<ISource> = (route) => {
   return sourceService.get(id).pipe(map((res) => res.data));
 };
 
-export const SourceDeliveriesResolver: ResolveFn<GetDAWResponse[]> = (
-  route
+export const SourceDeliveriesResolver: ResolveFn<IDeliveryAttempt[]> = (
+  route,
 ) => {
   const deliveryService = inject(DeliveryService);
   const id = route.paramMap.get("id")!;

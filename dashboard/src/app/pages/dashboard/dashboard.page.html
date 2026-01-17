@@ -13,7 +13,7 @@
     <!-- Control Center Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         @for (card of navCards; track card.title) {
-            <div class="group relative bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 rounded-2xl p-6 hover:shadow-sm hover:border-surface-300 dark:hover:border-surface-600 transition-all duration-300 cursor-pointer flex flex-col h-full"
+            <div class="group relative bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 rounded-xl p-4 hover:shadow-sm hover:border-surface-300 dark:hover:border-surface-600 transition-all duration-300 cursor-pointer flex flex-col h-full"
                  [routerLink]="card.route">
                 
                 <!-- Icon & Header -->
@@ -68,7 +68,7 @@
 <p-toast />
 
 <!-- Create Project Dialog -->
-<p-dialog header="Create Project" styleClass="rounded-2xl!" [(visible)]="projectDialogVisible" [modal]="true" [style]="{ width: '40rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [draggable]="false" [resizable]="false">
+<p-dialog header="Create Project" styleClass="rounded-xl!" [(visible)]="projectDialogVisible" [modal]="true" [style]="{ width: '40rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [draggable]="false" [resizable]="false">
     <div class="flex flex-col gap-4 pt-2">
          <div class="flex flex-col gap-2">
             <label for="pname" class="font-medium">Project Name</label>
@@ -94,7 +94,7 @@
     [resizable]="false"
     header="Contact Us"
     appendTo="body"
-    styleClass="rounded-2xl!">
+    styleClass="rounded-xl!">
     <div class="space-y-6">
         <!-- Description -->
         <div class="text-center">

@@ -22,8 +22,8 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 shrink-0">
         <!-- Total Targets -->
         <div
-            class="p-6 rounded-2xl bg-surface-0 dark:bg-surface-950 border border-surface-200 dark:border-surface-700 flex flex-col gap-2">
-            <div class="flex items-start gap-2 justify-between">
+            class="card-panel flex flex-col gap-2 h-full">
+            <div class="flex items-start justify-between">
                 <span class="text-xl font-light leading-tight">
                     Total Targets
                 </span>
@@ -43,14 +43,13 @@
         </div>
 
         <!-- Total Deliveries -->
-        <div
-            class="p-6 rounded-2xl bg-surface-0 dark:bg-surface-950 border border-surface-200 dark:border-surface-700 flex flex-col gap-2">
+        <div class="card-panel flex flex-col gap-2 h-full">
             <div class="flex items-start gap-2 justify-between">
                 <span class="text-xl font-light leading-tight">
                     Total Deliveries
                 </span>
                 <span
-                    class="shrink-0 bg-primary-100 dark:bg-primary-400/20 text-primary rounded-lg w-8 h-8 flex items-center justify-center border border-primary-200 dark:border-primary-400/40">
+                    class="shrink-0 bg-surface-100 dark:bg-surface-800 text-surface-900 dark:text-surface-0 rounded-lg w-8 h-8 flex items-center justify-center">
                     <i class="pi pi-send text-xl! leading-none!"></i>
                 </span>
             </div>
@@ -65,8 +64,7 @@
         </div>
 
         <!-- Success Rate -->
-        <div
-            class="p-6 rounded-2xl bg-surface-0 dark:bg-surface-950 border border-surface-200 dark:border-surface-700 flex flex-col gap-2">
+        <div class="card-panel flex flex-col gap-2 h-full">
             <div class="flex items-start gap-2 justify-between">
                 <span class="text-xl font-light leading-tight">
                     Success Rate
@@ -87,8 +85,7 @@
         </div>
 
         <!-- Failed Deliveries -->
-        <div
-            class="p-6 rounded-2xl bg-surface-0 dark:bg-surface-950 border border-surface-200 dark:border-surface-700 flex flex-col gap-2">
+        <div class="card-panel flex flex-col gap-2 h-full">
             <div class="flex items-start gap-2 justify-between">
                 <span class="text-xl font-light leading-tight">
                     Failed
@@ -112,7 +109,7 @@
     <ng-container *ngIf="hasData || loadingCharts; else emptyData">
         <div class="mb-8">
             <p-card header="Delivery Trends"
-                class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+                class="card-panel">
                 <div *ngIf="loadingCharts" class="h-[450px] flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
                         <g stroke="currentColor" stroke-width="1">
@@ -137,7 +134,7 @@
         <!-- Charts Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <!-- Top Event Types - Bar Chart -->
-            <p-card header="Top Event Types" class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+            <p-card header="Top Event Types" class="card-panel">
                 <div *ngIf="loadingCharts" class="h-[320px] flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
                         <g stroke="currentColor" stroke-width="1">
@@ -159,7 +156,7 @@
             </p-card>
 
             <!-- Status Code Distribution - Pie Chart -->
-            <p-card header="Status Code Distribution" class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+            <p-card header="Status Code Distribution" class="card-panel">
                 <div *ngIf="loadingCharts" class="h-[320px] flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
                         <g stroke="currentColor" stroke-width="1">

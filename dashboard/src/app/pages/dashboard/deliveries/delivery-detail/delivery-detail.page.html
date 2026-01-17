@@ -11,7 +11,7 @@
         <!-- Right section -->
         <div class="flex items-center gap-4">
             <p-button label="Back to Deliveries" icon="pi pi-arrow-left" [outlined]="true" severity="secondary"
-                routerLink="/dashboard/deliveries" styleClass="rounded-2xl!" />
+                routerLink="/dashboard/deliveries" styleClass="rounded-xl!" />
         </div>
     </div>
 
@@ -20,7 +20,7 @@
 
         <!-- Basic Delivery Info -->
         <p-card header="Delivery Information"
-            class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+            class="card-panel">
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-semibold text-surface-900 dark:text-surface-0 mb-1">Delivery
@@ -32,7 +32,7 @@
                 <div>
                     <label class="block text-sm font-semibold text-surface-900 dark:text-surface-0 mb-1">Endpoint
                         URL</label>
-                    <input type="text" pInputText [value]="delivery.target" [readonly]="true"
+                    <input type="text" pInputText [value]="delivery.target_url" [readonly]="true"
                         class="w-full rounded-xl!" />
                 </div>
 
@@ -65,7 +65,7 @@
 
         <!-- Request Details -->
         <p-card header="Request Details"
-            class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+            class="card-panel">
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-semibold text-surface-900 dark:text-surface-0 mb-2">Request
@@ -87,7 +87,7 @@
 
     <!-- Response Details - Full Width -->
     <p-card header="Response Details"
-        class="rounded-2xl! p-2! bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-none!">
+        class="card-panel">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
                 <label class="block text-sm font-semibold text-surface-900 dark:text-surface-0 mb-2">Response
