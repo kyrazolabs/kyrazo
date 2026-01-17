@@ -12,7 +12,7 @@ export const routes: Routes = [
     path: "",
     loadComponent: () =>
       import("@pages/landing/landing-layout").then(
-        (p) => p.LandingLayoutComponent
+        (p) => p.LandingLayoutComponent,
       ),
     children: [
       {
@@ -24,21 +24,21 @@ export const routes: Routes = [
         path: "legal/privacy-policy",
         loadComponent: () =>
           import("@pages/legal/policies/privacy/privacy.page").then(
-            (p) => p.PrivacyPage
+            (p) => p.PrivacyPage,
           ),
       },
       {
         path: "legal/refund-policy",
         loadComponent: () =>
           import("@pages/legal/policies/refund/refund.page").then(
-            (p) => p.RefundPage
+            (p) => p.RefundPage,
           ),
       },
       {
         path: "legal/terms-of-service",
         loadComponent: () =>
           import("@pages/legal/terms-of-service/terms-of-service").then(
-            (p) => p.TermsOfService
+            (p) => p.TermsOfService,
           ),
       },
     ],
@@ -65,7 +65,7 @@ export const routes: Routes = [
         path: "",
         loadComponent: () =>
           import("@pages/dashboard/dashboard.page").then(
-            (p) => p.DashboardPage
+            (p) => p.DashboardPage,
           ),
         data: { title: "Dashboard", animation: "dashboard-home" },
       },
@@ -73,7 +73,7 @@ export const routes: Routes = [
         path: "projects",
         loadComponent: () =>
           import("@pages/dashboard/projects/projects.page").then(
-            (p) => p.ProjectsPage
+            (p) => p.ProjectsPage,
           ),
         data: { title: "Projects", animation: "projects" },
       },
@@ -81,7 +81,7 @@ export const routes: Routes = [
         path: "connectors",
         loadComponent: () =>
           import("@pages/dashboard/connectors/connectors.page").then(
-            (p) => p.ConnectorsPage
+            (p) => p.ConnectorsPage,
           ),
         data: { title: "Connectors", animation: "connectors" },
       },
@@ -89,7 +89,7 @@ export const routes: Routes = [
         path: "inspector",
         loadComponent: () =>
           import("@pages/dashboard/inspector/inspector.page").then(
-            (p) => p.InspectorPage
+            (p) => p.InspectorPage,
           ),
         data: { title: "Connectors", animation: "inspector" },
       },
@@ -97,28 +97,28 @@ export const routes: Routes = [
         path: "deliveries",
         loadChildren: () =>
           import("@pages/dashboard/deliveries/deliveries.routes").then(
-            (p) => p.deliveriesRoutes
+            (p) => p.deliveriesRoutes,
           ),
       },
       {
         path: "secrets",
         loadChildren: () =>
           import("@pages/dashboard/secrets/secrets.routes").then(
-            (p) => p.secretsRoutes
+            (p) => p.secretsRoutes,
           ),
       },
       {
         path: "events",
         loadChildren: () =>
           import("@pages/dashboard/events/events.routes").then(
-            (p) => p.eventsRoutes
+            (p) => p.eventsRoutes,
           ),
       },
       {
         path: "settings",
         loadChildren: () =>
           import("@pages/dashboard/settings/settings.routes").then(
-            (p) => p.settingsRoutes
+            (p) => p.settingsRoutes,
           ),
       },
     ],
@@ -127,8 +127,8 @@ export const routes: Routes = [
     path: "invitation/:token",
     canActivate: [authGuard],
     loadComponent: () =>
-      import("@pages/auth/invitation/invitation.page").then(
-        (m) => m.InvitationPage
+      import("@pages/dashboard/invitation/invitation.page").then(
+        (m) => m.InvitationPage,
       ),
     data: { animation: "InvitationPage" },
   },
@@ -136,7 +136,7 @@ export const routes: Routes = [
     path: "verify-email",
     loadComponent: () =>
       import("@pages/auth/verify-email/verify-email.page").then(
-        (m) => m.VerifyEmailPage
+        (m) => m.VerifyEmailPage,
       ),
     data: { animation: "VerifyEmail" },
   },
@@ -144,7 +144,7 @@ export const routes: Routes = [
     path: "not-found",
     loadComponent: () =>
       import("@shared/ui/not-found/not-found.component").then(
-        (p) => p.NotFoundComponent
+        (p) => p.NotFoundComponent,
       ),
     data: { animation: "not-found" },
   },

@@ -11,7 +11,7 @@
         <!-- Right section -->
         <div class="flex items-center gap-4">
             <p-select [(ngModel)]="selectedTimeRange" [options]="timeRangeOptions" optionLabel="label" [variant]="'filled'"
-                optionValue="value" placeholder="Select time range" class="rounded-xl!"
+                optionValue="value" placeholder="Select time range" class="rounded-xl!" size="small"
                 (onChange)="onTimeRangeChange()" />
             <p-button label="Export" icon="pi pi-download" [outlined]="true" severity="secondary"
                 styleClass="rounded-xl!" />

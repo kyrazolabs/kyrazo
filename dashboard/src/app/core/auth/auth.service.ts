@@ -54,7 +54,7 @@ export class AuthService {
   forgetPassword(payload: ForgetPasswordRequest): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>(
       environment.auth.forgetPassword,
-      payload
+      payload,
     );
   }
 
@@ -68,26 +68,26 @@ export class AuthService {
   changePassword(payload: ChangePasswordRequest): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>(
       environment.auth.changePassword,
-      payload
+      payload,
     );
   }
 
   verifyEmail(payload: VerifyEmailRequest): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>(
       environment.auth.verifyEmail,
-      payload
+      payload,
     );
   }
 
   resetPassword(payload: ResetPasswordRequest): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>(
       environment.auth.resetPassword,
-      payload
+      payload,
     );
   }
 
   refreshToken(
-    refreshToken: string
+    refreshToken: string,
   ): Observable<ApiResponse<RefreshTokenResponse>> {
     return this.http
       .post<ApiResponse<RefreshTokenResponse>>(environment.auth.refreshToken, {
@@ -120,6 +120,7 @@ export class AuthService {
     this.storage.setItem("workspace", workspaceId);
     this.storage.setItem("avatar", avatar);
     this.storage.setItem("user_id", _id);
+    this.storage.setItem("user_name", name);
 
     this.posthog.identify(_id, {
       email,
