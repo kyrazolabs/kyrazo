@@ -46,6 +46,8 @@ app.use(
             'Authorization',
             'x-workspace-id',
             'x-project-id',
+            'sentry-trace',
+            'baggage',
         ],
         credentials: config.security.corsCredentials,
     })
