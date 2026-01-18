@@ -27,14 +27,14 @@ app.use(
 /**
  * Serve CSR App Shell for Dashboard
  */
-app.get("/dashboard/**", (req, res) => {
+app.get("/dashboard/*", (req, res) => {
   res.sendFile(indexHtml);
 });
 
 /**
  * Handle all other requests by rendering the Angular application.
  */
-app.get("**", (req, res, next) => {
+app.get("*", (req, res, next) => {
   const { protocol, originalUrl, baseUrl, headers } = req;
 
   commonEngine
