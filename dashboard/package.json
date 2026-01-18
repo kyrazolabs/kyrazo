@@ -8,7 +8,7 @@
     "build": "bunx ng build",
     "rebuild": "bun run clean && bun run build",
     "watch": "bunx ng build --watch --configuration development",
-    "prod": "bunx ng build --configuration production",
+    "prod": "bunx ng build --configuration production && bun run serve:ssr:kyrazo",
     "clean": "rm -rf dist && echo 'Done .'",
     "test": "ng test",
     "serve:ssr:kyrazo": "node dist/server/server.mjs"
