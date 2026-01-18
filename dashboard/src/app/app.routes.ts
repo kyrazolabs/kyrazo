@@ -19,6 +19,15 @@ export const routes: Routes = [
         path: "home",
         loadComponent: () =>
           import("@pages/landing/home/landing.page").then((p) => p.LandingPage),
+        data: {
+          title: "Home",
+          meta: {
+            description:
+              "Kyrazo - The Platform Engineering Platform for SaaS. Streamline your infrastructure and deployment workflow.",
+            keywords:
+              "SaaS, Platform Engineering, DevOps, Infrastructure, Deployment",
+          },
+        },
       },
       {
         path: "legal/privacy-policy",
@@ -26,6 +35,13 @@ export const routes: Routes = [
           import("@pages/legal/policies/privacy/privacy.page").then(
             (p) => p.PrivacyPage,
           ),
+        data: {
+          title: "Privacy Policy",
+          meta: {
+            description:
+              "Read Kyrazo's Privacy Policy to understand how we collect, use, and protect your data.",
+          },
+        },
       },
       {
         path: "legal/refund-policy",
@@ -33,6 +49,13 @@ export const routes: Routes = [
           import("@pages/legal/policies/refund/refund.page").then(
             (p) => p.RefundPage,
           ),
+        data: {
+          title: "Refund Policy",
+          meta: {
+            description:
+              "Kyrazo's Refund Policy. Understand our terms for refunds and cancellations.",
+          },
+        },
       },
       {
         path: "legal/terms-of-service",
@@ -40,6 +63,13 @@ export const routes: Routes = [
           import("@pages/legal/terms-of-service/terms-of-service").then(
             (p) => p.TermsOfService,
           ),
+        data: {
+          title: "Terms of Service",
+          meta: {
+            description:
+              "Kyrazo's Terms of Service. Read the rules and regulations for using our platform.",
+          },
+        },
       },
     ],
   },

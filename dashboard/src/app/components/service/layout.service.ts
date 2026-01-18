@@ -1,4 +1,12 @@
-import { effect, Injectable, signal, WritableSignal } from "@angular/core";
+import {
+  effect,
+  Injectable,
+  signal,
+  WritableSignal,
+  Inject,
+  PLATFORM_ID,
+} from "@angular/core";
+import { isPlatformBrowser } from "@angular/common";
 import { Subject } from "rxjs";
 
 export interface AppState {
@@ -31,7 +39,7 @@ export class LayoutService {
 
   appStateUpdate$ = this.appStateUpdate.asObservable();
 
-  constructor() {
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
     effect(() => {
       const appState = this.appState();
       if (appState) {
@@ -60,6 +68,8 @@ export class LayoutService {
   }
 
   private handleDarkModeTransition(config: AppState): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
     if ((document as any).startViewTransition) {
       this.startViewTransition(config);
     } else {
@@ -69,6 +79,8 @@ export class LayoutService {
   }
 
   private startViewTransition(config: AppState): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
     const transition = (document as any).startViewTransition(() => {
       this.toggleDarkMode(config);
     });
@@ -81,6 +93,8 @@ export class LayoutService {
   }
 
   toggleDarkMode(appState?: AppState): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
     const _appState = appState || this.appState();
     if (_appState.darkMode) {
       document.documentElement.classList.add("p-dark");
