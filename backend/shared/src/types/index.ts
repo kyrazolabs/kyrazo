@@ -12,6 +12,7 @@ export * from './user.types';
 export * from './billing.types';
 export * from './workspace.types';
 export * from './target.types';
+export * from './ingest.types';
 
 export interface IPagination {
     total: number;

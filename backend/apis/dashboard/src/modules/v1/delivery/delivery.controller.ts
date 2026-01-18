@@ -18,6 +18,7 @@ import {
     IGetTargetsResponse,
     IngestRepo,
     logger,
+    secretCrypto,
 } from '@kyrazo/shared';
 
 export class DeliveryController {
@@ -77,7 +78,7 @@ export class DeliveryController {
                         limit,
                         pages: Math.ceil(total / limit),
                     },
-                    data: deliveries,
+                    data: deliveries.map(DeliveryController.decryptDelivery),
                 },
                 200
             );
@@ -143,7 +144,7 @@ export class DeliveryController {
                         limit,
                         pages: Math.ceil(total / limit),
                     },
-                    data: deliveries,
+                    data: deliveries.map(DeliveryController.decryptDelivery),
                 },
                 200
             );
@@ -267,7 +268,7 @@ export class DeliveryController {
                         limit,
                         pages: Math.ceil(total / limit),
                     },
-                    data: deliveries,
+                    data: deliveries.map(DeliveryController.decryptDelivery),
                 },
                 200
             );
@@ -320,7 +321,7 @@ export class DeliveryController {
             return c.json<IGetDeliveryResponse>(
                 {
                     success: true,
-                    data: delivery,
+                    data: DeliveryController.decryptDelivery(delivery),
                 },
                 200
             );
@@ -625,5 +626,31 @@ export class DeliveryController {
                 500
             );
         }
+    }
+
+    private static decryptDelivery(delivery: any) {
+        if (!delivery) return delivery;
+        const projectId = delivery.project_id;
+        if (!projectId) return delivery;
+
+        const tryDecrypt = (field: string) => {
+            if (!field || typeof field !== 'string' || !field.includes(':'))
+                return field;
+            const [iv, encrypted] = field.split(':');
+            if (!iv || !encrypted) return field;
+            try {
+                return secretCrypto.decrypt(encrypted, iv, projectId);
+            } catch (e) {
+                return field;
+            }
+        };
+
+        return {
+            ...delivery,
+            request_body: tryDecrypt(delivery.request_body),
+            request_header: tryDecrypt(delivery.request_header),
+            response_body: tryDecrypt(delivery.response_body),
+            response_header: tryDecrypt(delivery.response_header),
+        };
     }
 }

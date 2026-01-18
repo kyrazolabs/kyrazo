@@ -1,5 +1,10 @@
 import { AppContext } from '@/core/middlewares/auth.middleware';
-import { IErrorResponse, IngestRepo, logger } from '@kyrazo/shared';
+import {
+    IErrorResponse,
+    IngestRepo,
+    logger,
+    secretCrypto,
+} from '@kyrazo/shared';
 import { GetIngestsBySourceIdInput, IFilterIngest } from './ingest.schema';
 import {
     IGetIngestEventResponse,
@@ -50,7 +55,7 @@ export class IngestController {
                         limit,
                         pages: Math.ceil(total / limit),
                     },
-                    data: deliveries,
+                    data: deliveries.map(IngestController.decryptIngestEvent),
                 },
                 200
             );
@@ -129,7 +134,7 @@ export class IngestController {
                         limit,
                         pages: Math.ceil(total / limit),
                     },
-                    data: deliveries,
+                    data: deliveries.map(IngestController.decryptIngestEvent),
                 },
                 200
             );
@@ -182,7 +187,7 @@ export class IngestController {
             return c.json<IGetIngestEventResponse>(
                 {
                     success: true,
-                    data: delivery,
+                    data: IngestController.decryptIngestEvent(delivery),
                 },
                 200
             );
@@ -203,5 +208,29 @@ export class IngestController {
                 500
             );
         }
+    }
+
+    private static decryptIngestEvent(event: any) {
+        if (!event) return event;
+        const projectId = event.project_id;
+        if (!projectId) return event;
+
+        const tryDecrypt = (field: string) => {
+            if (!field || typeof field !== 'string' || !field.includes(':'))
+                return field;
+            const [iv, encrypted] = field.split(':');
+            if (!iv || !encrypted) return field;
+            try {
+                return secretCrypto.decrypt(encrypted, iv, projectId);
+            } catch (e) {
+                return field;
+            }
+        };
+
+        return {
+            ...event,
+            headers: tryDecrypt(event.headers),
+            body: tryDecrypt(event.body),
+        };
     }
 }

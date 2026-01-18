@@ -1,4 +1,4 @@
-import { logger } from "@kyrazo/shared";
+import { logger, secretCrypto } from "@kyrazo/shared";
 import {
     DeliveryRepo,
     IngestRepo,
@@ -28,7 +28,36 @@ export class BatchWriter {
         if (!attempts.length) return;
 
         try {
-            await DeliveryRepo.insert(attempts);
+            const encryptedAttempts: SQLDeliveryAttempt[] = [];
+
+            for (const attempt of attempts) {
+                const requestBody = secretCrypto.encrypt(
+                    attempt.project_id,
+                    attempt.request_body,
+                );
+                const requestHeader = secretCrypto.encrypt(
+                    attempt.project_id,
+                    attempt.request_header,
+                );
+                const responseBody = secretCrypto.encrypt(
+                    attempt.project_id,
+                    attempt.response_body,
+                );
+                const responseHeader = secretCrypto.encrypt(
+                    attempt.project_id,
+                    attempt.response_header,
+                );
+
+                encryptedAttempts.push({
+                    ...attempt,
+                    request_body: `${requestBody.iv}:${requestBody.encrypted}`,
+                    request_header: `${requestHeader.iv}:${requestHeader.encrypted}`,
+                    response_body: `${responseBody.iv}:${responseBody.encrypted}`,
+                    response_header: `${responseHeader.iv}:${responseHeader.encrypted}`,
+                });
+            }
+
+            await DeliveryRepo.insert(encryptedAttempts);
 
             logger.info(
                 `✅ Successfully flushed ${attempts.length} delivery attempts to ClickHouse`,
@@ -52,7 +81,23 @@ export class BatchWriter {
         if (!events.length) return;
 
         try {
-            await IngestRepo.insert(events);
+            const encryptedEvents: SQLIngestEvent[] = [];
+
+            for (const event of events) {
+                const headers = secretCrypto.encrypt(
+                    event.project_id,
+                    event.headers,
+                );
+                const body = secretCrypto.encrypt(event.project_id, event.body);
+
+                encryptedEvents.push({
+                    ...event,
+                    headers: `${headers.iv}:${headers.encrypted}`,
+                    body: `${body.iv}:${body.encrypted}`,
+                });
+            }
+
+            await IngestRepo.insert(encryptedEvents);
 
             logger.info(
                 `✅ Successfully flushed ${events.length} ingest events to ClickHouse`,

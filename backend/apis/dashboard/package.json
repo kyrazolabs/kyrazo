@@ -1,14 +1,20 @@
 {
     "name": "@dashboard/api",
     "scripts": {
-        "start": "bun run src/index.ts",
+        "start": "bun run dist/index.js",
         "dev": "bun run --hot src/index.ts",
         "tunnel": "bun run src/tunnel.ts",
+        "test": "bun test",
+        "clean": "rm -rf dist && echo 'Done.'",
+        "build": "bun build ./src/index.ts --outdir ./dist --target bun && cp -r ../../shared/src/models/clickhouse/sql ./sql",
+        "build:watch": "bun run build && bun run watch",
+        "prod": "bun run build && bun run src/index.ts",
+        "watch": "concurrently -k -n TSC -c blue \"tsc -p tsconfig.json -w\"",
+        "rebuild": "rm -rf dist && bun run build",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "format": "prettier --write .",
-        "format:check": "prettier --check .",
-        "test": "bun test"
+        "format:check": "prettier --check ."
     },
     "dependencies": {
         "@arcjet/bun": "^1.0.0-beta.10",
@@ -30,13 +36,11 @@
         "@types/dotenv": "^8.2.3",
         "@types/got": "^9.6.12",
         "@types/he": "^1.2.3",
-        "@types/jest": "^30.0.0",
         "@types/jsonwebtoken": "^9.0.10",
         "@types/mongoose": "^5.11.97",
         "@types/morgan": "^1.9.10",
         "@types/node-cron": "^3.0.11",
         "@types/nodemailer": "^7.0.4",
-        "@types/supertest": "^6.0.3",
         "@types/winston": "^2.4.4",
         "axios": "^1.11.0",
         "bullmq": "^5.58.4",
@@ -61,7 +65,6 @@
         "resend": "^6.1.0",
         "smee-client": "^4.3.1",
         "stripe": "^18.5.0",
-        "ts-jest": "^29.4.5",
         "uuid": "^11.1.0",
         "winston": "^3.17.0",
         "winston-daily-rotate-file": "^5.0.0",
@@ -73,12 +76,11 @@
         "@eslint/markdown": "^7.2.0",
         "@rcmade/hono-docs": "^1.0.30",
         "@types/bun": "latest",
+        "concurrently": "^9.2.1",
         "eslint": "^9.35.0",
         "globals": "^16.4.0",
-        "jest": "^30.2.0",
         "jiti": "^2.5.1",
         "prettier": "^3.6.2",
-        "supertest": "^7.1.4",
         "typescript-eslint": "^8.43.0"
     }
 }
