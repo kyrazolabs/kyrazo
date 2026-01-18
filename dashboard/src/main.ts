@@ -18,10 +18,14 @@ if (environment.sentry.enabled) {
   Sentry.init({
     dsn: environment.sentry.dsn,
     environment: environment.production ? "production" : "development",
-    // Point to the Nginx tunnel
-    tunnel: "/sentry/",
 
     integrations: [Sentry.browserTracingIntegration()],
+    tracePropagationTargets: [
+      "localhost", // For local development
+      /^\/api\//, // For same-origin API calls
+      "https://kyrazo.com", // For same-origin calls
+      "https://api.kyrazo.com", // For backend domain
+    ],
 
     tracesSampleRate: 1.0,
     // Setting this option to true will send default PII data to Sentry.
