@@ -1,5 +1,5 @@
 import { APP_BASE_HREF } from "@angular/common";
-import { CommonEngine } from "@angular/ssr/node";
+import { CommonEngine, isMainModule } from "@angular/ssr/node";
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve, relative } from "node:path";
 import bootstrap from "./main.server";
@@ -67,10 +67,14 @@ app.get("*", async (c) => {
   }
 });
 
-const port = Number(process.env["PORT"]) || 4000;
-console.log(`Starting Hono server on http://localhost:${port}`);
+if (isMainModule(import.meta.url) || process.env["pm_id"]) {
+  const port = Number(process.env["PORT"]) || 4000;
+  console.log(`Starting Hono server on http://localhost:${port}`);
 
-serve({
-  fetch: app.fetch,
-  port,
-});
+  serve({
+    fetch: app.fetch,
+    port,
+  });
+}
+
+export default app;
