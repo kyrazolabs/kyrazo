@@ -18,6 +18,12 @@ if (environment.sentry.enabled) {
   Sentry.init({
     dsn: environment.sentry.dsn,
     environment: environment.production ? "production" : "development",
+    // Point to the Nginx tunnel
+    tunnel: "/sentry/",
+
+    integrations: [Sentry.browserTracingIntegration()],
+
+    tracesSampleRate: 1.0,
     // Setting this option to true will send default PII data to Sentry.
     // For example, automatic IP address collection on events
     sendDefaultPii: true,
@@ -25,5 +31,5 @@ if (environment.sentry.enabled) {
 }
 
 bootstrapApplication(AppComponent, appConfig).catch((err) =>
-  console.error(err)
+  console.error(err),
 );
