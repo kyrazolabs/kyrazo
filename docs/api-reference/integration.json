@@ -58,17 +58,90 @@
                         "description": "Event successfully queued",
                         "content": {
                             "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
+                                "example": {
+                                    "status": "queued",
+                                    "eventId": "123e4567-e89b-12d3-a456-426614174000",
+                                    "targetsCount": 1,
+                                    "unfoundTargets": [],
+                                    "queuedAt": "2024-01-20T12:00:00.000Z",
+                                    "processingTimeMs": 15
                                 }
                             }
                         }
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "VALIDATION_ERROR",
+                                        "message": "Invalid event payload",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "UNAUTHORIZED",
+                                        "message": "Authentication required",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "RATE_LIMIT_EXCEEDED",
+                                        "message": "Too many requests",
+                                        "retryAfter": 30,
+                                        "remainingRequests": 0,
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "INTERNAL_ERROR",
+                                        "message": "Failed to publish event",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -114,8 +187,100 @@
                         "description": "Events successfully queued",
                         "content": {
                             "application/json": {
+                                "example": {
+                                    "status": "queued",
+                                    "batchSize": 2,
+                                    "queuedCount": 2,
+                                    "skippedCount": 0,
+                                    "failedCount": 0,
+                                    "results": [
+                                        {
+                                            "eventId": "123e4567-e89b-12d3-a456-426614174000",
+                                            "status": "queued",
+                                            "targetsCount": 1
+                                        },
+                                        {
+                                            "eventId": "987e6543-e21b-12d3-a456-426614174001",
+                                            "status": "queued",
+                                            "targetsCount": 2
+                                        }
+                                    ],
+                                    "queuedAt": "2024-01-20T12:00:00.000Z",
+                                    "processingTimeMs": 35
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "VALIDATION_ERROR",
+                                        "message": "Invalid batch payload",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "UNAUTHORIZED",
+                                        "message": "Authentication required",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "RATE_LIMIT_EXCEEDED",
+                                        "message": "Too many requests",
+                                        "retryAfter": 30,
+                                        "remainingRequests": 0,
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "INTERNAL_ERROR",
+                                        "message": "Failed to batch publish events",
+                                        "requestId": "req_123"
+                                    }
                                 }
                             }
                         }
@@ -167,7 +332,105 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of targets"
+                        "description": "List of targets",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "success": true,
+                                    "message": "Targets fetched successfully.",
+                                    "pagination": {
+                                        "total": 1,
+                                        "page": 1,
+                                        "limit": 10,
+                                        "pages": 1
+                                    },
+                                    "data": [
+                                        {
+                                            "_id": "65a1b2c3d4e5f67890123456",
+                                            "name": "Production Webhook",
+                                            "url": "https://api.example.com/webhooks",
+                                            "enabled": true,
+                                            "createdAt": "2024-01-15T12:00:00.000Z",
+                                            "updatedAt": "2024-01-15T12:00:00.000Z"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "INVALID_INPUT",
+                                        "message": "Invalid input parameters",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "UNAUTHORIZED",
+                                        "message": "Authentication required",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "RATE_LIMIT_EXCEEDED",
+                                        "message": "Too many requests",
+                                        "retryAfter": 60,
+                                        "remainingRequests": 0,
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "INTERNAL_ERROR",
+                                        "message": "An unexpected error occurred",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -200,7 +463,97 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Target created"
+                        "description": "Target created",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "success": true,
+                                    "message": "Target added successfully.",
+                                    "data": {
+                                        "_id": "65a1b2c3d4e5f67890123456",
+                                        "name": "Production Webhook",
+                                        "url": "https://api.example.com/webhooks",
+                                        "enabled": true,
+                                        "createdAt": "2024-01-15T12:00:00.000Z",
+                                        "updatedAt": "2024-01-15T12:00:00.000Z"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Target already exists",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "TARGET_ALREADY_EXISTS",
+                                        "message": "Target with this url already exists",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "UNAUTHORIZED",
+                                        "message": "Authentication required",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "RATE_LIMIT_EXCEEDED",
+                                        "message": "Too many requests",
+                                        "retryAfter": 60,
+                                        "remainingRequests": 0,
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "INTERNAL_ERROR",
+                                        "message": "Failed to create target",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -233,7 +586,97 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Target details"
+                        "description": "Target details",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "success": true,
+                                    "message": "Target fetched successfully.",
+                                    "data": {
+                                        "_id": "65a1b2c3d4e5f67890123456",
+                                        "name": "Production Webhook",
+                                        "url": "https://api.example.com/webhooks",
+                                        "enabled": true,
+                                        "createdAt": "2024-01-15T12:00:00.000Z",
+                                        "updatedAt": "2024-01-15T12:00:00.000Z"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "UNAUTHORIZED",
+                                        "message": "Authentication required",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "RATE_LIMIT_EXCEEDED",
+                                        "message": "Too many requests",
+                                        "retryAfter": 60,
+                                        "remainingRequests": 0,
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Target not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "TARGET_NOT_FOUND",
+                                        "message": "Target not found",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "INTERNAL_ERROR",
+                                        "message": "Failed to get target",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -273,7 +716,97 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Target updated"
+                        "description": "Target updated",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "success": true,
+                                    "message": "Target updated successfully.",
+                                    "data": {
+                                        "_id": "65a1b2c3d4e5f67890123456",
+                                        "name": "Updated Webhook Name",
+                                        "url": "https://api.example.com/webhooks/updated",
+                                        "enabled": true,
+                                        "createdAt": "2024-01-15T12:00:00.000Z",
+                                        "updatedAt": "2024-01-16T12:00:00.000Z"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "UNAUTHORIZED",
+                                        "message": "Authentication required",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "RATE_LIMIT_EXCEEDED",
+                                        "message": "Too many requests",
+                                        "retryAfter": 60,
+                                        "remainingRequests": 0,
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Target not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "TARGET_NOT_FOUND",
+                                        "message": "Target not found",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "INTERNAL_ERROR",
+                                        "message": "Failed to update target",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -319,7 +852,93 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Status updated"
+                        "description": "Status updated",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "success": true,
+                                    "message": "Target updated successfully.",
+                                    "data": {
+                                        "_id": "65a1b2c3d4e5f67890123456",
+                                        "enabled": false
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "UNAUTHORIZED",
+                                        "message": "Authentication required",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "RATE_LIMIT_EXCEEDED",
+                                        "message": "Too many requests",
+                                        "retryAfter": 60,
+                                        "remainingRequests": 0,
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Target not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "TARGET_NOT_FOUND",
+                                        "message": "Target not found",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "INTERNAL_ERROR",
+                                        "message": "Failed to update target status",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -350,7 +969,93 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Target deleted"
+                        "description": "Target deleted",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "success": true,
+                                    "message": "Target deleted successfully.",
+                                    "data": {
+                                        "acknowledged": true,
+                                        "deletedCount": 1
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "UNAUTHORIZED",
+                                        "message": "Authentication required",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "RATE_LIMIT_EXCEEDED",
+                                        "message": "Too many requests",
+                                        "retryAfter": 60,
+                                        "remainingRequests": 0,
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Target not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "TARGET_NOT_FOUND",
+                                        "message": "Target not found",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "INTERNAL_ERROR",
+                                        "message": "Failed to delete target",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -383,7 +1088,92 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Target secret"
+                        "description": "Target secret",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "success": true,
+                                    "message": "Target fetched successfully.",
+                                    "data": {
+                                        "secret": "whsec_kz8...9d"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "UNAUTHORIZED",
+                                        "message": "Authentication required",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "RATE_LIMIT_EXCEEDED",
+                                        "message": "Too many requests",
+                                        "retryAfter": 60,
+                                        "remainingRequests": 0,
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Target not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "TARGET_NOT_FOUND",
+                                        "message": "Target not found",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "INTERNAL_ERROR",
+                                        "message": "Failed to get target secret",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -423,7 +1213,91 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of endpoints"
+                        "description": "List of endpoints",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "success": true,
+                                    "pagination": {
+                                        "total": 1,
+                                        "page": 1,
+                                        "limit": 10,
+                                        "pages": 1
+                                    },
+                                    "data": [
+                                        {
+                                            "_id": "65b2c3d4e5f6789012345678",
+                                            "name": "Backend Service",
+                                            "url": "https://api.internal.service/v1/webhook",
+                                            "status": "active",
+                                            "method": "POST",
+                                            "config": {
+                                                "timeout": 5000,
+                                                "retryCount": 3
+                                            },
+                                            "createdAt": "2024-01-20T10:00:00.000Z",
+                                            "updatedAt": "2024-01-20T10:00:00.000Z"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "UNAUTHORIZED",
+                                        "message": "Authentication required",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "RATE_LIMIT_EXCEEDED",
+                                        "message": "Too many requests",
+                                        "retryAfter": 60,
+                                        "remainingRequests": 0,
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "INTERNAL_ERROR",
+                                        "message": "Failed to get endpoints",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -455,7 +1329,86 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Endpoint created"
+                        "description": "Endpoint created",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "success": true,
+                                    "message": "Endpoint created successfully",
+                                    "data": {
+                                        "endpoint": {
+                                            "_id": "65b2c3d4e5f6789012345678",
+                                            "name": "Backend Service",
+                                            "url": "https://api.internal.service/v1/webhook",
+                                            "status": "active",
+                                            "method": "POST",
+                                            "config": {
+                                                "timeout": 5000,
+                                                "retryCount": 3
+                                            },
+                                            "createdAt": "2024-01-20T10:00:00.000Z",
+                                            "updatedAt": "2024-01-20T10:00:00.000Z"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "UNAUTHORIZED",
+                                        "message": "Authentication required",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "RATE_LIMIT_EXCEEDED",
+                                        "message": "Too many requests",
+                                        "retryAfter": 60,
+                                        "remainingRequests": 0,
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "INTERNAL_ERROR",
+                                        "message": "Failed to create endpoint",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -487,7 +1440,84 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Endpoint details"
+                        "description": "Endpoint details",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "success": true,
+                                    "message": "Endpoint fetched successfully",
+                                    "data": {
+                                        "_id": "65b2c3d4e5f6789012345678",
+                                        "name": "Backend Service",
+                                        "url": "https://api.internal.service/v1/webhook",
+                                        "status": "active",
+                                        "method": "POST",
+                                        "config": {
+                                            "timeout": 5000,
+                                            "retryCount": 3
+                                        },
+                                        "createdAt": "2024-01-20T10:00:00.000Z",
+                                        "updatedAt": "2024-01-20T10:00:00.000Z"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Endpoint not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "ENDPOINT_NOT_FOUND",
+                                        "message": "Endpoint not found",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "RATE_LIMIT_EXCEEDED",
+                                        "message": "Too many requests",
+                                        "retryAfter": 60,
+                                        "remainingRequests": 0,
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "INTERNAL_ERROR",
+                                        "message": "Failed to get endpoint",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -526,7 +1556,76 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Endpoint updated"
+                        "description": "Endpoint updated",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "success": true,
+                                    "message": "Endpoint updated successfully",
+                                    "data": {
+                                        "_id": "65b2c3d4e5f6789012345678",
+                                        "name": "Updated Service Name",
+                                        "status": "inactive"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Endpoint not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "ENDPOINT_NOT_FOUND",
+                                        "message": "Endpoint not found",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "RATE_LIMIT_EXCEEDED",
+                                        "message": "Too many requests",
+                                        "retryAfter": 60,
+                                        "remainingRequests": 0,
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "INTERNAL_ERROR",
+                                        "message": "Failed to update endpoint",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -556,7 +1655,75 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Endpoint deleted"
+                        "description": "Endpoint deleted",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "success": true,
+                                    "message": "Endpoint deleted successfully",
+                                    "data": {
+                                        "acknowledged": true,
+                                        "deletedCount": 1
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Endpoint not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "ENDPOINT_NOT_FOUND",
+                                        "message": "Endpoint not found",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "RATE_LIMIT_EXCEEDED",
+                                        "message": "Too many requests",
+                                        "retryAfter": 60,
+                                        "remainingRequests": 0,
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "INTERNAL_ERROR",
+                                        "message": "Failed to delete endpoint",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -588,7 +1755,74 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Endpoint secret"
+                        "description": "Endpoint secret",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "success": true,
+                                    "message": "Endpoint secret fetched successfully",
+                                    "data": {
+                                        "secret": "whsec_..."
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Endpoint not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "ENDPOINT_NOT_FOUND",
+                                        "message": "Endpoint not found",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "RATE_LIMIT_EXCEEDED",
+                                        "message": "Too many requests",
+                                        "retryAfter": 60,
+                                        "remainingRequests": 0,
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "INTERNAL_ERROR",
+                                        "message": "Failed to get endpoint secret",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -628,7 +1862,85 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of sources"
+                        "description": "List of sources",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "success": true,
+                                    "total": 1,
+                                    "sources": [
+                                        {
+                                            "_id": "65c3d4e5f678901234567890",
+                                            "name": "Stripe Ingest",
+                                            "description": "Ingest events from Stripe webhooks",
+                                            "service": "stripe",
+                                            "authentication": {
+                                                "enabled": true,
+                                                "type": "hmac"
+                                            },
+                                            "createdAt": "2024-01-25T15:30:00.000Z",
+                                            "updatedAt": "2024-01-25T15:30:00.000Z"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "UNAUTHORIZED",
+                                        "message": "Authentication required",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "RATE_LIMIT_EXCEEDED",
+                                        "message": "Too many requests",
+                                        "retryAfter": 60,
+                                        "remainingRequests": 0,
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "INTERNAL_ERROR",
+                                        "message": "Failed to get sources",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -660,7 +1972,86 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Source created"
+                        "description": "Source created",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "success": true,
+                                    "message": "Source created successfully",
+                                    "data": {
+                                        "sourceId": "65c3d4e5f678901234567890",
+                                        "source": {
+                                            "_id": "65c3d4e5f678901234567890",
+                                            "name": "Stripe Ingest",
+                                            "description": "Ingest events from Stripe webhooks",
+                                            "service": "stripe",
+                                            "authentication": {
+                                                "enabled": true,
+                                                "type": "hmac"
+                                            },
+                                            "createdAt": "2024-01-25T15:30:00.000Z",
+                                            "updatedAt": "2024-01-25T15:30:00.000Z"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "UNAUTHORIZED",
+                                        "message": "Authentication required",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "RATE_LIMIT_EXCEEDED",
+                                        "message": "Too many requests",
+                                        "retryAfter": 60,
+                                        "remainingRequests": 0,
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "INTERNAL_ERROR",
+                                        "message": "Failed to create source",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -692,7 +2083,83 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Source details"
+                        "description": "Source details",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "success": true,
+                                    "message": "Source fetched successfully",
+                                    "data": {
+                                        "_id": "65c3d4e5f678901234567890",
+                                        "name": "Stripe Ingest",
+                                        "description": "Ingest events from Stripe webhooks",
+                                        "service": "stripe",
+                                        "authentication": {
+                                            "enabled": true,
+                                            "type": "hmac"
+                                        },
+                                        "createdAt": "2024-01-25T15:30:00.000Z",
+                                        "updatedAt": "2024-01-25T15:30:00.000Z"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Source not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "SOURCE_NOT_FOUND",
+                                        "message": "Source not found",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "RATE_LIMIT_EXCEEDED",
+                                        "message": "Too many requests",
+                                        "retryAfter": 60,
+                                        "remainingRequests": 0,
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "INTERNAL_ERROR",
+                                        "message": "Failed to get source",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -731,7 +2198,75 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Source updated"
+                        "description": "Source updated",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "success": true,
+                                    "message": "Source updated successfully",
+                                    "data": {
+                                        "_id": "65c3d4e5f678901234567890",
+                                        "name": "Updated Source Name"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Source not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "SOURCE_NOT_FOUND",
+                                        "message": "Source not found",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "RATE_LIMIT_EXCEEDED",
+                                        "message": "Too many requests",
+                                        "retryAfter": 60,
+                                        "remainingRequests": 0,
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "INTERNAL_ERROR",
+                                        "message": "Failed to update source",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -761,7 +2296,75 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Source deleted"
+                        "description": "Source deleted",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "success": true,
+                                    "message": "Source deleted successfully",
+                                    "data": {
+                                        "acknowledged": true,
+                                        "deletedCount": 1
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Source not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "SOURCE_NOT_FOUND",
+                                        "message": "Source not found",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "RATE_LIMIT_EXCEEDED",
+                                        "message": "Too many requests",
+                                        "retryAfter": 60,
+                                        "remainingRequests": 0,
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "INTERNAL_ERROR",
+                                        "message": "Failed to delete source",
+                                        "requestId": "req_123"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -909,6 +2512,48 @@
                     },
                     "data": {
                         "type": "object"
+                    }
+                }
+            },
+            "ErrorResponse": {
+                "type": "object",
+                "required": [
+                    "success",
+                    "error"
+                ],
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "error": {
+                        "type": "object",
+                        "required": [
+                            "code",
+                            "message"
+                        ],
+                        "properties": {
+                            "code": {
+                                "type": "string"
+                            },
+                            "message": {
+                                "type": "string"
+                            },
+                            "details": {
+                                "type": "object"
+                            },
+                            "requestId": {
+                                "type": "string"
+                            },
+                            "retryAfter": {
+                                "type": "integer",
+                                "description": "Seconds until retry"
+                            },
+                            "remainingRequests": {
+                                "type": "integer",
+                                "description": "Remaining requests in current window"
+                            }
+                        }
                     }
                 }
             },
