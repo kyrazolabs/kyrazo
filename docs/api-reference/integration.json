@@ -387,6 +387,384 @@
                     }
                 }
             }
+        },
+        "/v1/endpoints/{projectId}": {
+            "get": {
+                "summary": "List Endpoints",
+                "operationId": "listEndpoints",
+                "tags": [
+                    "Endpoints"
+                ],
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of endpoints"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create Endpoint",
+                "operationId": "createEndpoint",
+                "tags": [
+                    "Endpoints"
+                ],
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateEndpoint"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Endpoint created"
+                    }
+                }
+            }
+        },
+        "/v1/endpoints/{projectId}/{endpointId}": {
+            "get": {
+                "summary": "Get Endpoint",
+                "operationId": "getEndpoint",
+                "tags": [
+                    "Endpoints"
+                ],
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "endpointId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Endpoint details"
+                    }
+                }
+            },
+            "patch": {
+                "summary": "Update Endpoint",
+                "operationId": "updateEndpoint",
+                "tags": [
+                    "Endpoints"
+                ],
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "endpointId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateEndpoint"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Endpoint updated"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete Endpoint",
+                "operationId": "deleteEndpoint",
+                "tags": [
+                    "Endpoints"
+                ],
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "endpointId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Endpoint deleted"
+                    }
+                }
+            }
+        },
+        "/v1/endpoints/{projectId}/{endpointId}/secret": {
+            "get": {
+                "summary": "Get Endpoint Secret",
+                "operationId": "getEndpointSecret",
+                "tags": [
+                    "Endpoints"
+                ],
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "endpointId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Endpoint secret"
+                    }
+                }
+            }
+        },
+        "/v1/source/{projectId}": {
+            "get": {
+                "summary": "List Sources",
+                "operationId": "listSources",
+                "tags": [
+                    "Sources"
+                ],
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of sources"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create Source",
+                "operationId": "createSource",
+                "tags": [
+                    "Sources"
+                ],
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateSource"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Source created"
+                    }
+                }
+            }
+        },
+        "/v1/source/{projectId}/{sourceId}": {
+            "get": {
+                "summary": "Get Source",
+                "operationId": "getSource",
+                "tags": [
+                    "Sources"
+                ],
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sourceId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Source details"
+                    }
+                }
+            },
+            "patch": {
+                "summary": "Update Source",
+                "operationId": "updateSource",
+                "tags": [
+                    "Sources"
+                ],
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sourceId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateSource"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Source updated"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete Source",
+                "operationId": "deleteSource",
+                "tags": [
+                    "Sources"
+                ],
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sourceId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Source deleted"
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -533,6 +911,151 @@
                         "type": "object"
                     }
                 }
+            },
+            "CreateEndpoint": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "url"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 3,
+                        "maxLength": 100
+                    },
+                    "url": {
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "description": {
+                        "type": "string",
+                        "maxLength": 500
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "inactive"
+                        ],
+                        "default": "active"
+                    },
+                    "method": {
+                        "type": "string",
+                        "enum": [
+                            "POST",
+                            "PUT",
+                            "PATCH"
+                        ],
+                        "default": "POST"
+                    },
+                    "config": {
+                        "type": "object",
+                        "properties": {
+                            "timeout": {
+                                "type": "integer",
+                                "minimum": 100,
+                                "maximum": 60000,
+                                "default": 5000
+                            },
+                            "retryCount": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 10,
+                                "default": 3
+                            }
+                        }
+                    },
+                    "customHeaders": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "UpdateEndpoint": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/CreateEndpoint"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {}
+                    }
+                ]
+            },
+            "CreateSource": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "authentication"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 3,
+                        "maxLength": 100
+                    },
+                    "description": {
+                        "type": "string",
+                        "maxLength": 500
+                    },
+                    "service": {
+                        "type": "string",
+                        "enum": [
+                            "general",
+                            "stripe",
+                            "github",
+                            "shopify",
+                            "paypal"
+                        ],
+                        "default": "general"
+                    },
+                    "authentication": {
+                        "type": "object",
+                        "required": [
+                            "type"
+                        ],
+                        "properties": {
+                            "enabled": {
+                                "type": "boolean",
+                                "default": true
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "api_key",
+                                    "basic_auth",
+                                    "service",
+                                    "hmac"
+                                ]
+                            },
+                            "apiKey": {
+                                "type": "object",
+                                "properties": {
+                                    "headerName": {
+                                        "type": "string"
+                                    },
+                                    "key": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "UpdateSource": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/CreateSource"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {}
+                    }
+                ]
             }
         },
         "securitySchemes": {

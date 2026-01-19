@@ -75,6 +75,32 @@
                 ]
               }
             ]
+          },
+          {
+            "group": "Ingest",
+            "pages": [
+              {
+                "group": "Endpoints",
+                "pages": [
+                  "api-reference/integration/list-endpoints",
+                  "api-reference/integration/create-endpoint",
+                  "api-reference/integration/get-endpoint",
+                  "api-reference/integration/update-endpoint",
+                  "api-reference/integration/delete-endpoint",
+                  "api-reference/integration/get-endpoint-secret"
+                ]
+              },
+              {
+                "group": "Sources",
+                "pages": [
+                  "api-reference/integration/list-sources",
+                  "api-reference/integration/create-source",
+                  "api-reference/integration/get-source",
+                  "api-reference/integration/update-source",
+                  "api-reference/integration/delete-source"
+                ]
+              }
+            ]
           }
         ]
       }
