@@ -41,4 +41,15 @@ describe("EndpointsModule", () => {
       "/v1/endpoints/proj_123/ep_123",
     );
   });
+
+  it("should get endpoint secret", async () => {
+    const mockResponse = { data: { secret: "whsec_123" } };
+    mockHttpClient.get.mockResolvedValue(mockResponse);
+
+    await endpoints.getSecret("proj_123", "ep_123");
+
+    expect(mockHttpClient.get).toHaveBeenCalledWith(
+      "/v1/endpoints/proj_123/ep_123/secret",
+    );
+  });
 });

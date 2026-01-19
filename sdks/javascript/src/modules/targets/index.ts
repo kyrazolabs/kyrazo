@@ -30,6 +30,15 @@ export interface TargetsModule {
     data: UpdateTargetInput,
   ) => Promise<APIResponse<Target>>;
   delete: (projectId: string, targetId: string) => Promise<APIResponse<void>>;
+  getSecret: (
+    projectId: string,
+    targetId: string,
+  ) => Promise<APIResponse<{ secret: string }>>;
+  updateStatus: (
+    projectId: string,
+    targetId: string,
+    enabled: boolean,
+  ) => Promise<APIResponse<Target>>;
 }
 
 /**
@@ -88,6 +97,28 @@ export function createTargetsModule(client: HttpClient): TargetsModule {
     ): Promise<APIResponse<void>> {
       const response = await client.delete<APIResponse<void>>(
         `/v1/targets/${projectId}/${targetId}`,
+      );
+      return response.data;
+    },
+
+    async getSecret(
+      projectId: string,
+      targetId: string,
+    ): Promise<APIResponse<{ secret: string }>> {
+      const response = await client.get<APIResponse<{ secret: string }>>(
+        `/v1/targets/${projectId}/${targetId}/secret`,
+      );
+      return response.data;
+    },
+
+    async updateStatus(
+      projectId: string,
+      targetId: string,
+      enabled: boolean,
+    ): Promise<APIResponse<Target>> {
+      const response = await client.put<APIResponse<Target>>(
+        `/v1/targets/${projectId}/${targetId}`,
+        { enabled },
       );
       return response.data;
     },

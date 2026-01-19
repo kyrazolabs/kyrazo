@@ -33,6 +33,10 @@ export interface EndpointsModule {
     data: UpdateEndpointInput,
   ) => Promise<APIResponse<Endpoint>>;
   delete: (projectId: string, endpointId: string) => Promise<APIResponse<void>>;
+  getSecret: (
+    projectId: string,
+    endpointId: string,
+  ) => Promise<APIResponse<{ secret: string }>>;
 }
 
 /**
@@ -91,6 +95,16 @@ export function createEndpointsModule(client: HttpClient): EndpointsModule {
     ): Promise<APIResponse<void>> {
       const response = await client.delete<APIResponse<void>>(
         `/v1/endpoints/${projectId}/${endpointId}`,
+      );
+      return response.data;
+    },
+
+    async getSecret(
+      projectId: string,
+      endpointId: string,
+    ): Promise<APIResponse<{ secret: string }>> {
+      const response = await client.get<APIResponse<{ secret: string }>>(
+        `/v1/endpoints/${projectId}/${endpointId}/secret`,
       );
       return response.data;
     },
