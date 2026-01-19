@@ -18,17 +18,23 @@ sdk/javascript/
 │   ├── types/
 │   │   ├── index.ts      # Type re-exports
 │   │   ├── common.ts     # Shared types (EventTarget, etc.)
-│   │   └── dispatch.ts   # Dispatch module types
+│   │   ├── events.ts     # Event types
+│   │   ├── sources.ts    # Source types
+│   │   ├── endpoints.ts  # Endpoint types
+│   │   └── targets.ts    # Target types
 │   ├── utils/
 │   │   ├── http.ts       # HTTP client with retries
 │   │   ├── validation.ts # Input validation
 │   │   └── helpers.ts    # Utility functions
 │   └── modules/
-│       └── dispatch/
-│           ├── index.ts          # Module exports
-│           ├── types.ts          # Type re-exports
-│           ├── publish-event.ts  # single() method
-│           └── publish-events.ts # batch() method
+│       ├── events/       # Events module (Publishing)
+│       │   ├── index.ts
+│       │   ├── types.ts
+│       │   ├── publish-event.ts
+│       │   └── publish-events.ts
+│       ├── sources/      # Sources module (CRUD)
+│       ├── endpoints/    # Endpoints module (CRUD)
+│       └── targets/      # Targets module (CRUD)
 └── dist/                 # Built output (gitignored)
 ```
 
@@ -55,6 +61,8 @@ npm run lint
 
 ### Client Architecture
 
+The SDK uses a modular functional factory pattern.
+
 ```
 Kyrazo (client.ts)
     │
@@ -64,34 +72,44 @@ Kyrazo (client.ts)
     ├── _httpClient (HttpClient)
     │       └── Handles all HTTP requests with retry logic
     │
-    └── dispatch (DispatchModule)
-            ├── single(projectId, payload) → PublishEventResponse
-            └── batch(projectId, events[]) → BatchPublishEventResponse[]
+    ├── events (EventsModule)
+    │       ├── single(projectId, payload) → PublishEventResponse
+    │       └── batch(projectId, events[]) → BatchPublishEventResponse[]
+    │
+    ├── sources (SourcesModule)
+    │       └── list, get, create, update, delete
+    │
+    ├── endpoints (EndpointsModule)
+    │       └── list, get, create, update, delete
+    │
+    └── targets (TargetsModule)
+            └── list, get, create, update, delete
 ```
 
 ### Request Flow
 
-1. User calls `kyrazo.dispatch.single(projectId, payload)`
-2. Validation runs on `projectId` and `payload`
-3. `HttpClient.post()` sends request with:
+1. User calls `kyrazo.events.single(projectId, payload)`
+2. Factory function creates the request context
+3. Validation runs on `projectId` and `payload`
+4. `HttpClient.post()` sends request with:
    - `x-api-key` header
    - JSON body
    - Retry logic on failures
-4. Response is parsed and returned
-5. Errors are mapped to specific error classes
+5. Response is parsed and returned
+6. Errors are mapped to specific error classes (e.g. `RateLimitError` with retry headers)
 
 ### Error Handling
 
 All API errors extend `KyrazoError`:
 
-| Error Class | HTTP Code | When |
-|-------------|-----------|------|
-| `AuthenticationError` | 401 | Invalid API key |
-| `ValidationError` | 400 | Invalid payload |
-| `LimitExceededError` | 403 | Monthly limit hit |
-| `RateLimitError` | 429 | Too many requests |
-| `ServerError` | 500 | Backend error |
-| `NetworkError` | - | Connection issues |
+| Error Class           | HTTP Code | When                                      |
+| --------------------- | --------- | ----------------------------------------- |
+| `AuthenticationError` | 401       | Invalid API key                           |
+| `ValidationError`     | 400       | Invalid payload                           |
+| `LimitExceededError`  | 403       | Monthly limit hit                         |
+| `RateLimitError`      | 429       | Too many requests (includes `retryAfter`) |
+| `ServerError`         | 500       | Backend error                             |
+| `NetworkError`        | -         | Connection issues                         |
 
 ## 🧪 Testing
 
@@ -111,21 +129,21 @@ npm run test:watch
 ### Manual Testing
 
 ```typescript
-import { Kyrazo } from './src';
+import { Kyrazo } from "./src";
 
 const client = new Kyrazo({
-  apiKey: 'your-api-key',
-  baseURL: 'http://localhost:4000',
+  apiKey: "your-api-key",
+  baseURL: "http://localhost:4000",
 });
 
 // Test single event
-const response = await client.dispatch.single('project-id', {
-  webhookId: '68c674dd3b96f77d9426a93b',
-  eventType: 'user.created',
-  payload: { userId: 'u_123' },
-  targets: [{ targetUrl: 'https://webhook.site/xxx' }],
+const response = await client.events.single("project-id", {
+  webhookId: "68c674dd3b96f77d9426a93b",
+  eventType: "user.created",
+  payload: { userId: "u_123" },
+  targets: [{ targetUrl: "https://webhook.site/xxx" }],
 });
-console.log('Response:', response);
+console.log("Response:", response);
 ```
 
 ## 📝 Adding New Features
@@ -134,33 +152,33 @@ console.log('Response:', response);
 
 1. Create folder: `src/modules/newmodule/`
 2. Create types: `src/types/newmodule.ts`
-3. Create module: `src/modules/newmodule/index.ts`
+3. Create factory: `src/modules/newmodule/index.ts` (export `createNewModule` and `NewModule` interface)
 4. Export from `src/index.ts`
 5. Add to client in `src/client.ts`
 
 ### Adding a New Method
 
-1. Create file: `src/modules/dispatch/new-method.ts`
-2. Export from `src/modules/dispatch/index.ts`
-3. Add to `DispatchModule` interface
+1. Create file: `src/modules/events/new-method.ts`
+2. Export from `src/modules/events/index.ts`
+3. Add to `EventsModule` interface
 
 ## 🔑 Key Files
 
-| File | Purpose |
-|------|---------|
-| `src/index.ts` | Main entry, all exports |
-| `src/client.ts` | `Kyrazo` class |
-| `src/utils/http.ts` | HTTP client |
-| `src/errors.ts` | Error classes |
-| `src/modules/dispatch/publish-event.ts` | `single()` method |
-| `src/modules/dispatch/publish-events.ts` | `batch()` method |
+| File                                   | Purpose                 |
+| -------------------------------------- | ----------------------- |
+| `src/index.ts`                         | Main entry, all exports |
+| `src/client.ts`                        | `Kyrazo` client class   |
+| `src/utils/http.ts`                    | HTTP client             |
+| `src/errors.ts`                        | Error classes           |
+| `src/modules/events/publish-event.ts`  | `single()` method       |
+| `src/modules/events/publish-events.ts` | `batch()` method        |
 
 ## 🛠️ Scripts Reference
 
-| Script | Command | Description |
-|--------|---------|-------------|
-| `build` | `tsup src/index.ts --format cjs,esm --dts --clean` | Production build |
-| `dev` | `tsup src/index.ts --format cjs,esm --dts --watch` | Watch mode |
-| `typecheck` | `tsc --noEmit` | Type checking |
-| `lint` | `eslint src --ext .ts` | Linting |
-| `test` | `vitest` | Run tests |
+| Script      | Command                                            | Description      |
+| ----------- | -------------------------------------------------- | ---------------- |
+| `build`     | `tsup src/index.ts --format cjs,esm --dts --clean` | Production build |
+| `dev`       | `tsup src/index.ts --format cjs,esm --dts --watch` | Watch mode       |
+| `typecheck` | `tsc --noEmit`                                     | Type checking    |
+| `lint`      | `eslint src --ext .ts`                             | Linting          |
+| `test`      | `vitest`                                           | Run tests        |
