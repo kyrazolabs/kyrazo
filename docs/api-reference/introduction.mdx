@@ -51,3 +51,53 @@ https://api.kyrazo.com
 <Note>
   Ensure you are using the correct Project ID from your dashboard when constructing the publish URL: `https://api.kyrazo.com/v1/events/{projectId}/publish`
 </Note>
+
+## SDK Support
+
+Kyrazo provides official SDKs to make integration easier.
+
+<CodeGroup>
+  ```bash JavaScript
+  npm install @kyrazo/javascript
+  ```
+
+  ```bash Python
+  pip install kyrazo
+  ```
+</CodeGroup>
+
+### Usage Example
+
+<CodeGroup>
+```javascript JavaScript
+import { Kyrazo } from '@kyrazo/javascript';
+
+const client = new Kyrazo({
+  apiKey: '<your_api_key>',
+});
+
+await client.events.single('project_id', {
+  webhookId: 'wh_123',
+  eventType: 'user.created',
+  payload: { userId: 1 },
+  targets: [{ targetUrl: 'https://site.com/hook' }]
+});
+```
+
+```python Python
+from kyrazo import Kyrazo
+from kyrazo.resources.events import PublishEventBody
+
+client = Kyrazo(api_key="<your_api_key>")
+
+client.events.publish(
+    project_id="project_id",
+    body=PublishEventBody(
+        webhookId="wh_123",
+        eventType="user.created",
+        payload={"userId": 1},
+        targets=[{"targetUrl": "https://site.com/hook"}]
+    )
+)
+```
+</CodeGroup>
