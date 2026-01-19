@@ -9,20 +9,27 @@ const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, "../browser");
 const indexHtml = join(browserDistFolder, "index.csr.html");
 
+console.log("Initializing server.ts...");
+
 const app = express();
+console.log("Express app created.");
+
 const commonEngine = new CommonEngine();
+console.log("CommonEngine created.");
 
 /**
  * Serve static files from /browser
  * Using app.use with express.static is the standard way to serve files
  * and avoids regex issues with newer path-to-regexp versions.
  */
+console.log("Configuring static files...");
 app.use(
   express.static(browserDistFolder, {
     maxAge: "1y",
     index: "index.html",
   }),
 );
+console.log("Static files configured.");
 
 /**
  * Serve CSR App Shell for Dashboard
@@ -49,12 +56,15 @@ app.get("*", (req, res, next) => {
     .catch((err) => next(err));
 });
 
+console.log("Routes configured.");
+
 /**
  * Start the server if this module is the main entry point, or it is ran via PM2.
  * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
  */
 if (isMainModule(import.meta.url) || process.env["pm_id"]) {
   const port = Number(process.env["PORT"]) || 4000;
+  console.log(`Starting server on port ${port}...`);
   app.listen(port, () => {
     console.log(`Node Express server listening on http://localhost:${port}`);
   });
