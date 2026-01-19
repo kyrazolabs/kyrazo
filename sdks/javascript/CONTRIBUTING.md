@@ -1,0 +1,166 @@
+# JavaScript SDK Development Guide
+
+## 📁 Project Structure
+
+```
+sdk/javascript/
+├── package.json          # Dependencies and scripts
+├── tsconfig.json         # TypeScript configuration
+├── README.md             # User-facing documentation
+├── CONTRIBUTING.md       # This file
+├── src/
+│   ├── index.ts          # Main entry - exports everything
+│   ├── client.ts         # Kyrazo client class
+│   ├── core/
+│   │   ├── config.ts     # Configuration types
+│   │   ├── errors.ts     # Error classes
+│   │   └── version.ts    # SDK version
+│   ├── types/
+│   │   ├── index.ts      # Type re-exports
+│   │   ├── common.ts     # Shared types (EventTarget, etc.)
+│   │   └── dispatch.ts   # Dispatch module types
+│   ├── utils/
+│   │   ├── http.ts       # HTTP client with retries
+│   │   ├── validation.ts # Input validation
+│   │   └── helpers.ts    # Utility functions
+│   └── modules/
+│       └── dispatch/
+│           ├── index.ts          # Module exports
+│           ├── types.ts          # Type re-exports
+│           ├── publish-event.ts  # single() method
+│           └── publish-events.ts # batch() method
+└── dist/                 # Built output (gitignored)
+```
+
+## 🚀 Quick Start
+
+```bash
+# Install dependencies
+npm install
+
+# Build the SDK
+npm run build
+
+# Type check without building
+npm run typecheck
+
+# Watch mode for development
+npm run dev
+
+# Run linting
+npm run lint
+```
+
+## 🔧 How It Works
+
+### Client Architecture
+
+```
+Kyrazo (client.ts)
+    │
+    ├── config (KyrazoConfig)
+    │       └── apiKey, baseURL, timeout, maxRetries
+    │
+    ├── _httpClient (HttpClient)
+    │       └── Handles all HTTP requests with retry logic
+    │
+    └── dispatch (DispatchModule)
+            ├── single(projectId, payload) → PublishEventResponse
+            └── batch(projectId, events[]) → BatchPublishEventResponse[]
+```
+
+### Request Flow
+
+1. User calls `kyrazo.dispatch.single(projectId, payload)`
+2. Validation runs on `projectId` and `payload`
+3. `HttpClient.post()` sends request with:
+   - `x-api-key` header
+   - JSON body
+   - Retry logic on failures
+4. Response is parsed and returned
+5. Errors are mapped to specific error classes
+
+### Error Handling
+
+All API errors extend `KyrazoError`:
+
+| Error Class | HTTP Code | When |
+|-------------|-----------|------|
+| `AuthenticationError` | 401 | Invalid API key |
+| `ValidationError` | 400 | Invalid payload |
+| `LimitExceededError` | 403 | Monthly limit hit |
+| `RateLimitError` | 429 | Too many requests |
+| `ServerError` | 500 | Backend error |
+| `NetworkError` | - | Connection issues |
+
+## 🧪 Testing
+
+### Run Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run with coverage
+npm run test:coverage
+
+# Watch mode
+npm run test:watch
+```
+
+### Manual Testing
+
+```typescript
+import { Kyrazo } from './src';
+
+const client = new Kyrazo({
+  apiKey: 'your-api-key',
+  baseURL: 'http://localhost:4000',
+});
+
+// Test single event
+const response = await client.dispatch.single('project-id', {
+  webhookId: '68c674dd3b96f77d9426a93b',
+  eventType: 'user.created',
+  payload: { userId: 'u_123' },
+  targets: [{ targetUrl: 'https://webhook.site/xxx' }],
+});
+console.log('Response:', response);
+```
+
+## 📝 Adding New Features
+
+### Adding a New Module
+
+1. Create folder: `src/modules/newmodule/`
+2. Create types: `src/types/newmodule.ts`
+3. Create module: `src/modules/newmodule/index.ts`
+4. Export from `src/index.ts`
+5. Add to client in `src/client.ts`
+
+### Adding a New Method
+
+1. Create file: `src/modules/dispatch/new-method.ts`
+2. Export from `src/modules/dispatch/index.ts`
+3. Add to `DispatchModule` interface
+
+## 🔑 Key Files
+
+| File | Purpose |
+|------|---------|
+| `src/index.ts` | Main entry, all exports |
+| `src/client.ts` | `Kyrazo` class |
+| `src/utils/http.ts` | HTTP client |
+| `src/errors.ts` | Error classes |
+| `src/modules/dispatch/publish-event.ts` | `single()` method |
+| `src/modules/dispatch/publish-events.ts` | `batch()` method |
+
+## 🛠️ Scripts Reference
+
+| Script | Command | Description |
+|--------|---------|-------------|
+| `build` | `tsup src/index.ts --format cjs,esm --dts --clean` | Production build |
+| `dev` | `tsup src/index.ts --format cjs,esm --dts --watch` | Watch mode |
+| `typecheck` | `tsc --noEmit` | Type checking |
+| `lint` | `eslint src --ext .ts` | Linting |
+| `test` | `vitest` | Run tests |
