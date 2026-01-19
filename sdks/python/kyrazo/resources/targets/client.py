@@ -32,3 +32,13 @@ class TargetsClient:
     def delete(self, project_id: str, target_id: str) -> bool:
         response = self._http_client.delete(f"/v1/targets/{project_id}/{target_id}")
         return response.get("success", False)
+
+    def get_secret(self, project_id: str, target_id: str) -> str:
+        response = self._http_client.get(f"/v1/targets/{project_id}/{target_id}/secret")
+        return response.get("data", {}).get("secret")
+
+    def update_status(self, project_id: str, target_id: str, enabled: bool) -> Target:
+        response = self._http_client.put(
+            f"/v1/targets/{project_id}/{target_id}", data={"enabled": enabled}
+        )
+        return Target(**response.get("data"))

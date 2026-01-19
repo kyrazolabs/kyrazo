@@ -45,6 +45,21 @@ def test_create_endpoint_success(client, mock_api):
     assert endpoint.url == "https://example.com/webhook"
 
 
+def test_get_endpoint_secret(client, mock_api):
+    project_id = "proj_123"
+    endpoint_id = "ep_123"
+    secret = "whsec_12345"
+
+    mock_api.get(f"/v1/endpoints/{project_id}/{endpoint_id}/secret").mock(
+        return_value=Response(
+            200, json={"success": True, "data": {"secret": secret}}
+        )
+    )
+
+    result = client.endpoints.get_secret(project_id, endpoint_id)
+    assert result == secret
+
+
 def test_list_endpoints(client, mock_api):
     project_id = "proj_123"
 

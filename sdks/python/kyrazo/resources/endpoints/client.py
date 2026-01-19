@@ -31,3 +31,9 @@ class EndpointsClient:
     def delete(self, project_id: str, endpoint_id: str) -> bool:
         response = self._http_client.delete(f"/v1/endpoints/{project_id}/{endpoint_id}")
         return response.get("success", False)
+
+    def get_secret(self, project_id: str, endpoint_id: str) -> str:
+        response = self._http_client.get(
+            f"/v1/endpoints/{project_id}/{endpoint_id}/secret"
+        )
+        return response.get("data", {}).get("secret")
