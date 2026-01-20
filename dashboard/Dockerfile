@@ -1,5 +1,5 @@
 # Stage 1: Build the application
-FROM node:22-slim AS builder
+FROM node:lts-alpine3.23 AS builder
 
 # Install Bun
 RUN npm install -g bun
