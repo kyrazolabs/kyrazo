@@ -32,6 +32,38 @@ app.use(
 console.log("Static files configured.");
 
 /**
+ * Health check endpoint
+ */
+app.get("/health", (req, res) => {
+  try {
+    res.status(200).json({
+      success: true,
+      message: "Client server is healthy",
+      services: {
+        server: {
+          status: "healthy",
+          details: {
+            uptime: process.uptime(),
+            memory: process.memoryUsage(),
+            nodeVersion: process.version,
+          },
+        },
+      },
+      timestamp: new Date().toISOString(),
+      version: "1.0.0",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Health check failed",
+      error: error instanceof Error ? error.message : "Unknown error",
+      timestamp: new Date().toISOString(),
+      version: "1.0.0",
+    });
+  }
+});
+
+/**
  * Serve CSR App Shell for Dashboard
  */
 app.get("/dashboard/*", (req, res) => {

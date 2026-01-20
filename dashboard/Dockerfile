@@ -30,5 +30,9 @@ COPY --from=builder /app/dist ./dist
 ENV PORT=4000
 EXPOSE 4000
 
+# Healthcheck
+HEALTHCHECK --start-period=20s --interval=30s --timeout=3s --retries=3 \
+    CMD wget -qO- http://localhost:${PORT}/health || exit 1
+
 # Start the server using Node.js (more stable for SSR)
 CMD ["node", "dist/server/server.mjs"]
