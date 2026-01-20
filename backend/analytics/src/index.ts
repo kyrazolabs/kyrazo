@@ -2,6 +2,9 @@ import { RedisSnapshotConsumer } from './consumers/redis-snapshot.consumer';
 import { DispatchAggregator } from './aggregators/dispatch.aggregator';
 import { IngestAggregator } from './aggregators/ingest.aggregator';
 import { Config } from './config';
+import { db } from './db/client';
+import { sql } from 'drizzle-orm';
+import Redis from 'ioredis';
 
 async function main() {
     const dispatchAgg = new DispatchAggregator();
@@ -11,15 +14,115 @@ async function main() {
 
     consumer.start();
 
+    // Initialize Redis client for health checks
+    const redisClient = new Redis(Config.get().redisUrl);
+
     // Start health check server using Bun.serve
     Bun.serve({
         port: Config.get().port,
-        fetch(req) {
+        async fetch(req) {
             const url = new URL(req.url);
             if (url.pathname === '/v1/health') {
-                return new Response(JSON.stringify({ status: 'ok' }), {
-                    headers: { 'Content-Type': 'application/json' },
-                });
+                try {
+                    // Check all database services in parallel
+                    const [postgres, redis] = await Promise.all([
+                        // PostgreSQL health check
+                        (async () => {
+                            try {
+                                await db.execute(sql`SELECT 1`);
+                                return {
+                                    status: 'healthy',
+                                    details: {
+                                        connected: true,
+                                        database: 'PostgreSQL',
+                                    },
+                                };
+                            } catch (error) {
+                                return {
+                                    status: 'unhealthy',
+                                    details: {
+                                        connected: false,
+                                        database: 'PostgreSQL',
+                                        error:
+                                            error instanceof Error
+                                                ? error.message
+                                                : 'Unknown error',
+                                    },
+                                };
+                            }
+                        })(),
+                        // Redis health check
+                        (async () => {
+                            try {
+                                const ping = await redisClient.ping();
+                                const info = await redisClient.info('server');
+                                return {
+                                    status: 'healthy',
+                                    details: {
+                                        connected: true,
+                                        ping,
+                                        serverInfo: info
+                                            .split('\r\n')
+                                            .slice(0, 5)
+                                            .join('\n'),
+                                    },
+                                };
+                            } catch (error) {
+                                return {
+                                    status: 'unhealthy',
+                                    details: {
+                                        connected: false,
+                                        error:
+                                            error instanceof Error
+                                                ? error.message
+                                                : 'Unknown error',
+                                    },
+                                };
+                            }
+                        })(),
+                    ]);
+
+                    // Determine overall health status
+                    const allHealthy = [postgres, redis].every(
+                        service => service.status === 'healthy'
+                    );
+
+                    return new Response(
+                        JSON.stringify({
+                            success: allHealthy,
+                            message: allHealthy
+                                ? 'All services are healthy'
+                                : 'Some services are unhealthy',
+                            services: {
+                                postgres,
+                                redis,
+                            },
+                            timestamp: new Date().toISOString(),
+                            version: '1.0.0',
+                        }),
+                        {
+                            status: allHealthy ? 200 : 503,
+                            headers: { 'Content-Type': 'application/json' },
+                        }
+                    );
+                } catch (error) {
+                    return new Response(
+                        JSON.stringify({
+                            success: false,
+                            message: 'Health check failed',
+                            error:
+                                error instanceof Error
+                                    ? error.message
+                                    : 'Unknown error',
+                            timestamp: new Date().toISOString(),
+                            version: '1.0.0',
+                        }),
+                        {
+                            status: 500,
+                            headers: { 'Content-Type': 'application/json' },
+                        }
+                    );
+                }
             }
             return new Response('Not Found', { status: 404 });
         },
