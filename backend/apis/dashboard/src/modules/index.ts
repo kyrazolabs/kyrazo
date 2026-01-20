@@ -14,6 +14,12 @@ import paymentsRouter from './payments';
 import projectRouter from './v1/project/project.routes';
 import targetRouter from './v1/target/target.routes';
 import ingestRouter from './v1/ingest/ingest.routes';
+import {
+    clickhouseConfig,
+    databaseConfig,
+    postgresConfig,
+} from '@kyrazo/shared';
+import { redisConfig } from '@/configs';
 
 const router = new Hono();
 
@@ -46,9 +52,9 @@ router.route('/analytics', analyticsRouter);
 router.route('/ingest', ingestRouter);
 
 // Mount billing routes
-router.route('/plans', plansRouter);
-router.route('/subscriptions', subscriptionsRouter);
-router.route('/payments', paymentsRouter);
+// router.route('/plans', plansRouter);
+// router.route('/subscriptions', subscriptionsRouter);
+// router.route('/payments', paymentsRouter);
 
 // Mount plan routes
 // router.route('/subscriptions', subscriptionRouter);
@@ -57,57 +63,78 @@ router.route('/payments', paymentsRouter);
 // router.route('/plans', planRouter);
 
 // Health check endpoint
-router.get('/health', c => {
-    return c.json({
-        success: true,
-        message: 'Server is running',
-        timestamp: new Date().toISOString(),
-        version: '1.0.0',
-    });
+router.get('/health', async c => {
+    try {
+        // Check all database services in parallel
+        const [mongo, postgres, clickhouse, redis, redisQueue] =
+            await Promise.all([
+                databaseConfig.healthCheck(),
+                postgresConfig.healthCheck(),
+                clickhouseConfig.healthCheck(),
+                redisConfig.healthCheck(),
+                (async () => {
+                    try {
+                        const queueClient = redisConfig.getQueueClient();
+                        const ping = await queueClient.ping();
+                        return {
+                            status: 'healthy',
+                            details: {
+                                connected: true,
+                                ping,
+                            },
+                        };
+                    } catch (error) {
+                        return {
+                            status: 'unhealthy',
+                            details: {
+                                connected: false,
+                                error:
+                                    error instanceof Error
+                                        ? error.message
+                                        : 'Unknown error',
+                            },
+                        };
+                    }
+                })(),
+            ]);
+
+        // Determine overall health status
+        const allHealthy = [
+            mongo,
+            postgres,
+            clickhouse,
+            redis,
+            redisQueue,
+        ].every(service => service.status === 'healthy');
+
+        return c.json({
+            success: allHealthy,
+            message: allHealthy
+                ? 'All services are healthy'
+                : 'Some services are unhealthy',
+            services: {
+                mongo,
+                postgres,
+                clickhouse,
+                redis,
+                redisQueue,
+            },
+            timestamp: new Date().toISOString(),
+            version: '1.0.0',
+        });
+    } catch (error) {
+        return c.json(
+            {
+                success: false,
+                message: 'Health check failed',
+                error: error instanceof Error ? error.message : 'Unknown error',
+                timestamp: new Date().toISOString(),
+                version: '1.0.0',
+            },
+            500
+        );
+    }
 });
 
-// API documentation endpoint
-router.get('/', c => {
-    return c.json({
-        success: true,
-        message: 'Hookster API',
-        version: '1.0.0',
-        endpoints: {
-            auth: {
-                register: 'POST /auth/register',
-                login: 'POST /auth/login',
-                refreshToken: 'POST /auth/refresh-token',
-                logout: 'POST /auth/logout',
-                profile: 'GET /auth/profile',
-                updateProfile: 'PUT /auth/profile',
-                changePassword: 'POST /auth/change-password',
-                forgotPassword: 'POST /auth/forgot-password',
-                resetPassword: 'POST /auth/reset-password',
-                verifyEmail: 'POST /auth/verify-email',
-            },
-            plans: {
-                createPlan: 'POST /plans (admin)',
-                getPlans: 'GET /plans',
-                getPlanBySlug: 'GET /plans/:slug',
-                updatePlan: 'PATCH /plans/:id (admin)',
-                deletePlan: 'DELETE /plans/:id (admin)',
-            },
-            subscriptions: {
-                createSubscription: 'POST /subscriptions',
-                getSubscriptions: 'GET /subscriptions',
-                getSubscription: 'GET /subscriptions/:id',
-                changePlan: 'POST /subscriptions/:id/change-plan',
-                cancelSubscription: 'POST /subscriptions/:id/cancel',
-                checkLimits: 'GET /subscriptions/limits',
-            },
-            payments: {
-                createCheckoutSession: 'POST /payments/checkout-session',
-                createBillingPortal: 'POST /payments/portal',
-                source: 'POST /payments/source',
-            },
-            health: 'GET /health',
-        },
-    });
-});
 export type AppType = typeof router;
 export default router;
