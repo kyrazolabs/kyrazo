@@ -6,4 +6,3 @@
  */
 export { config, validateConfig } from './app';
 export { redisConfig } from './redis';
-export { natsConfig } from './nats';
