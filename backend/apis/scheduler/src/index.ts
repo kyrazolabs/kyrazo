@@ -17,6 +17,8 @@ import {
 import { subscriptionsJob } from './jobs/subscriptions.job';
 import { databaseConfig } from '@kyrazo/shared';
 import { Gateway } from '@/modules/gateway/gateway';
+import { db } from '@/db';
+import { sql } from 'drizzle-orm';
 
 const app = new Hono();
 
@@ -24,7 +26,67 @@ app.use('*', logger());
 app.onError(globalErrorHandler);
 
 // --- Public Routes ---
-app.get('/v1/health', c => c.json({ status: 'ok' }));
+app.get('/v1/health', async c => {
+    try {
+        // Check all services in parallel
+        const [mongo, postgres] = await Promise.all([
+            databaseConfig.healthCheck(),
+            (async () => {
+                try {
+                    await db.execute(sql`SELECT 1`);
+                    return {
+                        status: 'healthy',
+                        details: {
+                            connected: true,
+                            database: 'PostgreSQL',
+                        },
+                    };
+                } catch (error) {
+                    return {
+                        status: 'unhealthy',
+                        details: {
+                            connected: false,
+                            database: 'PostgreSQL',
+                            error:
+                                error instanceof Error
+                                    ? error.message
+                                    : 'Unknown error',
+                        },
+                    };
+                }
+            })(),
+        ]);
+
+        // Determine overall health status
+        const allHealthy = [mongo, postgres].every(
+            service => service.status === 'healthy'
+        );
+
+        return c.json({
+            success: allHealthy,
+            message: allHealthy
+                ? 'All services are healthy'
+                : 'Some services are unhealthy',
+            services: {
+                mongo,
+                postgres,
+            },
+            timestamp: new Date().toISOString(),
+            version: '1.0.0',
+        });
+    } catch (error) {
+        return c.json(
+            {
+                success: false,
+                message: 'Health check failed',
+                error: error instanceof Error ? error.message : 'Unknown error',
+                timestamp: new Date().toISOString(),
+                version: '1.0.0',
+            },
+            500
+        );
+    }
+});
 
 // app.post(
 //     '/servers/register',
