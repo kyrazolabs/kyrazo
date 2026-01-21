@@ -122,6 +122,27 @@ export class RpcClient {
         }, 15000); // 15 seconds
     }
 
+    public getStatus():
+        | 'connecting'
+        | 'open'
+        | 'closing'
+        | 'closed'
+        | 'not_initialized' {
+        if (!this.ws) return 'not_initialized';
+        switch (this.ws.readyState) {
+            case WebSocket.CONNECTING:
+                return 'connecting';
+            case WebSocket.OPEN:
+                return 'open';
+            case WebSocket.CLOSING:
+                return 'closing';
+            case WebSocket.CLOSED:
+                return 'closed';
+            default:
+                return 'not_initialized';
+        }
+    }
+
     private stopHeartbeatLoop() {
         if (this.heartbeatInterval) {
             clearInterval(this.heartbeatInterval);

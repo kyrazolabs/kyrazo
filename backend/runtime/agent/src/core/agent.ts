@@ -134,4 +134,51 @@ export class Agent {
             },
         });
     }
+
+    async getHealth() {
+        const os = require('os');
+        const dockerHealthy = await (async () => {
+            try {
+                await DockerManager.checkHealth();
+                return { status: 'healthy', details: 'Docker is running' };
+            } catch (err) {
+                return {
+                    status: 'unhealthy',
+                    details: (err as Error).message,
+                };
+            }
+        })();
+
+        const rpcStatus = this.rpc.getStatus();
+        const rpcHealthy =
+            rpcStatus === 'open'
+                ? { status: 'healthy', details: 'Connected to Scheduler' }
+                : { status: 'unhealthy', details: `RPC status: ${rpcStatus}` };
+
+        const runningWorkers = await DockerManager.getRunningContainers();
+
+        return {
+            success:
+                dockerHealthy.status === 'healthy' &&
+                rpcHealthy.status === 'healthy',
+            message:
+                dockerHealthy.status === 'healthy' &&
+                rpcHealthy.status === 'healthy'
+                    ? 'Agent is healthy'
+                    : 'Agent is unhealthy',
+            services: {
+                docker: dockerHealthy,
+                rpc: rpcHealthy,
+            },
+            resources: {
+                cpuUsage: os.loadavg()[0],
+                memoryFree: os.freemem(),
+                memoryTotal: os.totalmem(),
+                uptime: os.uptime(),
+            },
+            activeWorkers: runningWorkers.length,
+            timestamp: new Date().toISOString(),
+            version: '1.0.0',
+        };
+    }
 }
