@@ -26,8 +26,8 @@ describe('SupportController', () => {
         const input = {
             subject: 'Test Subject',
             message: 'Test message with more than ten characters',
-            Types: 'Bug',
-            Category: 'UI',
+            Types: 'Bug' as const,
+            Category: 'Dashboard',
         };
 
         const serviceSpy = spyOn(
@@ -65,8 +65,8 @@ describe('SupportController', () => {
         const c = mockContext({
             subject: 'Test',
             message: 'Test message',
-            Types: 'Bug',
-            Category: 'UI',
+            Types: 'Bug' as const,
+            Category: 'Dashboard',
         });
         const result: any = await SupportController.createTicket(c);
 
