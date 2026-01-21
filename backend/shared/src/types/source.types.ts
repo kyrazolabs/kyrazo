@@ -17,6 +17,7 @@ export interface ISource extends Document {
     service: 'general' | 'paypal';
 
     ingressId: string;
+    ingressUrl: string;
     forwarding: boolean;
     endpoints: Types.ObjectId[];
 

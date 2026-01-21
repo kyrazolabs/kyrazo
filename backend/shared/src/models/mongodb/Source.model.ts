@@ -82,6 +82,7 @@ const SourceSchema = new Schema<ISource>(
         },
 
         ingressId: { type: String, required: true, unique: true },
+        ingressUrl: { type: String, required: true, unique: true },
 
         // forwarding
         forwarding: { type: Boolean, default: false },
