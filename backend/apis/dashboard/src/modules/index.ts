@@ -14,6 +14,7 @@ import paymentsRouter from './payments';
 import projectRouter from './v1/project/project.routes';
 import targetRouter from './v1/target/target.routes';
 import ingestRouter from './v1/ingest/ingest.routes';
+import supportRouter from './v1/support/support.routes';
 import {
     clickhouseConfig,
     databaseConfig,
@@ -50,6 +51,9 @@ router.route('/analytics', analyticsRouter);
 
 // Mount ingest routes
 router.route('/ingest', ingestRouter);
+
+// Mount support routes
+router.route('/support', supportRouter);
 
 // Mount billing routes
 // router.route('/plans', plansRouter);

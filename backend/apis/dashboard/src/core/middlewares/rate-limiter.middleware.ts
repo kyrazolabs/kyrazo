@@ -1,6 +1,7 @@
 import { AppContext } from '@/core/middlewares/auth.middleware';
 import { RateLimiterRedis } from 'rate-limiter-flexible';
 import { config, redisConfig } from '@/configs';
+import { logger } from '@kyrazo/shared';
 
 /**
  * @title Rate Limiter Configuration
