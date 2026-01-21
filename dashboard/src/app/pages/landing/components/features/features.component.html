@@ -5,7 +5,7 @@
             <div *ngFor="let feature of features; let last = last; let i = index"
                  appScrollReveal 
                  [delay]="'delay-' + (i * 100 + 100)"
-                 [class]="'group flex flex-col p-8 rounded-2xl bg-surface-0 dark:bg-surface-950 hover:shadow-sm transition-all duration-300 border border-surface-200 dark:border-surface-800 overflow-hidden relative ' + feature.class">
+                 [class]="'group flex flex-col p-8 rounded-2xl bg-surface-0 dark:bg-surface-950 hover:shadow-sm transition-all duration-300 border border-surface-200 dark:border-surface-900 overflow-hidden relative ' + feature.class">
                 
                 Text Content Container
                 <div class="relative z-10" [ngClass]="{'order-first mb-8': i !== 1, 'order-last mt-8': i === 1}">
@@ -131,7 +131,7 @@
             <div *ngFor="let cap of capabilities.slice(0, 2); let i = index" appScrollReveal
                 [delay]="'delay-' + (i * 200 + 100)" class="group relative transition-all duration-300">
                 <div
-                    class="relative p-6 rounded-2xl bg-surface-0 dark:bg-surface-950 border border-surface-200 dark:border-surface-800 h-full shadow-xs group-hover:shadow-sm hover:shadow-primary-500/10 overflow-hidden flex flex-col">
+                    class="relative p-6 rounded-2xl bg-surface-0 dark:bg-surface-950 border border-surface-200 dark:border-surface-900 h-full shadow-xs group-hover:shadow-sm hover:shadow-primary-500/10 overflow-hidden flex flex-col">
                     <!-- Diagram Container -->
                     <div
                         class="relative mb-10 flex items-center justify-center rounded-2xl transition-colors overflow-hidden shrink-0 h-64">
@@ -208,7 +208,7 @@
                         <!-- Special Features Badges -->
                         <div class="flex flex-wrap gap-2 mb-10 justify-center">
                             <div *ngFor="let f of automate.features"
-                                class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface-50 dark:bg-surface-800/40 border border-surface-200 dark:border-surface-700 text-[10px] font-bold text-surface-600 dark:text-surface-400">
+                                class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface-50 dark:bg-surface-800/40 border border-surface-200 dark:border-surface-800 text-[10px] font-bold text-surface-600 dark:text-surface-400">
                                 <i class="pi pi-check-circle text-primary-500"></i>
                                 {{ f }}
                             </div>

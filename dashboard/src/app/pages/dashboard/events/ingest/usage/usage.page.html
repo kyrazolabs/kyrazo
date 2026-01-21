@@ -10,7 +10,7 @@
             </p>
         </div>
         <div class="flex gap-3">
-            <p-select [(ngModel)]="selectedTimeRange" [options]="timeRangeOptions" optionLabel="label" [variant]="'filled'"
+            <p-select [(ngModel)]="selectedTimeRange" [options]="timeRangeOptions" optionLabel="label" [variant]="'outlined'"
                 optionValue="value" placeholder="Select time range" class="rounded-xl!"
                 (onChange)="onTimeRangeChange()" size="small" />
             <p-button label="Export" icon="pi pi-download" [outlined]="true" severity="secondary"
@@ -126,7 +126,7 @@
                     </g>
                 </svg>
             </div>
-            <p-chart *ngIf="!loadingCharts" type="line" [data]="eventsReceivedData" [options]="eventsReceivedOptions" [height]="'450'"></p-chart>
+            <p-chart *ngIf="!loadingCharts" type="line" [data]="eventsReceivedData" [options]="eventsReceivedOptions" [height]="'450'" [plugins]="lineShadowPlugin"></p-chart>
         </p-card>
     </div>
 
@@ -194,15 +194,15 @@
                     </g>
                 </svg>
             </div>
-            <p-chart *ngIf="!loadingCharts" type="line" [data]="failuresOverTimeData" [options]="failuresOverTimeOptions" [height]="'320'"></p-chart>
+            <p-chart *ngIf="!loadingCharts" type="line" [data]="failuresOverTimeData" [options]="failuresOverTimeOptions" [height]="'320'" [plugins]="lineShadowPlugin"></p-chart>
         </p-card>
     </div>
         </ng-container>
 
     <ng-template #emptyData>
-        <div class="flex-1 flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-surface-200 dark:border-surface-700 rounded-2xl bg-surface-50 dark:bg-surface-900/50 mb-8">
-            <div class="bg-surface-100 dark:bg-surface-800 flex items-center justify-center p-4 rounded-full mb-4">
-                 <i class="icon-[hugeicons--chart-histogram] text-3xl text-surface-400 dark:text-surface-500"></i>
+        <div class="flex-1 flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-surface-200 dark:border-surface-800 rounded-2xl bg-surface-50 dark:bg-surface-950 mb-8">
+            <div class="bg-surface-100 dark:bg-surface-900 flex items-center justify-center p-4 rounded-full mb-4">
+                 <i class="icon-[hugeicons--chart-01] text-3xl text-surface-400 dark:text-surface-600"></i>
             </div>
             <h3 class="text-xl font-semibold text-surface-900 dark:text-surface-0 mb-2">No usage data found</h3>
             <p class="text-surface-500 dark:text-surface-400 max-w-md mx-auto mb-6">

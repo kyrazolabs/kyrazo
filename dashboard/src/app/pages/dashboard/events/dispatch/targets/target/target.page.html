@@ -10,7 +10,7 @@
 
         <!-- Right section -->
         <div class="flex items-center gap-4">
-            <p-select [(ngModel)]="selectedTimeRange" [options]="timeRangeOptions" optionLabel="label" [variant]="'filled'"
+            <p-select [(ngModel)]="selectedTimeRange" [options]="timeRangeOptions" optionLabel="label" [variant]="'outlined'"
                 optionValue="value" placeholder="Select time range" class="rounded-xl! custom-select-panel"
                 (onChange)="onTimeRangeChange()" size="small" />
             <p-button label="Export" icon="pi pi-download" [outlined]="true" severity="secondary"
@@ -125,7 +125,7 @@
                     </g>
                 </svg>
             </div>
-            <p-chart *ngIf="!loadingCharts" type="line" [data]="lineChartData" [options]="lineChartOptions" [height]="'450'">
+            <p-chart *ngIf="!loadingCharts" type="line" [data]="lineChartData" [options]="lineChartOptions" [height]="'450'" [plugins]="lineShadowPlugin">
             </p-chart>
         </p-card>
     </div>

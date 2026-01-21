@@ -12,7 +12,7 @@ import {
   Validators,
   FormsModule,
 } from "@angular/forms";
-import { Router, RouterLink } from "@angular/router";
+import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { MessageService } from "primeng/api";
 import { CardModule } from "primeng/card";
 import { ButtonModule } from "primeng/button";
@@ -51,6 +51,7 @@ declare const google: any;
 })
 export class LoginPage implements OnInit {
   private readonly fb = inject(FormBuilder);
+  private readonly route = inject(ActivatedRoute);
   private readonly messageService = inject(MessageService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
@@ -137,7 +138,14 @@ export class LoginPage implements OnInit {
         });
 
         setTimeout(() => {
-          this.router.navigate(["/dashboard"], { replaceUrl: true });
+          if (this.route.snapshot.queryParamMap.get("returnUrl")) {
+            this.router.navigate(
+              [this.route.snapshot.queryParamMap.get("returnUrl")],
+              { replaceUrl: true },
+            );
+          } else {
+            this.router.navigate(["/dashboard"], { replaceUrl: true });
+          }
         }, 1000);
       },
       error: (error) => {

@@ -1,17 +1,17 @@
-import { Component, computed, inject } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
-import { StyleClassModule } from 'primeng/styleclass';
-import { AppConfig } from './app.config';
-import { LayoutService } from './service/layout.service';
-import { CommonModule } from '@angular/common';
+import { Component, computed, inject } from "@angular/core";
+import { ButtonModule } from "primeng/button";
+import { StyleClassModule } from "primeng/styleclass";
+import { AppConfig } from "./app.config";
+import { LayoutService } from "./service/layout.service";
+import { CommonModule } from "@angular/common";
 
 @Component({
-  selector: 'app-topbar',
+  selector: "app-topbar",
   standalone: true,
   imports: [CommonModule, ButtonModule, StyleClassModule, AppConfig],
   template: `
     <div
-      class="bg-transparent p-6 rounded-2xl mx-auto border border-surface-200 dark:border-surface-700 w-full"
+      class="bg-transparent p-6 rounded-2xl mx-auto border border-surface-200 dark:border-surface-800 w-full"
     >
       <div class="flex justify-between items-center">
         <div class="flex gap-3 items-center">
@@ -136,7 +136,7 @@ import { CommonModule } from '@angular/common';
               class="pi text-base"
               [ngClass]="{
                 'pi-moon': isDarkMode(),
-                'pi-sun': !isDarkMode()
+                'pi-sun': !isDarkMode(),
               }"
             ></i>
           </button>

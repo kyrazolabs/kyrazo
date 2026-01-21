@@ -45,6 +45,28 @@ export class UsagePage implements OnInit, AfterViewInit {
   ];
 
   loadingCharts = true;
+  lineShadowPlugin = [
+    {
+      id: "lineShadow",
+      beforeDatasetDraw(chart: any, args: any) {
+        const { ctx } = chart;
+        if (args.meta.type === "line") {
+          const borderColor = args.meta.dataset.options.borderColor;
+          ctx.save();
+          ctx.shadowColor = borderColor || "rgba(0, 0, 0, 0.15)";
+          ctx.shadowBlur = 10;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 12;
+        }
+      },
+      afterDatasetDraw(chart: any, args: any) {
+        const { ctx } = chart;
+        if (args.meta.type === "line") {
+          ctx.restore();
+        }
+      },
+    },
+  ];
   overview: DispatchUsageResponse["data"] | null = null;
 
   lineChartData: any;
@@ -54,30 +76,25 @@ export class UsagePage implements OnInit, AfterViewInit {
   statusCodeChartData: any;
   statusCodeChartOptions: any;
 
+  private getPrimaryColor(shade: string = "500"): string {
+    return (
+      getComputedStyle(document.documentElement)
+        .getPropertyValue(`--p-primary-${shade}`)
+        .trim() || "#3b82f6"
+    );
+  }
+
+  private isDarkMode(): boolean {
+    return document.documentElement.classList.contains("p-dark");
+  }
+
   async ngOnInit() {
     this.posthog.capture("usage_viewed", { type: "dispatch" });
     await this.loadAnalytics();
   }
 
   ngAfterViewInit() {
-    // Create gradient after view init
-    const lineCanvas = document.getElementById(
-      "lineChart"
-    ) as HTMLCanvasElement;
-    if (lineCanvas) {
-      const ctx = lineCanvas.getContext("2d")!;
-      const gradientGreen = ctx.createLinearGradient(0, 0, 0, 150);
-      gradientGreen.addColorStop(0, "rgba(16, 185, 129, 0.3)");
-      gradientGreen.addColorStop(1, "rgba(16, 185, 129, 0)");
-
-      const gradientRed = ctx.createLinearGradient(0, 0, 0, 150);
-      gradientRed.addColorStop(0, "rgba(239, 68, 68, 0.3)");
-      gradientRed.addColorStop(1, "rgba(239, 68, 68, 0)");
-
-      // Apply gradients
-      this.lineChartData.datasets[0].backgroundColor = gradientGreen;
-      this.lineChartData.datasets[1].backgroundColor = gradientRed;
-    }
+    // No longer needed: background fills replaced by shadows
   }
 
   async loadAnalytics() {
@@ -89,14 +106,14 @@ export class UsagePage implements OnInit, AfterViewInit {
             const days = this.getDaysFromRange(this.selectedTimeRange);
             this.overview.deliveryTrends = this.fillMissingDays(
               this.overview.deliveryTrends,
-              days
+              days,
             );
             if (
               this.selectedTimeRange === "last180days" ||
               this.selectedTimeRange === "last360days"
             ) {
               this.overview.deliveryTrends = this.aggregateByMonth(
-                this.overview.deliveryTrends
+                this.overview.deliveryTrends,
               );
             }
             this.initCharts();
@@ -137,44 +154,47 @@ export class UsagePage implements OnInit, AfterViewInit {
     const allData = [...successfulData, ...failedData];
     const maxLineValue = allData.length > 0 ? Math.max(...allData) : 0;
 
+    const isDark = this.isDarkMode();
+    const primary500 = this.getPrimaryColor("500");
+    const rose500 = "#f43f5e";
+    const emerald500 = "#10b981";
+    const slate500 = "#64748b";
+
+    // Grid colors for light/dark
+    const gridColor = isDark
+      ? "rgba(255, 255, 255, 0.05)"
+      : "rgba(15, 23, 42, 0.05)";
+
     this.lineChartData = {
       labels: deliveryTrends.map((d) => this.formatDateLabel(d.day, isMonthly)),
       datasets: [
         {
           label: "Successful Deliveries",
           data: successfulData,
-          borderColor: "#10b981",
+          borderColor: primary500,
           backgroundColor: "transparent",
           tension: 0.4,
           pointRadius: 0,
           pointHoverRadius: 6,
-          pointBackgroundColor: "#10b981",
+          pointBackgroundColor: primary500,
           pointBorderColor: "#ffffff",
           pointBorderWidth: 2,
           fill: false,
           borderWidth: 3,
-          shadowColor: "rgba(16, 185, 129, 0.3)",
-          shadowBlur: 8,
-          shadowOffsetX: 0,
-          shadowOffsetY: 4,
         },
         {
           label: "Failed Deliveries",
           data: failedData,
-          borderColor: "#ef4444",
-          backgroundColor: "rgba(239, 68, 68, 0.3)",
+          borderColor: rose500,
+          backgroundColor: "transparent",
           tension: 0.4,
           pointRadius: 0,
           pointHoverRadius: 6,
-          pointBackgroundColor: "#ef4444",
+          pointBackgroundColor: rose500,
           pointBorderColor: "#ffffff",
           pointBorderWidth: 2,
           fill: false,
           borderWidth: 3,
-          shadowColor: "rgba(239, 68, 68, 0.3)",
-          shadowBlur: 8,
-          shadowOffsetX: 0,
-          shadowOffsetY: 4,
         },
       ],
     };
@@ -204,26 +224,27 @@ export class UsagePage implements OnInit, AfterViewInit {
       scales: {
         y: {
           beginAtZero: true,
-          max: Math.ceil(maxLineValue * 1.01),
-          grid: { display: false },
-          border: { display: false },
-          ticks: {
-            font: { size: 11 },
-            padding: 10,
-          },
-        },
-        x: {
+          max: Math.ceil(maxLineValue * 1.05),
           grid: {
             display: true,
-            color: "rgba(0, 0, 0, 0.1)",
+            color: gridColor,
             borderDash: [5, 5],
             drawTicks: false,
           },
           border: { display: false },
           ticks: {
-            font: { size: 11 },
-            maxRotation: 45,
-            minRotation: 45,
+            color: slate500,
+            font: { size: 11, weight: "500" },
+            padding: 10,
+          },
+        },
+        x: {
+          grid: { display: false },
+          border: { display: false },
+          ticks: {
+            color: slate500,
+            font: { size: 11, weight: "500" },
+            maxRotation: 0,
             padding: 10,
           },
         },
@@ -250,11 +271,11 @@ export class UsagePage implements OnInit, AfterViewInit {
         {
           label: "Event Count",
           data: this.overview.topEventTypes.map((m) => m.total),
-          backgroundColor: "#3b82f6",
-          borderRadius: 12,
+          backgroundColor: primary500,
+          borderRadius: 4,
           borderSkipped: false,
-          barThickness: 40,
-          barPercentage: 0.8,
+          barThickness: 32,
+          maxBarThickness: 40,
         },
       ],
     };
@@ -302,7 +323,7 @@ export class UsagePage implements OnInit, AfterViewInit {
         {
           data: statusCodes.map((sc) => sc.total),
           backgroundColor: statusCodes.map((sc) =>
-            this.getStatusCodeColor(sc.response_code)
+            this.getStatusCodeColor(sc.response_code),
           ),
           borderWidth: 0,
           hoverOffset: 4,
@@ -328,7 +349,7 @@ export class UsagePage implements OnInit, AfterViewInit {
             label: function (context: any) {
               const total = context.dataset.data.reduce(
                 (a: number, b: number) => a + b,
-                0
+                0,
               );
               const percentage = ((context.parsed / total) * 100).toFixed(1);
               return `${context.label}: ${context.parsed} (${percentage}%)`;
@@ -376,14 +397,15 @@ export class UsagePage implements OnInit, AfterViewInit {
 
   // Helper methods
   getStatusCodeColor(statusCode: number): string {
+    const isDark = this.isDarkMode();
     if (statusCode >= 200 && statusCode < 300) {
-      return "#10b981"; // Success green
+      return this.getPrimaryColor("500");
     } else if (statusCode >= 300 && statusCode < 400) {
-      return "#3b82f6"; // Info blue
+      return isDark ? this.getPrimaryColor("600") : this.getPrimaryColor("400");
     } else if (statusCode >= 400 && statusCode < 500) {
-      return "#f59e0b"; // Warning orange
+      return isDark ? this.getPrimaryColor("700") : this.getPrimaryColor("300");
     } else if (statusCode >= 500) {
-      return "#ef4444"; // Error red
+      return isDark ? this.getPrimaryColor("800") : this.getPrimaryColor("200");
     }
     return "#6b7280"; // Default gray
   }
@@ -442,7 +464,7 @@ export class UsagePage implements OnInit, AfterViewInit {
     deliveryTrends.forEach((item) => {
       const date = new Date(item.day);
       const monthKey = `${date.getFullYear()}-${String(
-        date.getMonth() + 1
+        date.getMonth() + 1,
       ).padStart(2, "0")}`;
       if (!monthMap.has(monthKey)) {
         monthMap.set(monthKey, { successful: 0, failed: 0, count: 0 });
@@ -469,14 +491,18 @@ export class UsagePage implements OnInit, AfterViewInit {
 
   formatDateLabel(dateStr: string, isMonthly: boolean): string {
     if (isMonthly) {
+      if (!dateStr.includes("-")) return dateStr;
       const [year, month] = dateStr.split("-").map(Number);
       const date = new Date(year, month - 1);
       return date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
+        month: "long",
       });
     } else {
-      return dateStr;
+      const date = new Date(dateStr);
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
     }
   }
 }

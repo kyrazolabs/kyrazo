@@ -45,6 +45,28 @@ export class UsagePage implements OnInit, AfterViewInit {
   ];
 
   loadingCharts = true;
+  lineShadowPlugin = [
+    {
+      id: "lineShadow",
+      beforeDatasetDraw(chart: any, args: any) {
+        const { ctx } = chart;
+        if (args.meta.type === "line") {
+          const borderColor = args.meta.dataset.options.borderColor;
+          ctx.save();
+          ctx.shadowColor = borderColor || "rgba(0, 0, 0, 0.15)";
+          ctx.shadowBlur = 10;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 12;
+        }
+      },
+      afterDatasetDraw(chart: any, args: any) {
+        const { ctx } = chart;
+        if (args.meta.type === "line") {
+          ctx.restore();
+        }
+      },
+    },
+  ];
   overview: IngestUsageResponse["data"] | null = null;
 
   // Chart data
@@ -74,22 +96,19 @@ export class UsagePage implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    // Create gradients after view init for area charts
-    this.createGradients();
+    // No longer needed: background fills replaced by shadows
   }
 
-  private createGradients() {
-    // Create gradient for Events Received chart
-    const eventsCanvas = document.querySelector("canvas") as HTMLCanvasElement;
-    if (eventsCanvas) {
-      const ctx = eventsCanvas.getContext("2d");
-      if (ctx) {
-        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-        gradient.addColorStop(0, "rgba(59, 130, 246, 0.3)");
-        gradient.addColorStop(1, "rgba(59, 130, 246, 0.05)");
-        this.eventsReceivedData.datasets[0].backgroundColor = gradient;
-      }
-    }
+  private getPrimaryColor(shade: string = "500"): string {
+    return (
+      getComputedStyle(document.documentElement)
+        .getPropertyValue(`--p-primary-${shade}`)
+        .trim() || "#3b82f6"
+    );
+  }
+
+  private isDarkMode(): boolean {
+    return document.documentElement.classList.contains("p-dark");
   }
 
   async loadAnalytics() {
@@ -102,12 +121,12 @@ export class UsagePage implements OnInit, AfterViewInit {
             this.overview.receiveTrends = this.fillMissingDays(
               this.overview.receiveTrends,
               days,
-              "events"
+              "events",
             );
             this.overview.failureTrends = this.fillMissingDays(
               this.overview.failureTrends,
               days,
-              "total"
+              "total",
             );
             if (
               this.selectedTimeRange === "last180days" ||
@@ -115,11 +134,11 @@ export class UsagePage implements OnInit, AfterViewInit {
             ) {
               this.overview.receiveTrends = this.aggregateByMonth(
                 this.overview.receiveTrends,
-                "events"
+                "events",
               );
               this.overview.failureTrends = this.aggregateByMonth(
                 this.overview.failureTrends,
-                "total"
+                "total",
               );
             }
             this.initCharts();
@@ -155,26 +174,40 @@ export class UsagePage implements OnInit, AfterViewInit {
     const receiveTrends = this.overview.receiveTrends || [];
 
     // Events Received Over Time (Line Chart)
-    const receivedData = receiveTrends.map((d) => d.events);
+    const receivedData = receiveTrends.map((d: any) => d.events);
     const allReceivedData = [...receivedData];
     const maxReceivedValue =
       allReceivedData.length > 0 ? Math.max(...allReceivedData) : 0;
 
+    const isDark = this.isDarkMode();
+    const primary500 = this.getPrimaryColor("500");
+    const rose500 = "#f43f5e";
+    const emerald500 = "#10b981";
+    const slate500 = "#64748b";
+
+    // Grid colors for light/dark
+    const gridColor = isDark
+      ? "rgba(255, 255, 255, 0.05)"
+      : "rgba(15, 23, 42, 0.05)";
+
     this.eventsReceivedData = {
-      labels: receiveTrends.map((d) => this.formatDateLabel(d.day, isMonthly)),
+      labels: receiveTrends.map((d: any) =>
+        this.formatDateLabel(d.day, isMonthly),
+      ),
       datasets: [
         {
           label: "Events Received",
           data: receivedData,
-          borderColor: "#3b82f6",
-          backgroundColor: "rgba(59, 130, 246, 0.1)",
+          borderColor: primary500,
+          backgroundColor: "transparent",
           tension: 0.4,
-          fill: true,
+          fill: false,
           pointRadius: 0,
           pointHoverRadius: 6,
-          pointBackgroundColor: "#3b82f6",
+          pointBackgroundColor: primary500,
           pointBorderColor: "#ffffff",
           pointBorderWidth: 2,
+          borderWidth: 3,
         },
       ],
     };
@@ -195,27 +228,28 @@ export class UsagePage implements OnInit, AfterViewInit {
       scales: {
         y: {
           beginAtZero: true,
-          max: Math.ceil(maxReceivedValue * 1.01),
-          grid: { display: false },
-          border: { display: false },
-          ticks: {
-            callback: (value: any) => value.toLocaleString(),
-            font: { size: 11 },
-            padding: 10,
-          },
-        },
-        x: {
+          max: Math.ceil(maxReceivedValue * 1.05),
           grid: {
             display: true,
-            color: "rgba(0, 0, 0, 0.1)",
+            color: gridColor,
             borderDash: [5, 5],
             drawTicks: false,
           },
           border: { display: false },
           ticks: {
-            font: { size: 11 },
-            maxRotation: 45,
-            minRotation: 45,
+            color: slate500,
+            callback: (value: any) => value.toLocaleString(),
+            font: { size: 11, weight: "500" },
+            padding: 10,
+          },
+        },
+        x: {
+          grid: { display: false },
+          border: { display: false },
+          ticks: {
+            color: slate500,
+            font: { size: 11, weight: "500" },
+            maxRotation: 0,
             padding: 10,
           },
         },
@@ -243,7 +277,7 @@ export class UsagePage implements OnInit, AfterViewInit {
         {
           data: statusDistribution.map((s) => s.total),
           backgroundColor: statusDistribution.map((s) =>
-            this.getStatusColor(s.processing_status)
+            this.getStatusColor(s.processing_status),
           ),
           borderWidth: 0,
           hoverOffset: 4,
@@ -261,7 +295,7 @@ export class UsagePage implements OnInit, AfterViewInit {
             label: (context: any) => {
               const total = context.dataset.data.reduce(
                 (a: number, b: number) => a + b,
-                0
+                0,
               );
               const percentage = ((context.parsed / total) * 100).toFixed(1);
               return `${
@@ -275,24 +309,27 @@ export class UsagePage implements OnInit, AfterViewInit {
 
     // Failures Over Time (Area Chart)
     const failureTrends = this.overview.failureTrends || [];
-    const failedData = failureTrends.map((d) => d.total);
+    const failedData = failureTrends.map((d: any) => d.total);
     const allFailedData = [...failedData];
     const maxFailedValue =
       allFailedData.length > 0 ? Math.max(...allFailedData) : 0;
 
     this.failuresOverTimeData = {
-      labels: failureTrends.map((d) => this.formatDateLabel(d.day, isMonthly)),
+      labels: failureTrends.map((d: any) =>
+        this.formatDateLabel(d.day, isMonthly),
+      ),
       datasets: [
         {
           label: "Failures",
           data: failedData,
-          borderColor: "#ef4444",
-          backgroundColor: "rgba(239, 68, 68, 0.2)",
+          borderColor: rose500,
+          backgroundColor: "transparent",
           tension: 0.4,
-          fill: true,
+          fill: false,
           pointRadius: 0,
           pointHoverRadius: 6,
-          pointBackgroundColor: "#ef4444",
+          pointBackgroundColor: rose500,
+          borderWidth: 3,
         },
       ],
     };
@@ -359,13 +396,13 @@ export class UsagePage implements OnInit, AfterViewInit {
         {
           label: "Events",
           data: topSources.map((s) => s.total),
-          backgroundColor: "#1da1f2",
+          backgroundColor: primary500,
           borderRadius: 4,
           borderSkipped: false,
           barThickness: 32,
           maxBarThickness: 40,
           borderWidth: 0,
-          hoverBackgroundColor: "#1991db",
+          hoverBackgroundColor: this.getPrimaryColor("600"),
         },
       ],
     };
@@ -376,17 +413,12 @@ export class UsagePage implements OnInit, AfterViewInit {
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: "rgba(0, 0, 0, 0.8)",
+          backgroundColor: "#0f172a",
           titleColor: "#ffffff",
           bodyColor: "#ffffff",
           cornerRadius: 8,
           padding: 10,
-          displayColors: false,
           callbacks: {
-            title: (context: any) =>
-              context[0].label
-                .replace("-", " ")
-                .replace(/\b\w/g, (l: string) => l.toUpperCase()),
             label: (context: any) => {
               const value = context.parsed.y;
               if (value >= 1000) {
@@ -477,18 +509,23 @@ export class UsagePage implements OnInit, AfterViewInit {
   // Helper methods
   getStatusColor(status: string): string {
     if (!status) return "#6b7280"; // Default gray for undefined/null
+    const isDark = this.isDarkMode();
 
     switch (status.toLowerCase()) {
       case "processed":
       case "delivered":
-        return "#10b981"; // Success green
+        return this.getPrimaryColor("500");
       case "pending":
       case "processing":
-        return "#f59e0b"; // Warning orange
+        return isDark
+          ? this.getPrimaryColor("600")
+          : this.getPrimaryColor("400");
       case "failed":
       case "timeout":
       case "network_error":
-        return "#ef4444"; // Error red
+        return isDark
+          ? this.getPrimaryColor("700")
+          : this.getPrimaryColor("300");
       default:
         return "#6b7280"; // Default gray
     }
@@ -514,7 +551,7 @@ export class UsagePage implements OnInit, AfterViewInit {
   fillMissingDays(
     trends: any[],
     days: number,
-    valueField: string = "events"
+    valueField: string = "events",
   ): any[] {
     const today = new Date();
     const startDate = new Date(today);
@@ -545,7 +582,7 @@ export class UsagePage implements OnInit, AfterViewInit {
     trends.forEach((item) => {
       const date = new Date(item.day);
       const monthKey = `${date.getFullYear()}-${String(
-        date.getMonth() + 1
+        date.getMonth() + 1,
       ).padStart(2, "0")}`;
       if (!monthMap.has(monthKey)) {
         monthMap.set(monthKey, { value: 0, count: 0 });
@@ -567,14 +604,18 @@ export class UsagePage implements OnInit, AfterViewInit {
 
   formatDateLabel(dateStr: string, isMonthly: boolean): string {
     if (isMonthly) {
+      if (!dateStr.includes("-")) return dateStr;
       const [year, month] = dateStr.split("-").map(Number);
       const date = new Date(year, month - 1);
       return date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
+        month: "long",
       });
     } else {
-      return dateStr;
+      const date = new Date(dateStr);
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
     }
   }
 }

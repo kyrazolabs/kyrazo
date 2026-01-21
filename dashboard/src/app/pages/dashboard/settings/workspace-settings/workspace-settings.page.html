@@ -72,7 +72,7 @@
                 <div class="flex flex-col gap-2">
                     <label class="font-semibold text-surface-900 dark:text-surface-0">Workspace Name</label>
                     <input pInputText type="text" formControlName="name" placeholder="Enter workspace name"
-                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800"
+                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
                         [class.border-red-500]="workspaceForm.get('name')?.invalid && workspaceForm.get('name')?.touched"
                         [readonly]="!canEditWorkspace()" />
                     <small *ngIf="workspaceForm.get('name')?.invalid && workspaceForm.get('name')?.touched" class="text-red-500 text-sm">
@@ -85,7 +85,7 @@
                     <label class="font-semibold text-surface-900 dark:text-surface-0">Description</label>
                     <textarea pInputTextarea formControlName="description" rows="3"
                         placeholder="Enter workspace description (optional)"
-                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800 resize-none"
+                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800 resize-none"
                         [readonly]="!canEditWorkspace()"></textarea>
                     <small class="text-surface-600 dark:text-surface-400 text-sm">
                         {{workspaceForm.get('description')?.value?.length || 0}}/2000 characters
@@ -101,7 +101,7 @@
                 <div class="flex flex-col gap-2">
                     <label class="font-semibold text-surface-900 dark:text-surface-0">Workspace ID</label>
                     <div class="flex items-center gap-2">
-                        <div class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700 flex-1 font-mono text-sm">
+                        <div class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-800 flex-1 font-mono text-sm">
                             {{workspace?._id || 'N/A'}}
                         </div>
                         <p-button icon="pi pi-copy" [outlined]="true" size="small" styleClass="rounded-xl!"
@@ -113,7 +113,7 @@
                 <!-- Created Date -->
                 <div class="flex flex-col gap-2">
                     <label class="font-semibold text-surface-900 dark:text-surface-0">Created</label>
-                    <div class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700">
+                    <div class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-800">
                         {{workspace?.createdAt ? formatDate(workspace!.createdAt) : 'N/A'}}
                     </div>
                 </div>
@@ -245,7 +245,7 @@
         <div class="flex flex-col gap-2">
             <label class="font-semibold text-surface-900 dark:text-surface-0">Email Address</label>
             <input pInputText type="email" formControlName="email" placeholder="Enter email address"
-                class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800"
+                class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
                 [class.border-red-500]="inviteForm.get('email')?.invalid && inviteForm.get('email')?.touched" />
             <small *ngIf="inviteForm.get('email')?.invalid && inviteForm.get('email')?.touched" class="text-red-500 text-sm">
                 Please enter a valid email address
@@ -264,7 +264,7 @@
             <label class="font-semibold text-surface-900 dark:text-surface-0">Message (Optional)</label>
             <textarea pInputTextarea formControlName="message" rows="3"
                 placeholder="Add a personal message to the invitation..."
-                class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800 resize-none"></textarea>
+                class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800 resize-none"></textarea>
             <small class="text-surface-600 dark:text-surface-400 text-sm">
                 {{inviteForm.get('message')?.value?.length || 0}}/2000 characters
             </small>
@@ -288,7 +288,7 @@
 <p-confirmDialog #cd styleClass="rounded-xl!">
     <ng-template #headless let-message let-onAccept="onAccept" let-onReject="onReject">
         <div
-            class="flex flex-col items-center p-6 bg-surface-0 dark:bg-surface-900 rounded-xl! border border-surface-200 dark:border-surface-700 shadow-lg max-w-md mx-auto">
+            class="flex flex-col items-center p-6 bg-surface-0 dark:bg-surface-950! rounded-xl! border border-surface-200 dark:border-surface-800 shadow-lg max-w-md mx-auto">
             <!-- Danger Icon Circle -->
             <div
                 class="rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 inline-flex justify-center items-center h-20 w-20 -mt-16">

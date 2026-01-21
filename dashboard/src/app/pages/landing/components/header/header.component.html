@@ -3,7 +3,7 @@
         <div class="w-full max-w-7xl rounded-3xl border transition-all duration-300 px-4 flex items-center justify-between relative "
             [ngClass]="{
                 'bg-transparent border-transparent py-2': !isScrolled,
-                'bg-surface-0/90 dark:bg-surface-950/75 backdrop-blur-xl border-surface-200 dark:border-surface-700 shadow-xs py-3': isScrolled
+                'bg-surface-0/90 dark:bg-surface-950/75 backdrop-blur-xl border-surface-200 dark:border-surface-800 shadow-xs py-3': isScrolled
             }">
             
             <div class="flex items-center justify-center gap-3 cursor-pointer transition-transform duration-300"  [class.scale-90]="isScrolled" routerLink="/">
@@ -14,7 +14,7 @@
             <!-- Center Nav -->
             <!-- <div class="hidden md:flex items-center gap-1 rounded-full p-1 transition-all duration-300 border absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
                 [ngClass]="{
-                    'bg-surface-0/50 dark:bg-surface-950/50 border-surface-200 dark:border-surface-700 backdrop-blur-sm shadow-sm': !isScrolled,
+                    'bg-surface-0/50 dark:bg-surface-950/50 border-surface-200 dark:border-surface-800 backdrop-blur-sm shadow-sm': !isScrolled,
                     'bg-transparent border-transparent': isScrolled
                 }">
                 <button *ngFor="let item of items" 
@@ -26,16 +26,16 @@
     
             <!-- Right Actions -->
             <div class="flex items-center gap-2">
-                <!-- <p-button
+                <p-button
                     [outlined]="true"
                     [rounded]="true"
                     [text]="true"
                     (click)="toggleDarkMode()"
                     [icon]="isDarkMode()? 'pi pi-moon' : 'pi pi-sun'"
                     styleClass="w-9 h-9 rounded-2xl!"
-                /> -->
+                />
                 <div class="relative">
-                    <!-- <p-button
+                    <p-button
                         pStyleClass="@next"
                         enterFromClass="hidden"
                         enterActiveClass="animate-scalein"
@@ -46,7 +46,7 @@
                         [text]="true"
                         icon="pi pi-palette"
                         aria-label="Settings"
-                    /> -->
+                    />
                     <app-config class="hidden" />
                 </div>
                 
@@ -59,7 +59,7 @@
         <div class="border-b-2 py-1 transition-colors duration-100 max-w-[1400px]"
             [ngClass]="{
                 'bg-transparent border-transparent py-2': isScrolled,
-                'border-surface-200 dark:border-surface-700': !isScrolled
+                'border-surface-200 dark:border-surface-800': !isScrolled
             }"
         ></div>
     </div>

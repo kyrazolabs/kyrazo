@@ -1,4 +1,4 @@
-<div class="bg-surface-50 dark:bg-surface-950 min-h-screen w-full flex items-center justify-center p-4">
+<div class="bg-transparent min-h-screen w-full flex items-center justify-center p-4">
     <app-config class="hidden" />
     <p-card class="card-panel w-full max-w-md mx-auto">
         <ng-template pTemplate="header">
@@ -26,7 +26,7 @@
 
                 <!-- Email -->
                 <div class="space-y-1">
-                    <label for="email" class="block text-surface-900 dark:text-surface-0 font-medium text-sm">
+                    <label for="email" class="block text-surface-900 dark:text-surface-100 font-medium text-sm">
                         Email Address *
                     </label>
                     <input pInputText id="email" formControlName="email" type="email"
@@ -40,7 +40,7 @@
 
                 <!-- Password -->
                 <div class="space-y-1">
-                    <label for="password" class="block text-surface-900 dark:text-surface-0 font-medium text-sm">
+                    <label for="password" class="block text-surface-900 dark:text-surface-100 font-medium text-sm">
                         Password *
                     </label>
                         <p-password id="password" formControlName="password"
@@ -58,7 +58,7 @@
                 <div class="flex items-center justify-between py-2">
                     <div class="flex items-center space-x-2">
                         <p-checkbox formControlName="rememberMe" inputId="rememberMe" [binary]="true"></p-checkbox>
-                        <label for="rememberMe" class="text-surface-900 dark:text-surface-0 text-sm cursor-pointer">
+                        <label for="rememberMe" class="text-surface-900 dark:text-surface-100 text-sm cursor-pointer">
                             Remember me
                         </label>
                     </div>
@@ -80,10 +80,10 @@
           <div class="mt-6">
             <div class="relative">
               <div class="absolute inset-0 flex items-center">
-                <div class="w-full border-t border-surface-300 dark:border-surface-600"></div>
+                <div class="w-full border-t-2 border-surface-300 dark:border-surface-800"></div>
               </div>
               <div class="relative flex justify-center text-sm">
-                <span class="px-2 bg-surface-0 text-surface-500 dark:text-surface-400">
+                <span class="px-2 pb-1 bg-surface-0 text-surface-500 dark:bg-surface-950 dark:text-surface-400">
                   Or continue with
                 </span>
               </div>

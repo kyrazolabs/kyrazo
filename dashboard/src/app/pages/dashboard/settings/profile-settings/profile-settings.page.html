@@ -72,7 +72,7 @@
                 <div class="flex flex-col gap-2">
                     <label class="font-semibold text-surface-900 dark:text-surface-0">First Name</label>
                     <input pInputText type="text" formControlName="firstName" placeholder="Enter your first name"
-                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800"
+                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
                         [class.border-red-500]="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched" />
                     <small *ngIf="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched"
                         class="text-red-500 text-sm">
@@ -84,7 +84,7 @@
                 <div class="flex flex-col gap-2">
                     <label class="font-semibold text-surface-900 dark:text-surface-0">Last Name</label>
                     <input pInputText type="text" formControlName="lastName" placeholder="Enter your last name"
-                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800"
+                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
                         [class.border-red-500]="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched" />
                     <small *ngIf="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched"
                         class="text-red-500 text-sm">
@@ -96,7 +96,7 @@
                 <div class="flex flex-col gap-2">
                     <label class="font-semibold text-surface-900 dark:text-surface-0">Email Address</label>
                     <input pInputText type="email" formControlName="email" placeholder="Enter your email address"
-                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800"
+                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
                         [class.border-red-500]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched" />
                     <small *ngIf="profileForm.get('email')?.invalid && profileForm.get('email')?.touched"
                         class="text-red-500 text-sm">
@@ -109,7 +109,7 @@
                 <div class="flex flex-col gap-2">
                     <label class="font-semibold text-surface-900 dark:text-surface-0">Job Title</label>
                     <input pInputText type="text" formControlName="jobTitle" placeholder="Enter your job title"
-                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800" />
+                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800" />
                 </div>
             </div>
         </p-card>
@@ -148,7 +148,7 @@
                 <div class="flex flex-col gap-2">
                     <label class="font-semibold text-surface-900 dark:text-surface-0">Member Since</label>
                     <div
-                        class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700">
+                        class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-800">
                         {{originalProfile?.createdAt ? formatDate(originalProfile!.createdAt) : 'N/A'}}
                     </div>
                 </div>
@@ -157,7 +157,7 @@
                 <div class="flex flex-col gap-2">
                     <label class="font-semibold text-surface-900 dark:text-surface-0">Last Login</label>
                     <div
-                        class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700">
+                        class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-800">
                         {{originalProfile?.lastLogin ? formatDate(originalProfile!.lastLogin) : 'Never'}}
                     </div>
                 </div>
@@ -167,7 +167,7 @@
                     <label class="font-semibold text-surface-900 dark:text-surface-0">Account ID</label>
                     <div class="flex items-center gap-2">
                         <div
-                            class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700 flex-1 font-mono text-sm">
+                            class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-800 flex-1 font-mono text-sm">
                             {{originalProfile?.id || 'N/A'}}
                         </div>
                         <p-button icon="pi pi-copy" [outlined]="true" size="small" styleClass="rounded-xl!"
@@ -186,7 +186,7 @@
                 <div class="flex flex-col gap-2">
                     <label class="font-semibold text-surface-900 dark:text-surface-0">Current Password</label>
                     <input pInputText type="password" formControlName="currentPassword" placeholder="••••••••"
-                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800"
+                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
                         [class.border-red-500]="passwordForm.get('currentPassword')?.invalid && passwordForm.get('currentPassword')?.touched" />
                 </div>
     
@@ -194,7 +194,7 @@
                 <div class="flex flex-col gap-2">
                     <label class="font-semibold text-surface-900 dark:text-surface-0">New Password</label>
                     <input pInputText type="password" formControlName="newPassword" placeholder="••••••••"
-                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800"
+                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
                         [class.border-red-500]="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched" />
                     <small class="text-xs opacity-60">Min. 8 characters</small>
                 </div>
@@ -204,7 +204,7 @@
                     <label class="font-semibold text-surface-900 dark:text-surface-0">Confirm New Password</label>
                     <div class="flex flex-col gap-2">
                         <input pInputText type="password" formControlName="confirmPassword" placeholder="••••••••"
-                            class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800"
+                            class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
                             [class.border-red-500]="passwordForm.hasError('mismatch') && passwordForm.get('confirmPassword')?.touched" />
                         <p-button label="Update Password" icon="pi pi-lock" styleClass="rounded-xl! w-full"
                             [disabled]="passwordForm.invalid || isChangingPassword" [loading]="isChangingPassword"

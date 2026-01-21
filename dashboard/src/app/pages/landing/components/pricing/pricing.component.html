@@ -15,7 +15,7 @@
             <div *ngFor="let plan of plans; let i = index" 
                  appScrollReveal
                  [delay]="'delay-' + (i * 100 + 100)"
-                 [class]="'p-8 rounded-2xl! border transition-all duration-300 relative ' + (plan.highlighted ? 'bg-surface-900 text-surface-0 border-surface-900 shadow-2xl scale-105 z-10' : 'bg-surface-0 dark:bg-surface-900 border-surface-200 dark:border-surface-800 hover:border-primary-500/50')">
+                 [class]="'p-8 rounded-2xl! border transition-all duration-300 relative ' + (plan.highlighted ? 'bg-surface-900 text-surface-0 border-surface-900 shadow-2xl scale-105 z-10' : 'bg-surface-0 dark:bg-surface-950! border-surface-200 dark:border-surface-900 hover:border-primary-500/50')">
                 
                 <div *ngIf="plan.tag" class="absolute -top-4 left-1/2 -translate-x-1/2">
                     <p-tag [value]="plan.tag" severity="info" styleClass="rounded-xl! font-bold"></p-tag>

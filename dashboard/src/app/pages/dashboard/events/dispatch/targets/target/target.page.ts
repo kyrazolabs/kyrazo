@@ -163,6 +163,40 @@ export class TargetPage implements OnInit, AfterViewInit {
   totalRecords = 0;
   rows = 10;
   currentPage = 1;
+  lineShadowPlugin = [
+    {
+      id: "lineShadow",
+      beforeDatasetDraw(chart: any, args: any) {
+        const { ctx } = chart;
+        if (args.meta.type === "line") {
+          const borderColor = args.meta.dataset.options.borderColor;
+          ctx.save();
+          ctx.shadowColor = borderColor || "rgba(0, 0, 0, 0.15)";
+          ctx.shadowBlur = 10;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 12;
+        }
+      },
+      afterDatasetDraw(chart: any, args: any) {
+        const { ctx } = chart;
+        if (args.meta.type === "line") {
+          ctx.restore();
+        }
+      },
+    },
+  ];
+
+  private getPrimaryColor(shade: string = "500"): string {
+    return (
+      getComputedStyle(document.documentElement)
+        .getPropertyValue(`--p-primary-${shade}`)
+        .trim() || "#3b82f6"
+    );
+  }
+
+  private isDarkMode(): boolean {
+    return document.documentElement.classList.contains("p-dark");
+  }
 
   constructor(private route: ActivatedRoute) {}
 
@@ -205,32 +239,21 @@ export class TargetPage implements OnInit, AfterViewInit {
     // Wait for data to load before manipulating canvas
   }
 
-  updateChartGradients() {
-    const lineCanvas = document.getElementById(
-      "lineChart",
-    ) as HTMLCanvasElement;
-    if (lineCanvas && this.lineChartData) {
-      const ctx = lineCanvas.getContext("2d")!;
-      const gradientGreen = ctx.createLinearGradient(0, 0, 0, 150);
-      gradientGreen.addColorStop(0, "rgba(16, 185, 129, 0.3)");
-      gradientGreen.addColorStop(1, "rgba(16, 185, 129, 0)");
-
-      const gradientRed = ctx.createLinearGradient(0, 0, 0, 150);
-      gradientRed.addColorStop(0, "rgba(239, 68, 68, 0.3)");
-      gradientRed.addColorStop(1, "rgba(239, 68, 68, 0)");
-
-      // Apply gradients if datasets exist
-      if (
-        this.lineChartData.datasets &&
-        this.lineChartData.datasets.length >= 2
-      ) {
-        this.lineChartData.datasets[0].backgroundColor = gradientGreen;
-        this.lineChartData.datasets[1].backgroundColor = gradientRed;
-      }
-    }
-  }
-
   initCharts() {
+    if (!this.overview) return;
+    const isDark = this.isDarkMode();
+    const indigo500 = "#6366f1";
+    const rose500 = "#f43f5e";
+    const emerald500 = "#10b981";
+    const amber500 = "#f59e0b";
+    const slate500 = "#64748b";
+    const primary500 = this.getPrimaryColor("500");
+
+    // Grid colors for light/dark
+    const gridColor = isDark
+      ? "rgba(255, 255, 255, 0.05)"
+      : "rgba(15, 23, 42, 0.05)";
+
     const last30DaysLabels = Array.from({ length: 30 }).map((_, i) => {
       const d = new Date();
       d.setDate(d.getDate() - (29 - i));
@@ -239,7 +262,6 @@ export class TargetPage implements OnInit, AfterViewInit {
         month: "short",
       });
     });
-    // Line Chart for Delivery Trends
     const deliveryTrends = this.overview?.deliveryTrends || [];
     const successfulData = deliveryTrends.map((d) => d.successful);
     const failedData = deliveryTrends.map((d) => d.failed);
@@ -248,35 +270,36 @@ export class TargetPage implements OnInit, AfterViewInit {
     const isMonthly =
       this.selectedTimeRange === "last180days" ||
       this.selectedTimeRange === "last360days";
+
     this.lineChartData = {
       labels: deliveryTrends.map((d) => this.formatDateLabel(d.day, isMonthly)),
       datasets: [
         {
           label: "Successful Deliveries",
           data: successfulData,
-          borderColor: "#10b981",
-          backgroundColor: "transparent", // Will be replaced by gradient
+          borderColor: primary500,
+          backgroundColor: "transparent",
           tension: 0.4,
           pointRadius: 0,
           pointHoverRadius: 6,
-          pointBackgroundColor: "#10b981",
+          pointBackgroundColor: primary500,
           pointBorderColor: "#ffffff",
           pointBorderWidth: 2,
-          fill: true,
+          fill: false,
           borderWidth: 3,
         },
         {
           label: "Failed Deliveries",
           data: failedData,
-          borderColor: "#ef4444",
-          backgroundColor: "transparent", // Will be replaced by gradient
+          borderColor: rose500,
+          backgroundColor: "transparent",
           tension: 0.4,
           pointRadius: 0,
           pointHoverRadius: 6,
-          pointBackgroundColor: "#ef4444",
+          pointBackgroundColor: rose500,
           pointBorderColor: "#ffffff",
           pointBorderWidth: 2,
-          fill: true,
+          fill: false,
           borderWidth: 3,
         },
       ],
@@ -309,26 +332,27 @@ export class TargetPage implements OnInit, AfterViewInit {
       scales: {
         y: {
           beginAtZero: true,
-          max: Math.ceil(maxLineValue * 1.01),
-          grid: { display: false },
-          border: { display: false },
-          ticks: {
-            font: { size: 11 },
-            padding: 10,
-          },
-        },
-        x: {
+          max: Math.ceil(maxLineValue * 1.05),
           grid: {
             display: true,
-            color: "rgba(0, 0, 0, 0.1)",
-            borderDash: [5, 5], // Dashed grid lines
+            color: gridColor,
+            borderDash: [5, 5],
             drawTicks: false,
           },
           border: { display: false },
           ticks: {
-            font: { size: 11 },
-            maxRotation: 45,
-            minRotation: 45,
+            color: slate500,
+            font: { size: 11, weight: "500" },
+            padding: 10,
+          },
+        },
+        x: {
+          grid: { display: false },
+          border: { display: false },
+          ticks: {
+            color: slate500,
+            font: { size: 11, weight: "500" },
+            maxRotation: 0,
             padding: 10,
           },
         },
@@ -354,19 +378,19 @@ export class TargetPage implements OnInit, AfterViewInit {
     };
 
     // Top Event Types Bar Chart
-    const colors = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
+    const shade500 = this.getPrimaryColor("500");
+
     this.eventTypesChartData = {
-      labels: this.overview?.topEventTypes.map((m) => m.event_type),
+      labels: this.overview.topEventTypes.map((m) => m.event_type),
       datasets: [
         {
           label: "Event Count",
-          data: this.overview?.topEventTypes.map((m) => m.total),
-          backgroundColor: this.overview?.topEventTypes.map(
-            (_, i) => colors[i % colors.length],
-          ),
-          borderRadius: 8,
+          data: this.overview.topEventTypes.map((m) => m.total),
+          backgroundColor: primary500,
+          borderRadius: 4,
           borderSkipped: false,
-          barThickness: 30,
+          barThickness: 32,
+          maxBarThickness: 40,
         },
       ],
     };
@@ -451,9 +475,6 @@ export class TargetPage implements OnInit, AfterViewInit {
     };
 
     this.loadingCharts = false;
-
-    // Wait for next tick to update gradients
-    setTimeout(() => this.updateChartGradients(), 100);
   }
 
   onTimeRangeChange() {
@@ -727,15 +748,15 @@ export class TargetPage implements OnInit, AfterViewInit {
 
   getStatusCodeColor(statusCode: number): string {
     if (statusCode >= 200 && statusCode < 300) {
-      return "#10b981"; // Success green
+      return "#10b981"; // Emerald-500
     } else if (statusCode >= 300 && statusCode < 400) {
-      return "#3b82f6"; // Info blue
+      return "#6366f1"; // Indigo-500
     } else if (statusCode >= 400 && statusCode < 500) {
-      return "#f59e0b"; // Warning orange
+      return "#f59e0b"; // Amber-500
     } else if (statusCode >= 500) {
-      return "#ef4444"; // Error red
+      return "#f43f5e"; // Rose-500
     }
-    return "#6b7280"; // Default gray
+    return "#64748b"; // Slate-500
   }
 
   getDaysFromRange(range: string): number {
@@ -757,14 +778,18 @@ export class TargetPage implements OnInit, AfterViewInit {
 
   formatDateLabel(dateStr: string, isMonthly: boolean): string {
     if (isMonthly) {
+      if (!dateStr.includes("-")) return dateStr;
       const [year, month] = dateStr.split("-").map(Number);
       const date = new Date(year, month - 1);
       return date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
+        month: "long",
       });
     } else {
-      return dateStr;
+      const date = new Date(dateStr);
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
     }
   }
 

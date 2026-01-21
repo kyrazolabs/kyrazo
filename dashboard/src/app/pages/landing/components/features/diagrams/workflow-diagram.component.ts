@@ -17,7 +17,7 @@ import { LayoutService } from "@components/service/layout.service";
         <!-- Input Event (Left) -->
         <div class="z-20 translate-x-4">
           <div
-            class="px-5 py-3 rounded-2xl bg-surface-800 border border-surface-200 dark:border-surface-700 flex items-center gap-4 shadow-xl shadow-black/5"
+            class="px-5 py-3 rounded-2xl bg-surface-800 border border-surface-200 dark:border-surface-800 flex items-center gap-4 shadow-xl shadow-black/5"
           >
             <div
               class="w-3 h-3 rounded-full bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.6)] animate-pulse"
@@ -112,7 +112,7 @@ import { LayoutService } from "@components/service/layout.service";
             class="flex items-center gap-5 group cursor-default"
           >
             <div
-              class="w-30 h-10 p-2 rounded-2xl bg-surface-800 flex items-center justify-center border border-surface-200 dark:border-surface-700 shadow-md shadow-black/5 transition-all group-hover:border-primary-500/50 group-hover:shadow-primary-500/10"
+              class="w-30 h-10 p-2 rounded-2xl bg-surface-800 flex items-center justify-center border border-surface-200 dark:border-surface-800 shadow-md shadow-black/5 transition-all group-hover:border-primary-500/50 group-hover:shadow-primary-500/10"
             >
               <img
                 [src]="action.icon"

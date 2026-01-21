@@ -25,7 +25,7 @@
             <div class="flex flex-col gap-2">
                 <label class="font-semibold text-surface-900 dark:text-surface-0">Name</label>
                 <div
-                    class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700">
+                    class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-800">
                     {{endpoint().name}}
                 </div>
             </div>
@@ -44,7 +44,7 @@
                 <label class="font-semibold text-surface-900 dark:text-surface-0">URL</label>
                 <div class="flex items-center gap-2">
                     <div
-                        class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700 flex-1 font-mono text-sm break-all">
+                        class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-800 flex-1 font-mono text-sm break-all">
                         {{endpoint().url}}
                     </div>
                     <p-button icon="pi pi-copy" [outlined]="true" size="small" styleClass="rounded-xl!"
@@ -70,7 +70,7 @@
             <div class="flex flex-col gap-2">
                 <label class="font-semibold text-surface-900 dark:text-surface-0">Timeout</label>
                 <div
-                    class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700">
+                    class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-800">
                     {{endpoint().config?.timeout}} ms
                 </div>
             </div>
@@ -79,7 +79,7 @@
             <div class="flex flex-col gap-2">
                 <label class="font-semibold text-surface-900 dark:text-surface-0">Retry Count</label>
                 <div
-                    class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700">
+                    class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-800">
                     {{endpoint().config?.retryCount}} attempts
                 </div>
             </div>
@@ -88,7 +88,7 @@
             <div class="flex flex-col gap-2">
                 <label class="font-semibold text-surface-900 dark:text-surface-0">Rate Limit</label>
                 <div
-                    class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700">
+                    class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-800">
                     {{endpoint().config?.rateLimit || 'Not set'}}{{endpoint().config?.rateLimit ? '/min' : ''}}
                 </div>
             </div>
@@ -107,7 +107,7 @@
             <div class="flex flex-col gap-2">
                 <label class="font-semibold text-surface-900 dark:text-surface-0">Created</label>
                 <div
-                    class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700">
+                    class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-800">
                     {{formatDate(endpoint().createAt || '')}}
                 </div>
             </div>
@@ -117,7 +117,7 @@
         <div class="flex flex-col gap-2 mt-6" *ngIf="endpoint().description">
             <label class="font-semibold text-surface-900 dark:text-surface-0">Description</label>
             <div
-                class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700">
+                class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-800">
                 {{endpoint().description}}
             </div>
         </div>
@@ -129,7 +129,7 @@
         *ngIf="endpoint().customHeaders && (endpoint().customHeaders | keyvalue)?.length !== 0">
         <div class="space-y-4">
             <div *ngFor="let header of endpoint().customHeaders | keyvalue"
-                class="flex gap-3 items-center p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700">
+                class="flex gap-3 items-center p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-800">
                 <div class="flex-1">
                     <div class="font-semibold text-surface-900 dark:text-surface-0 text-sm mb-1">{{header.key}}</div>
                     <div class="text-surface-600 dark:text-surface-400 text-sm font-mono break-all">{{header.value}}

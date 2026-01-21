@@ -54,7 +54,7 @@ declare type SurfacesType = {
   ],
   template: `
     <div
-      class="absolute top-16 right-0 w-64 p-4 bg-white dark:bg-surface-950/95 backdrop-blur-xs! rounded-2xl shadow-lg border border-surface-200 dark:border-surface-800 origin-top z-50"
+      class="absolute top-16 right-0 w-64 p-4 bg-white dark:bg-surface-950/95 backdrop-blur-xs! rounded-2xl shadow-lg border-2 border-surface-200 dark:border-surface-900 origin-top z-50"
     >
       <div class="flex flex-col gap-4">
         <div>
@@ -71,7 +71,7 @@ declare type SurfacesType = {
                 'border-none w-5 h-5 rounded-full p-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2',
                 selectedPrimaryColor() === pc.name
                   ? 'ring-2 ring-primary ring-offset-2'
-                  : ''
+                  : '',
               ]"
               [ngStyle]="{ backgroundColor: pc?.palette?.['500'] }"
               (click)="updateColors($event, 'primary', pc)"
@@ -94,11 +94,11 @@ declare type SurfacesType = {
                   selectedSurface()
                     ? selectedSurface() === s.name
                     : isDarkMode()
-                    ? s.name === 'zinc'
-                    : s.name === 'slate'
+                      ? s.name === 'zinc'
+                      : s.name === 'slate'
                 )
                   ? 'ring-2 ring-primary ring-offset-2'
-                  : ''
+                  : '',
               ]"
               [ngStyle]="{ backgroundColor: s?.palette?.['500'] }"
               (click)="updateColors($event, 'surface', s)"
@@ -320,7 +320,7 @@ export class AppConfig {
   getPresetExt() {
     const color: SurfacesType =
       this.primaryColors().find(
-        (c) => c.name === this.selectedPrimaryColor()
+        (c) => c.name === this.selectedPrimaryColor(),
       ) || {};
 
     if (color.name === "noir") {
@@ -444,7 +444,7 @@ export class AppConfig {
     }));
     const preset = presets[event as KeyOfType<typeof presets>];
     const surfacePalette = this.surfaces.find(
-      (s) => s.name === this.selectedSurface()
+      (s) => s.name === this.selectedSurface(),
     )?.palette;
     $t()
       .preset(preset)

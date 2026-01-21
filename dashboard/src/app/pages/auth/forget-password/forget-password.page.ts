@@ -169,15 +169,4 @@ export class ForgetPasswordPage {
       this.onSubmit();
     }, 300);
   }
-
-  // Navigate to forgot password page
-  onForgotPassword(): void {
-    // You can implement forgot password functionality here
-    this.messageService.add({
-      severity: "info",
-      summary: "Forgot Password",
-      detail: "Forgot password functionality will be implemented soon",
-      life: 3000,
-    });
-  }
 }

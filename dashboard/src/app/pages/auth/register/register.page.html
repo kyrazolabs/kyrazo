@@ -28,7 +28,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- First Name -->
                     <div class="space-y-1">
-                        <label for="firstName" class="block text-surface-900 dark:text-surface-0 font-medium text-sm">
+                        <label for="firstName" class="block text-surface-900 dark:text-surface-100 font-medium text-sm">
                             First Name *
                         </label>
                         <input pInputText id="firstName" formControlName="firstName" type="text"
@@ -43,7 +43,7 @@
 
                     <!-- Last Name -->
                     <div class="space-y-1">
-                        <label for="lastName" class="block text-surface-900 dark:text-surface-0 font-medium text-sm">
+                        <label for="lastName" class="block text-surface-900 dark:text-surface-100 font-medium text-sm">
                             Last Name *
                         </label>
                         <input pInputText id="lastName" formControlName="lastName" type="text"
@@ -59,7 +59,7 @@
 
                 <!-- Email -->
                 <div class="space-y-1">
-                    <label for="email" class="block text-surface-900 dark:text-surface-0 font-medium text-sm">
+                    <label for="email" class="block text-surface-900 dark:text-surface-100 font-medium text-sm">
                         Email Address *
                     </label>
                     <input pInputText id="email" formControlName="email" type="email"
@@ -73,7 +73,7 @@
 
                 <!-- Job Title -->
                 <div class="space-y-1">
-                    <label for="jobTitle" class="block text-surface-900 dark:text-surface-0 font-medium text-sm">
+                    <label for="jobTitle" class="block text-surface-900 dark:text-surface-100 font-medium text-sm">
                         Job Title *
                     </label>
                     <p-select [options]="jobTitles" formControlName="jobTitle" inputId="jobTitle"
@@ -88,7 +88,7 @@
 
                 <!-- Password -->
                 <div class="space-y-1">
-                    <label for="password" class="block text-surface-900 dark:text-surface-0 font-medium text-sm">
+                    <label for="password" class="block text-surface-900 dark:text-surface-100 font-medium text-sm">
                         Password *
                     </label>
                     <p-password formControlName="password" inputId="password" placeholder="Create a strong password"
@@ -102,7 +102,7 @@
 
                 <!-- Confirm Password -->
                 <div class="space-y-1">
-                    <label for="confirmPassword" class="block text-surface-900 dark:text-surface-0 font-medium text-sm">
+                    <label for="confirmPassword" class="block text-surface-900 dark:text-surface-100 font-medium text-sm">
                         Confirm Password *
                     </label>
                     <p-password id="confirmPassword" formControlName="confirmPassword"
@@ -116,11 +116,11 @@
                 </div>
 
                 <!-- Terms Agreement -->
-                <div class="flex items-start space-x-3 py-2">
+                <div class="flex items-start space-x-3 py-2 font-semibold">
                     <p-checkbox formControlName="agreeToTerms" inputId="agreeToTerms" [binary]="true"
                         [class.p-invalid]="isFieldInvalid('agreeToTerms')"></p-checkbox>
                     <div class="flex-1">
-                        <label for="agreeToTerms" class="text-surface-900 dark:text-surface-0 text-sm cursor-pointer">
+                        <label for="agreeToTerms" class="text-surface-900 dark:text-surface-400 text-sm cursor-pointer">
                             I agree to the
                             <a href="/legal/terms-of-service" target="_blank" class="text-primary hover:text-primary-600 underline">
                                 Terms of Service

@@ -55,7 +55,7 @@ interface FaqItem {
             <p-accordion-panel
               *ngFor="let item of faqs"
               [value]="item.question"
-              styleClass="border-b border-surface-200 dark:border-surface-800/50 block"
+              styleClass="border-b border-surface-200 dark:border-surface-900/50 block"
             >
               <p-accordion-header class="w-full">
                 <span
@@ -75,7 +75,7 @@ interface FaqItem {
         </div>
 
         <div
-          class="mt-20 p-10 rounded-2xl bg-surface-100 dark:bg-surface-900/50 border border-surface-200 dark:border-surface-800 backdrop-blur-sm text-center"
+          class="mt-20 p-10 rounded-2xl bg-surface-100 dark:bg-surface-900/50 border border-surface-200 dark:border-surface-900 backdrop-blur-sm text-center"
         >
           <h3
             class="text-2xl font-bold text-surface-950 dark:text-white mb-3 tracking-tight"

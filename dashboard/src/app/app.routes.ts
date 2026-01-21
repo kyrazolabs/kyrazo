@@ -86,7 +86,7 @@ export const routes: Routes = [
   },
   {
     path: "dashboard",
-    // canActivate: [authGuard],
+    canActivateChild: [authGuard],
     loadComponent: () =>
       import("@pages/dashboard/app-shell/app-shell").then((p) => p.AppShell),
     data: { animation: "dashboard" },

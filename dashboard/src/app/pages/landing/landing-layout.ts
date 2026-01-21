@@ -10,9 +10,7 @@ import { filter } from "rxjs/operators";
   standalone: true,
   imports: [CommonModule, RouterOutlet, HeaderComponent, FooterComponent],
   template: `
-    <main
-      class="bg-surface-0 dark:bg-surface-950 min-h-screen min-w-screen relative overflow-x-hidden"
-    >
+    <main class="min-h-screen min-w-screen relative overflow-x-hidden">
       <app-landing-header></app-landing-header>
 
       <!-- Shared Background Blobs -->
