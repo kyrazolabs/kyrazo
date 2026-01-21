@@ -4,6 +4,9 @@ import { logger } from '@kyrazo/shared';
 import { CreateSupportTicketInput } from './support.schema';
 
 export class SupportService {
+    private readonly PREFIX = 'TK';
+    private readonly CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    private readonly RANDOM_LENGTH = 3;
     private queue: PQueue;
     private readonly webhookUrl =
         'https://n8n.kyrazo.com/webhook/25f4b0df-aa76-4488-8cb0-1a76951803c9';
@@ -19,6 +22,7 @@ export class SupportService {
         const payload = {
             ...input,
             ...userDetails,
+            ticket_id: this.generate(),
             timestamp: new Date().toISOString(),
         };
 
@@ -51,6 +55,24 @@ export class SupportService {
                 throw error;
             }
         });
+    }
+
+    private generate(date: Date = new Date()): string {
+        // Format date part: YYMMDD
+        const year = date.getFullYear().toString().slice(-2);
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        const datePart = `${year}${month}${day}`;
+
+        // Generate random 3-character suffix
+        let randomPart = '';
+        for (let i = 0; i < this.RANDOM_LENGTH; i++) {
+            const randomIndex = Math.floor(Math.random() * this.CHARS.length);
+            randomPart += this.CHARS[randomIndex];
+        }
+
+        // Combine all parts
+        return `${this.PREFIX}-${datePart}-${randomPart}`;
     }
 }
 
