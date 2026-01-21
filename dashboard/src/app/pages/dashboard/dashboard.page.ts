@@ -16,6 +16,9 @@ import { TextareaModule } from "primeng/textarea";
 import { ToastModule } from "primeng/toast";
 import { MessageService } from "primeng/api";
 
+// Shared Components
+import { SupportDialogComponent } from "@shared/components/support-dialog/support-dialog.component";
+
 // Services
 import { ProjectService } from "@core/services/project.service";
 import { SentryService } from "@core/3rd-party/sentry";
@@ -35,6 +38,7 @@ import { SentryService } from "@core/3rd-party/sentry";
     InputTextModule,
     TextareaModule,
     ToastModule,
+    SupportDialogComponent,
   ],
   templateUrl: "./dashboard.page.html",
   styleUrl: "./dashboard.page.scss",
@@ -54,6 +58,9 @@ export class DashboardPage {
     name: "",
     description: "",
   };
+
+  // Support Dialog State
+  supportDialogVisible = false;
 
   // Navigation Cards Configuration
   navCards = [
@@ -99,16 +106,6 @@ export class DashboardPage {
     },
   ];
 
-  // Contact dialog properties
-  contactDialogVisible = false;
-  contactForm = {
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  };
-  contactSubmitting = false;
-
   handleQuickAction(actionId: string) {
     if (actionId === "new-project") {
       this.openCreateProjectDialog();
@@ -145,43 +142,9 @@ export class DashboardPage {
       },
     });
   }
-  // Contact dialog methods
-  openContactDialog() {
-    this.contactDialogVisible = true;
-  }
 
-  closeContactDialog() {
-    this.contactDialogVisible = false;
-    this.resetContactForm();
-  }
-
-  resetContactForm() {
-    this.contactForm = {
-      name: "",
-      email: "",
-      subject: "",
-      message: "",
-    };
-  }
-
-  submitContactForm() {
-    if (
-      !this.contactForm.name ||
-      !this.contactForm.email ||
-      !this.contactForm.message
-    ) {
-      return;
-    }
-
-    this.contactSubmitting = true;
-
-    // TODO: Integrate with backend API when ready
-    // For now, just simulate submission
-    setTimeout(() => {
-      console.log("Contact form submitted:", this.contactForm);
-      this.contactSubmitting = false;
-      this.closeContactDialog();
-      // TODO: Show success message
-    }, 1000);
+  // Support dialog
+  openSupportDialog() {
+    this.supportDialogVisible = true;
   }
 }

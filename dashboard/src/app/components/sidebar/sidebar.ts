@@ -12,14 +12,13 @@ import { RouterLink, Router, NavigationEnd } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import { filter } from "rxjs/operators";
 
-import { MenuItem } from "primeng/api";
+import { MenuItem, MessageService } from "primeng/api";
 import { MenuModule } from "primeng/menu";
 import { BadgeModule } from "primeng/badge";
 import { RippleModule } from "primeng/ripple";
 import { AvatarModule } from "primeng/avatar";
 import { Popover, PopoverModule } from "primeng/popover";
 import { InputGroupAddonModule } from "primeng/inputgroupaddon";
-import { StyleClass } from "primeng/styleclass";
 import { Drawer, DrawerModule } from "primeng/drawer";
 import { ButtonModule } from "primeng/button";
 import { DialogModule } from "primeng/dialog";
@@ -31,6 +30,8 @@ import { StorageService } from "@core/services/storage.service";
 import { WorkspaceService } from "@core/services/workspace.service";
 import { IWorkspace, IWorkspaceMembership } from "@models/workspaces.types";
 import { TooltipModule } from "primeng/tooltip";
+import { SupportDialogComponent } from "@shared/components/support-dialog/support-dialog.component";
+import { ToastModule } from "primeng/toast";
 
 @Component({
   selector: "app-sidebar",
@@ -51,7 +52,10 @@ import { TooltipModule } from "primeng/tooltip";
     InputTextModule,
     TextareaModule,
     CardModule,
+    ToastModule,
+    SupportDialogComponent,
   ],
+  providers: [MessageService],
   templateUrl: "./sidebar.html",
   styleUrl: "./sidebar.scss",
   animations: [dropdownAnimation],
@@ -60,6 +64,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
   private ss = inject(StorageService);
   private ws = inject(WorkspaceService);
   private router = inject(Router);
+  private messageService = inject(MessageService);
 
   currentRoute = "";
   dispatchDropdownOpen = false;
@@ -112,16 +117,6 @@ export class SidebarComponent implements OnInit, AfterViewInit {
   selectedWorkspace: IWorkspace | null = null;
   workspaceMemberships: IWorkspaceMembership[] = [];
   loading = false;
-
-  // Contact dialog properties
-  contactDialogVisible = false;
-  contactForm = {
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  };
-  contactSubmitting = false;
 
   toggle(event: any) {
     this.wp.toggle(event);
@@ -229,44 +224,11 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     return (this.helpVisible = true);
   }
 
-  // Contact dialog methods
-  openContactDialog() {
-    this.contactDialogVisible = true;
-  }
+  // Support dialog state
+  supportDialogVisible = false;
 
-  closeContactDialog() {
-    this.contactDialogVisible = false;
-    this.resetContactForm();
-  }
-
-  resetContactForm() {
-    this.contactForm = {
-      name: "",
-      email: "",
-      subject: "",
-      message: "",
-    };
-  }
-
-  submitContactForm() {
-    if (
-      !this.contactForm.name ||
-      !this.contactForm.email ||
-      !this.contactForm.message
-    ) {
-      return;
-    }
-
-    this.contactSubmitting = true;
-
-    // TODO: Integrate with backend API when ready
-    // For now, just simulate submission
-    setTimeout(() => {
-      console.log("Contact form submitted:", this.contactForm);
-      this.contactSubmitting = false;
-      this.closeContactDialog();
-      // TODO: Show success message
-    }, 1000);
+  openSupportDialog() {
+    this.supportDialogVisible = true;
   }
 }
 

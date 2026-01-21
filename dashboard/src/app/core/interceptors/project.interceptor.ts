@@ -16,7 +16,8 @@ export const projectInterceptor: HttpInterceptorFn = (req, next) => {
     req.url.includes("/v1/targets") ||
     req.url.includes("/v1/plans") ||
     req.url.includes("/v1/subscriptions") ||
-    req.url.includes("/v1/payment")
+    req.url.includes("/v1/payment") ||
+    req.url.includes("/v1/support")
   ) {
     const modified = req.clone({
       setHeaders: {

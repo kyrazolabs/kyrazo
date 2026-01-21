@@ -264,9 +264,9 @@
                                 <li>
                                     <a pRipple
                                         class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700"
-                                        (click)="openContactDialog()">
+                                        (click)="openSupportDialog()">
                                         <i class="icon-[hugeicons--bubble-chat-question] size-5 mr-2"></i>
-                                        <span class="text-sm font-medium">Contact us</span>
+                                        <span class="text-sm font-medium">Support</span>
                                     </a>
                                 </li>
                             </ul>
@@ -301,110 +301,11 @@
 
 </div>
 
-<!-- Contact Us Dialog -->
-<p-dialog
-    [(visible)]="contactDialogVisible"
-    [modal]="true"
-    [style]="{ width: '500px' }"
-    [draggable]="false"
-    [resizable]="false"
-    header="Contact Us"
-    appendTo="body"
-    styleClass="rounded-2xl!">
-    <div class="space-y-6">
-        <!-- Description -->
-        <div class="text-center">
-            <p class="text-surface-600 dark:text-surface-400 text-sm">
-                Have a question or need help? We'd love to hear from you!
-            </p>
-        </div>
+<!-- Toast for notifications -->
+<p-toast></p-toast>
 
-        <!-- Contact Form -->
-        <form class="space-y-4" (ngSubmit)="submitContactForm()">
-            <!-- Name Field -->
-            <div class="flex flex-col gap-2">
-                <label for="contactName" class="text-sm font-medium text-surface-900 dark:text-surface-0">
-                    Name <span class="text-red-500">*</span>
-                </label>
-                <input
-                    pInputText
-                    id="contactName"
-                    [(ngModel)]="contactForm.name"
-                    name="name"
-                    placeholder="Your full name"
-                    class="w-full rounded-xl!"
-                    required />
-            </div>
-
-            <!-- Email Field -->
-            <div class="flex flex-col gap-2">
-                <label for="contactEmail" class="text-sm font-medium text-surface-900 dark:text-surface-0">
-                    Email <span class="text-red-500">*</span>
-                </label>
-                <input
-                    pInputText
-                    id="contactEmail"
-                    type="email"
-                    [(ngModel)]="contactForm.email"
-                    name="email"
-                    placeholder="your.email@example.com"
-                    class="w-full rounded-xl!"
-                    required />
-            </div>
-
-            <!-- Subject Field -->
-            <div class="flex flex-col gap-2">
-                <label for="contactSubject" class="text-sm font-medium text-surface-900 dark:text-surface-0">
-                    Subject
-                </label>
-                <input
-                    pInputText
-                    id="contactSubject"
-                    [(ngModel)]="contactForm.subject"
-                    name="subject"
-                    placeholder="What's this about?"
-                    class="w-full rounded-xl!" />
-            </div>
-
-            <!-- Message Field -->
-            <div class="flex flex-col gap-2">
-                <label for="contactMessage" class="text-sm font-medium text-surface-900 dark:text-surface-0">
-                    Message <span class="text-red-500">*</span>
-                </label>
-                <textarea
-                    pInputTextarea
-                    id="contactMessage"
-                    [(ngModel)]="contactForm.message"
-                    name="message"
-                    rows="4"
-                    placeholder="Tell us how we can help you..."
-                    class="w-full rounded-xl!"
-                    required></textarea>
-            </div>
-        </form>
-    </div>
-
-    <ng-template pTemplate="footer">
-        <div class="flex justify-end gap-3">
-            <p-button
-                label="Cancel"
-                icon="pi pi-times"
-                [outlined]="true"
-                severity="secondary"
-                styleClass="rounded-xl!"
-                (onClick)="closeContactDialog()">
-            </p-button>
-            <p-button
-                label="Send Message"
-                icon="pi pi-send"
-                styleClass="rounded-xl!"
-                [loading]="contactSubmitting"
-                [disabled]="!contactForm.name || !contactForm.email || !contactForm.message"
-                (onClick)="submitContactForm()">
-            </p-button>
-        </div>
-    </ng-template>
-</p-dialog>
+<!-- Support Dialog -->
+<app-support-dialog [(visible)]="supportDialogVisible"></app-support-dialog>
 
 <!-- <p-menu [model]="items" class="fixed h-auto bottom-4 top-4 left-4 flex justify-center"
     styleClass="w-full md:w-[264px] h-full bg-transparent! p-6 mx-auto rounded-2xl! border border-surface-200 dark:border-surface-800 overflow-y-auto">
