@@ -14,7 +14,7 @@ export interface ISource extends Document {
     description?: string;
     status: 'active' | 'inactive';
 
-    service: 'general' | 'paypal';
+    service: 'stripe' | 'paypal';
 
     ingressId: string;
     ingressUrl: string;
