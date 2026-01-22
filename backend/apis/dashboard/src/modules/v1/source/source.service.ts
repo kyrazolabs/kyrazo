@@ -46,41 +46,42 @@ export class SourceService {
                     iv: encrypted.iv,
                 },
             };
-        } else if (
-            valid.authentication.type === 'api_key' &&
-            valid.authentication.apiKey
-        ) {
-            const encrypted = secretCrypto.encrypt(
-                projectId,
-                valid.authentication.apiKey.apiKey
-            );
-            processedAuth = {
-                enabled: true,
-                type: 'api_key' as SourceAuthType,
-                credentials: {
-                    ...valid.authentication.apiKey,
-                    apiKey: encrypted.encrypted,
-                    iv: encrypted.iv,
-                },
-            };
-        } else if (
-            valid.authentication.type === 'basic_auth' &&
-            valid.authentication.basicAuth
-        ) {
-            const encrypted = secretCrypto.encrypt(
-                projectId,
-                valid.authentication.basicAuth.password
-            );
-            processedAuth = {
-                enabled: true,
-                type: 'basic_auth' as SourceAuthType,
-                credentials: {
-                    ...valid.authentication.basicAuth,
-                    password: encrypted.encrypted,
-                    iv: encrypted.iv,
-                },
-            };
         }
+        // } else if (
+        //     valid.authentication.type === 'api_key' &&
+        //     valid.authentication.apiKey
+        // ) {
+        //     const encrypted = secretCrypto.encrypt(
+        //         projectId,
+        //         valid.authentication.apiKey.apiKey
+        //     );
+        //     processedAuth = {
+        //         enabled: true,
+        //         type: 'api_key' as SourceAuthType,
+        //         credentials: {
+        //             ...valid.authentication.apiKey,
+        //             apiKey: encrypted.encrypted,
+        //             iv: encrypted.iv,
+        //         },
+        //     };
+        // } else if (
+        //     valid.authentication.type === 'basic_auth' &&
+        //     valid.authentication.basicAuth
+        // ) {
+        //     const encrypted = secretCrypto.encrypt(
+        //         projectId,
+        //         valid.authentication.basicAuth.password
+        //     );
+        //     processedAuth = {
+        //         enabled: true,
+        //         type: 'basic_auth' as SourceAuthType,
+        //         credentials: {
+        //             ...valid.authentication.basicAuth,
+        //             password: encrypted.encrypted,
+        //             iv: encrypted.iv,
+        //         },
+        //     };
+        // }
 
         const ingress = generateIngressId(userId);
         const data: Partial<ISource> = {

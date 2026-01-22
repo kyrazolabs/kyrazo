@@ -1,27 +1,17 @@
 import z from 'zod';
 
-const objectIdSchema = z
-    .string()
-    .regex(/^[0-9a-fA-F]{24}$/, 'Invalid ID format');
+const objectIdSchema = z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid ID format');
 export const sourceStatus = z.enum(['active', 'inactive']);
-export const sourceType = z.enum(
-    ['publish', 'receive', 'forward'],
-    'Invalid sourceType'
-);
+export const sourceType = z.enum(['publish', 'receive', 'forward'], 'Invalid sourceType');
 export const sourceService = z.enum(['stripe', 'paypal'], 'Invalid service');
 
 export const sourceAuthType = z.enum([
     'service',
     // "hmac",
-    'api_key',
-    'basic_auth',
+    // 'api_key',
+    // 'basic_auth',
 ]);
-export const sourceAuthHmacAlgorithm = z.enum([
-    'sha1',
-    'sha256',
-    'sha512',
-    'md5',
-]);
+export const sourceAuthHmacAlgorithm = z.enum(['sha1', 'sha256', 'sha512', 'md5']);
 export const sourceAuthHmacEncoding = z.enum(['base64', 'base64url', 'hex']);
 
 export const SourceSchema = z.object({
@@ -30,12 +20,8 @@ export const SourceSchema = z.object({
         .min(3, 'Name must be at least 3 characters long')
         .max(100, 'Name must be at most 100 characters long'),
 
-    description: z
-        .string()
-        .max(500, 'Description must be at most 500 characters')
-        .optional(),
+    description: z.string().max(500, 'Description must be at most 500 characters').optional(),
 
-    type: z.enum(['receive']).default('receive'),
     service: sourceService,
     status: sourceStatus.default('active'),
 
@@ -66,30 +52,27 @@ export const SourceSchema = z.object({
                     secret: z
                         .string()
                         .min(3, 'Signing secret must be at least 3 characters')
-                        .max(
-                            250,
-                            'Signing secret must be at most 250 characters'
-                        ),
+                        .max(250, 'Signing secret must be at most 250 characters'),
                 })
                 .optional(),
-            basicAuth: z
-                .object({
-                    username: z.string().nonempty("Username mustn't be empty"),
-                    password: z.string().nonempty("password mustn't be empty"),
-                })
-                .optional(),
-            apiKey: z
-                .object({
-                    headerKey: z
-                        .string()
-                        .min(3, 'Header key must be at least 3 characters')
-                        .max(50, 'Header key must be at most 50 characters'),
-                    apiKey: z
-                        .string()
-                        .min(3, 'API key must be at least 3 characters')
-                        .max(250, 'API key must be at most 250 characters'),
-                })
-                .optional(),
+            // basicAuth: z
+            //     .object({
+            //         username: z.string().nonempty("Username mustn't be empty"),
+            //         password: z.string().nonempty("password mustn't be empty"),
+            //     })
+            //     .optional(),
+            // apiKey: z
+            //     .object({
+            //         headerKey: z
+            //             .string()
+            //             .min(3, 'Header key must be at least 3 characters')
+            //             .max(50, 'Header key must be at most 50 characters'),
+            //         apiKey: z
+            //             .string()
+            //             .min(3, 'API key must be at least 3 characters')
+            //             .max(250, 'API key must be at most 250 characters'),
+            //     })
+            //     .optional(),
         })
         .optional(),
 });
@@ -98,8 +81,8 @@ export const CreateSourceSchema = SourceSchema.superRefine((data, ctx) => {
     const usedTypes = [
         data.authentication?.service,
         // data.authentication?.hmac,
-        data.authentication?.apiKey,
-        data.authentication?.basicAuth,
+        // data.authentication?.apiKey,
+        // data.authentication?.basicAuth,
     ].filter(Boolean);
     if (usedTypes.length > 1) {
         ctx.addIssue({
@@ -123,10 +106,7 @@ export const CreateSourceSchema = SourceSchema.superRefine((data, ctx) => {
             path: ['authentication.type'],
             message: 'Authentication is required for receive sources.',
         });
-    } else if (
-        data.authentication.type !== 'service' ||
-        !data.authentication.service?.secret
-    ) {
+    } else if (data.authentication.type !== 'service' || !data.authentication.service?.secret) {
         ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ['authentication.service.secret'],
@@ -141,15 +121,11 @@ export const CreateSourceSchema = SourceSchema.superRefine((data, ctx) => {
         ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ['authentication.type'],
-            message:
-                'Authentication type is required when authentication is enabled.',
+            message: 'Authentication type is required when authentication is enabled.',
         });
     }
 
-    if (
-        data.authentication?.type === 'service' &&
-        !data.authentication?.service
-    ) {
+    if (data.authentication?.type === 'service' && !data.authentication?.service) {
         ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ['authentication.hmac'],
@@ -165,29 +141,29 @@ export const CreateSourceSchema = SourceSchema.superRefine((data, ctx) => {
     //     });
     // }
 
-    if (
-        data.authentication?.type === 'api_key' &&
-        !data.authentication?.apiKey
-    ) {
-        ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ['authentication.apiKey'],
-            message:
-                "API key configuration is required when type is 'api_key'.",
-        });
-    }
+    // if (
+    //     data.authentication?.type === 'api_key' &&
+    //     !data.authentication?.apiKey
+    // ) {
+    //     ctx.addIssue({
+    //         code: z.ZodIssueCode.custom,
+    //         path: ['authentication.apiKey'],
+    //         message:
+    //             "API key configuration is required when type is 'api_key'.",
+    //     });
+    // }
 
-    if (
-        data.authentication?.type === 'basic_auth' &&
-        !data.authentication?.basicAuth
-    ) {
-        ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ['authentication.basicAuth'],
-            message:
-                "Basic Auth configuration is required when type is 'basic_auth'.",
-        });
-    }
+    // if (
+    //     data.authentication?.type === 'basic_auth' &&
+    //     !data.authentication?.basicAuth
+    // ) {
+    //     ctx.addIssue({
+    //         code: z.ZodIssueCode.custom,
+    //         path: ['authentication.basicAuth'],
+    //         message:
+    //             "Basic Auth configuration is required when type is 'basic_auth'.",
+    //     });
+    // }
 });
 
 export const UpdateSourceSchema = SourceSchema.omit({

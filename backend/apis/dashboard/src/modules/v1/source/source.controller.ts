@@ -52,7 +52,7 @@ export class SourceController {
                     message: 'Source has been created successfully.',
                     data: {
                         sourceId: saved._id,
-                        ingress: `http://localhost:3003/v1/ingest/${saved.ingressId}`,
+                        ingress: saved.ingressUrl,
                     },
                 },
                 201
@@ -111,8 +111,7 @@ export class SourceController {
                 200
             );
         } catch (error: unknown) {
-            const message =
-                error instanceof Error ? error.message : 'Unknown error';
+            const message = error instanceof Error ? error.message : 'Unknown error';
             const code = message === 'Source not found' ? 404 : 500;
             return c.json<IErrorResponse>(
                 {
@@ -153,12 +152,7 @@ export class SourceController {
                 );
             }
             // @ts-ignore
-            const {
-                q,
-                status,
-                limit = 10,
-                page = 1,
-            }: FilterSourcesInput = c.req.valid('query');
+            const { q, status, limit = 10, page = 1 }: FilterSourcesInput = c.req.valid('query');
 
             const query: Record<string, unknown> = {
                 workspaceId,
@@ -168,11 +162,7 @@ export class SourceController {
             if (q) query.$text = { $search: q };
             if (status) query.status = status;
 
-            const { sources, total } = await sourceService.getSources(
-                query,
-                limit,
-                page
-            );
+            const { sources, total } = await sourceService.getSources(query, limit, page);
 
             return c.json<GetSourcesResponse>(
                 {
@@ -244,8 +234,7 @@ export class SourceController {
                 },
             });
         } catch (error: unknown) {
-            const message =
-                error instanceof Error ? error.message : 'Unknown error';
+            const message = error instanceof Error ? error.message : 'Unknown error';
             const code = message === 'Source not found' ? 404 : 500;
             return c.json<IErrorResponse>(
                 {
@@ -314,8 +303,7 @@ export class SourceController {
                 200
             );
         } catch (error: unknown) {
-            const message =
-                error instanceof Error ? error.message : 'Unknown error';
+            const message = error instanceof Error ? error.message : 'Unknown error';
             // If delete failed (not found), service might throw 'Failed to delete source' (if repo returns false).
             // Repo returns false if not found.
 
