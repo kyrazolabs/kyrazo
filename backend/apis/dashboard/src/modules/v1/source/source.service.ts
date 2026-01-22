@@ -12,6 +12,7 @@ import {
     generateIngressId,
     decryptSourceSecrets,
 } from '@kyrazo/shared';
+import { config } from '@/configs';
 
 export class SourceService {
     async createSource(
@@ -81,14 +82,16 @@ export class SourceService {
             };
         }
 
+        const ingress = generateIngressId(userId);
         const data: Partial<ISource> = {
             ...valid,
-            service: valid.service as any, // Cast service to any to bypass shared type restrictions if stripe is not yet in ISource
+            service: valid.service,
             endpoints: valid.endpoints?.map(id => new Types.ObjectId(id)),
             userId: new Types.ObjectId(userId),
             workspaceId: new Types.ObjectId(workspaceId),
             projectId: new Types.ObjectId(projectId),
-            ingressId: generateIngressId(userId),
+            ingressId: ingress,
+            ingressUrl: config.app.ingest.v1 + valid.service + '/' + ingress,
             authentication: processedAuth,
         };
 

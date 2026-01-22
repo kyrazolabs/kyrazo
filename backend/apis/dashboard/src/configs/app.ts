@@ -55,6 +55,9 @@ export const config = {
         version: process.env.APP_VERSION || '1.0.0',
         url: process.env.APP_URL || 'http://localhost:3003',
         frontendUrl: process.env.FRONTEND_URL || 'http://localhost:4200',
+        ingest: {
+            v1: 'https://api.kyrazo.com/ingest/v1/',
+        },
     },
 
     clickhouse: {
