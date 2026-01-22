@@ -204,7 +204,7 @@ export class UsagePage implements OnInit, AfterViewInit {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          display: true,
+          display: false,
           position: "top",
           labels: {
             usePointStyle: true,
