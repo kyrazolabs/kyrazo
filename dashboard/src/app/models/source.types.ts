@@ -123,6 +123,7 @@ export interface GetSourceResponse {
   endpoints?: IEndpoint[];
   // ingressIds: Array<string>;
   ingressId?: string;
+  ingressUrl?: string;
   service?: string;
   forwarding?: boolean;
 
@@ -133,6 +134,12 @@ export interface GetSourceResponse {
   // iv: string;
   // isEnabled: boolean;
   // signatureAlgorithm: SignatureAlgorithm;
+
+  authentication: {
+    enabled: boolean;
+    type: string;
+    credentials: any;
+  };
 
   retryPolicy: {
     maxAttempts: number;

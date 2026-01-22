@@ -135,16 +135,14 @@ export class SourcePage implements OnInit, AfterViewInit {
         this.source.set(response.data);
         this.endpoints.set(response.data.endpoints || []);
 
-        if (response.data.ingressId) {
-          this.ingressUrl.set(
-            environment.ingest.ingress(response.data.ingressId)
-          );
+        if (response.data.ingressUrl) {
+          this.ingressUrl.set(response.data.ingressUrl);
         }
 
         // Safely access nested secret if available
-        const auth = (response.data as any).authentication;
-        if (auth?.service?.secret) {
-          this.secret.set(auth.service.secret);
+        const auth = response.data.authentication;
+        if (auth?.credentials?.secret) {
+          this.secret.set(auth.credentials.secret);
         }
 
         this.loading.set(false);
@@ -192,7 +190,7 @@ export class SourcePage implements OnInit, AfterViewInit {
   }
 
   getDeliveryTagSeverity(
-    status: string
+    status: string,
   ): "success" | "info" | "warn" | "danger" | "secondary" | "contrast" {
     switch (status) {
       case "success":
@@ -223,7 +221,7 @@ export class SourcePage implements OnInit, AfterViewInit {
     page: number = 1,
     limit: number = 10,
     search?: string,
-    status?: "pending" | "processed" | "failed"
+    status?: "pending" | "processed" | "failed",
   ) {
     const source = this.source();
     if (!source) return;
@@ -243,13 +241,13 @@ export class SourcePage implements OnInit, AfterViewInit {
           // Calculate stats from loaded events
           const total = events.length;
           const successful = events.filter(
-            (e) => e.processing_status === "processed"
+            (e) => e.processing_status === "processed",
           ).length;
           const failed = events.filter(
-            (e) => e.processing_status === "failed"
+            (e) => e.processing_status === "failed",
           ).length;
           const pending = events.filter(
-            (e) => e.processing_status === "pending"
+            (e) => e.processing_status === "pending",
           ).length;
           this.ingestStats.set({ total, successful, failed, pending });
 
@@ -277,7 +275,7 @@ export class SourcePage implements OnInit, AfterViewInit {
     // Apply status filter
     if (this.activeFilter !== "all") {
       filtered = filtered.filter(
-        (event) => event.processing_status === this.activeFilter
+        (event) => event.processing_status === this.activeFilter,
       );
     }
 
@@ -288,7 +286,7 @@ export class SourcePage implements OnInit, AfterViewInit {
         (event) =>
           event.event_id.toLowerCase().includes(query) ||
           event.source.toLowerCase().includes(query) ||
-          event.source.toLowerCase().includes(query)
+          event.source.toLowerCase().includes(query),
       );
     }
 
@@ -304,7 +302,7 @@ export class SourcePage implements OnInit, AfterViewInit {
       this.searchTerm,
       this.activeFilter === "all"
         ? undefined
-        : (this.activeFilter as "pending" | "processed" | "failed")
+        : (this.activeFilter as "pending" | "processed" | "failed"),
     );
   }
 
@@ -316,7 +314,7 @@ export class SourcePage implements OnInit, AfterViewInit {
       this.searchTerm,
       status === "all"
         ? undefined
-        : (status as "pending" | "processed" | "failed")
+        : (status as "pending" | "processed" | "failed"),
     );
   }
 
@@ -328,7 +326,7 @@ export class SourcePage implements OnInit, AfterViewInit {
       this.searchTerm,
       this.activeFilter === "all"
         ? undefined
-        : (this.activeFilter as "pending" | "processed" | "failed")
+        : (this.activeFilter as "pending" | "processed" | "failed"),
     );
   }
 

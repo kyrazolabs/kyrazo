@@ -270,7 +270,7 @@ export class CreatePage implements OnInit {
     // Add event types
     source.eventTypes.forEach((eventType) => {
       this.eventTypesArray.push(
-        this.fb.control(eventType, Validators.required)
+        this.fb.control(eventType, Validators.required),
       );
     });
 
@@ -324,7 +324,10 @@ export class CreatePage implements OnInit {
         status: formValue.status as SourceStatus,
         type: formValue.type as SourceType,
         eventTypes: formValue.eventTypes.filter((et: string) => et.trim()),
-        forwarding: formValue.forwarding,
+        forwarding:
+          Array.isArray(formValue.endpoints) && formValue.endpoints.length > 0
+            ? true
+            : false,
         endpoints: formValue.endpoints,
       };
 
@@ -364,7 +367,10 @@ export class CreatePage implements OnInit {
         status: formValue.status as SourceStatus,
         type: SourceType.RECEIVE,
         service: formValue.service,
-        forwarding: formValue.forwarding || false,
+        forwarding:
+          Array.isArray(formValue.endpoints) && formValue.endpoints.length > 0
+            ? true
+            : false,
         eventTypes: formValue.eventTypes.filter((et: string) => et.trim()),
         endpoints: formValue.endpoints || [], // Map endpoints
         retryPolicy: {
