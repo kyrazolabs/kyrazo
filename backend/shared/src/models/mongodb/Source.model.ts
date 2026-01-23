@@ -103,7 +103,14 @@ const SourceSchema = new Schema<ISource>(
             default: {},
         },
     },
-    { timestamps: true }
+    {
+        timestamps: true,
+        toJSON: {
+            transform: function (doc, ret: any) {
+                delete ret.__v;
+            },
+        },
+    }
 );
 
 SourceSchema.index({ name: 'text' });

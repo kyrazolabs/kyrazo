@@ -7,20 +7,19 @@ export class TargetRepository {
         const savedTarget = await target.save();
         const targetWithoutSecrets = savedTarget.toObject();
         delete targetWithoutSecrets.secrets;
-        return targetWithoutSecrets;
+        delete (targetWithoutSecrets as any).userId;
+        delete (targetWithoutSecrets as any).workspaceId;
+        delete (targetWithoutSecrets as any).__v;
+        return targetWithoutSecrets as unknown as ITarget;
     }
 
-    async findById(
-        id: string,
-        workspaceId: string,
-        projectId: string
-    ): Promise<ITarget | null> {
+    async findById(id: string, workspaceId: string, projectId: string): Promise<ITarget | null> {
         return await Target.findOne({
             _id: id,
             workspaceId,
             projectId,
         })
-            .select('-secrets')
+            .select('-secrets -userId -workspaceId -__v')
             .exec();
     }
     async findSecretById(
@@ -33,7 +32,7 @@ export class TargetRepository {
             workspaceId,
             projectId,
         })
-            .select('+secrets')
+            .select('+secrets -userId -workspaceId -__v')
             .exec();
     }
 
@@ -44,15 +43,13 @@ export class TargetRepository {
             page?: number;
         } = { query: {}, limit: 10, page: 1 }
     ): Promise<{ targets: ITarget[]; total: number }> {
-        const skip = options.page
-            ? (options.page - 1) * (options.limit || 10)
-            : 0;
+        const skip = options.page ? (options.page - 1) * (options.limit || 10) : 0;
         const [targets, total] = await Promise.all([
             Target.find(options.query || {})
                 .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(options.limit || 10)
-                .select('-secrets')
+                .select('-secrets -userId -workspaceId -__v')
                 .lean(),
             Target.countDocuments(options.query || {}),
         ]);
@@ -65,26 +62,20 @@ export class TargetRepository {
         projectId: string,
         data: Partial<ITarget>
     ): Promise<ITarget | null> {
-        return await Target.findOneAndUpdate(
-            { _id: id, workspaceId, projectId },
-            data,
-            { new: true }
-        )
-            .select('-secrets')
+        return await Target.findOneAndUpdate({ _id: id, workspaceId, projectId }, data, {
+            new: true,
+        })
+            .select('-secrets -userId -workspaceId -__v')
             .exec();
     }
 
-    async deleteById(
-        id: string,
-        workspaceId: string,
-        projectId: string
-    ): Promise<boolean> {
+    async deleteById(id: string, workspaceId: string, projectId: string): Promise<boolean> {
         const deleted = await Target.findOneAndDelete({
             _id: id,
             workspaceId,
             projectId,
         })
-            .select('-secrets')
+            .select('-secrets -userId -workspaceId -__v')
             .exec();
         return deleted !== null;
     }

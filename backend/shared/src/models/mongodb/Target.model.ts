@@ -55,7 +55,14 @@ const TargetSchema = new Schema<ITarget>(
             default: {},
         },
     },
-    { timestamps: true }
+    {
+        timestamps: true,
+        toJSON: {
+            transform: function (doc, ret: any) {
+                delete ret.__v;
+            },
+        },
+    }
 );
 
 TargetSchema.index({

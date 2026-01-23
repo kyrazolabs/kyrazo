@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import eventsRouter from './v1/events/event.routes';
 import targetsRouter from './v1/targets/target.routes';
 import endpointsRouter from './v1/endpoints/endpoint.routes';
-import sourceRouter from './v1/source/source.routes';
+import sourceRouter from './v1/sources/source.routes';
 import type { AppContext } from '@/core/middlewares/auth.middleware';
 import { databaseConfig } from '@kyrazo/shared';
 import { redisConfig, natsConfig } from '@/configs';
@@ -38,10 +38,7 @@ router.get('/health', async (c: AppContext) => {
                         status: 'unhealthy',
                         details: {
                             connected: false,
-                            error:
-                                error instanceof Error
-                                    ? error.message
-                                    : 'Unknown error',
+                            error: error instanceof Error ? error.message : 'Unknown error',
                         },
                     };
                 }
@@ -56,9 +53,7 @@ router.get('/health', async (c: AppContext) => {
 
         return c.json({
             success: allHealthy,
-            message: allHealthy
-                ? 'All services are healthy'
-                : 'Some services are unhealthy',
+            message: allHealthy ? 'All services are healthy' : 'Some services are unhealthy',
             services: {
                 mongo,
                 redis,

@@ -59,7 +59,14 @@ const EndpointSchema = new Schema<IEndpoint>(
             default: {},
         },
     },
-    { timestamps: true }
+    {
+        timestamps: true,
+        toJSON: {
+            transform: function (doc, ret: any) {
+                delete ret.__v;
+            },
+        },
+    }
 );
 
 EndpointSchema.index({

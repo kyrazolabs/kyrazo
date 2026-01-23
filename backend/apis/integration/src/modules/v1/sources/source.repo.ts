@@ -3,19 +3,22 @@ import { Source, type ISource } from '@kyrazo/shared';
 export class SourceRepository {
     async create(sourceData: Partial<ISource>): Promise<ISource> {
         const source = new Source(sourceData);
-        return await source.save();
+        const savedSource = await source.save();
+        const sourceObj = savedSource.toObject();
+        delete (sourceObj as any).userId;
+        delete (sourceObj as any).workspaceId;
+        delete (sourceObj as any).__v;
+        return sourceObj as unknown as ISource;
     }
 
-    async findById(
-        id: string,
-        workspaceId: string,
-        projectId: string
-    ): Promise<ISource | null> {
+    async findById(id: string, workspaceId: string, projectId: string): Promise<ISource | null> {
         return await Source.findOne({
             _id: id,
             workspaceId,
             projectId,
-        }).exec();
+        })
+            .select('-userId -workspaceId -__v')
+            .exec();
     }
 
     async findAll(
@@ -25,14 +28,13 @@ export class SourceRepository {
             page?: number;
         } = { query: {}, limit: 10, page: 1 }
     ): Promise<{ sources: ISource[]; total: number }> {
-        const skip = options.page
-            ? (options.page - 1) * (options.limit || 10)
-            : 0;
+        const skip = options.page ? (options.page - 1) * (options.limit || 10) : 0;
         const [sources, total] = await Promise.all([
             Source.find(options.query || {})
                 .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(options.limit || 10)
+                .select('-userId -workspaceId -__v')
                 .lean(),
             Source.countDocuments(options.query || {}),
         ]);
@@ -46,22 +48,17 @@ export class SourceRepository {
         data: Partial<ISource> | Record<string, unknown>
     ): Promise<ISource | null> {
         // Handle $set operators if present
-        const updateOp = Object.keys(data).some(k => k.startsWith('$'))
-            ? data
-            : { $set: data };
+        const updateOp = Object.keys(data).some(k => k.startsWith('$')) ? data : { $set: data };
 
-        return await Source.findOneAndUpdate(
-            { _id: id, workspaceId, projectId },
-            updateOp,
-            { new: true, runValidators: true }
-        ).lean();
+        return await Source.findOneAndUpdate({ _id: id, workspaceId, projectId }, updateOp, {
+            new: true,
+            runValidators: true,
+        })
+            .select('-userId -workspaceId -__v')
+            .lean();
     }
 
-    async deleteById(
-        id: string,
-        workspaceId: string,
-        projectId: string
-    ): Promise<boolean> {
+    async deleteById(id: string, workspaceId: string, projectId: string): Promise<boolean> {
         const deleted = await Source.findOneAndDelete({
             _id: id,
             workspaceId,
