@@ -46,7 +46,7 @@ export function createPublishEvent(httpClient: HttpClient) {
    *     email: "user@example.com",
    *     plan: "pro"
    *   },
-   *   targets: [{ targetUrl: "https://example.com/webhook" }]
+   *   targets: [{ targetId: "65a1b2c3d4e5f67890123456" }]
    * });
    *
    * console.log(`Event ${response.eventId} queued at ${response.queued_at}`);
@@ -59,8 +59,8 @@ export function createPublishEvent(httpClient: HttpClient) {
    *   eventType: "payment.completed",
    *   payload: { orderId: "order_456", amount: 99.99 },
    *   targets: [
-   *     { targetUrl: "https://primary.example.com/webhook" },
-   *     { targetUrl: "https://backup.example.com/webhook" }
+   *     { targetId: "65a1b2c3d4e5f67890123456" },
+   *     { targetId: "65a1b2c3d4e5f67890123457" }
    *   ],
    *   meta: {
    *     priority: "high",
@@ -116,16 +116,9 @@ export function createPublishEvent(httpClient: HttpClient) {
       if (!target || typeof target !== "object") {
         throw new ValidationError(`targets[${i}] must be an object`);
       }
-      if (!target.targetUrl || typeof target.targetUrl !== "string") {
+      if (!target.targetId || typeof target.targetId !== "string") {
         throw new ValidationError(
-          `targets[${i}].targetUrl is required and must be a string`,
-        );
-      }
-      try {
-        new URL(target.targetUrl);
-      } catch {
-        throw new ValidationError(
-          `targets[${i}].targetUrl must be a valid URL`,
+          `targets[${i}].targetId is required and must be a string`,
         );
       }
     }

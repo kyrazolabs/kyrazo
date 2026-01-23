@@ -42,8 +42,8 @@ export interface Timestamps {
 }
 
 export interface EventTarget {
-  targetUrl: string;
-  targetId?: string;
+  targetId: string;
+  targetUrl?: string;
   headers?: Record<string, string>;
 }
 
