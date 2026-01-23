@@ -9,7 +9,7 @@ import { signatureCrypto, logger } from '@kyrazo/shared';
 import type {
     BatchCreatePublishedEvent,
     CreatePublishedEvent,
-} from '@/core/utils/libs/zod';
+} from '@/modules/v1/events/event.schema';
 import {
     publishQueuesName,
     publishQueues,
@@ -100,8 +100,7 @@ export class PublishEventPublisher {
                 });
                 logger.info('Created EVENTS JetStream stream');
             } catch (error: unknown) {
-                const errorMessage =
-                    error instanceof Error ? error.message : 'Unknown error';
+                const errorMessage = error instanceof Error ? error.message : 'Unknown error';
                 if (
                     !errorMessage.includes('already exists') &&
                     !errorMessage.includes('subjects overlap')
@@ -111,10 +110,7 @@ export class PublishEventPublisher {
                 logger.debug(`Stream setup handled: ${errorMessage}`);
             }
         } catch (error: unknown) {
-            logger.error(
-                'Failed to setup JetStream in publish.nats.ts',
-                error as Error
-            );
+            logger.error('Failed to setup JetStream in publish.nats.ts', error as Error);
             throw error;
         }
     }
@@ -125,9 +121,7 @@ export class PublishEventPublisher {
      * @param {IPublishedEvent} data - The event data to publish.
      * @returns {Promise<{ success: boolean; eventId: string; subject: string; stream: string; sequence: number; targetsCount: number; timestamp: number;} | null>} The published event data.
      */
-    public async publish(
-        data: CreatePublishedEvent & { planSlug: string }
-    ): Promise<{
+    public async publish(data: CreatePublishedEvent & { planSlug: string }): Promise<{
         success: boolean;
         eventId: string;
         targetsCount: number;
@@ -160,23 +154,16 @@ export class PublishEventPublisher {
                 JSON.stringify(event)
             );
             const message = { event, signature, timestamp, nonce };
-            const publishResult = await js.publish(
+            const publishResult = await js.publish(subject, JSON.stringify(message), {
+                expect: {
+                    streamName: 'EVENTS',
+                },
+            });
+            logger.info(`Published receive event ${event.eventId} to JetStream`, {
                 subject,
-                JSON.stringify(message),
-                {
-                    expect: {
-                        streamName: 'EVENTS',
-                    },
-                }
-            );
-            logger.info(
-                `Published receive event ${event.eventId} to JetStream`,
-                {
-                    subject,
-                    stream: publishResult.stream,
-                    sequence: publishResult.seq,
-                }
-            );
+                stream: publishResult.stream,
+                sequence: publishResult.seq,
+            });
             // Store delivery tracking in Redis
             // await this.storeDeliveryTracking(events[0], data);
 
@@ -187,14 +174,8 @@ export class PublishEventPublisher {
                 timestamp: data.timestamp,
             };
         } catch (error) {
-            logger.error(
-                'Failed to send publish event to NATS',
-                error as Error
-            );
-            publishQueues.publishQueue.add(
-                publishQueuesName.retryPublishQueueName,
-                data
-            );
+            logger.error('Failed to send publish event to NATS', error as Error);
+            publishQueues.publishQueue.add(publishQueuesName.retryPublishQueueName, data);
             return {
                 success: false,
                 eventId: data.eventId,
@@ -236,10 +217,7 @@ export class PublishEventPublisher {
                     try {
                         const subject = `workspace.${item.workspaceId}.plan.${planSlug}.events.publish.${item.eventType.toLowerCase()}`;
 
-                        const event: Omit<
-                            IPublishedEvent,
-                            'producerId' | 'userId'
-                        > = {
+                        const event: Omit<IPublishedEvent, 'producerId' | 'userId'> = {
                             eventId: item.eventId,
                             workspaceId: item.workspaceId,
                             projectId: item.projectId,
@@ -255,23 +233,18 @@ export class PublishEventPublisher {
                             meta: item.meta,
                         };
 
-                        const { signature, timestamp, nonce } =
-                            signatureCrypto.signMessage(JSON.stringify(event));
+                        const { signature, timestamp, nonce } = signatureCrypto.signMessage(
+                            JSON.stringify(event)
+                        );
                         const message = { event, signature, timestamp, nonce };
 
-                        const publishResult = await js.publish(
-                            subject,
-                            JSON.stringify(message)
-                        );
+                        const publishResult = await js.publish(subject, JSON.stringify(message));
 
-                        logger.info(
-                            `Published receive event ${item.event_id} to JetStream`,
-                            {
-                                subject,
-                                stream: publishResult.stream,
-                                sequence: publishResult.seq,
-                            }
-                        );
+                        logger.info(`Published receive event ${item.event_id} to JetStream`, {
+                            subject,
+                            stream: publishResult.stream,
+                            sequence: publishResult.seq,
+                        });
 
                         // Store delivery tracking in Redis
                         // await this.storeDeliveryTracking(event, data);
@@ -299,10 +272,7 @@ export class PublishEventPublisher {
                             eventId: item.eventId,
                             targetsCount: item.targets.length,
                             timestamp: item.timestamp,
-                            error:
-                                error instanceof Error
-                                    ? error.message
-                                    : 'Unknown error',
+                            error: error instanceof Error ? error.message : 'Unknown error',
                         };
                     }
                 })
@@ -311,10 +281,7 @@ export class PublishEventPublisher {
             const returns = await Promise.all(publishPromises);
             return returns;
         } catch (error: unknown) {
-            logger.error(
-                'Failed to send batch publish events to NATS',
-                error as Error
-            );
+            logger.error('Failed to send batch publish events to NATS', error as Error);
             return [null];
         }
     }
@@ -366,11 +333,7 @@ export class PublishEventPublisher {
                 });
 
                 // Add to dirty set for synchronization
-                await redisClient.zadd(
-                    REDIS_KEYS.dirtyZset,
-                    Date.now(),
-                    targetKey
-                );
+                await redisClient.zadd(REDIS_KEYS.dirtyZset, Date.now(), targetKey);
             }
         } catch (error: unknown) {
             logger.error('Failed to store delivery tracking:', error as Error);
@@ -403,10 +366,7 @@ export class PublishEventPublisher {
             return {
                 status: 'unhealthy',
                 details: {
-                    error:
-                        error instanceof Error
-                            ? error.message
-                            : 'Unknown error',
+                    error: error instanceof Error ? error.message : 'Unknown error',
                     timestamp: new Date().toISOString(),
                 },
             };

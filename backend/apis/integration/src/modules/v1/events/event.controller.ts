@@ -4,14 +4,14 @@ import { redisConfig } from '@/configs';
 import { PerformanceTimer } from '@/core/utils';
 import { logger, type IErrorResponse } from '@kyrazo/shared';
 import { publishEventPublisher } from '@/producers/jobs/v1/publishers';
-import {
-    type BatchCreatePublishedEvent,
-    type BatchPublishedEventInput,
-    type CreatePublishedEvent,
-    type GetProjectByIdInput,
-    type PublishedEventInput,
-    type TargetInput,
-} from '@/core/utils/libs/zod';
+import { type GetProjectByIdInput } from '@/core/utils/libs/zod';
+import type {
+    BatchCreatePublishedEvent,
+    BatchPublishedEventInput,
+    CreatePublishedEvent,
+    PublishedEventInput,
+    TargetInput,
+} from './event.schema';
 import { usageProducer } from '@/core/services/usage.producer';
 import { LimitChecker } from '@/core/services/limit.checker';
 import { targetRepository } from '@/repositories/target.repo';
@@ -33,20 +33,17 @@ export class EventController {
         );
 
         // 2. Split: Found in cash / Lost
-        const cachedMap = new Map(
-            cachedTargets.map((t: any) => [t._id.toString(), t])
-        );
+        const cachedMap = new Map(cachedTargets.map((t: any) => [t._id.toString(), t]));
         const missingFromCache = targets.filter(id => !cachedMap.has(id));
 
         // 3. Retrieve missing information from the database
         let fetchedTargets: any[] = [];
         if (missingFromCache.length > 0) {
-            fetchedTargets =
-                await targetRepository.getTargetsByWorkspaceIdAndProjectIdAndTargetIds(
-                    workspaceId,
-                    projectId,
-                    missingFromCache
-                );
+            fetchedTargets = await targetRepository.getTargetsByWorkspaceIdAndProjectIdAndTargetIds(
+                workspaceId,
+                projectId,
+                missingFromCache
+            );
         }
 
         // 4. Merge the cache with the retrieved data from the database and update the cache.
@@ -118,12 +115,11 @@ export class EventController {
                 shard,
             };
 
-            const { foundTargets, unfoundTargets } =
-                await EventController.checkTargetsExsisting(
-                    workspaceId.toString(),
-                    projectId,
-                    valid.targets.map((t: TargetInput) => t.targetId)
-                );
+            const { foundTargets, unfoundTargets } = await EventController.checkTargetsExsisting(
+                workspaceId.toString(),
+                projectId,
+                valid.targets.map((t: TargetInput) => t.targetId)
+            );
             if (foundTargets.length === 0) {
                 await redisConfig.set(
                     `idem:${workspaceId}:${c.req.path}:${key}`,
@@ -159,9 +155,7 @@ export class EventController {
             data.targets = foundTargets;
 
             // Check limits
-            const canProceed = await LimitChecker.checkEventLimit(
-                workspaceId.toString()
-            );
+            const canProceed = await LimitChecker.checkEventLimit(workspaceId.toString());
 
             if (!canProceed) {
                 await redisConfig.set(
@@ -224,12 +218,7 @@ export class EventController {
             const duration = timer.end();
 
             // Track usage asynchronously
-            usageProducer.trackEvent(
-                workspaceId.toString(),
-                undefined,
-                'eventsPerMonth',
-                1
-            );
+            usageProducer.trackEvent(workspaceId.toString(), undefined, 'eventsPerMonth', 1);
 
             // Log performance metrics
             logger.info(`Source created in ${duration.toFixed(2)}ms`, {
@@ -266,10 +255,7 @@ export class EventController {
             );
         } catch (error: unknown) {
             timer.end();
-            logger.error(
-                'Unexpected error in EventController.publishEvent',
-                error as Error
-            );
+            logger.error('Unexpected error in EventController.publishEvent', error as Error);
             await redisConfig.set(
                 `idem:${c.req.workspace.workspaceId}:${c.req.path}:${c.idempotencyKey}`,
                 JSON.stringify({
@@ -391,9 +377,7 @@ export class EventController {
             // Optimized target lookup for the single projectId
             const allTargetIds = new Set<string>();
             valid.forEach((eventData: PublishedEventInput) => {
-                eventData.targets.forEach((t: TargetInput) =>
-                    allTargetIds.add(t.targetId)
-                );
+                eventData.targets.forEach((t: TargetInput) => allTargetIds.add(t.targetId));
             });
 
             const { foundTargets, unfoundTargets: globalUnfoundTargets } =
@@ -403,9 +387,7 @@ export class EventController {
                     Array.from(allTargetIds)
                 );
 
-            const foundTargetsMap = new Map(
-                foundTargets.map(t => [t.targetId, t])
-            );
+            const foundTargetsMap = new Map(foundTargets.map(t => [t.targetId, t]));
             const shard = parseInt(workspaceId.toString().slice(-6), 16) % 10;
 
             // Process events
@@ -452,9 +434,7 @@ export class EventController {
             }
 
             // Check limits
-            const canProceed = await LimitChecker.checkEventLimit(
-                workspaceId.toString()
-            );
+            const canProceed = await LimitChecker.checkEventLimit(workspaceId.toString());
             if (!canProceed) {
                 await redisConfig.set(
                     `idem:${workspaceId}:${c.req.path}:${key}`,
@@ -540,11 +520,8 @@ export class EventController {
                                   : 'skipped',
                         batchSize: valid.length,
                         queuedCount,
-                        skippedCount: results.filter(
-                            r => r.status === 'skipped'
-                        ).length,
-                        failedCount: results.filter(r => r.status === 'failed')
-                            .length,
+                        skippedCount: results.filter(r => r.status === 'skipped').length,
+                        failedCount: results.filter(r => r.status === 'failed').length,
                         results,
                         queuedAt: new Date().toISOString(),
                         processingTimeMs: Math.round(duration),
@@ -562,10 +539,8 @@ export class EventController {
                               : 'skipped',
                     batchSize: valid.length,
                     queuedCount,
-                    skippedCount: results.filter(r => r.status === 'skipped')
-                        .length,
-                    failedCount: results.filter(r => r.status === 'failed')
-                        .length,
+                    skippedCount: results.filter(r => r.status === 'skipped').length,
+                    failedCount: results.filter(r => r.status === 'failed').length,
                     results,
                     queuedAt: new Date().toISOString(),
                     processingTimeMs: Math.round(duration),
@@ -574,10 +549,7 @@ export class EventController {
             );
         } catch (error: unknown) {
             timer.end();
-            logger.error(
-                'Unexpected error in EventController.publishEvents',
-                error as Error
-            );
+            logger.error('Unexpected error in EventController.publishEvents', error as Error);
             await redisConfig.set(
                 `idem:${c.req.workspace.workspaceId}:${c.req.path}:${c.idempotencyKey}`,
                 JSON.stringify({

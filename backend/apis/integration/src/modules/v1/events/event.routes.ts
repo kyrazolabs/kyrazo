@@ -1,10 +1,7 @@
 import { Hono } from 'hono';
 import type { AppContext } from '@/core/middlewares/auth.middleware';
 import { zValidator } from '@hono/zod-validator';
-import {
-    PublishEventSchema,
-    BatchPublishEventsSchema,
-} from '@/core/utils/libs/zod/schemas/event.zod';
+import { PublishEventSchema, BatchPublishEventsSchema } from './event.schema';
 import { authenticate, checkScope } from '@/core/middlewares/auth.middleware';
 import { EventController } from '@/modules/v1/events/event.controller';
 import { GetProjectByIdSchema } from '@/core/utils/libs/zod';
@@ -33,9 +30,7 @@ event.post(
 
     authenticate,
     checkScope('dispatch:event'),
-    createDynamicRateLimiter((c: AppContext) =>
-        c.workspace?.workspaceId?.toString()
-    ),
+    createDynamicRateLimiter((c: AppContext) => c.workspace?.workspaceId?.toString()),
     idempotencyMiddleware,
     zValidator('json', PublishEventSchema, (result, c) => {
         if (!result.success) {
@@ -75,9 +70,7 @@ event.post(
 
     authenticate,
     checkScope('dispatch:event:batch'),
-    createDynamicRateLimiter((c: AppContext) =>
-        c.workspace?.workspaceId?.toString()
-    ),
+    createDynamicRateLimiter((c: AppContext) => c.workspace?.workspaceId?.toString()),
     idempotencyMiddleware,
     zValidator('json', BatchPublishEventsSchema, (result, c) => {
         if (!result.success) {

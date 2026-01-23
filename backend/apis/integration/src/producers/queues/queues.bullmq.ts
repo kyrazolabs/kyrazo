@@ -4,7 +4,7 @@ import {
     retryPublishQueueName,
     storePublishQueueName,
 } from '@/producers/constants/constants.bullmq';
-import type { CreatePublishedEvent } from '@/core/utils/libs/zod';
+import type { CreatePublishedEvent } from '@/modules/v1/events/event.schema';
 
 type PublishBatchPayload = CreatePublishedEvent;
 type PublishRetryPayload = CreatePublishedEvent;

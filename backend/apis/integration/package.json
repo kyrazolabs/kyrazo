@@ -8,6 +8,7 @@
     "dev": "bun run --hot src/index.ts",
     "prod": "bun run src/cluster.ts",
     "tunnel": "bun run src/tunnel.ts",
+    "test": "bun test",
     "watch": "concurrently -k -n TSC -c blue \"tsc -p tsconfig.json -w\"",
     "build": "tsc -p tsconfig.json",
     "build:watch": "bun run build && bun run watch",
