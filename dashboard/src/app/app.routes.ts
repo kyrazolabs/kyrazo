@@ -5,18 +5,13 @@ import { noAuthGuard } from "@core/guards/no-auth.guard";
 export const routes: Routes = [
   {
     path: "",
-    redirectTo: "/home",
-    pathMatch: "full",
-  },
-  {
-    path: "",
     loadComponent: () =>
       import("@pages/landing/landing-layout").then(
         (p) => p.LandingLayoutComponent,
       ),
     children: [
       {
-        path: "home",
+        path: "",
         loadComponent: () =>
           import("@pages/landing/home/landing.page").then((p) => p.LandingPage),
         data: {
@@ -169,6 +164,20 @@ export const routes: Routes = [
         (m) => m.VerifyEmailPage,
       ),
     data: { animation: "VerifyEmail" },
+  },
+  {
+    path: "changelogs",
+    loadComponent: () =>
+      import("@pages/changelogs/changelogs.page").then((p) => p.ChangelogsPage),
+    data: {
+      title: "Changelogs",
+      meta: {
+        description:
+          "Kyrazo - The Platform Engineering Platform for SaaS. Streamline your infrastructure and deployment workflow.",
+        keywords:
+          "SaaS, Platform Engineering, DevOps, Infrastructure, Deployment",
+      },
+    },
   },
   {
     path: "not-found",
