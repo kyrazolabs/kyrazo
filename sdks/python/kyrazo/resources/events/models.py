@@ -4,8 +4,11 @@ from pydantic import BaseModel, Field, HttpUrl, ConfigDict
 
 class TargetInput(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
-    target_url: str = Field(
-        ..., alias="targetUrl", description="The URL to send the webhook to."
+    target_id: str = Field(
+        ..., alias="targetId", description="The ID of the target to send the event to."
+    )
+    target_url: Optional[str] = Field(
+        None, alias="targetUrl", description="The URL to send the webhook to."
     )
 
 
