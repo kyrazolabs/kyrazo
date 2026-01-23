@@ -85,7 +85,11 @@ export class SourceService {
         };
 
         try {
-            return await sourceRepository.create(data);
+            const saved = await sourceRepository.create(data);
+            const source = saved.toObject();
+            delete source.authentication?.credentials;
+
+            return source;
         } catch (error) {
             logger.error('Failed to create source:', error as Error);
             throw error;
