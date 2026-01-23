@@ -142,7 +142,9 @@ export class SourceService {
             if (!updated) {
                 throw new Error('Failed to update source');
             }
-            return decryptSourceSecrets(updated);
+            const sourceDoc = updated.toObject();
+            delete sourceDoc.authentication?.credentials;
+            return sourceDoc;
         } catch (error) {
             logger.error('Failed to update source:', error as Error);
             throw error;
