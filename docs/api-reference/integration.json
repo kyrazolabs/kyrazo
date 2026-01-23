@@ -28,11 +28,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "JavaScript",
-                        "source": "await client.events.single('project_id', {\n  webhookId: 'wh_123',\n  eventType: 'user.created',\n  payload: { id: 1 },\n  targets: [{ targetUrl: 'https://webhook.site/...' }]\n});"
+                        "source": "await client.events.single('project_id', {\n  webhookId: 'wh_123',\n  eventType: 'user.created',\n  payload: { id: 1 },\n  targets: [{ targetId: '65a1b2c3d4e5f67890123456' }]\n});"
                     },
                     {
                         "lang": "Python",
-                        "source": "client.events.publish(\n    project_id='project_id',\n    body=PublishEventBody(\n        webhookId='wh_123',\n        eventType='user.created',\n        payload={'id': 1},\n        targets=[{'targetUrl': 'https://webhook.site/...'}]\n    )\n)"
+                        "source": "client.events.publish(\n    project_id='project_id',\n    body=PublishEventBody(\n        webhookId='wh_123',\n        eventType='user.created',\n        payload={'id': 1},\n        targets=[{'targetId': '65a1b2c3d4e5f67890123456'}]\n    )\n)"
                     }
                 ],
                 "tags": [
@@ -167,11 +167,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "JavaScript",
-                        "source": "await client.events.batch('project_id', [\n  {\n    webhookId: 'wh_1',\n    eventType: 'user.created',\n    payload: { id: 1 },\n    targets: [{ targetUrl: 'https://site.com' }]\n  },\n  {\n    webhookId: 'wh_2',\n    eventType: 'order.created',\n    payload: { id: 99 },\n    targets: [{ targetUrl: 'https://site.com' }]\n  }\n]);"
+                        "source": "await client.events.batch('project_id', [\n  {\n    webhookId: 'wh_1',\n    eventType: 'user.created',\n    payload: { id: 1 },\n    targets: [{ targetId: '65a1b2c3d4e5f67890123456' }]\n  },\n  {\n    webhookId: 'wh_2',\n    eventType: 'order.created',\n    payload: { id: 99 },\n    targets: [{ targetId: '65a1b2c3d4e5f67890123457' }]\n  }\n]);"
                     },
                     {
                         "lang": "Python",
-                        "source": "client.events.batch(\n    project_id='project_id',\n    body=[\n        PublishEventBody(\n            webhookId='wh_1',\n            eventType='user.created',\n            payload={'id': 1},\n            targets=[{'targetUrl': 'https://site.com'}]\n        ),\n        PublishEventBody(\n            webhookId='wh_2',\n            eventType='order.created',\n            payload={'id': 99},\n            targets=[{'targetUrl': 'https://site.com'}]\n        )\n    ]\n)"
+                        "source": "client.events.batch(\n    project_id='project_id',\n    body=[\n        PublishEventBody(\n            webhookId='wh_1',\n            eventType='user.created',\n            payload={'id': 1},\n            targets=[{'targetId': '65a1b2c3d4e5f67890123456'}]\n        ),\n        PublishEventBody(\n            webhookId='wh_2',\n            eventType='order.created',\n            payload={'id': 99},\n            targets=[{'targetId': '65a1b2c3d4e5f67890123457'}]\n        )\n    ]\n)"
                     }
                 ],
                 "tags": [
@@ -388,7 +388,17 @@
                                             "_id": "65a1b2c3d4e5f67890123456",
                                             "name": "Production Webhook",
                                             "url": "https://api.example.com/webhooks",
+                                            "method": "POST",
                                             "enabled": true,
+                                            "config": {
+                                                "timeout": 5000,
+                                                "retryCount": 3,
+                                                "rateLimit": 100,
+                                                "rateLimitDuration": 60
+                                            },
+                                            "customHeaders": {
+                                                "x-api-key": "secret-key"
+                                            },
                                             "createdAt": "2024-01-15T12:00:00.000Z",
                                             "updatedAt": "2024-01-15T12:00:00.000Z"
                                         }
@@ -480,11 +490,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "JavaScript",
-                        "source": "const target = await client.targets.create('project_id', {\n  name: 'Production Webhook',\n  url: 'https://api.example.com/webhooks',\n  method: 'POST'\n});"
+                        "source": "const target = await client.targets.create('project_id', {\n  name: 'Production Webhook',\n  url: 'https://api.example.com/webhooks',\n  method: 'POST',\n  config: { timeout: 5000, retryCount: 3 }\n});"
                     },
                     {
                         "lang": "Python",
-                        "source": "target = client.targets.create(\n    project_id='project_id',\n    data=CreateTargetInput(\n        name='Production Webhook',\n        url='https://api.example.com/webhooks',\n        method='POST'\n    )\n)"
+                        "source": "target = client.targets.create(\n    project_id='project_id',\n    data=CreateTargetInput(\n        name='Production Webhook',\n        url='https://api.example.com/webhooks',\n        method='POST',\n        config=TargetConfig(timeout=5000, retryCount=3)\n    )\n)"
                     }
                 ],
                 "tags": [
@@ -525,7 +535,17 @@
                                         "_id": "65a1b2c3d4e5f67890123456",
                                         "name": "Production Webhook",
                                         "url": "https://api.example.com/webhooks",
+                                        "method": "POST",
                                         "enabled": true,
+                                        "config": {
+                                            "timeout": 5000,
+                                            "retryCount": 3,
+                                            "rateLimit": 100,
+                                            "rateLimitDuration": 60
+                                        },
+                                        "customHeaders": {
+                                            "x-api-key": "secret-key"
+                                        },
                                         "createdAt": "2024-01-15T12:00:00.000Z",
                                         "updatedAt": "2024-01-15T12:00:00.000Z"
                                     }
@@ -661,7 +681,17 @@
                                         "_id": "65a1b2c3d4e5f67890123456",
                                         "name": "Production Webhook",
                                         "url": "https://api.example.com/webhooks",
+                                        "method": "POST",
                                         "enabled": true,
+                                        "config": {
+                                            "timeout": 5000,
+                                            "retryCount": 3,
+                                            "rateLimit": 100,
+                                            "rateLimitDuration": 60
+                                        },
+                                        "customHeaders": {
+                                            "x-api-key": "secret-key"
+                                        },
                                         "createdAt": "2024-01-15T12:00:00.000Z",
                                         "updatedAt": "2024-01-15T12:00:00.000Z"
                                     }
@@ -805,6 +835,10 @@
                                         "name": "Updated Webhook Name",
                                         "url": "https://api.example.com/webhooks/updated",
                                         "enabled": true,
+                                        "config": {
+                                            "timeout": 5000,
+                                            "retryCount": 3
+                                        },
                                         "createdAt": "2024-01-15T12:00:00.000Z",
                                         "updatedAt": "2024-01-16T12:00:00.000Z"
                                     }
@@ -951,7 +985,10 @@
                                     "message": "Target updated successfully.",
                                     "data": {
                                         "_id": "65a1b2c3d4e5f67890123456",
-                                        "enabled": false
+                                        "enabled": false,
+                                        "name": "Production Webhook",
+                                        "url": "https://api.example.com/webhooks",
+                                        "method": "POST"
                                     }
                                 }
                             }
@@ -1079,10 +1116,7 @@
                                 "example": {
                                     "success": true,
                                     "message": "Target deleted successfully.",
-                                    "data": {
-                                        "acknowledged": true,
-                                        "deletedCount": 1
-                                    }
+                                    "data": true
                                 }
                             }
                         }
@@ -1211,9 +1245,7 @@
                                 "example": {
                                     "success": true,
                                     "message": "Target fetched successfully.",
-                                    "data": {
-                                        "secret": "whsec_kz8...9d"
-                                    }
+                                    "data": "whsec_kz8...9d"
                                 }
                             }
                         }
@@ -1485,9 +1517,15 @@
                                             "url": "https://api.internal.service/v1/webhook",
                                             "status": "active",
                                             "method": "POST",
+                                            "enabled": true,
                                             "config": {
                                                 "timeout": 5000,
-                                                "retryCount": 3
+                                                "retryCount": 3,
+                                                "rateLimit": 100,
+                                                "rateLimitDuration": 60
+                                            },
+                                            "customHeaders": {
+                                                "x-api-key": "k1..."
                                             },
                                             "createdAt": "2024-01-20T10:00:00.000Z",
                                             "updatedAt": "2024-01-20T10:00:00.000Z"
@@ -1843,10 +1881,7 @@
                                 "example": {
                                     "success": true,
                                     "message": "Endpoint deleted successfully",
-                                    "data": {
-                                        "acknowledged": true,
-                                        "deletedCount": 1
-                                    }
+                                    "data": true
                                 }
                             }
                         }
@@ -1956,9 +1991,7 @@
                                 "example": {
                                     "success": true,
                                     "message": "Endpoint secret fetched successfully",
-                                    "data": {
-                                        "secret": "whsec_..."
-                                    }
+                                    "data": "whsec_..."
                                 }
                             }
                         }
@@ -2078,16 +2111,34 @@
                                     "total": 1,
                                     "sources": [
                                         {
-                                            "_id": "65c3d4e5f678901234567890",
-                                            "name": "Stripe Ingest",
-                                            "description": "Ingest events from Stripe webhooks",
-                                            "service": "stripe",
+                                            "_id": "69734d32990b0591070786c8",
+                                            "projectId": "69674fad7590d01406e98126",
+                                            "name": "Paypal Source",
+                                            "description": "Webhook for receiving general events",
+                                            "service": "paypal",
+                                            "status": "active",
+                                            "ingressId": "kmGOQOYqRppcfzeBuvuMMroqGL",
+                                            "ingressUrl": "https://api.kyrazo.com/ingest/v1/paypal/nTBaBmKOalJMJioSsvZTNginxg",
+                                            "forwarding": true,
+                                            "endpoints": [
+                                                "69502276f03e52acfbad1a2e"
+                                            ],
+                                            "eventTypes": [
+                                                "payment.completed",
+                                                "user.updated"
+                                            ],
+                                            "retryPolicy": {
+                                                "maxAttempts": 3
+                                            },
                                             "authentication": {
                                                 "enabled": true,
-                                                "type": "hmac"
+                                                "type": "service",
+                                                "credentials": {
+                                                    "secret": "eyJhbGc..."
+                                                }
                                             },
-                                            "createdAt": "2024-01-25T15:30:00.000Z",
-                                            "updatedAt": "2024-01-25T15:30:00.000Z"
+                                            "createdAt": "2026-01-23T10:28:02.577Z",
+                                            "updatedAt": "2026-01-23T10:28:02.577Z"
                                         }
                                     ]
                                 }
@@ -2158,11 +2209,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "JavaScript",
-                        "source": "const source = await client.sources.create('project_id', {\n  name: 'Stripe Ingest',\n  service: 'stripe',\n  type: 'receive',\n  eventTypes: ['charge.succeeded']\n});"
+                        "source": "const source = await client.sources.create('project_id', {\n  name: 'Stripe Ingest',\n  service: 'stripe',\n  type: 'receive',\n  eventTypes: ['charge.succeeded'],\n  authentication: { enabled: true, type: 'service', service: { secret: 'whsec_...' } }\n});"
                     },
                     {
                         "lang": "Python",
-                        "source": "source = client.sources.create(\n    project_id='project_id',\n    data=CreateSourceInput(\n        name='Stripe Ingest',\n        service='stripe',\n        type='receive',\n        eventTypes=['charge.succeeded']\n    )\n)"
+                        "source": "source = client.sources.create(\n    project_id='project_id',\n    data=CreateSourceInput(\n        name='Stripe Ingest',\n        service='stripe',\n        type='receive',\n        eventTypes=['charge.succeeded'],\n        authentication=SourceAuth(type='service', service=ServiceAuth(secret='whsec_...'))\n    )\n)"
                     }
                 ],
                 "tags": [
@@ -2200,18 +2251,29 @@
                                     "success": true,
                                     "message": "Source created successfully",
                                     "data": {
-                                        "sourceId": "65c3d4e5f678901234567890",
+                                        "sourceId": "69734d32990b0591070786c8",
                                         "source": {
-                                            "_id": "65c3d4e5f678901234567890",
-                                            "name": "Stripe Ingest",
-                                            "description": "Ingest events from Stripe webhooks",
-                                            "service": "stripe",
-                                            "authentication": {
-                                                "enabled": true,
-                                                "type": "hmac"
+                                            "_id": "69734d32990b0591070786c8",
+                                            "projectId": "69674fad7590d01406e98126",
+                                            "name": "Paypal Source",
+                                            "description": "Webhook for receiving general events",
+                                            "service": "paypal",
+                                            "status": "active",
+                                            "ingressId": "kmGOQOYqRppcfzeBuvuMMroqGL",
+                                            "ingressUrl": "https://api.kyrazo.com/ingest/v1/paypal/nTBaBmKOalJMJioSsvZTNginxg",
+                                            "forwarding": true,
+                                            "endpoints": [
+                                                "69502276f03e52acfbad1a2e"
+                                            ],
+                                            "eventTypes": [
+                                                "payment.completed",
+                                                "user.updated"
+                                            ],
+                                            "retryPolicy": {
+                                                "maxAttempts": 3
                                             },
-                                            "createdAt": "2024-01-25T15:30:00.000Z",
-                                            "updatedAt": "2024-01-25T15:30:00.000Z"
+                                            "createdAt": "2026-01-23T10:28:02.577Z",
+                                            "updatedAt": "2026-01-23T10:28:02.577Z"
                                         }
                                     }
                                 }
@@ -2324,16 +2386,34 @@
                                     "success": true,
                                     "message": "Source fetched successfully",
                                     "data": {
-                                        "_id": "65c3d4e5f678901234567890",
-                                        "name": "Stripe Ingest",
-                                        "description": "Ingest events from Stripe webhooks",
-                                        "service": "stripe",
+                                        "_id": "69734d32990b0591070786c8",
+                                        "projectId": "69674fad7590d01406e98126",
+                                        "name": "Paypal Source",
+                                        "description": "Webhook for receiving general events",
+                                        "service": "paypal",
+                                        "status": "active",
+                                        "ingressId": "kmGOQOYqRppcfzeBuvuMMroqGL",
+                                        "ingressUrl": "https://api.kyrazo.com/ingest/v1/paypal/nTBaBmKOalJMJioSsvZTNginxg",
+                                        "forwarding": true,
+                                        "endpoints": [
+                                            "69502276f03e52acfbad1a2e"
+                                        ],
+                                        "eventTypes": [
+                                            "payment.completed",
+                                            "user.updated"
+                                        ],
+                                        "retryPolicy": {
+                                            "maxAttempts": 3
+                                        },
                                         "authentication": {
                                             "enabled": true,
-                                            "type": "hmac"
+                                            "type": "service",
+                                            "credentials": {
+                                                "secret": "eyJhbGc..."
+                                            }
                                         },
-                                        "createdAt": "2024-01-25T15:30:00.000Z",
-                                        "updatedAt": "2024-01-25T15:30:00.000Z"
+                                        "createdAt": "2026-01-23T10:28:02.577Z",
+                                        "updatedAt": "2026-01-23T10:28:02.577Z"
                                     }
                                 }
                             }
@@ -2452,8 +2532,27 @@
                                     "success": true,
                                     "message": "Source updated successfully",
                                     "data": {
-                                        "_id": "65c3d4e5f678901234567890",
-                                        "name": "Updated Source Name"
+                                        "_id": "69734d32990b0591070786c8",
+                                        "projectId": "69674fad7590d01406e98126",
+                                        "name": "Updated Paypal Source",
+                                        "description": "Updated Webhook for receiving general events",
+                                        "service": "paypal",
+                                        "status": "inactive",
+                                        "ingressId": "kmGOQOYqRppcfzeBuvuMMroqGL",
+                                        "ingressUrl": "https://api.kyrazo.com/ingest/v1/paypal/nTBaBmKOalJMJioSsvZTNginxg",
+                                        "forwarding": false,
+                                        "endpoints": [
+                                            "69502276f03e52acfbad1a2e"
+                                        ],
+                                        "eventTypes": [
+                                            "payment.updated",
+                                            "user.updated"
+                                        ],
+                                        "retryPolicy": {
+                                            "maxAttempts": 4
+                                        },
+                                        "createdAt": "2026-01-23T10:28:02.577Z",
+                                        "updatedAt": "2026-01-23T14:27:49.664Z"
                                     }
                                 }
                             }
@@ -2561,11 +2660,7 @@
                                 },
                                 "example": {
                                     "success": true,
-                                    "message": "Source deleted successfully",
-                                    "data": {
-                                        "acknowledged": true,
-                                        "deletedCount": 1
-                                    }
+                                    "message": "Source deleted successfully."
                                 }
                             }
                         }
@@ -2650,7 +2745,8 @@
                     },
                     "previous": {
                         "type": "object",
-                        "description": "Optional previous state of the object."
+                        "description": "Optional previous state of the object.",
+                        "nullable": true
                     },
                     "targets": {
                         "type": "array",
@@ -2665,7 +2761,8 @@
                                     "pattern": "^[0-9a-fA-F]{24}$"
                                 }
                             }
-                        }
+                        },
+                        "minItems": 1
                     },
                     "meta": {
                         "type": "object",
@@ -2685,6 +2782,10 @@
                                 "minimum": 0,
                                 "maximum": 10,
                                 "default": 3
+                            },
+                            "insertedAt": {
+                                "type": "string",
+                                "format": "date-time"
                             }
                         }
                     }
@@ -2739,6 +2840,17 @@
                                 "minimum": 0,
                                 "maximum": 10,
                                 "default": 3
+                            },
+                            "rateLimit": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 10000
+                            },
+                            "rateLimitDuration": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 3600,
+                                "default": 1
                             }
                         }
                     },
@@ -2845,14 +2957,9 @@
                         ],
                         "default": "active"
                     },
-                    "method": {
-                        "type": "string",
-                        "enum": [
-                            "POST",
-                            "PUT",
-                            "PATCH"
-                        ],
-                        "default": "POST"
+                    "enabled": {
+                        "type": "boolean",
+                        "default": true
                     },
                     "config": {
                         "type": "object",
@@ -2868,6 +2975,17 @@
                                 "minimum": 0,
                                 "maximum": 10,
                                 "default": 3
+                            },
+                            "rateLimit": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 10000
+                            },
+                            "rateLimitDuration": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 3600,
+                                "default": 1
                             }
                         }
                     },
@@ -2909,13 +3027,56 @@
                     "service": {
                         "type": "string",
                         "enum": [
-                            "general",
                             "stripe",
-                            "github",
-                            "shopify",
                             "paypal"
                         ],
-                        "default": "general"
+                        "default": "stripe"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "receive"
+                        ],
+                        "default": "receive"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "inactive"
+                        ],
+                        "default": "active"
+                    },
+                    "forwarding": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "endpoints": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "pattern": "^[0-9a-fA-F]{24}$"
+                        }
+                    },
+                    "eventTypes": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "minLength": 3,
+                            "maxLength": 100
+                        },
+                        "default": []
+                    },
+                    "retryPolicy": {
+                        "type": "object",
+                        "properties": {
+                            "maxAttempts": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 10,
+                                "default": 3
+                            }
+                        }
                     },
                     "authentication": {
                         "type": "object",
@@ -2925,25 +3086,22 @@
                         "properties": {
                             "enabled": {
                                 "type": "boolean",
-                                "default": true
+                                "default": false
                             },
                             "type": {
                                 "type": "string",
                                 "enum": [
-                                    "api_key",
-                                    "basic_auth",
-                                    "service",
-                                    "hmac"
-                                ]
+                                    "service"
+                                ],
+                                "default": "service"
                             },
-                            "apiKey": {
+                            "service": {
                                 "type": "object",
                                 "properties": {
-                                    "headerName": {
-                                        "type": "string"
-                                    },
-                                    "key": {
-                                        "type": "string"
+                                    "secret": {
+                                        "type": "string",
+                                        "minLength": 3,
+                                        "maxLength": 250
                                     }
                                 }
                             }
@@ -2952,15 +3110,53 @@
                 }
             },
             "UpdateSource": {
-                "allOf": [
-                    {
-                        "$ref": "#/components/schemas/CreateSource"
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 3,
+                        "maxLength": 100
                     },
-                    {
+                    "description": {
+                        "type": "string",
+                        "maxLength": 500
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "inactive"
+                        ]
+                    },
+                    "forwarding": {
+                        "type": "boolean"
+                    },
+                    "endpoints": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "pattern": "^[0-9a-fA-F]{24}$"
+                        }
+                    },
+                    "eventTypes": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "minLength": 3,
+                            "maxLength": 100
+                        }
+                    },
+                    "retryPolicy": {
                         "type": "object",
-                        "properties": {}
+                        "properties": {
+                            "maxAttempts": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 10
+                            }
+                        }
                     }
-                ]
+                }
             }
         },
         "securitySchemes": {
