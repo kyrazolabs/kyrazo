@@ -45,20 +45,20 @@ import { RouterModule } from '@angular/router';
                     </p>
                 </div>
 
-                <div class="space-y-4">
-                    <button
+                <div class="space-x-4">
+                    <a
                         routerLink="/"
                         class="w-full px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-xl transition-colors shadow-sm"
                     >
                         Go to Dashboard
-                    </button>
+                    </a>
 
-                    <button
+                    <a
                         (click)="goBack()"
                         class="w-full px-4 py-2 bg-surface-100 hover:bg-surface-200 dark:bg-surface-800 dark:hover:bg-surface-700 text-surface-900 dark:text-surface-100 font-semibold rounded-xl transition-colors"
                     >
                         Go Back
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
