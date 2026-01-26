@@ -1,5 +1,4 @@
 /
-/home
 /legal/privacy-policy
 /legal/refund-policy
 /legal/terms-of-service
