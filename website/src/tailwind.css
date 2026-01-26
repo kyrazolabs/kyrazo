@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&family=Caveat:wght@400..700&display=swap');
+@import "tailwindcss";
+@import "tailwindcss-primeui";
+
+@theme {
+  --animate-float-slow: float-slow 20s ease-in-out infinite;
+  --animate-pulse-soft: pulse-soft 10s ease-in-out infinite;
+  --animate-gradient-shimmer: gradient-shimmer 8s linear infinite;
+
+  @keyframes float-slow {
+    0%, 100% { transform: translate(0, 0); }
+    33% { transform: translate(30px, -50px); }
+    66% { transform: translate(-20px, 20px); }
+  }
+
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.2); }
+  }
+
+  @keyframes gradient-shimmer {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
+}
+
+@custom-variant dark (&:where(.p-dark, .p-dark *));
+
+
+@layer base {
+  html, :host {
+    font-family: "Quicksand", "sans-serif" !important;
+  }
+
+}
+.p-datatable-mask {
+  @apply backdrop-blur-sm! bg-surface-0/20! dark:bg-surface-900/20!;
+}
+
+.p-datatable-loading-icon {
+  @apply text-primary!;
+}
