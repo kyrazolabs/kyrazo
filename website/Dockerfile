@@ -16,7 +16,7 @@ RUN bun install
 COPY . .
 
 # Build the application
-RUN bun run prod:build
+RUN bun run build
 
 # Stage 2: Production runtime
 FROM node:22-slim
