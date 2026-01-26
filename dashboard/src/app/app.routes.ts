@@ -105,22 +105,6 @@ export const routes: Routes = [
         data: { animation: 'VerifyEmail' },
     },
     {
-        path: 'changelogs',
-        loadComponent: () =>
-            import('@pages/changelogs/changelogs.page').then(
-                (p) => p.ChangelogsPage,
-            ),
-        data: {
-            title: 'Changelogs',
-            meta: {
-                description:
-                    'Kyrazo - The Platform Engineering Platform for SaaS. Streamline your infrastructure and deployment workflow.',
-                keywords:
-                    'SaaS, Platform Engineering, DevOps, Infrastructure, Deployment',
-            },
-        },
-    },
-    {
         path: 'not-found',
         loadComponent: () =>
             import('@shared/ui/not-found/not-found.component').then(
