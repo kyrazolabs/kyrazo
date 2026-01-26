@@ -21,7 +21,6 @@ import { authInterceptor } from "@core/interceptors/auth.interceptor";
 import { projectInterceptor } from "@core/interceptors/project.interceptor";
 import { retryInterceptor } from "@core/interceptors/retry.interceptor";
 import { workspaceInterceptor } from "@core/interceptors/workspace.interceptor";
-import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -36,7 +35,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(
       routes,
-      withInMemoryScrolling({ scrollPositionRestoration: "enabled" })
+      withInMemoryScrolling({ scrollPositionRestoration: "enabled" }),
     ),
     provideAnimations(),
     provideHttpClient(
@@ -45,7 +44,7 @@ export const appConfig: ApplicationConfig = {
         projectInterceptor,
         retryInterceptor,
         workspaceInterceptor,
-      ])
+      ]),
     ),
     MessageService,
     ConfirmationService,
@@ -66,6 +65,6 @@ export const appConfig: ApplicationConfig = {
             multi: true,
           },
         ]
-      : []), provideClientHydration(withEventReplay()),
+      : []),
   ],
 };

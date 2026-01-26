@@ -20,8 +20,3 @@
   @apply text-primary!;
 }
 
-@theme {
-  --font-weight-semibold: 700 !important;
-  --font-weight-medium: 600  !important;
-  --font-weight-base: 500 !important;
-}

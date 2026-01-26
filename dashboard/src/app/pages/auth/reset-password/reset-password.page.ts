@@ -19,7 +19,6 @@ import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { MessageService } from "primeng/api";
 import { CardModule } from "primeng/card";
 import { ButtonModule } from "primeng/button";
-import { InputText } from "primeng/inputtext";
 import { PasswordModule } from "primeng/password";
 import { ProgressSpinnerModule } from "primeng/progressspinner";
 import { DividerModule } from "primeng/divider";
@@ -38,7 +37,6 @@ import { finalize } from "rxjs";
     RouterLink,
     CardModule,
     ButtonModule,
-    InputText,
     PasswordModule,
     ProgressSpinnerModule,
     DividerModule,
@@ -67,13 +65,13 @@ export class ResetPasswordPage implements OnInit {
           Validators.required,
           Validators.minLength(8),
           Validators.pattern(
-            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$/
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$/,
           ),
         ],
       ],
       confirmPassword: ["", [Validators.required]],
     },
-    { validators: this.passwordMatchValidator }
+    { validators: this.passwordMatchValidator },
   );
 
   ngOnInit(): void {
@@ -91,7 +89,7 @@ export class ResetPasswordPage implements OnInit {
   }
 
   private passwordMatchValidator(
-    control: AbstractControl
+    control: AbstractControl,
   ): ValidationErrors | null {
     const password = control.get("password");
     const confirmPassword = control.get("confirmPassword");

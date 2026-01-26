@@ -13,7 +13,7 @@
     <!-- Control Center Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         @for (card of navCards; track card.title) {
-            <div class="group relative bg-surface-0 dark:bg-surface-950! border-2 border-surface-100 dark:border-surface-900 rounded-xl p-4 hover:shadow-sm hover:border-primary-500/50 transition-all duration-300 cursor-pointer flex flex-col h-full"
+            <div class="group relative bg-surface-0 dark:bg-surface-950! border-2 border-surface-100 dark:border-surface-900 rounded-2xl p-4 hover:shadow-sm hover:border-primary-500/50 transition-all duration-300 cursor-pointer flex flex-col h-full"
                  [routerLink]="card.route">
                 
                 <!-- Icon & Header -->
@@ -47,7 +47,7 @@
 
     <!-- Documentation & Help (Optional Footer) -->
     <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-linear-to-r from-surface-0 to-primary-50/10 dark:from-surface-950 dark:to-primary-500/10 border-2 border-surface-100 dark:border-surface-900 rounded-xl p-6 flex items-center justify-between">
+        <div class="bg-linear-to-r from-surface-0 to-primary-50/10 dark:from-surface-950 dark:to-primary-500/10 border-2 border-surface-100 dark:border-surface-900 rounded-2xl p-6 flex items-center justify-between">
             <div class="flex flex-col gap-1">
                 <span class="font-bold text-surface-900 dark:text-surface-0">Read the Docs</span>
                 <span class="text-sm text-surface-500">Learn how to integrate Webhooks</span>
