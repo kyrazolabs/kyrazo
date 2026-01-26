@@ -15,12 +15,12 @@ export const routes: Routes = [
                         (p) => p.LandingPage,
                     ),
                 data: {
-                    title: 'Home',
+                    title: 'The Platform Engineering Platform for SaaS',
                     meta: {
                         description:
-                            'Kyrazo - The Platform Engineering Platform for SaaS. Streamline your infrastructure and deployment workflow.',
+                            'Kyrazo is the all-in-one Platform Engineering platform that helps SaaS companies streamline infrastructure management, automate deployments, and accelerate developer velocity.',
                         keywords:
-                            'SaaS, Platform Engineering, DevOps, Infrastructure, Deployment',
+                            'SaaS, Platform Engineering, DevOps, Infrastructure Automation, Deployment Workflow, Kyrazo',
                     },
                 },
             },
@@ -75,12 +75,12 @@ export const routes: Routes = [
                 (p) => p.ChangelogsPage,
             ),
         data: {
-            title: 'Changelogs',
+            title: 'Changelogs & Updates',
             meta: {
                 description:
-                    'Kyrazo - The Platform Engineering Platform for SaaS. Streamline your infrastructure and deployment workflow.',
+                    'Stay up to date with the latest features, improvements, and bug fixes in Kyrazo. Track our evolution as we build the best platform for SaaS engineering.',
                 keywords:
-                    'SaaS, Platform Engineering, DevOps, Infrastructure, Deployment',
+                    'Kyrazo Changelog, SaaS Updates, Product News, Engineering Blog',
             },
         },
     },
