@@ -42,26 +42,26 @@
                                     <li>
                                         <a pRipple [routerLink]="'/dashboard'"
                                             class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
-                                            [class]="isRouteActive('/dashboard') && !isRouteActive('/dashboard/connectors') && !isRouteActive('/dashboard/projects') && !isRouteActive('/dashboard/inspector') && !isRouteActive('/dashboard/endpoints') && !isRouteActive('/dashboard/events') && !isRouteActive('/dashboard/secrets') && !isRouteActive('/dashboard/settings') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                            [class]="isRouteActive('/dashboard') && !isRouteActive('/connectors') && !isRouteActive('/projects') && !isRouteActive('/inspector') && !isRouteActive('/endpoints') && !isRouteActive('/events') && !isRouteActive('/secrets') && !isRouteActive('/settings') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
                                             <i class="icon-[hugeicons--home-04] size-5 mr-2"></i>
                                             <span class="font-medium">Home</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a pRipple [routerLink]="'/dashboard/projects'"
+                                        <a pRipple [routerLink]="'/projects'"
                                             class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
-                                            [class]="isRouteActive('/dashboard/projects') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                            [class]="isRouteActive('/projects') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
                                             <i class="icon-[hugeicons--dashboard-square-01] size-5 mr-2"></i>
                                             <span class="font-medium">Projects</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a pRipple [routerLink]="'/dashboard/connectors'"
+                                        <a pRipple [routerLink]="'/connectors'"
                                             pTooltip="Not Ready Yet"
                                             tooltipPosition="right"
                                             tooltipStyleClass="text-xs font-bold"
                                             class="flex items-center justify-between cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
-                                            [class]="isRouteActive('/dashboard/connectors') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                            [class]="isRouteActive('/connectors') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
                                             <div class="flex items-center">
                                                 <i class="icon-[hugeicons--flow] size-5 mr-2"></i>
                                                 <span class="font-medium">Connectors</span>
@@ -73,12 +73,12 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a pRipple  [routerLink]="'/dashboard/inspector'"
+                                        <a pRipple  [routerLink]="'/inspector'"
                                             pTooltip="Almost There"
                                             tooltipPosition="right"
                                             tooltipStyleClass="text-xs font-bold"
                                             class="flex items-center justify-between cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
-                                            [class]="isRouteActive('/dashboard/inspector') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                            [class]="isRouteActive('/inspector') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
                                             <div class="flex items-center">
                                                 <i class="icon-[hugeicons--zap] size-5 mr-2"></i>
                                                 <span class="font-medium">Inspector</span>
@@ -96,21 +96,21 @@
                                 <ul
                                     class="list-none py-0 pl-4 pr-0 m-0 overflow-y-hidden transition-all duration-400 ease-in-out">
                                     <!-- <li>
-                                        <a pRipple [routerLink]="'/dashboard/webhooks'"
+                                        <a pRipple [routerLink]="'/webhooks'"
                                             class="flex items-center cursor-pointer py-2 px-4 rounded-xl text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-150 transition-colors p-ripple">
                                             <i class="icon-[lucide--webhook] size-4 mr-2"></i>
                                             <span class="font-medium">Webhooks</span>
                                         </a>
                                     </li> -->
                                     <!-- <li>
-                                        <a pRipple [routerLink]="'/dashboard/endpoints'"
+                                        <a pRipple [routerLink]="'/endpoints'"
                                             class="flex items-center cursor-pointer py-2 px-4 rounded-xl text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-150 transition-colors p-ripple">
                                             <i class="pi pi-link mr-2"></i>
                                             <span class="font-medium">Event Types</span>
                                         </a>
                                     </li> -->
                                     <li>
-                                        <a pRipple 
+                                        <a pRipple
                                             class="flex items-center cursor-pointer py-2 px-4 rounded-xl text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-500 transition-colors p-ripple"
                                             (click)="toggleDispatch()">
                                             <i class="icon-[hugeicons--rocket-01] size-5 mr-2"></i>
@@ -121,25 +121,25 @@
                                             class="list-none py-0 pl-4 pr-0 m-0 space-y-1 overflow-y-hidden transition-[max-height,opacity] duration-500 ease-in-out"
                                             [class]="dispatchDropdownOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'">
                                             <li>
-                                                <a pRipple [routerLink]="'/dashboard/events/dispatch'"
+                                                <a pRipple [routerLink]="'/events/dispatch'"
                                                     class="flex items-center cursor-pointer py-2 px-4 mt-2 rounded-xl duration-150 transition-colors"
-                                                    [class]="isRouteActive('/dashboard/events/dispatch') && !isRouteActive('/dashboard/endpoints') && !isRouteActive('/dashboard/events/dispatch/targets') && !isRouteActive('/dashboard/events/dispatch/logs') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                    [class]="isRouteActive('/events/dispatch') && !isRouteActive('/endpoints') && !isRouteActive('/events/dispatch/targets') && !isRouteActive('/events/dispatch/logs') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
                                                     <i class="icon-[hugeicons--activity-03] size-5 mr-2"></i>
                                                     <span class="font-medium">Usage</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a pRipple [routerLink]="'/dashboard/events/dispatch/targets'"
+                                                <a pRipple [routerLink]="'/events/dispatch/targets'"
                                                     class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
-                                                    [class]="isRouteActive('/dashboard/events/dispatch/targets') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                    [class]="isRouteActive('/events/dispatch/targets') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
                                                     <i class="icon-[hugeicons--target-02] size-5 mr-2"></i>
                                                     <span class="font-medium">Targets</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a pRipple [routerLink]="'/dashboard/events/dispatch/logs'"
+                                                <a pRipple [routerLink]="'/events/dispatch/logs'"
                                                     class="flex items-center cursor-pointer py-2 px-4 mb-2 rounded-xl duration-150 transition-colors"
-                                                    [class]="isRouteActive('/dashboard/events/dispatch/logs') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                    [class]="isRouteActive('/events/dispatch/logs') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
                                                     <i class="icon-[hugeicons--transaction-history] size-5 mr-2"></i>
                                                     <span class="font-medium">Logs</span>
                                                 </a>
@@ -159,33 +159,33 @@
                                             class="list-none py-0 pl-4 pr-0 m-0 space-y-1 overflow-y-hidden transition-[max-height,opacity] duration-500 ease-in-out"
                                             [class]="ingestDropdownOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'">
                                             <li>
-                                                <a pRipple [routerLink]="'/dashboard/events/ingest'"
+                                                <a pRipple [routerLink]="'/events/ingest'"
                                                     class="flex items-center cursor-pointer py-2 px-4 mt-2 rounded-xl duration-150 transition-colors"
-                                                    [class]="isRouteActive('/dashboard/events/ingest') && !isRouteActive('/dashboard/endpoints') && !isRouteActive('/dashboard/events/ingest/sources') && !isRouteActive('/dashboard/events/ingest/endpoints') && !isRouteActive('/dashboard/events/ingest/logs') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                    [class]="isRouteActive('/events/ingest') && !isRouteActive('/endpoints') && !isRouteActive('/events/ingest/sources') && !isRouteActive('/events/ingest/endpoints') && !isRouteActive('/events/ingest/logs') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
                                                     <i class="icon-[hugeicons--activity-03] size-5 mr-2"></i>
                                                     <span class="font-medium">Usage</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a pRipple [routerLink]="'/dashboard/events/ingest/sources'"
+                                                <a pRipple [routerLink]="'/events/ingest/sources'"
                                                     class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
-                                                    [class]="isRouteActive('/dashboard/events/ingest/sources') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                    [class]="isRouteActive('/events/ingest/sources') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
                                                     <i class="icon-[hugeicons--live-streaming-02] size-5 mr-2"></i>
                                                     <span class="font-medium">Source</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a pRipple [routerLink]="'/dashboard/events/ingest/endpoints'"
+                                                <a pRipple [routerLink]="'/events/ingest/endpoints'"
                                                     class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
-                                                    [class]="isRouteActive('/dashboard/events/ingest/endpoints') || isRouteActive('/dashboard/endpoints') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                    [class]="isRouteActive('/events/ingest/endpoints') || isRouteActive('/endpoints') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
                                                     <i class="pi pi-link mr-2"></i>
                                                     <span class="font-medium">Endpoints</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a pRipple [routerLink]="'/dashboard/events/ingest/logs'"
+                                                <a pRipple [routerLink]="'/events/ingest/logs'"
                                                     class="flex items-center cursor-pointer py-2 px-4 mb-2 rounded-xl duration-150 transition-colors"
-                                                    [class]="isRouteActive('/dashboard/events/ingest/logs') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                    [class]="isRouteActive('/events/ingest/logs') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
                                                     <i class="icon-[hugeicons--transaction-history] size-5 mr-2"></i>
                                                     <span class="font-medium">Logs</span>
                                                 </a>
@@ -196,21 +196,21 @@
                             </li>
                             <li>
                                 <!-- <div class="border border-surface-200 dark:border-surface-900 m-4"></div> -->
-    
+
                                 <ul
                                     class="list-none py-0 pl-4 pr-0 m-0 space-y-1 overflow-y-hidden transition-all duration-400 ease-in-out">
                                     <li>
-                                        <a pRipple [routerLink]="'/dashboard/secrets'"
+                                        <a pRipple [routerLink]="'/secrets'"
                                             class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
-                                            [class]="isRouteActive('/dashboard/secrets') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                            [class]="isRouteActive('/secrets') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
                                             <i class="pi pi-key mr-2"></i>
                                             <span class="font-medium">Secrets</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a pRipple [routerLink]="'/dashboard/settings'"
+                                        <a pRipple [routerLink]="'/settings'"
                                             class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
-                                            [class]="isRouteActive('/dashboard/settings') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                            [class]="isRouteActive('/settings') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
                                             <i class="pi pi-cog mr-2"></i>
                                             <span class="font-medium">Settings</span>
                                         </a>
@@ -223,7 +223,7 @@
             </div>
 
             <div class="mt-auto relative" #helpContainer>
-                
+
                 <div class="flex flex-col gap-4 w-full p-2">
                     <ul>
                         <li>
@@ -330,7 +330,7 @@
                 <span class="text-sm font-medium text-primary leading-tight">Webhooks Simplified</span>
             </div>
         </div>
-        
+
     </ng-template>
 
     <ng-template #submenuheader let-item>
@@ -370,11 +370,11 @@
             </div>
         </p-button>
     </ng-template>
-    
+
 
     <ng-template #end>
         <div class="mt-auto pt-4 border-t border-surface-200 dark:border-surface-800">
-            <p-button pRipple 
+            <p-button pRipple
                 class="relative overflow-hidden w-full border-0 bg-transparent flex items-center p-3 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-xl cursor-pointer transition-all duration-200 group"
                 (click)="op.toggle($event)" >
                 <p-avatar

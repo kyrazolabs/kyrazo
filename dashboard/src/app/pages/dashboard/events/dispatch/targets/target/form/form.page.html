@@ -7,7 +7,7 @@
             </p>
         </div>
         <div class="flex gap-2">
-            <p-button label="Cancel" severity="secondary" [size]="'small'" [outlined]="true" routerLink="/dashboard/events/dispatch/targets"
+            <p-button label="Cancel" severity="secondary" [size]="'small'" [outlined]="true" routerLink="/events/dispatch/targets"
                 [disabled]="loading" styleClass="rounded-xl!"/>
             <p-button [label]="isEditMode ? 'Update' : 'Create'" [size]="'small'" [icon]="loading ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
                 (onClick)="onSubmit()" [loading]="loading" [disabled]="form.invalid || loading" styleClass="rounded-xl!"/>
@@ -67,7 +67,7 @@
                         styleClass="w-full" inputStyleClass="w-full"></p-inputNumber>
                     <small class="text-surface-500">Max wait time for response</small>
                 </div>
-                
+
                 <div class="flex flex-col gap-2">
                     <label class="font-medium text-surface-900 dark:text-surface-0">Retry Count</label>
                     <p-inputNumber formControlName="retryCount" [min]="0" [max]="10" [showButtons]="true"
@@ -88,7 +88,7 @@
         <p-card header="Custom Headers" styleClass="card-panel">
             <div class="space-y-4">
                 <div formArrayName="customHeaders" class="space-y-3">
-                    <div *ngFor="let header of customHeaders.controls; let i=index" [formGroupName]="i" 
+                    <div *ngFor="let header of customHeaders.controls; let i=index" [formGroupName]="i"
                          class="flex gap-3 items-start">
                         <div class="flex-1">
                             <input pInputText formControlName="key" placeholder="Header Key (e.g. X-API-Key)" class="w-full" />

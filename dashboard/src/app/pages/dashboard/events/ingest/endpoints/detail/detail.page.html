@@ -11,9 +11,9 @@
         <!-- Right section -->
         <div class="flex items-center gap-4">
             <p-button label="Edit" icon="icon-[hugeicons--edit-03] size-5" styleClass="rounded-xl!"
-                [routerLink]="'/dashboard/events/ingest/endpoints/' + endpoint()._id + '/edit'" />
+                [routerLink]="'/events/ingest/endpoints/' + endpoint()._id + '/edit'" />
             <p-button label="Back" icon="pi pi-arrow-left" [outlined]="true" severity="secondary"
-                styleClass="rounded-xl!" routerLink="/dashboard/events/ingest/endpoints" />
+                styleClass="rounded-xl!" routerLink="/events/ingest/endpoints" />
         </div>
     </div>
 
@@ -150,7 +150,7 @@
             <i class="pi pi-info-circle text-4xl text-surface-400 dark:text-surface-500 mb-4"></i>
             <p class="text-surface-600 dark:text-surface-400 mb-4">No custom headers configured</p>
             <p-button label="Add Headers" icon="pi pi-plus" [outlined]="true" styleClass="rounded-xl!"
-                [routerLink]="'/dashboard/endpoints/' + endpoint()._id + '/edit'" />
+                [routerLink]="'/endpoints/' + endpoint()._id + '/edit'" />
         </div>
     </p-card>
 
@@ -243,4 +243,3 @@
     </div>
     -->
 </div>
-  

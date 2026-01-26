@@ -27,7 +27,7 @@
         label="New Source"
         icon="pi pi-plus"
         [size]="'small'"
-        routerLink="/dashboard/events/ingest/sources/create"
+        routerLink="/events/ingest/sources/create"
         styleClass="rounded-xl!"
       />
     </div>
@@ -183,7 +183,7 @@
                 size="small"
                 severity="info"
                 styleClass="rounded-xl!"
-                [routerLink]="['/dashboard/events/ingest/sources/view/', source._id || source.id]"
+                [routerLink]="['/events/ingest/sources/view/', source._id || source.id]"
                 pTooltip="View Details"
                 tooltipStyleClass="text-xs! rounded-xl!"
               />
@@ -193,7 +193,7 @@
                 size="small"
                 severity="secondary"
                 styleClass="rounded-xl!"
-                [routerLink]="['/dashboard/events/ingest/sources', source._id || source.id, 'edit']"
+                [routerLink]="['/events/ingest/sources', source._id || source.id, 'edit']"
                 pTooltip="Edit Source"
                 tooltipStyleClass="text-xs! rounded-xl!"
               />
@@ -252,7 +252,7 @@
                     label="Add Source"
                     icon="pi pi-plus"
                     styleClass="rounded-xl!"
-                    routerLink="/dashboard/events/ingest/sources/create"
+                    routerLink="/events/ingest/sources/create"
                     size="small"
                   />
                 </div>

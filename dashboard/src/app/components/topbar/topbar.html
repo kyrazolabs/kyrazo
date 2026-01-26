@@ -3,7 +3,7 @@
 >
     <div class="flex justify-between items-center">
         <div class="flex gap-3 p-1 items-center">
-            <p-button 
+            <p-button
                 [outlined]="true"
                 [text]="true"
                 (click)="openSidebar()"
@@ -45,7 +45,7 @@
         </p-popover>
 
         <div class="flex items-center gap-2">
-            <!-- <p-button 
+            <!-- <p-button
             [outlined]="true"
             [text]="true"
             [icon]="'pi pi-search'"
@@ -61,7 +61,7 @@
                 [style]="{ width: '25rem' }"
             >
             <ng-template #header>
-                
+
             </ng-template>
                 <div class="flex items-center gap-4 mb-4">
                     <input
@@ -115,7 +115,7 @@
                     icon="pi pi-bell"
                     aria-label="Notifications"
                 /> -->
-            <p-button pRipple 
+            <p-button pRipple
                 [outlined]="false"
                 variant="text"
                 [raised]="false"
@@ -135,21 +135,21 @@
                             <ul
                                 class="list-none py-0 pr-0 m-0 transition-all duration-400 ease-in-out">
                                 <li>
-                                    <a pRipple [routerLink]="'/dashboard/settings/profile'"
+                                    <a pRipple [routerLink]="'/settings/profile'"
                                         class="flex items-center cursor-pointer p-2 rounded-xl text-sm text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-150 transition-colors p-ripple">
                                         <i class="pi pi-user mr-2"></i>
                                         <span class="font-medium">Profile</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a pRipple [routerLink]="'/dashboard/settings/notifications'"
+                                    <a pRipple [routerLink]="'/settings/notifications'"
                                         class="flex items-center cursor-pointer p-2 rounded-xl text-sm text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-150 transition-colors p-ripple">
                                         <i class="pi pi-bell mr-2"></i>
                                         <span class="font-medium">Notifications</span>
                                     </a>
                                 </li>
                                 <!-- <li>
-                                    <a pRipple [routerLink]="'/dashboard/settings/billing'"
+                                    <a pRipple [routerLink]="'/settings/billing'"
                                         class="flex items-center cursor-pointer p-2 rounded-xl text-sm text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-150 transition-colors p-ripple">
                                         <i class="pi pi-credit-card mr-2"></i>
                                         <span class="font-medium">Billing</span>

@@ -17,38 +17,38 @@
         <div class="space-y-3">
              <!-- Step 1: Source -->
             <div class="flex items-center gap-3 p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors backdrop-blur-sm border border-white/5">
-                <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0" 
+                <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
                      [ngClass]="state.hasSource ? 'bg-green-400 text-white' : 'bg-white/20 text-white/50 border border-white/30'">
                     <i class="pi" [ngClass]="state.hasSource ? 'pi-check text-xs' : 'pi-circle-fill text-[8px]'"></i>
                 </div>
                  <div class="flex-1">
                     <span class="font-medium text-sm" [ngClass]="{'line-through opacity-70': state.hasSource}">Create a Source</span>
                 </div>
-                 <p-button *ngIf="!state.hasSource" label="Create" size="small" [text]="true" styleClass="text-white hover:bg-white/10 px-2 py-1 h-auto" routerLink="/dashboard/events/ingest/sources/new"></p-button>
+                 <p-button *ngIf="!state.hasSource" label="Create" size="small" [text]="true" styleClass="text-white hover:bg-white/10 px-2 py-1 h-auto" routerLink="/events/ingest/sources/new"></p-button>
             </div>
 
              <!-- Step 2: Target -->
             <div class="flex items-center gap-3 p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors backdrop-blur-sm border border-white/5">
-                <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0" 
+                <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
                      [ngClass]="state.hasTarget ? 'bg-green-400 text-white' : 'bg-white/20 text-white/50 border border-white/30'">
                     <i class="pi" [ngClass]="state.hasTarget ? 'pi-check text-xs' : 'pi-circle-fill text-[8px]'"></i>
                 </div>
                  <div class="flex-1">
                     <span class="font-medium text-sm" [ngClass]="{'line-through opacity-70': state.hasTarget}">Add a Destination</span>
                 </div>
-                 <p-button *ngIf="!state.hasTarget" label="Add" size="small" [text]="true" styleClass="text-white hover:bg-white/10 px-2 py-1 h-auto" routerLink="/dashboard/events/dispatch/targets/new"></p-button>
+                 <p-button *ngIf="!state.hasTarget" label="Add" size="small" [text]="true" styleClass="text-white hover:bg-white/10 px-2 py-1 h-auto" routerLink="/events/dispatch/targets/new"></p-button>
             </div>
 
              <!-- Step 3: First Event -->
             <div class="flex items-center gap-3 p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors backdrop-blur-sm border border-white/5">
-                <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0" 
+                <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
                      [ngClass]="state.hasEvent ? 'bg-green-400 text-white' : 'bg-white/20 text-white/50 border border-white/30'">
                     <i class="pi" [ngClass]="state.hasEvent ? 'pi-check text-xs' : 'pi-circle-fill text-[8px]'"></i>
                 </div>
                  <div class="flex-1">
                     <span class="font-medium text-sm" [ngClass]="{'line-through opacity-70': state.hasEvent}">Receive First Event</span>
                 </div>
-                 <p-button *ngIf="!state.hasEvent" label="Test" size="small" [text]="true" styleClass="text-white hover:bg-white/10 px-2 py-1 h-auto" routerLink="/dashboard/events/ingest/test"></p-button>
+                 <p-button *ngIf="!state.hasEvent" label="Test" size="small" [text]="true" styleClass="text-white hover:bg-white/10 px-2 py-1 h-auto" routerLink="/events/ingest/test"></p-button>
             </div>
         </div>
     </div>

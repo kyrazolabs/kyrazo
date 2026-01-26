@@ -4,7 +4,7 @@
            <h3 class="font-bold text-lg text-surface-900 dark:text-surface-0">Recent Activity</h3>
            <p class="text-sm text-surface-500">Latest delivery attempts</p>
         </div>
-        <p-button icon="pi pi-arrow-right" [link]="true" size="small" routerLink="/dashboard/events/dispatch/logs" />
+        <p-button icon="pi pi-arrow-right" [link]="true" size="small" routerLink="/events/dispatch/logs" />
     </div>
 
     <div class="flex flex-col gap-0 overflow-y-auto max-h-[400px] relative">
@@ -15,14 +15,14 @@
             <div class="flex gap-4 items-start p-2 relative z-10 group hover:bg-surface-50 dark:hover:bg-surface-800/50 rounded-lg transition-colors cursor-pointer">
                 <!-- Status Icon -->
                 <div class="mt-1 shrink-0 bg-surface-0 dark:bg-surface-950! z-10 p-0.5">
-                    <i class="pi text-sm" 
+                    <i class="pi text-sm"
                        [ngClass]="{
                            'pi-check-circle text-green-500': item.status === 'succeeded' || item.status === 'delivered',
                            'pi-times-circle text-red-500': item.status === 'failed',
                            'pi-clock text-yellow-500 hover:animate-spin': item.status === 'pending' || item.status === 'processing'
                        }"></i>
                 </div>
-                
+
                 <div class="flex flex-col gap-0.5 min-w-0 flex-1">
                     <div class="flex items-center justify-between">
                          <span class="font-medium text-sm text-surface-900 dark:text-surface-0 truncate">{{ item.event_type }}</span>
