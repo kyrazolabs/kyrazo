@@ -36,18 +36,14 @@
                 />
                 <div class="relative">
                     <p-button
-                        pStyleClass="@next"
-                        enterFromClass="hidden"
-                        enterActiveClass="animate-scalein"
-                        leaveToClass="hidden"
-                        leaveActiveClass="animate-fadeout"
-                        [hideOnOutsideClick]="true"
+                        #settingsButton
+                        (click)="toggleConfig()"
                         [outlined]="true"
                         [text]="true"
                         icon="pi pi-palette"
                         aria-label="Settings"
                     />
-                    <app-config class="hidden" />
+                    <app-config *ngIf="showConfig" @dropdownAnimation />
                 </div>
 
                 <div class="h-5 w-px bg-surface-300 dark:bg-surface-700 mx-1"></div>

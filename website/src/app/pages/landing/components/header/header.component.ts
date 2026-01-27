@@ -1,4 +1,12 @@
-import { Component, computed, inject, HostListener } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    HostListener,
+    ElementRef,
+    ViewChild,
+} from '@angular/core';
+import { dropdownAnimation } from '@shared/animations/dropdown.animation';
 import { FormsModule } from '@angular/forms';
 
 import { MenuItem } from 'primeng/api';
@@ -33,6 +41,7 @@ import { PostHogService } from '@core/3rd-party/posthog';
     ],
     templateUrl: './header.component.html',
     styleUrl: './header.component.scss',
+    animations: [dropdownAnimation],
 })
 export class HeaderComponent {
     private posthog = inject(PostHogService);
@@ -44,6 +53,24 @@ export class HeaderComponent {
     isDarkMode = computed(() => this.layoutService.appState().darkMode);
 
     isScrolled = false;
+    showConfig = false;
+
+    @ViewChild(AppConfig, { read: ElementRef }) configPanel!: ElementRef;
+    @ViewChild('settingsButton', { read: ElementRef })
+    settingsButton!: ElementRef;
+
+    @HostListener('document:click', ['$event'])
+    handleClickOutside(event: Event) {
+        if (
+            this.showConfig &&
+            this.configPanel &&
+            this.settingsButton &&
+            !this.configPanel.nativeElement.contains(event.target) &&
+            !this.settingsButton.nativeElement.contains(event.target)
+        ) {
+            this.showConfig = false;
+        }
+    }
 
     @HostListener('window:scroll', [])
     onWindowScroll() {
@@ -87,6 +114,10 @@ export class HeaderComponent {
             ...state,
             darkMode: !state.darkMode,
         }));
+    }
+
+    toggleConfig() {
+        this.showConfig = !this.showConfig;
     }
     trackGetStarted() {
         this.posthog.capture('header_get_started_clicked');
