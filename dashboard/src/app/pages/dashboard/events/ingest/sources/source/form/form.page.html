@@ -115,10 +115,11 @@
                     <label for="sourceServiceSecret" class="font-semibold text-surface-900 dark:text-surface-0">
                         Source Service Secret <span class="text-red-500">*</span>
                     </label>
-                    <p-password id="sourceServiceSecret" [formControl]="secretControl"
-                        placeholder="Enter source signing secret" class="w-full"
-                        inputStyleClass="rounded-xl!" [feedback]="false" [toggleMask]="true" fluid  autocomplete="off"
-                        [class.ng-invalid]="secretControl.errors?.['required'] && secretControl.touched" />
+                    @if (secretControl.errors?.['required'] && secretControl.touched) {
+                        <p-password id="sourceServiceSecret" [formControl]="secretControl"
+                            placeholder="Enter source signing secret" class="w-full"
+                            inputStyleClass="rounded-xl!" [feedback]="false" [toggleMask]="true" fluid  autocomplete="off"/>
+                    }
                     @if (secretControl.errors?.['required'] && secretControl.touched) {
                         <small class="text-red-500">
                             Source signing secret is required
