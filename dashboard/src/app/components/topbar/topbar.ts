@@ -1,4 +1,12 @@
-import { Component, computed, inject, OnInit, ViewChild } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    OnInit,
+    ViewChild,
+    ElementRef,
+    HostListener,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -11,6 +19,7 @@ import { filter, map } from 'rxjs/operators';
 
 import { AppConfig } from '@components/app.config';
 import { LayoutService } from '../service/layout.service';
+import { dropdownAnimation } from '@shared/animations/dropdown.animation';
 
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
@@ -50,6 +59,7 @@ import { AuthService } from '@core/auth/auth.service';
     ],
     templateUrl: './topbar.html',
     styleUrl: './topbar.scss',
+    animations: [dropdownAnimation],
 })
 export class TopbarComponent implements OnInit {
     private as = inject(AuthService);
@@ -109,6 +119,24 @@ export class TopbarComponent implements OnInit {
     loadingProjects: boolean = false;
     showFirstProjectDialog: boolean = false;
     firstProjectDialogVisible: boolean = false;
+    showConfig = false;
+
+    @ViewChild(AppConfig, { read: ElementRef }) configPanel!: ElementRef;
+    @ViewChild('settingsButton', { read: ElementRef })
+    settingsButton!: ElementRef;
+
+    @HostListener('document:click', ['$event'])
+    handleClickOutside(event: Event) {
+        if (
+            this.showConfig &&
+            this.configPanel &&
+            this.settingsButton &&
+            !this.configPanel.nativeElement.contains(event.target) &&
+            !this.settingsButton.nativeElement.contains(event.target)
+        ) {
+            this.showConfig = false;
+        }
+    }
 
     // Get current workspace ID for dialog
     get currentWorkspaceId(): string | undefined {
@@ -240,6 +268,10 @@ export class TopbarComponent implements OnInit {
             ...state,
             darkMode: !state.darkMode,
         }));
+    }
+
+    toggleConfig() {
+        this.showConfig = !this.showConfig;
     }
     openSidebar() {
         this.layoutService.appState.update((state) => ({
