@@ -11,16 +11,16 @@
                 {{ isEditing() ? 'Update your receive source configuration' : 'Set up a new receive source endpoint' }}
             </p>
         </div>
-    
+
         <!-- Right Sections -->
         <div class="flex items-center gap-4">
             <p-button label="Cancel" icon="pi pi-times" [outlined]="true" severity="secondary" styleClass="rounded-xl!" (onClick)="goBack()" />
         </div>
     </div>
-    
+
     <!-- Form -->
     <form [formGroup]="sourceForm" (ngSubmit)="onSubmit()">
-    
+
         <!-- Basic Information Card -->
         <p-card class="mb-4 card-panel">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -31,12 +31,13 @@
                     </label>
                     <input id="name" type="text" pInputText formControlName="name" placeholder="Enter source name" class="rounded-xl!"
                         [class.ng-invalid]="sourceForm.get('name')?.errors?.['required'] && sourceForm.get('name')?.touched" />
-                    <small class="text-red-500"
-                        *ngIf="sourceForm.get('name')?.errors?.['required'] && sourceForm.get('name')?.touched">
-                        Name is required
-                    </small>
+                        @if (sourceForm.get('name')?.errors?.['required'] && sourceForm.get('name')?.touched) {
+                            <small class="text-red-500">
+                                Name is required
+                            </small>
+                        }
                 </div>
-    
+
                 <!-- Status Field -->
                 <div class="flex flex-col gap-2">
                     <label for="status" class="font-semibold text-surface-900 dark:text-surface-0">
@@ -46,7 +47,7 @@
                         optionLabel="label" optionValue="value" class="w-full rounded-xl!" panelStyleClass="rounded-xl!" size="small" />
                 </div>
             </div>
-    
+
             <!-- Description Field -->
             <div class="flex flex-col gap-2 mt-6">
                 <label for="description" class="font-semibold text-surface-900 dark:text-surface-0">
@@ -61,14 +62,14 @@
                 <label for="endpoints" class="font-semibold text-surface-900 dark:text-surface-0">
                     Forwarding Endpoints
                 </label>
-                <p-multiSelect 
-                    id="endpoints" 
-                    formControlName="endpoints" 
-                    [options]="availableEndpoints()" 
-                    optionLabel="name" 
+                <p-multiSelect
+                    id="endpoints"
+                    formControlName="endpoints"
+                    [options]="availableEndpoints()"
+                    optionLabel="name"
                     optionValue="_id"
                     placeholder="Select endpoints to forward to"
-                    styleClass="w-full rounded-xl!" 
+                    styleClass="w-full rounded-xl!"
                     panelStyleClass="rounded-xl!"
                     display="chip"
                     size="small"
@@ -76,8 +77,8 @@
                 </p-multiSelect>
                 <small class="text-surface-500">Select endpoints where received events will be forwarded to.</small>
             </div>
-            
-    
+
+
             <div class="grid grid-cols-1 md:grid-cols-10 gap-6 mt-6 w-full">
                 <div class="col-span-10!">
                     <!-- Service -->
@@ -107,7 +108,7 @@
                     </div>
                 </div>
             </div>
-    
+
             <!-- Source Secret (for non-general services) -->
             @if (sourceForm.get('service')?.value && sourceForm.get('service')?.value !== 'general') {
                 <div class="flex flex-col gap-2 mt-6">
@@ -118,21 +119,22 @@
                         placeholder="Enter source signing secret" class="w-full"
                         inputStyleClass="rounded-xl!" [feedback]="false" [toggleMask]="true" fluid  autocomplete="off"
                         [class.ng-invalid]="secretControl.errors?.['required'] && secretControl.touched" />
-                    <small class="text-red-500"
-                        *ngIf="secretControl.errors?.['required'] && secretControl.touched">
-                        Source signing secret is required
-                    </small>
+                    @if (secretControl.errors?.['required'] && secretControl.touched) {
+                        <small class="text-red-500">
+                            Source signing secret is required
+                        </small>
+                    }
                 </div>
             }
-    
+
             <!-- Event Types Card (only for non-general services) -->
             @if (sourceForm.get('service')?.value && sourceForm.get('service')?.value !== 'general') {
                 <div class="flex items-center justify-start gap-4 mt-6">
                     <p-toggle-switch formControlName="showEventTypes" />
                     <span class="text-primary ">Filter incoming event by their Event Type</span>
                 </div>
-    
-    
+
+
                 @if (sourceForm.get('showEventTypes')?.value) {
                     <div formArrayName="eventTypes" class="space-y-3 mt-4">
                         @for (control of eventTypesArray.controls; track $index) {
@@ -142,15 +144,15 @@
                                 <p-button icon="pi pi-trash" severity="danger" [outlined]="true"
                                     (onClick)="removeEventType($index)" [disabled]="eventTypesArray.length <= 1" styleClass="rounded-xl!" />
                                 <p-button icon="pi pi-plus" [outlined]="true" [hidden]="$index !== eventTypesArray.length - 1" styleClass="rounded-xl!" (onClick)="addEventType()" />
-    
+
                             </div>
                         }
                     </div>
                 }
             }
-    
+
         </p-card>
-    
+
         <!-- Form Actions -->
         <div class="flex items-center justify-end gap-3">
             <p-button label="Cancel" icon="pi pi-times" [outlined]="true" severity="secondary" styleClass="rounded-xl!"  (onClick)="goBack()" />

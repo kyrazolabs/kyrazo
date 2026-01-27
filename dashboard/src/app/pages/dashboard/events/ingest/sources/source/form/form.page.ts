@@ -45,7 +45,7 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
 import { MultiSelectModule } from 'primeng/multiselect';
 
 @Component({
-    selector: 'app-create.page',
+    selector: 'app-form.page',
     imports: [
         CommonModule,
         ReactiveFormsModule,
@@ -71,10 +71,10 @@ import { MultiSelectModule } from 'primeng/multiselect';
         MultiSelectModule,
     ],
     providers: [SourceService],
-    templateUrl: './create.page.html',
-    styleUrl: './create.page.scss',
+    templateUrl: './form.page.html',
+    styleUrl: './form.page.scss',
 })
-export class CreatePage implements OnInit {
+export class FormPage implements OnInit {
     private fb = inject(FormBuilder);
     private mes = inject(MessageService);
     private router = inject(Router);
@@ -236,6 +236,15 @@ export class CreatePage implements OnInit {
                 console.error('Failed to load endpoints', err);
             },
         });
+
+        // Listen for showEventTypes toggle
+        this.sourceForm
+            .get('showEventTypes')
+            ?.valueChanges.subscribe((show) => {
+                if (show && this.eventTypesArray.length === 0) {
+                    this.addEventType();
+                }
+            });
     }
 
     loadSource() {
@@ -273,6 +282,11 @@ export class CreatePage implements OnInit {
                 this.fb.control(eventType, Validators.required),
             );
         });
+
+        // Set showEventTypes based on whether there are event types
+        this.sourceForm
+            .get('showEventTypes')
+            ?.setValue(source.eventTypes.length > 0);
 
         // Patch form values
         this.sourceForm.patchValue({
