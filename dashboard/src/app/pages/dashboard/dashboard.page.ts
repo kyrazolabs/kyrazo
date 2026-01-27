@@ -4,8 +4,8 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 // Widgets
-import { WelcomeWidgetComponent } from '@components/welcome-widget.component/welcome-widget.component';
-import { QuickActionsWidgetComponent } from '@components/quick-actions-widget/quick-actions-widget.component';
+import { WelcomeWidgetComponent } from '@components/dashboard/welcome-widget.component/welcome-widget.component';
+import { QuickActionsWidgetComponent } from '@components/dashboard/quick-actions-widget/quick-actions-widget.component';
 
 // PrimeNG
 import { CardModule } from 'primeng/card';
