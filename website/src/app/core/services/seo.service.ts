@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
+import { DOCUMENT } from '@angular/common';
 import { filter, map, mergeMap } from 'rxjs/operators';
 
 @Injectable({
@@ -12,6 +13,7 @@ export class SeoService {
         private metaService: Meta,
         private router: Router,
         private activatedRoute: ActivatedRoute,
+        @Inject(DOCUMENT) private _document: Document,
     ) {}
 
     init() {
@@ -82,13 +84,13 @@ export class SeoService {
             this.metaService.updateTag({ name: 'twitter:url', content: url });
 
             // Update canonical link
-            let link: HTMLLinkElement | null = document.querySelector(
+            let link: HTMLLinkElement | null = this._document.querySelector(
                 'link[rel="canonical"]',
             );
             if (!link) {
-                link = document.createElement('link');
+                link = this._document.createElement('link');
                 link.setAttribute('rel', 'canonical');
-                document.head.appendChild(link);
+                this._document.head.appendChild(link);
             }
             link.setAttribute('href', url);
         }
