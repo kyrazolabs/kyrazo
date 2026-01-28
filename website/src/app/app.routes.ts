@@ -15,12 +15,12 @@ export const routes: Routes = [
                         (p) => p.LandingPage,
                     ),
                 data: {
-                    title: 'The Platform Engineering Platform for SaaS',
+                    title: 'Kyrazo – Reliable Webhook Management, Automation & Event Dispatch for Developers',
                     meta: {
                         description:
-                            'Kyrazo is the all-in-one Platform Engineering platform that helps SaaS companies streamline infrastructure management, automate deployments, and accelerate developer velocity.',
+                            'Kyrazo is a scalable and secure webhook as a service platform. Receive, send, and automate events from Stripe, GitHub, and more with high reliability and low latency. Perfect for SaaS products and development teams.',
                         keywords:
-                            'SaaS, Platform Engineering, DevOps, Infrastructure Automation, Deployment Workflow, Kyrazo',
+                            'webhook service, webhook management, webhook automation, Stripe webhooks, GitHub webhooks, SaaS integration, event-driven architecture, reliable webhooks, developer tools, automated webhook delivery, low-latency webhook platform, webhook retries and failures handling, webhook SDK for Node.js',
                     },
                 },
             },
