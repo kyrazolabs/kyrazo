@@ -1,10 +1,11 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SeoService } from './core/services/seo.service';
+import { AppConfig } from '@components/app.config';
 
 @Component({
     selector: 'app-root',
-    imports: [RouterOutlet],
+    imports: [RouterOutlet, AppConfig],
     templateUrl: './app.html',
     styleUrl: './app.scss',
 })
