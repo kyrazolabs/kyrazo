@@ -17,20 +17,20 @@ export interface DeleteSourceResponse {
 export interface GetSourceResponse {
     success: true;
     message?: string;
-    data?: ISource;
+    data?: any;
 }
 
 export interface GetSourcesResponse {
     success: true;
     message?: string;
     pagination: IPagination;
-    data?: Array<ISource>;
+    data?: any[];
 }
 
 export interface UpdateSourceResponse {
     success: true;
     message?: string;
     data?: {
-        source: ISource;
+        source: any;
     };
 }

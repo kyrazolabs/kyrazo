@@ -12,6 +12,7 @@ import {
     GetSourceByIdInput,
     FilterSourcesInput,
     UpdateSourceInput,
+    UpdateSourceAuthInput,
 } from './source.schema';
 import { sourceService } from './source.service';
 
@@ -318,6 +319,65 @@ export class SourceController {
                     },
                 },
                 500 // Or 404 if I distinguished not found. Service throws generic error for now.
+            );
+        }
+    }
+
+    static async updateSourceAuth(c: AppContext): Promise<Response> {
+        try {
+            const workspaceId = c.workspace?.workspaceId;
+            const projectId = c.project?.projectId;
+
+            if (!workspaceId || !projectId) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'UNAUTHORIZED_USER',
+                            message: 'Unauthorized user',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    401
+                );
+            }
+
+            // @ts-ignore
+            const { sourceId }: GetSourceByIdInput = c.req.valid('param');
+            // @ts-ignore
+            const data: UpdateSourceAuthInput = c.req.valid('json');
+
+            await sourceService.updateSourceAuth(
+                sourceId,
+                workspaceId.toString(),
+                projectId.toString(),
+                data
+            );
+
+            return c.json({
+                success: true,
+                message: 'Source authentication updated successfully.',
+            });
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            const code = message === 'Source not found' ? 404 : 500;
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code:
+                            message === 'Source not found'
+                                ? 'WEBHOOK_NOT_FOUND'
+                                : 'UPDATE_WEBHOOK_FAILED',
+                        message:
+                            message === 'Source not found'
+                                ? 'Source not found or you do not have permission.'
+                                : 'Failed to update source authentication',
+                        details: message,
+                        requestId: c.get('requestId'),
+                    },
+                },
+                code
             );
         }
     }

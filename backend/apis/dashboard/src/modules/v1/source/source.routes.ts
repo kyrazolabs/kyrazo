@@ -13,6 +13,7 @@ import {
     CreateSourceSchema,
     SearchSourceSchema,
     UpdateSourceSchema,
+    UpdateSourceAuthSchema,
     GetSourceByIdSchema,
 } from './source.schema';
 import { ProjectHeadersSchema } from '@/core/utils/libs/zod';
@@ -21,62 +22,44 @@ import { SourceController } from '@/modules/v1/source/source.controller';
 const source = new Hono();
 
 // Header validation using zValidator
-const validateProjectHeaders = zValidator(
-    'header',
-    ProjectHeadersSchema,
-    (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
+const validateProjectHeaders = zValidator('header', ProjectHeadersSchema, (result, c) => {
+    if (!result.success) {
+        return c.json(
+            {
+                success: false,
+                statusCode: 400,
+                errors: JSON.parse(result.error.message).map((e: any) => ({
+                    field: e.path.join('.') || 'unknown',
+                    message: e.message,
+                })),
+            },
+            400
+        );
     }
-);
+});
 
 // Lazy wrappers for source routes rate limiter (user-based)
-const sourceReadRateLimiter = async (
-    c: AppContext,
-    next: () => Promise<void>
-) => {
+const sourceReadRateLimiter = async (c: AppContext, next: () => Promise<void>) => {
     const limiter = createRateLimitMiddleware(
         createSlidingWindowLimiter({
             points: config.security.rateLimiter.protected.normal.points,
             duration: config.security.rateLimiter.protected.normal.duration,
-            blockDuration:
-                config.security.rateLimiter.protected.normal.blockDuration,
+            blockDuration: config.security.rateLimiter.protected.normal.blockDuration,
         }),
-        c =>
-            config.security.rateLimiter.protected.normal.keyPrefix(
-                (c as any).user.userId
-            ),
+        c => config.security.rateLimiter.protected.normal.keyPrefix((c as any).user.userId),
         'Too many source read requests'
     );
     return limiter(c, next);
 };
 
-const sourceWriteRateLimiter = async (
-    c: AppContext,
-    next: () => Promise<void>
-) => {
+const sourceWriteRateLimiter = async (c: AppContext, next: () => Promise<void>) => {
     const limiter = createRateLimitMiddleware(
         createSlidingWindowLimiter({
             points: config.security.rateLimiter.protected.medium.points,
             duration: config.security.rateLimiter.protected.medium.duration,
-            blockDuration:
-                config.security.rateLimiter.protected.medium.blockDuration,
+            blockDuration: config.security.rateLimiter.protected.medium.blockDuration,
         }),
-        c =>
-            config.security.rateLimiter.protected.medium.keyPrefix(
-                (c as any).user.userId
-            ),
+        c => config.security.rateLimiter.protected.medium.keyPrefix((c as any).user.userId),
         'Too many source write requests'
     );
     return limiter(c, next);
@@ -184,6 +167,42 @@ source.patch(
         }
     }),
     SourceController.updateSource
+);
+
+source.put(
+    '/:sourceId/auth',
+    sourceWriteRateLimiter,
+    zValidator('param', GetSourceByIdSchema, (result, c) => {
+        if (!result.success) {
+            return c.json(
+                {
+                    success: false,
+                    statusCode: 400,
+                    errors: JSON.parse(result.error.message).map((e: any) => ({
+                        field: e.path.join('.') || 'unknown',
+                        message: e.message,
+                    })),
+                },
+                400
+            );
+        }
+    }),
+    zValidator('json', UpdateSourceAuthSchema, (result, c) => {
+        if (!result.success) {
+            return c.json(
+                {
+                    success: false,
+                    statusCode: 400,
+                    errors: JSON.parse(result.error.message).map((e: any) => ({
+                        field: e.path.join('.') || 'unknown',
+                        message: e.message,
+                    })),
+                },
+                400
+            );
+        }
+    }),
+    SourceController.updateSourceAuth
 );
 
 source.delete(

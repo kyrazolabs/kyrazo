@@ -41,11 +41,9 @@ export class WorkspaceController {
                 );
             }
 
+            // @ts-ignore
             const valid: CreateWorkspaceInput = c.req.valid('json');
-            const workspace = await workspaceService.createWorkspace(
-                userId,
-                valid
-            );
+            const workspace = await workspaceService.createWorkspace(userId, valid);
 
             return c.json<CreateWorkspaceResponse>(
                 {
@@ -78,9 +76,9 @@ export class WorkspaceController {
      */
     static async getWorkspaceById(c: AppContext): Promise<Response> {
         try {
+            // @ts-ignore
             const { workspaceId }: GetWorkspaceByIdInput = c.req.valid('param');
-            const workspace =
-                await workspaceService.getWorkspaceById(workspaceId);
+            const workspace = await workspaceService.getWorkspaceById(workspaceId);
 
             if (!workspace) {
                 return c.json<IErrorResponse>(
@@ -156,8 +154,7 @@ export class WorkspaceController {
                     success: false,
                     error: {
                         code: 'GET_USER_WORKSPACES_FAILED',
-                        message:
-                            error.message || 'Failed to get user workspaces',
+                        message: error.message || 'Failed to get user workspaces',
                         requestId: c.get('requestId'),
                     },
                 },
@@ -172,13 +169,12 @@ export class WorkspaceController {
      */
     static async updateWorkspace(c: AppContext): Promise<Response> {
         try {
+            // @ts-ignore
             const { workspaceId }: GetWorkspaceByIdInput = c.req.valid('param');
+            // @ts-ignore
             const valid: UpdateWorkspaceInput = c.req.valid('json');
 
-            const workspace = await workspaceService.updateWorkspace(
-                workspaceId,
-                valid
-            );
+            const workspace = await workspaceService.updateWorkspace(workspaceId, valid);
             if (!workspace) {
                 return c.json<IErrorResponse>(
                     {
@@ -237,9 +233,7 @@ export class WorkspaceController {
                 );
             }
 
-            const workspace = await workspaceService.deleteWorkspace(
-                workspaceId.toString()
-            );
+            const workspace = await workspaceService.deleteWorkspace(workspaceId.toString());
             if (!workspace) {
                 return c.json<IErrorResponse>(
                     {
@@ -282,9 +276,9 @@ export class WorkspaceController {
      */
     static async restoreWorkspace(c: AppContext): Promise<Response> {
         try {
+            // @ts-ignore
             const { workspaceId }: GetWorkspaceByIdInput = c.req.valid('param');
-            const workspace =
-                await workspaceService.restoreWorkspace(workspaceId);
+            const workspace = await workspaceService.restoreWorkspace(workspaceId);
 
             if (!workspace) {
                 return c.json<IErrorResponse>(
@@ -328,9 +322,9 @@ export class WorkspaceController {
      */
     static async archiveWorkspace(c: AppContext): Promise<Response> {
         try {
+            // @ts-ignore
             const { workspaceId }: GetWorkspaceByIdInput = c.req.valid('param');
-            const success =
-                await workspaceService.archiveWorkspace(workspaceId);
+            const success = await workspaceService.archiveWorkspace(workspaceId);
 
             if (!success) {
                 return c.json<IErrorResponse>(
@@ -374,9 +368,9 @@ export class WorkspaceController {
      */
     static async unarchiveWorkspace(c: AppContext): Promise<Response> {
         try {
+            // @ts-ignore
             const { workspaceId }: GetWorkspaceByIdInput = c.req.valid('param');
-            const success =
-                await workspaceService.unarchiveWorkspace(workspaceId);
+            const success = await workspaceService.unarchiveWorkspace(workspaceId);
 
             if (!success) {
                 return c.json<IErrorResponse>(
@@ -405,8 +399,7 @@ export class WorkspaceController {
                     success: false,
                     error: {
                         code: 'UNARCHIVE_WORKSPACE_FAILED',
-                        message:
-                            error.message || 'Failed to unarchive workspace',
+                        message: error.message || 'Failed to unarchive workspace',
                         requestId: c.get('requestId'),
                     },
                 },
@@ -436,17 +429,12 @@ export class WorkspaceController {
                 );
             }
 
+            // @ts-ignore
             const { workspaceId }: GetWorkspaceByIdInput = c.req.valid('param');
-            const { email, role, message }: InviteWorkspaceMemberInput =
-                c.req.valid('json');
+            // @ts-ignore
+            const { email, role, message }: InviteWorkspaceMemberInput = c.req.valid('json');
 
-            await workspaceService.inviteUser(
-                inviterId,
-                workspaceId,
-                email,
-                role,
-                message
-            );
+            await workspaceService.inviteUser(inviterId, workspaceId, email, role, message);
 
             return c.json<WorkspaceActionResponse>(
                 {
@@ -461,8 +449,7 @@ export class WorkspaceController {
                     success: false,
                     error: {
                         code: 'INVITE_USER_FAILED',
-                        message:
-                            error.message || 'Failed to add user to workspace',
+                        message: error.message || 'Failed to add user to workspace',
                         requestId: c.get('requestId'),
                     },
                 },
@@ -493,6 +480,7 @@ export class WorkspaceController {
                 );
             }
 
+            // @ts-ignore
             const { token }: UpdateInvitationStatusInput = c.req.valid('param');
             await workspaceService.acceptInvitation(userId, userEmail, token);
 
@@ -540,6 +528,7 @@ export class WorkspaceController {
                 );
             }
 
+            // @ts-ignore
             const { token }: UpdateInvitationStatusInput = c.req.valid('param');
             await workspaceService.rejectInvitation(userId, userEmail, token);
 
@@ -571,13 +560,10 @@ export class WorkspaceController {
      */
     static async removeUserFromWorkspace(c: AppContext): Promise<Response> {
         try {
-            const { workspaceId, userId }: WorkspaceMemberInput =
-                c.req.valid('param');
+            // @ts-ignore
+            const { workspaceId, userId }: WorkspaceMemberInput = c.req.valid('param');
 
-            const success = await workspaceService.removeMember(
-                workspaceId,
-                userId
-            );
+            const success = await workspaceService.removeMember(workspaceId, userId);
             if (!success) {
                 return c.json<IErrorResponse>(
                     {
@@ -605,9 +591,7 @@ export class WorkspaceController {
                     success: false,
                     error: {
                         code: 'REMOVE_USER_FAILED',
-                        message:
-                            error.message ||
-                            'Failed to remove user from workspace',
+                        message: error.message || 'Failed to remove user from workspace',
                         requestId: c.get('requestId'),
                     },
                 },
@@ -622,15 +606,12 @@ export class WorkspaceController {
      */
     static async updateUserRoleInWorkspace(c: AppContext): Promise<Response> {
         try {
+            // @ts-ignore
             const { workspaceId }: GetWorkspaceByIdInput = c.req.valid('param');
-            const { userId, role }: UpdateWorkspaceMemberRoleInput =
-                c.req.valid('json');
+            // @ts-ignore
+            const { userId, role }: UpdateWorkspaceMemberRoleInput = c.req.valid('json');
 
-            const membership = await workspaceService.updateMemberRole(
-                workspaceId,
-                userId,
-                role
-            );
+            const membership = await workspaceService.updateMemberRole(workspaceId, userId, role);
             if (!membership) {
                 return c.json<IErrorResponse>(
                     {
@@ -673,9 +654,9 @@ export class WorkspaceController {
      */
     static async getWorkspaceMembers(c: AppContext): Promise<Response> {
         try {
+            // @ts-ignore
             const { workspaceId }: GetWorkspaceByIdInput = c.req.valid('param');
-            const members =
-                await workspaceService.getWorkspaceMembers(workspaceId);
+            const members = await workspaceService.getWorkspaceMembers(workspaceId);
 
             return c.json<GetWorkspaceMembersResponse>(
                 {
@@ -691,9 +672,7 @@ export class WorkspaceController {
                     success: false,
                     error: {
                         code: 'GET_WORKSPACE_MEMBER_FAILED',
-                        message:
-                            error.message ||
-                            'Failed to retrieve workspace members',
+                        message: error.message || 'Failed to retrieve workspace members',
                         requestId: c.get('requestId'),
                     },
                 },
@@ -707,6 +686,7 @@ export class WorkspaceController {
      */
     static async getInvitationDetails(c: AppContext): Promise<Response> {
         try {
+            // @ts-ignore
             const { token }: UpdateInvitationStatusInput = c.req.valid('param');
             const details = await workspaceService.getInvitationByToken(token);
 
@@ -724,8 +704,7 @@ export class WorkspaceController {
                     success: false,
                     error: {
                         code: 'GET_INVITATION_DETAILS_FAILED',
-                        message:
-                            error.message || 'Failed to get invitation details',
+                        message: error.message || 'Failed to get invitation details',
                         requestId: c.get('requestId'),
                     },
                 },

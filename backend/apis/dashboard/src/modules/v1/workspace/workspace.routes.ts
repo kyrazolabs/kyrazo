@@ -4,10 +4,7 @@ import { WorkspaceController } from '@/modules/v1/workspace/workspace.controller
 import { authenticate } from '@/core/middlewares/auth.middleware';
 import { requireWorkspaceMembershipParam } from '@/core/middlewares/workspace.middleware';
 import { checkWorkspaceLimits } from '@/core/middlewares/limits.middleware';
-import {
-    workspaceReadRateLimiter,
-    workspaceWriteRateLimiter,
-} from './workspace.rate-limiter';
+import { workspaceReadRateLimiter, workspaceWriteRateLimiter } from './workspace.rate-limiter';
 import {
     CreateWorkspaceSchema,
     GetWorkspaceByIdSchema,
@@ -45,11 +42,7 @@ workspace.post(
     WorkspaceController.createWorkspace
 );
 
-workspace.get(
-    '/',
-    workspaceReadRateLimiter,
-    WorkspaceController.getUserWorkspaces
-);
+workspace.get('/', workspaceReadRateLimiter, WorkspaceController.getUserWorkspaces);
 
 // This route does not require authentication
 workspace.get(

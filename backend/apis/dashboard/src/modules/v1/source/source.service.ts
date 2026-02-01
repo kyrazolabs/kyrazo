@@ -2,6 +2,7 @@ import { Types } from 'mongoose';
 import {
     CreateSourceInput,
     UpdateSourceInput,
+    UpdateSourceAuthInput,
     SourceAuthType,
 } from './source.schema';
 import { sourceRepository } from './source.repo';
@@ -22,22 +23,14 @@ export class SourceService {
         projectId: string
     ) {
         if (!valid.authentication?.enabled) {
-            throw new Error(
-                'Authentication is required for receive type sources.'
-            );
+            throw new Error('Authentication is required for receive type sources.');
         }
 
         // Handle different authentication types for receive sources
         let processedAuth: any;
 
-        if (
-            valid.authentication.type === 'service' &&
-            valid.authentication.service
-        ) {
-            const encrypted = secretCrypto.encrypt(
-                projectId,
-                valid.authentication.service.secret
-            );
+        if (valid.authentication.type === 'service' && valid.authentication.service) {
+            const encrypted = secretCrypto.encrypt(projectId, valid.authentication.service.secret);
             processedAuth = {
                 enabled: true,
                 type: 'service' as SourceAuthType,
@@ -104,11 +97,7 @@ export class SourceService {
         }
     }
 
-    async getSources(
-        query: Record<string, unknown>,
-        limit: number,
-        page: number
-    ) {
+    async getSources(query: Record<string, unknown>, limit: number, page: number) {
         try {
             const { sources, total } = await sourceRepository.findAll({
                 query,
@@ -116,32 +105,33 @@ export class SourceService {
                 page,
             });
             // Decrypt secrets for all sources before returning
-            const decryptedSources = sources.map(source =>
-                decryptSourceSecrets(source)
-            );
-            return { sources: decryptedSources, total };
+            // const decryptedSources = sources.map(source =>
+            //     decryptSourceSecrets(source)
+            // );
+            // return { sources: decryptedSources, total };
+            const sanitizedSources = sources.map(source => {
+                const s = { ...source };
+                delete s.authentication;
+                return s;
+            });
+            return { sources: sanitizedSources, total };
         } catch (error) {
             logger.error('Failed to get sources:', error as Error);
             throw new Error('Failed to get sources');
         }
     }
 
-    async getSourceById(
-        sourceId: string,
-        workspaceId: string,
-        projectId: string
-    ) {
+    async getSourceById(sourceId: string, workspaceId: string, projectId: string) {
         try {
-            const source = await sourceRepository.findById(
-                sourceId,
-                workspaceId,
-                projectId
-            );
+            const source = await sourceRepository.findById(sourceId, workspaceId, projectId);
             if (!source) {
                 throw new Error('Source not found');
             }
             // Decrypt secrets before returning
-            return decryptSourceSecrets(source);
+            // return decryptSourceSecrets(source);
+            const s = { ...source };
+            delete s.authentication;
+            return s;
         } catch (error) {
             logger.error('Failed to get source by id:', error as Error);
             throw error;
@@ -155,23 +145,14 @@ export class SourceService {
         valid: UpdateSourceInput
     ) {
         try {
-            const source = await sourceRepository.findById(
-                sourceId,
-                workspaceId,
-                projectId
-            );
+            const source = await sourceRepository.findById(sourceId, workspaceId, projectId);
             if (!source) {
                 throw new Error('Source not found');
             }
             // TODO: Handle auth update if necessary, keeping simple update for now based on existing controller
             // If authentication is being updated, we might need to re-encrypt.
 
-            const updated = await sourceRepository.update(
-                sourceId,
-                workspaceId,
-                projectId,
-                valid
-            );
+            const updated = await sourceRepository.update(sourceId, workspaceId, projectId, valid);
             if (!updated) {
                 throw new Error('Failed to update source');
             }
@@ -182,23 +163,60 @@ export class SourceService {
         }
     }
 
-    async deleteSource(
-        sourceId: string,
-        workspaceId: string,
-        projectId: string
-    ): Promise<boolean> {
+    async deleteSource(sourceId: string, workspaceId: string, projectId: string): Promise<boolean> {
         try {
-            const deleted = await sourceRepository.deleteById(
-                sourceId,
-                workspaceId,
-                projectId
-            );
+            const deleted = await sourceRepository.deleteById(sourceId, workspaceId, projectId);
             if (!deleted) {
                 throw new Error('Failed to delete source');
             }
             return deleted;
         } catch (error) {
             logger.error('Failed to delete source:', error as Error);
+            throw error;
+        }
+    }
+    async updateSourceAuth(
+        sourceId: string,
+        workspaceId: string,
+        projectId: string,
+        valid: UpdateSourceAuthInput
+    ) {
+        try {
+            const source = await sourceRepository.findById(sourceId, workspaceId, projectId);
+            if (!source) {
+                throw new Error('Source not found');
+            }
+
+            let processedAuth: any;
+
+            if (valid.authentication.type === 'service' && valid.authentication.service) {
+                const encrypted = secretCrypto.encrypt(
+                    projectId,
+                    valid.authentication.service.secret
+                );
+                processedAuth = {
+                    enabled: valid.authentication.enabled,
+                    type: 'service' as SourceAuthType,
+                    credentials: {
+                        secret: encrypted.encrypted,
+                        iv: encrypted.iv,
+                    },
+                };
+            }
+
+            const updated = await sourceRepository.update(sourceId, workspaceId, projectId, {
+                authentication: processedAuth,
+            });
+
+            if (!updated) {
+                throw new Error('Failed to update source authentication');
+            }
+
+            return {
+                message: 'Authentication updated successfully',
+            };
+        } catch (error) {
+            logger.error('Failed to update source auth:', error as Error);
             throw error;
         }
     }

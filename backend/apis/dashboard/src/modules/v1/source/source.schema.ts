@@ -202,5 +202,22 @@ export type CreateSourceInput = z.infer<typeof CreateSourceSchema>;
 
 export type UpdateSourceInput = z.infer<typeof UpdateSourceSchema>;
 
+export const UpdateSourceAuthSchema = z.object({
+    authentication: z.object({
+        enabled: z.boolean().default(true),
+        type: sourceAuthType,
+        service: z
+            .object({
+                secret: z
+                    .string()
+                    .min(3, 'Signing secret must be at least 3 characters')
+                    .max(250, 'Signing secret must be at most 250 characters'),
+            })
+            .optional(),
+    }),
+});
+
+export type UpdateSourceAuthInput = z.infer<typeof UpdateSourceAuthSchema>;
+
 export type GetSourceByIdInput = z.infer<typeof GetSourceByIdSchema>;
 export type FilterSourcesInput = z.infer<typeof SearchSourceSchema>;

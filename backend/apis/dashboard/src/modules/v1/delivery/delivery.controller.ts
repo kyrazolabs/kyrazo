@@ -55,19 +55,16 @@ export class DeliveryController {
                 );
             }
 
-            const { sourceId }: GetDeliveriesBySourceIdInput =
-                c.req.valid('param');
-            const { limit = 10, page = 1 }: IFilterDeliveryBySource =
-                c.req.valid('query');
+            const { sourceId }: GetDeliveriesBySourceIdInput = c.req.valid('param');
+            const { limit = 10, page = 1 }: IFilterDeliveryBySource = c.req.valid('query');
 
-            const { data: deliveries, total } =
-                await DeliveryRepo.getDeliveriesBySource(
-                    sourceId,
-                    workspaceId.toString(),
-                    projectId.toString(),
-                    limit,
-                    page
-                );
+            const { data: deliveries, total } = await DeliveryRepo.getDeliveriesBySource(
+                sourceId,
+                workspaceId.toString(),
+                projectId.toString(),
+                limit,
+                page
+            );
 
             return c.json<IGetDeliveriesResponse>(
                 {
@@ -120,20 +117,15 @@ export class DeliveryController {
                 );
             }
 
-            const {
-                status,
-                limit = 10,
-                page = 1,
-            }: IFilterDelivery = c.req.valid('query');
+            const { status, limit = 10, page = 1 }: IFilterDelivery = c.req.valid('query');
 
-            const { data: deliveries, total } =
-                await DeliveryRepo.getDeliveries(
-                    workspaceId.toString(),
-                    projectId.toString(),
-                    status,
-                    limit,
-                    page
-                );
+            const { data: deliveries, total } = await DeliveryRepo.getDeliveries(
+                workspaceId.toString(),
+                projectId.toString(),
+                status,
+                limit,
+                page
+            );
 
             return c.json<IGetDeliveriesResponse>(
                 {
@@ -149,10 +141,7 @@ export class DeliveryController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in DeliveryController.getDeliveries',
-                error as Error
-            );
+            logger.error('Unexpected error in DeliveryController.getDeliveries', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -186,8 +175,7 @@ export class DeliveryController {
                 );
             }
 
-            const { limit = 10, page = 1 }: IFilterDelivery =
-                c.req.valid('query');
+            const { limit = 10, page = 1 }: IFilterDelivery = c.req.valid('query');
 
             const { data: deliveries, total } = await DeliveryRepo.getTargets(
                 workspaceId.toString(),
@@ -210,10 +198,7 @@ export class DeliveryController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in DeliveryController.getTargets',
-                error as Error
-            );
+            logger.error('Unexpected error in DeliveryController.getTargets', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -246,18 +231,18 @@ export class DeliveryController {
                     401
                 );
             }
-            const { limit = 10, page = 1 }: IFilterDelivery =
-                c.req.valid('query');
+            // @ts-ignore
+            const { limit = 10, page = 1 }: IFilterDelivery = c.req.valid('query');
+            // @ts-ignore
             const { target }: GetDeliveriesByTargetInput = c.req.valid('param');
 
-            const { data: deliveries, total } =
-                await DeliveryRepo.getDeliveriesByTarget(
-                    target,
-                    workspaceId.toString(),
-                    projectId.toString(),
-                    limit,
-                    page
-                );
+            const { data: deliveries, total } = await DeliveryRepo.getDeliveriesByTarget(
+                target,
+                workspaceId.toString(),
+                projectId.toString(),
+                limit,
+                page
+            );
 
             return c.json<IGetDeliveriesResponse>(
                 {
@@ -273,10 +258,7 @@ export class DeliveryController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in DeliveryController.getByTarget',
-                error as Error
-            );
+            logger.error('Unexpected error in DeliveryController.getByTarget', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -326,10 +308,7 @@ export class DeliveryController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in DeliveryController.getDeliveryById',
-                error as Error
-            );
+            logger.error('Unexpected error in DeliveryController.getDeliveryById', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -368,17 +347,13 @@ export class DeliveryController {
 
             const last = days.replace(/\D/g, '');
 
-            const {
-                stats,
-                deliveryTrends,
-                topEventTypes,
-                statusCodeDistribution,
-            } = await DeliveryRepo.getDeliveriesOverviewByTarget(
-                parseInt(last),
-                target,
-                workspaceId.toString(),
-                projectId.toString()
-            );
+            const { stats, deliveryTrends, topEventTypes, statusCodeDistribution } =
+                await DeliveryRepo.getDeliveriesOverviewByTarget(
+                    parseInt(last),
+                    target,
+                    workspaceId.toString(),
+                    projectId.toString()
+                );
 
             // Calculate success rate
             const total = Number(stats.total_deliveries) || 0;
@@ -386,10 +361,7 @@ export class DeliveryController {
             const failed = Number(stats.failed_deliveries) || 0;
             const pending = Number(stats.pending_deliveries) || 0;
             const average = Number(stats.average_delivery_time) || null;
-            const successRate =
-                total > 0
-                    ? Math.round((successful / total) * 100 * 100) / 100
-                    : 0; // Round to 2 decimal places
+            const successRate = total > 0 ? Math.round((successful / total) * 100 * 100) / 100 : 0; // Round to 2 decimal places
 
             return c.json(
                 {
@@ -449,20 +421,15 @@ export class DeliveryController {
                 );
             }
 
-            const {
-                status,
-                limit = 10,
-                page = 1,
-            }: IFilterIngest = c.req.valid('query');
+            const { status, limit = 10, page = 1 }: IFilterIngest = c.req.valid('query');
 
-            const { data: deliveries, total } =
-                await IngestRepo.getIngestEvents(
-                    workspaceId.toString(),
-                    projectId.toString(),
-                    status,
-                    limit,
-                    page
-                );
+            const { data: deliveries, total } = await IngestRepo.getIngestEvents(
+                workspaceId.toString(),
+                projectId.toString(),
+                status,
+                limit,
+                page
+            );
 
             return c.json<IGetReceivedEventsResponse>(
                 {
@@ -478,10 +445,7 @@ export class DeliveryController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in DeliveryController.getDeliveries',
-                error as Error
-            );
+            logger.error('Unexpected error in DeliveryController.getDeliveries', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -529,19 +493,16 @@ export class DeliveryController {
                 );
             }
 
-            const { sourceId }: GetDeliveriesBySourceIdInput =
-                c.req.valid('param');
-            const { limit = 10, page = 1 }: IFilterDeliveryBySource =
-                c.req.valid('query');
+            const { sourceId }: GetDeliveriesBySourceIdInput = c.req.valid('param');
+            const { limit = 10, page = 1 }: IFilterDeliveryBySource = c.req.valid('query');
 
-            const { data: deliveries, total } =
-                await IngestRepo.getReceivedEventsBySource(
-                    sourceId,
-                    workspaceId.toString(),
-                    projectId.toString(),
-                    limit,
-                    page
-                );
+            const { data: deliveries, total } = await IngestRepo.getReceivedEventsBySource(
+                sourceId,
+                workspaceId.toString(),
+                projectId.toString(),
+                limit,
+                page
+            );
 
             return c.json<IGetReceivedEventsResponse>(
                 {
@@ -610,10 +571,7 @@ export class DeliveryController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in DeliveryController.getDeliveryById',
-                error as Error
-            );
+            logger.error('Unexpected error in DeliveryController.getDeliveryById', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -634,8 +592,7 @@ export class DeliveryController {
         if (!projectId) return delivery;
 
         const tryDecrypt = (field: string) => {
-            if (!field || typeof field !== 'string' || !field.includes(':'))
-                return field;
+            if (!field || typeof field !== 'string' || !field.includes(':')) return field;
             const [iv, encrypted] = field.split(':');
             if (!iv || !encrypted) return field;
             try {
