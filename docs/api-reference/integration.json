@@ -2130,13 +2130,6 @@
                                             "retryPolicy": {
                                                 "maxAttempts": 3
                                             },
-                                            "authentication": {
-                                                "enabled": true,
-                                                "type": "service",
-                                                "credentials": {
-                                                    "secret": "eyJhbGc..."
-                                                }
-                                            },
                                             "createdAt": "2026-01-23T10:28:02.577Z",
                                             "updatedAt": "2026-01-23T10:28:02.577Z"
                                         }
@@ -2404,13 +2397,6 @@
                                         ],
                                         "retryPolicy": {
                                             "maxAttempts": 3
-                                        },
-                                        "authentication": {
-                                            "enabled": true,
-                                            "type": "service",
-                                            "credentials": {
-                                                "secret": "eyJhbGc..."
-                                            }
                                         },
                                         "createdAt": "2026-01-23T10:28:02.577Z",
                                         "updatedAt": "2026-01-23T10:28:02.577Z"
