@@ -229,22 +229,29 @@ export class DispatchConsumer extends EventEmitter {
 
             // Update delivery attempt record with final headers
             deliveryAttempt.request_header = JSON.stringify(headers);
-            logger.debug(`✅ Message signed successfully`);
             await job.log(`✅ Message signed`);
-
-            logger.info(`📤 Sending POST request to ${target.url}...`);
             await job.log(`📤 Sending POST request to ${target.url}`);
             const response = await httpRequester.post(target.url, body, {
                 headers: headers,
             });
-
-            logger.info(
-                `📥 Received response from ${target.url}: ${response.status}`,
-            );
             await job.log(`📥 Received response: ${response.status}`);
 
+            // Update delivery attempt with response details
+            deliveryAttempt.response_code = response.status;
+            deliveryAttempt.response_header = JSON.stringify(response.headers);
+            deliveryAttempt.response_body =
+                typeof response.data === "string"
+                    ? response.data
+                    : JSON.stringify(response.data);
+            deliveryAttempt.response_time_ms = response.duration;
+
+            if (response.status < 200 || response.status >= 300) {
+                throw new Error(
+                    `Target responded with status: ${response.status}`,
+                );
+            }
+
             // DEBUG: Add to Delivery Attempt Collection
-            logger.info(`📦 Sending delivery attempt to ClickHouse sink...`);
             await job.log(`📦 Sending success report to ClickHouse sink...`);
             await dispatchProducer
                 .getQueues()
@@ -254,15 +261,6 @@ export class DispatchConsumer extends EventEmitter {
                         ...deliveryAttempt,
                         status: DeliveryStatus.DELIVERED,
                         attempt_number: job.attemptsMade + 1,
-
-                        response_code: response.status,
-                        response_header: JSON.stringify(response.headers),
-                        response_body:
-                            typeof response.data === "string"
-                                ? response.data
-                                : JSON.stringify(response.data),
-                        response_time_ms: response.duration,
-
                         processed_at: toCHDate(new Date()),
                     },
                 );
@@ -318,7 +316,7 @@ export class DispatchConsumer extends EventEmitter {
                     projectId: deliveryAttempt.project_id,
                     targetId: deliveryAttempt.target_id,
                     eventType: deliveryAttempt.event_type,
-                    responseCode: 400, // or 500? Use 0 or -1?
+                    responseCode: deliveryAttempt.response_code ?? 500,
                     status: DeliveryStatus.FAILED,
                     latencyMs: 0,
                     timestamp: new Date(),
@@ -348,7 +346,7 @@ export class DispatchConsumer extends EventEmitter {
                     projectId: deliveryAttempt.project_id,
                     targetId: deliveryAttempt.target_id,
                     eventType: deliveryAttempt.event_type,
-                    responseCode: 0,
+                    responseCode: deliveryAttempt.response_code ?? 0,
                     status: DeliveryStatus.PROCESSING,
                     latencyMs: 0,
                     timestamp: new Date(),
