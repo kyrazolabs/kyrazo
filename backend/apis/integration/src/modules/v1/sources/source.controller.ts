@@ -27,12 +27,7 @@ export class SourceController {
             const projectId = c.project!.projectId.toString();
             const userId = c.userId!;
 
-            const saved = await sourceService.createSource(
-                valid,
-                userId,
-                workspaceId,
-                projectId
-            );
+            const saved = await sourceService.createSource(valid, userId, workspaceId, projectId);
 
             return c.json<CreateSourceResponse>(
                 {
@@ -51,10 +46,7 @@ export class SourceController {
                 {
                     success: false,
                     message: 'Failed to create source',
-                    error:
-                        error instanceof Error
-                            ? error.message
-                            : 'Unknown error',
+                    error: error instanceof Error ? error.message : 'Unknown error',
                 },
                 500
             );
@@ -64,12 +56,7 @@ export class SourceController {
     static async getSources(c: AppContext) {
         try {
             // @ts-ignore
-            const {
-                q,
-                status,
-                limit = 10,
-                page = 1,
-            }: FilterSourcesInput = c.req.valid('query');
+            const { q, status, limit = 10, page = 1 }: FilterSourcesInput = c.req.valid('query');
 
             const workspaceId = c.workspace!.workspaceId.toString();
             const projectId = c.project!.projectId.toString();
@@ -86,11 +73,7 @@ export class SourceController {
                 query.status = status;
             }
 
-            const { sources, total } = await sourceService.getSources(
-                query,
-                limit,
-                page
-            );
+            const { sources, total } = await sourceService.getSources(query, limit, page);
 
             return c.json<GetSourcesResponse>(
                 {
@@ -119,11 +102,7 @@ export class SourceController {
             const workspaceId = c.workspace!.workspaceId.toString();
             const projectId = c.project!.projectId.toString();
 
-            const source = await sourceService.getSourceById(
-                sourceId,
-                workspaceId,
-                projectId
-            );
+            const source = await sourceService.getSourceById(sourceId, workspaceId, projectId);
 
             return c.json<GetSourceResponse>(
                 {
@@ -207,11 +186,7 @@ export class SourceController {
             const workspaceId = c.workspace!.workspaceId.toString();
             const projectId = c.project!.projectId.toString();
 
-            const deleted = await sourceService.deleteSource(
-                sourceId,
-                workspaceId,
-                projectId
-            );
+            const deleted = await sourceService.deleteSource(sourceId, workspaceId, projectId);
 
             return c.json<DeleteSourceResponse>(
                 {

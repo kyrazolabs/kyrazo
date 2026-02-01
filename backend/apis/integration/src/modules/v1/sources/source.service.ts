@@ -104,8 +104,14 @@ export class SourceService {
                 page,
             });
             // Decrypt secrets for all sources before returning
-            const decryptedSources = sources.map(source => decryptSourceSecrets(source));
-            return { sources: decryptedSources, total };
+            // const decryptedSources = sources.map(source => decryptSourceSecrets(source));
+            // return { sources: decryptedSources, total };
+            const sanitizedSources = sources.map(source => {
+                const s = { ...source };
+                delete s.authentication;
+                return s;
+            });
+            return { sources: sanitizedSources, total };
         } catch (error) {
             logger.error('Failed to get sources:', error as Error);
             throw new Error('Failed to get sources');
@@ -119,7 +125,10 @@ export class SourceService {
                 throw new Error('Source not found');
             }
             // Decrypt secrets before returning
-            return decryptSourceSecrets(source);
+            // return decryptSourceSecrets(source);
+            const s = { ...source };
+            delete s.authentication;
+            return s;
         } catch (error) {
             logger.error('Failed to get source by id:', error as Error);
             throw error;
