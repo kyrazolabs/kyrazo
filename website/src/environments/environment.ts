@@ -9,4 +9,7 @@ export const environment = {
         key: 'phc_3YHwJQbSU1f4xiVk8uPVtArvWAhGh55nZOQ3Oc49Cy2',
         host: 'https://eu.i.posthog.com',
     },
+    cms: {
+        host: 'https://cms.kyrazo.com',
+    },
 };

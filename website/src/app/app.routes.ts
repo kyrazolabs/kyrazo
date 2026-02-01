@@ -66,6 +66,20 @@ export const routes: Routes = [
                     },
                 },
             },
+            {
+                path: 'blog',
+                loadChildren: () =>
+                    import('./pages/blog/blog.routes').then(
+                        (m) => m.BLOG_ROUTES,
+                    ),
+                data: {
+                    title: 'Blog',
+                    meta: {
+                        description:
+                            'Kyrazo Blog - Latest updates and articles.',
+                    },
+                },
+            },
         ],
     },
     {
