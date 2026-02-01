@@ -1,7 +1,9 @@
 export type EndpointStatus = 'active' | 'inactive';
 export type EndpointMethods = 'POST' | 'PUT' | 'PATCH' | 'GET' | 'DELETE';
-export enum IngressType { RECEIVE = 'receive', FORWARD = 'forward' }
-
+export enum IngressType {
+    RECEIVE = 'receive',
+    FORWARD = 'forward',
+}
 
 export interface IEndpoint<T = string> {
     _id: string;
@@ -24,16 +26,16 @@ export interface IEndpoint<T = string> {
         [key: string]: T;
     };
 
-    createAt: string
+    createdAt: string;
 }
 
 export interface EndpointStats {
-        totalRequests: number,
-        successfulRequests: number,
-        failedRequests: number,
-        avgResponseTime: number
+    totalRequests: number;
+    successfulRequests: number;
+    failedRequests: number;
+    avgResponseTime: number;
 }
 
-export interface Endpoint extends IEndpoint{
-    stats: EndpointStats
+export interface Endpoint extends IEndpoint {
+    stats: EndpointStats;
 }

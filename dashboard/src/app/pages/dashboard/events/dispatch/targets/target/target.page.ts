@@ -4,6 +4,7 @@ import {
     ViewChild,
     OnInit,
     inject,
+    signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
@@ -12,9 +13,13 @@ import { finalize } from 'rxjs';
 
 import { TableModule, Table, TableLazyLoadEvent } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
+import { SelectButtonModule } from 'primeng/selectbutton';
 import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { InputTextModule } from 'primeng/inputtext';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { TextareaModule } from 'primeng/textarea';
+import { CheckboxModule } from 'primeng/checkbox';
 import { ChartModule } from 'primeng/chart';
 import { TooltipModule } from 'primeng/tooltip';
 import { CardModule } from 'primeng/card';
@@ -34,6 +39,8 @@ import {
     IDeliveryAttempt,
 } from '@models/delivery.types';
 import { TargetService, ITarget } from '@core/services/target.service';
+import { DialogService } from '@shared/services/dialog.service';
+import { SentryService } from '@core/3rd-party/sentry';
 
 interface Delivery {
     _id: string;
@@ -62,6 +69,9 @@ interface Delivery {
     imports: [
         TagModule,
         InputTextModule,
+        InputNumberModule,
+        TextareaModule,
+        CheckboxModule,
         TooltipModule,
         ProgressSpinnerModule,
         IconFieldModule,
@@ -72,6 +82,7 @@ interface Delivery {
         CommonModule,
         FormsModule,
         SelectModule,
+        SelectButtonModule,
         ButtonModule,
         CardModule,
         ChartModule,
@@ -90,10 +101,23 @@ export class TargetPage implements OnInit, AfterViewInit {
     private readonly targetService = inject(TargetService);
     private readonly messageService = inject(MessageService);
     private readonly router = inject(Router);
+    private readonly dialogService = inject(DialogService);
+    private readonly sentry = inject(SentryService);
 
     targetId: string;
     targetEntity: ITarget | null = null;
     targetUrl: string;
+
+    activeTab: 'overview' | 'details' = 'overview';
+
+    tabOptions = [
+        { label: 'Overview', value: 'overview' },
+        { label: 'Details', value: 'details' },
+    ];
+
+    setActiveTab(tab: 'overview' | 'details') {
+        this.activeTab = tab;
+    }
 
     selectedTimeRange = 'last7days';
     timeRangeOptions = [
@@ -209,6 +233,10 @@ export class TargetPage implements OnInit, AfterViewInit {
                 this.loadStats();
             }
         });
+
+        this.dialogService.targetSaved$.subscribe(() => {
+            this.loadTargetEntity();
+        });
     }
 
     async loadTargetEntity() {
@@ -233,6 +261,12 @@ export class TargetPage implements OnInit, AfterViewInit {
                     // this.router.navigate(['/events/dispatch/targets']);
                 },
             });
+    }
+
+    openEditDialog() {
+        if (this.targetId) {
+            this.dialogService.openTargetDialog(this.targetId);
+        }
     }
 
     ngAfterViewInit() {
@@ -530,7 +564,7 @@ export class TargetPage implements OnInit, AfterViewInit {
 
         // Assuming deliveryService has a gets method similar to webhooks
         this.deliveryService
-            .getByTarget(this.targetUrl, queryParams)
+            .getByTarget(this.encodeTarget(this.targetUrl), queryParams)
             .pipe(finalize(() => this.loader.hide()))
             .subscribe({
                 next: (response) => {
@@ -691,8 +725,6 @@ export class TargetPage implements OnInit, AfterViewInit {
         this.loadStats();
     }
 
-    // ... existing helpers ...
-
     retryDelivery(deliveryId: string) {
         console.log('Retrying delivery:', deliveryId);
         // Simulate retry
@@ -773,6 +805,42 @@ export class TargetPage implements OnInit, AfterViewInit {
             return '#f43f5e'; // Rose-500
         }
         return '#64748b'; // Slate-500
+    }
+
+    formatDate(dateString: string): string {
+        if (!dateString) return '-';
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return '-';
+
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+    }
+
+    async copyToClipboard(text: string) {
+        try {
+            await navigator.clipboard.writeText(text);
+            this.messageService.add({
+                severity: 'success',
+                summary: 'Copied',
+                detail: 'Copied to clipboard',
+            });
+
+            // Visual feedback
+            this.copyTooltip.set('Copied!');
+            this.isCopied.set(true);
+
+            setTimeout(() => {
+                this.copyTooltip.set('Copy Secret');
+                this.isCopied.set(false);
+            }, 2000);
+        } catch (err) {
+            console.error('Failed to copy to clipboard:', err);
+        }
     }
 
     getDaysFromRange(range: string): number {
@@ -873,5 +941,45 @@ export class TargetPage implements OnInit, AfterViewInit {
             });
         });
         return aggregated.sort((a, b) => a.day.localeCompare(b.day));
+    }
+
+    encodeTarget(decoded: string): string {
+        const b64 = btoa(decoded);
+        return encodeURIComponent(b64);
+    }
+
+    // Secret Management
+    signingSecret = signal<string | null>(null);
+    isSecretVisible = signal<boolean>(false);
+    loadingSecret = signal<boolean>(false);
+    copyTooltip = signal<string>('Copy Secret');
+    isCopied = signal<boolean>(false);
+
+    toggleSecret() {
+        if (this.isSecretVisible()) {
+            this.isSecretVisible.set(false);
+            return;
+        }
+
+        if (this.signingSecret()) {
+            this.isSecretVisible.set(true);
+            return;
+        }
+
+        if (!this.targetId) return;
+
+        this.loadingSecret.set(true);
+        this.targetService.getSecret(this.targetId).subscribe({
+            next: (response) => {
+                this.signingSecret.set(response.data);
+                this.isSecretVisible.set(true);
+                this.loadingSecret.set(false);
+            },
+            error: (error) => {
+                this.sentry.captureException(error);
+                console.error('Failed to fetch secret:', error);
+                this.loadingSecret.set(false);
+            },
+        });
     }
 }

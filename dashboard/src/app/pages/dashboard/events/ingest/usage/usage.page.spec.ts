@@ -1,23 +1,22 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OverviewPage } from './usage.page';
+import { UsagePage } from './usage.page';
 
-describe('OverviewPage', () => {
-  let component: OverviewPage;
-  let fixture: ComponentFixture<OverviewPage>;
+describe('UsagePage', () => {
+    let component: UsagePage;
+    let fixture: ComponentFixture<UsagePage>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [OverviewPage]
-    })
-    .compileComponents();
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            imports: [UsagePage],
+        }).compileComponents();
 
-    fixture = TestBed.createComponent(OverviewPage);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+        fixture = TestBed.createComponent(UsagePage);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 });

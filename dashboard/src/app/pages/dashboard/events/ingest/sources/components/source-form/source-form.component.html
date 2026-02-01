@@ -1,0 +1,168 @@
+
+@if (initialLoading()) {
+    <div class="flex flex-col gap-6">
+        <div class="flex flex-col gap-4">
+            <div class="flex flex-col gap-2">
+                <p-skeleton width="10rem" height="1.5rem" class="mb-2"></p-skeleton>
+                <p-skeleton width="100%" height="2.5rem" borderRadius="12px"></p-skeleton>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <p-skeleton width="10rem" height="1.5rem" class="mb-2"></p-skeleton>
+                <p-skeleton width="100%" height="5rem" borderRadius="12px"></p-skeleton>
+            </div>
+
+             <div class="flex flex-col gap-2">
+                <p-skeleton width="10rem" height="1.5rem" class="mb-2"></p-skeleton>
+                <p-skeleton width="100%" height="2.5rem" borderRadius="12px"></p-skeleton>
+            </div>
+        </div>
+        <p-divider />
+        <div class="flex flex-col gap-4">
+            <p-skeleton width="8rem" height="1.5rem" class="mb-2"></p-skeleton>
+            <p-skeleton width="100%" height="2.5rem" borderRadius="12px"></p-skeleton>
+        </div>
+    </div>
+} @else {
+    <div class="flex flex-col gap-6" [formGroup]="sourceForm">
+        <!-- General Information -->
+        <div class="flex flex-col gap-4">
+            <div class="flex flex-col gap-2">
+                <label for="name" class="font-medium text-surface-900 dark:text-surface-0">
+                    Source Name <span class="text-red-500">*</span>
+                </label>
+                <input pInputText id="name" formControlName="name" placeholder="e.g. Stripe Payments"
+                    class="w-full rounded-xl!" size="small" />
+                @if (sourceForm.get('name')?.invalid && sourceForm.get('name')?.touched) {
+                    <small class="text-red-500">
+                        Source name is required.
+                    </small>
+                }
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <label for="description" class="font-medium text-surface-900 dark:text-surface-0">Description</label>
+                <textarea pTextarea id="description" formControlName="description" rows="3"
+                    placeholder="Describe this source..." class="w-full rounded-xl!"></textarea>
+            </div>
+
+            <!-- Status (Hidden for create or handled? Logic kept from Page) -->
+            @if (isEditing()) {
+                <div class="flex flex-col gap-2">
+                     <label class="font-medium text-surface-900 dark:text-surface-0">Status</label>
+                     <p-select [options]="statusOptions" formControlName="status" optionLabel="label" optionValue="value"
+                        class="w-full rounded-xl!" size="small"/>
+                </div>
+            }
+        </div>
+
+        <p-divider />
+
+        <!-- Service Selection -->
+        <div class="flex flex-col gap-4">
+            <h3 class="text-lg font-medium text-surface-900 dark:text-surface-0">Integration</h3>
+
+            <div class="flex flex-col gap-2">
+                <label class="font-medium text-surface-900 dark:text-surface-0">
+                    Service Provider <span class="text-red-500">*</span>
+                </label>
+                <p-select [options]="servicesItem" formControlName="service" optionLabel="label" optionValue="value"
+                    placeholder="Select a service" class="w-full rounded-xl!" size="small" [filter]="true" filterBy="label">
+                    <ng-template let-item pTemplate="item">
+                        <div class="flex items-center gap-2">
+                            <span [class]="item.icon + ' text-lg'"></span>
+                            <span>{{ item.label }}</span>
+                        </div>
+                    </ng-template>
+                    <ng-template let-item pTemplate="selectedItem">
+                        @if (item) {
+                            <div class="flex items-center gap-2">
+                                <span [class]="item.icon + ' text-lg'"></span>
+                                <span>{{ item.label }}</span>
+                            </div>
+                        }
+                    </ng-template>
+                </p-select>
+                @if (sourceForm.get('service')?.invalid && sourceForm.get('service')?.touched) {
+                    <small class="text-red-500">
+                        Service provider is required.
+                    </small>
+                }
+            </div>
+
+            <!-- Authentication (Create Mode Only - for Edit use 'Update Secret' action) -->
+            @if (!isEditing() && sourceForm.get('service')?.value && sourceForm.get('service')?.value !== 'general') {
+                <div class="flex flex-col gap-2" formGroupName="authentication">
+                     <label class="font-medium text-surface-900 dark:text-surface-0">
+                        Webhook Secret <span class="text-red-500">*</span>
+                    </label>
+                    <p-password formControlName="secret" [toggleMask]="true" [feedback]="false"
+                        placeholder="Enter webhook secret from provider" styleClass="w-full" inputStyleClass="w-full rounded-xl!"></p-password>
+                     <small class="text-surface-500 dark:text-surface-400">
+                        Required for signature verification.
+                    </small>
+                </div>
+            }
+        </div>
+
+
+        <!-- Event Types (Only for non-general services) -->
+        @if (sourceForm.get('service')?.value && sourceForm.get('service')?.value !== 'general') {
+            <div>
+                <p-divider />
+                <div class="flex items-center justify-start gap-4 mt-6">
+                    <p-toggle-switch formControlName="showEventTypes" />
+                    <span class="text-primary">Filter incoming event by their Event Type</span>
+                </div>
+
+                @if (sourceForm.get('showEventTypes')?.value) {
+                    <div class="flex flex-col gap-4 mt-4">
+                        <div formArrayName="eventTypes" class="space-y-3">
+                            @for (control of eventTypesArray.controls; track $index; let i = $index) {
+                                <div class="flex gap-2">
+                                    <input [formControlName]="i" pInputText placeholder="e.g. payment.succeeded" class="flex-1 rounded-xl!" />
+                                    <p-button icon="pi pi-trash" [text]="true" severity="danger" (onClick)="removeEventType(i)"
+                                        [disabled]="eventTypesArray.length === 1 && i === 0" styleClass="rounded-xl!" />
+                                </div>
+                            }
+                            <p-button label="Add Event Type" icon="pi pi-plus" [text]="true" size="small" (onClick)="addEventType()"
+                                styleClass="w-fit rounded-xl!" />
+                        </div>
+                        <small class="text-surface-500 dark:text-surface-400">
+                            Define which event types this source should accept. Leave empty to accept all.
+                        </small>
+                    </div>
+                }
+            </div>
+        }
+
+        <p-divider />
+
+        <!-- Forwarding -->
+        <div class="flex flex-col gap-4">
+            <h3 class="text-lg font-medium text-surface-900 dark:text-surface-0">Forwarding</h3>
+
+            <div class="flex flex-col gap-2">
+                <label class="font-medium text-surface-900 dark:text-surface-0">Forward to Endpoints</label>
+                <p-multiSelect [options]="availableEndpoints()" formControlName="endpoints" optionLabel="url" optionValue="_id"
+                    placeholder="Select endpoints" display="chip" class="w-full rounded-xl!" size="small" [filter]="true">
+                    <ng-template let-endpoint pTemplate="item">
+                        <div class="flex flex-col">
+                            <span class="font-medium">{{ endpoint.url }}</span>
+                            <span class="text-xs text-surface-500">{{ endpoint.description }}</span>
+                        </div>
+                    </ng-template>
+                </p-multiSelect>
+                <small class="text-surface-500 dark:text-surface-400">
+                    Automatically forward received events to these endpoints.
+                </small>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-4">
+            <p-button label="Cancel" icon="pi pi-times" size="small" [text]="true" (onClick)="cancel()" styleClass="rounded-xl!" />
+            <p-button [label]="isEditing() ? 'Update Source' : 'Create Source'" icon="pi pi-check" size="small"
+                [loading]="loading()" (onClick)="onSubmit()" styleClass="rounded-xl!" />
+        </div>
+    </div>
+}

@@ -28,14 +28,14 @@ export const eventsRoutes: Routes = [
             ),
         data: { title: 'Dispatch Targets', animation: 'dispatch-targets' },
     },
-    {
-        path: 'dispatch/targets/create',
-        loadComponent: () =>
-            import('./dispatch/targets/target/form/form.page').then(
-                (p) => p.TargetFormPage,
-            ),
-        data: { title: 'Create Target', animation: 'dispatch-target-create' },
-    },
+    // {
+    //     path: 'dispatch/targets/create',
+    //     loadComponent: () =>
+    //         import('./dispatch/targets/target/form/form.page').then(
+    //             (p) => p.TargetFormPage,
+    //         ),
+    //     data: { title: 'Create Target', animation: 'dispatch-target-create' },
+    // },
     {
         path: 'dispatch/targets/:id',
         loadComponent: () =>
@@ -45,14 +45,14 @@ export const eventsRoutes: Routes = [
         resolve: { target: targetResolver },
         data: { title: 'Dispatch Target', animation: 'dispatch-target' },
     },
-    {
-        path: 'dispatch/targets/:id/edit',
-        loadComponent: () =>
-            import('./dispatch/targets/target/form/form.page').then(
-                (p) => p.TargetFormPage,
-            ),
-        data: { title: 'Edit Target', animation: 'dispatch-target-edit' },
-    },
+    // {
+    //     path: 'dispatch/targets/:id/edit',
+    //     loadComponent: () =>
+    //         import('./dispatch/targets/target/form/form.page').then(
+    //             (p) => p.TargetFormPage,
+    //         ),
+    //     data: { title: 'Edit Target', animation: 'dispatch-target-edit' },
+    // },
     {
         path: 'dispatch/logs',
         loadComponent: () =>
@@ -81,14 +81,14 @@ export const eventsRoutes: Routes = [
         resolve: { sources: sourcesResolver },
         data: { title: 'Ingest Sources', animation: 'ingest-usage' },
     },
-    {
-        path: 'ingest/sources/create',
-        loadComponent: () =>
-            import('./ingest/sources/source/form/form.page').then(
-                (p) => p.FormPage,
-            ),
-        data: { title: 'New Source', animation: 'ingest-targets' },
-    },
+    // {
+    //     path: 'ingest/sources/create',
+    //     loadComponent: () =>
+    //         import('./ingest/sources/source/form/form.page').then(
+    //             (p) => p.FormPage,
+    //         ),
+    //     data: { title: 'New Source', animation: 'ingest-targets' },
+    // },
     {
         path: 'ingest/sources/view/:id',
         loadComponent: () =>
@@ -97,14 +97,14 @@ export const eventsRoutes: Routes = [
             ),
         data: { title: 'Source Details', animation: 'ingest-targets' },
     },
-    {
-        path: 'ingest/sources/:id/edit',
-        loadComponent: () =>
-            import('./ingest/sources/source/form/form.page').then(
-                (p) => p.FormPage,
-            ),
-        data: { title: 'Edit Source', animation: 'ingest-targets' },
-    },
+    // {
+    //     path: 'ingest/sources/:id/edit',
+    //     loadComponent: () =>
+    //         import('./ingest/sources/source/form/form.page').then(
+    //             (p) => p.FormPage,
+    //         ),
+    //     data: { title: 'Edit Source', animation: 'ingest-targets' },
+    // },
     {
         path: 'ingest/endpoints',
         loadComponent: () =>
@@ -114,14 +114,14 @@ export const eventsRoutes: Routes = [
         resolve: { data: endpointsResolver },
         data: { title: 'Endpoints', animation: 'endpoints' },
     },
-    {
-        path: 'ingest/endpoints/create',
-        loadComponent: () =>
-            import('./ingest/endpoints/form/form.page').then(
-                (p) => p.EndpointFormPage,
-            ),
-        data: { title: 'Create Endpoint', animation: 'endpoint-create' },
-    },
+    // {
+    //     path: 'ingest/endpoints/create',
+    //     loadComponent: () =>
+    //         import('./ingest/endpoints/form/form.page').then(
+    //             (p) => p.EndpointFormPage,
+    //         ),
+    //     data: { title: 'Create Endpoint', animation: 'endpoint-create' },
+    // },
     {
         path: 'ingest/endpoints/:id',
         loadComponent: () =>
@@ -130,14 +130,14 @@ export const eventsRoutes: Routes = [
             ),
         data: { title: 'Endpoint Details', animation: 'endpoint-detail' },
     },
-    {
-        path: 'ingest/endpoints/:id/edit',
-        loadComponent: () =>
-            import('./ingest/endpoints/form/form.page').then(
-                (p) => p.EndpointFormPage,
-            ),
-        data: { title: 'Edit Endpoint', animation: 'endpoint-edit' },
-    },
+    // {
+    //     path: 'ingest/endpoints/:id/edit',
+    //     loadComponent: () =>
+    //         import('./ingest/endpoints/form/form.page').then(
+    //             (p) => p.EndpointFormPage,
+    //         ),
+    //     data: { title: 'Edit Endpoint', animation: 'endpoint-edit' },
+    // },
     {
         path: 'ingest/logs',
         loadComponent: () =>

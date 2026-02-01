@@ -1,4 +1,4 @@
-<div class="space-y-6">
+<div class="space-y-6 mb-4">
   <!-- Header -->
   <div
     class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6"
@@ -27,7 +27,7 @@
         label="New Source"
         icon="pi pi-plus"
         [size]="'small'"
-        routerLink="/events/ingest/sources/create"
+        (onClick)="openCreateDialog()"
         styleClass="rounded-xl!"
       />
     </div>
@@ -193,7 +193,7 @@
                 size="small"
                 severity="secondary"
                 styleClass="rounded-xl!"
-                [routerLink]="['/events/ingest/sources', source._id || source.id, 'edit']"
+                (onClick)="openEditDialog(source)"
                 pTooltip="Edit Source"
                 tooltipStyleClass="text-xs! rounded-xl!"
               />
@@ -252,7 +252,7 @@
                     label="Add Source"
                     icon="pi pi-plus"
                     styleClass="rounded-xl!"
-                    routerLink="/events/ingest/sources/create"
+                    (onClick)="openCreateDialog()"
                     size="small"
                   />
                 </div>
@@ -270,3 +270,5 @@
 
 <!-- Toast Messages -->
 <p-toast />
+
+

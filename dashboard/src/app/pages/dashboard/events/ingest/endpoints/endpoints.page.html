@@ -1,4 +1,4 @@
-<div class="space-y-6">
+<div class="space-y-6 mb-4">
     <!-- Header -->
     <div
         class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
@@ -12,7 +12,7 @@
         <div class="flex items-center gap-4">
             <p-button label="Refresh" icon="pi pi-refresh" size="small" severity="secondary" [outlined]="true"
                 (onClick)="refreshEndpoints()" [loading]="loader.loading$ | async" styleClass="rounded-xl!" />
-            <p-button label="Add Endpoint" icon="pi pi-plus" size="small" routerLink="/events/ingest/endpoints/create"
+            <p-button label="Add Endpoint" icon="pi pi-plus" size="small" (onClick)="openCreateDialog()"
                 styleClass="rounded-xl!" />
         </div>
     </div>
@@ -113,7 +113,7 @@
                                 [routerLink]="['/events/ingest/endpoints', endpoint._id]" pTooltip="View Details"
                                 styleClass="rounded-xl!" tooltipStyleClass="text-xs! rounded-xl!" />
                             <p-button icon="pi pi-pencil" [outlined]="true" size="small" severity="secondary"
-                                [routerLink]="['/events/ingest/endpoints', endpoint._id, 'edit']" pTooltip="Edit Endpoint"
+                                (onClick)="openEditDialog(endpoint)" pTooltip="Edit Endpoint"
                                 styleClass="rounded-xl!" tooltipStyleClass="text-xs! rounded-xl!" />
                             <p-button [icon]="endpoint.status === 'active' ? 'pi pi-pause' : 'pi pi-play'"
                                 [outlined]="true" size="small"
@@ -150,7 +150,7 @@
                                         size="small" [outlined]="true" (onClick)="refreshEndpoints()" styleClass="rounded-xl!"
                                         *ngIf="searchQuery || activeFilter !== 'all'" />
                                     <p-button label="Add Endpoint" icon="pi pi-plus"
-                                        routerLink="/events/ingest/endpoints/create" size="small" styleClass="rounded-xl!" />
+                                        (onClick)="openCreateDialog()" size="small" styleClass="rounded-xl!" />
                                 </div>
                             </div>
                         </div>

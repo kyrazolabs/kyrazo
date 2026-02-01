@@ -1,23 +1,22 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CreateFirstWorksapce } from './create-first-worksapce';
+import { CreateFirstWorkspace } from './create-first-workspace';
 
-describe('CreateFirstWorksapce', () => {
-  let component: CreateFirstWorksapce;
-  let fixture: ComponentFixture<CreateFirstWorksapce>;
+describe('CreateFirstWorkspace', () => {
+    let component: CreateFirstWorkspace;
+    let fixture: ComponentFixture<CreateFirstWorkspace>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [CreateFirstWorksapce]
-    })
-    .compileComponents();
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            imports: [CreateFirstWorkspace],
+        }).compileComponents();
 
-    fixture = TestBed.createComponent(CreateFirstWorksapce);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+        fixture = TestBed.createComponent(CreateFirstWorkspace);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 });

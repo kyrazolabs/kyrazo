@@ -39,7 +39,7 @@
         <div class="rounded-xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center p-4">
                 <i class="icon-[hugeicons--checkmark-circle-04] size-14"></i>
             </div>
-            
+
             <div class="text-center space-y-2">
                 <h2 class="text-2xl font-bold">API Key Generated</h2>
                 <p class="text-surface-600 dark:text-surface-400 max-w-lg mx-auto">
@@ -133,4 +133,28 @@
             </div>
         </div>
     </div>
+</p-dialog>
+
+<!-- Source Form Dialog (Global) -->
+<p-dialog [header]="sourceDialogHeader" [(visible)]="sourceDialogVisible" [modal]="true" [style]="{ width: '600px' }"
+    [breakpoints]="{ '960px': '75vw', '640px': '90vw' }" styleClass="rounded-2xl!" [draggable]="false" [resizable]="false"
+    (onHide)="onSourceDialogHide()">
+    <app-source-form [sourceId]="sourceDialogId" (onSuccess)="onSourceFormSuccess($event)"
+        (onCancel)="onSourceDialogHide()"></app-source-form>
+</p-dialog>
+
+<!-- Endpoint Form Dialog (Global) -->
+<p-dialog [header]="endpointDialogHeader" [(visible)]="endpointDialogVisible" [modal]="true" [style]="{ width: '800px' }"
+    [breakpoints]="{ '960px': '90vw', '640px': '90vw' }" styleClass="rounded-2xl!" [draggable]="false" [resizable]="false"
+    (onHide)="onEndpointDialogHide()">
+    <app-endpoint-form [endpointId]="endpointDialogId" (onSuccess)="onEndpointFormSuccess($event)"
+        (onCancel)="onEndpointDialogHide()"></app-endpoint-form>
+</p-dialog>
+
+<!-- Target Form Dialog (Global) -->
+<p-dialog [header]="targetDialogHeader" [(visible)]="targetDialogVisible" [modal]="true" [style]="{ width: '800px' }"
+    [breakpoints]="{ '960px': '90vw', '640px': '90vw' }" styleClass="rounded-2xl!" [draggable]="false" [resizable]="false"
+    (onHide)="onTargetDialogHide()">
+    <app-target-form [targetId]="targetDialogId" (onSuccess)="onTargetFormSuccess($event)"
+        (onCancel)="onTargetDialogHide()"></app-target-form>
 </p-dialog>

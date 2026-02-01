@@ -2,22 +2,21 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { LogPage } from './log.page';
 
-describe('LogsPage', () => {
-  let component: LogsPage;
-  let fixture: ComponentFixture<LogsPage>;
+describe('LogPage', () => {
+    let component: LogPage;
+    let fixture: ComponentFixture<LogPage>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [LogsPage]
-    })
-    .compileComponents();
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            imports: [LogPage],
+        }).compileComponents();
 
-    fixture = TestBed.createComponent(LogsPage);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+        fixture = TestBed.createComponent(LogPage);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 });
