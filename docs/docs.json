@@ -121,7 +121,7 @@
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://kyrazo.com/dashboard"
+      "href": "https://dash.kyrazo.com"
     }
   },
   "contextual": {
