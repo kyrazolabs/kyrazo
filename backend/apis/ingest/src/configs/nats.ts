@@ -66,11 +66,13 @@ export class NatsConfig {
             // Connect to NATS
             this.nc = await connect({
                 servers: config.nats.servers,
-                tls: {
-                    certFile: config.nats.tls.certFile,
-                    keyFile: config.nats.tls.keyFile,
-                    caFile: config.nats.tls.caFile,
-                },
+                tls: config.isProduction
+                    ? {
+                          certFile: config.nats.tls.certFile,
+                          keyFile: config.nats.tls.keyFile,
+                          caFile: config.nats.tls.caFile,
+                      }
+                    : undefined,
                 user: config.nats.user,
                 pass: config.nats.password,
                 maxReconnectAttempts: config.nats.maxReconnectAttempts,
@@ -234,10 +236,7 @@ export class NatsConfig {
                 status: 'unhealthy',
                 details: {
                     connected: this.isConnected,
-                    error:
-                        error instanceof Error
-                            ? error.message
-                            : 'Unknown error',
+                    error: error instanceof Error ? error.message : 'Unknown error',
                 },
             };
         }

@@ -3,15 +3,12 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { redisConfig } from '@/configs';
 import { logger, mapToObject, PerformanceTimer } from '@kyrazo/shared';
-import {
-    type IErrorResponse,
-    type IReceivedEvent,
-    Source,
-} from '@kyrazo/shared';
+import { type IErrorResponse, type IReceivedEvent, Source } from '@kyrazo/shared';
 import { receiveEventPublisher } from '@/producers/jobs/v1/publishers';
 import { usageProducer } from '@/core/services/usage.producer';
 import { LimitChecker } from '@/core/services/limit.checker';
 import type { ingestInput } from './ingest.schema';
+import { getServiceFilter } from './service';
 
 export class ingestController {
     static async receiveEvent(c: Context) {
@@ -72,9 +69,7 @@ export class ingestController {
             }
 
             // Check limits
-            const canProceed = await LimitChecker.checkEventLimit(
-                source.workspaceId.toString()
-            );
+            const canProceed = await LimitChecker.checkEventLimit(source.workspaceId.toString());
             if (!canProceed) {
                 return c.json(
                     {
@@ -98,12 +93,28 @@ export class ingestController {
                 // Keep body empty if parsing fails
             }
 
-            const shard =
-                parseInt(source.workspaceId.toString().slice(-6), 16) % 10;
+            // Filter by event types if configured
+            if (source.eventTypes && source.eventTypes.length > 0) {
+                const serviceFilter = getServiceFilter(service || source.service);
+                if (serviceFilter) {
+                    const eventType = serviceFilter.getEventType(body);
+                    if (eventType && !source.eventTypes.includes(eventType)) {
+                        return c.json(
+                            {
+                                success: true,
+                                data: {
+                                    message: 'Event filtered out',
+                                },
+                            },
+                            200
+                        );
+                    }
+                }
+            }
 
-            const planSlug = await redisConfig.get(
-                `workspace:${source.workspaceId}`
-            );
+            const shard = parseInt(source.workspaceId.toString().slice(-6), 16) % 10;
+
+            const planSlug = await redisConfig.get(`workspace:${source.workspaceId}`);
 
             // Create the received event data
             const receivedEventData: IReceivedEvent & {
@@ -129,12 +140,7 @@ export class ingestController {
                 associatedEventId: undefined,
                 shard: shard,
             };
-            logger.info(
-                `message details : ${JSON.stringify(receivedEventData)}`
-            );
-
-            const receivedEventResult =
-                await receiveEventPublisher.receive(receivedEventData);
+            const receivedEventResult = await receiveEventPublisher.receive(receivedEventData);
 
             if (!receivedEventResult.success) {
                 throw new Error('Failed to publish receive event to NATS');

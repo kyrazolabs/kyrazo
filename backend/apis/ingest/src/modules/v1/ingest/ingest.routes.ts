@@ -47,9 +47,7 @@ ingest.post(
         'param',
         z.object({
             service: z.string('Invalid service').min(5, 'Service is required'),
-            IEId: z
-                .string('Invalid Ingress Endpoint')
-                .min(5, 'Ingress Endpoint is required'),
+            IEId: z.string('Invalid Ingress Endpoint').min(5, 'Ingress Endpoint is required'),
         }),
         (result, c) => {
             if (!result.success) {
@@ -57,12 +55,10 @@ ingest.post(
                     {
                         success: false,
                         statusCode: 400,
-                        errors: JSON.parse(result.error.message).map(
-                            (e: any) => ({
-                                field: e.path.join('.') || 'unknown',
-                                message: e.message,
-                            })
-                        ),
+                        errors: JSON.parse(result.error.message).map((e: any) => ({
+                            field: e.path.join('.') || 'unknown',
+                            message: e.message,
+                        })),
                     },
                     400
                 );
@@ -79,9 +75,7 @@ ingest.post(
     zValidator(
         'param',
         z.object({
-            IEId: z
-                .string('Invalid Ingress Endpoint')
-                .min(5, 'Ingress Endpoint is required'),
+            IEId: z.string('Invalid Ingress Endpoint').min(5, 'Ingress Endpoint is required'),
         }),
         (result, c) => {
             if (!result.success) {
@@ -89,12 +83,10 @@ ingest.post(
                     {
                         success: false,
                         statusCode: 400,
-                        errors: JSON.parse(result.error.message).map(
-                            (e: any) => ({
-                                field: e.path.join('.') || 'unknown',
-                                message: e.message,
-                            })
-                        ),
+                        errors: JSON.parse(result.error.message).map((e: any) => ({
+                            field: e.path.join('.') || 'unknown',
+                            message: e.message,
+                        })),
                     },
                     400
                 );

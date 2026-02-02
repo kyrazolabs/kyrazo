@@ -90,18 +90,14 @@ export class ReceiveEventPublisher {
                 });
                 logger.info('Created EVENTS JetStream stream');
             } catch (error: unknown) {
-                const errorMessage =
-                    error instanceof Error ? error.message : 'Unknown error';
+                const errorMessage = error instanceof Error ? error.message : 'Unknown error';
                 if (!errorMessage.includes('already exists')) {
                     throw error;
                 }
                 logger.debug('WEBHOOKS stream already exists');
             }
         } catch (error: unknown) {
-            logger.error(
-                'Failed to setup JetStream in receive.nats.ts',
-                error as Error
-            );
+            logger.error('Failed to setup JetStream in receive.nats.ts', error as Error);
             throw error;
         }
     }
@@ -143,28 +139,14 @@ export class ReceiveEventPublisher {
             );
             const message = { event, signature, timestamp, nonce };
 
-            logger.debug(JSON.stringify(message));
-
             const publishResult = await js.publish(
                 subject,
                 this.sc.encode(JSON.stringify(message))
             );
 
-            logger.info(
-                `Published receive event ${data.eventId} to JetStream`,
-                {
-                    subject,
-                    stream: publishResult.stream,
-                    sequence: publishResult.seq,
-                }
-            );
-
             return { success: true };
         } catch (error: unknown) {
-            logger.error(
-                'Failed to publish receive event to NATS',
-                error as Error
-            );
+            logger.error('Failed to publish receive event to NATS', error as Error);
             throw error;
         }
     }
@@ -194,10 +176,7 @@ export class ReceiveEventPublisher {
             return {
                 status: 'unhealthy',
                 details: {
-                    error:
-                        error instanceof Error
-                            ? error.message
-                            : 'Unknown error',
+                    error: error instanceof Error ? error.message : 'Unknown error',
                     timestamp: new Date().toISOString(),
                 },
             };
