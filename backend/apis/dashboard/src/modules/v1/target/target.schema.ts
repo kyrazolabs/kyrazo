@@ -1,8 +1,6 @@
 import { z } from 'zod';
 
-const objectIdSchema = z
-    .string()
-    .regex(/^[0-9a-fA-F]{24}$/, 'Invalid ID format');
+const objectIdSchema = z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid ID format');
 
 export const CreateTargetSchema = z.object({
     name: z
@@ -12,12 +10,9 @@ export const CreateTargetSchema = z.object({
 
     url: z.string().min(1, 'URL is required').url('Invalid URL format'),
 
-    // method: endpointMethodsEnum,
+    method: z.enum(['POST', 'PUT', 'PATCH']).default('POST'),
 
-    description: z
-        .string()
-        .max(500, 'Description must be at most 500 characters')
-        .optional(),
+    description: z.string().max(500, 'Description must be at most 500 characters').optional(),
 
     enabled: z.boolean().default(true),
 
