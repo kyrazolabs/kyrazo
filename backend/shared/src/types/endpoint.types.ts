@@ -2,7 +2,7 @@ import { Document, Model, Types } from 'mongoose';
 import { BaseDocument, IPagination } from '.';
 
 export type EndpointStatus = 'active' | 'inactive';
-export type EndpointMethods = 'POST' | 'PUT' | 'PATCH' | 'GET' | 'DELETE';
+export type EndpointMethods = 'POST' | 'PUT' | 'PATCH';
 
 export interface IEndpoint<T = string> extends BaseDocument {
     workspaceId: Types.ObjectId;

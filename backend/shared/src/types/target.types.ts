@@ -1,6 +1,6 @@
 import { Document, Model, Types } from 'mongoose';
 import { BaseDocument, IPagination } from '.';
-export type TargetMethods = 'POST' | 'PUT' | 'PATCH' | 'GET' | 'DELETE';
+export type TargetMethods = 'POST' | 'PUT' | 'PATCH';
 export type TargetStatus = 'active' | 'inactive';
 
 export interface ITarget<T = string> extends BaseDocument {
