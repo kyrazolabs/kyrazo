@@ -4,7 +4,7 @@
 
 import type { PaginationParams } from "./common";
 
-export type TargetMethod = "POST" | "PUT" | "PATCH" | "GET" | "DELETE";
+export type TargetMethod = "POST" | "PUT" | "PATCH";
 
 export interface TargetConfig {
   timeout: number;

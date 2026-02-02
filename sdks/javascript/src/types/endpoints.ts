@@ -5,6 +5,7 @@
 import type { PaginationParams } from "./common";
 
 export type EndpointStatus = "active" | "inactive";
+export type EndpointMethod = "POST" | "PUT" | "PATCH";
 
 export interface EndpointConfig {
   timeout: number;
@@ -18,6 +19,7 @@ export interface Endpoint {
   name: string;
   status: EndpointStatus;
   url: string;
+  method: EndpointMethod;
   description?: string;
   enabled: boolean;
   config: EndpointConfig;
@@ -30,6 +32,7 @@ export interface CreateEndpointInput {
   name: string;
   status: EndpointStatus;
   url: string;
+  method?: EndpointMethod;
   description?: string;
   enabled?: boolean;
   config: EndpointConfig;
