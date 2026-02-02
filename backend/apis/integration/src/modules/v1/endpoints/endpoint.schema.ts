@@ -2,9 +2,7 @@ import z from 'zod';
 
 export const endpointStatusEnum = z.enum(['active', 'inactive']);
 
-const objectIdSchema = z
-    .string()
-    .regex(/^[0-9a-fA-F]{24}$/, 'Invalid ID format');
+const objectIdSchema = z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid ID format');
 
 export const CreateEndpointSchema = z.object({
     name: z
@@ -15,11 +13,9 @@ export const CreateEndpointSchema = z.object({
     status: endpointStatusEnum,
 
     url: z.string().min(1, 'URL is required').url('Invalid URL format'),
+    method: z.enum(['POST', 'PUT', 'PATCH']).default('POST'),
 
-    description: z
-        .string()
-        .max(500, 'Description must be at most 500 characters')
-        .optional(),
+    description: z.string().max(500, 'Description must be at most 500 characters').optional(),
 
     enabled: z.boolean().default(true),
 
@@ -73,8 +69,6 @@ export const GetEndpointByIdSchema = z.object({
 
 export type CreateEndpointInput = z.infer<typeof CreateEndpointSchema>;
 export type UpdateEndpointInput = z.infer<typeof UpdateEndpointSchema>;
-export type UpdateEndpointStatusInput = z.infer<
-    typeof UpdateEndpointStatusSchema
->;
+export type UpdateEndpointStatusInput = z.infer<typeof UpdateEndpointStatusSchema>;
 export type FilterEndpointInput = z.infer<typeof SearchEndpointSchema>;
 export type GetEndpointByIdInput = z.infer<typeof GetEndpointByIdSchema>;

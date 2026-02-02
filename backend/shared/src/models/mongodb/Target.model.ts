@@ -19,7 +19,7 @@ const TargetSchema = new Schema<ITarget>(
         url: { type: String, required: true },
         method: {
             type: String,
-            enum: ['POST', 'PUT', 'PATCH', 'GET', 'DELETE'],
+            enum: ['POST', 'PUT', 'PATCH'],
             default: 'POST',
             required: true,
         },
