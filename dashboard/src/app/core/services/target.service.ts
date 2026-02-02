@@ -14,6 +14,7 @@ export interface ITarget {
     url: string;
     description?: string;
     enabled: boolean;
+    method: 'POST' | 'PUT' | 'PATCH';
     config: {
         timeout: number;
         retryCount: number;

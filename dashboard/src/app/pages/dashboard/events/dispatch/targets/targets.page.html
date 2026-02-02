@@ -56,6 +56,7 @@
                         URL
                         <!-- <p-sortIcon field="url" /> -->
                     </th>
+                    <th class="rounded-xl! border-none!">Method</th>
                     <th class="rounded-xl! border-none!" style="max-width:100px">Status</th>
                     <th class="rounded-xl! border-none! text-center!">Config</th>
                     <th class="rounded-xl! border-none! text-center!">Actions</th>
@@ -72,6 +73,9 @@
                     </td>
                     <td class="break-all">
                         <span class="font-mono text-sm text-surface-700 dark:text-surface-300">{{ target.url }}</span>
+                    </td>
+                    <td>
+                        <p-tag [rounded]="true" [value]="target.method || 'POST'" severity="info" class="text-xs!" />
                     </td>
                     <td>
                         <p-tag [severity]="target.enabled ? 'success' : 'danger'" [value]="target.enabled ? 'Active' : 'Inactive'"  [rounded]="true" class="uppercase text-xs! font-bold" />

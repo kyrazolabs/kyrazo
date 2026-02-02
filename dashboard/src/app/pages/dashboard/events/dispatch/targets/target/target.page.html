@@ -133,6 +133,17 @@
             <!-- Configuration Details -->
             <p-card header="Configuration" class="card-panel">
                 <div class="flex flex-col gap-5">
+                    <!-- Method -->
+                    <div class="flex flex-col gap-2">
+                        <label class="text-sm font-semibold text-surface-600 dark:text-surface-400">Method</label>
+                        <p-iconfield iconPosition="left" class="w-full md:w-auto">
+                            <p-inputicon class="relative!">
+                                <span class="icon-[hugeicons--arrow-data-transfer-horizontal] size-5 absolute top-1/2 -translate-y-1/2 "></span>
+                            </p-inputicon>
+                            <input pInputText [value]="targetEntity.method || 'POST'" [disabled]="true" class="w-full rounded-xl! pl-9!" />
+                        </p-iconfield>
+                    </div>
+
                     <!-- Timeout -->
                     <div class="flex flex-col gap-2">
                         <label class="text-sm font-semibold text-surface-600 dark:text-surface-400">Timeout</label>
@@ -140,7 +151,7 @@
                                 <p-inputicon class="relative!">
                                     <span class="icon-[hugeicons--stop-watch] size-5 absolute top-1/2 -translate-y-1/2 "></span>
                                 </p-inputicon>
-                                <p-inputNumber [ngModel]="targetEntity.config?.timeout" [disabled]="true" suffix=" ms"
+                                <p-inputNumber [ngModel]="targetEntity.config.timeout" [disabled]="true" suffix=" ms"
                                 inputStyleClass="w-full rounded-xl! pl-9!" styleClass="w-full" [showButtons]="false" />
                         </p-iconfield>
                     </div>
@@ -152,7 +163,7 @@
                                 <p-inputicon class="relative!">
                                     <span class="icon-[hugeicons--arrow-reload-horizontal] size-5 absolute top-1/2 -translate-y-1/2 "></span>
                                 </p-inputicon>
-                                <p-inputNumber [ngModel]="targetEntity.config?.retryCount" [disabled]="true"
+                                <p-inputNumber [ngModel]="targetEntity.config.retryCount" [disabled]="true"
                                     suffix=" attempts" inputStyleClass="w-full rounded-xl! pl-9!" styleClass="w-full"
                                     [showButtons]="false" />
                             </p-iconfield>
@@ -165,7 +176,7 @@
                                 <p-inputicon class="relative!">
                                     <span class="icon-[hugeicons--zap] size-5 absolute top-1/2 -translate-y-1/2 "></span>
                                 </p-inputicon>
-                                <p-inputNumber [ngModel]="targetEntity.config?.rateLimit" [disabled]="true"
+                                <p-inputNumber [ngModel]="targetEntity.config.rateLimit" [disabled]="true"
                                 placeholder="Unlimited" inputStyleClass="w-full rounded-xl! pl-9!" styleClass="w-full"
                                 [showButtons]="false" />
                             </p-iconfield>

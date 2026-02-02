@@ -25,6 +25,7 @@ import { DividerModule } from 'primeng/divider';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { TextareaModule } from 'primeng/textarea';
+import { SelectModule } from 'primeng/select';
 
 @Component({
     selector: 'app-target-form',
@@ -44,6 +45,7 @@ import { TextareaModule } from 'primeng/textarea';
         IconFieldModule,
         InputIconModule,
         TextareaModule,
+        SelectModule,
     ],
     providers: [MessageService],
     templateUrl: './form.page.html',
@@ -61,6 +63,12 @@ export class TargetFormPage implements OnInit {
     isEditMode = false;
     targetId: string | null = null;
     loading = false;
+
+    methodOptions = [
+        { label: 'POST', value: 'POST' },
+        { label: 'PUT', value: 'PUT' },
+        { label: 'PATCH', value: 'PATCH' },
+    ];
 
     get customHeaders() {
         return this.form.get('customHeaders') as FormArray;
@@ -89,6 +97,7 @@ export class TargetFormPage implements OnInit {
                 '',
                 [Validators.required, Validators.pattern(/https?:\/\/.+/)],
             ],
+            method: ['POST', [Validators.required]],
             description: ['', [Validators.maxLength(500)]],
             enabled: [true],
             config: this.fb.group({
@@ -152,6 +161,7 @@ export class TargetFormPage implements OnInit {
         this.form.patchValue({
             name: target.name,
             url: target.url,
+            method: target.method,
             description: target.description,
             enabled: target.enabled,
             config: target.config,

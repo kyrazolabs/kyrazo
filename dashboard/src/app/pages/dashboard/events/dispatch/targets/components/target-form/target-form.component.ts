@@ -35,6 +35,7 @@ import { MessageModule } from 'primeng/message';
 import { SkeletonModule } from 'primeng/skeleton';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
+import { SelectModule } from 'primeng/select';
 
 @Component({
     selector: 'app-target-form',
@@ -55,6 +56,7 @@ import { InputIconModule } from 'primeng/inputicon';
         SkeletonModule,
         IconFieldModule,
         InputIconModule,
+        SelectModule,
     ],
     templateUrl: './target-form.component.html',
     styleUrls: ['./target-form.component.scss'],
@@ -78,6 +80,12 @@ export class TargetFormComponent implements OnInit, OnChanges {
     isEditing = signal(false);
     customHeaders: { key: string; value: string }[] = [{ key: '', value: '' }];
 
+    methodOptions = [
+        { label: 'POST', value: 'POST' },
+        { label: 'PUT', value: 'PUT' },
+        { label: 'PATCH', value: 'PATCH' },
+    ];
+
     constructor() {
         this.targetForm = this.fb.group({
             name: [
@@ -92,6 +100,7 @@ export class TargetFormComponent implements OnInit, OnChanges {
                 '',
                 [Validators.required, Validators.pattern(/https?:\/\/.+/)],
             ],
+            method: ['POST', [Validators.required]],
             description: ['', [Validators.maxLength(500)]],
             enabled: [true],
             config: this.fb.group({
@@ -151,6 +160,7 @@ export class TargetFormComponent implements OnInit, OnChanges {
                 this.targetForm.patchValue({
                     name: target.name,
                     url: target.url,
+                    method: target.method,
                     description: target.description,
                     enabled: target.enabled,
                     config: target.config,

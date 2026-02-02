@@ -89,8 +89,6 @@ export class EndpointFormComponent implements OnInit, OnChanges {
         { label: 'POST', value: 'POST' },
         { label: 'PUT', value: 'PUT' },
         { label: 'PATCH', value: 'PATCH' },
-        { label: 'GET', value: 'GET' },
-        { label: 'DELETE', value: 'DELETE' },
     ];
 
     constructor() {
