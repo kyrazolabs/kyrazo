@@ -25,6 +25,7 @@ export interface SQLDeliveryAttempt {
     status: DeliveryStatus;
     attempt_number: number;
 
+    request_method: string;
     request_header: string;
     request_body: string;
 

@@ -43,6 +43,8 @@ export class PayPalTransformer {
             targets: (endpoints ?? []).map((t: any) => ({
                 targetId: t._id,
                 targetUrl: t.url,
+                method: t.method,
+                customHeaders: t.customHeaders,
                 attempts: 0,
                 lastAttemptAt: null,
                 nextRetryAt: null,

@@ -173,6 +173,7 @@ export class DispatchConsumer extends EventEmitter {
             attempt_number: job.attemptsMade + 1,
 
             // Request details
+            request_method: target.method || "POST",
             request_header: JSON.stringify(headers),
             request_body: JSON.stringify(event),
 
@@ -236,10 +237,16 @@ export class DispatchConsumer extends EventEmitter {
             // Update delivery attempt record with final headers
             deliveryAttempt.request_header = JSON.stringify(headers);
             await job.log(`✅ Message signed`);
-            await job.log(`📤 Sending POST request to ${target.url}`);
-            const response = await httpRequester.post(target.url, body, {
-                headers: headers,
-            });
+            const method = target.method || "POST";
+            await job.log(`📤 Sending ${method} request to ${target.url}`);
+            const response = await httpRequester.request(
+                method,
+                target.url,
+                body,
+                {
+                    headers: headers,
+                },
+            );
             await job.log(`📥 Received response: ${response.status}`);
 
             // Update delivery attempt with response details

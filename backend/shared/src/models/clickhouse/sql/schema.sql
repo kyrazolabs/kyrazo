@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS delivery_attempts (
     attempt_number UInt16,
 
     -- Request details
+    request_method String CODEC(ZSTD),
     request_header String CODEC(ZSTD),
     request_body String CODEC(ZSTD),
 

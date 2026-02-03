@@ -34,6 +34,8 @@ export class DispatcherTransformer {
             targets: (event.targets ?? []).map((t: any) => ({
                 targetId: t.targetId,
                 targetUrl: t.targetUrl,
+                method: t.method,
+                customHeaders: t.customHeaders,
                 attempts: t.attempts ?? 0,
                 lastAttemptAt: null,
                 nextRetryAt: null,

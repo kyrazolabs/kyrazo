@@ -1,9 +1,9 @@
-import { connect, StringCodec } from "nats";
-import type { NatsConnection, JetStreamManager, JetStreamClient } from "nats";
-import * as dotenv from "dotenv";
+import { connect, StringCodec } from 'nats';
+import type { NatsConnection, JetStreamManager, JetStreamClient } from 'nats';
+import * as dotenv from 'dotenv';
 
-import { logger } from "@kyrazo/shared";
-import config from "./app.config";
+import { logger } from '@kyrazo/shared';
+import config from './app.config';
 
 dotenv.config();
 
@@ -53,7 +53,7 @@ export class NatsConfig {
      */
     public async connect(): Promise<void> {
         if (this.isConnected && this.nc) {
-            logger.info("NATS already connected");
+            logger.info('NATS already connected');
             return;
         }
 
@@ -61,11 +61,13 @@ export class NatsConfig {
             // Connect to NATS
             this.nc = await connect({
                 servers: config.nats.servers,
-                tls: {
-                    certFile: config.nats.tls.certFile,
-                    keyFile: config.nats.tls.keyFile,
-                    caFile: config.nats.tls.caFile,
-                },
+                tls: config.isProduction
+                    ? {
+                          certFile: config.nats.tls.certFile,
+                          keyFile: config.nats.tls.keyFile,
+                          caFile: config.nats.tls.caFile,
+                      }
+                    : undefined,
                 user: config.nats.user,
                 pass: config.nats.password,
                 maxReconnectAttempts: config.nats.maxReconnectAttempts,
@@ -80,32 +82,32 @@ export class NatsConfig {
             this.js = this.nc.jetstream();
 
             // Send PING
-            this.nc.publish("webhooks.init", "PING");
+            this.nc.publish('webhooks.init', 'PING');
 
             this.isConnected = true;
-            logger.info("Connected to NATS successfully");
+            logger.info('Connected to NATS successfully');
 
             // Test JetStream with a ping
             try {
-                await this.nc.request("$JS.API.INFO", "", { timeout: 5000 });
-                logger.info("NATS JetStream PING successful");
+                await this.nc.request('$JS.API.INFO', '', { timeout: 5000 });
+                logger.info('NATS JetStream PING successful');
             } catch (error) {
-                logger.warn("NATS JetStream PING failed:", error);
+                logger.warn('NATS JetStream PING failed:', error);
             }
 
             // Handle connection events
             this.nc
                 .closed()
                 .then(() => {
-                    logger.warn("NATS connection closed");
+                    logger.warn('NATS connection closed');
                     this.isConnected = false;
                 })
                 .catch((error: unknown) => {
-                    logger.error("NATS connection error:", error as Error);
+                    logger.error('NATS connection error:', error as Error);
                     this.isConnected = false;
                 });
         } catch (error) {
-            logger.error("Failed to connect to NATS:", error as Error);
+            logger.error('Failed to connect to NATS:', error as Error);
             this.isConnected = false;
             throw error;
         }
@@ -129,9 +131,9 @@ export class NatsConfig {
             this.jsm = null;
             this.js = null;
             this.isConnected = false;
-            logger.info("Disconnected from NATS");
+            logger.info('Disconnected from NATS');
         } catch (error) {
-            logger.error("Error disconnecting from NATS:", error as Error);
+            logger.error('Error disconnecting from NATS:', error as Error);
             throw error;
         }
     }
@@ -146,7 +148,7 @@ export class NatsConfig {
      */
     public getConnection(): NatsConnection {
         if (!this.nc || !this.isConnected) {
-            throw new Error("NATS connection is not established");
+            throw new Error('NATS connection is not established');
         }
         return this.nc;
     }
@@ -161,7 +163,7 @@ export class NatsConfig {
      */
     public getJetStreamManager(): JetStreamManager {
         if (!this.jsm || !this.isConnected) {
-            throw new Error("NATS JetStream manager is not available");
+            throw new Error('NATS JetStream manager is not available');
         }
         return this.jsm;
     }
@@ -176,7 +178,7 @@ export class NatsConfig {
      */
     public getJetStreamClient(): JetStreamClient {
         if (!this.js || !this.isConnected) {
-            throw new Error("NATS JetStream client is not available");
+            throw new Error('NATS JetStream client is not available');
         }
         return this.js;
     }
@@ -206,10 +208,10 @@ export class NatsConfig {
         try {
             if (!this.nc || !this.isConnected) {
                 return {
-                    status: "unhealthy",
+                    status: 'unhealthy',
                     details: {
                         connected: false,
-                        error: "Connection not established",
+                        error: 'Connection not established',
                     },
                 };
             }
@@ -218,7 +220,7 @@ export class NatsConfig {
             await this.nc.flush();
 
             return {
-                status: "healthy",
+                status: 'healthy',
                 details: {
                     connected: this.isConnected,
                     server: this.nc.getServer(),
@@ -226,13 +228,10 @@ export class NatsConfig {
             };
         } catch (error: unknown) {
             return {
-                status: "unhealthy",
+                status: 'unhealthy',
                 details: {
                     connected: this.isConnected,
-                    error:
-                        error instanceof Error
-                            ? error.message
-                            : "Unknown error",
+                    error: error instanceof Error ? error.message : 'Unknown error',
                 },
             };
         }

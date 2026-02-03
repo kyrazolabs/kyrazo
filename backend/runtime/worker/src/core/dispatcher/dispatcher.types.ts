@@ -23,6 +23,7 @@ export interface IDispatchedTarget {
     responseTimeMs?: number;
     errorMessage?: string;
     customHeaders?: Record<string, string>;
+    method?: string;
 }
 
 export interface IDispatchedEvent {
@@ -84,6 +85,7 @@ export interface IConfiguredTarget {
     rateLimitDuration?: number;
     retryCount?: number;
     customHeaders?: Record<string, string>;
+    method?: string;
 }
 export interface IDispatchJobData {
     event: IDispatchedEvent;

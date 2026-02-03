@@ -84,6 +84,7 @@ export class DispatcherQueue extends EventEmitter {
             rateLimitDuration?: number;
             retryCount?: number;
             customHeaders?: Record<string, string>;
+            method?: string;
         }[]
     > {
         const targets: {
@@ -95,6 +96,7 @@ export class DispatcherQueue extends EventEmitter {
             rateLimitDuration?: number;
             retryCount?: number;
             customHeaders?: Record<string, string>;
+            method?: string;
         }[] = [];
         switch (type) {
             case "target":
@@ -139,6 +141,7 @@ export class DispatcherQueue extends EventEmitter {
                         rateLimitDuration: target.config.rateLimitDuration,
                         retryCount: target.config.retryCount,
                         customHeaders: target.customHeaders,
+                        method: target.method,
                     });
                 }
                 break;
@@ -185,6 +188,7 @@ export class DispatcherQueue extends EventEmitter {
                         rateLimitDuration: endpoint.config.rateLimitDuration,
                         retryCount: endpoint.config.retryCount,
                         customHeaders: endpoint.customHeaders,
+                        method: endpoint.method,
                     });
                 }
                 break;
