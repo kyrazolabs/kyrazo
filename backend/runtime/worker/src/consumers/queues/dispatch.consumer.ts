@@ -225,6 +225,12 @@ export class DispatchConsumer extends EventEmitter {
 
             const signatureHeaders =
                 await dispatcherSignature.buildHeaders(signatureResult);
+
+            // Merge custom headers if they exist
+            if (target.customHeaders) {
+                Object.assign(headers, target.customHeaders);
+            }
+
             Object.assign(headers, signatureHeaders);
 
             // Update delivery attempt record with final headers

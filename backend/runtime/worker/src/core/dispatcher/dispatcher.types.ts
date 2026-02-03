@@ -9,6 +9,7 @@ export interface IWebhookHeaders {
     "X-Webhook-Nonce": string;
     "X-Webhook-Version": string;
     "X-Webhook-Schema": string;
+    [key: string]: string;
 }
 
 export interface IDispatchedTarget {
@@ -21,6 +22,7 @@ export interface IDispatchedTarget {
     responseBody?: Record<string, any>;
     responseTimeMs?: number;
     errorMessage?: string;
+    customHeaders?: Record<string, string>;
 }
 
 export interface IDispatchedEvent {
@@ -81,6 +83,7 @@ export interface IConfiguredTarget {
     rateLimit?: number;
     rateLimitDuration?: number;
     retryCount?: number;
+    customHeaders?: Record<string, string>;
 }
 export interface IDispatchJobData {
     event: IDispatchedEvent;
