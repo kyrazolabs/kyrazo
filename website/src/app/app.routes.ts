@@ -31,7 +31,7 @@ export const routes: Routes = [
                         (p) => p.PrivacyPage,
                     ),
                 data: {
-                    title: 'Privacy Policy',
+                    title: 'Privacy Policy - Kyrazo',
                     meta: {
                         description:
                             "Read Kyrazo's Privacy Policy to understand how we collect, use, and protect your data.",
@@ -45,7 +45,7 @@ export const routes: Routes = [
                         (p) => p.RefundPage,
                     ),
                 data: {
-                    title: 'Refund Policy',
+                    title: 'Refund Policy - Kyrazo',
                     meta: {
                         description:
                             "Kyrazo's Refund Policy. Understand our terms for refunds and cancellations.",
@@ -59,7 +59,7 @@ export const routes: Routes = [
                         (p) => p.TermsOfService,
                     ),
                 data: {
-                    title: 'Terms of Service',
+                    title: 'Terms of Service - Kyrazo',
                     meta: {
                         description:
                             "Kyrazo's Terms of Service. Read the rules and regulations for using our platform.",
