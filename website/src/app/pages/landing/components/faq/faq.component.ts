@@ -58,6 +58,9 @@ interface FaqItem {
                         <button
                             (click)="toggle(i)"
                             class="w-full text-left py-4 px-6 flex items-center justify-between gap-4 group/btn outline-hidden"
+                            [attr.aria-expanded]="activeIndex === i"
+                            [attr.aria-controls]="'faq-content-' + i"
+                            [attr.id]="'faq-button-' + i"
                         >
                             <span
                                 class="text-lg md:text-xl font-bold tracking-tight text-surface-950 dark:text-white transition-colors duration-300"
@@ -71,6 +74,7 @@ interface FaqItem {
                                 [class.bg-primary-500]="activeIndex === i"
                                 [class.border-primary-500]="activeIndex === i"
                                 [class.text-white]="activeIndex === i"
+                                aria-hidden="true"
                             >
                                 <i
                                     class="icon-[hugeicons--arrow-down-01] size-6"
@@ -83,6 +87,10 @@ interface FaqItem {
                             [style.grid-template-rows]="
                                 activeIndex === i ? '1fr' : '0fr'
                             "
+                            [attr.id]="'faq-content-' + i"
+                            [attr.aria-hidden]="activeIndex !== i"
+                            role="region"
+                            [attr.aria-labelledby]="'faq-button-' + i"
                         >
                             <div class="overflow-hidden">
                                 <div

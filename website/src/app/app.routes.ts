@@ -15,12 +15,12 @@ export const routes: Routes = [
                         (p) => p.LandingPage,
                     ),
                 data: {
-                    title: 'Kyrazo – Reliable Webhook Management, Automation & Event Dispatch for Developers',
+                    title: 'Kyrazo',
                     meta: {
                         description:
-                            'Kyrazo is a scalable and secure webhook as a service platform. Receive, send, and automate events from Stripe, GitHub, and more with high reliability and low latency. Perfect for SaaS products and development teams.',
+                            'Kyrazo: Secure webhooks as a service for reliable event ingestion, dispatch, and automation. Simplify webhook management with retries, scheduling, and high scalability for developers and enterprises',
                         keywords:
-                            'webhook service, webhook management, webhook automation, Stripe webhooks, GitHub webhooks, SaaS integration, event-driven architecture, reliable webhooks, developer tools, automated webhook delivery, low-latency webhook platform, webhook retries and failures handling, webhook SDK for Node.js',
+                            'Webhook as a Service, Webhook Management Platform, Webhook Infrastructure, Webhook Automation Platform, Webhook Relay Platform, Enterprise Webhook Solution, Stripe webhook management, Github webhook service, Webhook retry and failure handling, Dedicated webhook workers, Webhook scheduling and queuing',
                     },
                 },
             },

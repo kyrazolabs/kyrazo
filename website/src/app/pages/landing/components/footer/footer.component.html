@@ -2,7 +2,7 @@
     class="bg-surface-0 dark:bg-surface-950 pt-24 pb-12 px-6 relative overflow-hidden">
 
     <!-- Premium Background Effects -->
-    <div class="absolute inset-0 pointer-events-none overflow-hidden">
+    <div class="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
         <!-- Mesh Grid -->
         <div class="absolute inset-0 opacity-10 dark:opacity-20"
              style="background-image: radial-gradient(circle at 2px 2px, var(--surface-300) 1px, transparent 0); background-size: 40px 40px;"></div>
@@ -16,7 +16,7 @@
             <div class="md:col-span-6 md:row-span-2 p-10 flex flex-col justify-between relative overflow-hidden rounded-2xl border border-surface-100 bg-surface-50/30 backdrop-blur-3xl transition-all duration-300 dark:border-surface-800/50 dark:bg-surface-900/20 scale-[0.99] hover:scale-[1.00] hover:border-primary-500/50 hover:shadow-2xl hover:shadow-primary-500/10" appScrollReveal>
 
                 <!-- Massive Background Watermark -->
-                <div class="absolute -bottom-5 -right-12 select-none pointer-events-none opacity-[0.03] dark:opacity-[0.05] translate-y-1/4">
+                <div class="absolute -bottom-5 -right-12 select-none pointer-events-none opacity-[0.03] dark:opacity-[0.05] translate-y-1/4" aria-hidden="true">
                     <h1 class="text-[20rem] font-black tracking-tighter leading-none font-sans">Kyrazo</h1>
                 </div>
 
@@ -31,14 +31,14 @@
                         <p class="text-xl font-bold text-surface-900 dark:text-surface-0 mb-6 leading-tight max-w-md">
                             Developer-first infrastructure for the next generation of event-driven apps.
                         </p>
-                        <div class="flex gap-3">
-                            <a href="https://x.com/nx_2io" target="_blank" class="flex items-center justify-center w-11 h-11 rounded-xl bg-transparent text-surface-600 dark:text-surface-400 transition-all duration-100 hover:bg-primary-500 hover:text-white hover:-translate-y-1 hover:rotate-6 hover:shadow-xl hover:shadow-primary-500/20" aria-label="Twitter">
-                                <i class="icon-[ri--twitter-x-line] text-lg"></i>
+                        <nav class="flex gap-3" aria-label="Social links">
+                            <a href="https://x.com/nx_2io" target="_blank" class="flex items-center justify-center w-11 h-11 rounded-xl bg-transparent text-surface-600 dark:text-surface-400 transition-all duration-100 hover:bg-primary-500 hover:text-white hover:-translate-y-1 hover:rotate-6 hover:shadow-xl hover:shadow-primary-500/20" aria-label="Twitter/X">
+                                <i class="icon-[ri--twitter-x-line] text-lg" aria-hidden="true"></i>
                             </a>
                             <a href="https://www.producthunt.com/posts/kyrazo" target="_blank" class="flex items-center justify-center w-11 h-11 rounded-xl bg-transparent text-surface-600 dark:text-surface-400 transition-all duration-100 hover:bg-primary-500 hover:text-white hover:-translate-y-1 hover:rotate-6 hover:shadow-xl hover:shadow-primary-500/20" aria-label="Product Hunt">
-                                <i class="icon-[logos--producthunt] text-lg"></i>
+                                <i class="icon-[logos--producthunt] text-lg" aria-hidden="true"></i>
                             </a>
-                        </div>
+                        </nav>
                     </div>
                 </div>
 

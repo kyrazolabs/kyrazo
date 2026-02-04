@@ -30,6 +30,7 @@ import { LayoutService } from '@components/service/layout.service';
                 <svg
                     class="absolute inset-0 w-full h-full pointer-events-none"
                     viewBox="0 0 400 300"
+                    aria-hidden="true"
                 >
                     <!-- Flow: Source to Center K -->
                     <path

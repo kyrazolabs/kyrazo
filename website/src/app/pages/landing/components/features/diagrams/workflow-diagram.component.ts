@@ -35,6 +35,7 @@ import { LayoutService } from '@components/service/layout.service';
                 <svg
                     class="absolute inset-0 w-full h-full pointer-events-none"
                     viewBox="0 0 700 500"
+                    aria-hidden="true"
                 >
                     <defs>
                         <linearGradient

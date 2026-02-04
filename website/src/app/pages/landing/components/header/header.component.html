@@ -6,8 +6,8 @@
                 'bg-surface-0/90 dark:bg-surface-950/75 backdrop-blur-xl border-surface-200 dark:border-surface-800 shadow-xs py-3': isScrolled
             }">
 
-            <div class="flex items-center justify-center gap-3 cursor-pointer transition-transform duration-300"  [class.scale-90]="isScrolled" routerLink="/">
-                <img [src]="isDarkMode() ? 'logo-dark.png' : 'logo-light.png'" alt="Kyrazo" width="40" height="40" class="h-10 p-1 rounded-xl bg-primary dark:bg-primary flex items-center justify-center transition-transform duration-300" >
+            <div class="flex items-center justify-center gap-3 cursor-pointer transition-transform duration-300"  [class.scale-90]="isScrolled" routerLink="/" aria-label="Home">
+                <img [src]="isDarkMode() ? 'logo-dark.png' : 'logo-light.png'" alt="Kyrazo logo" width="40" height="40" class="h-10 p-1 rounded-xl bg-primary dark:bg-primary flex items-center justify-center transition-transform duration-300" >
                 <span class="text-3xl font-bold text-surface-950 dark:text-surface-0">Kyrazo</span>
             </div>
 
@@ -32,6 +32,7 @@
                     [text]="true"
                     (click)="toggleDarkMode()"
                     [icon]="isDarkMode()? 'pi pi-moon' : 'pi pi-sun'"
+                    ariaLabel="Toggle color theme"
                     styleClass="w-9 h-9 rounded-2xl!"
                 />
                 <div class="relative">
@@ -41,7 +42,7 @@
                         [outlined]="true"
                         [text]="true"
                         icon="pi pi-palette"
-                        aria-label="Settings"
+                        ariaLabel="Settings"
                     />
                     <app-config *ngIf="showConfig" @dropdownAnimation />
                 </div>

@@ -55,6 +55,7 @@ import { dropdownAnimation } from '@shared/animations/dropdown.animation';
                     <svg
                         viewBox="0 0 210 100"
                         class="w-full h-full opacity-30 group-hover/map:opacity-50 transition-opacity duration-1000"
+                        aria-hidden="true"
                     >
                         <g class="fill-surface-400">
                             <circle
@@ -71,6 +72,7 @@ import { dropdownAnimation } from '@shared/animations/dropdown.animation';
                     <svg
                         viewBox="0 0 210 100"
                         class="absolute inset-0 w-full h-full pointer-events-none opacity-40"
+                        aria-hidden="true"
                     >
                         <path
                             d="M110,26 Q85,20 55,35"
