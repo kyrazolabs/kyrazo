@@ -85,19 +85,32 @@ export class ingestController {
 
             // Extract request details
             const headers = c.req.header();
+            const contentType = headers['content-type'];
             const rawBody = await c.req.text();
-            let body = {};
+            let body: any = {};
+
             try {
-                body = JSON.parse(rawBody);
+                if (contentType?.includes('application/x-www-form-urlencoded')) {
+                    const params = new URLSearchParams(rawBody);
+                    const payload = params.get('payload');
+                    if (payload) {
+                        body = JSON.parse(payload);
+                    } else {
+                        // Fallback: convert all params to object
+                        body = Object.fromEntries(params.entries());
+                    }
+                } else {
+                    body = JSON.parse(rawBody);
+                }
             } catch (e) {
-                // Keep body empty if parsing fails
+                // Keep body empty or partial if parsing fails
             }
 
             // Filter by event types if configured
             if (source.eventTypes && source.eventTypes.length > 0) {
                 const serviceFilter = getServiceFilter(service || source.service);
                 if (serviceFilter) {
-                    const eventType = serviceFilter.getEventType(body);
+                    const eventType = serviceFilter.getEventType(body, headers);
                     if (eventType && !source.eventTypes.includes(eventType)) {
                         return c.json(
                             {
