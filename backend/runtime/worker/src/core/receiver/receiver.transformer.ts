@@ -1,5 +1,5 @@
-import type { IReceivedEvent } from "@/types/events/event.types";
-import type { SQLIngestEvent } from "@kyrazo/shared";
+import type { IReceivedEvent } from '@/types/events/event.types';
+import type { SQLIngestEvent } from '@kyrazo/shared';
 
 export class ReceiverTransformer {
     static instance: ReceiverTransformer;
@@ -13,16 +13,16 @@ export class ReceiverTransformer {
         return ReceiverTransformer.instance;
     }
 
-    public transform(event: IReceivedEvent): SQLIngestEvent {
+    public transform<T = any>(event: IReceivedEvent<T>): SQLIngestEvent {
         const toCHDate = (date: Date | string | number) =>
-            new Date(date).toISOString().slice(0, 23).replace("T", " ");
+            new Date(date).toISOString().slice(0, 23).replace('T', ' ');
 
         return {
             event_id: event.eventId,
 
             workspace_id: event.workspaceId,
             project_id: event.projectId,
-            user_id: event.userId ?? "",
+            user_id: event.userId ?? '',
 
             source_id: event.sourceId,
             source_type: event.sourceType,
@@ -33,8 +33,8 @@ export class ReceiverTransformer {
             processed_at: toCHDate(event.receivedAt),
 
             provider: event.source,
-            provider_event_id: event.body.id ?? "",
-            provider_resource_id: event.body.resource_id ?? "",
+            provider_event_id: (event.body as any).id ?? '',
+            provider_resource_id: (event.body as any).resource_id ?? '',
 
             headers: JSON.stringify(event.headers),
             body: JSON.stringify(event.body),
@@ -42,9 +42,9 @@ export class ReceiverTransformer {
             verified: event.verified,
 
             processing_status: event.processingStatus,
-            processing_error: event.processingError ?? "",
+            processing_error: event.processingError ?? '',
 
-            associated_event_id: event.associatedEventId ?? "",
+            associated_event_id: event.associatedEventId ?? '',
         };
     }
 }
