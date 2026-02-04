@@ -67,7 +67,7 @@
                     Service Provider <span class="text-red-500">*</span>
                 </label>
                 <p-select [options]="servicesItem" formControlName="service" optionLabel="label" optionValue="value"
-                    placeholder="Select a service" class="w-full rounded-xl!" size="small" [filter]="true" filterBy="label">
+                    placeholder="Select a service" filterPlaceholder="e.g. stripe" class="w-full rounded-xl!" panelStyleClass="w-full rounded-xl!" size="small" [filter]="true" filterBy="label">
                     <ng-template let-item pTemplate="item">
                         <div class="flex items-center gap-2">
                             <span [class]="item.icon + ' text-lg'"></span>
@@ -117,17 +117,20 @@
 
                 @if (sourceForm.get('showEventTypes')?.value) {
                     <div class="flex flex-col gap-4 mt-4">
-                        <div formArrayName="eventTypes" class="space-y-3">
-                            @for (control of eventTypesArray.controls; track $index; let i = $index) {
-                                <div class="flex gap-2">
-                                    <input [formControlName]="i" pInputText placeholder="e.g. payment.succeeded" class="flex-1 rounded-xl!" />
-                                    <p-button icon="pi pi-trash" [text]="true" severity="danger" (onClick)="removeEventType(i)"
-                                        [disabled]="eventTypesArray.length === 1 && i === 0" styleClass="rounded-xl!" />
-                                </div>
-                            }
-                            <p-button label="Add Event Type" icon="pi pi-plus" [text]="true" size="small" (onClick)="addEventType()"
-                                styleClass="w-fit rounded-xl!" />
-                        </div>
+                        <p-autoComplete
+                            formControlName="eventTypes"
+                            [suggestions]="filteredEventTypes()"
+                            (completeMethod)="searchEventTypes($event)"
+                            [multiple]="true"
+                            [dropdown]="false"
+                            [dropdownMode]="'current'"
+                            placeholder="e.g. payment.succeeded"
+                            inputStyleClass="w-full rounded-xl!"
+                            panelStyleClass="rounded-xl!"
+                            [unique]="true"
+                            [size]="'small'"
+                            [addOnBlur]="true"
+                        ></p-autoComplete>
                         <small class="text-surface-500 dark:text-surface-400">
                             Define which event types this source should accept. Leave empty to accept all.
                         </small>
@@ -145,7 +148,7 @@
             <div class="flex flex-col gap-2">
                 <label class="font-medium text-surface-900 dark:text-surface-0">Forward to Endpoints</label>
                 <p-multiSelect [options]="availableEndpoints()" formControlName="endpoints" optionLabel="url" optionValue="_id"
-                    placeholder="Select endpoints" display="chip" class="w-full rounded-xl!" size="small" [filter]="true">
+                    placeholder="Select endpoints" filterPlaceHolder="e.g. paypal/oWmjjcQbWHSBcWAcEEFTwLTdFQ" display="chip" class="w-full rounded-xl!" panelStyleClass="w-full rounded-xl!" size="small" [filter]="true">
                     <ng-template let-endpoint pTemplate="item">
                         <div class="flex flex-col">
                             <span class="font-medium">{{ endpoint.url }}</span>

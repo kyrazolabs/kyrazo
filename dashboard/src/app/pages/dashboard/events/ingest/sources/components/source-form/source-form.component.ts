@@ -54,6 +54,9 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { SkeletonModule } from 'primeng/skeleton';
+import { AutoCompleteModule } from 'primeng/autocomplete';
+
+import { COMMON_EVENT_TYPES } from './events';
 
 @Component({
     selector: 'app-source-form',
@@ -81,6 +84,7 @@ import { SkeletonModule } from 'primeng/skeleton';
         ToggleSwitch,
         MultiSelectModule,
         SkeletonModule,
+        AutoCompleteModule,
     ],
     providers: [SourceService],
     templateUrl: './source-form.component.html',
@@ -105,6 +109,7 @@ export class SourceFormComponent implements OnInit, OnChanges {
     loading = signal(false);
     initialLoading = signal(false);
     isEditing = signal(false);
+    filteredEventTypes = signal<string[]>([]);
 
     availableEndpoints = signal<any[]>([]); // Store fetched endpoints
 
@@ -125,56 +130,26 @@ export class SourceFormComponent implements OnInit, OnChanges {
             value: 'stripe',
             icon: 'icon-[logos--stripe]',
         },
-        // {
-        //     label: 'Gitlab',
-        //     value: 'gitlab',
-        //     icon: 'icon-[logos--gitlab-icon]',
-        // },
-        // {
-        //     label: 'Github',
-        //     value: 'github',
-        //     icon: 'icon-[logos--github-icon]',
-        // },
-        // {
-        //     label: 'Shopify',
-        //     value: 'shopify',
-        //     icon: 'icon-[logos--shopify]',
-        // },
-        // {
-        //     label: 'Twilio',
-        //     value: 'twilio',
-        //     icon: 'icon-[logos--twilio-icon]',
-        // },
-        // {
-        //     label: 'Intercom',
-        //     value: 'intercom',
-        //     icon: 'icon-[logos--intercom-icon]',
-        // },
-        // {
-        //     label: 'Discord',
-        //     value: 'discord',
-        //     icon: 'icon-[logos--discord-icon]',
-        // },
-        // {
-        //     label: 'Monday',
-        //     value: 'monday',
-        //     icon: 'icon-[logos--monday-icon]',
-        // },
-        // {
-        //     label: 'Mailgun',
-        //     value: 'mailgun',
-        //     icon: 'icon-[logos--mailgun-icon]',
-        // },
-        // {
-        //     label: 'OpenAI',
-        //     value: 'openai',
-        //     icon: 'icon-[logos--openai-icon]',
-        // },
-        // {
-        //     label: 'Twitch',
-        //     value: 'twitch',
-        //     icon: 'icon-[logos--twitch]',
-        // },
+        {
+            label: 'GitHub',
+            value: 'github',
+            icon: 'icon-[logos--github-icon]',
+        },
+        {
+            label: 'Shopify',
+            value: 'shopify',
+            icon: 'icon-[logos--shopify]',
+        },
+        {
+            label: 'Slack',
+            value: 'slack',
+            icon: 'icon-[logos--slack-icon]',
+        },
+        {
+            label: 'Webflow',
+            value: 'webflow',
+            icon: 'icon-[logos--webflow]',
+        },
     ];
 
     constructor() {
@@ -186,7 +161,7 @@ export class SourceFormComponent implements OnInit, OnChanges {
             type: ['receive'], // Fixed to receive type
             service: ['', [Validators.required]], // Service is required for receive
 
-            eventTypes: this.fb.array([this.fb.control('')]),
+            eventTypes: [[]],
             showEventTypes: [true],
 
             forwarding: [false],
@@ -198,8 +173,8 @@ export class SourceFormComponent implements OnInit, OnChanges {
         });
     }
 
-    get eventTypesArray() {
-        return this.sourceForm.get('eventTypes') as FormArray;
+    get eventTypesControl() {
+        return this.sourceForm.get('eventTypes') as FormControl;
     }
 
     get secretControl() {
@@ -252,14 +227,26 @@ export class SourceFormComponent implements OnInit, OnChanges {
             secretControl?.updateValueAndValidity();
         });
 
-        // Listen for showEventTypes toggle
+        // Listen for showEventTypes toggle (Legacy logic, keep for safety but can be simplified now)
         this.sourceForm
             .get('showEventTypes')
             ?.valueChanges.subscribe((show) => {
-                if (show && this.eventTypesArray.length === 0) {
-                    this.addEventType();
-                }
+                // No longer need to add empty control for autocomplete
             });
+    }
+
+    searchEventTypes(event: any) {
+        const query = event.query.toLowerCase();
+        const service = this.sourceForm.get('service')?.value;
+        const availableTypes = COMMON_EVENT_TYPES[service] || [];
+
+        const filtered = availableTypes.filter((type: string) =>
+            type.toLowerCase().includes(query),
+        );
+
+        // If no matches and query is not empty, still allow the user to add the custom type
+        // (PrimeNG p-autoComplete supports this via its selection logic)
+        this.filteredEventTypes.set(filtered);
     }
 
     resetForm() {
@@ -271,16 +258,14 @@ export class SourceFormComponent implements OnInit, OnChanges {
             service: '',
             forwarding: false,
             endpoints: [],
-            eventTypes: [''], // Reset array logic handled below
+            eventTypes: [],
             showEventTypes: true,
             authentication: { secret: '' },
         });
 
-        // Reset Event Types Array
-        while (this.eventTypesArray.length !== 0) {
-            this.eventTypesArray.removeAt(0);
-        }
-        this.addEventType(); // Add initial empty control
+        // Re-enable fields that might have been disabled in Edit mode
+        this.sourceForm.get('service')?.enable();
+        this.sourceForm.get('authentication.secret')?.enable();
     }
 
     loadSource() {
@@ -307,26 +292,10 @@ export class SourceFormComponent implements OnInit, OnChanges {
     }
 
     populateForm(source: ISource) {
-        // Clear existing event types
-        while (this.eventTypesArray.length !== 0) {
-            this.eventTypesArray.removeAt(0);
-        }
-
-        // Add event types
-        if (source.eventTypes && source.eventTypes.length > 0) {
-            source.eventTypes.forEach((eventType) => {
-                this.eventTypesArray.push(
-                    this.fb.control(eventType), // Removed Validators.required to allow empty/optional editing logic if needed
-                );
-            });
-        } else {
-            this.addEventType(); // Add one empty if none exist
-        }
-
         // Set showEventTypes based on whether there are event types
         this.sourceForm
             .get('showEventTypes')
-            ?.setValue(source.eventTypes.length > 0);
+            ?.setValue(source.eventTypes?.length > 0);
 
         // Patch form values
         this.sourceForm.patchValue({
@@ -337,6 +306,7 @@ export class SourceFormComponent implements OnInit, OnChanges {
             service: source.service,
             forwarding: source.forwarding,
             endpoints: source.endpoints?.map((e) => e._id) || [],
+            eventTypes: source.eventTypes || [],
         });
 
         // Disable fields that cannot be updated in Edit mode
@@ -346,15 +316,8 @@ export class SourceFormComponent implements OnInit, OnChanges {
         // If editing, we generally don't show the secret management here as per user request
     }
 
-    addEventType() {
-        this.eventTypesArray.push(this.fb.control('')); // Removed Validators.required
-    }
-
-    removeEventType(index: number) {
-        if (this.eventTypesArray.length > 1) {
-            this.eventTypesArray.removeAt(index);
-        }
-    }
+    addEventType() {}
+    removeEventType(index: number) {}
 
     onSubmit() {
         if (this.sourceForm.invalid) {
