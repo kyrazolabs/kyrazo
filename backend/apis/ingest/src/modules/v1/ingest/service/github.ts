@@ -3,5 +3,5 @@ export const getEventType = (body: any, headers?: Record<string, string>): strin
     if (!githubEvent) return undefined;
 
     const action = body?.action;
-    return action ? `github.${githubEvent}.${action}` : `github.${githubEvent}`;
+    return action ? `${githubEvent}.${action}` : githubEvent;
 };
