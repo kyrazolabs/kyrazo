@@ -6,12 +6,14 @@ import { stripeTransformer } from './sources/stripe/stripe.transformer';
 import { githubTransformer } from './sources/github/github.transformer';
 import { shopifyTransformer } from './sources/shopify/shopify.transformer';
 import { slackTransformer } from './sources/slack/slack.transformer';
+import { webflowTransformer } from './sources/webflow/webflow.transformer';
 
 import { payPalPipeline } from './sources/paypal/paypal.pipeline';
 import { stripePipeline } from './sources/stripe/stripe.pipeline';
 import { githubPipeline } from './sources/github/github.pipeline';
 import { shopifyPipeline } from './sources/shopify/shopify.pipeline';
 import { slackPipeline } from './sources/slack/slack.pipeline';
+import { webflowPipeline } from './sources/webflow/webflow.pipeline';
 
 import { dispatcherHeaders } from '../dispatcher/dispatcher.headers';
 import { dispatcherQueue } from '../dispatcher/dispatcher.queue';
@@ -208,6 +210,42 @@ export class ReceiverDetector {
                     await dispatcherQueue.enqueue(envelope, headers, targets, 'endpoint');
 
                     logger.debug(`✅ Slack event processed: ${event.eventId}`);
+                }
+                break;
+            case 'webflow':
+                await webflowPipeline.process(event);
+                logger.debug(JSON.stringify(event));
+                const webflowSource = await redisConfig.cache(
+                    `source:${event.sourceId}`,
+                    async () => {
+                        return await Source.findById(event.sourceId).populate('endpoints');
+                    },
+                    60 * 60 * 24
+                );
+                if (!webflowSource) {
+                    logger.error(`Source not found: ${event.sourceId}`);
+                    return;
+                }
+
+                if (
+                    webflowSource.forwarding &&
+                    webflowSource.endpoints &&
+                    webflowSource.endpoints.length > 0
+                ) {
+                    logger.debug(`Webflow event ${event.eventId} routing to endpoint`);
+
+                    const envelope = webflowTransformer.transform(event, webflowSource.endpoints);
+                    const headers = await dispatcherHeaders.buildHeaders(envelope, 1);
+                    const targets = envelope.targets;
+
+                    if (targets.length === 0) {
+                        logger.warn(`No targets found for event ${envelope.id}, skipping dispatch`);
+                        return;
+                    }
+
+                    await dispatcherQueue.enqueue(envelope, headers, targets, 'endpoint');
+
+                    logger.debug(`✅ Webflow event processed: ${event.eventId}`);
                 }
                 break;
             default:
