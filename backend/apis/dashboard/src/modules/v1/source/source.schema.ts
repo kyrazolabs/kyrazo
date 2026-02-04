@@ -3,7 +3,10 @@ import z from 'zod';
 const objectIdSchema = z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid ID format');
 export const sourceStatus = z.enum(['active', 'inactive']);
 export const sourceType = z.enum(['publish', 'receive', 'forward'], 'Invalid sourceType');
-export const sourceService = z.enum(['stripe', 'paypal'], 'Invalid service');
+export const sourceService = z.enum(
+    ['stripe', 'paypal', 'github', 'shopify', 'slack', 'webflow'],
+    'Invalid service'
+);
 
 export const sourceAuthType = z.enum([
     'service',
