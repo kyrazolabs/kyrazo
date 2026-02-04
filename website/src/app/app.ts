@@ -1,7 +1,10 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, afterNextRender } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SeoService } from './core/services/seo.service';
 import { AppConfig } from '@components/app.config';
+import { environment } from 'environments/environment';
+import * as Sentry from '@sentry/angular';
+import posthog from 'posthog-js';
 
 @Component({
     selector: 'app-root',
@@ -14,5 +17,37 @@ export class App {
 
     constructor(private seoService: SeoService) {
         this.seoService.init();
+
+        afterNextRender(() => {
+            this.initAnalytics();
+        });
+    }
+
+    private initAnalytics() {
+        if (environment.posthog.key) {
+            posthog.init(environment.posthog.key, {
+                api_host: environment.posthog.host,
+                person_profiles: 'identified_only',
+                capture_pageview: false,
+            });
+        }
+
+        if (environment.sentry.enabled) {
+            Sentry.init({
+                dsn: environment.sentry.dsn,
+                environment: environment.production
+                    ? 'production'
+                    : 'development',
+                integrations: [Sentry.browserTracingIntegration()],
+                tracePropagationTargets: [
+                    'localhost',
+                    /^\/api\//,
+                    'https://kyrazo.com',
+                    'https://api.kyrazo.com',
+                ],
+                tracesSampleRate: 1.0,
+                sendDefaultPii: true,
+            });
+        }
     }
 }

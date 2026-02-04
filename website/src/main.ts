@@ -1,35 +1,5 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
 import { App } from './app/app';
-import { environment } from 'environments/environment';
-import * as Sentry from '@sentry/angular';
-import posthog from 'posthog-js';
 
-if (environment.posthog.key) {
-    posthog.init(environment.posthog.key, {
-        api_host: environment.posthog.host,
-        person_profiles: 'identified_only',
-        capture_pageview: false, // Handled manually in components
-    });
-}
-
-if (environment.sentry.enabled) {
-    Sentry.init({
-        dsn: environment.sentry.dsn,
-        environment: environment.production ? 'production' : 'development',
-
-        integrations: [Sentry.browserTracingIntegration()],
-        tracePropagationTargets: [
-            'localhost', // For local development
-            /^\/api\//, // For same-origin API calls
-            'https://kyrazo.com', // For same-origin calls
-            'https://api.kyrazo.com', // For backend domain
-        ],
-
-        tracesSampleRate: 1.0,
-        // Setting this option to true will send default PII data to Sentry.
-        // For example, automatic IP address collection on events
-        sendDefaultPii: true,
-    });
-}
 bootstrapApplication(App, appConfig).catch((err) => console.error(err));
