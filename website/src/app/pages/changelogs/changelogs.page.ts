@@ -39,6 +39,22 @@ export class ChangelogsPage {
     constructor() {
         this.events = [
             {
+                week: 'Week 6',
+                date: 'Feb 4, 2026',
+                status: 'Released',
+                title: 'Feature Expansion & Blog Launch',
+                description:
+                    'This week we introduced extensive event type suggestions for sources, flexible HTTP methods for dispatching, and launched the Kyrazo blog.',
+                type: 'feat',
+                changes: [
+                    'Dashboard: Added event type suggestions for Stripe, GitHub, Slack, PayPal, Shopify, and Webflow',
+                    'Dashboard: Configurable HTTP methods (POST, PUT, PATCH) for targets and endpoints',
+                    'Website: Official blog launch with SSR support and CMS integration',
+                    'Backend: Support for custom headers and methods in worker dispatch targets',
+                    'Security: Sanitized source responses and dedicated authentication update endpoint',
+                ],
+            },
+            {
                 week: 'Week 5',
                 date: 'Jan 26, 2026',
                 status: 'Released',
