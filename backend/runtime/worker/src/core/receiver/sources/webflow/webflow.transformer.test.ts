@@ -39,7 +39,7 @@ describe('WebflowTransformer', () => {
 
         const result = webflowTransformer.transform(event, endpoints);
 
-        expect(result.type).toBe('webflow.form_submission');
+        expect(result.type).toBe('form_submission');
         expect(result.provider!.name).toBe('webflow');
         expect(result.provider!.eventId).toBe('form_123');
         expect(result.provider!.resourceId).toBe('site_123');

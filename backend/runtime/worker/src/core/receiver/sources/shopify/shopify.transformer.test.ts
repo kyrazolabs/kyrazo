@@ -36,7 +36,7 @@ describe('ShopifyTransformer', () => {
 
         const result = shopifyTransformer.transform(event, endpoints);
 
-        expect(result.type).toBe('shopify.orders.create');
+        expect(result.type).toBe('orders.create');
         expect(result.provider!.name).toBe('shopify');
         expect(result.provider!.eventId).toBe('delivery_123');
         expect(result.provider!.resourceId).toBe('123456789');
@@ -68,7 +68,7 @@ describe('ShopifyTransformer', () => {
 
         const result = shopifyTransformer.transform(event, []);
 
-        expect(result.type).toBe('shopify.app.uninstalled');
+        expect(result.type).toBe('app.uninstalled');
         expect(result.provider!.resourceId).toBe('test.myshopify.com');
     });
 });

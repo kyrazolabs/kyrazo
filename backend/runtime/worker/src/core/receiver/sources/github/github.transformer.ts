@@ -21,7 +21,7 @@ export class GitHubTransformer {
     ): IDispatchedEvent {
         const githubEvent = event.headers['x-github-event'] as string;
         const action = event.body.action;
-        const fullEventType = action ? `github.${githubEvent}.${action}` : `github.${githubEvent}`;
+        const fullEventType = action ? `${githubEvent}.${action}` : githubEvent;
         const deliveryId = event.headers['x-github-delivery'] as string;
 
         return {

@@ -21,7 +21,7 @@ export class WebflowTransformer {
     ): IDispatchedEvent {
         const payload = event.body;
         const triggerType = payload.triggerType;
-        const normalizedType = `webflow.${triggerType}`;
+        const normalizedType = triggerType;
 
         const timestamp = payload.timestamp || new Date().getTime();
         const providerEventId = payload.payload?._id || `webflow_${crypto.randomUUID()}`;

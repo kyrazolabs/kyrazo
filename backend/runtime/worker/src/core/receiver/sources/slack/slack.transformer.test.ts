@@ -40,7 +40,7 @@ describe('SlackTransformer', () => {
 
         const result = slackTransformer.transform(event, endpoints);
 
-        expect(result.type).toBe('slack.message');
+        expect(result.type).toBe('message');
         expect(result.provider!.name).toBe('slack');
         expect(result.provider!.eventId).toBe('Ev123');
         expect(result.provider!.resourceId).toBe('T123');
@@ -71,6 +71,6 @@ describe('SlackTransformer', () => {
 
         const result = slackTransformer.transform(event, []);
 
-        expect(result.type).toBe('slack.url_verification');
+        expect(result.type).toBe('url_verification');
     });
 });

@@ -18,7 +18,7 @@ export class SlackTransformer {
     public transform(event: IReceivedEvent<SlackEventPayload>, endpoints: any[]): IDispatchedEvent {
         const payload = event.body;
         const eventType = payload.event?.type || payload.type;
-        const normalizedType = `slack.${eventType}`;
+        const normalizedType = eventType;
 
         const timestamp = payload.event_time ? payload.event_time * 1000 : new Date().getTime();
         const providerEventId = payload.event_id || `slack_${crypto.randomUUID()}`;

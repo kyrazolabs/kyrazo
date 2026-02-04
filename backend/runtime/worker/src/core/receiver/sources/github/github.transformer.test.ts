@@ -38,7 +38,7 @@ describe('GitHubTransformer', () => {
 
         const result = githubTransformer.transform(event, endpoints);
 
-        expect(result.type).toBe('github.push');
+        expect(result.type).toBe('push');
         expect(result.provider!.name).toBe('github');
         expect(result.provider!.eventId).toBe('delivery_123');
         expect(result.provider!.resourceId).toBe('12345');
@@ -74,7 +74,7 @@ describe('GitHubTransformer', () => {
 
         const result = githubTransformer.transform(event, []);
 
-        expect(result.type).toBe('github.pull_request.opened');
+        expect(result.type).toBe('pull_request.opened');
         expect(result.provider!.resourceId).toBe('67890');
     });
 });

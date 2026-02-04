@@ -21,13 +21,13 @@ export class ShopifyTransformer {
     ): IDispatchedEvent {
         const topic = event.headers['x-shopify-topic'] as string;
         // Topics come like 'orders/create', we normalize to 'shopify.orders.create'
-        const normalizedTopic = `shopify.${topic.replace(/\//g, '.')}`;
+        const normalizedType = topic.replace(/\//g, '.');
         const webhookId = event.headers['x-shopify-webhook-id'] as string;
         const shopDomain = event.headers['x-shopify-shop-domain'] as string;
 
         return {
             id: event.eventId,
-            type: normalizedTopic,
+            type: normalizedType,
             timestamp: event.headers['x-shopify-triggered-at']
                 ? new Date(event.headers['x-shopify-triggered-at']).getTime()
                 : new Date().getTime(),
