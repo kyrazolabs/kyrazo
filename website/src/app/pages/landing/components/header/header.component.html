@@ -1,5 +1,5 @@
 <div class="fixed top-0 left-0 right-0 z-50 flex justify-center pt-4 px-4 transition-all duration-500">
-    <div class="w-full max-w-7xl rounded-3xl">
+    <div class="w-full max-w-6xl rounded-3xl">
         <div class="w-full max-w-7xl rounded-3xl border transition-all duration-300 px-4 flex items-center justify-between relative "
             [ngClass]="{
                 'bg-transparent border-transparent py-2': !isScrolled,
@@ -17,11 +17,13 @@
                     'bg-surface-0/50 dark:bg-surface-950/50 border-surface-200 dark:border-surface-800 backdrop-blur-sm shadow-sm': !isScrolled,
                     'bg-transparent border-transparent': isScrolled
                 }">
-                <button *ngFor="let item of items"
-                    (click)="item.command?.({originalEvent: $event})"
-                    class="bg-transparent border-none text-surface-600 dark:text-surface-300 hover:text-primary-500 hover:bg-surface-100 dark:hover:bg-surface-800 px-3 py-2 rounded-3xl font-medium transition-colors cursor-pointer text-sm">
-                    {{ item.label }}
-                </button>
+                @for (item of items; track item.label) {
+                    <button
+                        (click)="item.command?.({originalEvent: $event})"
+                        class="bg-transparent border-none text-surface-600 dark:text-surface-300 hover:text-primary-500 hover:bg-surface-100 dark:hover:bg-surface-800 px-3 py-2 rounded-3xl font-medium transition-colors cursor-pointer text-sm">
+                        {{ item.label }}
+                    </button>
+                }
             </div> -->
 
             <!-- Right Actions -->
@@ -33,7 +35,7 @@
                     (click)="toggleDarkMode()"
                     [icon]="isDarkMode()? 'pi pi-moon' : 'pi pi-sun'"
                     ariaLabel="Toggle color theme"
-                    styleClass="w-9 h-9 rounded-2xl!"
+                    styleClass="w-9 h-9 rounded-xl!"
                 />
                 <div class="relative">
                     <p-button
@@ -44,20 +46,16 @@
                         icon="pi pi-palette"
                         ariaLabel="Settings"
                     />
-                    <app-config *ngIf="showConfig" @dropdownAnimation />
+                    @if (showConfig) {
+                        <app-config @dropdownAnimation />
+                    }
                 </div>
 
                 <div class="h-5 w-px bg-surface-300 dark:bg-surface-700 mx-1"></div>
 
-                <p-button label="Log In" (click)="trackLogin()" [text]="true" size="small" styleClass="text-sm! w-18! font-bold! rounded-2xl!"></p-button>
-                <p-button label="Get Started" (click)="trackGetStarted()" severity="primary" size="small" styleClass="text-sm! w-26! font-bold! rounded-2xl!"></p-button>
+                <p-button label="Log In" (click)="trackLogin()" [text]="true" size="small" styleClass="text-sm! w-18! font-bold! rounded-xl!"></p-button>
+                <p-button label="Get Started" (click)="trackGetStarted()" severity="primary" size="small" styleClass="text-sm! w-26! font-bold! rounded-xl!"></p-button>
             </div>
         </div>
-        <div class="border-b-2 py-1 transition-colors duration-100 max-w-[1400px]"
-            [ngClass]="{
-                'bg-transparent border-transparent py-2': isScrolled,
-                'border-surface-200 dark:border-surface-800': !isScrolled
-            }"
-        ></div>
     </div>
 </div>

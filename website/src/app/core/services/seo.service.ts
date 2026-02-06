@@ -30,6 +30,7 @@ export class SeoService {
             .subscribe((data) => {
                 this.updateTitle(data['title']);
                 this.updateMetaTags(data['meta']);
+                this.setSchema(data['schema']);
             });
     }
 
@@ -105,5 +106,22 @@ export class SeoService {
             name: 'twitter:card',
             content: 'summary_large_image',
         });
+    }
+
+    setSchema(schema: any) {
+        // Remove existing schema script
+        const existingScript = this._document.querySelector(
+            'script[type="application/ld+json"]',
+        );
+        if (existingScript) {
+            existingScript.remove();
+        }
+
+        if (schema) {
+            const script = this._document.createElement('script');
+            script.type = 'application/ld+json';
+            script.text = JSON.stringify(schema);
+            this._document.head.appendChild(script);
+        }
     }
 }

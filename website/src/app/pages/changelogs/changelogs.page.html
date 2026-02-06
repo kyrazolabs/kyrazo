@@ -36,19 +36,21 @@
                                 <p-tag [value]="event.status | titlecase" [severity]="getTypeSeverity(event.type)" [rounded]="true" styleClass="text-xs font-semibold px-3 py-1" />
                             </div>
                         </ng-template>
-                        
+
                         <div class="px-2 pb-2">
                              <div class="mb-4">
                                 <h4 class="text-lg font-semibold mb-2 text-surface-800 dark:text-surface-100">{{ event.title }}</h4>
                                 <p class="text-surface-600 dark:text-surface-300 leading-relaxed">{{ event.description }}</p>
                              </div>
-                             
+
                              <div class="bg-surface-50 dark:bg-surface-900/50 rounded-xl p-4 border border-surface-100 dark:border-surface-800/50">
                                  <ul class="list-none p-0 m-0 space-y-3">
-                                     <li *ngFor="let change of event.changes" class="flex items-start gap-3 text-surface-700 dark:text-surface-200">
-                                         <i class="pi pi-check-circle text-primary-500 mt-1 text-sm"></i>
-                                         <span class="leading-snug">{{ change }}</span>
-                                     </li>
+                                     @for (change of event.changes; track $index) {
+                                         <li class="flex items-start gap-3 text-surface-700 dark:text-surface-200">
+                                             <i class="pi pi-check-circle text-primary-500 mt-1 text-sm"></i>
+                                             <span class="leading-snug">{{ change }}</span>
+                                         </li>
+                                     }
                                  </ul>
                              </div>
                         </div>

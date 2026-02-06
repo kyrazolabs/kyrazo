@@ -3,60 +3,42 @@
   (mousemove)="onMouseMove($event)"
   (mouseleave)="onMouseLeave()"
 >
-  <div class="relative z-10 max-w-4xl mx-auto">
+  <div class="z-10 max-w-4xl mx-auto">
     <div class="mb-6 inline-block animate-fade-in-up">
       <span
-        class="px-4 py-2 rounded-full bg-primary-500/10 text-primary-600 dark:text-primary-400 text-sm font-semibold border border-primary-500/20"
+        class="px-3 py-1 rounded-full bg-primary-500/10 text-primary-600 dark:text-primary-400 text-sm font-semibold border border-primary-500/20"
       >
-        Early Access — The Next Gen Webhooks
+        Simplify Your Event Architecture
       </span>
     </div>
 
-    <h1
-      class="text-5xl md:text-7xl font-bold mb-6 text-surface-900 dark:text-surface-0 tracking-tight leading-tight flex flex-col md:flex-row items-center justify-center gap-2 md:gap-4 relative animate-fade-in-up delay-100"
-    >
-      <span>Speed meets</span>
-      <div class="relative inline-block">
-        <span class="relative z-10 px-1">
-            Complexity
-            <svg class="absolute inset-0 w-full h-full pointer-events-none overflow-visible translate-y-3" viewBox="0 0 400 40" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-                <!-- Handwritten strikethrough line with slight curve and imperfections -->
-                <path d="M 10 20 Q 100 17 200 18 Q 300 19 390 15"
-                        class="stroke-primary-500"
-                        stroke-width="2"
-                        fill="none"
-                        stroke-linecap="round"
-                        opacity="1"/>
+    <!-- Background Keywords -->
+    <div class="absolute inset-0 max-w-8xl mx-auto z-0 pointer-events-none overflow-hidden select-none opacity-20 dark:opacity-10">
+         <span class="absolute top-[15%] left-[10%] text-6xl md:text-5xl font-black text-surface-400 dark:text-surface-300 -rotate-12 blur-[2px] animate-floating">Fast</span>
+         <span class="absolute top-[20%] right-[10%] text-5xl md:text-5xl font-black text-primary-500/80 rotate-12 blur-[2px] animate-floating">Dedicated</span>
 
-                <path d="M 12 22 Q 118 20 205 20 Q 305 20 388 17"
-                        class="stroke-primary-500"
-                        stroke-width="1.2"
-                        fill="none"
-                        stroke-linecap="round"
-                        opacity="0.95"/>
-                <path d="M 12 22 Q 105 18 205 19 Q 305 20 388 17"
-                        class="stroke-primary-500"
-                        stroke-width="1.2"
-                        fill="none"
-                        stroke-linecap="round"
-                        opacity="0.85"/>
-            </svg>
-        </span>
-        <span
-            class="absolute -top-10 md:-top-14 left-1/2 w-max text-4xl md:text-6xl text-primary-500 rotate-[-10deg]"
-            style="font-family: 'Caveat', cursive;"
-        >
-            Simplicity
-        </span>
-      </div>
+         <span class="absolute top-[50%] left-[5%] text-5xl md:text-6xl font-black text-primary-500/40 -rotate-6 blur-[3px] animate-floating">Simple</span>
+         <span class="absolute top-[45%] right-[5%] text-6xl md:text-6xl font-black text-surface-400 dark:text-surface-300 rotate-6 blur-[3px] animate-floating">Scalable</span>
+
+         <span class="absolute bottom-[10%] left-[15%] text-5xl md:text-5xl font-black text-primary-500/60 -rotate-3 blur-[2px] animate-floating">Reliable</span>
+         <span class="absolute bottom-[10%] right-[15%] text-6xl md:text-5xl font-black text-surface-400 dark:text-surface-300 rotate-3 blur-[2px] animate-floating">Secure</span>
+    </div>
+
+    <h1
+      class="relative z-10 text-2xl md:text-6xl lg:text-6xl font-bold mb-6 text-surface-900 dark:text-surface-0 tracking-tight leading-tight max-w-5xl animate-fade-in-up delay-100"
+    >
+      Reliable Webhooks as a Service with <span class="text-primary-500 relative">
+        Dedicated Workers
+        <svg class="absolute -bottom-2 left-0 w-full h-3 pointer-events-none overflow-visible" viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M 0 5 Q 50 10 100 5" class="stroke-primary-500/30" stroke-width="2" fill="none" />
+        </svg>
+      </span>
     </h1>
 
     <p
-      class="text-xl md:text-2xl text-surface-600 dark:text-surface-300 mb-10 max-w-2xl mx-auto leading-relaxed animate-fade-in-up delay-200"
+      class="text-xl md:text-xl text-surface-600 dark:text-surface-300 mb-10 max-w-3xl mx-auto leading-relaxed animate-fade-in-up delay-200"
     >
-      Faster, and more developer-friendly than ever.
-      <br class="hidden md:block" />
-      Receive, send, and route events with confidence.
+      A managed webhook platform offering signature verification, automatic retries, and dedicated workers for predictable performance.
     </p>
 
     <div
@@ -66,20 +48,18 @@
         label="Get Early Access"
         ariaLabel="Get Early Access to Kyrazo"
         (click)="trackEarlyAccess()"
-        styleClass="text-base! font-bold! shadow-xl! shadow-primary-500/20 rounded-3xl!  px-4!"
-        [rounded]="true"
+        styleClass="text-base! font-bold! shadow-xl! shadow-primary-500/20 transition-all! duration-500! hover:shadow-primary-500/40 rounded-xl!  px-4!"
         size="small"
         class="w-full sm:w-auto"
       ></p-button>
       <p-button
-        label="View Documentation"
+        label="Documentation"
         ariaLabel="View Kyrazo Documentation"
         (click)="trackDocs()"
         icon="icon-[hugeicons--book-02] size-4.5"
         severity="secondary"
-        styleClass="text-base! rounded-3xl! px-4!"
+        styleClass="text-base! rounded-xl! px-4!"
         [outlined]="true"
-        [rounded]="true"
         size="small"
         class="w-full sm:w-auto"
       ></p-button>

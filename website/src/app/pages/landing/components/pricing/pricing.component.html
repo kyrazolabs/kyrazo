@@ -12,31 +12,37 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 items-start">
-            <div *ngFor="let plan of plans; let i = index"
-                 appScrollReveal
-                 [delay]="'delay-' + (i * 100 + 100)"
-                 [class]="'p-8 rounded-2xl! border transition-all duration-300 relative ' + (plan.highlighted ? 'bg-surface-900 text-surface-0 border-surface-900 shadow-2xl scale-105 z-10' : 'bg-surface-0 dark:bg-surface-950! border-surface-200 dark:border-surface-900 hover:border-primary-500/50')">
+            @for (plan of plans; track plan.name) {
+                <div
+                     appScrollReveal
+                     [delay]="'delay-' + ($index * 100 + 100)"
+                     [class]="'p-8 rounded-2xl! border transition-all duration-300 relative ' + (plan.highlighted ? 'bg-surface-900 text-surface-0 border-surface-900 shadow-2xl scale-105 z-10' : 'bg-surface-0 dark:bg-surface-950! border-surface-200 dark:border-surface-900 hover:border-primary-500/50')">
 
-                <div *ngIf="plan.tag" class="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <p-tag [value]="plan.tag" severity="info" styleClass="rounded-xl! font-bold"></p-tag>
+                    @if (plan.tag) {
+                        <div class="absolute -top-4 left-1/2 -translate-x-1/2">
+                            <p-tag [value]="plan.tag" severity="info" styleClass="rounded-xl! font-bold"></p-tag>
+                        </div>
+                    }
+
+                    <h3 class="text-xl font-bold mb-2 opacity-90">{{ plan.name }}</h3>
+                    <div class="flex items-baseline gap-1 mb-6">
+                        <span class="text-4xl font-bold">{{ plan.price }}</span>
+                        <span class="opacity-70 text-sm">{{ plan.period }}</span>
+                    </div>
+
+                    <!-- Enforced rounded-xl! -->
+                    <p-button [label]="plan.cta" [outlined]="!plan.highlighted" [severity]="plan.highlighted ? 'primary' : 'secondary'" [ariaLabel]="'Select ' + plan.name + ' plan'" styleClass="w-full mb-8 font-bold! rounded-2xl!"></p-button>
+
+                    <ul class="space-y-4">
+                        @for (feature of plan.features; track $index) {
+                            <li class="flex items-center gap-3 text-sm opacity-80">
+                                <i class="pi pi-check text-green-500" aria-hidden="true"></i>
+                                <span>{{ feature }}</span>
+                            </li>
+                        }
+                    </ul>
                 </div>
-
-                <h3 class="text-xl font-bold mb-2 opacity-90">{{ plan.name }}</h3>
-                <div class="flex items-baseline gap-1 mb-6">
-                    <span class="text-4xl font-bold">{{ plan.price }}</span>
-                    <span class="opacity-70 text-sm">{{ plan.period }}</span>
-                </div>
-
-                <!-- Enforced rounded-xl! -->
-                <p-button [label]="plan.cta" [outlined]="!plan.highlighted" [severity]="plan.highlighted ? 'primary' : 'secondary'" [ariaLabel]="'Select ' + plan.name + ' plan'" styleClass="w-full mb-8 font-bold! rounded-2xl!"></p-button>
-
-                <ul class="space-y-4">
-                    <li *ngFor="let feature of plan.features" class="flex items-center gap-3 text-sm opacity-80">
-                        <i class="pi pi-check text-green-500" aria-hidden="true"></i>
-                        <span>{{ feature }}</span>
-                    </li>
-                </ul>
-            </div>
+            }
         </div>
     </div>
 </section>

@@ -1,12 +1,3 @@
-import { Component, computed, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { LayoutService } from '@components/service/layout.service';
-
-@Component({
-    selector: 'app-ingest-diagram',
-    standalone: true,
-    imports: [CommonModule],
-    template: `
         <div
             class="relative w-full h-full flex items-center justify-center py-4 overflow-hidden"
         >
@@ -16,24 +7,18 @@ import { LayoutService } from '@components/service/layout.service';
             >
                 <!-- Sources (Left) -->
                 <div class="flex flex-col gap-5 z-20">
-                    <div
-                        *ngFor="let source of sources"
-                        class="flex items-center gap-3"
-                    >
-                        <div
-                            class="w-9 h-9 p-1.5 rounded-xl bg-surface-800 flex items-center justify-center border border-surface-700 shadow-md"
-                        >
-                            <img
-                                [src]="source.icon"
-                                [alt]="source.name"
-                                width="36"
-                                height="36"
-                                loading="lazy"
-                                decoding="async"
-                                class="h-full object-contain opacity-80"
-                            />
+                    @for (source of sources; track source.name) {
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-9 h-9 p-1.5 rounded-xl bg-surface-50 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 shadow-sm flex items-center justify-center"
+                            >
+                                <span
+                                    [class]="source.iconClass"
+                                    class="text-2xl"
+                                ></span>
+                            </div>
                         </div>
-                    </div>
+                    }
                 </div>
 
                 <!-- Connection SVG Layer -->
@@ -64,7 +49,7 @@ import { LayoutService } from '@components/service/layout.service';
                     </defs>
 
                     <!-- Source to Center Pipes -->
-                    <g *ngFor="let path of sourcePaths; let i = index">
+                    @for (path of sourcePaths; track $index) {
                         <path
                             [attr.d]="path.d"
                             class="stroke-primary-500/10 fill-none stroke-3"
@@ -72,12 +57,12 @@ import { LayoutService } from '@components/service/layout.service';
                         <path
                             [attr.d]="path.d"
                             class="stroke-primary-500/30 fill-none stroke-3 line-dash animation-delay"
-                            [style.animation-delay]="i * 0.4 + 1.2 + 's'"
+                            [style.animation-delay]="$index * 0.4 + 1.2 + 's'"
                         />
-                    </g>
+                    }
 
                     <!-- Center to Destinations Pipes -->
-                    <g *ngFor="let path of destPaths; let i = index">
+                    @for (path of destPaths; track $index) {
                         <path
                             [attr.d]="path.d"
                             class="stroke-primary-500/15 fill-none stroke-3"
@@ -85,9 +70,9 @@ import { LayoutService } from '@components/service/layout.service';
                         <path
                             [attr.d]="path.d"
                             class="stroke-primary-500/40 fill-none stroke-3 line-dash animation-delay"
-                            [style.animation-delay]="i * 0.4 + 1.5 + 's'"
+                            [style.animation-delay]="$index * 0.4 + 1.5 + 's'"
                         />
-                    </g>
+                    }
                 </svg>
 
                 <!-- Kyrazo Ingest (Center) -->
@@ -115,26 +100,26 @@ import { LayoutService } from '@components/service/layout.service';
                 <div class="flex flex-col gap-10 z-20 items-end">
                     <div class="flex items-center gap-3 group">
                         <div
-                            class="px-3 py-1.5 rounded-xl bg-surface-800 border border-surface-700 shadow-md flex items-center gap-2"
+                            class="px-3 py-1.5 rounded-xl bg-surface-50 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 shadow-sm flex items-center gap-2"
                         >
                             <i
                                 class="pi pi-database text-primary-500 text-[10px]"
                             ></i>
                             <span
-                                class="text-[10px] font-black uppercase tracking-widest text-surface-200"
+                                class="text-[10px] font-black uppercase tracking-widest text-surface-900 dark:text-surface-50"
                                 >Storage</span
                             >
                         </div>
                     </div>
                     <div class="flex items-center gap-3 group">
                         <div
-                            class="px-3 py-1.5 rounded-xl bg-surface-800 border border-surface-700 shadow-md flex items-center gap-2"
+                            class="px-3 py-1.5 rounded-xl bg-surface-50 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 shadow-sm flex items-center gap-2"
                         >
                             <i
                                 class="pi pi-link text-primary-500 text-[10px]"
                             ></i>
                             <span
-                                class="text-[10px] font-black uppercase tracking-widest text-surface-200"
+                                class="text-[10px] font-black uppercase tracking-widest text-surface-900 dark:text-surface-50"
                                 >Endpoint</span
                             >
                         </div>
@@ -151,48 +136,3 @@ import { LayoutService } from '@components/service/layout.service';
                 ></div>
             </div>
         </div>
-    `,
-    styles: [
-        `
-            .line-dash {
-                stroke-dasharray: 4, 12;
-                animation: dash 0.5s linear infinite;
-            }
-            @keyframes dash {
-                to {
-                    stroke-dashoffset: -48;
-                }
-            }
-            .animation-delay {
-                animation-duration: 1s;
-            }
-        `,
-    ],
-})
-export class IngestDiagramComponent {
-    layoutService: LayoutService = inject(LayoutService);
-    isDarkMode = computed(() => this.layoutService.appState().darkMode);
-
-    sources = [
-        { name: 'Stripe', icon: 'logos/stripe.svg' },
-        { name: 'GitHub', icon: 'logos/github.svg' },
-        { name: 'Shopify', icon: 'logos/shopify.svg' },
-    ];
-
-    sourcePaths = [
-        // Top
-        { d: 'M-230,40 C0,40 0,150 100,150' },
-
-        // Middle
-        { d: 'M-230,150 L100,150' },
-
-        // Bottom
-        { d: 'M-230,260 C0,260 0,150 100,150' },
-    ];
-
-    // Center K to Destinations
-    destPaths = [
-        { d: 'M180,150 C280,150 280,95 500,80' }, // Center to Storage
-        { d: 'M180,150 C280,150 280,205 500,225' }, // Center to Endpoint
-    ];
-}

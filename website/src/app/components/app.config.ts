@@ -64,21 +64,22 @@ declare type SurfacesType = {
                         >Primary</span
                     >
                     <div class="pt-2 flex gap-2 flex-wrap justify-between">
-                        <button
-                            *ngFor="let pc of primaryColors()"
-                            type="button"
-                            [title]="pc.name"
-                            [ngClass]="[
-                                'border-none w-5 h-5 rounded-full p-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2',
-                                selectedPrimaryColor() === pc.name
-                                    ? 'ring-2 ring-primary ring-offset-2'
-                                    : '',
-                            ]"
-                            [ngStyle]="{
-                                backgroundColor: pc?.palette?.['500'],
-                            }"
-                            (click)="updateColors($event, 'primary', pc)"
-                        ></button>
+                        @for (pc of primaryColors(); track pc.name) {
+                            <button
+                                type="button"
+                                [title]="pc.name"
+                                [ngClass]="[
+                                    'border-none w-5 h-5 rounded-full p-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2',
+                                    selectedPrimaryColor() === pc.name
+                                        ? 'ring-2 ring-primary ring-offset-2'
+                                        : '',
+                                ]"
+                                [ngStyle]="{
+                                    backgroundColor: pc?.palette?.['500'],
+                                }"
+                                (click)="updateColors($event, 'primary', pc)"
+                            ></button>
+                        }
                     </div>
                 </div>
                 <div>
@@ -87,25 +88,28 @@ declare type SurfacesType = {
                         >Surface</span
                     >
                     <div class="pt-2 flex gap-2 flex-wrap justify-between">
-                        <button
-                            *ngFor="let s of surfaces"
-                            type="button"
-                            [title]="s.name"
-                            [ngClass]="[
-                                'border-none w-5 h-5 rounded-full p-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2',
-                                (
-                                    selectedSurface()
-                                        ? selectedSurface() === s.name
-                                        : isDarkMode()
-                                          ? s.name === 'zinc'
-                                          : s.name === 'slate'
-                                )
-                                    ? 'ring-2 ring-primary ring-offset-2'
-                                    : '',
-                            ]"
-                            [ngStyle]="{ backgroundColor: s?.palette?.['500'] }"
-                            (click)="updateColors($event, 'surface', s)"
-                        ></button>
+                        @for (s of surfaces; track s.name) {
+                            <button
+                                type="button"
+                                [title]="s.name"
+                                [ngClass]="[
+                                    'border-none w-5 h-5 rounded-full p-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2',
+                                    (
+                                        selectedSurface()
+                                            ? selectedSurface() === s.name
+                                            : isDarkMode()
+                                              ? s.name === 'zinc'
+                                              : s.name === 'slate'
+                                    )
+                                        ? 'ring-2 ring-primary ring-offset-2'
+                                        : '',
+                                ]"
+                                [ngStyle]="{
+                                    backgroundColor: s?.palette?.['500'],
+                                }"
+                                (click)="updateColors($event, 'surface', s)"
+                            ></button>
+                        }
                     </div>
                 </div>
             </div>
@@ -291,6 +295,7 @@ export class AppConfig {
                 >
             ].primitive;
         const colors = [
+            'indigo',
             'noir',
             'green',
             'lime',
@@ -301,7 +306,6 @@ export class AppConfig {
             'cyan',
             'sky',
             'blue',
-            'indigo',
             'violet',
             'purple',
             'fuchsia',

@@ -15,12 +15,12 @@ export const routes: Routes = [
                         (p) => p.LandingPage,
                     ),
                 data: {
-                    title: 'Kyrazo',
+                    title: 'Reliable Webhooks as a Service',
                     meta: {
                         description:
-                            'Kyrazo: Secure webhooks as a service for reliable event ingestion, dispatch, and automation. Simplify webhook management with retries, scheduling, and high scalability for developers and enterprises',
+                            'Simplify your event architecture with Kyrazo. A managed webhook platform offering signature verification, automatic retries, and dedicated workers.',
                         keywords:
-                            'Webhook as a Service, Webhook Management Platform, Webhook Infrastructure, Webhook Automation Platform, Webhook Relay Platform, Enterprise Webhook Solution, Stripe webhook management, Github webhook service, Webhook retry and failure handling, Dedicated webhook workers, Webhook scheduling and queuing',
+                            'Webhooks as a Service, Managed Webhook Infrastructure, Webhook Relay, Dedicated Workers, Webhook Isolation, Kyrazo, Webhook Retry',
                     },
                 },
             },
@@ -77,6 +77,54 @@ export const routes: Routes = [
                     meta: {
                         description:
                             'Kyrazo Blog - Latest updates and articles.',
+                    },
+                },
+            },
+            {
+                path: 'features/ingest',
+                loadComponent: () =>
+                    import('@pages/features/ingest/ingest.page').then(
+                        (p) => p.IngestPage,
+                    ),
+                data: {
+                    title: 'Secure Webhook Ingestion & Verification',
+                    meta: {
+                        description:
+                            'Securely receive webhooks from any provider. Kyrazo handles HMAC signature verification, payload normalization, and event logging automatically.',
+                        keywords:
+                            'Webhook Ingestion, HMAC Verification, Webhook Receiver, Secure Webhooks, Stripe Webhooks, GitHub Webhooks, Event Normalization',
+                    },
+                },
+            },
+            {
+                path: 'features/dispatch',
+                loadComponent: () =>
+                    import('@pages/features/dispatch/dispatch.page').then(
+                        (p) => p.DispatchPage,
+                    ),
+                data: {
+                    title: 'Reliable Webhook Dispatch & Retry Logic',
+                    meta: {
+                        description:
+                            'Guarantee webhook delivery with Kyrazo. Automatic retries with exponential backoff, dead-letter queues, and event scheduling.',
+                        keywords:
+                            'Webhook Dispatch, Webhook Retries, Exponential Backoff, Dead Letter Queue, Reliability, Event Scheduling, Webhook Delivery',
+                    },
+                },
+            },
+            {
+                path: 'features/architecture',
+                loadComponent: () =>
+                    import('@pages/features/architecture/architecture.page').then(
+                        (p) => p.ArchitecturePage,
+                    ),
+                data: {
+                    title: 'Dedicated Workers Architecture',
+                    meta: {
+                        description:
+                            'Eliminate noisy neighbor issues with Kyrazo’s dedicated workers. Isolated infrastructure ensures consistent latency and high throughput for your webhooks.',
+                        keywords:
+                            'Dedicated Workers, Webhook Isolation, Noisy Neighbor Problem, High Throughput Webhooks, Predictable Latency, Enterprise Webhooks',
                     },
                 },
             },

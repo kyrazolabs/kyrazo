@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&family=Caveat:wght@400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=Dosis:wght@200..800&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Caveat:wght@400..700&family=Quicksand:wght@300..700&display=swap');
 @import "tailwindcss";
 @import "tailwindcss-primeui";
 @plugin "@tailwindcss/typography";
@@ -17,11 +17,6 @@
   @keyframes pulse-soft {
     0%, 100% { opacity: 0.3; transform: scale(1); }
     50% { opacity: 0.6; transform: scale(1.2); }
-  }
-
-  @keyframes gradient-shimmer {
-    0% { background-position: 0% 50%; }
-    100% { background-position: 200% 50%; }
   }
 }
 

@@ -19,11 +19,9 @@ import Aura from '@primeuix/themes/aura';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { environment } from 'environments/environment';
 import { definePreset } from '@primeuix/themes';
-import { getNoirSemantic } from './theme.config';
+import { getIndigoPreset } from './theme.config';
 
-const NoirAura = definePreset(Aura, {
-    semantic: getNoirSemantic(),
-});
+const IndigoAura = definePreset(Aura, getIndigoPreset());
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -32,7 +30,7 @@ export const appConfig: ApplicationConfig = {
         providePrimeNG({
             ripple: true,
             theme: {
-                preset: NoirAura,
+                preset: IndigoAura,
                 options: {
                     darkModeSelector: '.p-dark',
                 },

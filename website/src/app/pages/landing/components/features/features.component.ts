@@ -2,9 +2,9 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 
-import { IngestDiagramComponent } from './diagrams/ingest-diagram.component';
-import { DispatchDiagramComponent } from './diagrams/dispatch-diagram.component';
-import { WorkflowDiagramComponent } from './diagrams/workflow-diagram.component';
+import { IngestDiagramComponent } from './diagrams/ingest/ingest.component';
+import { DispatchDiagramComponent } from './diagrams/dispatch/dispatch.component';
+import { WorkflowDiagramComponent } from './diagrams/workflow/workflow.component';
 
 import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directive';
 
@@ -92,7 +92,7 @@ export class FeaturesComponent {
             title: 'Ingest Events',
             subtitle: 'Secure & Reliable',
             description:
-                'Ingest incoming events from any external service (Stripe, GitHub, etc.) via secure endpoints. We handle signature verification for you automatically with zero configuration.',
+                'Securely ingest events from any provider (Stripe, GitHub, Shopify, and more). We handle HMAC signature verification, payload normalization, and persistent logging automatically.',
             icon: 'pi pi-download',
             color: 'text-sky-600 dark:text-sky-500',
             bg: 'border border-sky-500/20 bg-sky-500/10',
@@ -103,7 +103,7 @@ export class FeaturesComponent {
             title: 'Dispatch Events',
             subtitle: 'Guaranteed Delivery',
             description:
-                'Send events to your customers or internal services. Advanced retry mechanisms and dead-letter queues ensuring nothing gets lost in transit.',
+                'Guarantee delivery to your internal services or customers. Built-in exponential backoff, dead-letter queues, and event scheduling ensure zero data loss.',
             icon: 'pi pi-send',
             color: 'text-emerald-600 dark:text-emerald-500',
             bg: 'border border-emerald-500/20 bg-emerald-500/10',
@@ -114,7 +114,7 @@ export class FeaturesComponent {
             title: 'Automate Workflows',
             subtitle: 'Smart Connectors',
             description:
-                'Automate actions zero-code. Chain tasks, apply filters, and transform data payloads on the fly. Connect Kyrazo to your entire stack—from Slack to custom DBs—with enterprise-grade reliability and Fan-out support.',
+                'Chain actions and transform payloads without writing glue code. Filter events, fan-out to multiple destinations, and connect your entire stack with smart logic.',
             icon: 'icon-[hugeicons--node-view]',
             color: 'text-purple-700 dark:text-purple-500',
             bg: 'bg-purple-500/15 dark:bg-purple-500/10',

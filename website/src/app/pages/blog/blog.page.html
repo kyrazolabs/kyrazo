@@ -5,60 +5,77 @@
     </div>
 
     <!-- Loading State -->
-    <div *ngIf="isLoading()" class="flex justify-center py-20">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-    </div>
+    @if (isLoading()) {
+        <div class="flex justify-center py-20">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+    }
 
     <!-- Error State -->
-    <div *ngIf="error()" class="text-center py-20 text-red-500">
-        {{ error() }}
-    </div>
+    @if (error()) {
+        <div class="text-center py-20 text-red-500">
+            {{ error() }}
+        </div>
+    }
 
     <!-- Blog Grid -->
-    <div *ngIf="!isLoading() && !error()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div *ngFor="let article of articles()" class="group bg-surface-0 dark:bg-surface-900 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-surface-200 dark:border-surface-800 flex flex-col h-full ring-1 ring-black/5">
-            <!-- Image -->
-            <div class="h-56 overflow-hidden bg-surface-100 dark:bg-surface-800 relative">
-                 <img *ngIf="article.cover"
-                      [src]="cmsService.getImageUrl(article.cover!.url)"
-                      [alt]="article.cover!.alternativeText || article.title"
-                      class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
-                 <div *ngIf="!article.cover" class="w-full h-full flex items-center justify-center text-surface-400">
-                    <span class="text-4xl italic font-serif opacity-30">Kyrazo</span>
-                 </div>
+    @if (!isLoading() && !error()) {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            @for (article of articles(); track article.slug) {
+                <div class="group bg-surface-0 dark:bg-surface-900 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-surface-200 dark:border-surface-800 flex flex-col h-full ring-1 ring-black/5">
+                    <!-- Image -->
+                    <div class="h-56 overflow-hidden bg-surface-100 dark:bg-surface-800 relative">
+                         @if (article.cover) {
+                             <img
+                                  [src]="cmsService.getImageUrl(article.cover!.url)"
+                                  [alt]="article.cover!.alternativeText || article.title"
+                                  class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+                         } @else {
+                             <div class="w-full h-full flex items-center justify-center text-surface-400">
+                                <span class="text-4xl italic font-serif opacity-30">Kyrazo</span>
+                             </div>
+                         }
 
-                 <!-- Category Badge -->
-                 <div class="absolute top-4 left-4" *ngIf="article.category">
-                    <span class="bg-surface-0/90 dark:bg-surface-950/90 backdrop-blur-sm text-surface-900 dark:text-surface-0 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm">
-                        {{ article.category!.name }}
-                    </span>
-                 </div>
-            </div>
-
-            <!-- Content -->
-            <div class="p-8 flex-1 flex flex-col">
-                <div class="flex items-center text-sm text-surface-500 dark:text-surface-400 mb-4">
-                    <span>{{ article.publishedAt | date:'mediumDate' }}</span>
-                </div>
-
-                <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-3 line-clamp-2 group-hover:text-primary transition-colors">
-                    <a [routerLink]="['/blog', article.slug]">{{ article.title }}</a>
-                </h2>
-
-                <p class="text-surface-600 dark:text-surface-300 mb-6 line-clamp-3 text-base leading-relaxed flex-1">
-                    {{ article.description }}
-                </p>
-
-                <div class="pt-6 mt-auto border-t border-surface-100 dark:border-surface-800 flex items-center justify-between">
-                    <div class="flex items-center" *ngIf="article.author">
-                        <img *ngIf="article.author!.picture"
-                             [src]="cmsService.getImageUrl(article.author!.picture!.url)"
-                             class="w-8 h-8 rounded-full object-cover mr-3 ring-2 ring-surface-100 dark:ring-surface-800">
-                        <span class="text-sm font-medium text-surface-700 dark:text-surface-200">{{ article.author!.name }}</span>
+                         <!-- Category Badge -->
+                         @if (article.category) {
+                             <div class="absolute top-4 left-4">
+                                <span class="bg-surface-0/90 dark:bg-surface-950/90 backdrop-blur-sm text-surface-900 dark:text-surface-0 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm">
+                                    {{ article.category!.name }}
+                                </span>
+                             </div>
+                         }
                     </div>
-                    <a [routerLink]="['/blog', article.slug]" class="text-primary hover:text-primary-emphasis font-bold text-sm tracking-wide group-hover:underline decoration-2 underline-offset-4">Read more</a>
+
+                    <!-- Content -->
+                    <div class="p-8 flex-1 flex flex-col">
+                        <div class="flex items-center text-sm text-surface-500 dark:text-surface-400 mb-4">
+                            <span>{{ article.publishedAt | date:'mediumDate' }}</span>
+                        </div>
+
+                        <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-3 line-clamp-2 group-hover:text-primary transition-colors">
+                            <a [routerLink]="['/blog', article.slug]">{{ article.title }}</a>
+                        </h2>
+
+                        <p class="text-surface-600 dark:text-surface-300 mb-6 line-clamp-3 text-base leading-relaxed flex-1">
+                            {{ article.description }}
+                        </p>
+
+                        <div class="pt-6 mt-auto border-t border-surface-100 dark:border-surface-800 flex items-center justify-between">
+                            @if (article.author) {
+                                <div class="flex items-center">
+                                    @if (article.author!.picture) {
+                                        <img
+                                             [src]="cmsService.getImageUrl(article.author!.picture!.url)"
+                                             class="w-8 h-8 rounded-full object-cover mr-3 ring-2 ring-surface-100 dark:ring-surface-800">
+                                    }
+                                    <span class="text-sm font-medium text-surface-700 dark:text-surface-200">{{ article.author!.name }}</span>
+                                </div>
+                            }
+                            <a [routerLink]="['/blog', article.slug]" class="text-primary hover:text-primary-emphasis font-bold text-sm tracking-wide group-hover:underline decoration-2 underline-offset-4">Read more</a>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            }
         </div>
-    </div>
+    }
 </div>

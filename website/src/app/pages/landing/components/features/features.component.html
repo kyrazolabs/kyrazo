@@ -2,117 +2,140 @@
     <div class="px-6 max-w-7xl mx-auto">
         <!-- Main Features Bento Grid -->
         <!-- <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-32">
-            <div *ngFor="let feature of features; let last = last; let i = index"
-                 appScrollReveal 
-                 [delay]="'delay-' + (i * 100 + 100)"
-                 [class]="'group flex flex-col p-8 rounded-2xl bg-surface-0 dark:bg-surface-950 hover:shadow-sm transition-all duration-300 border border-surface-200 dark:border-surface-900 overflow-hidden relative ' + feature.class">
-                
-                Text Content Container
-                <div class="relative z-10" [ngClass]="{'order-first mb-8': i !== 1, 'order-last mt-8': i === 1}">
-                    <div class="flex items-center gap-4 mb-4">
-                        <div *ngIf="i !== 1" class="p-2 rounded-lg bg-surface-100 dark:bg-surface-800 text-surface-600 dark:text-surface-400">
-                             <i [class]="feature.icon + ' text-xl'"></i>
-                        </div>
-                        <h3 class="text-2xl font-black text-surface-900 dark:text-surface-0 tracking-tight">{{ feature.title }}</h3>
-                        Badges
-                         <div *ngIf="i === 0" class="px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20 text-[10px] font-bold uppercase tracking-wider">
-                            Fastest
-                        </div>
-                         <div *ngIf="i === 2" class="px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20 text-[10px] font-bold uppercase tracking-wider">
-                            Global
-                        </div>
-                    </div>
-                    <p class="text-surface-600 dark:text-surface-400 leading-relaxed text-lg max-w-xl">{{ feature.description }}</p>
-                </div>
+            @for (feature of features; track feature.title) {
+                <div
+                     appScrollReveal
+                     [delay]="'delay-' + ($index * 100 + 100)"
+                     [class]="'group flex flex-col p-8 rounded-2xl bg-surface-0 dark:bg-surface-950 hover:shadow-sm transition-all duration-300 border border-surface-200 dark:border-surface-900 overflow-hidden relative ' + feature.class">
 
-                Visualizer Container
-                <div [class]="'relative h-64 overflow-hidden rounded-xl flex items-center justify-center p-2 gap-4 ' + (i === 1 ? '' : 'bg-transparent border-none p-0! h-auto min-h-[160px]')" 
-                     [ngSwitch]="feature.id"
-                     [ngClass]="{'order-last': i !== 1, 'order-first': i === 1}">
-                    
-                    Speed Visualizer
-                    <div *ngSwitchCase="'speed'" class="relative w-full h-full flex flex-col justify-end group/vis overflow-hidden">
-                        Metric
-                        <div class="flex items-baseline gap-2 mb-6">
-                            <span class="text-5xl md:text-6xl font-black text-orange-500 tracking-tighter">
-                                {{ speedMetric.value }}
-                            </span>
-                            <span class="text-lg text-surface-500 font-bold">latency</span>
-                        </div>
-                        
-                        Visual Bars
-                        <div class="flex items-end justify-between h-24 w-full gap-[4px]">
-                            <div *ngFor="let _ of speedBars; let i = index" 
-                                 class="flex-1 min-w-[4px] h-full rounded-t-sm transition-all duration-700"
-                                 [ngClass]="{
-                                    'bg-linear-to-t from-orange-500 to-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.4)]': i < 16, 
-                                    'bg-surface-200 dark:bg-surface-800 opacity-20': i >= 16
-                                 }"
-                                 [style.height.%]="80 + (i < 16 ? (i % 2 === 0 ? 20 : 0) : 0)">
-                            </div>
-                        </div>
-                    </div>
-
-                    Security Visualizer
-                    <div *ngSwitchCase="'security'" class="relative w-full h-full flex flex-col justify-end group/vis overflow-hidden">
-                         Metric
-                         <div class="flex items-baseline gap-2 mb-6">
-                            <span class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-linear-to-br from-emerald-400 to-teal-500 tracking-tighter box-decoration-clone">
-                                E2E
-                            </span>
-                            <span class="text-lg text-surface-500 font-bold">encrypted</span>
-                        </div>
-
-                         Abstract Encryption Grid
-                         <div class="flex flex-wrap content-end gap-1 w-full h-32 mask-gradient-b">
-                            <div *ngFor="let _ of securityBits; let i = index" 
-                                 class="w-1.5 h-3 rounded-[1px] transition-all duration-1000"
-                                 [ngClass]="{
-                                    'bg-emerald-500': i % 5 === 0,
-                                    'bg-teal-400': i % 3 === 0,
-                                    'bg-emerald-900/20 dark:bg-emerald-500/10': i % 3 !== 0 && i % 5 !== 0,
-                                    'animate-pulse': i % 7 === 0
-                                 }"
-                                 [style.opacity]="(i % 4 === 0) ? 1 : 0.4">
-                            </div>
-                        </div>
-                    </div>
-
-                    Resilience Visualizer
-                    <div *ngSwitchCase="'resilience'" class="relative w-full h-full flex flex-col justify-end group/vis overflow-hidden">
-                        Metric
-                        <div class="flex items-baseline gap-2 mb-6">
-                            <span class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-linear-to-br from-cyan-400 to-indigo-500 tracking-tighter box-decoration-clone">
-                                Global Mesh
-                            </span>
-                            <span class="text-lg text-surface-500 font-bold">99.99%</span>
-                        </div>
-
-                        Abstract Region Health
-                        <div class="flex items-end gap-3 w-full h-24">
-                            <div *ngFor="let region of resilienceRegions; let i = index" 
-                                 class="flex-1 flex flex-col items-center gap-2">
-                                <div class="w-full rounded-full transition-all duration-1000 bg-linear-to-t"
-                                     [ngClass]="{
-                                        'from-cyan-500 to-indigo-400 shadow-[0_0_15px_rgba(34,211,238,0.4)]': region.status === 'optimal',
-                                        'from-amber-500 to-orange-400 shadow-[0_0_15px_rgba(245,158,11,0.4)]': region.status === 'degraded'
-                                     }"
-                                     [style.height.%]="region.value">
+                    Text Content Container
+                    <div class="relative z-10" [ngClass]="{'order-first mb-8': $index !== 1, 'order-last mt-8': $index === 1}">
+                        <div class="flex items-center gap-4 mb-4">
+                            @if ($index !== 1) {
+                                <div class="p-2 rounded-lg bg-surface-100 dark:bg-surface-800 text-surface-600 dark:text-surface-400">
+                                     <i [class]="feature.icon + ' text-xl'"></i>
                                 </div>
-                                <span class="text-[8px] font-bold text-surface-500 tracking-widest">{{ region.label }}</span>
-                            </div>
+                            }
+                            <h3 class="text-2xl font-black text-surface-900 dark:text-surface-0 tracking-tight">{{ feature.title }}</h3>
+                            Badges
+                            @if ($index === 0) {
+                                <div class="px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20 text-[10px] font-bold uppercase tracking-wider">
+                                    Fastest
+                                </div>
+                            }
+                            @if ($index === 2) {
+                                <div class="px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20 text-[10px] font-bold uppercase tracking-wider">
+                                    Global
+                                </div>
+                            }
                         </div>
+                        <p class="text-surface-600 dark:text-surface-400 leading-relaxed text-lg max-w-xl">{{ feature.description }}</p>
                     </div>
 
+                    Visualizer Container
+                    <div [class]="'relative h-64 overflow-hidden rounded-xl flex items-center justify-center p-2 gap-4 ' + ($index === 1 ? '' : 'bg-transparent border-none p-0! h-auto min-h-[160px]')"
+                         [ngClass]="{'order-last': $index !== 1, 'order-first': $index === 1}">
+
+                        @switch (feature.id) {
+                            @case ('speed') {
+                                <div class="relative w-full h-full flex flex-col justify-end group/vis overflow-hidden">
+                                    Metric
+                                    <div class="flex items-baseline gap-2 mb-6">
+                                        <span class="text-5xl md:text-6xl font-black text-orange-500 tracking-tighter">
+                                            {{ speedMetric.value }}
+                                        </span>
+                                        <span class="text-lg text-surface-500 font-bold">latency</span>
+                                    </div>
+
+                                    Visual Bars
+                                    <div class="flex items-end justify-between h-24 w-full gap-[4px]">
+                                        @for (bar of speedBars; track $index) {
+                                            <div
+                                                 class="flex-1 min-w-[4px] h-full rounded-t-sm transition-all duration-700"
+                                                 [ngClass]="{
+                                                    'bg-linear-to-t from-orange-500 to-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.4)]': $index < 16,
+                                                    'bg-surface-200 dark:bg-surface-800 opacity-20': $index >= 16
+                                                 }"
+                                                 [style.height.%]="80 + ($index < 16 ? ($index % 2 === 0 ? 20 : 0) : 0)">
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+
+                            @case ('security') {
+                                <div class="relative w-full h-full flex flex-col justify-end group/vis overflow-hidden">
+                                     Metric
+                                     <div class="flex items-baseline gap-2 mb-6">
+                                        <span class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-linear-to-br from-emerald-400 to-teal-500 tracking-tighter box-decoration-clone">
+                                            E2E
+                                        </span>
+                                        <span class="text-lg text-surface-500 font-bold">encrypted</span>
+                                    </div>
+
+                                     Abstract Encryption Grid
+                                     <div class="flex flex-wrap content-end gap-1 w-full h-32 mask-gradient-b">
+                                        @for (bit of securityBits; track $index) {
+                                            <div
+                                                 class="w-1.5 h-3 rounded-[1px] transition-all duration-1000"
+                                                 [ngClass]="{
+                                                    'bg-emerald-500': $index % 5 === 0,
+                                                    'bg-teal-400': $index % 3 === 0,
+                                                    'bg-emerald-900/20 dark:bg-emerald-500/10': $index % 3 !== 0 && $index % 5 !== 0,
+                                                    'animate-pulse': $index % 7 === 0
+                                                 }"
+                                                 [style.opacity]="($index % 4 === 0) ? 1 : 0.4">
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+
+                            @case ('resilience') {
+                                <div class="relative w-full h-full flex flex-col justify-end group/vis overflow-hidden">
+                                    Metric
+                                    <div class="flex items-baseline gap-2 mb-6">
+                                        <span class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-linear-to-br from-cyan-400 to-indigo-500 tracking-tighter box-decoration-clone">
+                                            Global Mesh
+                                        </span>
+                                        <span class="text-lg text-surface-500 font-bold">99.99%</span>
+                                    </div>
+
+                                    Abstract Region Health
+                                    <div class="flex items-end gap-3 w-full h-24">
+                                        @for (region of resilienceRegions; track region.label) {
+                                            <div
+                                                 class="flex-1 flex flex-col items-center gap-2">
+                                                <div class="w-full rounded-full transition-all duration-1000 bg-linear-to-t"
+                                                     [ngClass]="{
+                                                        'from-cyan-500 to-indigo-400 shadow-[0_0_15px_rgba(34,211,238,0.4)]': region.status === 'optimal',
+                                                        'from-amber-500 to-orange-400 shadow-[0_0_15px_rgba(245,158,11,0.4)]': region.status === 'degraded'
+                                                     }"
+                                                     [style.height.%]="region.value">
+                                                </div>
+                                                <span class="text-[8px] font-bold text-surface-500 tracking-widest">{{ region.label }}</span>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+
+                    Abstract background glows
+                    @if ($index === 0) {
+                        <div class="absolute -bottom-12 -right-12 w-48 h-48 bg-orange-500/20 blur-[80px] rounded-full group-hover:bg-orange-500/30 duration-500 transition-colors"></div>
+                    }
+
+                    @if ($index === 1) {
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-emerald-500/20 blur-[60px] rounded-full group-hover:bg-emerald-500/30 duration-500 transition-colors pointer-events-none"></div>
+                    }
+
+                    @if ($index === 2) {
+                        <div class="absolute -bottom-12 -right-12 w-48 h-48 bg-cyan-500/20 blur-[80px] rounded-full group-hover:bg-cyan-500/30 duration-500 transition-colors"></div>
+                    }
                 </div>
-
-                Abstract background glows
-                <div *ngIf="i === 0" class="absolute -bottom-12 -right-12 w-48 h-48 bg-orange-500/20 blur-[80px] rounded-full group-hover:bg-orange-500/30 duration-500 transition-colors"></div>
-                
-                <div *ngIf="i === 1" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-emerald-500/20 blur-[60px] rounded-full group-hover:bg-emerald-500/30 duration-500 transition-colors pointer-events-none"></div>
-
-                <div *ngIf="i === 2" class="absolute -bottom-12 -right-12 w-48 h-48 bg-cyan-500/20 blur-[80px] rounded-full group-hover:bg-cyan-500/30 duration-500 transition-colors"></div>
-            </div>
+            }
         </div> -->
 
         <!-- Core Capabilities Section -->
@@ -128,109 +151,107 @@
         </div>
         <!-- Ingest & Dispatch Top Duo -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-[1400px] mx-auto mb-12">
-            <div *ngFor="let cap of capabilities.slice(0, 2); let i = index" appScrollReveal
-                [delay]="'delay-' + (i * 200 + 100)" class="group relative transition-all duration-300">
-                <div
-                    class="relative p-6 rounded-2xl bg-surface-0 dark:bg-surface-950 border border-surface-200 dark:border-surface-900 h-full shadow-xs group-hover:shadow-sm hover:shadow-primary-500/10 overflow-hidden flex flex-col">
-                    <!-- Diagram Container -->
+            @for (cap of capabilities.slice(0, 2); track cap.title) {
+                <div appScrollReveal
+                    [delay]="'delay-' + ($index * 200 + 100)" class="group relative transition-all duration-300">
                     <div
-                        class="relative mb-10 flex items-center justify-center rounded-2xl transition-colors overflow-hidden shrink-0 h-64">
-                        <div class="transition-transform w-full duration-700 ease-out">
-                            <ng-container [ngSwitch]="cap.diagram">
-                                <app-ingest-diagram *ngSwitchCase="'ingest'"></app-ingest-diagram>
-                                <app-dispatch-diagram *ngSwitchCase="'dispatch'"></app-dispatch-diagram>
-                            </ng-container>
-                        </div>
-                    </div>
-
-                    <!-- Content -->
-                    <div class="relative z-10 flex flex-col grow">
-                        <div class="flex items-center gap-4 mb-6">
-                            <h3
-                                class="text-3xl font-black text-surface-900 dark:text-surface-0 tracking-tight transition-colors leading-tight">
-                                {{ cap.title }}</h3>
-                            <div
-                                [class]="'px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md border border-white/5 ' + cap.bg + ' ' + cap.color">
-                                {{ cap.subtitle }}
+                        class="relative p-6 rounded-2xl bg-surface-0 dark:bg-surface-950 border border-surface-200 dark:border-surface-900 h-full shadow-xs group-hover:shadow-sm hover:shadow-primary-500/10 overflow-hidden flex flex-col">
+                        <!-- Diagram Container -->
+                        <div
+                            class="relative mb-10 flex items-center justify-center rounded-2xl transition-colors overflow-hidden shrink-0 h-64">
+                            <div class="transition-transform w-full duration-700 ease-out">
+                                @switch (cap.diagram) {
+                                    @case ('ingest') {
+                                        <app-ingest-diagram />
+                                    }
+                                    @case ('dispatch') {
+                                        <app-dispatch-diagram />
+                                    }
+                                }
                             </div>
                         </div>
-                        <p
-                            class="text-surface-600 dark:text-surface-400 leading-relaxed font-medium opacity-80 group-hover:opacity-100 transition-opacity">
-                            {{ cap.description }}</p>
 
-                        <!-- <div class="mt-auto pt-8 flex items-center gap-2 text-primary-500 font-bold text-sm tracking-tight group/link">
-                            <span>Get started with {{ cap.title.split(' ')[0] }}</span>
-                            <i class="pi pi-arrow-right text-[10px] transform group-hover/link:translate-x-1 transition-transform"></i>
-                        </div> -->
+                        <!-- Content -->
+                        <div class="relative z-10 flex flex-col grow">
+                            <div class="flex items-center gap-4 mb-6">
+                                <h3
+                                    class="text-3xl font-black text-surface-900 dark:text-surface-0 tracking-tight transition-colors leading-tight">
+                                    {{ cap.title }}</h3>
+                                <div
+                                    [class]="'px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md border border-white/5 ' + cap.bg + ' ' + cap.color">
+                                    {{ cap.subtitle }}
+                                </div>
+                            </div>
+                            <p
+                                class="text-surface-600 dark:text-surface-400 leading-relaxed font-medium opacity-80 group-hover:opacity-100 transition-opacity">
+                                {{ cap.description }}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
         </div>
 
         <!-- Automation Featured Section -->
         <div class="max-w-7xl mx-auto" appScrollReveal delay="delay-200">
-            <div *ngIf="capabilities[2] as automate" class="group relative transition-all duration-500">
-                <div
-                    class="absolute top-6 right-6 z-20 flex items-center gap-1.5 px-3 py-1 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md shadow-sm">
-                    <i class="icon-[hugeicons--sparkles] text-sm"></i>
-                    <span>Almost Here</span>
-                </div>
-                <div
-                    class="relative  w-full p-10 md:p-12 rounded-2xl bg-linear-to-br from-surface-0 to-surface-50 dark:from-surface-950 dark:to-surface-900/50 border-2 border-primary-400/10 dark:border-primary-600/10 h-full overflow-hidden flex flex-col items-center text-center">
-                    <!-- Featured Diagram Container -->
+            @if (capabilities[2]; as automate) {
+                <div class="group relative transition-all duration-500">
                     <div
-                        class="relative mb-12 w-full max-w-4xl h-[300px] flex items-center justify-center overflow-hidden shrink-0">
-                        <div class="transition-transform w-full duration-500 ease-out">
-                            <app-workflow-diagram></app-workflow-diagram>
-                        </div>
+                        class="absolute top-6 right-6 z-20 flex items-center gap-1.5 px-3 py-1 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md shadow-sm">
+                        <i class="icon-[hugeicons--sparkles] text-sm"></i>
+                        <span>Almost Here</span>
                     </div>
-
-                    <!-- Featured Content -->
-                    <div class="relative z-10 flex flex-col items-center">
-                        <div class="flex items-center gap-4 mb-6 justify-center">
-                            <div
-                                class="px-3 py-1 rounded-full bg-purple-500/10 text-purple-500 border border-purple-500/20 text-[9px] font-black uppercase tracking-[0.3em]">
-                                Standalone Power
-                            </div>
-                            <span class="text-surface-400 font-medium text-[10px]">Dynamic Fan-out</span>
-                        </div>
-
-                        <h2
-                            class="text-3xl md:text-5xl font-black mb-6 text-surface-900 dark:text-surface-0 tracking-tighter leading-tight group-hover:text-primary-600 duration-300 transition-colors">
-                            {{ automate.title }}
-                        </h2>
-
-                        <p
-                            class="text-surface-600 dark:text-surface-400 leading-relaxed text-base md:text-lg font-medium mb-8 max-w-3xl mx-auto">
-                            {{ automate.description }}
-                        </p>
-
-                        <!-- Special Features Badges -->
-                        <div class="flex flex-wrap gap-2 mb-10 justify-center">
-                            <div *ngFor="let f of automate.features"
-                                class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface-50 dark:bg-surface-800/40 border border-surface-200 dark:border-surface-800 text-[10px] font-bold text-surface-600 dark:text-surface-400">
-                                <i class="pi pi-check-circle text-primary-500"></i>
-                                {{ f }}
+                    <div
+                        class="relative  w-full p-10 md:p-12 rounded-3xl bg-linear-to-br from-surface-0 to-surface-50 dark:from-surface-950 dark:to-surface-900/50 border-2 border-primary-400/10 dark:border-primary-600/10 h-full overflow-hidden flex flex-col items-center text-center">
+                        <!-- Featured Diagram Container -->
+                        <div
+                            class="relative mb-12 w-full max-w-4xl h-[300px] flex items-center justify-center overflow-hidden shrink-0">
+                            <div class="transition-transform w-full duration-500 ease-out">
+                                <app-workflow-diagram></app-workflow-diagram>
                             </div>
                         </div>
 
-                        <!-- <div class="flex flex-col sm:flex-row items-center gap-4 justify-center">
-                            <p-button styleClass="rounded-2xl!" class="px-3!">
-                                Design Your Workflow
-                            </p-button>
-                            <p-button label="See live examples" [link]="true" styleClass="font-bold! text-surface-600! dark:text-surface-400! text-sm!"></p-button>
-                        </div> -->
-                    </div>
+                        <!-- Featured Content -->
+                        <div class="relative z-10 flex flex-col items-center">
+                            <div class="flex items-center gap-4 mb-6 justify-center">
+                                <div
+                                    class="px-3 py-1 rounded-full bg-purple-500/10 text-purple-500 border border-purple-500/20 text-[9px] font-black uppercase tracking-[0.3em]">
+                                    Standalone Power
+                                </div>
+                                <span class="text-surface-400 font-medium text-[10px]">Dynamic Fan-out</span>
+                            </div>
 
-                    <!-- Featured Background Decorations -->
-                    <div
-                        class="absolute top-0 right-0 w-[400px] h-[400px] bg-primary-500/5 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2">
-                    </div>
-                    <div
-                        class="absolute bottom-0 left-0 w-[300px] h-[300px] bg-purple-500/5 blur-[80px] rounded-full translate-y-1/2 -translate-x-1/2">
+                            <h2
+                                class="text-3xl md:text-5xl font-black mb-6 text-surface-900 dark:text-surface-0 tracking-tighter leading-tight group-hover:text-primary-600 duration-300 transition-colors">
+                                {{ automate.title }}
+                            </h2>
+
+                            <p
+                                class="text-surface-600 dark:text-surface-400 leading-relaxed text-base md:text-lg font-medium mb-8 max-w-3xl mx-auto">
+                                {{ automate.description }}
+                            </p>
+
+                            <!-- Special Features Badges -->
+                            <div class="flex flex-wrap gap-2 mb-10 justify-center">
+                                @for (f of automate.features; track $index) {
+                                    <div
+                                        class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface-50 dark:bg-surface-800/40 border border-surface-200 dark:border-surface-800 text-[10px] font-bold text-surface-600 dark:text-surface-400">
+                                        <i class="pi pi-check-circle text-primary-500"></i>
+                                        {{ f }}
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Featured Background Decorations -->
+                        <div
+                            class="absolute top-0 right-0 w-[400px] h-[400px] bg-primary-500/5 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2">
+                        </div>
+                        <div
+                            class="absolute bottom-0 left-0 w-[300px] h-[300px] bg-purple-500/5 blur-[80px] rounded-full translate-y-1/2 -translate-x-1/2">
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
         </div>
     </div>
 </section>

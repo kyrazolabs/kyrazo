@@ -22,7 +22,7 @@ export interface AppState {
 export class LayoutService {
     _appState: AppState = {
         preset: 'Aura',
-        primary: 'noir',
+        primary: 'indigo',
         surface: 'zinc',
         darkMode: false,
     };

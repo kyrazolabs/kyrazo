@@ -48,59 +48,70 @@ interface FaqItem {
                 </div>
 
                 <div class="space-y-3">
-                    <div
-                        *ngFor="let item of faqs; let i = index"
-                        class="group rounded-2xl border border-surface-200 dark:border-surface-800/60 bg-surface-0/40 dark:bg-surface-900/40 transition-all duration-300 overflow-hidden"
-                        [class.border-primary-500/30]="activeIndex === i"
-                        [class.bg-surface-50/50]="activeIndex === i"
-                        [class.dark:bg-surface-900/60]="activeIndex === i"
-                    >
-                        <button
-                            (click)="toggle(i)"
-                            class="w-full text-left py-4 px-6 flex items-center justify-between gap-4 group/btn outline-hidden"
-                            [attr.aria-expanded]="activeIndex === i"
-                            [attr.aria-controls]="'faq-content-' + i"
-                            [attr.id]="'faq-button-' + i"
-                        >
-                            <span
-                                class="text-lg md:text-xl font-bold tracking-tight text-surface-950 dark:text-white transition-colors duration-300"
-                                [class.text-primary-500]="activeIndex === i"
-                            >
-                                {{ item.question }}
-                            </span>
-                            <div
-                                class="w-8 h-8 rounded-full border border-surface-200 dark:border-surface-800 flex items-center justify-center transition-all duration-300 shrink-0 pt-0.5"
-                                [class.rotate-180]="activeIndex === i"
-                                [class.bg-primary-500]="activeIndex === i"
-                                [class.border-primary-500]="activeIndex === i"
-                                [class.text-white]="activeIndex === i"
-                                aria-hidden="true"
-                            >
-                                <i
-                                    class="icon-[hugeicons--arrow-down-01] size-6"
-                                ></i>
-                            </div>
-                        </button>
-
+                    @for (item of faqs; track item.question) {
                         <div
-                            class="grid transition-all duration-300 ease-in-out"
-                            [style.grid-template-rows]="
-                                activeIndex === i ? '1fr' : '0fr'
+                            class="group rounded-2xl border border-surface-200 dark:border-surface-800/60 bg-surface-0/40 dark:bg-surface-900/40 transition-all duration-300 overflow-hidden"
+                            [class.border-primary-500/30]="
+                                activeIndex === $index
                             "
-                            [attr.id]="'faq-content-' + i"
-                            [attr.aria-hidden]="activeIndex !== i"
-                            role="region"
-                            [attr.aria-labelledby]="'faq-button-' + i"
+                            [class.bg-surface-50/50]="activeIndex === $index"
+                            [class.dark:bg-surface-900/60]="
+                                activeIndex === $index
+                            "
                         >
-                            <div class="overflow-hidden">
-                                <div
-                                    class="px-6 pb-6 text-surface-600 dark:text-surface-400 leading-relaxed text-lg font-medium animate-in fade-in duration-500"
+                            <button
+                                (click)="toggle($index)"
+                                class="w-full text-left py-4 px-6 flex items-center justify-between gap-4 group/btn outline-hidden"
+                                [attr.aria-expanded]="activeIndex === $index"
+                                [attr.aria-controls]="'faq-content-' + $index"
+                                [attr.id]="'faq-button-' + $index"
+                            >
+                                <span
+                                    class="text-lg md:text-xl font-bold tracking-tight text-surface-950 dark:text-white transition-colors duration-300"
+                                    [class.text-primary-500]="
+                                        activeIndex === $index
+                                    "
                                 >
-                                    {{ item.answer }}
+                                    {{ item.question }}
+                                </span>
+                                <div
+                                    class="w-8 h-8 rounded-full border border-surface-200 dark:border-surface-800 flex items-center justify-center transition-all duration-300 shrink-0 pt-0.5"
+                                    [class.rotate-180]="activeIndex === $index"
+                                    [class.bg-primary-500]="
+                                        activeIndex === $index
+                                    "
+                                    [class.border-primary-500]="
+                                        activeIndex === $index
+                                    "
+                                    [class.text-white]="activeIndex === $index"
+                                    aria-hidden="true"
+                                >
+                                    <i
+                                        class="icon-[hugeicons--arrow-down-01] size-6"
+                                    ></i>
+                                </div>
+                            </button>
+
+                            <div
+                                class="grid transition-all duration-300 ease-in-out"
+                                [style.grid-template-rows]="
+                                    activeIndex === $index ? '1fr' : '0fr'
+                                "
+                                [attr.id]="'faq-content-' + $index"
+                                [attr.aria-hidden]="activeIndex !== $index"
+                                role="region"
+                                [attr.aria-labelledby]="'faq-button-' + $index"
+                            >
+                                <div class="overflow-hidden">
+                                    <div
+                                        class="px-6 pb-6 text-surface-600 dark:text-surface-400 leading-relaxed text-lg font-medium animate-in fade-in duration-500"
+                                    >
+                                        {{ item.answer }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    }
                 </div>
 
                 <div

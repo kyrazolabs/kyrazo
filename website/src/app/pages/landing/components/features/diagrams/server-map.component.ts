@@ -58,13 +58,14 @@ import { dropdownAnimation } from '@shared/animations/dropdown.animation';
                         aria-hidden="true"
                     >
                         <g class="fill-surface-400">
-                            <circle
-                                *ngFor="let p of points"
-                                [attr.cx]="p.x"
-                                [attr.cy]="p.y"
-                                r="0.25"
-                                class="transition-all duration-700 hover:fill-primary-500 hover:scale-150"
-                            />
+                            @for (p of points; track $index) {
+                                <circle
+                                    [attr.cx]="p.x"
+                                    [attr.cy]="p.y"
+                                    r="0.25"
+                                    class="transition-all duration-700 hover:fill-primary-500 hover:scale-150"
+                                />
+                            }
                         </g>
                     </svg>
 
@@ -101,26 +102,27 @@ import { dropdownAnimation } from '@shared/animations/dropdown.animation';
                             ></div>
                         </div>
                         <!-- Tooltip -->
-                        <div
-                            *ngIf="hoveredMarker === 'eu'"
-                            @dropdownAnimation
-                            class="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 pointer-events-none z-50"
-                        >
+                        @if (hoveredMarker === 'eu') {
                             <div
-                                class="bg-surface-900/90 backdrop-blur-md border border-surface-700 px-4 py-2 rounded-xl shadow-2xl whitespace-nowrap"
+                                @dropdownAnimation
+                                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 pointer-events-none z-50"
                             >
-                                <div class="flex items-center gap-3">
-                                    <span
-                                        class="text-[11px] font-black uppercase text-white tracking-widest"
-                                        >EU Nuremberg</span
-                                    >
-                                    <span
-                                        class="px-2 py-0.5 rounded bg-green-500/20 text-green-400 text-[9px] font-black tracking-widest"
-                                        >ACTIVE</span
-                                    >
+                                <div
+                                    class="bg-surface-900/90 backdrop-blur-md border border-surface-700 px-4 py-2 rounded-xl shadow-2xl whitespace-nowrap"
+                                >
+                                    <div class="flex items-center gap-3">
+                                        <span
+                                            class="text-[11px] font-black uppercase text-white tracking-widest"
+                                            >EU Nuremberg</span
+                                        >
+                                        <span
+                                            class="px-2 py-0.5 rounded bg-green-500/20 text-green-400 text-[9px] font-black tracking-widest"
+                                            >ACTIVE</span
+                                        >
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        }
                     </div>
 
                     <!-- US Manassas (Soon) -->
@@ -144,31 +146,32 @@ import { dropdownAnimation } from '@shared/animations/dropdown.animation';
                             ></div>
                         </div>
                         <!-- Tooltip -->
-                        <div
-                            *ngIf="hoveredMarker === 'us'"
-                            @dropdownAnimation
-                            class="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 pointer-events-none z-50"
-                        >
+                        @if (hoveredMarker === 'us') {
                             <div
-                                class="bg-surface-900/90 backdrop-blur-md border border-surface-700 px-4 py-2 rounded-xl shadow-2xl whitespace-nowrap"
+                                @dropdownAnimation
+                                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 pointer-events-none z-50"
                             >
-                                <div class="flex items-center gap-3">
-                                    <span
-                                        class="text-[11px] font-black uppercase text-white tracking-widest"
-                                        >US Manassas</span
-                                    >
-                                    <span
-                                        class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-500 text-[9px] font-black tracking-widest flex items-center gap-1"
-                                    >
-                                        SOON
+                                <div
+                                    class="bg-surface-900/90 backdrop-blur-md border border-surface-700 px-4 py-2 rounded-xl shadow-2xl whitespace-nowrap"
+                                >
+                                    <div class="flex items-center gap-3">
                                         <span
-                                            class="bg-amber-500/20 px-1.5 rounded text-[8px]"
-                                            >BUN</span
+                                            class="text-[11px] font-black uppercase text-white tracking-widest"
+                                            >US Manassas</span
                                         >
-                                    </span>
+                                        <span
+                                            class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-500 text-[9px] font-black tracking-widest flex items-center gap-1"
+                                        >
+                                            SOON
+                                            <span
+                                                class="bg-amber-500/20 px-1.5 rounded text-[8px]"
+                                                >BUN</span
+                                            >
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        }
                     </div>
                 </div>
 

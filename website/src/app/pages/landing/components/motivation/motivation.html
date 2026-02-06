@@ -42,36 +42,37 @@
 
     <!-- Problems Grid -->
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-      <div
-        *ngFor="let item of items; let i = index"
-        appScrollReveal
-        [delay]="'delay-' + (i * 100 + 100)"
-        class="group relative overflow-hidden rounded-2xl border border-surface-800/50 bg-surface-900/30 p-6 transition-all duration-500 hover:border-primary-500/50 hover:bg-surface-900/35"
-      >
-        <!-- Glow -->
+      @for (item of items; track item.title) {
         <div
-          class="absolute -top-24 -right-24 h-24 w-24 rounded-full bg-primary-500/0 blur-[60px] transition-all duration-700 group-hover:bg-primary-500/5"
-        ></div>
+          appScrollReveal
+          [delay]="'delay-' + ($index * 100 + 100)"
+          class="group relative overflow-hidden rounded-2xl border border-surface-800/50 bg-surface-900/30 p-6 transition-all duration-500 hover:border-primary-500/50 hover:bg-surface-900/35"
+        >
+          <!-- Glow -->
+          <div
+            class="absolute -top-24 -right-24 h-24 w-24 rounded-full bg-primary-500/0 blur-[60px] transition-all duration-700 group-hover:bg-primary-500/5"
+          ></div>
 
-        <div class="relative z-10">
-          <div class="mb-8 flex items-center gap-4">
-            <div class="flex h-10 w-10 items-center justify-center rounded-xl border border-surface-700 bg-surface-800 text-primary-500 transition-all duration-500 group-hover:border-primary-500/20 group-hover:bg-primary-500/10">
-              <span class="text-2xl" [class]="item.icon"></span>
+          <div class="relative z-10">
+            <div class="mb-8 flex items-center gap-4">
+              <div class="flex h-10 w-10 items-center justify-center rounded-xl border border-surface-700 bg-surface-800 text-primary-500 transition-all duration-500 group-hover:border-primary-500/20 group-hover:bg-primary-500/10">
+                <span class="text-2xl" [class]="item.icon"></span>
+              </div>
+              <h3
+                class="text-xl font-bold tracking-tight text-white transition-colors group-hover:text-primary-300"
+              >
+                {{ item.title }}
+              </h3>
             </div>
-            <h3
-              class="text-xl font-bold tracking-tight text-white transition-colors group-hover:text-primary-300"
-            >
-              {{ item.title }}
-            </h3>
-          </div>
 
-          <p
-            class="font-medium leading-relaxed text-surface-400 opacity-80 transition-opacity group-hover:opacity-100"
-          >
-            {{ item.description }}
-          </p>
+            <p
+              class="font-medium leading-relaxed text-surface-400 opacity-80 transition-opacity group-hover:opacity-100"
+            >
+              {{ item.description }}
+            </p>
+          </div>
         </div>
-      </div>
+      }
     </div>
   </div>
 </section>
