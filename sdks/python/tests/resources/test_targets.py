@@ -1,6 +1,5 @@
-import pytest
 from httpx import Response
-from kyrazo.resources.targets import CreateTargetInput, Target
+from kyrazo.resources.targets import CreateTargetInput
 
 
 def test_create_target_success(client, mock_api):
@@ -16,7 +15,7 @@ def test_create_target_success(client, mock_api):
 
     response_data = {
         "data": {
-            "_id": "tgt_123",
+            "id": "tgt_123",
             "name": "My Target",
             "url": "https://example.com/target",
             "method": "POST",
@@ -65,7 +64,7 @@ def test_get_target_secret(client, mock_api):
 
     mock_api.get(f"/v1/targets/{project_id}/{target_id}/secret").mock(
         return_value=Response(
-            200, json={"success": True, "data": {"secret": secret}}
+            200, json={"success": True, "data": secret}
         )
     )
 
@@ -81,9 +80,8 @@ def test_update_target_status(client, mock_api):
     response_data = {
         "success": True,
         "data": {
-            "_id": "tgt_123",
+            "id": "tgt_123",
             "name": "My Target",
-            "url": "https://example.com/target",
             "url": "https://example.com/target",
             "method": "POST",
             "enabled": False,
@@ -99,9 +97,11 @@ def test_update_target_status(client, mock_api):
         },
     }
 
-    mock_api.put(f"/v1/targets/{project_id}/{target_id}").mock(
+    route = mock_api.put(f"/v1/targets/{project_id}/{target_id}").mock(
         return_value=Response(200, json=response_data)
     )
 
     target = client.targets.update_status(project_id, target_id, enabled)
     assert target.enabled is False
+    import json
+    assert json.loads(route.calls.last.request.content) == {"targetId": target_id, "enabled": enabled}

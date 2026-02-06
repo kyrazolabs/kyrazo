@@ -1,44 +1,47 @@
-from typing import List, Optional, Dict, Any, Union, Literal
+from typing import List, Optional, Literal
 from pydantic import BaseModel, Field, ConfigDict
 
 SourceService = Literal["stripe", "paypal"]
 SourceStatus = Literal["active", "inactive"]
-SourceType = Literal["receive", "publish", "forward"]
-SourceAuthType = Literal["service", "api_key", "basic_auth"]
+SourceAuthType = Literal["service"]
 
 
 class SourceRetryPolicy(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
     max_attempts: int = Field(..., alias="maxAttempts", ge=1, le=10)
 
 
+class SourceAuthService(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+    secret: str
+
+
 class SourceAuthentication(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
     enabled: bool
     type: Optional[SourceAuthType] = None
-    service: Optional[Dict[str, str]] = None
-    basic_auth: Optional[Dict[str, str]] = Field(None, alias="basicAuth")
-    api_key: Optional[Dict[str, str]] = Field(None, alias="apiKey")
+    service: Optional[SourceAuthService] = None
 
 
 class Source(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
     id: str = Field(..., alias="_id")
     name: str
     description: Optional[str] = None
-    type: SourceType
     service: SourceService
     status: SourceStatus
     forwarding: bool
     endpoints: Optional[List[str]] = None
     event_types: List[str] = Field(..., alias="eventTypes")
     retry_policy: Optional[SourceRetryPolicy] = Field(None, alias="retryPolicy")
-    authentication: Optional[SourceAuthentication] = None
     created_at: str = Field(..., alias="createdAt")
     updated_at: str = Field(..., alias="updatedAt")
 
 
 class CreateSourceInput(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
     name: str
     description: Optional[str] = None
-    type: Optional[SourceType] = "receive"
     service: SourceService
     status: Optional[SourceStatus] = "active"
     forwarding: Optional[bool] = False
@@ -49,6 +52,7 @@ class CreateSourceInput(BaseModel):
 
 
 class UpdateSourceInput(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
     name: Optional[str] = None
     description: Optional[str] = None
     status: Optional[SourceStatus] = None

@@ -1,6 +1,5 @@
-import pytest
 from httpx import Response
-from kyrazo.resources.endpoints import CreateEndpointInput, Endpoint
+from kyrazo.resources.endpoints import CreateEndpointInput
 
 
 def test_create_endpoint_success(client, mock_api):
@@ -16,20 +15,23 @@ def test_create_endpoint_success(client, mock_api):
 
     response_data = {
         "data": {
-            "_id": "end_123",
-            "name": "My Endpoint",
-            "status": "active",
-            "url": "https://example.com/webhook",
-            "enabled": True,
-            "config": {
-                "timeout": 5000,
-                "retryCount": 3,
-                "rateLimit": None,
-                "rateLimitDuration": 60,
-            },
-            "customHeaders": None,
-            "createdAt": "2024-01-01T00:00:00Z",
-            "updatedAt": "2024-01-01T00:00:00Z",
+            "endpoint": {
+                "id": "end_123",
+                "name": "My Endpoint",
+                "status": "active",
+                "url": "https://example.com/webhook",
+                "method": "POST",
+                "enabled": True,
+                "config": {
+                    "timeout": 5000,
+                    "retryCount": 3,
+                    "rateLimit": None,
+                    "rateLimitDuration": 60,
+                },
+                "customHeaders": None,
+                "createdAt": "2024-01-01T00:00:00Z",
+                "updatedAt": "2024-01-01T00:00:00Z",
+            }
         }
     }
 
@@ -52,7 +54,7 @@ def test_get_endpoint_secret(client, mock_api):
 
     mock_api.get(f"/v1/endpoints/{project_id}/{endpoint_id}/secret").mock(
         return_value=Response(
-            200, json={"success": True, "data": {"secret": secret}}
+            200, json={"success": True, "data": secret}
         )
     )
 
@@ -69,10 +71,11 @@ def test_list_endpoints(client, mock_api):
             json={
                 "data": [
                     {
-                        "_id": "end_1",
+                        "id": "end_1",
                         "name": "E1",
                         "status": "active",
                         "url": "https://test.com",
+                        "method": "POST",
                         "enabled": True,
                         "config": {
                             "timeout": 1000,

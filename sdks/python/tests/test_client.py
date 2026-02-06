@@ -1,6 +1,6 @@
 import pytest
 from httpx import Response
-from kyrazo import Kyrazo, KyrazoError, AuthenticationError
+from kyrazo import Kyrazo, AuthenticationError
 from kyrazo.core.http_client import HttpClient
 
 

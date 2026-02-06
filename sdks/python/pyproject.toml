@@ -5,6 +5,10 @@ description = "Official Kyrazo SDK for Python"
 authors = ["Kyrazo <support@kyrazo.com>"]
 readme = "README.md"
 packages = [{include = "kyrazo"}]
+license = "MIT"
+repository = "https://github.com/kyrazolabs/sdks"
+homepage = "https://github.com/kyrazolabs/sdks/tree/main/sdks/python#readme"
+keywords = ["kyrazo", "webhooks", "events", "sdk", "api"]
 
 [tool.poetry.dependencies]
 python = "^3.9"

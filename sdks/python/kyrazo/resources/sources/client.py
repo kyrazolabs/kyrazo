@@ -1,5 +1,6 @@
-from typing import List, Optional, Any
+from typing import Optional
 from ...core.http_client import HttpClient
+from ...models.common import PaginatedResponse
 from .models import Source, CreateSourceInput, UpdateSourceInput
 
 
@@ -7,9 +8,9 @@ class SourcesClient:
     def __init__(self, http_client: HttpClient):
         self._http_client = http_client
 
-    def list(self, project_id: str, params: Optional[dict] = None) -> Any:
-        # Returns paginated response; simpler to return raw dict or generic model
-        return self._http_client.get(f"/v1/sources/{project_id}", params=params)
+    def list(self, project_id: str, params: Optional[dict] = None) -> PaginatedResponse[Source]:
+        response = self._http_client.get(f"/v1/sources/{project_id}", params=params)
+        return PaginatedResponse[Source](**response)
 
     def get(self, project_id: str, source_id: str) -> Source:
         response = self._http_client.get(f"/v1/sources/{project_id}/{source_id}")

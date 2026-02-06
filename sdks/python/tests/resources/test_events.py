@@ -1,15 +1,13 @@
-import pytest
 from httpx import Response
-from kyrazo.resources.events import PublishEventBody, TargetInput
+from kyrazo.resources.events import PublishEventBody
 
 
 def test_publish_event_success(client, mock_api):
     project_id = "proj_123"
     payload = {
-        "webhookId": "wh_123",
         "eventType": "test.event",
         "payload": {"hello": "world"},
-        "targets": [{"targetUrl": "https://google.com"}],
+        "targets": [{"targetId": "target_123"}],
     }
 
     response_data = {
@@ -37,10 +35,9 @@ def test_publish_event_idempotency(client, mock_api):
     project_id = "proj_123"
     key = "unique_key"
     payload = {
-        "webhookId": "wh_123",
         "eventType": "test.event",
         "payload": {},
-        "targets": [{"targetUrl": "https://google.com"}],
+        "targets": [{"targetId": "target_123"}],
     }
 
     route = mock_api.post(f"/v1/events/{project_id}/publish").mock(
@@ -61,3 +58,38 @@ def test_publish_event_idempotency(client, mock_api):
     client.events.publish(project_id, event_body, idempotency_key=key)
 
     assert route.calls.last.request.headers["Idempotency-Key"] == key
+
+
+def test_publish_event_automatic_idempotency(client, mock_api):
+    project_id = "proj_123"
+    payload = {
+        "eventType": "test.event",
+        "payload": {},
+        "targets": [{"targetId": "target_123"}],
+    }
+
+    route = mock_api.post(f"/v1/events/{project_id}/publish").mock(
+        return_value=Response(
+            200,
+            json={
+                "status": "queued",
+                "eventId": "evt_123",
+                "targetsCount": 1,
+                "unfoundTargets": [],
+                "queuedAt": "now",
+                "processingTimeMs": 1,
+            },
+        )
+    )
+
+    event_body = PublishEventBody(**payload)
+    client.events.publish(project_id, event_body)
+
+    # Header should be present and be a valid UUID
+    idempotency_key = route.calls.last.request.headers.get("Idempotency-Key")
+    assert idempotency_key is not None
+    import uuid
+    try:
+        uuid.UUID(idempotency_key)
+    except ValueError:
+        pytest.fail("Idempotency-Key is not a valid UUID")

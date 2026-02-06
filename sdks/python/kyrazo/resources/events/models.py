@@ -1,14 +1,11 @@
-from typing import List, Optional, Dict, Any, Union
-from pydantic import BaseModel, Field, HttpUrl, ConfigDict
+from typing import List, Optional, Dict, Any
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class TargetInput(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
     target_id: str = Field(
         ..., alias="targetId", description="The ID of the target to send the event to."
-    )
-    target_url: Optional[str] = Field(
-        None, alias="targetUrl", description="The URL to send the webhook to."
     )
 
 
@@ -20,9 +17,9 @@ class EventMeta(BaseModel):
 
 class PublishEventBody(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
-    webhook_id: str = Field(..., alias="webhookId", min_length=1)
     event_type: str = Field(..., alias="eventType", min_length=1)
     payload: Dict[str, Any] = Field(..., description="The event data payload.")
+    previous: Optional[Any] = None
     targets: List[TargetInput] = Field(..., min_length=1)
     meta: Optional[EventMeta] = None
 
@@ -42,6 +39,7 @@ class BatchPublishEventResponseItem(BaseModel):
     event_id: str = Field(..., alias="eventId")
     status: str
     targets_count: Optional[int] = Field(None, alias="targetsCount")
+    unfound_targets: List[str] = Field(default_factory=list, alias="unfoundTargets")
     error: Optional[str] = None
 
 

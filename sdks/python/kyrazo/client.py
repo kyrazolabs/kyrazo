@@ -1,4 +1,3 @@
-from typing import Optional
 from .core.http_client import HttpClient
 from .resources.events.client import EventsClient
 from .resources.sources.client import SourcesClient

@@ -1,5 +1,6 @@
 import httpx
-from typing import Optional, Any, Dict, Union
+import uuid
+from typing import Optional, Any, Dict, Union, List
 from .exceptions import (
     KyrazoError,
     AuthenticationError,
@@ -86,13 +87,18 @@ class HttpClient:
         self,
         method: str,
         path: str,
-        data: Optional[Dict[str, Any]] = None,
+        data: Optional[Union[Dict[str, Any], List[Any]]] = None,
         params: Optional[Dict[str, Any]] = None,
         headers: Optional[Dict[str, str]] = None,
     ) -> Any:
+        # Generate a unique idempotency key for every request
+        request_headers = {"Idempotency-Key": str(uuid.uuid4())}
+        if headers:
+            request_headers.update(headers)
+
         try:
             response = self._client.request(
-                method, path, json=data, params=params, headers=headers
+                method, path, json=data, params=params, headers=request_headers
             )
             return self._handle_response(response)
         except Exception as e:
@@ -107,15 +113,15 @@ class HttpClient:
     def post(
         self,
         path: str,
-        data: Optional[Dict[str, Any]] = None,
+        data: Optional[Union[Dict[str, Any], List[Any]]] = None,
         headers: Optional[Dict[str, str]] = None,
     ) -> Any:
         return self.request("POST", path, data=data, headers=headers)
 
-    def put(self, path: str, data: Optional[Dict[str, Any]] = None) -> Any:
+    def put(self, path: str, data: Optional[Union[Dict[str, Any], List[Any]]] = None) -> Any:
         return self.request("PUT", path, data=data)
 
-    def patch(self, path: str, data: Optional[Dict[str, Any]] = None) -> Any:
+    def patch(self, path: str, data: Optional[Union[Dict[str, Any], List[Any]]] = None) -> Any:
         return self.request("PATCH", path, data=data)
 
     def delete(self, path: str) -> Any:

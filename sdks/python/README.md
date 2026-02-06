@@ -20,11 +20,10 @@ client = Kyrazo(api_key="your_api_key")
 # Publish an event
 response = client.events.publish(
     project_id="proj_123",
-    payload={
-        "webhookId": "wh_123",
+    body={
         "eventType": "user.created",
         "payload": {"id": 1, "name": "Alice"},
-        "targets": [{"targetUrl": "https://example.com/webhook"}]
+        "targets": [{"targetId": "target_123"}]
     }
 )
 print(response.event_id)
