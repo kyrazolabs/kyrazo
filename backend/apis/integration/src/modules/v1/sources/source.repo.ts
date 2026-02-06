@@ -18,6 +18,7 @@ export class SourceRepository {
             projectId,
         })
             .select('-userId -workspaceId -__v')
+            .lean()
             .exec();
     }
 

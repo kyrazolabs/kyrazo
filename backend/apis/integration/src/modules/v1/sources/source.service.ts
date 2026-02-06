@@ -86,7 +86,7 @@ export class SourceService {
 
         try {
             const saved = await sourceRepository.create(data);
-            const source = saved.toObject();
+            const source = saved;
             delete source.authentication?.credentials;
 
             return source;
@@ -151,7 +151,7 @@ export class SourceService {
             if (!updated) {
                 throw new Error('Failed to update source');
             }
-            const sourceDoc = updated.toObject();
+            const sourceDoc = updated;
             delete sourceDoc.authentication?.credentials;
             return sourceDoc;
         } catch (error) {
