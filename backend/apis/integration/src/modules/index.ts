@@ -13,7 +13,7 @@ const router = new Hono();
 router.route('/events', eventsRouter);
 router.route('/targets', targetsRouter);
 router.route('/endpoints', endpointsRouter);
-router.route('/source', sourceRouter);
+router.route('/sources', sourceRouter);
 
 // Health check endpoint
 router.get('/health', async (c: AppContext) => {
