@@ -9,6 +9,7 @@ import {
   type APIErrorResponse,
 } from "../errors";
 import { VERSION } from "../version";
+import { generateIdempotencyKey } from "./helpers";
 
 /**
  * HTTP method types
@@ -86,6 +87,7 @@ export class HttpClient {
       Accept: "application/json",
       "x-api-key": this.apiKey,
       "User-Agent": `kyrazo-sdk/${VERSION}`,
+      "Idempotency-Key": generateIdempotencyKey(),
       ...this.customHeaders,
       ...additionalHeaders,
     };

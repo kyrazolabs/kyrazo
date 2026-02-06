@@ -35,7 +35,6 @@ describe("SourcesModule", () => {
     const mockData = {
       name: "Test Source",
       service: "stripe",
-      type: "receive",
     };
     const mockResponse = { data: { data: { ...mockData, _id: "src_123" } } };
     mockHttpClient.post.mockResolvedValue(mockResponse);

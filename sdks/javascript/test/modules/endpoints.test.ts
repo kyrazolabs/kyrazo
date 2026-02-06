@@ -14,6 +14,7 @@ describe("EndpointsModule", () => {
       get: vi.fn(),
       post: vi.fn(),
       patch: vi.fn(),
+      put: vi.fn(),
       delete: vi.fn(),
     } as unknown as HttpClient;
     endpoints = createEndpointsModule(mockHttpClient);
@@ -32,7 +33,7 @@ describe("EndpointsModule", () => {
   });
 
   it("should get an endpoint", async () => {
-    const mockResponse = { data: { data: { _id: "ep_123" } } };
+    const mockResponse = { data: { data: { id: "ep_123" } } };
     mockHttpClient.get.mockResolvedValue(mockResponse);
 
     await endpoints.get("proj_123", "ep_123");
@@ -46,10 +47,11 @@ describe("EndpointsModule", () => {
     const mockResponse = { data: { secret: "whsec_123" } };
     mockHttpClient.get.mockResolvedValue(mockResponse);
 
-    await endpoints.getSecret("proj_123", "ep_123");
+    const response = await endpoints.getSecret("proj_123", "ep_123");
 
     expect(mockHttpClient.get).toHaveBeenCalledWith(
       "/v1/endpoints/proj_123/ep_123/secret",
     );
+    expect(response).toEqual(mockResponse.data);
   });
 });

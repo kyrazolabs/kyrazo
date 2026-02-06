@@ -26,26 +26,7 @@ export type EventStatus =
   | "timeout"
   | "network_error";
 
-/**
- * Payload for publishing a single event
- *
- * @example
- * ```typescript
- * const payload: PublishEventPayload = {
- *   eventType: "user.created",
- *   webhookId: "68c674dd3b96f77d9426a93b",
- *   payload: { userId: "u_123", email: "user@example.com" },
- *   targets: [{ targetId: "65a1b2c3d4e5f67890123456" }]
- * };
- * ```
- */
 export interface PublishEventPayload {
-  /**
-   * ID of the webhook configuration (MongoDB ObjectId)
-   * @required
-   */
-  webhookId: string;
-
   /**
    * Type of the event (e.g., "user.created", "order.completed")
    * Should follow the format "resource.action"
@@ -60,8 +41,12 @@ export interface PublishEventPayload {
   payload: EventData;
 
   /**
+   * Optional previous state of the resource
+   */
+  previous?: any;
+
+  /**
    * Target endpoints to deliver the event to
-   * Each target must have a valid `targetUrl`
    * At least one target is required
    * @required
    */
@@ -109,34 +94,24 @@ export interface PublishEventResponse {
   eventId: string;
 
   /**
-   * NATS subject the event was published to
-   */
-  subject: string;
-
-  /**
-   * NATS stream name
-   */
-  stream: string;
-
-  /**
-   * NATS sequence number
-   */
-  sequence: number;
-
-  /**
    * Number of targets the event will be delivered to
    */
   targetsCount: number;
 
   /**
+   * Array of target IDs that could not be found
+   */
+  unfoundTargets: string[];
+
+  /**
    * ISO 8601 timestamp when the event was queued
    */
-  queued_at: string;
+  queuedAt: string;
 
   /**
    * Server processing time in milliseconds
    */
-  processing_time_ms: number;
+  processingTimeMs: number;
 }
 
 /**
@@ -146,7 +121,7 @@ export interface BatchPublishEventResponseItem {
   /**
    * Status of the individual event
    */
-  status: "queued";
+  status: "queued" | "skipped" | "failed";
 
   /**
    * Unique identifier for the published event
@@ -154,30 +129,49 @@ export interface BatchPublishEventResponseItem {
   eventId: string;
 
   /**
-   * NATS subject the event was published to
-   */
-  subject: string;
-
-  /**
-   * NATS stream name
-   */
-  stream: string;
-
-  /**
-   * NATS sequence number
-   */
-  sequence: number;
-
-  /**
    * Number of targets for this event
    */
   targetsCount: number;
+
+  /**
+   * Optional array of unfound target IDs for this event
+   */
+  unfoundTargets?: string[];
+
+  /**
+   * Optional error message if the event failed to publish
+   */
+  error?: string;
 }
 
 /**
  * Response from batch publishing multiple events
  */
-export type BatchPublishEventResponse = BatchPublishEventResponseItem[];
+export interface BatchPublishEventResponse {
+  /** Overall batch status */
+  status: "queued" | "failed" | "skipped";
+
+  /** Total number of events in the batch */
+  batchSize: number;
+
+  /** Number of successfully queued events */
+  queuedCount: number;
+
+  /** Number of skipped events (e.g., no valid targets) */
+  skippedCount: number;
+
+  /** Number of events that failed to publish */
+  failedCount: number;
+
+  /** Individual event results */
+  results: BatchPublishEventResponseItem[];
+
+  /** ISO 8601 timestamp when the batch was processed */
+  queuedAt: string;
+
+  /** Server processing time in milliseconds */
+  processingTimeMs: number;
+}
 
 /**
  * Full event entity with all fields

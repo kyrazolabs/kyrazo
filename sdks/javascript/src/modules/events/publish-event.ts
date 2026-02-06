@@ -38,8 +38,7 @@ export function createPublishEvent(httpClient: HttpClient) {
    *
    * @example Basic usage
    * ```typescript
-   * const response = await kyrazo.dispatch.publishEvent("project-123", {
-   *   webhookId: "68c674dd3b96f77d9426a93b",
+   * const response = await kyrazo.events.single("project-123", {
    *   eventType: "user.created",
    *   payload: {
    *     userId: "u_123",
@@ -49,18 +48,16 @@ export function createPublishEvent(httpClient: HttpClient) {
    *   targets: [{ targetId: "65a1b2c3d4e5f67890123456" }]
    * });
    *
-   * console.log(`Event ${response.eventId} queued at ${response.queued_at}`);
+   * console.log(`Event ${response.eventId} queued at ${response.queuedAt}`);
    * ```
    *
-   * @example With priority and retry configuration
+   * @example With targetId
    * ```typescript
-   * const response = await kyrazo.dispatch.publishEvent("project-123", {
-   *   webhookId: "68c674dd3b96f77d9426a93b",
+   * const response = await kyrazo.events.single("project-123", {
    *   eventType: "payment.completed",
    *   payload: { orderId: "order_456", amount: 99.99 },
    *   targets: [
-   *     { targetId: "65a1b2c3d4e5f67890123456" },
-   *     { targetId: "65a1b2c3d4e5f67890123457" }
+   *     { targetId: "65a1b2c3d4e5f67890123456" }
    *   ],
    *   meta: {
    *     priority: "high",
@@ -90,11 +87,7 @@ export function createPublishEvent(httpClient: HttpClient) {
       throw new ValidationError("payload is required and must be an object");
     }
 
-    const { webhookId, eventType, payload: eventData, targets } = payload;
-
-    if (!webhookId || typeof webhookId !== "string") {
-      throw new ValidationError("webhookId is required and must be a string");
-    }
+    const { eventType, payload: eventData, targets } = payload;
 
     if (!eventType || typeof eventType !== "string") {
       throw new ValidationError("eventType is required and must be a string");

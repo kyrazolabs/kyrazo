@@ -41,22 +41,20 @@ export function createPublishEvents(httpClient: HttpClient) {
    *
    * @example Batch publishing multiple events
    * ```typescript
-   * const responses = await kyrazo.dispatch.publishEvents("project-123", [
+   * const response = await kyrazo.events.batch("project-123", [
    *   {
-   *     webhookId: "68c674dd3b96f77d9426a93b",
    *     eventType: "user.created",
    *     payload: { userId: "u_1" },
-   *     targets: [{ targetUrl: "https://example.com/webhook" }]
+   *     targets: [{ targetId: "target-1" }]
    *   },
    *   {
-   *     webhookId: "68c674dd3b96f77d9426a93b",
    *     eventType: "user.created",
    *     payload: { userId: "u_2" },
-   *     targets: [{ targetUrl: "https://example.com/webhook" }]
+   *     targets: [{ targetId: "target-2" }]
    *   }
    * ]);
    *
-   * console.log(`Published ${responses.length} events`);
+   * console.log(`Published ${response.queuedCount} events`);
    * ```
    */
   return async function publishEvents(
@@ -98,10 +96,6 @@ export function createPublishEvents(httpClient: HttpClient) {
         throw new ValidationError(`events[${i}] must be an object`);
       }
 
-      if (!event.webhookId || typeof event.webhookId !== "string") {
-        throw new ValidationError(`events[${i}].webhookId is required`);
-      }
-
       if (!event.eventType || typeof event.eventType !== "string") {
         throw new ValidationError(`events[${i}].eventType is required`);
       }
@@ -119,16 +113,9 @@ export function createPublishEvents(httpClient: HttpClient) {
       // Validate targets
       for (let j = 0; j < event.targets.length; j++) {
         const target = event.targets[j];
-        if (!target?.targetUrl) {
+        if (!target?.targetId || typeof target.targetId !== "string") {
           throw new ValidationError(
-            `events[${i}].targets[${j}].targetUrl is required`,
-          );
-        }
-        try {
-          new URL(target.targetUrl);
-        } catch {
-          throw new ValidationError(
-            `events[${i}].targets[${j}].targetUrl must be a valid URL`,
+            `events[${i}].targets[${j}].targetId is required and must be a string`,
           );
         }
       }

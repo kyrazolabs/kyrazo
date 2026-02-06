@@ -12,27 +12,65 @@ import type {
 import type { PaginatedResponse, APIResponse } from "../../types/common";
 
 /**
- * Endpoints Module Interface
+ * Endpoints Module
+ *
+ * Provides methods for managing webhook endpoints.
  */
 export interface EndpointsModule {
+  /**
+   * List endpoints for a project.
+   * @param projectId - The project ID.
+   * @param params - Optional filter and pagination parameters.
+   */
   list: (
     projectId: string,
     params?: FilterEndpointsInput,
   ) => Promise<PaginatedResponse<Endpoint>>;
+
+  /**
+   * Get a single endpoint by its ID.
+   * @param projectId - The project ID.
+   * @param endpointId - The endpoint ID.
+   */
   get: (
     projectId: string,
     endpointId: string,
   ) => Promise<APIResponse<Endpoint>>;
+
+  /**
+   * Create a new webhook endpoint.
+   * @param projectId - The project ID.
+   * @param data - Endpoint configuration.
+   */
   create: (
     projectId: string,
     data: CreateEndpointInput,
   ) => Promise<APIResponse<Endpoint>>;
+
+  /**
+   * Update an existing webhook endpoint.
+   * @param projectId - The project ID.
+   * @param endpointId - The endpoint ID.
+   * @param data - Updated endpoint configuration.
+   */
   update: (
     projectId: string,
     endpointId: string,
     data: UpdateEndpointInput,
   ) => Promise<APIResponse<Endpoint>>;
+
+  /**
+   * Delete a webhook endpoint.
+   * @param projectId - The project ID.
+   * @param endpointId - The endpoint ID.
+   */
   delete: (projectId: string, endpointId: string) => Promise<APIResponse<void>>;
+
+  /**
+   * Get the signing secret for an endpoint.
+   * @param projectId - The project ID.
+   * @param endpointId - The endpoint ID.
+   */
   getSecret: (
     projectId: string,
     endpointId: string,
@@ -53,6 +91,7 @@ export function createEndpointsModule(client: HttpClient): EndpointsModule {
         `/v1/endpoints/${projectId}`,
         params,
       );
+      // Backend: { success, pagination, data: Endpoint[] }
       return response.data;
     },
 
@@ -63,6 +102,7 @@ export function createEndpointsModule(client: HttpClient): EndpointsModule {
       const response = await client.get<APIResponse<Endpoint>>(
         `/v1/endpoints/${projectId}/${endpointId}`,
       );
+      // Backend: { success, message, data: Endpoint }
       return response.data;
     },
 
@@ -70,11 +110,15 @@ export function createEndpointsModule(client: HttpClient): EndpointsModule {
       projectId: string,
       data: CreateEndpointInput,
     ): Promise<APIResponse<Endpoint>> {
-      const response = await client.post<APIResponse<Endpoint>>(
+      const response = await client.post<APIResponse<{ endpoint: Endpoint }>>(
         `/v1/endpoints/${projectId}`,
         data,
       );
-      return response.data;
+      // Backend: { success, message, data: { endpoint: Endpoint } }
+      return {
+        ...response.data,
+        data: response.data.data.endpoint,
+      };
     },
 
     async update(
@@ -86,6 +130,7 @@ export function createEndpointsModule(client: HttpClient): EndpointsModule {
         `/v1/endpoints/${projectId}/${endpointId}`,
         data,
       );
+      // Backend: { success, message, data: Endpoint }
       return response.data;
     },
 

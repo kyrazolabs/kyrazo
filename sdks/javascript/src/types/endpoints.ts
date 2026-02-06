@@ -14,17 +14,31 @@ export interface EndpointConfig {
   rateLimitDuration: number;
 }
 
+/**
+ * Represents a webhook endpoint configuration.
+ */
 export interface Endpoint {
-  _id: string;
+  /** Unique ID for the endpoint */
+  id: string;
+  /** Human-readable name */
   name: string;
+  /** Current operational status */
   status: EndpointStatus;
+  /** Destination URL for webhook events */
   url: string;
+  /** HTTP method to use for delivery (POST, PUT, or PATCH) */
   method: EndpointMethod;
+  /** Optional description */
   description?: string;
+  /** Whether this endpoint is currently enabled */
   enabled: boolean;
+  /** Technical configuration for delivery */
   config: EndpointConfig;
+  /** Optional custom headers to include in delivery */
   customHeaders?: Record<string, string>;
+  /** ISO 8601 timestamp of creation */
   createdAt: string;
+  /** ISO 8601 timestamp of last update */
   updatedAt: string;
 }
 

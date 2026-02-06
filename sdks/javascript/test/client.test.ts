@@ -32,21 +32,19 @@ describe("Events.single()", () => {
   it("should validate projectId is required", async () => {
     await expect(
       client.events.single("", {
-        webhookId: "webhook-123",
         eventType: "test.event",
         payload: {},
-        targets: [{ targetUrl: "https://example.com" }],
+        targets: [{ targetId: "target-123" }],
       }),
     ).rejects.toThrow(ValidationError);
   });
 
-  it("should validate webhookId is required", async () => {
+  it("should validate eventType is required", async () => {
     await expect(
       client.events.single("project-123", {
-        webhookId: "",
-        eventType: "test.event",
+        eventType: "",
         payload: {},
-        targets: [{ targetUrl: "https://example.com" }],
+        targets: [{ targetId: "target-123" }],
       }),
     ).rejects.toThrow(ValidationError);
   });
@@ -54,7 +52,6 @@ describe("Events.single()", () => {
   it("should validate targets is required", async () => {
     await expect(
       client.events.single("project-123", {
-        webhookId: "webhook-123",
         eventType: "test.event",
         payload: {},
         targets: [],
@@ -62,13 +59,12 @@ describe("Events.single()", () => {
     ).rejects.toThrow(ValidationError);
   });
 
-  it("should validate target URL is valid", async () => {
+  it("should validate targetId is required", async () => {
     await expect(
       client.events.single("project-123", {
-        webhookId: "webhook-123",
         eventType: "test.event",
         payload: {},
-        targets: [{ targetUrl: "not-a-url" }],
+        targets: [{ targetId: "" }],
       }),
     ).rejects.toThrow(ValidationError);
   });
@@ -92,10 +88,9 @@ describe("Events.batch()", () => {
 
   it("should validate max batch size", async () => {
     const events = Array(101).fill({
-      webhookId: "webhook-123",
       eventType: "test.event",
       payload: {},
-      targets: [{ targetUrl: "https://example.com" }],
+      targets: [{ targetId: "target-123" }],
     });
     await expect(client.events.batch("project-123", events)).rejects.toThrow(
       ValidationError,

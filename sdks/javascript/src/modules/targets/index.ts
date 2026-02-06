@@ -12,28 +12,73 @@ import type {
 import type { PaginatedResponse, APIResponse } from "../../types/common";
 
 /**
- * Targets Module Interface
+ * Targets Module
+ *
+ * Provides methods for managing webhook delivery targets.
  */
 export interface TargetsModule {
+  /**
+   * List targets for a project.
+   * @param projectId - The project ID.
+   * @param params - Optional filter and pagination parameters.
+   */
   list: (
     projectId: string,
     params?: FilterTargetsInput,
   ) => Promise<PaginatedResponse<Target>>;
+
+  /**
+   * Get a single target by its ID.
+   * @param projectId - The project ID.
+   * @param targetId - The target ID.
+   */
   get: (projectId: string, targetId: string) => Promise<APIResponse<Target>>;
+
+  /**
+   * Create a new delivery target.
+   * @param projectId - The project ID.
+   * @param data - Target configuration.
+   */
   create: (
     projectId: string,
     data: CreateTargetInput,
   ) => Promise<APIResponse<Target>>;
+
+  /**
+   * Update an existing delivery target.
+   * @param projectId - The project ID.
+   * @param targetId - The target ID.
+   * @param data - Updated target configuration.
+   */
   update: (
     projectId: string,
     targetId: string,
     data: UpdateTargetInput,
   ) => Promise<APIResponse<Target>>;
+
+  /**
+   * Delete a delivery target.
+   * @param projectId - The project ID.
+   * @param targetId - The target ID.
+   */
   delete: (projectId: string, targetId: string) => Promise<APIResponse<void>>;
+
+  /**
+   * Get the signing secret for a target.
+   * @param projectId - The project ID.
+   * @param targetId - The target ID.
+   */
   getSecret: (
     projectId: string,
     targetId: string,
   ) => Promise<APIResponse<{ secret: string }>>;
+
+  /**
+   * Enable or disable a target.
+   * @param projectId - The project ID.
+   * @param targetId - The target ID.
+   * @param enabled - Whether the target should be enabled.
+   */
   updateStatus: (
     projectId: string,
     targetId: string,
@@ -55,6 +100,7 @@ export function createTargetsModule(client: HttpClient): TargetsModule {
         `/v1/targets/${projectId}`,
         params,
       );
+      // Backend: { success, message, pagination, data: Target[] }
       return response.data;
     },
 
@@ -65,6 +111,7 @@ export function createTargetsModule(client: HttpClient): TargetsModule {
       const response = await client.get<APIResponse<Target>>(
         `/v1/targets/${projectId}/${targetId}`,
       );
+      // Backend: { success, message, data: Target }
       return response.data;
     },
 
@@ -76,6 +123,7 @@ export function createTargetsModule(client: HttpClient): TargetsModule {
         `/v1/targets/${projectId}`,
         data,
       );
+      // Backend: { success, message, data: Target }
       return response.data;
     },
 
@@ -88,6 +136,7 @@ export function createTargetsModule(client: HttpClient): TargetsModule {
         `/v1/targets/${projectId}/${targetId}`,
         data,
       );
+      // Backend: { success, message, data: Target }
       return response.data;
     },
 
@@ -118,7 +167,7 @@ export function createTargetsModule(client: HttpClient): TargetsModule {
     ): Promise<APIResponse<Target>> {
       const response = await client.put<APIResponse<Target>>(
         `/v1/targets/${projectId}/${targetId}`,
-        { enabled },
+        { targetId, enabled },
       );
       return response.data;
     },

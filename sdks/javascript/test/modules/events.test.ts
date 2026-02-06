@@ -23,15 +23,14 @@ describe("EventsModule", () => {
 
   describe("single()", () => {
     const validEvent = {
-      webhookId: "wh_123",
       eventType: "user.created",
       payload: { id: "u_1" },
-      targets: [{ targetUrl: "https://example.com" }],
+      targets: [{ targetId: "target-123" }],
     };
 
     it("should publish a single event successfully", async () => {
       const mockResponse = {
-        data: { eventId: "evt_123", queued_at: "2024-01-01T00:00:00Z" },
+        data: { eventId: "evt_123", queuedAt: "2024-01-01T00:00:00Z" },
       };
       mockHttpClient.post.mockResolvedValue(mockResponse);
 
@@ -86,21 +85,25 @@ describe("EventsModule", () => {
   describe("batch()", () => {
     const validEvents = [
       {
-        webhookId: "wh_1",
         eventType: "e1",
         payload: { id: 1 },
-        targets: [{ targetUrl: "https://u1.com" }],
+        targets: [{ targetId: "target-1" }],
       },
       {
-        webhookId: "wh_2",
         eventType: "e2",
         payload: { id: 2 },
-        targets: [{ targetUrl: "https://u2.com" }],
+        targets: [{ targetId: "target-2" }],
       },
     ];
 
     it("should publish batch events successfully", async () => {
-      const mockResponse = { data: [{ eventId: "e1" }, { eventId: "e2" }] };
+      const mockResponse = {
+        data: {
+          status: "queued",
+          queuedCount: 2,
+          results: [{ eventId: "e1" }, { eventId: "e2" }],
+        },
+      };
       mockHttpClient.post.mockResolvedValue(mockResponse);
 
       const response = await events.batch("proj_123", validEvents);

@@ -15,21 +15,18 @@ import { Kyrazo } from "@kyrazo/sdk";
 
 const kyrazo = new Kyrazo({
   apiKey: "your-api-key",
-  baseURL: "http://localhost:4000", // defaults to production
+  baseURL: "http://api.kyrazo.com", // defaults to production
 });
 
 // Publish an event
-const response = await kyrazo.dispatch.single("project-id", {
-  webhookId: "68c674dd3b96f77d9426a93b",
+const response = await kyrazo.events.single("project-id", {
   eventType: "user.created",
   payload: {
     user_id: "u_334",
     email: "user@example.com",
     plan: "pro",
   },
-  targets: [
-    { targetUrl: "https://your-endpoint.com/webhook" },
-  ],
+  targets: [{ targetId: "65a1b2c3d4e5f67890123456" }],
 });
 
 console.log("Event queued:", response.eventId);
@@ -37,24 +34,24 @@ console.log("Event queued:", response.eventId);
 
 ## Configuration
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `apiKey` | `string` | **required** | Your Kyrazo API key |
-| `baseURL` | `string` | `https://api.kyrazo.com` | API base URL |
-| `timeout` | `number` | `30000` | Request timeout (ms) |
-| `maxRetries` | `number` | `3` | Max retry attempts |
+| Option       | Type     | Default                  | Description          |
+| ------------ | -------- | ------------------------ | -------------------- |
+| `apiKey`     | `string` | **required**             | Your Kyrazo API key  |
+| `baseURL`    | `string` | `https://api.kyrazo.com` | API base URL         |
+| `timeout`    | `number` | `30000`                  | Request timeout (ms) |
+| `maxRetries` | `number` | `3`                      | Max retry attempts   |
 
 ## API Reference
 
 ### Publish Single Event
 
 ```typescript
-const response = await kyrazo.dispatch.single(projectId, {
-  webhookId: "...",      // Required: Webhook config ID
+const response = await kyrazo.events.single(projectId, {
   eventType: "...",      // Required: Event type (e.g., "user.created")
   payload: { ... },      // Required: Event data
+  previous: { ... },     // Optional: Previous state of the resource
   targets: [             // Required: Delivery targets
-    { targetUrl: "https://..." }
+    { targetId: "..." }
   ],
   meta: {                // Optional
     priority: "high",    // "low" | "normal" | "high" | "urgent"
@@ -64,32 +61,33 @@ const response = await kyrazo.dispatch.single(projectId, {
 ```
 
 **Response:**
+
 ```typescript
 {
   status: "queued",
   eventId: "uuid",
-  subject: "events.project-id",
-  stream: "EVENTS",
-  sequence: 12345,
   targetsCount: 1,
-  queued_at: "2024-01-01T00:00:00.000Z",
-  processing_time_ms: 15
+  unfoundTargets: [],
+  queuedAt: "2024-01-01T00:00:00.000Z",
+  processingTimeMs: 15
 }
 ```
 
-### Batch Publish (up to 100 events)
+### Batch Publish (up to 1000 events)
 
 ```typescript
-const responses = await kyrazo.dispatch.batch(projectId, [
-  { webhookId: "...", eventType: "user.created", payload: {...}, targets: [...] },
-  { webhookId: "...", eventType: "user.updated", payload: {...}, targets: [...] },
+const response = await kyrazo.events.batch(projectId, [
+  { eventType: "user.created", payload: {...}, targets: [{ targetId: "..." }] },
+  { eventType: "user.updated", payload: {...}, targets: [{ targetId: "..." }] },
 ]);
+
+console.log(`Queued ${response.queuedCount} events`);
 ```
 
 ## Error Handling
 
 ```typescript
-import { 
+import {
   Kyrazo,
   RateLimitError,
   LimitExceededError,
@@ -98,7 +96,7 @@ import {
 } from "@kyrazo/sdk";
 
 try {
-  await kyrazo.dispatch.single(projectId, payload);
+  await kyrazo.events.single(projectId, payload);
 } catch (error) {
   if (error instanceof RateLimitError) {
     console.log(`Rate limited. Retry in ${error.retryAfter}s`);
@@ -112,23 +110,23 @@ try {
 }
 ```
 
-| Error Class | Code | Status | Description |
-|-------------|------|--------|-------------|
-| `AuthenticationError` | `UNAUTHORIZED` | 401 | Invalid/missing API key |
-| `ValidationError` | `INVALID_PAYLOAD` | 400 | Invalid request payload |
-| `LimitExceededError` | `LIMIT_EXCEEDED` | 403 | Monthly limit exceeded |
-| `RateLimitError` | `RATE_LIMIT_EXCEEDED` | 429 | Too many requests |
-| `ServerError` | `INTERNAL_ERROR` | 500 | Server error |
+| Error Class           | Code                  | Status | Description             |
+| --------------------- | --------------------- | ------ | ----------------------- |
+| `AuthenticationError` | `UNAUTHORIZED`        | 401    | Invalid/missing API key |
+| `ValidationError`     | `INVALID_PAYLOAD`     | 400    | Invalid request payload |
+| `LimitExceededError`  | `LIMIT_EXCEEDED`      | 403    | Monthly limit exceeded  |
+| `RateLimitError`      | `RATE_LIMIT_EXCEEDED` | 429    | Too many requests       |
+| `ServerError`         | `INTERNAL_ERROR`      | 500    | Server error            |
 
 ## TypeScript
 
 Full TypeScript support with all types exported:
 
 ```typescript
-import type { 
+import type {
   PublishEventPayload,
   PublishEventResponse,
-  EventPriority 
+  EventPriority,
 } from "@kyrazo/sdk";
 ```
 

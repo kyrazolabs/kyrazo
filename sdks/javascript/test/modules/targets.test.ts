@@ -62,7 +62,7 @@ describe("TargetsModule", () => {
 
     expect(mockHttpClient.put).toHaveBeenCalledWith(
       "/v1/targets/proj_123/tgt_123",
-      { enabled: false },
+      { targetId: "tgt_123", enabled: false },
     );
   });
 });

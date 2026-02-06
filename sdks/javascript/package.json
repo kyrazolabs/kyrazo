@@ -1,6 +1,6 @@
 {
     "name": "@kyrazo/sdk",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Official Kyrazo SDK for JavaScript/TypeScript",
     "main": "dist/index.js",
     "module": "dist/index.mjs",
@@ -11,6 +11,9 @@
             "import": "./dist/index.mjs",
             "require": "./dist/index.js"
         }
+    },
+    "publishConfig": {
+        "access": "public"
     },
     "files": [
         "dist"
@@ -32,6 +35,15 @@
     ],
     "author": "Kyrazo",
     "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/kyrazolabs/sdks.git",
+        "directory": "sdks/javascript"
+    },
+    "bugs": {
+        "url": "https://github.com/kyrazolabs/sdks/issues"
+    },
+    "homepage": "https://github.com/kyrazolabs/sdks/tree/main/sdks/javascript#readme",
     "devDependencies": {
         "@types/node": "^20.10.0",
         "tsup": "^8.0.1",

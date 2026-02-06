@@ -6,7 +6,7 @@ import type { PaginationParams } from "./common";
 
 export type SourceStatus = "active" | "inactive";
 export type SourceService = "stripe" | "paypal";
-export type SourceAuthType = "service" | "api_key" | "basic_auth";
+export type SourceAuthType = "service";
 
 export interface SourceRetryPolicy {
   maxAttempts: number;
@@ -18,28 +18,18 @@ export interface SourceAuthentication {
   service?: {
     secret: string;
   };
-  basicAuth?: {
-    username: string;
-    password: string;
-  };
-  apiKey?: {
-    headerKey: string;
-    apiKey: string;
-  };
 }
 
 export interface Source {
   _id: string;
   name: string;
   description?: string;
-  type: "receive" | "publish" | "forward";
   service: SourceService;
   status: SourceStatus;
   forwarding: boolean;
   endpoints?: string[];
   eventTypes: string[];
   retryPolicy?: SourceRetryPolicy;
-  authentication?: SourceAuthentication;
   createdAt: string;
   updatedAt: string;
 }
@@ -47,7 +37,6 @@ export interface Source {
 export interface CreateSourceInput {
   name: string;
   description?: string;
-  type?: "receive";
   service: SourceService;
   status?: SourceStatus;
   forwarding?: boolean;
