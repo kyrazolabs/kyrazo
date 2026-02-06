@@ -58,7 +58,7 @@ Kyrazo provides official SDKs to make integration easier.
 
 <CodeGroup>
   ```bash JavaScript
-  npm install @kyrazo/javascript
+  npm install @kyrazo/sdk
   ```
 
   ```bash Python
@@ -76,28 +76,32 @@ const client = new Kyrazo({
   apiKey: '<your_api_key>',
 });
 
-await client.events.single('project_id', {
-  webhookId: 'wh_123',
-  eventType: 'user.created',
-  payload: { userId: 1 },
-  targets: [{ targetUrl: 'https://site.com/hook' }]
+// Publish an event
+const response = await kyrazo.events.single("project-id", {
+  eventType: "user.created",
+  payload: {
+    user_id: "u_334",
+    email: "user@example.com",
+    plan: "pro",
+  },
+  targets: [{ targetId: "65a1b2c3d4e5f67890123456" }],
 });
 ```
 
 ```python Python
 from kyrazo import Kyrazo
-from kyrazo.resources.events import PublishEventBody
 
-client = Kyrazo(api_key="<your_api_key>")
+client = Kyrazo(api_key="your_api_key")
 
-client.events.publish(
-    project_id="project_id",
-    body=PublishEventBody(
-        webhookId="wh_123",
-        eventType="user.created",
-        payload={"userId": 1},
-        targets=[{"targetUrl": "https://site.com/hook"}]
-    )
+# Publish an event
+response = client.events.publish(
+    project_id="proj_123",
+    body={
+        "eventType": "user.created",
+        "payload": {"id": 1, "name": "Alice"},
+        "targets": [{"targetId": "target_123"}]
+    }
 )
+print(response.event_id)
 ```
 </CodeGroup>
