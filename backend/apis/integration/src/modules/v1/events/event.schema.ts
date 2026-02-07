@@ -3,7 +3,8 @@ import z from 'zod';
 
 const objectIdSchema = z
     .string()
-    .regex(/^[0-9a-fA-F]{24}$/, 'Invalid ID format');
+    .regex(/^([a-z]{3}_)?[0-9a-fA-F]{24}$/, 'Invalid ID format')
+    .transform((val: string) => (val.includes('_') ? val.split('_')[1] : val));
 
 const TargetSchema = z.object({
     targetId: objectIdSchema,
@@ -43,10 +44,7 @@ export const ReceivedEventSchema = z.object({
         message: 'Request body is required and cannot be null or undefined.',
     }),
 
-    processingStatus: z
-        .enum(ProcessingStatus)
-        .default(ProcessingStatus.PENDING)
-        .optional(),
+    processingStatus: z.enum(ProcessingStatus).default(ProcessingStatus.PENDING).optional(),
 
     processingError: z.string().optional(),
 

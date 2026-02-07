@@ -40,9 +40,10 @@ describe('SourceController (Integration)', () => {
                 service: { secret: 'shhh' },
             },
         };
+        const id = new Types.ObjectId().toString();
         const savedSource = {
             ...input,
-            _id: 'source1',
+            id: `src_${id}`,
             ingressId: 'ingress1',
             authentication: {
                 ...input.authentication,
@@ -50,20 +51,19 @@ describe('SourceController (Integration)', () => {
             },
         };
 
-        spyOn(sourceService, 'createSource').mockResolvedValue(
-            savedSource as any
-        );
+        spyOn(sourceService, 'createSource').mockResolvedValue(savedSource as any);
 
         const c = mockContext(input);
         const result: any = await SourceController.createSource(c);
 
         expect(result.status).toBe(201);
         expect(result.data.success).toBe(true);
-        expect(result.data.data.sourceId).toBe('source1');
+        expect(result.data.data.sourceId).toBe(`src_${id}`);
     });
 
     it('getSources should fetch sources', async () => {
-        const sources = [{ _id: 'source1', name: 'Test' }];
+        const id = new Types.ObjectId().toString();
+        const sources = [{ id: `src_${id}`, name: 'Test' }];
         spyOn(sourceService, 'getSources').mockResolvedValue({
             sources,
             total: 1,

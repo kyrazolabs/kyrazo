@@ -106,7 +106,18 @@ const SourceSchema = new Schema<ISource>(
     {
         timestamps: true,
         toJSON: {
+            virtuals: true,
             transform: function (doc, ret: any) {
+                ret.id = `src_${ret._id.toString()}`;
+                delete ret._id;
+                delete ret.__v;
+            },
+        },
+        toObject: {
+            virtuals: true,
+            transform: function (doc, ret: any) {
+                ret.id = `src_${ret._id.toString()}`;
+                delete ret._id;
                 delete ret.__v;
             },
         },
@@ -139,25 +150,19 @@ AuthenticationSchema.pre('validate', function () {
     switch (this.type) {
         case 'api_key':
             if (!creds.headerKey || !creds.apiKey || !creds.iv) {
-                return new Error(
-                    'API Key authentication requires: headerKey, apiKey, and iv.'
-                );
+                return new Error('API Key authentication requires: headerKey, apiKey, and iv.');
             }
             break;
 
         case 'basic_auth':
             if (!creds.username || !creds.password || !creds.iv) {
-                return new Error(
-                    'Basic Auth requires: username, password, and iv.'
-                );
+                return new Error('Basic Auth requires: username, password, and iv.');
             }
             break;
 
         case 'service':
             if (!creds.secret || !creds.iv) {
-                return new Error(
-                    'Service authentication requires: secret and iv.'
-                );
+                return new Error('Service authentication requires: secret and iv.');
             }
             break;
 

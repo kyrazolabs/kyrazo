@@ -1,4 +1,4 @@
-import { Source, type ISource } from '@kyrazo/shared';
+import { Source, type ISource, transformWithId } from '@kyrazo/shared';
 
 export class SourceRepository {
     async create(sourceData: Partial<ISource>): Promise<ISource> {
@@ -12,7 +12,7 @@ export class SourceRepository {
     }
 
     async findById(id: string, workspaceId: string, projectId: string): Promise<ISource | null> {
-        return await Source.findOne({
+        const source = await Source.findOne({
             _id: id,
             workspaceId,
             projectId,
@@ -20,6 +20,7 @@ export class SourceRepository {
             .select('-userId -workspaceId -__v')
             .lean()
             .exec();
+        return source ? (transformWithId(source, 'source') as unknown as ISource) : null;
     }
 
     async findAll(
@@ -39,7 +40,10 @@ export class SourceRepository {
                 .lean(),
             Source.countDocuments(options.query || {}),
         ]);
-        return { sources, total };
+        return {
+            sources: transformWithId(sources, 'source') as unknown as ISource[],
+            total,
+        };
     }
 
     async update(
@@ -51,12 +55,17 @@ export class SourceRepository {
         // Handle $set operators if present
         const updateOp = Object.keys(data).some(k => k.startsWith('$')) ? data : { $set: data };
 
-        return await Source.findOneAndUpdate({ _id: id, workspaceId, projectId }, updateOp, {
-            new: true,
-            runValidators: true,
-        })
+        const updated = await Source.findOneAndUpdate(
+            { _id: id, workspaceId, projectId },
+            updateOp,
+            {
+                new: true,
+                runValidators: true,
+            }
+        )
             .select('-userId -workspaceId -__v')
             .lean();
+        return updated ? (transformWithId(updated, 'source') as unknown as ISource) : null;
     }
 
     async deleteById(id: string, workspaceId: string, projectId: string): Promise<boolean> {

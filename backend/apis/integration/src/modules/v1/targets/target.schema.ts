@@ -1,6 +1,9 @@
 import { z } from 'zod';
 
-const objectIdSchema = z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid ID format');
+const objectIdSchema = z
+    .string()
+    .regex(/^([a-z]{3}_)?[0-9a-fA-F]{24}$/, 'Invalid ID format')
+    .transform((val: string) => (val.includes('_') ? val.split('_')[1] : val));
 
 export const CreateTargetSchema = z.object({
     name: z

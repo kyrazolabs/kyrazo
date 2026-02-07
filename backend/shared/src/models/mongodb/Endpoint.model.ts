@@ -62,7 +62,18 @@ const EndpointSchema = new Schema<IEndpoint>(
     {
         timestamps: true,
         toJSON: {
+            virtuals: true,
             transform: function (doc, ret: any) {
+                ret.id = `end_${ret._id.toString()}`;
+                delete ret._id;
+                delete ret.__v;
+            },
+        },
+        toObject: {
+            virtuals: true,
+            transform: function (doc, ret: any) {
+                ret.id = `end_${ret._id.toString()}`;
+                delete ret._id;
                 delete ret.__v;
             },
         },
@@ -175,7 +186,4 @@ EndpointSchema.pre('save', async function () {
 //     next();
 // });
 
-export const Endpoint = model<IEndpoint, IEndpointModel>(
-    'Endpoint',
-    EndpointSchema
-);
+export const Endpoint = model<IEndpoint, IEndpointModel>('Endpoint', EndpointSchema);

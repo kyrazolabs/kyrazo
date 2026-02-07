@@ -58,7 +58,18 @@ const TargetSchema = new Schema<ITarget>(
     {
         timestamps: true,
         toJSON: {
+            virtuals: true,
             transform: function (doc, ret: any) {
+                ret.id = `trg_${ret._id.toString()}`;
+                delete ret._id;
+                delete ret.__v;
+            },
+        },
+        toObject: {
+            virtuals: true,
+            transform: function (doc, ret: any) {
+                ret.id = `trg_${ret._id.toString()}`;
+                delete ret._id;
                 delete ret.__v;
             },
         },
@@ -118,10 +129,7 @@ TargetSchema.virtual('isDisabled').get(function (this: ITarget) {
 /**
  * 🔹 Static Methods
  */
-TargetSchema.statics.findByWorkspaceAndProject = function (
-    workspaceId: string,
-    projectId: string
-) {
+TargetSchema.statics.findByWorkspaceAndProject = function (workspaceId: string, projectId: string) {
     return this.find({ workspaceId, projectId });
 };
 

@@ -1,5 +1,4 @@
-import type { ITarget } from '@kyrazo/shared';
-import { Target } from '@kyrazo/shared';
+import { Target, type ITarget, transformWithId } from '@kyrazo/shared';
 
 export class TargetRepository {
     async create(targetData: Partial<ITarget>): Promise<ITarget> {
@@ -53,7 +52,10 @@ export class TargetRepository {
                 .lean(),
             Target.countDocuments(options.query || {}),
         ]);
-        return { targets, total };
+        return {
+            targets: transformWithId(targets, 'target') as unknown as ITarget[],
+            total,
+        };
     }
 
     async update(

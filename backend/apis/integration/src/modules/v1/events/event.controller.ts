@@ -33,7 +33,12 @@ export class EventController {
         );
 
         // 2. Split: Found in cash / Lost
-        const cachedMap = new Map(cachedTargets.map((t: any) => [t._id.toString(), t]));
+        const cachedMap = new Map(
+            cachedTargets.map((t: any) => {
+                const id = t._id?.toString() || (t.id?.includes('_') ? t.id.split('_')[1] : t.id);
+                return [id, t];
+            })
+        );
         const missingFromCache = targets.filter(id => !cachedMap.has(id));
 
         // 3. Retrieve missing information from the database
@@ -49,7 +54,10 @@ export class EventController {
         // 4. Merge the cache with the retrieved data from the database and update the cache.
         const allTargets = [
             ...cachedTargets,
-            ...fetchedTargets.filter(t => !cachedMap.has(t._id.toString())),
+            ...fetchedTargets.filter(t => {
+                const id = t._id?.toString() || (t.id?.includes('_') ? t.id.split('_')[1] : t.id);
+                return !cachedMap.has(id);
+            }),
         ];
         if (fetchedTargets.length > 0) {
             await redisConfig.cache(
@@ -60,11 +68,15 @@ export class EventController {
         }
 
         const foundTargets = allTargets.map(t => ({
-            targetId: t._id.toString(),
+            targetId: t.id || `trg_${t._id.toString()}`,
             targetUrl: t.url,
         }));
 
-        const foundSet = new Set(foundTargets.map(t => t.targetId));
+        const foundSet = new Set(
+            foundTargets.map(t =>
+                t.targetId.includes('_') ? t.targetId.split('_')[1] : t.targetId
+            )
+        );
         const unfoundTargets = targets.filter(id => !foundSet.has(id));
 
         return { foundTargets, unfoundTargets };

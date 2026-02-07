@@ -1,4 +1,4 @@
-import { Endpoint, type IEndpoint } from '@kyrazo/shared';
+import { Endpoint, type IEndpoint, transformWithId } from '@kyrazo/shared';
 
 export class EndpointRepository {
     async create(endpointData: Partial<IEndpoint>): Promise<IEndpoint> {
@@ -52,7 +52,10 @@ export class EndpointRepository {
                 .lean(),
             Endpoint.countDocuments(options.query || {}),
         ]);
-        return { endpoints, total };
+        return {
+            endpoints: transformWithId(endpoints, 'endpoint') as unknown as IEndpoint[],
+            total,
+        };
     }
 
     async update(
@@ -64,12 +67,17 @@ export class EndpointRepository {
         // Handle $set operators if present
         const updateOp = Object.keys(data).some(k => k.startsWith('$')) ? data : { $set: data };
 
-        return await Endpoint.findOneAndUpdate({ _id: id, workspaceId, projectId }, updateOp, {
-            new: true,
-            runValidators: true,
-        })
+        const updated = await Endpoint.findOneAndUpdate(
+            { _id: id, workspaceId, projectId },
+            updateOp,
+            {
+                new: true,
+                runValidators: true,
+            }
+        )
             .select('-secrets -userId -workspaceId -__v')
             .lean();
+        return updated ? (transformWithId(updated, 'endpoint') as unknown as IEndpoint) : null;
     }
 
     async deleteById(id: string, workspaceId: string, projectId: string): Promise<boolean> {

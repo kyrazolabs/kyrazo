@@ -34,7 +34,7 @@ export class SourceController {
                     success: true,
                     message: 'Source created successfully',
                     data: {
-                        sourceId: saved._id.toString(),
+                        sourceId: (saved as any).id,
                         source: saved,
                     },
                 },

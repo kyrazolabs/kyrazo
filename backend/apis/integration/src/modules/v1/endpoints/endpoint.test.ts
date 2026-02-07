@@ -34,15 +34,14 @@ describe('EndpointController (Integration)', () => {
             name: 'Test Endpoint',
             url: 'https://example.com',
         };
+        const id = new Types.ObjectId().toString();
         const savedEndpoint = {
             ...input,
-            _id: 'endpoint1',
+            id: `end_${id}`,
             ingressId: 'ingress1',
         };
 
-        spyOn(endpointService, 'createEndpoint').mockResolvedValue(
-            savedEndpoint as any
-        );
+        spyOn(endpointService, 'createEndpoint').mockResolvedValue(savedEndpoint as any);
 
         const c = mockContext(input);
         const result: any = await EndpointController.createEndpoint(c);
@@ -53,7 +52,8 @@ describe('EndpointController (Integration)', () => {
     });
 
     it('getEndpoints should fetch endpoints', async () => {
-        const endpoints = [{ _id: 'endpoint1', name: 'Test' }];
+        const id = new Types.ObjectId().toString();
+        const endpoints = [{ id: `end_${id}`, name: 'Test' }];
         spyOn(endpointService, 'getEndpoints').mockResolvedValue({
             endpoints,
             total: 1,

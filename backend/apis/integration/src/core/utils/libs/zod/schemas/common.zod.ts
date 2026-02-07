@@ -6,7 +6,10 @@ export const ProjectHeadersSchema = z.object({
     'x-project-id': z.string().min(1, 'Project ID is required'),
 });
 export const GetProjectByIdSchema = z.object({
-    projectId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid ID format'),
+    projectId: z
+        .string()
+        .regex(/^(pro_)?[0-9a-fA-F]{24}$/, 'Invalid ID format')
+        .transform((val: string) => (val.startsWith('pro_') ? val.split('_')[1] : val)),
 });
 
 // Type exports
