@@ -153,7 +153,7 @@ export class SourcePage implements OnInit, AfterViewInit {
         // Load source details
         this.sourceService.get(sourceId).subscribe({
             next: (response) => {
-                this.source.set(response.data);
+                this.source.set(response.data as any);
                 this.endpoints.set(response.data.endpoints || []);
 
                 if (response.data.ingressUrl) {
@@ -187,7 +187,7 @@ export class SourcePage implements OnInit, AfterViewInit {
             source.status === SourceStatus.ACTIVE
                 ? SourceStatus.INACTIVE
                 : SourceStatus.ACTIVE;
-        this.sourceService.update(source._id, { status: newStatus }).subscribe({
+        this.sourceService.update(source.id, { status: newStatus }).subscribe({
             next: (updatedSource) => {
                 this.source.set(updatedSource.data.source);
                 this.mes.add({
@@ -233,7 +233,7 @@ export class SourcePage implements OnInit, AfterViewInit {
     }
 
     trackByEndpoint(index: number, endpoint: IEndpoint): string {
-        return endpoint._id;
+        return endpoint.id;
     }
 
     trackByDelivery(index: number, delivery: GetDAWResponse): string {
@@ -253,7 +253,7 @@ export class SourcePage implements OnInit, AfterViewInit {
 
         // Use the delivery service to get ingest events by source
         this.deliveryService
-            .getReceivedEventsBySource(source._id, { page, limit })
+            .getReceivedEventsBySource(source.id, { page, limit })
             .pipe(finalize(() => (this.tableLoading = false)))
             .subscribe({
                 next: (response) => {
@@ -432,8 +432,8 @@ export class SourcePage implements OnInit, AfterViewInit {
             return;
         }
 
-        const source = this.source();
-        if (!source) return;
+        const id = this.source()?.id;
+        if (!id) return;
 
         this.updatingAuth.set(true);
 
@@ -448,7 +448,7 @@ export class SourcePage implements OnInit, AfterViewInit {
         };
 
         this.sourceService
-            .updateAuth(source._id, payload)
+            .updateAuth(id, payload)
             .pipe(finalize(() => this.updatingAuth.set(false)))
             .subscribe({
                 next: () => {
@@ -472,7 +472,7 @@ export class SourcePage implements OnInit, AfterViewInit {
     }
     openEditDialog() {
         if (this.source()) {
-            this.dialogService.openSourceDialog(this.source()!._id);
+            this.dialogService.openSourceDialog(this.source()!.id);
         }
     }
 }

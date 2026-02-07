@@ -192,7 +192,7 @@ export class TopbarComponent implements OnInit {
     }
     selectProject(project: IProject) {
         this.selectedProject = project;
-        this.ss.setItem('project', project._id);
+        this.ss.setItem('project', project.id);
         // Close the popover after selection
         this.pp.hide();
     }
@@ -206,7 +206,7 @@ export class TopbarComponent implements OnInit {
                 const projectId = this.ss.getItem<string>('project');
                 if (projectId) {
                     const savedProject = this.projects.find(
-                        (p) => p._id === projectId,
+                        (p) => p.id === projectId,
                     );
                     if (savedProject) {
                         this.selectedProject = savedProject;
@@ -216,7 +216,7 @@ export class TopbarComponent implements OnInit {
                 // Select first project by default if available and none selected
                 if (this.projects.length > 0 && !this.selectedProject) {
                     this.selectedProject = this.projects[0];
-                    this.ss.setItem('project', this.selectedProject._id);
+                    this.ss.setItem('project', this.selectedProject.id);
                 }
 
                 // Show first project dialog if no projects exist and none selected

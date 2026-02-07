@@ -20,7 +20,7 @@ export enum backoffStrategy {
 }
 
 export interface ISource {
-    _id: string;
+    id: string;
     userId: string;
     workspaceId: string;
     name: string;
@@ -122,7 +122,7 @@ export interface UpdateSourceResponse {
 }
 
 export interface GetSourceResponse {
-    _id: string;
+    id: string;
     userId: string;
     workspaceId: string;
     name: string;
@@ -159,8 +159,7 @@ export interface GetSourceResponse {
 }
 
 export interface GetSourcesResponse {
-    _id: string;
-    id?: string; // Fallback
+    id: string;
     userId: string;
     workspaceId: string;
     name: string;

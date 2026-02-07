@@ -289,12 +289,10 @@ export class SourcesPage implements OnInit, OnDestroy {
             retryPolicy: source.retryPolicy,
         };
 
-        this.sourceService.update(source._id, updatePayload).subscribe({
+        this.sourceService.update(source.id, updatePayload).subscribe({
             next: (response) => {
                 // Update local data
-                const index = this.sources.findIndex(
-                    (s) => s._id === source._id,
-                );
+                const index = this.sources.findIndex((s) => s.id === source.id);
                 if (index !== -1) {
                     this.sources[index] = {
                         ...this.sources[index],
@@ -312,14 +310,14 @@ export class SourcesPage implements OnInit, OnDestroy {
                     life: 3000,
                 });
                 this.posthog.capture('source_updated', {
-                    source_id: source._id,
+                    source_id: source.id,
                     new_status: newStatus,
                 });
             },
             error: (error) => {
                 this.sentry.captureException(error);
                 this.posthog.capture('source_update_error', {
-                    source_id: source._id,
+                    source_id: source.id,
                     error: error.message,
                 });
                 console.error('Error updating source status:', error);
@@ -347,7 +345,7 @@ export class SourcesPage implements OnInit, OnDestroy {
     }
 
     private performDelete(source: GetSourcesResponse) {
-        this.sourceService.delete(source._id).subscribe({
+        this.sourceService.delete(source.id).subscribe({
             next: () => {
                 this.removeSourceFromLocal(source);
                 this.messageService.add({
@@ -357,13 +355,13 @@ export class SourcesPage implements OnInit, OnDestroy {
                     life: 3000,
                 });
                 this.posthog.capture('source_deleted', {
-                    source_id: source._id,
+                    source_id: source.id,
                 });
             },
             error: (error) => {
                 this.sentry.captureException(error);
                 this.posthog.capture('source_delete_error', {
-                    source_id: source._id,
+                    source_id: source.id,
                     error: error.message,
                 });
                 console.error('Error deleting source:', error);
@@ -379,7 +377,7 @@ export class SourcesPage implements OnInit, OnDestroy {
     }
 
     private removeSourceFromLocal(source: GetSourcesResponse) {
-        const index = this.sources.findIndex((s) => s._id === source._id);
+        const index = this.sources.findIndex((s) => s.id === source.id);
         if (index !== -1) {
             this.sources.splice(index, 1);
             this.applyClientSideFiltering();
@@ -411,7 +409,7 @@ export class SourcesPage implements OnInit, OnDestroy {
     }
 
     openEditDialog(source: GetSourcesResponse) {
-        this.dialogService.openSourceDialog(source._id);
+        this.dialogService.openSourceDialog(source.id);
     }
 
     // Utility method to format dates

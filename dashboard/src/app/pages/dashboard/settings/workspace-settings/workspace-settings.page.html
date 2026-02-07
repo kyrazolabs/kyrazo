@@ -102,11 +102,11 @@
                     <label class="font-semibold text-surface-900 dark:text-surface-0">Workspace ID</label>
                     <div class="flex items-center gap-2">
                         <div class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-800 flex-1 font-mono text-sm">
-                            {{workspace?._id || 'N/A'}}
+                            {{workspace?.id || 'N/A'}}
                         </div>
                         <p-button icon="pi pi-copy" [outlined]="true" size="small" styleClass="rounded-xl!"
                             pTooltip="Copy Workspace ID" tooltipStyleClass="text-xs! rounded-xl!" tooltipPosition="top"
-                            (onClick)="copyToClipboard(workspace?._id || '')" />
+                            (onClick)="copyToClipboard(workspace?.id || '')" />
                     </div>
                 </div>
 

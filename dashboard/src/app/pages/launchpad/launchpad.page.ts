@@ -35,7 +35,7 @@ export class LaunchpadPage {
     }
 
     onProjectCreated(project: any) {
-        this.storage.setItem('project', project._id);
+        this.storage.setItem('project', project.id);
         this.currentStep.set(3);
         this.triggerConfetti();
     }

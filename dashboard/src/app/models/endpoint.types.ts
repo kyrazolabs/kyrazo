@@ -6,7 +6,7 @@ export enum IngressType {
 }
 
 export interface IEndpoint<T = string> {
-    _id: string;
+    id: string;
     name: string;
     status: EndpointStatus;
     url: string;

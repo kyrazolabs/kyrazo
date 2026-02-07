@@ -144,7 +144,7 @@ export class WorkspaceSettingsPage implements OnInit {
         if (!this.workspace) return;
 
         // Load workspace members
-        this.workspaceService.getMembers(this.workspace._id).subscribe({
+        this.workspaceService.getMembers(this.workspace.id).subscribe({
             next: (response) => {
                 if (response.success && response.data) {
                     this.members = response.data;
@@ -197,7 +197,7 @@ export class WorkspaceSettingsPage implements OnInit {
         const formData = this.workspaceForm.value;
 
         this.workspaceService
-            .update(this.workspace._id, {
+            .update(this.workspace.id, {
                 name: formData.name,
                 description: formData.description || null,
             })
@@ -211,7 +211,7 @@ export class WorkspaceSettingsPage implements OnInit {
                             detail: 'Workspace settings saved successfully!',
                         });
                         this.posthog.capture('workspace_updated', {
-                            workspace_id: this.workspace?._id,
+                            workspace_id: this.workspace?.id,
                         });
                     } else {
                         this.messageService.add({
@@ -229,7 +229,7 @@ export class WorkspaceSettingsPage implements OnInit {
                         detail: 'Failed to save workspace settings',
                     });
                     this.posthog.capture('workspace_update_error', {
-                        workspace_id: this.workspace?._id,
+                        workspace_id: this.workspace?.id,
                         error: error.message,
                     });
                     console.error('Error saving workspace:', error);
@@ -262,7 +262,7 @@ export class WorkspaceSettingsPage implements OnInit {
         };
 
         this.workspaceService
-            .inviteUser(this.workspace._id, inviteData)
+            .inviteUser(this.workspace.id, inviteData)
             .pipe(finalize(() => (this.isInviting = false)))
             .subscribe({
                 next: (response) => {
@@ -319,7 +319,7 @@ export class WorkspaceSettingsPage implements OnInit {
         };
 
         this.workspaceService
-            .updateUserRole(this.workspace._id, updateData)
+            .updateUserRole(this.workspace.id, updateData)
             .subscribe({
                 next: (response) => {
                     if (response.success) {
@@ -369,7 +369,7 @@ export class WorkspaceSettingsPage implements OnInit {
             icon: 'pi pi-exclamation-triangle',
             accept: () => {
                 this.workspaceService
-                    .removeUser(this.workspace!._id, member.userId)
+                    .removeUser(this.workspace!.id, member.userId)
                     .subscribe({
                         next: (response) => {
                             if (response.success) {
@@ -380,7 +380,7 @@ export class WorkspaceSettingsPage implements OnInit {
                                 });
                                 // Remove from local array
                                 this.members = this.members.filter(
-                                    (m) => m._id !== member._id,
+                                    (m) => m.id !== member.id,
                                 );
                             } else {
                                 this.messageService.add({
@@ -495,7 +495,7 @@ export class WorkspaceSettingsPage implements OnInit {
             acceptButtonStyleClass: 'p-button-danger rounded-xl!',
             rejectButtonStyleClass: 'p-button-text rounded-xl!',
             accept: () => {
-                this.workspaceService.delete(this.workspace!._id).subscribe({
+                this.workspaceService.delete(this.workspace!.id).subscribe({
                     next: (response) => {
                         if (response.success) {
                             this.messageService.add({
@@ -503,7 +503,7 @@ export class WorkspaceSettingsPage implements OnInit {
                                 detail: 'Workspace deleted successfully!',
                             });
                             this.posthog.capture('workspace_deleted', {
-                                workspace_id: this.workspace?._id,
+                                workspace_id: this.workspace?.id,
                             });
                             // Force storage update and navigate to dash
 
