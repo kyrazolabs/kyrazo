@@ -70,24 +70,50 @@ Kyrazo provides official SDKs to make integration easier.
 
 <CodeGroup>
 ```javascript JavaScript
-import { Kyrazo } from '@kyrazo/javascript';
+import {
+  AuthenticationError,
+  Kyrazo,
+  LimitExceededError,
+  RateLimitError,
+  ValidationError,
+} from "@kyrazo/sdk";
 
 const client = new Kyrazo({
-  apiKey: '<your_api_key>',
+  apiKey: "kz_live.v2.hSuq...",
 });
 
-// Publish an event
-const response = await kyrazo.events.single("project-id", {
-  eventType: "user.created",
-  payload: {
-    user_id: "u_334",
-    email: "user@example.com",
-    plan: "pro",
-  },
-  targets: [{ targetId: "65a1b2c3d4e5f67890123456" }],
-});
+try {
+  // Create a webhook target
+  const target = await client.targets.create("pro_69674fad7590d01406e98126", {
+    name: "Production Webhook",
+    url: "https://api.example.com/webhooks",
+    method: "POST",
+    config: { timeout: 5000, retryCount: 3, rateLimitDuration: 60 },
+  });
+
+  // Publish an event
+  await client.events.single("pro_696...", {
+    eventType: "user.created",
+    payload: {
+      user_id: "u_334",
+      email: "user@example.com",
+      plan: "pro",
+    },
+    targets: [{ targetId: target.data.id }],
+  });
+} catch (error) {
+  if (error instanceof RateLimitError) {
+    console.log(`Rate limited. Retry in ${error.retryAfter}s`);
+  } else if (error instanceof LimitExceededError) {
+    console.log("Monthly limit exceeded. Upgrade your plan.");
+  } else if (error instanceof ValidationError) {
+    console.log("Invalid payload:", error.message);
+  } else if (error instanceof AuthenticationError) {
+    console.log("Invalid API key");
+  }
+}
 ```
-
+{/* 
 ```python Python
 from kyrazo import Kyrazo
 
@@ -103,5 +129,5 @@ response = client.events.publish(
     }
 )
 print(response.event_id)
-```
+``` */}
 </CodeGroup>
