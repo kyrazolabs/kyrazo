@@ -1,9 +1,12 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
+// Force reload
+import { rxResource } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CmsService } from '@core/services/cms.service';
 import { Article } from '@core/models/cms.models';
 import { MarkdownPipe } from '@shared/pipes/markdown.pipe';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-article',
@@ -12,44 +15,22 @@ import { MarkdownPipe } from '@shared/pipes/markdown.pipe';
     templateUrl: './article.page.html',
     styles: [],
 })
-export class ArticlePage implements OnInit {
-    article = signal<Article | null>(null);
-    isLoading = signal<boolean>(true);
-    error = signal<string | null>(null);
+export class ArticlePage {
+    articleResource = rxResource<Article | null, string | null>({
+        params: () => this.route.snapshot.paramMap.get('slug'),
+        stream: (params) => {
+            const slug = params.params;
+            if (!slug) return of(null);
+            return this.cmsService.getArticleBySlug(slug);
+        },
+    });
 
     constructor(
         private route: ActivatedRoute,
         public cmsService: CmsService,
     ) {}
 
-    ngOnInit() {
-        this.route.paramMap.subscribe((params) => {
-            const slug = params.get('slug');
-            if (slug) {
-                this.loadArticle(slug);
-            } else {
-                this.error.set('Article not found');
-                this.isLoading.set(false);
-            }
-        });
-    }
-
-    loadArticle(slug: string) {
-        this.isLoading.set(true);
-        this.cmsService.getArticleBySlug(slug).subscribe({
-            next: (article) => {
-                if (article) {
-                    this.article.set(article);
-                } else {
-                    this.error.set('Article not found');
-                }
-                this.isLoading.set(false);
-            },
-            error: (err) => {
-                console.error('Failed to load article', err);
-                this.error.set('Failed to load article');
-                this.isLoading.set(false);
-            },
-        });
-    }
+    isLoading$ = this.articleResource.isLoading;
+    article$ = this.articleResource.value;
+    error$ = this.articleResource.error;
 }

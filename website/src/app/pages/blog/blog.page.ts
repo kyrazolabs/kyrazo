@@ -1,8 +1,10 @@
 import { Component, OnInit, signal } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { CmsService } from '@core/services/cms.service';
 import { Article } from '@core/models/cms.models';
+import { map } from 'rxjs';
 
 @Component({
     selector: 'app-blog',
@@ -11,30 +13,16 @@ import { Article } from '@core/models/cms.models';
     templateUrl: './blog.page.html',
     styleUrl: './blog.page.scss',
 })
-export class BlogPage implements OnInit {
-    articles = signal<Article[]>([]);
-    isLoading = signal<boolean>(true);
-    error = signal<string | null>(null);
+export class BlogPage {
+    articlesResource = rxResource({
+        stream: () =>
+            this.cmsService
+                .getArticles()
+                .pipe(map((response) => response.data)),
+    });
+
+    articles$ = this.articlesResource.value;
+    isLoading$ = this.articlesResource.isLoading;
 
     constructor(public cmsService: CmsService) {}
-
-    ngOnInit() {
-        this.loadArticles();
-    }
-
-    loadArticles() {
-        this.cmsService.getArticles().subscribe({
-            next: (response) => {
-                this.articles.set(response.data);
-                this.isLoading.set(false);
-            },
-            error: (err) => {
-                console.error('Failed to load articles', err);
-                this.error.set(
-                    'Failed to load articles. Please try again later.',
-                );
-                this.isLoading.set(false);
-            },
-        });
-    }
 }
