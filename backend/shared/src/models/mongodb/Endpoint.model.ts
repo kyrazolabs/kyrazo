@@ -1,6 +1,6 @@
 import { Schema, Types, model } from 'mongoose';
-
 import { IEndpoint, IEndpointModel } from '../../types';
+import { unprefixId } from '../../utils/id';
 
 const EndpointSchema = new Schema<IEndpoint>(
     {
@@ -127,14 +127,21 @@ EndpointSchema.statics.findByWorkspaceAndProject = function (
     workspaceId: string,
     projectId: string
 ) {
-    return this.find({ workspaceId, projectId });
+    return this.find({
+        workspaceId: unprefixId(workspaceId),
+        projectId: unprefixId(projectId),
+    });
 };
 
 EndpointSchema.statics.findActiveByWorkspaceAndProject = function (
     workspaceId: string,
     projectId: string
 ) {
-    return this.find({ enabled: true, projectId, workspaceId });
+    return this.find({
+        enabled: true,
+        projectId: unprefixId(projectId),
+        workspaceId: unprefixId(workspaceId),
+    });
 };
 
 EndpointSchema.statics.findActiveByWorkspaceAndProjectAndIds = function (
@@ -144,9 +151,9 @@ EndpointSchema.statics.findActiveByWorkspaceAndProjectAndIds = function (
 ): Promise<IEndpoint[]> {
     return this.find({
         enabled: true,
-        workspaceId,
-        projectId,
-        _id: { $in: endpointIds.map(id => new Types.ObjectId(id)) },
+        workspaceId: unprefixId(workspaceId),
+        projectId: unprefixId(projectId),
+        _id: { $in: endpointIds.map(id => unprefixId(id)).filter((id): id is string => !!id) },
     });
 };
 
@@ -157,9 +164,9 @@ EndpointSchema.statics.findActiveByWorkspaceAndProjectAndId = function (
 ) {
     return this.findOne({
         enabled: true,
-        projectId,
-        workspaceId,
-        _id: new Types.ObjectId(endpointId),
+        projectId: unprefixId(projectId),
+        workspaceId: unprefixId(workspaceId),
+        _id: unprefixId(endpointId),
     });
 };
 

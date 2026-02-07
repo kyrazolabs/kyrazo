@@ -4,6 +4,7 @@ import { BaseDocument } from '.';
 import { IUserWorkspace, WorkspaceRole } from './user.types';
 
 export interface IWorkspace extends BaseDocument {
+    id: string;
     name: string;
     description?: string;
     avatar?: string;
@@ -48,6 +49,7 @@ export interface IWorkspaceModel extends Model<IWorkspace> {
 export type InvitationStatus = 'pending' | 'accepted' | 'declined' | 'expired';
 
 export interface IWorkspaceInvitation extends BaseDocument {
+    id: string;
     workspaceId: Types.ObjectId;
     invitedBy: Types.ObjectId;
     inviteeEmail: string;

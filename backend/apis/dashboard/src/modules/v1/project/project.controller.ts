@@ -11,6 +11,8 @@ import {
     RestoreProjectResponse,
     UpdateProjectResponse,
     logger,
+    transformWithId,
+    unprefixId,
 } from '@kyrazo/shared';
 import {
     CreateProjectInput,
@@ -38,12 +40,13 @@ export class ProjectController {
                     401
                 );
             }
+            // @ts-ignore
             const valid: CreateProjectInput = c.req.valid('json');
 
             const data = {
                 ...valid,
-                workspaceId: new Types.ObjectId(workspaceId),
-                createBy: new Types.ObjectId(userId),
+                workspaceId: new Types.ObjectId(unprefixId(workspaceId.toString())),
+                createBy: new Types.ObjectId(unprefixId(userId.toString())),
             };
 
             // Check plan limits
@@ -64,8 +67,7 @@ export class ProjectController {
                         success: false,
                         error: {
                             code: 'PLAN_LIMIT_EXCEEDED',
-                            message:
-                                'Project limit exceeded for your current plan',
+                            message: 'Project limit exceeded for your current plan',
                             requestId: c.get('requestId'),
                         },
                     },
@@ -87,10 +89,7 @@ export class ProjectController {
                 201
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in ProjectController.createProject',
-                error as Error
-            );
+            logger.error('Unexpected error in ProjectController.createProject', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -121,13 +120,16 @@ export class ProjectController {
                     401
                 );
             }
+            // @ts-ignore
             const { projectId }: GetProjectByIdInput = c.req.valid('param');
 
             const project = await Project.findOne({
-                _id: projectId,
-                workspaceId: workspaceId,
+                _id: unprefixId(projectId),
+                workspaceId: unprefixId(workspaceId.toString()),
                 isDeleted: false,
-            }).exec();
+            })
+                .lean()
+                .exec();
 
             if (!project) {
                 return c.json<IErrorResponse>(
@@ -135,8 +137,7 @@ export class ProjectController {
                         success: false,
                         error: {
                             code: 'PROJECT_NOT_FOUND',
-                            message:
-                                'Project not found or you do not have permission',
+                            message: 'Project not found or you do not have permission',
                             requestId: c.get('requestId'),
                         },
                     },
@@ -148,15 +149,12 @@ export class ProjectController {
                 {
                     success: true,
                     message: "Here's the project data that you asked",
-                    data: project as IProject,
+                    data: transformWithId(project, 'project') as any,
                 },
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in ProjectController.getProjectById',
-                error as Error
-            );
+            logger.error('Unexpected error in ProjectController.getProjectById', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -187,11 +185,17 @@ export class ProjectController {
                     401
                 );
             }
+            // @ts-ignore
             const { projectId: id }: GetProjectByIdInput = c.req.valid('param');
+            // @ts-ignore
             const valid: UpdateProjectInput = c.req.valid('json');
 
             const updated = await Project.findOneAndUpdate(
-                { _id: id, workspaceId, isDeleted: false },
+                {
+                    _id: unprefixId(id),
+                    workspaceId: unprefixId(workspaceId.toString()),
+                    isDeleted: false,
+                },
                 { $set: valid },
                 { new: true, runValidators: true }
             ).lean();
@@ -202,8 +206,7 @@ export class ProjectController {
                         success: false,
                         error: {
                             code: 'PROJECT_NOT_FOUND',
-                            message:
-                                'Project not found or you do not have permission.',
+                            message: 'Project not found or you do not have permission.',
                             requestId: c.get('requestId'),
                         },
                     },
@@ -211,19 +214,17 @@ export class ProjectController {
                 );
             }
 
+            const transformed = transformWithId(updated, 'project');
             return c.json<UpdateProjectResponse>(
                 {
                     success: true,
                     message: 'Project updated successfully.',
-                    data: updated as IProject,
+                    data: transformed as any,
                 },
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in ProjectController.updateProject',
-                error as Error
-            );
+            logger.error('Unexpected error in ProjectController.updateProject', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -254,10 +255,15 @@ export class ProjectController {
                     401
                 );
             }
+            // @ts-ignore
             const { projectId }: GetProjectByIdInput = c.req.valid('param');
 
             const deleted = await Project.findOneAndUpdate(
-                { _id: projectId, workspaceId, isDeleted: false },
+                {
+                    _id: unprefixId(projectId),
+                    workspaceId: unprefixId(workspaceId.toString()),
+                    isDeleted: false,
+                },
                 { isDeleted: true, deletedAt: new Date() },
                 { new: true }
             ).lean();
@@ -268,8 +274,7 @@ export class ProjectController {
                         success: false,
                         error: {
                             code: 'PROJECT_NOT_FOUND',
-                            message:
-                                'Project not found or you do not have permission',
+                            message: 'Project not found or you do not have permission',
                             requestId: c.get('requestId'),
                         },
                     },
@@ -285,10 +290,7 @@ export class ProjectController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in ProjectController.deleteProject',
-                error as Error
-            );
+            logger.error('Unexpected error in ProjectController.deleteProject', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -319,10 +321,15 @@ export class ProjectController {
                     401
                 );
             }
+            // @ts-ignore
             const { projectId }: GetProjectByIdInput = c.req.valid('param');
 
             const restored = await Project.findOneAndUpdate(
-                { _id: projectId, workspaceId, isDeleted: true },
+                {
+                    _id: unprefixId(projectId),
+                    workspaceId: unprefixId(workspaceId.toString()),
+                    isDeleted: true,
+                },
                 { isDeleted: false, deletedAt: null },
                 { new: true }
             ).lean();
@@ -333,8 +340,7 @@ export class ProjectController {
                         success: false,
                         error: {
                             code: 'PROJECT_NOT_FOUND',
-                            message:
-                                'Project not found or you do not have permission',
+                            message: 'Project not found or you do not have permission',
                             requestId: c.get('requestId'),
                         },
                     },
@@ -342,19 +348,17 @@ export class ProjectController {
                 );
             }
 
+            const transformed = transformWithId(restored, 'project');
             return c.json<RestoreProjectResponse>(
                 {
                     success: true,
                     message: 'Project restored successfully.',
-                    data: restored as IProject,
+                    data: transformed as any,
                 },
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in ProjectController.restoreProject',
-                error as Error
-            );
+            logger.error('Unexpected error in ProjectController.restoreProject', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -385,26 +389,24 @@ export class ProjectController {
                     401
                 );
             }
-            const {
-                q,
-                limit = 10,
-                page = 1,
-            }: FilterProjectInput = c.req.valid('query');
+            // @ts-ignore
+            const { q, limit = 10, page = 1 }: FilterProjectInput = c.req.valid('query');
 
-            const query: any = { workspaceId, isDeleted: false };
+            const query: any = {
+                workspaceId: unprefixId(workspaceId.toString()),
+                isDeleted: false,
+            };
 
             if (q) query.$text = { $search: q };
 
             const perPage = Math.min(limit, 100);
             const skip = (page - 1) * perPage;
             const [projects, total] = await Promise.all([
-                Project.find(query)
-                    .sort({ createdAt: -1 })
-                    .skip(skip)
-                    .limit(perPage)
-                    .lean(),
+                Project.find(query).sort({ createdAt: -1 }).skip(skip).limit(perPage).lean(),
                 Project.countDocuments(query),
             ]);
+
+            const transformedProjects = transformWithId(projects, 'project');
 
             return c.json<GetProjectsResponse>(
                 {
@@ -415,7 +417,7 @@ export class ProjectController {
                         limit: perPage,
                         pages: Math.ceil(total / perPage),
                     },
-                    data: projects as IProject[],
+                    data: transformedProjects as any,
                 },
                 200
             );

@@ -68,7 +68,7 @@ describe('ID Utility', () => {
             const input = { _id: validObjectId, name: 'Test' };
             const result = transformWithId(input, 'source');
             expect(result.id).toBe(`src_${validObjectId}`);
-            expect(result._id).toBeUndefined();
+            expect((result as any)._id).toBeUndefined();
             expect(result.name).toBe('Test');
         });
 
@@ -80,7 +80,7 @@ describe('ID Utility', () => {
             const result = transformWithId(input, 'target');
             expect(result[0].id).toBe(`trg_${validObjectId}`);
             expect(result[1].id).toBe(`trg_${validObjectId}`);
-            expect(result[0]._id).toBeUndefined();
+            expect((result[0] as any)._id).toBeUndefined();
         });
 
         it('should handle objects without _id', () => {

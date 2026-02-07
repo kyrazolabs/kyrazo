@@ -2,7 +2,7 @@ import { Types } from 'mongoose';
 import { CreateEndpointInput, UpdateEndpointInput } from './endpoint.schema';
 import { secretCrypto } from '@kyrazo/shared';
 import { endpointRepository } from './endpoint.repo';
-import { logger } from '@kyrazo/shared';
+import { logger, unprefixId } from '@kyrazo/shared';
 
 export class EndpointService {
     async createEndpoint(
@@ -12,13 +12,10 @@ export class EndpointService {
         projectId: Types.ObjectId
     ) {
         const secret = secretCrypto.generateSourceSecret();
-        const encryptedSecret = secretCrypto.encrypt(
-            projectId.toString(),
-            secret
-        );
+        const encryptedSecret = secretCrypto.encrypt(projectId.toString(), secret);
         const data = {
             ...valid,
-            userId: new Types.ObjectId(userId),
+            userId: new Types.ObjectId(unprefixId(userId)),
             workspaceId: workspaceId,
             projectId: projectId,
             secrets: [
@@ -39,11 +36,7 @@ export class EndpointService {
         }
     }
 
-    async getEndpoints(
-        query: Record<string, unknown>,
-        limit: number,
-        page: number
-    ) {
+    async getEndpoints(query: Record<string, unknown>, limit: number, page: number) {
         try {
             return await endpointRepository.findAll({
                 query,
@@ -56,17 +49,9 @@ export class EndpointService {
         }
     }
 
-    async getEndpointById(
-        endpointId: string,
-        workspaceId: string,
-        projectId: string
-    ) {
+    async getEndpointById(endpointId: string, workspaceId: string, projectId: string) {
         try {
-            const endpoint = await endpointRepository.findById(
-                endpointId,
-                workspaceId,
-                projectId
-            );
+            const endpoint = await endpointRepository.findById(endpointId, workspaceId, projectId);
             if (!endpoint) {
                 throw new Error('Endpoint not found');
             }
@@ -91,18 +76,12 @@ export class EndpointService {
             if (!endpoint) {
                 throw new Error('Endpoint not found');
             }
-            const activeSecret = endpoint.secrets?.find(
-                (secret: any) => secret.active
-            );
+            const activeSecret = endpoint.secrets?.find((secret: any) => secret.active);
 
             if (!activeSecret) {
                 throw new Error('Active secret not found');
             }
-            const secret = secretCrypto.decrypt(
-                activeSecret.value_enc,
-                activeSecret.iv,
-                projectId
-            );
+            const secret = secretCrypto.decrypt(activeSecret.value_enc, activeSecret.iv, projectId);
             return secret;
         } catch (error) {
             logger.error('Failed to get endpoint secret:', error as Error);
@@ -117,11 +96,7 @@ export class EndpointService {
         valid: Partial<CreateEndpointInput> | Record<string, unknown>
     ) {
         try {
-            const endpoint = await endpointRepository.findById(
-                endpointId,
-                workspaceId,
-                projectId
-            );
+            const endpoint = await endpointRepository.findById(endpointId, workspaceId, projectId);
             if (!endpoint) {
                 throw new Error('Endpoint not found');
             }
@@ -147,11 +122,7 @@ export class EndpointService {
         projectId: string
     ): Promise<boolean> {
         try {
-            const deleted = await endpointRepository.deleteById(
-                endpointId,
-                workspaceId,
-                projectId
-            );
+            const deleted = await endpointRepository.deleteById(endpointId, workspaceId, projectId);
             if (!deleted) {
                 throw new Error('Failed to delete endpoint');
             }

@@ -8,11 +8,11 @@ import { subscriptionRepository } from '@/modules/subscriptions/subscription.rep
 import { Types } from 'mongoose';
 import { snapshot } from '@/core/utils/transformers';
 import { planRepository } from '@/modules/plans/plan.repo';
+import { unprefixId } from '@kyrazo/shared';
 
 export class WorkspaceService {
     async createWorkspace(userId: string, data: any): Promise<IWorkspace> {
-        const existingWorkspace =
-            await workspaceRepository.findOwnedWorkspace(userId);
+        const existingWorkspace = await workspaceRepository.findOwnedWorkspace(userId);
         if (existingWorkspace) {
             throw new Error(
                 'You already own a workspace. You can only own one workspace at a time.'
@@ -24,8 +24,7 @@ export class WorkspaceService {
             ownerId: userId,
         };
 
-        const workspace =
-            await workspaceRepository.createWorkspace(workspaceData);
+        const workspace = await workspaceRepository.createWorkspace(workspaceData);
 
         const memberData = {
             userId: userId,
@@ -52,8 +51,8 @@ export class WorkspaceService {
         };
 
         await subscriptionRepository.create({
-            workspaceId: workspace?._id,
-            userId: new Types.ObjectId(userId),
+            workspaceId: workspace?.id,
+            userId: new Types.ObjectId(unprefixId(userId)),
             planId: plan?._id,
             planSnapshot: snapshot(plan),
             status: 'active',
@@ -120,19 +119,12 @@ export class WorkspaceService {
         if (!workspace) throw new Error('Workspace not found');
 
         // Check limits
-        const currentMembers =
-            await workspaceRepository.countMembers(workspaceId);
-        const pendingInvitations =
-            await workspaceRepository.countPendingInvitations(workspaceId);
+        const currentMembers = await workspaceRepository.countMembers(workspaceId);
+        const pendingInvitations = await workspaceRepository.countPendingInvitations(workspaceId);
         const totalMembers = currentMembers + pendingInvitations;
 
-        const canInvite = await limitService.checkLimit(
-            workspaceId,
-            'maxMembers',
-            totalMembers
-        );
-        if (!canInvite)
-            throw new Error('Member limit exceeded for your current plan');
+        const canInvite = await limitService.checkLimit(workspaceId, 'maxMembers', totalMembers);
+        if (!canInvite) throw new Error('Member limit exceeded for your current plan');
 
         // Check if user exists and is already member
         const user = await workspaceRepository.findUserByEmail(email);
@@ -141,8 +133,7 @@ export class WorkspaceService {
                 workspaceId,
                 user._id.toString()
             );
-            if (membership)
-                throw new Error('User is already a member of this workspace');
+            if (membership) throw new Error('User is already a member of this workspace');
         }
 
         const invitation = await workspaceRepository.createInvitation(
@@ -156,9 +147,7 @@ export class WorkspaceService {
         // Send email
         try {
             const invitationUrl = `${config.app.frontendUrl}/invitation/${invitation.token}`;
-            const recipientFirstName = user
-                ? (user.firstName as string)
-                : 'there';
+            const recipientFirstName = user ? (user.firstName as string) : 'there';
 
             const body = renderWorkspaceInvitationEmail({
                 firstName: recipientFirstName,
@@ -173,14 +162,11 @@ export class WorkspaceService {
                 supportEmail: config.contacts.support || 'support@kyrazo.com',
             });
 
-            await mailQueues.sendMailMediumPriorityQueue.add(
-                'medium-priority-mail',
-                {
-                    to: email,
-                    subject: `You’ve been invited to ${config.app.name}`,
-                    html: body,
-                }
-            );
+            await mailQueues.sendMailMediumPriorityQueue.add('medium-priority-mail', {
+                to: email,
+                subject: `You’ve been invited to ${config.app.name}`,
+                html: body,
+            });
         } catch (error) {
             logger.error('Failed to send invitation email:', error as Error);
             // We still created the invitation, so we return true but log the error
@@ -190,13 +176,8 @@ export class WorkspaceService {
         return true;
     }
 
-    async acceptInvitation(
-        userId: string,
-        userEmail: string,
-        token: string
-    ): Promise<boolean> {
-        const invitation =
-            await workspaceRepository.findInvitationByToken(token);
+    async acceptInvitation(userId: string, userEmail: string, token: string): Promise<boolean> {
+        const invitation = await workspaceRepository.findInvitationByToken(token);
         if (!invitation || invitation.inviteeEmail !== userEmail) {
             throw new Error('Invitation token is invalid or expired');
         }
@@ -205,8 +186,7 @@ export class WorkspaceService {
             invitation.workspaceId.toString(),
             userId
         );
-        if (membership)
-            throw new Error('User is already a member of this workspace');
+        if (membership) throw new Error('User is already a member of this workspace');
 
         const memberData = {
             userId: userId,
@@ -222,13 +202,8 @@ export class WorkspaceService {
         return true;
     }
 
-    async rejectInvitation(
-        userId: string,
-        userEmail: string,
-        token: string
-    ): Promise<boolean> {
-        const invitation =
-            await workspaceRepository.findInvitationByToken(token);
+    async rejectInvitation(userId: string, userEmail: string, token: string): Promise<boolean> {
+        const invitation = await workspaceRepository.findInvitationByToken(token);
         if (!invitation || invitation.inviteeEmail !== userEmail) {
             throw new Error('Invitation token is invalid or expired');
         }
@@ -238,25 +213,17 @@ export class WorkspaceService {
     }
 
     async getInvitationByToken(token: string): Promise<any> {
-        const invitation =
-            await workspaceRepository.findInvitationByToken(token);
+        const invitation = await workspaceRepository.findInvitationByToken(token);
         if (!invitation) {
             throw new Error('Invitation not found');
         }
 
-        if (
-            invitation.status !== 'pending' ||
-            invitation.expiresAt < new Date()
-        ) {
+        if (invitation.status !== 'pending' || invitation.expiresAt < new Date()) {
             throw new Error('Invitation is no longer valid');
         }
 
-        const workspace = await workspaceRepository.findById(
-            invitation.workspaceId.toString()
-        );
-        const inviter = await workspaceRepository.findUserById(
-            invitation.invitedBy.toString()
-        );
+        const workspace = await workspaceRepository.findById(invitation.workspaceId.toString());
+        const inviter = await workspaceRepository.findUserById(invitation.invitedBy.toString());
 
         return {
             workspaceName: workspace?.name,

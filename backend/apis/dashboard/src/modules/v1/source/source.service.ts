@@ -12,6 +12,7 @@ import {
     secretCrypto,
     generateIngressId,
     decryptSourceSecrets,
+    unprefixId,
 } from '@kyrazo/shared';
 import { config } from '@/configs';
 
@@ -80,10 +81,10 @@ export class SourceService {
         const data: Partial<ISource> = {
             ...valid,
             service: valid.service,
-            endpoints: valid.endpoints?.map(id => new Types.ObjectId(id)),
-            userId: new Types.ObjectId(userId),
-            workspaceId: new Types.ObjectId(workspaceId),
-            projectId: new Types.ObjectId(projectId),
+            endpoints: valid.endpoints?.map(id => new Types.ObjectId(unprefixId(id))),
+            userId: new Types.ObjectId(unprefixId(userId)),
+            workspaceId: new Types.ObjectId(unprefixId(workspaceId)),
+            projectId: new Types.ObjectId(unprefixId(projectId)),
             ingressId: ingress,
             ingressUrl: config.app.ingest.v1 + valid.service + '/' + ingress,
             authentication: processedAuth,

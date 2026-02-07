@@ -1,6 +1,6 @@
 import { subscriptionRepository } from './subscription.repo';
 import { planService } from '../plans/plan.service';
-import { ISubscription, IPlanSnapshot, User, Customer } from '@kyrazo/shared';
+import { ISubscription, IPlanSnapshot, User, Customer, unprefixId } from '@kyrazo/shared';
 import {
     CreateSubscriptionInput,
     ChangePlanInput,
@@ -21,8 +21,7 @@ export class SubscriptionService {
         const plan = await planService.getPlanById(subscriptionData.planId);
         if (!plan) throw new Error('Plan not found');
 
-        const existing =
-            await subscriptionRepository.findActiveByWorkspace(workspaceId);
+        const existing = await subscriptionRepository.findActiveByWorkspace(workspaceId);
         if (existing) {
             throw new Error('Workspace already has an active subscription');
         }
@@ -39,8 +38,8 @@ export class SubscriptionService {
             });
 
             customer = await Customer.create({
-                userId,
-                workspaceId,
+                userId: unprefixId(userId),
+                workspaceId: unprefixId(workspaceId),
                 stripeCustomerId: stripeCustomer.id,
                 email: user.email,
                 name: `${user.firstName} ${user.lastName}`,
@@ -55,9 +54,7 @@ export class SubscriptionService {
                     price: plan.stripePriceId,
                     quantity: subscriptionData.quantity ?? 1,
                 },
-                ...(plan.stripeMeteredPriceId
-                    ? [{ price: plan.stripeMeteredPriceId }]
-                    : []),
+                ...(plan.stripeMeteredPriceId ? [{ price: plan.stripeMeteredPriceId }] : []),
             ],
             success_url: `${config.stripe.baseUrl}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${config.stripe.baseUrl}/billing/cancel`,
@@ -82,15 +79,11 @@ export class SubscriptionService {
         return await subscriptionRepository.findById(id);
     }
 
-    async getWorkspaceSubscriptions(
-        workspaceId: string
-    ): Promise<ISubscription[]> {
+    async getWorkspaceSubscriptions(workspaceId: string): Promise<ISubscription[]> {
         return await subscriptionRepository.findByWorkspace(workspaceId);
     }
 
-    async getActiveWorkspaceSubscription(
-        workspaceId: string
-    ): Promise<ISubscription | null> {
+    async getActiveWorkspaceSubscription(workspaceId: string): Promise<ISubscription | null> {
         return await subscriptionRepository.findActiveByWorkspace(workspaceId);
     }
 
@@ -98,8 +91,7 @@ export class SubscriptionService {
         subscriptionId: string,
         changeData: ChangePlanInput
     ): Promise<ISubscription | null> {
-        const subscription =
-            await subscriptionRepository.findById(subscriptionId);
+        const subscription = await subscriptionRepository.findById(subscriptionId);
         if (!subscription) {
             throw new Error('Subscription not found');
         }
@@ -158,8 +150,7 @@ export class SubscriptionService {
         subscriptionId: string,
         cancelData: CancelSubscriptionInput
     ): Promise<ISubscription | null> {
-        const subscription =
-            await subscriptionRepository.findById(subscriptionId);
+        const subscription = await subscriptionRepository.findById(subscriptionId);
         if (!subscription) {
             throw new Error('Subscription not found');
         }
@@ -190,15 +181,10 @@ export class SubscriptionService {
         return updatedSubscription;
     }
 
-    async activateSubscription(
-        subscriptionId: string
-    ): Promise<ISubscription | null> {
-        const updatedSubscription = await subscriptionRepository.updateById(
-            subscriptionId,
-            {
-                status: 'active',
-            }
-        );
+    async activateSubscription(subscriptionId: string): Promise<ISubscription | null> {
+        const updatedSubscription = await subscriptionRepository.updateById(subscriptionId, {
+            status: 'active',
+        });
         if (updatedSubscription) {
             await limitService.invalidateWorkspaceLimits(
                 updatedSubscription.workspaceId.toString()
@@ -211,10 +197,9 @@ export class SubscriptionService {
         subscriptionId: string,
         status: ISubscription['status']
     ): Promise<ISubscription | null> {
-        const updatedSubscription = await subscriptionRepository.updateById(
-            subscriptionId,
-            { status }
-        );
+        const updatedSubscription = await subscriptionRepository.updateById(subscriptionId, {
+            status,
+        });
         if (updatedSubscription) {
             await limitService.invalidateWorkspaceLimits(
                 updatedSubscription.workspaceId.toString()
@@ -227,11 +212,10 @@ export class SubscriptionService {
         stripeSubscriptionId: string,
         updateData: Partial<ISubscription>
     ): Promise<ISubscription | null> {
-        const updatedSubscription =
-            await subscriptionRepository.updateByStripeId(
-                stripeSubscriptionId,
-                updateData
-            );
+        const updatedSubscription = await subscriptionRepository.updateByStripeId(
+            stripeSubscriptionId,
+            updateData
+        );
         if (updatedSubscription) {
             await limitService.invalidateWorkspaceLimits(
                 updatedSubscription.workspaceId.toString()
@@ -240,18 +224,12 @@ export class SubscriptionService {
         return updatedSubscription;
     }
 
-    async getExpiringTrials(
-        hoursFromNow: number = 24
-    ): Promise<ISubscription[]> {
+    async getExpiringTrials(hoursFromNow: number = 24): Promise<ISubscription[]> {
         return await subscriptionRepository.findExpiringTrials(hoursFromNow);
     }
 
-    async getEndingSubscriptions(
-        hoursFromNow: number = 24
-    ): Promise<ISubscription[]> {
-        return await subscriptionRepository.findEndingSubscriptions(
-            hoursFromNow
-        );
+    async getEndingSubscriptions(hoursFromNow: number = 24): Promise<ISubscription[]> {
+        return await subscriptionRepository.findEndingSubscriptions(hoursFromNow);
     }
 
     async checkWorkspaceLimits(workspaceId: string): Promise<{
@@ -275,8 +253,7 @@ export class SubscriptionService {
             maxConcurrent: number;
         };
     }> {
-        const subscription =
-            await subscriptionRepository.findActiveByWorkspace(workspaceId);
+        const subscription = await subscriptionRepository.findActiveByWorkspace(workspaceId);
 
         if (!subscription) {
             // No subscription, use free tier limits

@@ -1,5 +1,6 @@
 import { Schema, model, Document, Types } from 'mongoose';
 import { IRefreshToken } from '../../types';
+import { unprefixId } from '../../utils/id';
 
 // Define a Mongoose schema for the Refresh Token
 const RefreshTokenSchema = new Schema<IRefreshToken & Document>({
@@ -55,26 +56,17 @@ RefreshTokenSchema.statics.findByToken = async function (token: string) {
 };
 
 RefreshTokenSchema.statics.revokeToken = async function (token: string) {
-    return this.findOneAndUpdate(
-        { token },
-        { $set: { isRevoked: true } },
-        { new: true }
-    );
+    return this.findOneAndUpdate({ token }, { $set: { isRevoked: true } }, { new: true });
 };
 
-RefreshTokenSchema.statics.revokeAllUserTokens = async function (
-    userId: Types.ObjectId
-) {
+RefreshTokenSchema.statics.revokeAllUserTokens = async function (userId: string) {
     return this.updateMany(
-        { userId, isRevoked: false },
+        { userId: unprefixId(userId), isRevoked: false },
         { $set: { isRevoked: true } }
     );
 };
 
 // Create and export the Mongoose model
-export const RefreshToken = model<IRefreshToken & Document>(
-    'RefreshToken',
-    RefreshTokenSchema
-);
+export const RefreshToken = model<IRefreshToken & Document>('RefreshToken', RefreshTokenSchema);
 
 export default RefreshToken;

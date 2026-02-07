@@ -75,7 +75,7 @@ const apiKeySchema = new Schema<IAPIKey>(
 apiKeySchema.index({ name: 'text' });
 apiKeySchema.index({ workspace: 1, kid: 1 });
 apiKeySchema.index({ lastFour: 1 });
-apiKeySchema.index({ owner: 1 });
+apiKeySchema.index({ createBy: 1 });
 
 export const Key = model<IAPIKey, IAPIKeyModel>('Key', apiKeySchema);
 

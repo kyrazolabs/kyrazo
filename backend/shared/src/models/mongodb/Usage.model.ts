@@ -1,5 +1,6 @@
-import { Schema, model } from 'mongoose';
+import { Schema, Types, model } from 'mongoose';
 import { IUsage, IUsageModel } from '../../types';
+import { unprefixId } from '../../utils/id';
 
 // Usage schema
 const usageSchema = new Schema<IUsage>(
@@ -76,7 +77,7 @@ usageSchema.statics.aggregateUsage = function (
     return this.aggregate([
         {
             $match: {
-                workspaceId: workspaceId,
+                workspaceId: new Types.ObjectId(unprefixId(workspaceId)),
                 periodStart: { $gte: periodStart },
                 periodEnd: { $lte: periodEnd },
             },

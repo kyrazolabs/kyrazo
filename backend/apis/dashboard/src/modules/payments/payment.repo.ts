@@ -1,8 +1,9 @@
-import { Customer } from '@kyrazo/shared';
 import {
+    Customer,
     WebhookEventProcessed,
     ICustomer,
     IWebhookEventProcessed,
+    unprefixId,
 } from '@kyrazo/shared';
 
 export class PaymentRepository {
@@ -11,15 +12,11 @@ export class PaymentRepository {
         return await customer.save();
     }
 
-    async findCustomerByWorkspace(
-        workspaceId: string
-    ): Promise<ICustomer | null> {
-        return await (Customer as any).findOne({ workspaceId });
+    async findCustomerByWorkspace(workspaceId: string): Promise<ICustomer | null> {
+        return await (Customer as any).findOne({ workspaceId: unprefixId(workspaceId) });
     }
 
-    async findCustomerByStripeId(
-        stripeCustomerId: string
-    ): Promise<ICustomer | null> {
+    async findCustomerByStripeId(stripeCustomerId: string): Promise<ICustomer | null> {
         return await (Customer as any).findOne({ stripeCustomerId });
     }
 
@@ -27,17 +24,12 @@ export class PaymentRepository {
         stripeCustomerId: string,
         updateData: Partial<ICustomer>
     ): Promise<ICustomer | null> {
-        return await (Customer as any).findOneAndUpdate(
-            { stripeCustomerId },
-            updateData,
-            { new: true }
-        );
+        return await (Customer as any).findOneAndUpdate({ stripeCustomerId }, updateData, {
+            new: true,
+        });
     }
 
-    async recordWebhookEvent(
-        eventId: string,
-        eventType: string
-    ): Promise<IWebhookEventProcessed> {
+    async recordWebhookEvent(eventId: string, eventType: string): Promise<IWebhookEventProcessed> {
         const sourceEvent = new (WebhookEventProcessed as any)({
             eventId,
             eventType,
@@ -46,9 +38,7 @@ export class PaymentRepository {
         return await sourceEvent.save();
     }
 
-    async findWebhookEvent(
-        eventId: string
-    ): Promise<IWebhookEventProcessed | null> {
+    async findWebhookEvent(eventId: string): Promise<IWebhookEventProcessed | null> {
         return await (WebhookEventProcessed as any).findOne({ eventId });
     }
 

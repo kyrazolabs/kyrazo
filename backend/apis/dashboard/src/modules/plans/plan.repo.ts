@@ -1,4 +1,4 @@
-import { Plan, IPlan } from '@kyrazo/shared';
+import { Plan, IPlan, unprefixId } from '@kyrazo/shared';
 
 export class PlanRepository {
     async create(planData: Partial<IPlan>): Promise<IPlan> {
@@ -7,7 +7,7 @@ export class PlanRepository {
     }
 
     async findById(id: string): Promise<IPlan | null> {
-        return await Plan.findById(id);
+        return await Plan.findById(unprefixId(id));
     }
 
     async findBySlug(slug: string): Promise<IPlan | null> {
@@ -43,15 +43,12 @@ export class PlanRepository {
         return await Plan.countDocuments(query);
     }
 
-    async updateById(
-        id: string,
-        updateData: Partial<IPlan>
-    ): Promise<IPlan | null> {
-        return await Plan.findByIdAndUpdate(id, updateData, { new: true });
+    async updateById(id: string, updateData: Partial<IPlan>): Promise<IPlan | null> {
+        return await Plan.findByIdAndUpdate(unprefixId(id), updateData, { new: true });
     }
 
     async deleteById(id: string): Promise<boolean> {
-        const result = await Plan.findByIdAndDelete(id);
+        const result = await Plan.findByIdAndDelete(unprefixId(id));
         return !!result;
     }
 

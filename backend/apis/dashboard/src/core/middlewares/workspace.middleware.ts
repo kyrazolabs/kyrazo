@@ -2,7 +2,7 @@ import { Next } from 'hono';
 import { AppContext } from './auth.middleware';
 import { redisConfig } from '@/configs';
 import { GetWorkspaceByIdInput } from '@/modules/v1/workspace/workspace.schema';
-import { IErrorResponse, logger, UserWorkspace } from '@kyrazo/shared';
+import { IErrorResponse, logger, UserWorkspace, unprefixId } from '@kyrazo/shared';
 
 /**
  * @title requireWorkspaceMembership Middleware
@@ -42,12 +42,9 @@ export const requireWorkspaceMembership = (requiredRole?: string[]) => {
             }
 
             const membership = await redisConfig.cache(
-                `workspace:${workspaceId}:user:${userId}`,
+                `workspace:${unprefixId(workspaceId)}:user:${unprefixId(userId)}`,
                 async () => {
-                    return await UserWorkspace.findByUserAndWorkspace(
-                        userId,
-                        workspaceId
-                    );
+                    return await UserWorkspace.findByUserAndWorkspace(userId, workspaceId);
                 },
                 60 * 15
             );
@@ -58,8 +55,7 @@ export const requireWorkspaceMembership = (requiredRole?: string[]) => {
                         success: false,
                         error: {
                             code: 'WORKSPACE_ACCESS_DENIED',
-                            message:
-                                'Access denied: Not a member of this workspace',
+                            message: 'Access denied: Not a member of this workspace',
                             requestId: c.get('requestId'),
                         },
                     },
@@ -143,12 +139,9 @@ export const requireWorkspaceMembershipParam = (requiredRole?: string[]) => {
             }
 
             const membership = await redisConfig.cache(
-                `workspace:${workspaceId}:user:${userId}`,
+                `workspace:${unprefixId(workspaceId)}:user:${unprefixId(userId)}`,
                 async () => {
-                    return await UserWorkspace.findByUserAndWorkspace(
-                        userId,
-                        workspaceId
-                    );
+                    return await UserWorkspace.findByUserAndWorkspace(userId, workspaceId);
                 },
                 60 * 15
             );
@@ -159,8 +152,7 @@ export const requireWorkspaceMembershipParam = (requiredRole?: string[]) => {
                         success: false,
                         error: {
                             code: 'WORKSPACE_ACCESS_DENIED',
-                            message:
-                                'Access denied: Not a member of this workspace',
+                            message: 'Access denied: Not a member of this workspace',
                             requestId: c.get('requestId'),
                         },
                     },

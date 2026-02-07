@@ -6,7 +6,7 @@ import { sourceRepository } from './source.repo';
 describe('SourceService', () => {
     it('getSourceById should strip authentication data', async () => {
         const sourceWithAuth = {
-            _id: 's1',
+            id: 'src_65c3f1e5f1e5f1e5f1e5f1e5',
             name: 'Sensitive Source',
             authentication: { type: 'service', credentials: { secret: 'hidden' } },
         };
@@ -21,11 +21,11 @@ describe('SourceService', () => {
     it('getSources should strip authentication data from all sources', async () => {
         const sourcesWithAuth = [
             {
-                _id: 's1',
+                id: 'src_65c3f1e5f1e5f1e5f1e5f1e1',
                 authentication: { secret: 'shh' },
             },
             {
-                _id: 's2',
+                id: 'src_65c3f1e5f1e5f1e5f1e5f1e2',
                 authentication: { secret: 'quiet' },
             },
         ];
@@ -81,7 +81,7 @@ describe('SourceController', () => {
         };
         const savedSource = {
             ...input,
-            _id: 'source1',
+            id: 'src_65c3f1e5f1e5f1e5f1e5f1e5',
             ingressId: 'ingress1',
             authentication: {
                 ...input.authentication,
@@ -96,14 +96,14 @@ describe('SourceController', () => {
 
         expect(result.status).toBe(201);
         expect(result.data.success).toBe(true);
-        expect(result.data.data.sourceId).toBe('source1');
+        expect(result.data.data.sourceId).toBe('src_65c3f1e5f1e5f1e5f1e5f1e5');
     });
 
     it('getSource should fetch a source', async () => {
-        const source = { _id: 'source1', name: 'Test' };
+        const source = { id: 'src_65c3f1e5f1e5f1e5f1e5f1e5', name: 'Test' };
         spyOn(sourceService, 'getSourceById').mockResolvedValue(source as any);
 
-        const c = mockContext({}, { sourceId: 'source1' });
+        const c = mockContext({}, { sourceId: 'src_65c3f1e5f1e5f1e5f1e5f1e5' });
         const result: any = await SourceController.getSource(c);
 
         expect(result.status).toBe(200);

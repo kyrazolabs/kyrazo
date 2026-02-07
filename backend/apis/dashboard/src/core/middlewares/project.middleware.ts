@@ -1,5 +1,5 @@
 import { redisConfig } from '@/configs';
-import { IErrorResponse, IProject, logger, Project } from '@kyrazo/shared';
+import { IErrorResponse, IProject, logger, Project, unprefixId } from '@kyrazo/shared';
 import { Next } from 'hono';
 import { Types } from 'mongoose';
 import { AppContext } from './auth.middleware';
@@ -28,13 +28,13 @@ export const requireProjectAccess = (options?: { allowDeleted?: boolean }) => {
             }
 
             const access = await redisConfig.cache(
-                `workspace:${workspace.workspaceId}:project:${projectId}`,
+                `workspace:${unprefixId(workspace.workspaceId.toString())}:project:${unprefixId(projectId)}`,
                 async () => {
                     if (options?.allowDeleted) {
                         // Allow access to deleted projects for restore operations
                         return await Project.findOne({
-                            _id: projectId,
-                            workspaceId: workspace.workspaceId,
+                            _id: unprefixId(projectId),
+                            workspaceId: unprefixId(workspace.workspaceId.toString()),
                         });
                     } else {
                         // Normal access - only non-deleted projects
@@ -53,8 +53,7 @@ export const requireProjectAccess = (options?: { allowDeleted?: boolean }) => {
                         success: false,
                         error: {
                             code: 'PROJECT_ACCESS_DENIED',
-                            message:
-                                'Insufficient permissions to access this project',
+                            message: 'Insufficient permissions to access this project',
                             requestId: c.get('requestId'),
                         },
                     },
@@ -64,17 +63,12 @@ export const requireProjectAccess = (options?: { allowDeleted?: boolean }) => {
 
             const project = {
                 ...access,
-                projectId: new Types.ObjectId(
-                    (access._id as Types.ObjectId).toString()
-                ),
+                projectId: new Types.ObjectId(unprefixId(access.id)),
             };
             c.project = project as IProject & { projectId: Types.ObjectId };
             await next();
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in requireProjectAccess middleware',
-                error as Error
-            );
+            logger.error('Unexpected error in requireProjectAccess middleware', error as Error);
 
             return c.json<IErrorResponse>(
                 {
@@ -121,13 +115,13 @@ export const requireProjectAccessParam = (
 
             // parallel fetching
             const access = await redisConfig.cache(
-                `workspace:${workspace.workspaceId}:project:${projectId}`,
+                `workspace:${unprefixId(workspace.workspaceId.toString())}:project:${unprefixId(projectId)}`,
                 async () => {
                     if (options?.allowDeleted) {
                         // Allow access to deleted projects for restore operations
                         return await Project.findOne({
-                            _id: projectId,
-                            workspaceId: workspace.workspaceId,
+                            _id: unprefixId(projectId),
+                            workspaceId: unprefixId(workspace.workspaceId.toString()),
                         });
                     } else {
                         // Normal access - only non-deleted projects
@@ -146,8 +140,7 @@ export const requireProjectAccessParam = (
                         success: false,
                         error: {
                             code: 'PROJECT_ACCESS_DENIED',
-                            message:
-                                'Insufficient permissions to access this project',
+                            message: 'Insufficient permissions to access this project',
                             requestId: c.get('requestId'),
                         },
                     },
@@ -172,9 +165,7 @@ export const requireProjectAccessParam = (
 
             const project = {
                 ...access,
-                projectId: new Types.ObjectId(
-                    (access._id as Types.ObjectId).toString()
-                ),
+                projectId: new Types.ObjectId(unprefixId(access.id)),
             };
             c.project = project as IProject & { projectId: Types.ObjectId };
             await next();

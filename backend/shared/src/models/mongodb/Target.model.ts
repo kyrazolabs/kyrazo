@@ -1,5 +1,6 @@
 import { Schema, Types, model } from 'mongoose';
 import { ITarget, ITargetModel } from '../../types';
+import { unprefixId } from '../../utils/id';
 
 const TargetSchema = new Schema<ITarget>(
     {
@@ -130,14 +131,18 @@ TargetSchema.virtual('isDisabled').get(function (this: ITarget) {
  * 🔹 Static Methods
  */
 TargetSchema.statics.findByWorkspaceAndProject = function (workspaceId: string, projectId: string) {
-    return this.find({ workspaceId, projectId });
+    return this.find({ workspaceId: unprefixId(workspaceId), projectId: unprefixId(projectId) });
 };
 
 TargetSchema.statics.findActiveByWorkspaceAndProject = function (
     workspaceId: string,
     projectId: string
 ) {
-    return this.find({ enabled: true, projectId, workspaceId });
+    return this.find({
+        enabled: true,
+        projectId: unprefixId(projectId),
+        workspaceId: unprefixId(workspaceId),
+    });
 };
 
 TargetSchema.statics.findActiveByWorkspaceAndProjectAndTargetId = function (
@@ -147,9 +152,9 @@ TargetSchema.statics.findActiveByWorkspaceAndProjectAndTargetId = function (
 ) {
     return this.findOne({
         enabled: true,
-        projectId,
-        workspaceId,
-        _id: new Types.ObjectId(targetId),
+        projectId: unprefixId(projectId),
+        workspaceId: unprefixId(workspaceId),
+        _id: unprefixId(targetId),
     });
 };
 
@@ -160,9 +165,9 @@ TargetSchema.statics.findActiveByWorkspaceAndProjectAndTargetIds = function (
 ): Promise<ITarget[]> {
     return this.find({
         enabled: true,
-        workspaceId,
-        projectId,
-        _id: { $in: targetIds.map(id => new Types.ObjectId(id)) },
+        workspaceId: unprefixId(workspaceId),
+        projectId: unprefixId(projectId),
+        _id: { $in: targetIds.map(id => unprefixId(id)).filter((id): id is string => !!id) },
     });
 };
 

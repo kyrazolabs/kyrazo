@@ -1,7 +1,7 @@
 import { Types } from 'mongoose';
 import { CreateTargetInput, UpdateTargetInput } from './target.schema';
 import { targetRepository } from './target.repo';
-import { logger, secretCrypto } from '@kyrazo/shared';
+import { logger, secretCrypto, unprefixId } from '@kyrazo/shared';
 import { ITarget } from '@kyrazo/shared';
 
 export class TargetService {
@@ -12,13 +12,10 @@ export class TargetService {
         projectId: Types.ObjectId
     ) {
         const secret = secretCrypto.generateSourceSecret();
-        const encryptedSecret = secretCrypto.encrypt(
-            projectId.toString(),
-            secret
-        );
+        const encryptedSecret = secretCrypto.encrypt(projectId.toString(), secret);
         const data = {
             ...valid,
-            userId: new Types.ObjectId(userId),
+            userId: new Types.ObjectId(unprefixId(userId)),
             workspaceId: workspaceId,
             projectId: projectId,
             secrets: [
@@ -39,11 +36,7 @@ export class TargetService {
         }
     }
 
-    async getTargets(
-        query: Record<string, unknown>,
-        limit: number,
-        page: number
-    ) {
+    async getTargets(query: Record<string, unknown>, limit: number, page: number) {
         try {
             return await targetRepository.findAll({
                 query,
@@ -56,17 +49,9 @@ export class TargetService {
         }
     }
 
-    async getTargetById(
-        targetId: string,
-        workspaceId: string,
-        projectId: string
-    ) {
+    async getTargetById(targetId: string, workspaceId: string, projectId: string) {
         try {
-            const target = await targetRepository.findById(
-                targetId,
-                workspaceId,
-                projectId
-            );
+            const target = await targetRepository.findById(targetId, workspaceId, projectId);
             if (!target) {
                 throw new Error('Target not found');
             }
@@ -83,11 +68,7 @@ export class TargetService {
         projectId: string
     ): Promise<string> {
         try {
-            const target = await targetRepository.findSecretById(
-                targetId,
-                workspaceId,
-                projectId
-            );
+            const target = await targetRepository.findSecretById(targetId, workspaceId, projectId);
             if (!target) {
                 throw new Error('Target not found');
             }
@@ -96,11 +77,7 @@ export class TargetService {
             if (!activeSecret) {
                 throw new Error('Active secret not found');
             }
-            const secret = secretCrypto.decrypt(
-                activeSecret.value_enc,
-                activeSecret.iv,
-                projectId
-            );
+            const secret = secretCrypto.decrypt(activeSecret.value_enc, activeSecret.iv, projectId);
             return secret;
         } catch (error) {
             logger.error('Failed to get target secret:', error as Error);
@@ -115,20 +92,11 @@ export class TargetService {
         valid: UpdateTargetInput
     ): Promise<ITarget> {
         try {
-            const target = await targetRepository.findById(
-                targetId,
-                workspaceId,
-                projectId
-            );
+            const target = await targetRepository.findById(targetId, workspaceId, projectId);
             if (!target) {
                 throw new Error('Target not found');
             }
-            const updated = await targetRepository.update(
-                targetId,
-                workspaceId,
-                projectId,
-                valid
-            );
+            const updated = await targetRepository.update(targetId, workspaceId, projectId, valid);
             if (!updated) {
                 throw new Error('Failed to update target');
             }
@@ -139,17 +107,9 @@ export class TargetService {
         }
     }
 
-    async deleteTarget(
-        targetId: string,
-        workspaceId: string,
-        projectId: string
-    ): Promise<boolean> {
+    async deleteTarget(targetId: string, workspaceId: string, projectId: string): Promise<boolean> {
         try {
-            const deleted = await targetRepository.deleteById(
-                targetId,
-                workspaceId,
-                projectId
-            );
+            const deleted = await targetRepository.deleteById(targetId, workspaceId, projectId);
             if (!deleted) {
                 throw new Error('Failed to delete target');
             }

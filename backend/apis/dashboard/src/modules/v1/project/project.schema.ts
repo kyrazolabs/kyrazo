@@ -3,17 +3,14 @@ import { z } from 'zod';
 // Common schemas
 const objectIdSchema = z
     .string()
-    .regex(/^[0-9a-fA-F]{24}$/, 'Invalid ID format');
+    .regex(/^([a-z]{3}_)?[0-9a-fA-F]{24}$/, 'Invalid ID format')
+    .transform((val: string) => (val.includes('_') ? val.split('_')[1] : val));
 const nameSchema = z
     .string()
     .min(2, 'Name must be at least 2 characters long')
     .max(100, 'Name is too long')
     .trim();
-const descriptionSchema = z
-    .string()
-    .max(2000, 'Description is too long')
-    .optional()
-    .nullable();
+const descriptionSchema = z.string().max(2000, 'Description is too long').optional().nullable();
 
 // Project schemas
 export const CreateProjectSchema = z.object({
@@ -28,12 +25,10 @@ export const GetProjectByIdSchema = z.object({
 });
 
 export const FilterProjectSchema = z.object({
-    q: z.string().optional().default(""),
+    q: z.string().optional().default(''),
     limit: z.coerce.number().min(1).max(100).default(10),
     page: z.coerce.number().min(1).default(1),
 });
-
-
 
 // Type exports
 export type CreateProjectInput = z.infer<typeof CreateProjectSchema>;

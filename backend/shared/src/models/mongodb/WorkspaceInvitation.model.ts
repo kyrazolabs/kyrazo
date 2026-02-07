@@ -1,10 +1,7 @@
 import { Schema, model, Types } from 'mongoose';
 import crypto from 'crypto';
-import {
-    IWorkspaceInvitation,
-    IWorkspaceInvitationModel,
-    WorkspaceRole,
-} from '../../types';
+import { IWorkspaceInvitation, IWorkspaceInvitationModel, WorkspaceRole } from '../../types';
+import { unprefixId } from '../../utils/id';
 
 const workspaceInvitationSchema = new Schema<IWorkspaceInvitation>(
     {
@@ -24,10 +21,7 @@ const workspaceInvitationSchema = new Schema<IWorkspaceInvitation>(
             required: [true, 'Invitee email is required'],
             lowercase: true,
             trim: true,
-            match: [
-                /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
-                'Please enter a valid email',
-            ],
+            match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email'],
             index: true,
         },
         inviteeUserId: {
@@ -76,7 +70,9 @@ const workspaceInvitationSchema = new Schema<IWorkspaceInvitation>(
         timestamps: true,
         toJSON: {
             virtuals: true,
-            transform: function (doc, ret) {
+            transform: function (doc, ret: any) {
+                ret.id = `winv_${ret._id.toString()}`;
+                delete ret._id;
                 delete (ret as any).__v;
                 delete (ret as any).token; // Don't expose token in JSON responses
                 return ret;
@@ -84,6 +80,12 @@ const workspaceInvitationSchema = new Schema<IWorkspaceInvitation>(
         },
         toObject: {
             virtuals: true,
+            transform: function (doc, ret: any) {
+                ret.id = `winv_${ret._id.toString()}`;
+                delete ret._id;
+                delete (ret as any).__v;
+                return ret;
+            },
         },
     }
 );
@@ -117,27 +119,19 @@ workspaceInvitationSchema.virtual('invitee', {
     justOne: true,
 });
 
-workspaceInvitationSchema.virtual('isExpired').get(function (
-    this: IWorkspaceInvitation
-) {
+workspaceInvitationSchema.virtual('isExpired').get(function (this: IWorkspaceInvitation) {
     return this.expiresAt < new Date();
 });
 
-workspaceInvitationSchema.virtual('isPending').get(function (
-    this: IWorkspaceInvitation
-) {
+workspaceInvitationSchema.virtual('isPending').get(function (this: IWorkspaceInvitation) {
     return this.status === 'pending' && !this.isExpired;
 });
 
-workspaceInvitationSchema.virtual('canAccept').get(function (
-    this: IWorkspaceInvitation
-) {
+workspaceInvitationSchema.virtual('canAccept').get(function (this: IWorkspaceInvitation) {
     return this.status === 'pending' && !this.isExpired;
 });
 
-workspaceInvitationSchema.virtual('canDecline').get(function (
-    this: IWorkspaceInvitation
-) {
+workspaceInvitationSchema.virtual('canDecline').get(function (this: IWorkspaceInvitation) {
     return this.status === 'pending' && !this.isExpired;
 });
 
@@ -160,26 +154,24 @@ workspaceInvitationSchema.methods.accept = async function (
     return this.save();
 };
 
-workspaceInvitationSchema.methods.decline =
-    async function (): Promise<IWorkspaceInvitation> {
-        if (!this.canDecline) {
-            throw new Error('Invitation cannot be declined');
-        }
+workspaceInvitationSchema.methods.decline = async function (): Promise<IWorkspaceInvitation> {
+    if (!this.canDecline) {
+        throw new Error('Invitation cannot be declined');
+    }
 
-        this.status = 'declined';
-        this.declinedAt = new Date();
-        return this.save();
-    };
+    this.status = 'declined';
+    this.declinedAt = new Date();
+    return this.save();
+};
 
-workspaceInvitationSchema.methods.expire =
-    async function (): Promise<IWorkspaceInvitation> {
-        if (this.status !== 'pending') {
-            throw new Error('Only pending invitations can be expired');
-        }
+workspaceInvitationSchema.methods.expire = async function (): Promise<IWorkspaceInvitation> {
+    if (this.status !== 'pending') {
+        throw new Error('Only pending invitations can be expired');
+    }
 
-        this.status = 'expired';
-        return this.save();
-    };
+    this.status = 'expired';
+    return this.save();
+};
 
 workspaceInvitationSchema.methods.extendExpiry = async function (
     days: number = 7
@@ -219,10 +211,8 @@ workspaceInvitationSchema.statics.findByToken = function (token: string) {
     }).populate('workspace inviter');
 };
 
-workspaceInvitationSchema.statics.findByWorkspace = function (
-    workspaceId: string
-) {
-    return this.find({ workspaceId })
+workspaceInvitationSchema.statics.findByWorkspace = function (workspaceId: string) {
+    return this.find({ workspaceId: unprefixId(workspaceId) })
         .populate('inviter invitee')
         .sort({ createdAt: -1 });
 };
@@ -235,73 +225,54 @@ workspaceInvitationSchema.statics.findByEmail = function (email: string) {
         .sort({ createdAt: -1 });
 };
 
-workspaceInvitationSchema.statics.findPending = function (
-    workspaceId?: string
-) {
+workspaceInvitationSchema.statics.findPending = function (workspaceId?: string) {
     const query: any = {
         status: 'pending',
         expiresAt: { $gt: new Date() },
     };
 
     if (workspaceId) {
-        query.workspaceId = workspaceId;
+        query.workspaceId = unprefixId(workspaceId);
     }
 
-    return this.find(query)
-        .populate('workspace inviter invitee')
-        .sort({ createdAt: -1 });
+    return this.find(query).populate('workspace inviter invitee').sort({ createdAt: -1 });
 };
 
-workspaceInvitationSchema.statics.findExpired = function (
-    workspaceId?: string
-) {
+workspaceInvitationSchema.statics.findExpired = function (workspaceId?: string) {
     const query: any = {
-        $or: [
-            { status: 'expired' },
-            { status: 'pending', expiresAt: { $lte: new Date() } },
-        ],
+        $or: [{ status: 'expired' }, { status: 'pending', expiresAt: { $lte: new Date() } }],
     };
 
     if (workspaceId) {
-        query.workspaceId = workspaceId;
+        query.workspaceId = unprefixId(workspaceId);
     }
 
-    return this.find(query)
-        .populate('workspace inviter')
-        .sort({ createdAt: -1 });
+    return this.find(query).populate('workspace inviter').sort({ createdAt: -1 });
 };
 
-workspaceInvitationSchema.statics.findAccepted = function (
-    workspaceId?: string
-) {
+workspaceInvitationSchema.statics.findAccepted = function (workspaceId?: string) {
     const query: any = { status: 'accepted' };
 
     if (workspaceId) {
-        query.workspaceId = workspaceId;
+        query.workspaceId = unprefixId(workspaceId);
     }
 
-    return this.find(query)
-        .populate('workspace inviter invitee')
-        .sort({ acceptedAt: -1 });
+    return this.find(query).populate('workspace inviter invitee').sort({ acceptedAt: -1 });
 };
 
-workspaceInvitationSchema.statics.findDeclined = function (
-    workspaceId?: string
-) {
+workspaceInvitationSchema.statics.findDeclined = function (workspaceId?: string) {
     const query: any = { status: 'declined' };
 
     if (workspaceId) {
-        query.workspaceId = workspaceId;
+        query.workspaceId = unprefixId(workspaceId);
     }
 
-    return this.find(query)
-        .populate('workspace inviter')
-        .sort({ declinedAt: -1 });
+    return this.find(query).populate('workspace inviter').sort({ declinedAt: -1 });
 };
 
 workspaceInvitationSchema.statics.findByUser = function (userId: string) {
     return this.find({
-        $or: [{ invitedBy: userId }, { inviteeUserId: userId }],
+        $or: [{ invitedBy: unprefixId(userId) }, { inviteeUserId: unprefixId(userId) }],
     })
         .populate('workspace inviter invitee')
         .sort({ createdAt: -1 });
@@ -312,7 +283,7 @@ workspaceInvitationSchema.statics.hasPendingInvitation = async function (
     email: string
 ): Promise<boolean> {
     const invitation = await this.findOne({
-        workspaceId,
+        workspaceId: unprefixId(workspaceId),
         inviteeEmail: email.toLowerCase(),
         status: 'pending',
         expiresAt: { $gt: new Date() },
@@ -321,12 +292,10 @@ workspaceInvitationSchema.statics.hasPendingInvitation = async function (
     return !!invitation;
 };
 
-workspaceInvitationSchema.statics.getInvitationStats = async function (
-    workspaceId?: string
-) {
+workspaceInvitationSchema.statics.getInvitationStats = async function (workspaceId?: string) {
     const matchStage: any = {};
     if (workspaceId) {
-        matchStage.workspaceId = new Types.ObjectId(workspaceId);
+        matchStage.workspaceId = new Types.ObjectId(unprefixId(workspaceId));
     }
 
     const stats = await this.aggregate([
@@ -378,9 +347,10 @@ workspaceInvitationSchema.statics.createInvitation = async function (
     expiresInDays: number = 7
 ): Promise<IWorkspaceInvitation> {
     // Check if there's already a pending invitation
-    const existingInvitation = await (
-        this as IWorkspaceInvitationModel
-    ).hasPendingInvitation(workspaceId, inviteeEmail);
+    const existingInvitation = await (this as IWorkspaceInvitationModel).hasPendingInvitation(
+        workspaceId,
+        inviteeEmail
+    );
     if (existingInvitation) {
         throw new Error('A pending invitation already exists for this email');
     }
@@ -399,8 +369,8 @@ workspaceInvitationSchema.statics.createInvitation = async function (
     });
 
     const invitation = new this({
-        workspaceId,
-        invitedBy,
+        workspaceId: unprefixId(workspaceId),
+        invitedBy: unprefixId(invitedBy),
         inviteeEmail,
         inviteeUserId: existingUser?._id || null,
         role,
@@ -430,18 +400,15 @@ workspaceInvitationSchema.pre('save', async function () {
     }
 
     // Validate that inviter is not inviting themselves
-    if (
-        this.inviteeUserId &&
-        this.inviteeUserId.toString() === this.invitedBy.toString()
-    ) {
+    if (this.inviteeUserId && this.inviteeUserId.toString() === this.invitedBy.toString()) {
         throw new Error('Cannot invite yourself to a workspace');
     }
 });
 
 // Export the model
-export const WorkspaceInvitation = model<
-    IWorkspaceInvitation,
-    IWorkspaceInvitationModel
->('WorkspaceInvitation', workspaceInvitationSchema);
+export const WorkspaceInvitation = model<IWorkspaceInvitation, IWorkspaceInvitationModel>(
+    'WorkspaceInvitation',
+    workspaceInvitationSchema
+);
 
 export default WorkspaceInvitation;

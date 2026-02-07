@@ -1,24 +1,21 @@
-import { Source, ISource } from '@kyrazo/shared';
+import { Source, ISource, transformWithId, unprefixId } from '@kyrazo/shared';
 
 export class SourceRepository {
     async create(sourceData: Partial<ISource>): Promise<ISource> {
         const source = new Source(sourceData);
         const savedSource = await source.save();
-        return savedSource.toObject();
+        return transformWithId(savedSource, 'source') as any;
     }
 
-    async findById(
-        id: string,
-        workspaceId: string,
-        projectId: string
-    ): Promise<ISource | null> {
-        return await Source.findOne({
-            _id: id,
-            workspaceId,
-            projectId,
+    async findById(id: string, workspaceId: string, projectId: string): Promise<ISource | null> {
+        const source = await Source.findOne({
+            _id: unprefixId(id),
+            workspaceId: unprefixId(workspaceId),
+            projectId: unprefixId(projectId),
         })
             .populate('endpoints')
             .lean();
+        return source ? (transformWithId(source, 'source') as unknown as ISource) : null;
     }
 
     async findAll(
@@ -28,9 +25,12 @@ export class SourceRepository {
             page?: number;
         } = { query: {}, limit: 10, page: 1 }
     ): Promise<{ sources: ISource[]; total: number }> {
-        const skip = options.page
-            ? (options.page - 1) * (options.limit || 10)
-            : 0;
+        if (options.query?.workspaceId)
+            options.query.workspaceId = unprefixId(options.query.workspaceId as string);
+        if (options.query?.projectId)
+            options.query.projectId = unprefixId(options.query.projectId as string);
+
+        const skip = options.page ? (options.page - 1) * (options.limit || 10) : 0;
         const [sources, total] = await Promise.all([
             Source.find(options.query || {})
                 .sort({ createdAt: -1 })
@@ -39,7 +39,10 @@ export class SourceRepository {
                 .lean(),
             Source.countDocuments(options.query || {}),
         ]);
-        return { sources, total };
+        return {
+            sources: transformWithId(sources, 'source') as unknown as ISource[],
+            total,
+        };
     }
 
     async update(
@@ -49,30 +52,25 @@ export class SourceRepository {
         data: Partial<ISource> | Record<string, unknown>
     ): Promise<ISource | null> {
         // Handle $set operators if present
-        const updateOp = Object.keys(data).some(k => k.startsWith('$'))
-            ? data
-            : { $set: data };
+        const updateOp = Object.keys(data).some(k => k.startsWith('$')) ? data : { $set: data };
 
-        return await Source.findOneAndUpdate(
+        const updated = await Source.findOneAndUpdate(
             {
-                _id: id,
-                workspaceId,
-                projectId,
+                _id: unprefixId(id),
+                workspaceId: unprefixId(workspaceId),
+                projectId: unprefixId(projectId),
             },
             updateOp,
             { new: true }
         ).lean();
+        return updated ? (transformWithId(updated, 'source') as unknown as ISource) : null;
     }
 
-    async deleteById(
-        id: string,
-        workspaceId: string,
-        projectId: string
-    ): Promise<boolean> {
+    async deleteById(id: string, workspaceId: string, projectId: string): Promise<boolean> {
         const deleted = await Source.findOneAndDelete({
-            _id: id,
-            workspaceId,
-            projectId,
+            _id: unprefixId(id),
+            workspaceId: unprefixId(workspaceId),
+            projectId: unprefixId(projectId),
         }).exec();
         return deleted !== null;
     }

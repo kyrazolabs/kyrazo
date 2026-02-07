@@ -5,7 +5,7 @@ import { paymentRepository } from './payment.repo';
 import { subscriptionService } from '../subscriptions/subscription.service';
 import { planService } from '../plans/plan.service';
 import { CreateSubscriptionPaymentInput, PaymentResponse } from './payment.dto';
-import { Invoice, logger, Plan } from '@kyrazo/shared';
+import { Invoice, logger, Plan, unprefixId } from '@kyrazo/shared';
 import { subscriptionRepository } from '../subscriptions/subscription.repo';
 import { planRepository } from '../plans/plan.repo';
 import { snapshot } from '@/core/utils/transformers';
@@ -21,8 +21,8 @@ export class PaymentService {
         try {
             await Invoice.create({
                 stripeInvoiceId: stripeInvoice.id,
-                workspaceId: new Types.ObjectId(workspaceId),
-                subscriptionId: new Types.ObjectId(subscriptionId),
+                workspaceId: new Types.ObjectId(unprefixId(workspaceId)),
+                subscriptionId: new Types.ObjectId(unprefixId(subscriptionId)),
                 amountDue: stripeInvoice.amount_due,
                 amountPaid: stripeInvoice.amount_paid,
                 currency: stripeInvoice.currency,
@@ -41,9 +41,7 @@ export class PaymentService {
                 pdfUrl: stripeInvoice.invoice_pdf,
                 hostedInvoiceUrl: stripeInvoice.hosted_invoice_url,
             });
-            logger.info(
-                `Saved local invoice for Stripe Invoice ${stripeInvoice.id}`
-            );
+            logger.info(`Saved local invoice for Stripe Invoice ${stripeInvoice.id}`);
         } catch (error) {
             logger.error(`Failed to save local invoice: ${error}`);
         }
@@ -64,8 +62,7 @@ export class PaymentService {
         );
 
         // Get or create Stripe customer
-        let customer =
-            await paymentRepository.findCustomerByWorkspace(workspaceId);
+        let customer = await paymentRepository.findCustomerByWorkspace(workspaceId);
         if (!customer) {
             const stripeCustomer = await stripe.customers.create({
                 email: userEmail,
@@ -76,8 +73,8 @@ export class PaymentService {
             });
 
             customer = await paymentRepository.createCustomer({
-                workspaceId: new Types.ObjectId(workspaceId),
-                userId: new Types.ObjectId(userId),
+                workspaceId: new Types.ObjectId(unprefixId(workspaceId)),
+                userId: new Types.ObjectId(unprefixId(userId)),
                 stripeCustomerId: stripeCustomer.id,
                 email: userEmail,
                 name: stripeCustomer.name || undefined,
@@ -86,14 +83,10 @@ export class PaymentService {
 
         // Create subscription in our system (incomplete status)
         // Create subscription in our system (incomplete status)
-        const subscription = await subscriptionService.createSubscription(
-            workspaceId,
-            userId,
-            {
-                planId: plan._id.toString(),
-                quantity: input.quantity,
-            }
-        );
+        const subscription = await subscriptionService.createSubscription(workspaceId, userId, {
+            planId: plan._id.toString(),
+            quantity: input.quantity,
+        });
 
         // 1. Create Invoice (Empty Draft)
         const invoice = await stripe.invoices.create({
@@ -123,10 +116,9 @@ export class PaymentService {
         });
 
         // Finalize invoice to get payment intent
-        let finalizedInvoiceResponse = await stripe.invoices.finalizeInvoice(
-            invoice.id!,
-            { expand: ['payment_intent'] }
-        );
+        let finalizedInvoiceResponse = await stripe.invoices.finalizeInvoice(invoice.id!, {
+            expand: ['payment_intent'],
+        });
         let finalizedInvoice = finalizedInvoiceResponse as any;
 
         // Poll for PaymentIntent if missing (up to 3 times)
@@ -137,17 +129,12 @@ export class PaymentService {
             attempts < 3
         ) {
             attempts++;
-            logger.warn(
-                `PaymentIntent missing, attempt ${attempts}/3. Waiting 1s...`
-            );
+            logger.warn(`PaymentIntent missing, attempt ${attempts}/3. Waiting 1s...`);
             await new Promise(resolve => setTimeout(resolve, 1000));
 
-            finalizedInvoiceResponse = await stripe.invoices.retrieve(
-                invoice.id!,
-                {
-                    expand: ['payment_intent'],
-                }
-            );
+            finalizedInvoiceResponse = await stripe.invoices.retrieve(invoice.id!, {
+                expand: ['payment_intent'],
+            });
             finalizedInvoice = finalizedInvoiceResponse as any;
         }
 
@@ -188,9 +175,7 @@ export class PaymentService {
 
         // Fallback: Return Hosted Invoice URL if PI is still missing
         if (finalizedInvoice.hosted_invoice_url) {
-            logger.warn(
-                `Returning Hosted Invoice URL as fallback for missing PI`
-            );
+            logger.warn(`Returning Hosted Invoice URL as fallback for missing PI`);
             // Save Invoice to DB
             await this.saveInvoiceFromStripe(
                 finalizedInvoice,
@@ -216,8 +201,7 @@ export class PaymentService {
         returnUrl: string
     ): Promise<{ url: string }> {
         // Get customer
-        const customer =
-            await paymentRepository.findCustomerByWorkspace(workspaceId);
+        const customer = await paymentRepository.findCustomerByWorkspace(workspaceId);
         if (!customer) {
             throw new Error('No Stripe customer found for this workspace');
         }
@@ -240,8 +224,7 @@ export class PaymentService {
             metadata?: Record<string, string>;
         }>
     ): Promise<Stripe.Invoice> {
-        const customer =
-            await paymentRepository.findCustomerByWorkspace(workspaceId);
+        const customer = await paymentRepository.findCustomerByWorkspace(workspaceId);
         if (!customer) {
             throw new Error('No Stripe customer found for this workspace');
         }
@@ -281,11 +264,7 @@ export class PaymentService {
         const finalized = await stripe.invoices.finalizeInvoice(invoice.id!);
 
         // Save to DB
-        await this.saveInvoiceFromStripe(
-            finalized,
-            workspaceId,
-            subscriptionId
-        );
+        await this.saveInvoiceFromStripe(finalized, workspaceId, subscriptionId);
 
         return finalized as any;
     }
@@ -300,9 +279,7 @@ export class PaymentService {
             );
 
             // Check if we've already processed this event
-            const existingEvent = await paymentRepository.findWebhookEvent(
-                event.id
-            );
+            const existingEvent = await paymentRepository.findWebhookEvent(event.id);
             if (existingEvent) {
                 logger.info(`Webhook event ${event.id} already processed`);
                 return;
@@ -325,9 +302,7 @@ export class PaymentService {
     private async handleWebhookEvent(event: Stripe.Event): Promise<void> {
         switch (event.type) {
             case 'checkout.session.completed':
-                await this.onCheckoutCompleted(
-                    event.data.object as Stripe.Checkout.Session
-                );
+                await this.onCheckoutCompleted(event.data.object as Stripe.Checkout.Session);
                 break;
 
             case 'invoice.paid':
@@ -335,15 +310,11 @@ export class PaymentService {
                 break;
 
             case 'invoice.payment_failed':
-                await this.onInvoicePaymentFailed(
-                    event.data.object as Stripe.Invoice
-                );
+                await this.onInvoicePaymentFailed(event.data.object as Stripe.Invoice);
                 break;
 
             case 'customer.subscription.deleted':
-                await this.onSubscriptionDeleted(
-                    event.data.object as Stripe.Subscription
-                );
+                await this.onSubscriptionDeleted(event.data.object as Stripe.Subscription);
                 break;
 
             default:
@@ -360,12 +331,10 @@ export class PaymentService {
         const stripeSubscriptionId = session.subscription as string;
 
         // idempotency: لا تنشئ مرتين
-        const existing =
-            await subscriptionRepository.findByStripeId(stripeSubscriptionId);
+        const existing = await subscriptionRepository.findByStripeId(stripeSubscriptionId);
         if (existing) return;
 
-        const stripeSub =
-            await stripe.subscriptions.retrieve(stripeSubscriptionId);
+        const stripeSub = await stripe.subscriptions.retrieve(stripeSubscriptionId);
 
         const priceId = stripeSub.items.data[0].price.id;
         const plan = await planRepository.getPlanByStripePrice(priceId);
@@ -378,42 +347,32 @@ export class PaymentService {
         }
 
         await subscriptionRepository.create({
-            workspaceId: new Types.ObjectId(session.metadata!.workspaceId),
-            userId: new Types.ObjectId(session.metadata!.userId),
+            workspaceId: new Types.ObjectId(unprefixId(session.metadata!.workspaceId)),
+            userId: new Types.ObjectId(unprefixId(session.metadata!.userId)),
             planId: plan?._id,
             planSnapshot: snapshot(plan),
             stripeSubscriptionId,
             status: stripeSub.status,
-            currentPeriodStart: new Date(
-                stripeSub.items.data[0].current_period_start * 1000
-            ),
-            currentPeriodEnd: new Date(
-                stripeSub.items.data[0].current_period_end * 1000
-            ),
+            currentPeriodStart: new Date(stripeSub.items.data[0].current_period_start * 1000),
+            currentPeriodEnd: new Date(stripeSub.items.data[0].current_period_end * 1000),
             billingCycleAnchor: new Date(stripeSub.billing_cycle_anchor * 1000),
             quantity: stripeSub.items.data[0].quantity ?? 1,
         });
 
-        await limitService.invalidateWorkspaceLimits(
-            session.metadata!.workspaceId
-        );
+        await limitService.invalidateWorkspaceLimits(session.metadata!.workspaceId);
     }
 
     private async onInvoicePaid(invoice: Stripe.Invoice) {
         if (!invoice.parent?.subscription_details?.subscription) return;
 
-        const stripeSubscriptionId = invoice.parent.subscription_details
-            .subscription as string;
+        const stripeSubscriptionId = invoice.parent.subscription_details.subscription as string;
 
-        const stripeSub =
-            await stripe.subscriptions.retrieve(stripeSubscriptionId);
+        const stripeSub = await stripe.subscriptions.retrieve(stripeSubscriptionId);
 
         const priceId = stripeSub.items.data[0].price.id;
         const plan = await planRepository.getPlanByStripePrice(priceId);
         if (!plan) {
-            logger.error(
-                'Plan that called by id from invoice.paid webhook does not exists'
-            );
+            logger.error('Plan that called by id from invoice.paid webhook does not exists');
             return;
         }
 
@@ -421,12 +380,8 @@ export class PaymentService {
             status: stripeSub.status,
             planId: plan._id,
             planSnapshot: snapshot(plan),
-            currentPeriodStart: new Date(
-                stripeSub.items.data[0].current_period_start * 1000
-            ),
-            currentPeriodEnd: new Date(
-                stripeSub.items.data[0].current_period_end * 1000
-            ),
+            currentPeriodStart: new Date(stripeSub.items.data[0].current_period_start * 1000),
+            currentPeriodEnd: new Date(stripeSub.items.data[0].current_period_end * 1000),
             paymentFailureCount: 0,
         });
     }
@@ -446,9 +401,7 @@ export class PaymentService {
         });
     }
 
-    private async handleCheckoutSessionCompleted(
-        session: Stripe.Checkout.Session
-    ): Promise<void> {
+    private async handleCheckoutSessionCompleted(session: Stripe.Checkout.Session): Promise<void> {
         const subscriptionId = session.metadata?.subscriptionId;
         if (!subscriptionId) {
             logger.warn('Checkout session completed without subscription ID');
@@ -458,14 +411,10 @@ export class PaymentService {
         // Activate the subscription
         await subscriptionService.activateSubscription(subscriptionId);
 
-        logger.info(
-            `Activated subscription ${subscriptionId} after successful checkout`
-        );
+        logger.info(`Activated subscription ${subscriptionId} after successful checkout`);
     }
 
-    private async handleInvoicePaymentSucceeded(
-        invoice: Stripe.Invoice
-    ): Promise<void> {
+    private async handleInvoicePaymentSucceeded(invoice: Stripe.Invoice): Promise<void> {
         logger.info(`Invoice payment succeeded: ${invoice.id}`);
 
         // Update local invoice status
@@ -480,9 +429,7 @@ export class PaymentService {
                 }
             );
         } catch (err) {
-            logger.error(
-                `Failed to update local invoice status to paid: ${err}`
-            );
+            logger.error(`Failed to update local invoice status to paid: ${err}`);
         }
 
         const subscriptionId = invoice.metadata?.subscriptionId;
@@ -493,9 +440,7 @@ export class PaymentService {
         }
     }
 
-    private async handleInvoicePaymentFailed(
-        invoice: Stripe.Invoice
-    ): Promise<void> {
+    private async handleInvoicePaymentFailed(invoice: Stripe.Invoice): Promise<void> {
         logger.info(`Invoice payment failed: ${invoice.id}`);
 
         // Update local invoice status
@@ -508,17 +453,12 @@ export class PaymentService {
                 }
             );
         } catch (err) {
-            logger.error(
-                `Failed to update local invoice status on failure: ${err}`
-            );
+            logger.error(`Failed to update local invoice status on failure: ${err}`);
         }
 
         const subscriptionId = invoice.metadata?.subscriptionId;
         if (subscriptionId) {
-            await subscriptionService.updateSubscriptionStatus(
-                subscriptionId,
-                'past_due'
-            );
+            await subscriptionService.updateSubscriptionStatus(subscriptionId, 'past_due');
         }
     }
 

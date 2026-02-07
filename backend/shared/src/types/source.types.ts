@@ -7,6 +7,7 @@ export interface ISourceAuthentication {
 }
 
 export interface ISource extends Document {
+    id: string;
     userId: Types.ObjectId;
     workspaceId: Types.ObjectId;
     projectId: Types.ObjectId;

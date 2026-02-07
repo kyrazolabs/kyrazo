@@ -36,13 +36,11 @@ describe('EndpointController', () => {
         };
         const savedEndpoint = {
             ...input,
-            _id: 'endpoint1',
+            id: 'end_65c3f1e5f1e5f1e5f1e5f1e5',
             ingressId: 'ingress1',
         };
 
-        spyOn(endpointService, 'createEndpoint').mockResolvedValue(
-            savedEndpoint as any
-        );
+        spyOn(endpointService, 'createEndpoint').mockResolvedValue(savedEndpoint as any);
 
         const c = mockContext(input);
         const result: any = await EndpointController.createEndpoint(c);
@@ -53,12 +51,10 @@ describe('EndpointController', () => {
     });
 
     it('getEndpoint should fetch an endpoint', async () => {
-        const endpoint = { _id: 'endpoint1', name: 'Test' };
-        spyOn(endpointService, 'getEndpointById').mockResolvedValue(
-            endpoint as any
-        );
+        const endpoint = { id: 'end_65c3f1e5f1e5f1e5f1e5f1e5', name: 'Test' };
+        spyOn(endpointService, 'getEndpointById').mockResolvedValue(endpoint as any);
 
-        const c = mockContext({}, { endpointId: 'endpoint1' });
+        const c = mockContext({}, { endpointId: 'end_65c3f1e5f1e5f1e5f1e5f1e5' });
         const result: any = await EndpointController.getEndpoint(c);
 
         expect(result.status).toBe(200);

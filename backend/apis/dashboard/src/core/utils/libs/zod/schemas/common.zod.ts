@@ -2,8 +2,21 @@ import { z } from 'zod';
 
 // Common header validation schemas
 export const ProjectHeadersSchema = z.object({
-    'x-workspace-id': z.string().min(1, 'Workspace ID is required'),
-    'x-project-id': z.string().min(1, 'Project ID is required'),
+    'x-workspace-id': z
+        .string()
+        .regex(/^(wsp_)?[0-9a-fA-F]{24}$/, 'Invalid ID format')
+        .transform((val: string) => (val.includes('_') ? val.split('_')[1] : val)),
+    'x-project-id': z
+        .string()
+        .regex(/^(pro_)?[0-9a-fA-F]{24}$/, 'Invalid ID format')
+        .transform((val: string) => (val.includes('_') ? val.split('_')[1] : val)),
+});
+
+export const GetProjectByIdSchema = z.object({
+    projectId: z
+        .string()
+        .regex(/^(pro_)?[0-9a-fA-F]{24}$/, 'Invalid ID format')
+        .transform((val: string) => (val.includes('_') ? val.split('_')[1] : val)),
 });
 
 // Type exports

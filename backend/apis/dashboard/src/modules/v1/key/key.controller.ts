@@ -1,6 +1,6 @@
 import { AppContext } from '@/core/middlewares/auth.middleware';
 
-import { Key, IErrorResponse, logger } from '@kyrazo/shared';
+import { Key, IErrorResponse, logger, unprefixId } from '@kyrazo/shared';
 import { keyCrypto, secretCrypto } from '@kyrazo/shared';
 import { ICheckScopes, ICreateKey, IGetKey, IRevokeKey } from './key.schema';
 
@@ -34,8 +34,8 @@ export class KeyController {
                     kid: metadata.kid,
                     key: hashedKey,
                     name,
-                    workspace: workspaceId,
-                    createBy: userId,
+                    workspace: unprefixId(workspaceId.toString()),
+                    createBy: unprefixId(userId.toString()),
                     scopes,
                     lastFour: apiKey.slice(-4),
                 },
@@ -59,10 +59,7 @@ export class KeyController {
                 201
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in KeyController.createKey',
-                error as Error
-            );
+            logger.error('Unexpected error in KeyController.createKey', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -96,18 +93,14 @@ export class KeyController {
             }
             const { q, limit = 10, page = 1 }: IGetKey = c.req.valid('query');
 
-            const query: any = { workspace: workspaceId };
+            const query: any = { workspace: unprefixId(workspaceId.toString()) };
 
             if (q) query.$text = { $search: q };
 
             const perPage = Math.min(limit, 100);
             const skip = (page - 1) * perPage;
             const [keys, total] = await Promise.all([
-                Key.find(query)
-                    .sort({ createdAt: -1 })
-                    .skip(skip)
-                    .limit(perPage)
-                    .lean(),
+                Key.find(query).sort({ createdAt: -1 }).skip(skip).limit(perPage).lean(),
                 Key.countDocuments(query),
             ]);
 
@@ -159,8 +152,8 @@ export class KeyController {
             const { keyId }: ICheckScopes = c.req.valid('param');
 
             const data = await Key.findOne({
-                _id: keyId,
-                workspace: workspaceId,
+                _id: unprefixId(keyId),
+                workspace: unprefixId(workspaceId.toString()),
             });
 
             return c.json(
@@ -207,7 +200,10 @@ export class KeyController {
             }
             const { keyId }: IRevokeKey = c.req.valid('param');
 
-            await Key.findOneAndDelete({ _id: keyId, workspace: workspaceId });
+            await Key.findOneAndDelete({
+                _id: unprefixId(keyId),
+                workspace: unprefixId(workspaceId.toString()),
+            });
 
             return c.json(
                 {

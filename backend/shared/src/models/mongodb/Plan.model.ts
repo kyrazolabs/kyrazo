@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { IPlan, IPlanModel } from '../../types';
+import { unprefixId } from '../../utils/id';
 
 // Plan schema
 const planSchema = new Schema<IPlan>(
@@ -111,7 +112,6 @@ const planSchema = new Schema<IPlan>(
 );
 
 // Indexes
-planSchema.index({ slug: 1 });
 planSchema.index({ isActive: 1 });
 planSchema.index({ 'limits.eventsPerSecond': 1 });
 planSchema.index({ 'limits.eventsPerMonth': 1 });

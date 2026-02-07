@@ -4,6 +4,7 @@ export type TargetMethods = 'POST' | 'PUT' | 'PATCH';
 export type TargetStatus = 'active' | 'inactive';
 
 export interface ITarget<T = string> extends BaseDocument {
+    id: string;
     workspaceId: Types.ObjectId;
     projectId: Types.ObjectId;
     name: string;
@@ -34,14 +35,8 @@ export interface ITarget<T = string> extends BaseDocument {
 }
 
 export interface ITargetModel extends Model<ITarget> {
-    findByWorkspaceAndProject(
-        workspaceId: string,
-        projectId: string
-    ): Promise<ITarget[]>;
-    findActiveByWorkspaceAndProject(
-        workspaceId: string,
-        projectId: string
-    ): Promise<ITarget[]>;
+    findByWorkspaceAndProject(workspaceId: string, projectId: string): Promise<ITarget[]>;
+    findActiveByWorkspaceAndProject(workspaceId: string, projectId: string): Promise<ITarget[]>;
     findActiveByWorkspaceAndProjectAndTargetId(
         workspaceId: string,
         projectId: string,

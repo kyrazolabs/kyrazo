@@ -1,6 +1,6 @@
 import { redisConfig } from '@/configs/redis';
 import { subscriptionRepository } from '@/modules/subscriptions/subscription.repo';
-import { IPlanLimits, logger } from '@kyrazo/shared';
+import { IPlanLimits, logger, unprefixId } from '@kyrazo/shared';
 
 export const FREE_PLAN_LIMITS: IPlanLimits = {
     eventsPerSecond: 25,
@@ -16,7 +16,7 @@ export class LimitService {
     private readonly LIMITS_TTL = 60 * 60 * 24; // 24 hours
 
     private getLimitsKey(workspaceId: string): string {
-        return `workspace:limits:${workspaceId}`;
+        return `workspace:limits:${unprefixId(workspaceId)}`;
     }
 
     /**
@@ -40,8 +40,7 @@ export class LimitService {
         }
 
         // Fallback to DB
-        const subscription =
-            await subscriptionRepository.findActiveByWorkspace(workspaceId);
+        const subscription = await subscriptionRepository.findActiveByWorkspace(workspaceId);
 
         let limits: IPlanLimits;
         if (subscription) {
@@ -96,7 +95,7 @@ export class LimitService {
 
         const date = new Date();
         const currentMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-        const redisKey = `usage:events:${workspaceId}:${currentMonth}`;
+        const redisKey = `usage:events:${unprefixId(workspaceId)}:${currentMonth}`;
 
         const client = redisConfig.getClient();
         const usageStr = await client.get(redisKey);

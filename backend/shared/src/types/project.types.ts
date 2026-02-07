@@ -3,6 +3,7 @@ import { IUser, IWorkspace } from '.';
 
 // Project interface
 export interface IProject extends Document {
+    id: string;
     name: string;
     description?: string;
     workspaceId: Types.ObjectId;
@@ -28,13 +29,10 @@ export interface IProject extends Document {
 export interface IProjectModel extends Model<IProject> {
     findByOwner(ownerId: string): Promise<IProject[]>;
     findByWorkspace(workspaceId: string): Promise<IProject[]>;
-    findByWorkspaceAndProject(workspaceId: string, projectId: string): Promise<IProject>
+    findByWorkspaceAndProject(workspaceId: string, projectId: string): Promise<IProject>;
     findPublic(): Promise<IProject[]>;
 
-    searchProjects(
-        query: string,
-        limit?: number
-    ): Promise<IProject[]>;
+    searchProjects(query: string, limit?: number): Promise<IProject[]>;
 
     getProjectStats(): Promise<{
         totalProjects: number;

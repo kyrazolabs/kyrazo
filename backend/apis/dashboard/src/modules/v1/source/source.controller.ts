@@ -52,8 +52,8 @@ export class SourceController {
                     success: true,
                     message: 'Source has been created successfully.',
                     data: {
-                        sourceId: saved._id,
-                        ingress: saved.ingressUrl,
+                        sourceId: (saved as any).id,
+                        ingress: (saved as any).ingressUrl,
                     },
                 },
                 201

@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { IProject, IProjectModel } from '../../types';
+import { unprefixId } from '../../utils/id';
 
 // Project schema
 const ProjectSchema = new Schema<IProject>(
@@ -138,14 +139,18 @@ ProjectSchema.statics.findByOwner = function (ownerId: string) {
 };
 
 ProjectSchema.statics.findByWorkspace = function (workspaceId: string) {
-    return this.find({ workspaceId, isDeleted: false });
+    return this.find({ workspaceId: unprefixId(workspaceId), isDeleted: false });
 };
 
 ProjectSchema.statics.findByWorkspaceAndProject = async function (
     workspaceId: string,
     projectId: string
 ) {
-    return await this.findOne({ _id: projectId, workspaceId, isDeleted: false });
+    return await this.findOne({
+        _id: unprefixId(projectId),
+        workspaceId: unprefixId(workspaceId),
+        isDeleted: false,
+    });
 };
 
 ProjectSchema.statics.findPublic = function () {
@@ -250,16 +255,19 @@ ProjectSchema.statics.findOverdue = function () {
     });
 };
 
-ProjectSchema.statics.permanentlyDelete = function (ProjectId: string) {
-    return this.findByIdAndDelete(ProjectId);
+ProjectSchema.statics.permanentlyDelete = function (projectId: string) {
+    return this.findByIdAndDelete(unprefixId(projectId));
 };
 
 ProjectSchema.statics.isUserOwner = async function (
     userId: string,
-    ProjectId: string
+    projectId: string
 ): Promise<boolean> {
-    const Project = await this.findOne({ _id: ProjectId, createBy: userId });
-    return !!Project;
+    const project = await this.findOne({
+        _id: unprefixId(projectId),
+        createBy: unprefixId(userId),
+    });
+    return !!project;
 };
 
 // Export the model

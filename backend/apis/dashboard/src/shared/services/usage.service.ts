@@ -1,6 +1,6 @@
 import { Queue, Worker } from 'bullmq';
 import { redisConfig } from '@/configs/redis';
-import { logger, Usage } from '@kyrazo/shared';
+import { logger, Usage, unprefixId } from '@kyrazo/shared';
 import { Types } from 'mongoose';
 import { subscriptionService } from '@/modules/subscriptions/subscription.service';
 import stripe from '@/configs/stripe';
@@ -92,14 +92,7 @@ export class UsageService {
 
         // Normalize to start of the day/month for aggregation
         const periodStart = new Date(date.getFullYear(), date.getMonth(), 1);
-        const periodEnd = new Date(
-            date.getFullYear(),
-            date.getMonth() + 1,
-            0,
-            23,
-            59,
-            59
-        );
+        const periodEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59);
 
         try {
             logger.info(
@@ -125,8 +118,8 @@ export class UsageService {
             // 2. Persist to MongoDB
             await Usage.findOneAndUpdate(
                 {
-                    workspaceId: new Types.ObjectId(workspaceId),
-                    subscriptionId: new Types.ObjectId(subscriptionId),
+                    workspaceId: new Types.ObjectId(unprefixId(workspaceId)),
+                    subscriptionId: new Types.ObjectId(unprefixId(subscriptionId)),
                     eventType,
                     periodStart,
                 },
@@ -158,7 +151,7 @@ export class UsageService {
         const usage = await Usage.aggregate([
             {
                 $match: {
-                    subscriptionId: new Types.ObjectId(subscriptionId),
+                    subscriptionId: new Types.ObjectId(unprefixId(subscriptionId)),
                     periodStart: periodStart,
                 },
             },
@@ -175,7 +168,7 @@ export class UsageService {
 
     async getPendingUsage(subscriptionId: string) {
         return await Usage.find({
-            subscriptionId,
+            subscriptionId: unprefixId(subscriptionId),
             reported: { $ne: true },
         });
     }

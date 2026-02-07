@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { ISubscription, ISubscriptionModel } from '../../types';
+import { unprefixId } from '../../utils/id';
 
 // Subscription schema
 const subscriptionSchema = new Schema<ISubscription>(
@@ -152,20 +153,16 @@ const subscriptionSchema = new Schema<ISubscription>(
 // Indexes
 subscriptionSchema.index({ workspaceId: 1, status: 1 });
 subscriptionSchema.index({ userId: 1, status: 1 });
-subscriptionSchema.index({ planId: 1 });
-subscriptionSchema.index({ stripeSubscriptionId: 1 });
 subscriptionSchema.index({ currentPeriodEnd: 1 });
 subscriptionSchema.index({ createdAt: -1 });
 
 // Static methods
 subscriptionSchema.statics.findByWorkspace = function (workspaceId: string) {
-    return this.find({ workspaceId }).sort({ createdAt: -1 });
+    return this.find({ workspaceId: unprefixId(workspaceId) }).sort({ createdAt: -1 });
 };
 
-subscriptionSchema.statics.findActiveByWorkspace = function (
-    workspaceId: string
-) {
-    return this.findOne({ workspaceId, status: 'active' });
+subscriptionSchema.statics.findActiveByWorkspace = function (workspaceId: string) {
+    return this.findOne({ workspaceId: unprefixId(workspaceId), status: 'active' });
 };
 
 // Virtual for checking if subscription is active
@@ -175,11 +172,7 @@ subscriptionSchema.virtual('isActive').get(function () {
 
 // Virtual for checking if subscription is in trial
 subscriptionSchema.virtual('isTrial').get(function () {
-    return (
-        this.status === 'trialing' &&
-        this.trialEnd &&
-        this.trialEnd > new Date()
-    );
+    return this.status === 'trialing' && this.trialEnd && this.trialEnd > new Date();
 });
 
 // Virtual for checking if subscription is canceled
