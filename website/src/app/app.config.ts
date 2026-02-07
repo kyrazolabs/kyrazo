@@ -5,6 +5,7 @@ import {
     provideBrowserGlobalErrorListeners,
     provideZonelessChangeDetection,
 } from '@angular/core';
+import { provideHttpClient, withFetch } from '@angular/common/http';
 import { provideRouter, Router, withInMemoryScrolling } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -42,6 +43,7 @@ export const appConfig: ApplicationConfig = {
             withInMemoryScrolling({ scrollPositionRestoration: 'enabled' }),
         ),
         provideAnimations(),
+        provideHttpClient(withFetch()),
         provideClientHydration(withEventReplay()),
     ],
     ...(environment.sentry.enabled

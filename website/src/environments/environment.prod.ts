@@ -1,7 +1,6 @@
-const baseUrl = 'https://api.kyrazo.com/dashboard';
 export const environment = {
     production: true,
-    baseUrl,
+    baseUrl: 'https://api.kyrazo.com/dashboard',
 
     sentry: {
         dsn: 'https://c3803071d2f195c52eb7a5e915b895fc@o4510640976625664.ingest.de.sentry.io/4510640978657360',
