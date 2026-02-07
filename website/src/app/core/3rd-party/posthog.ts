@@ -1,29 +1,44 @@
-import { Injectable } from "@angular/core";
-import posthog from "posthog-js";
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import posthog from 'posthog-js';
 
 @Injectable({
-  providedIn: "root",
+    providedIn: 'root',
 })
 export class PostHogService {
-  constructor() {}
+    private isBrowser: boolean;
 
-  capture(event: string, properties?: any) {
-    posthog.capture(event, properties);
-  }
+    constructor(@Inject(PLATFORM_ID) platformId: any) {
+        this.isBrowser = isPlatformBrowser(platformId);
+    }
 
-  identify(distinctId: string, properties?: any) {
-    posthog.identify(distinctId, properties);
-  }
+    capture(event: string, properties?: any) {
+        if (this.isBrowser) {
+            posthog.capture(event, properties);
+        }
+    }
 
-  alias(alias: string, distinctId: string) {
-    posthog.alias(alias, distinctId);
-  }
+    identify(distinctId: string, properties?: any) {
+        if (this.isBrowser) {
+            posthog.identify(distinctId, properties);
+        }
+    }
 
-  reset() {
-    posthog.reset();
-  }
+    alias(alias: string, distinctId: string) {
+        if (this.isBrowser) {
+            posthog.alias(alias, distinctId);
+        }
+    }
 
-  trackPageView() {
-    posthog.capture("$pageview");
-  }
+    reset() {
+        if (this.isBrowser) {
+            posthog.reset();
+        }
+    }
+
+    trackPageView() {
+        if (this.isBrowser) {
+            posthog.capture('$pageview');
+        }
+    }
 }

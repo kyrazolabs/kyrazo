@@ -1,28 +1,28 @@
 <div class="container mx-auto px-4 py-12 mt-24 max-w-5xl">
   <!-- Loading State -->
-  @if (isLoading()) {
+  @if (isLoading$()) {
       <div class="flex justify-center py-20">
           <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
   }
 
   <!-- Error State -->
-  @if (error()) {
+  @if (error$()) {
       <div class="text-center py-20">
-          <p class="text-red-500 text-xl mb-4">{{ error() }}</p>
+          <p class="text-red-500 text-xl mb-4">Failed to load article</p>
           <a routerLink="/blog" class="text-primary hover:text-primary-emphasis font-medium">&larr; Back to Blog</a>
       </div>
   }
 
   <!-- Article Content -->
-  @if (article() && !isLoading()) {
+  @if (article$(); as article) {
       <article class="bg-surface-0 dark:bg-surface-900 rounded-2xl shadow-sm overflow-hidden">
           <!-- Cover Image -->
           <div class="w-full h-64 md:h-[400px] relative bg-surface-100 dark:bg-surface-800">
-              @if (article()!.cover) {
+              @if (article.cover) {
                   <img
-                       [src]="cmsService.getImageUrl(article()!.cover!.url)"
-                       [alt]="article()!.cover!.alternativeText || article()!.title"
+                       [src]="cmsService.getImageUrl(article.cover!.url)"
+                       [alt]="article.cover!.alternativeText || article.title"
                        class="w-full h-full object-cover">
               } @else {
                   <div class="w-full h-full flex items-center justify-center text-surface-400">
@@ -36,38 +36,38 @@
               <div class="flex flex-wrap items-center gap-4 text-sm text-surface-500 dark:text-surface-400 mb-8">
                   <a routerLink="/blog" class="text-primary hover:text-primary-emphasis font-medium transition-colors">&larr; Back to Blog</a>
                   <span class="w-1 h-1 bg-surface-300 rounded-full"></span>
-                  @if (article()!.category) {
+                  @if (article.category) {
                       <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                          {{ article()!.category!.name }}
+                          {{ article.category!.name }}
                       </span>
                   }
                   <span class="w-1 h-1 bg-surface-300 rounded-full"></span>
-                  <span>{{ article()!.publishedAt | date:'longDate' }}</span>
+                  <span>{{ article.publishedAt | date:'longDate' }}</span>
               </div>
 
               <!-- Title -->
               <h1 class="text-4xl md:text-5xl font-bold text-surface-900 dark:text-surface-0 mb-6 leading-tight tracking-tight">
-                  {{ article()!.title }}
+                  {{ article.title }}
               </h1>
 
               <!-- Author -->
-              @if (article()!.author) {
+              @if (article.author) {
                   <div class="flex items-center mb-10 pb-10 border-b border-surface-200 dark:border-surface-700">
-                       @if (article()!.author!.picture) {
+                       @if (article.author!.picture) {
                            <img
-                               [src]="cmsService.getImageUrl(article()!.author!.picture!.url)"
+                               [src]="cmsService.getImageUrl(article.author!.picture!.url)"
                                class="w-12 h-12 rounded-full object-cover mr-4 ring-2 ring-primary/20">
                        }
                       <div>
-                          <div class="font-bold text-surface-900 dark:text-surface-0">{{ article()!.author!.name }}</div>
-                          <div class="text-sm text-surface-500">{{ article()!.author!.email }}</div>
+                          <div class="font-bold text-surface-900 dark:text-surface-0">{{ article.author!.name }}</div>
+                          <div class="text-sm text-surface-500">{{ article.author!.email }}</div>
                       </div>
                   </div>
               }
 
               <!-- Blocks Rendering -->
               <div class="space-y-10 max-w-none">
-                  @for (block of article()!.blocks; track $index) {
+                  @for (block of article.blocks; track $index) {
 
                       <!-- Rich Text Block -->
                       @if (block.__component === 'shared.rich-text') {

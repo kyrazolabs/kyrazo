@@ -5,23 +5,23 @@
     </div>
 
     <!-- Loading State -->
-    @if (isLoading()) {
+    @if (isLoading$()) {
         <div class="flex justify-center py-20">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
     }
 
     <!-- Error State -->
-    @if (error()) {
+    @if (articlesResource.error()) {
         <div class="text-center py-20 text-red-500">
-            {{ error() }}
+            Failed to load articles. Please try again later.
         </div>
     }
 
     <!-- Blog Grid -->
-    @if (!isLoading() && !error()) {
+    @if (articles$(); as articles) {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            @for (article of articles(); track article.slug) {
+            @for (article of articles; track article.slug) {
                 <div class="group bg-surface-0 dark:bg-surface-900 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-surface-200 dark:border-surface-800 flex flex-col h-full ring-1 ring-black/5">
                     <!-- Image -->
                     <div class="h-56 overflow-hidden bg-surface-100 dark:bg-surface-800 relative">
