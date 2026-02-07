@@ -43,7 +43,6 @@ import { DialogService } from '@shared/services/dialog.service';
 import { SentryService } from '@core/3rd-party/sentry';
 
 interface Delivery {
-    _id: string;
     id: string;
     delivery_id: string;
     endpoint: string;
@@ -228,7 +227,7 @@ export class TargetPage implements OnInit, AfterViewInit {
         this.route.data.subscribe((data) => {
             if (data['target']) {
                 this.targetEntity = data['target'];
-                this.targetId = this.targetEntity!._id!;
+                this.targetId = this.targetEntity!.id;
                 this.targetUrl = this.targetEntity!.url;
                 this.loadStats();
             }
@@ -523,7 +522,6 @@ export class TargetPage implements OnInit, AfterViewInit {
     // Convert IDeliveryAttempt to Delivery for display
     private mapToDelivery(da: IDeliveryAttempt): Delivery {
         return {
-            _id: da.delivery_id,
             id: da.delivery_id,
             delivery_id: da.delivery_id,
             endpoint: da.target_url, // Mapped from target_url

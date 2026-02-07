@@ -9,7 +9,7 @@ import { ApiResponse } from '@models/index';
 import { environment } from 'environments/environment';
 
 export interface ITarget {
-    _id?: string;
+    id: string;
     name: string;
     url: string;
     description?: string;

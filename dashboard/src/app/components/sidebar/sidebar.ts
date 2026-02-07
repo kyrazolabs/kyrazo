@@ -124,7 +124,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
 
     selectWorkspace(workspace: IWorkspace) {
         this.selectedWorkspace = workspace;
-        this.ss.setItem('workspace', workspace._id);
+        this.ss.setItem('workspace', workspace.id);
         this.wp.hide();
     }
 
@@ -151,7 +151,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
                 ) {
                     this.selectedWorkspace =
                         this.workspaceMemberships[0].workspace;
-                    this.ss.setItem('workspace', this.selectedWorkspace._id);
+                    this.ss.setItem('workspace', this.selectedWorkspace.id);
                 }
                 this.loading = false;
             },

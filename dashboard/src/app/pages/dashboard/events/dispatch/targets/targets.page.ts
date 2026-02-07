@@ -190,35 +190,33 @@ export class TargetsPage implements OnInit {
     }
 
     toggleStatus(target: ITarget) {
-        this.targetService
-            .updateStatus(target._id!, !target.enabled)
-            .subscribe({
-                next: (res) => {
-                    this.ms.add({
-                        severity: 'success',
-                        summary: 'Success',
-                        detail: `Target ${target.enabled ? 'enabled' : 'disabled'}`,
-                    });
-                    this.posthog.capture('target_updated', {
-                        target_id: target._id,
-                        enabled: target.enabled,
-                        context: 'list_toggle',
-                    });
-                },
-                error: (error) => {
-                    this.sentry.captureException(error);
-                    this.posthog.capture('target_update_error', {
-                        target_id: target._id,
-                        error: error.message,
-                        context: 'list_toggle',
-                    });
-                    this.ms.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail: 'Failed to update status',
-                    });
-                },
-            });
+        this.targetService.updateStatus(target.id, !target.enabled).subscribe({
+            next: (res) => {
+                this.ms.add({
+                    severity: 'success',
+                    summary: 'Success',
+                    detail: `Target ${target.enabled ? 'enabled' : 'disabled'}`,
+                });
+                this.posthog.capture('target_updated', {
+                    target_id: target.id,
+                    enabled: target.enabled,
+                    context: 'list_toggle',
+                });
+            },
+            error: (error) => {
+                this.sentry.captureException(error);
+                this.posthog.capture('target_update_error', {
+                    target_id: target.id,
+                    error: error.message,
+                    context: 'list_toggle',
+                });
+                this.ms.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Failed to update status',
+                });
+            },
+        });
     }
 
     deleteTarget(target: ITarget) {
@@ -227,21 +225,21 @@ export class TargetsPage implements OnInit {
             header: 'Delete Confirmation',
             icon: 'pi pi-exclamation-triangle',
             accept: () => {
-                this.targetService.delete(target._id!).subscribe({
+                this.targetService.delete(target.id).subscribe({
                     next: () => {
                         this.ms.add({
                             severity: 'success',
                             detail: 'Target deleted',
                         });
                         this.posthog.capture('target_deleted', {
-                            target_id: target._id,
+                            target_id: target.id,
                         });
                         this.loadTargets(this.currentPage, this.rows);
                     },
                     error: (error) => {
                         this.sentry.captureException(error);
                         this.posthog.capture('target_delete_error', {
-                            target_id: target._id,
+                            target_id: target.id,
                             error: error.message,
                         });
                         this.ms.add({

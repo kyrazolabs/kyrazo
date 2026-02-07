@@ -98,7 +98,7 @@ export class EndpointsPage implements OnInit {
     }
 
     openEditDialog(endpoint: IEndpoint) {
-        this.dialogService.openEndpointDialog(endpoint._id);
+        this.dialogService.openEndpointDialog(endpoint.id);
     }
 
     loadEndpoints(
@@ -231,11 +231,11 @@ export class EndpointsPage implements OnInit {
             customHeaders: endpoint.customHeaders,
         };
 
-        this.endpointService.updateStatus(endpoint._id, newStatus).subscribe({
+        this.endpointService.updateStatus(endpoint.id, newStatus).subscribe({
             next: (response) => {
                 // Update local data
                 const index = this.endpoints.findIndex(
-                    (e) => e._id === endpoint._id,
+                    (e) => e.id === endpoint.id,
                 );
                 if (index !== -1) {
                     this.endpoints[index] = {
@@ -254,7 +254,7 @@ export class EndpointsPage implements OnInit {
                     life: 3000,
                 });
                 this.posthog.capture('endpoint_updated', {
-                    endpoint_id: endpoint._id,
+                    endpoint_id: endpoint.id,
                     new_status: newStatus,
                     context: 'list_toggle',
                 });
@@ -262,7 +262,7 @@ export class EndpointsPage implements OnInit {
             error: (error) => {
                 this.sentry.captureException(error);
                 this.posthog.capture('endpoint_update_error', {
-                    endpoint_id: endpoint._id,
+                    endpoint_id: endpoint.id,
                     error: error.message,
                     context: 'list_toggle',
                 });
@@ -296,7 +296,7 @@ export class EndpointsPage implements OnInit {
         // Uncomment the following when you add the delete method to the service:
 
         /*
-    this.endpointService.delete(endpoint._id)
+    this.endpointService.delete(endpoint.id)
       .subscribe({
         next: () => {
           this.removeEndpointFromLocal(endpoint);
@@ -327,11 +327,11 @@ export class EndpointsPage implements OnInit {
             detail: 'Endpoint deleted successfully',
             life: 3000,
         });
-        this.posthog.capture('endpoint_deleted', { endpoint_id: endpoint._id });
+        this.posthog.capture('endpoint_deleted', { endpoint_id: endpoint.id });
     }
 
     private removeEndpointFromLocal(endpoint: IEndpoint) {
-        const index = this.endpoints.findIndex((e) => e._id === endpoint._id);
+        const index = this.endpoints.findIndex((e) => e.id === endpoint.id);
         if (index !== -1) {
             this.endpoints.splice(index, 1);
             this.applyClientSideFiltering();

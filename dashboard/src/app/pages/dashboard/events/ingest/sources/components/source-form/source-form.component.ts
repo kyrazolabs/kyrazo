@@ -305,7 +305,7 @@ export class SourceFormComponent implements OnInit, OnChanges {
             type: source.type,
             service: source.service,
             forwarding: source.forwarding,
-            endpoints: source.endpoints?.map((e) => e._id) || [],
+            endpoints: source.endpoints?.map((e) => e.id) || [],
             eventTypes: source.eventTypes || [],
         });
 

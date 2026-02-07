@@ -84,7 +84,7 @@ export class EndpointDetailPage implements OnInit {
     }
 
     openEditDialog() {
-        const id = this.endpoint()._id;
+        const id = this.endpoint().id;
         if (id) {
             this.dialogService.openEndpointDialog(id);
         }
@@ -176,7 +176,7 @@ export class EndpointDetailPage implements OnInit {
             return;
         }
 
-        const id = this.endpoint()._id;
+        const id = this.endpoint().id;
         if (!id) return;
 
         this.loadingSecret.set(true);

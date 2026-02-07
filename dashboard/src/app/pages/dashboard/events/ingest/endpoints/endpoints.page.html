@@ -81,7 +81,7 @@
                                 {{ endpoint.description }}
                             </span>
                             <span class="text-xs text-surface-500 dark:text-surface-500">
-                                ID: {{ endpoint._id }}
+                                ID: {{ endpoint.id }}
                             </span>
                         </div>
                     </td>
@@ -110,7 +110,7 @@
                     <td>
                         <div class="flex gap-2">
                             <p-button icon="pi pi-eye" [outlined]="true" size="small" severity="info"
-                                [routerLink]="['/events/ingest/endpoints', endpoint._id]" pTooltip="View Details"
+                                [routerLink]="['/events/ingest/endpoints', endpoint.id]" pTooltip="View Details"
                                 styleClass="rounded-xl!" tooltipStyleClass="text-xs! rounded-xl!" />
                             <p-button icon="pi pi-pencil" [outlined]="true" size="small" severity="secondary"
                                 (onClick)="openEditDialog(endpoint)" pTooltip="Edit Endpoint"
