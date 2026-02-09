@@ -1,4 +1,4 @@
-import { Endpoint, type IEndpoint, transformWithId } from '@kyrazo/shared';
+import { Endpoint, type IEndpoint, transformWithId, unprefixId } from '@kyrazo/shared';
 
 export class EndpointRepository {
     async create(endpointData: Partial<IEndpoint>): Promise<IEndpoint> {
@@ -13,9 +13,9 @@ export class EndpointRepository {
     }
     async findById(id: string, workspaceId: string, projectId: string): Promise<IEndpoint | null> {
         return await Endpoint.findOne({
-            _id: id,
-            workspaceId,
-            projectId,
+            _id: unprefixId(id),
+            workspaceId: unprefixId(workspaceId),
+            projectId: unprefixId(projectId),
         })
             .select('-secrets -userId -workspaceId -__v')
             .exec();
@@ -27,9 +27,9 @@ export class EndpointRepository {
         projectId: string
     ): Promise<IEndpoint | null> {
         return await Endpoint.findOne({
-            _id: id,
-            workspaceId,
-            projectId,
+            _id: unprefixId(id),
+            workspaceId: unprefixId(workspaceId),
+            projectId: unprefixId(projectId),
         })
             .select('+secrets -userId -workspaceId -__v')
             .exec();
@@ -42,6 +42,11 @@ export class EndpointRepository {
             page?: number;
         } = { query: {}, limit: 10, page: 1 }
     ): Promise<{ endpoints: IEndpoint[]; total: number }> {
+        if (options.query?.workspaceId)
+            options.query.workspaceId = unprefixId(options.query.workspaceId as string);
+        if (options.query?.projectId)
+            options.query.projectId = unprefixId(options.query.projectId as string);
+
         const skip = options.page ? (options.page - 1) * (options.limit || 10) : 0;
         const [endpoints, total] = await Promise.all([
             Endpoint.find(options.query || {})
@@ -68,7 +73,11 @@ export class EndpointRepository {
         const updateOp = Object.keys(data).some(k => k.startsWith('$')) ? data : { $set: data };
 
         const updated = await Endpoint.findOneAndUpdate(
-            { _id: id, workspaceId, projectId },
+            {
+                _id: unprefixId(id),
+                workspaceId: unprefixId(workspaceId),
+                projectId: unprefixId(projectId),
+            },
             updateOp,
             {
                 new: true,
@@ -82,9 +91,9 @@ export class EndpointRepository {
 
     async deleteById(id: string, workspaceId: string, projectId: string): Promise<boolean> {
         const deleted = await Endpoint.findOneAndDelete({
-            _id: id,
-            workspaceId,
-            projectId,
+            _id: unprefixId(id),
+            workspaceId: unprefixId(workspaceId),
+            projectId: unprefixId(projectId),
         })
             .select('-secrets -userId -workspaceId -__v')
             .exec();

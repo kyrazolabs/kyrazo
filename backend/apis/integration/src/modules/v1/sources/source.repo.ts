@@ -1,4 +1,4 @@
-import { Source, type ISource, transformWithId } from '@kyrazo/shared';
+import { Source, type ISource, transformWithId, unprefixId } from '@kyrazo/shared';
 
 export class SourceRepository {
     async create(sourceData: Partial<ISource>): Promise<ISource> {
@@ -13,9 +13,9 @@ export class SourceRepository {
 
     async findById(id: string, workspaceId: string, projectId: string): Promise<ISource | null> {
         const source = await Source.findOne({
-            _id: id,
-            workspaceId,
-            projectId,
+            _id: unprefixId(id),
+            workspaceId: unprefixId(workspaceId),
+            projectId: unprefixId(projectId),
         })
             .select('-userId -workspaceId -__v')
             .lean()
@@ -30,6 +30,11 @@ export class SourceRepository {
             page?: number;
         } = { query: {}, limit: 10, page: 1 }
     ): Promise<{ sources: ISource[]; total: number }> {
+        if (options.query?.workspaceId)
+            options.query.workspaceId = unprefixId(options.query.workspaceId as string);
+        if (options.query?.projectId)
+            options.query.projectId = unprefixId(options.query.projectId as string);
+
         const skip = options.page ? (options.page - 1) * (options.limit || 10) : 0;
         const [sources, total] = await Promise.all([
             Source.find(options.query || {})
@@ -56,7 +61,11 @@ export class SourceRepository {
         const updateOp = Object.keys(data).some(k => k.startsWith('$')) ? data : { $set: data };
 
         const updated = await Source.findOneAndUpdate(
-            { _id: id, workspaceId, projectId },
+            {
+                _id: unprefixId(id),
+                workspaceId: unprefixId(workspaceId),
+                projectId: unprefixId(projectId),
+            },
             updateOp,
             {
                 new: true,
@@ -70,9 +79,9 @@ export class SourceRepository {
 
     async deleteById(id: string, workspaceId: string, projectId: string): Promise<boolean> {
         const deleted = await Source.findOneAndDelete({
-            _id: id,
-            workspaceId,
-            projectId,
+            _id: unprefixId(id),
+            workspaceId: unprefixId(workspaceId),
+            projectId: unprefixId(projectId),
         }).exec();
         return deleted !== null;
     }
