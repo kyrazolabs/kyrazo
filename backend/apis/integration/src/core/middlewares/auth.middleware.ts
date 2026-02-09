@@ -121,6 +121,24 @@ export const authenticate = async (c: AppContext, next: Next) => {
             );
         }
 
+        if (!workspace.workspace) {
+            logger.warn(`Auth failed: Workspace object missing for kid: ${key.parts.kid}`, {
+                requestId: c.get('requestId'),
+                kid: key.parts.kid,
+            });
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'INVALID_API_KEY',
+                        message: 'Invalid API key or workspace inactive',
+                        requestId: c.get('requestId'),
+                    },
+                },
+                401
+            );
+        }
+
         const hashedKey = secretCrypto.hash(apiKey, workspace.workspace._id.toString());
 
         if (hashedKey !== workspace.key) {
@@ -128,7 +146,7 @@ export const authenticate = async (c: AppContext, next: Next) => {
                 requestId: c.get('requestId'),
                 kid: key.parts.kid,
                 providedApiKey: '***',
-                workspaceId: workspace.workspace._id.toString(),
+                workspaceId: workspace.workspace?._id?.toString() || 'MISSING_WORKSPACE',
                 generatedHash: hashedKey,
                 storedHash: workspace.key,
                 encryptionKeyPrefix: config.security.encryptions.key
