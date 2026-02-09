@@ -7,6 +7,7 @@ import {
     secretCrypto,
     generateIngressId,
     decryptSourceSecrets,
+    unprefixId,
 } from '@kyrazo/shared';
 import { config } from '@/configs';
 
@@ -75,7 +76,7 @@ export class SourceService {
         const data: Partial<ISource> = {
             ...valid,
             service: valid.service as any, // Cast service to any to bypass shared type restrictions if stripe is not yet in ISource
-            endpoints: valid.endpoints?.map((id: string) => new Types.ObjectId(id)),
+            endpoints: valid.endpoints?.map((id: string) => new Types.ObjectId(unprefixId(id)!)),
             userId: new Types.ObjectId(userId),
             workspaceId: new Types.ObjectId(workspaceId),
             projectId: new Types.ObjectId(projectId),
