@@ -1,7 +1,7 @@
 import { Context, type Next } from 'hono';
 
 import type { IErrorResponse, IProject } from '@kyrazo/shared';
-import { Key, logger, Project } from '@kyrazo/shared';
+import { Key, logger, Project, unprefixId } from '@kyrazo/shared';
 import { redisConfig } from '@/configs';
 import { keyCrypto, secretCrypto, config } from '@kyrazo/shared';
 import { Types } from 'mongoose';
@@ -86,13 +86,10 @@ export const authenticate = async (c: AppContext, next: Next) => {
         );
 
         if (!workspace) {
-            logger.warn(
-                `Auth failed: Key not found for kid: ${key.parts.kid}`,
-                {
-                    requestId: c.get('requestId'),
-                    kid: key.parts.kid,
-                }
-            );
+            logger.warn(`Auth failed: Key not found for kid: ${key.parts.kid}`, {
+                requestId: c.get('requestId'),
+                kid: key.parts.kid,
+            });
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -107,13 +104,10 @@ export const authenticate = async (c: AppContext, next: Next) => {
         }
 
         if (!workspace.isEnabled) {
-            logger.warn(
-                `Auth failed: Key is disabled for kid: ${key.parts.kid}`,
-                {
-                    requestId: c.get('requestId'),
-                    kid: key.parts.kid,
-                }
-            );
+            logger.warn(`Auth failed: Key is disabled for kid: ${key.parts.kid}`, {
+                requestId: c.get('requestId'),
+                kid: key.parts.kid,
+            });
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -127,26 +121,20 @@ export const authenticate = async (c: AppContext, next: Next) => {
             );
         }
 
-        const hashedKey = secretCrypto.hash(
-            apiKey,
-            workspace.workspace._id.toString()
-        );
+        const hashedKey = secretCrypto.hash(apiKey, workspace.workspace._id.toString());
 
         if (hashedKey !== workspace.key) {
-            logger.warn(
-                `Auth failed: Key hash mismatch for kid: ${key.parts.kid}`,
-                {
-                    requestId: c.get('requestId'),
-                    kid: key.parts.kid,
-                    providedApiKey: '***',
-                    workspaceId: workspace.workspace._id.toString(),
-                    generatedHash: hashedKey,
-                    storedHash: workspace.key,
-                    encryptionKeyPrefix: config.security.encryptions.key
-                        ? config.security.encryptions.key.substring(0, 4)
-                        : 'MISSING',
-                }
-            );
+            logger.warn(`Auth failed: Key hash mismatch for kid: ${key.parts.kid}`, {
+                requestId: c.get('requestId'),
+                kid: key.parts.kid,
+                providedApiKey: '***',
+                workspaceId: workspace.workspace._id.toString(),
+                generatedHash: hashedKey,
+                storedHash: workspace.key,
+                encryptionKeyPrefix: config.security.encryptions.key
+                    ? config.security.encryptions.key.substring(0, 4)
+                    : 'MISSING',
+            });
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -160,7 +148,7 @@ export const authenticate = async (c: AppContext, next: Next) => {
             );
         }
 
-        const project = await Project.findById(projectId);
+        const project = await Project.findById(unprefixId(projectId));
 
         if (!project) {
             return c.json<IErrorResponse>(
