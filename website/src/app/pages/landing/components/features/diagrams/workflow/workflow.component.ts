@@ -46,11 +46,13 @@ export class WorkflowDiagramComponent {
         { name: 'Slack', iconClass: 'icon-[logos--slack-icon]' },
     ];
 
-    // Manual SVG paths for curved pipes from center (400, 250) to right elements
+    // Manual SVG paths for curved pipes from center (350, 250) to right elements
+    // The endpoints are roughly coordinate-aligned with the action card positions
+    // Manual SVG paths for curved pipes from center (500, 250) to right elements
     // The endpoints are roughly coordinate-aligned with the action card positions
     actionPaths = [
-        { d: 'M400,250 C550,250 550,115 690,115' }, // Top Action (Resend)
-        { d: 'M400,250 C550,250 550,250 690,250' }, // Middle Action (Zapier)
-        { d: 'M400,250 C550,250 550,385 690,385' }, // Bottom Action (PayPal)
+        { d: 'M500,250 C700,250 800,120 1000,120' }, // Top Action
+        { d: 'M500,250 L1000,250' }, // Middle Action
+        { d: 'M500,250 C700,250 800,380 1000,380' }, // Bottom Action
     ];
 }

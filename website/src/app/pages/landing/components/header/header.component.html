@@ -6,28 +6,13 @@
                 'bg-surface-0/90 dark:bg-surface-950/75 backdrop-blur-xl border-surface-200 dark:border-surface-800 shadow-xs py-3': isScrolled
             }">
 
-            <div class="flex items-center justify-center gap-3 cursor-pointer transition-transform duration-300"  [class.scale-90]="isScrolled" routerLink="/" aria-label="Home">
-                <img [src]="isDarkMode() ? 'logo-dark.png' : 'logo-light.png'" alt="Kyrazo logo" width="40" height="40" class="h-10 p-1 rounded-xl bg-primary dark:bg-primary flex items-center justify-center transition-transform duration-300" >
-                <span class="text-3xl font-bold text-surface-950 dark:text-surface-0">Kyrazo</span>
+            <div class="flex items-center justify-center gap-2 sm:gap-3 cursor-pointer transition-transform duration-300"  [class.scale-90]="isScrolled" routerLink="/" aria-label="Home">
+                <img [src]="isDarkMode() ? 'logo-dark.png' : 'logo-light.png'" alt="Kyrazo logo" width="40" height="40" class="h-8 w-8 sm:h-10 sm:w-10 p-1 rounded-xl bg-primary dark:bg-primary flex items-center justify-center transition-transform duration-300" >
+                <span class="text-2xl sm:text-3xl font-bold text-surface-950 dark:text-surface-0">Kyrazo</span>
             </div>
 
-            <!-- Center Nav -->
-            <!-- <div class="hidden md:flex items-center gap-1 rounded-full p-1 transition-all duration-300 border absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-                [ngClass]="{
-                    'bg-surface-0/50 dark:bg-surface-950/50 border-surface-200 dark:border-surface-800 backdrop-blur-sm shadow-sm': !isScrolled,
-                    'bg-transparent border-transparent': isScrolled
-                }">
-                @for (item of items; track item.label) {
-                    <button
-                        (click)="item.command?.({originalEvent: $event})"
-                        class="bg-transparent border-none text-surface-600 dark:text-surface-300 hover:text-primary-500 hover:bg-surface-100 dark:hover:bg-surface-800 px-3 py-2 rounded-3xl font-medium transition-colors cursor-pointer text-sm">
-                        {{ item.label }}
-                    </button>
-                }
-            </div> -->
-
             <!-- Right Actions -->
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1 sm:gap-2">
                 <p-button
                     [outlined]="true"
                     [rounded]="true"
@@ -35,9 +20,9 @@
                     (click)="toggleDarkMode()"
                     [icon]="isDarkMode()? 'pi pi-moon' : 'pi pi-sun'"
                     ariaLabel="Toggle color theme"
-                    styleClass="w-9 h-9 rounded-xl!"
+                    styleClass="w-8 h-8 sm:w-9 sm:h-9 rounded-xl!"
                 />
-                <div class="relative">
+                <div class="relative hidden sm:block">
                     <p-button
                         #settingsButton
                         (click)="toggleConfig()"
@@ -51,10 +36,10 @@
                     }
                 </div>
 
-                <div class="h-5 w-px bg-surface-300 dark:bg-surface-700 mx-1"></div>
+                <div class="h-5 w-px bg-surface-300 dark:bg-surface-700 mx-1 hidden sm:block"></div>
 
-                <p-button label="Log In" (click)="trackLogin()" [text]="true" size="small" styleClass="text-sm! w-18! font-bold! rounded-xl!"></p-button>
-                <p-button label="Get Started" (click)="trackGetStarted()" severity="primary" size="small" styleClass="text-sm! w-26! font-bold! rounded-xl!"></p-button>
+                <p-button label="Log In" (click)="trackLogin()" [text]="true" size="small" styleClass="text-xs sm:text-sm! w-14 sm:w-18! font-bold! rounded-xl!"></p-button>
+                <p-button label="Get Started" (click)="trackGetStarted()" severity="primary" size="small" styleClass="text-xs sm:text-sm! w-22 sm:w-26! font-bold! rounded-xl!"></p-button>
             </div>
         </div>
     </div>

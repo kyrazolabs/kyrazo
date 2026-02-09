@@ -20,10 +20,13 @@ interface FaqItem {
     standalone: true,
     imports: [CommonModule],
     template: `
-        <section class="py-32 bg-transparent relative overflow-hidden" id="faq">
-            <div class="max-w-4xl mx-auto px-6 relative z-10">
+        <section
+            class="py-16 md:py-32 bg-transparent relative overflow-hidden"
+            id="faq"
+        >
+            <div class="max-w-4xl mx-auto px-4 md:px-6 relative z-10">
                 <div
-                    class="text-center mb-20 animate-in fade-in slide-in-from-bottom-4 duration-700"
+                    class="text-center mb-12 md:mb-20 animate-in fade-in slide-in-from-bottom-4 duration-700 px-4 md:px-0"
                 >
                     <div
                         class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/10 border border-primary-500/20 mb-6"
@@ -34,20 +37,20 @@ interface FaqItem {
                         >
                     </div>
                     <h2
-                        class="text-4xl md:text-6xl font-black text-surface-950 dark:text-white tracking-tighter mb-6 leading-tight"
+                        class="text-3xl md:text-6xl font-black text-surface-950 dark:text-white tracking-tighter mb-6 leading-tight"
                     >
                         Frequently Asked
                         <span class="text-primary-500">Questions.</span>
                     </h2>
                     <p
-                        class="text-surface-600 dark:text-surface-400 text-lg md:text-xl font-medium max-w-2xl mx-auto"
+                        class="text-base md:text-xl text-surface-600 dark:text-surface-400 font-medium max-w-2xl mx-auto px-2 md:px-0"
                     >
                         Everything you need to know about building resilient
                         event-driven systems with Kyrazo.
                     </p>
                 </div>
 
-                <div class="space-y-3">
+                <div class="space-y-3 px-2 md:px-0">
                     @for (item of faqs; track item.question) {
                         <div
                             class="group rounded-2xl border border-surface-200 dark:border-surface-800/60 bg-surface-0/40 dark:bg-surface-900/40 transition-all duration-300 overflow-hidden"
@@ -67,7 +70,7 @@ interface FaqItem {
                                 [attr.id]="'faq-button-' + $index"
                             >
                                 <span
-                                    class="text-lg md:text-xl font-bold tracking-tight text-surface-950 dark:text-white transition-colors duration-300"
+                                    class="text-base md:text-xl font-bold tracking-tight text-surface-950 dark:text-white transition-colors duration-300"
                                     [class.text-primary-500]="
                                         activeIndex === $index
                                     "
@@ -104,7 +107,7 @@ interface FaqItem {
                             >
                                 <div class="overflow-hidden">
                                     <div
-                                        class="px-6 pb-6 text-surface-600 dark:text-surface-400 leading-relaxed text-lg font-medium animate-in fade-in duration-500"
+                                        class="px-6 pb-6 text-surface-600 dark:text-surface-400 leading-relaxed text-sm md:text-lg font-medium animate-in fade-in duration-500"
                                     >
                                         {{ item.answer }}
                                     </div>
@@ -115,22 +118,22 @@ interface FaqItem {
                 </div>
 
                 <div
-                    class="mt-20 p-10 rounded-2xl bg-surface-50/30 dark:bg-surface-900/30 border border-surface-200 dark:border-surface-800/50 backdrop-blur-2xl text-center"
+                    class="mt-12 md:mt-20 p-6 md:p-10 rounded-2xl bg-surface-50/30 dark:bg-surface-900/30 border border-surface-200 dark:border-surface-800/50 backdrop-blur-2xl text-center mx-2 md:mx-0"
                 >
                     <h3
-                        class="text-2xl font-bold text-surface-950 dark:text-white mb-3 tracking-tight"
+                        class="text-xl md:text-2xl font-bold text-surface-950 dark:text-white mb-3 tracking-tight"
                     >
                         Still have questions?
                     </h3>
                     <p
-                        class="text-surface-600 dark:text-surface-400 mb-8 max-w-md mx-auto font-medium"
+                        class="text-sm md:text-base text-surface-600 dark:text-surface-400 mb-8 max-w-sm md:max-w-md mx-auto font-medium"
                     >
                         Can't find the answer you're looking for? Reach out to
                         our engineering team.
                     </p>
                     <a
                         href="mailto:support@kyrazo.com"
-                        class="inline-flex items-center px-8! py-3 p-button font-semibold! rounded-xl"
+                        class="inline-flex items-center px-6 md:px-8! py-2 md:py-3 p-button font-semibold! rounded-xl"
                     >
                         Contact Support
                     </a>
