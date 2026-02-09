@@ -14,7 +14,8 @@ import type {
 } from './event.schema';
 import { usageProducer } from '@/core/services/usage.producer';
 import { LimitChecker } from '@/core/services/limit.checker';
-import { targetRepository } from '@/repositories/target.repo';
+import { targetRepository } from '@/modules/v1/targets/target.repo';
+import { unprefixId } from '@kyrazo/shared';
 
 export class EventController {
     private static async checkTargetsExsisting(
@@ -35,8 +36,8 @@ export class EventController {
         // 2. Split: Found in cash / Lost
         const cachedMap = new Map(
             cachedTargets.map((t: any) => {
-                const id = t._id?.toString() || (t.id?.includes('_') ? t.id.split('_')[1] : t.id);
-                return [id, t];
+                const id = t.id || `trg_${t._id.toString()}`;
+                return [unprefixId(id), t];
             })
         );
         const missingFromCache = targets.filter(id => !cachedMap.has(id));
@@ -55,8 +56,8 @@ export class EventController {
         const allTargets = [
             ...cachedTargets,
             ...fetchedTargets.filter(t => {
-                const id = t._id?.toString() || (t.id?.includes('_') ? t.id.split('_')[1] : t.id);
-                return !cachedMap.has(id);
+                const id = t.id || `trg_${t._id.toString()}`;
+                return !cachedMap.has(unprefixId(id));
             }),
         ];
         if (fetchedTargets.length > 0) {
@@ -72,11 +73,7 @@ export class EventController {
             targetUrl: t.url,
         }));
 
-        const foundSet = new Set(
-            foundTargets.map(t =>
-                t.targetId.includes('_') ? t.targetId.split('_')[1] : t.targetId
-            )
-        );
+        const foundSet = new Set(foundTargets.map(t => unprefixId(t.targetId)));
         const unfoundTargets = targets.filter(id => !foundSet.has(id));
 
         return { foundTargets, unfoundTargets };
@@ -87,7 +84,8 @@ export class EventController {
         try {
             const key = c.idempotencyKey;
             const workspaceId = c.workspace?.workspaceId;
-            const { projectId }: GetProjectByIdInput = c.req.valid('param');
+            const param = c.req.valid('param');
+            const projectId = unprefixId(param.projectId)!;
             const valid: PublishedEventInput = c.req.valid('json');
 
             if (!workspaceId || !projectId) {
@@ -295,7 +293,8 @@ export class EventController {
         try {
             const key = c.idempotencyKey;
             const workspaceId = c.workspace?.workspaceId;
-            const { projectId }: GetProjectByIdInput = c.req.valid('param');
+            const param = c.req.valid('param');
+            const projectId = unprefixId(param.projectId)!;
             const valid: BatchPublishedEventInput = c.req.valid('json');
 
             if (!workspaceId || !projectId) {

@@ -94,6 +94,18 @@ export class TargetRepository {
             .exec();
         return deleted !== null;
     }
+
+    async getTargetsByWorkspaceIdAndProjectIdAndTargetIds(
+        workspaceId: string,
+        projectId: string,
+        targetIds: string[]
+    ): Promise<ITarget[]> {
+        return await Target.findActiveByWorkspaceAndProjectAndTargetIds(
+            workspaceId,
+            projectId,
+            targetIds
+        );
+    }
 }
 
 export const targetRepository = new TargetRepository();
