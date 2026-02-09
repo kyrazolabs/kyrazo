@@ -1,7 +1,7 @@
 <!-- Problem / Solution Header -->
 <section
   id="trust"
-  class="relative w-full overflow-hidden rounded-[3rem] border border-surface-800 bg-surface-950 py-28 shadow-lg"
+  class="relative w-full overflow-hidden rounded-2xl md:rounded-[3rem] border border-surface-800 bg-surface-950 py-16 md:py-28 shadow-lg"
 >
   <!-- Background Mesh -->
   <div
@@ -10,27 +10,17 @@
     style="background-image: radial-gradient(#3b82f6 2px, transparent 2px); background-size: 30px 30px;"
   ></div>
 
-  <div class="relative z-10 mx-auto max-w-7xl px-6">
+  <div class="relative z-10 mx-auto max-w-7xl px-4 md:px-6">
     <!-- Header -->
-    <div class="mb-20 flex justify-center">
+    <div class="mb-12 md:mb-20 flex justify-center px-4 md:px-0">
       <div class="max-w-4xl text-center" appScrollReveal>
-        <!-- <div
-          class="mb-6 inline-flex items-center gap-2 rounded-full border border-primary-500/20 bg-primary-500/10 px-3 py-1"
-        >
-          <span
-            class="text-[10px] font-black uppercase tracking-[0.3em] text-primary-400"
-          >
-            Enterprise Grade
-          </span>
-        </div> -->
-
-        <h2 class="mb-6 text-3xl font-bold text-surface-0 md:text-5xl">
+        <h2 class="mb-6 text-2xl font-bold text-surface-0 md:text-5xl">
           Stop Building
           <span class="text-primary-400">Webhook Infrastructure.</span>
         </h2>
 
         <p
-          class="mx-auto max-w-2xl text-lg leading-relaxed text-surface-500 dark:text-surface-300"
+          class="mx-auto max-w-2xl text-base md:text-lg leading-relaxed text-surface-500 dark:text-surface-300 px-2 md:px-0"
         >
           Manually handling retries, signatures, scaling, and failures at scale
           turns webhooks into a liability.
@@ -55,7 +45,7 @@
 
           <div class="relative z-10">
             <div class="mb-8 flex items-center gap-4">
-              <div class="flex h-10 w-10 items-center justify-center rounded-xl border border-surface-700 bg-surface-800 text-primary-500 transition-all duration-500 group-hover:border-primary-500/20 group-hover:bg-primary-500/10">
+              <div class="flex h-10 w-10 aspect-square items-center justify-center rounded-xl border border-surface-700 bg-surface-800 text-primary-500 transition-all duration-500 group-hover:border-primary-500/20 group-hover:bg-primary-500/10">
                 <span class="text-2xl" [class]="item.icon"></span>
               </div>
               <h3

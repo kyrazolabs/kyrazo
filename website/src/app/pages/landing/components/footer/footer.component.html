@@ -13,10 +13,10 @@
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-[minmax(180px,auto)] mb-20">
 
             <!-- Brand Highlight Card -->
-            <div class="md:col-span-6 md:row-span-2 p-10 flex flex-col justify-between relative overflow-hidden rounded-2xl border border-surface-100 bg-surface-50/30 backdrop-blur-3xl transition-all duration-300 dark:border-surface-800/50 dark:bg-surface-900/20 scale-[0.99] hover:scale-[1.00] hover:border-primary-500/50 hover:shadow-2xl hover:shadow-primary-500/10" appScrollReveal>
+            <div class="md:col-span-6 md:row-span-2 p-6 md:p-10 flex flex-col justify-between relative overflow-hidden rounded-2xl border border-surface-100 bg-surface-50/30 backdrop-blur-3xl transition-all duration-300 dark:border-surface-800/50 dark:bg-surface-900/20 scale-[0.99] hover:scale-[1.00] hover:border-primary-500/50 hover:shadow-2xl hover:shadow-primary-500/10" appScrollReveal>
 
                 <!-- Massive Background Watermark -->
-                <div class="absolute -bottom-5 -right-12 select-none pointer-events-none opacity-[0.03] dark:opacity-[0.05] translate-y-1/4" aria-hidden="true">
+                <div class="absolute -bottom-5 -right-12 select-none pointer-events-none opacity-[0.03] dark:opacity-[0.05] translate-y-1/4 hidden md:block" aria-hidden="true">
                     <h1 class="text-[20rem] font-black tracking-tighter leading-none font-sans">Kyrazo</h1>
                 </div>
 
@@ -24,11 +24,11 @@
                     <div class="flex items-center gap-4 mb-8">
                         <img [src]="isDarkMode() ? 'logo-dark.png' : 'logo-light.png'" alt="Kyrazo"
                              width="48" height="48"
-                             class="h-12 w-12 p-1 rounded-xl bg-primary shadow-2xl shadow-primary-500/30">
-                        <h2 class="text-4xl font-black bg-clip-text text-transparent bg-linear-to-r from-primary-500 to-primary-500 bg-size-[200%_auto] animate-gradient-shimmer tracking-tighter">Kyrazo</h2>
+                             class="h-10 w-10 md:h-12 md:w-12 p-1 rounded-xl bg-primary shadow-2xl shadow-primary-500/30">
+                        <h2 class="text-3xl md:text-4xl font-black bg-clip-text text-transparent bg-linear-to-r from-primary-500 to-primary-500 bg-size-[200%_auto] animate-gradient-shimmer tracking-tighter">Kyrazo</h2>
                     </div>
                     <div>
-                        <p class="text-xl font-bold text-surface-900 dark:text-surface-0 mb-6 leading-tight max-w-md">
+                        <p class="text-lg md:text-xl font-bold text-surface-900 dark:text-surface-0 mb-6 leading-tight max-w-md">
                             Developer-first infrastructure for the next generation of event-driven apps.
                         </p>
                         <nav class="flex gap-3" aria-label="Social links">
@@ -49,20 +49,20 @@
                             <div class="w-8 h-8 rounded-lg bg-surface-100 dark:bg-surface-800 flex items-center justify-center group-hover/contact:bg-primary-500/10 group-hover/contact:text-primary-500 transition-colors">
                                 <i class="icon-[hugeicons--mail-01] text-lg"></i>
                             </div>
-                            <span class="font-medium tracking-tight">support@kyrazo.com</span>
+                            <span class="font-medium tracking-tight text-sm md:text-base">support@kyrazo.com</span>
                         </a>
                         <a href="tel:+19176728572" class="group/contact flex items-center gap-3 text-surface-600 dark:text-surface-400 hover:text-primary-500 transition-all duration-200 w-fit">
                             <div class="w-8 h-8 rounded-lg bg-surface-100 dark:bg-surface-800 flex items-center justify-center group-hover/contact:bg-primary-500/10 group-hover/contact:text-primary-500 transition-colors">
                                 <i class="icon-[hugeicons--smart-phone-01] text-lg"></i>
                             </div>
-                            <span class="font-medium tracking-tight">+1 (917) 672-8572 </span>
+                            <span class="font-medium tracking-tight text-sm md:text-base">+1 (917) 672-8572 </span>
                         </a>
                     </div>
                 </div>
             </div>
 
             <!-- Product Bento -->
-            <div class="md:col-span-3 p-8 group/card relative overflow-hidden rounded-2xl border border-surface-100 bg-surface-50/30 backdrop-blur-3xl transition-all duration-300 dark:border-surface-800/50 dark:bg-surface-900/20 scale-[0.99] hover:scale-[1.00] hover:border-primary-500/50 hover:shadow-2xl hover:shadow-primary-500/10" appScrollReveal delay="delay-100">
+            <div class="md:col-span-3 p-6 md:p-8 group/card relative overflow-hidden rounded-2xl border border-surface-100 bg-surface-50/30 backdrop-blur-3xl transition-all duration-300 dark:border-surface-800/50 dark:bg-surface-900/20 scale-[0.99] hover:scale-[1.00] hover:border-primary-500/50 hover:shadow-2xl hover:shadow-primary-500/10" appScrollReveal delay="delay-100">
                 <div class="relative z-10 h-full flex flex-col">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary-500">
@@ -79,7 +79,7 @@
             </div>
 
             <!-- Ecosystem Bento -->
-            <div class="md:col-span-3 p-8 group/card relative overflow-hidden rounded-2xl border border-surface-100 bg-surface-50/30 backdrop-blur-3xl transition-all duration-300 dark:border-surface-800/50 dark:bg-surface-900/20 scale-[0.99] hover:scale-[1.00] hover:border-primary-500/50 hover:shadow-2xl hover:shadow-primary-500/10" appScrollReveal delay="delay-150">
+            <div class="md:col-span-3 p-6 md:p-8 group/card relative overflow-hidden rounded-2xl border border-surface-100 bg-surface-50/30 backdrop-blur-3xl transition-all duration-300 dark:border-surface-800/50 dark:bg-surface-900/20 scale-[0.99] hover:scale-[1.00] hover:border-primary-500/50 hover:shadow-2xl hover:shadow-primary-500/10" appScrollReveal delay="delay-150">
                 <div class="relative z-10 h-full flex flex-col">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-9 h-9 rounded-xl bg-primary-500/10 flex items-center justify-center text-primary-500 dark:text-primary-400">
@@ -96,7 +96,7 @@
             </div>
 
             <!-- Legal Bento -->
-            <div class="md:col-span-6 p-8 group/card relative overflow-hidden rounded-2xl border border-surface-100 bg-surface-50/30 backdrop-blur-3xl transition-all duration-300 dark:border-surface-800/50 dark:bg-surface-900/20 scale-[0.99] hover:scale-[1.00] hover:border-primary-500/50 hover:shadow-2xl hover:shadow-primary-500/10" appScrollReveal delay="delay-200">
+            <div class="md:col-span-6 p-6 md:p-8 group/card relative overflow-hidden rounded-2xl border border-surface-100 bg-surface-50/30 backdrop-blur-3xl transition-all duration-300 dark:border-surface-800/50 dark:bg-surface-900/20 scale-[0.99] hover:scale-[1.00] hover:border-primary-500/50 hover:shadow-2xl hover:shadow-primary-500/10" appScrollReveal delay="delay-200">
                 <div class="relative z-10 h-full flex flex-col">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-9 h-9 rounded-xl bg-primary-500/10 flex items-center justify-center text-primary-500 dark:text-primary-400">
