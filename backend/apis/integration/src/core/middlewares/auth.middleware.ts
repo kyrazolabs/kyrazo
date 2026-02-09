@@ -139,14 +139,14 @@ export const authenticate = async (c: AppContext, next: Next) => {
             );
         }
 
-        const hashedKey = secretCrypto.hash(apiKey, workspace.workspace._id.toString());
+        const hashedKey = secretCrypto.hash(apiKey, unprefixId((workspace.workspace as any).id)!);
 
         if (hashedKey !== workspace.key) {
             logger.warn(`Auth failed: Key hash mismatch for kid: ${key.parts.kid}`, {
                 requestId: c.get('requestId'),
                 kid: key.parts.kid,
                 providedApiKey: '***',
-                workspaceId: workspace.workspace?._id?.toString() || 'MISSING_WORKSPACE',
+                workspaceId: (workspace.workspace as any).id || 'MISSING_WORKSPACE',
                 generatedHash: hashedKey,
                 storedHash: workspace.key,
                 encryptionKeyPrefix: config.security.encryptions.key
@@ -184,7 +184,7 @@ export const authenticate = async (c: AppContext, next: Next) => {
 
         const owner = workspace.workspace;
         const workspacePayload: { workspaceId: Types.ObjectId } = {
-            workspaceId: owner._id,
+            workspaceId: new Types.ObjectId(unprefixId((workspace.workspace as any).id)!),
         };
 
         c.workspace = workspacePayload;
