@@ -7,6 +7,7 @@ export const environment = {
     auth: {
         login: `${baseUrl}/v1/auth/login`,
         googleLogin: `${baseUrl}/v1/auth/google`,
+        googleClientId: `186041397422-044ckdegk8f5n9paeedif68t1kgj435p.apps.googleusercontent.com`,
         register: `${baseUrl}/v1/auth/register`,
         forgetPassword: `${baseUrl}/v1/auth/forgot-password`,
         verifyEmail: `${baseUrl}/v1/auth/verify-email`,
