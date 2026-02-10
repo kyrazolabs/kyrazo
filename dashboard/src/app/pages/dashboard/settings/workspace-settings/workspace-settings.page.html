@@ -1,7 +1,7 @@
 <div class="space-y-2 mb-4">
 
     <!-- Header -->
-    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <!-- Left section -->
         <div>
             <h1 class="text-2xl font-bold">Workspace Settings</h1>
@@ -9,10 +9,10 @@
         </div>
 
         <!-- Right section -->
-        <div class="flex items-center gap-4">
-            <p-button label="Invite Member" icon="pi pi-user-plus" styleClass="rounded-xl!"
+        <div class="flex flex-row items-center gap-4">
+            <p-button label="Invite Member" icon="pi pi-user-plus" styleClass="w-full sm:w-auto rounded-xl!"
                 (onClick)="openInviteDialog()" [disabled]="!canInviteMembers()" />
-            <p-button label="Save Changes" icon="pi pi-save" styleClass="rounded-xl!" (onClick)="saveWorkspace()"
+            <p-button label="Save Changes" icon="pi pi-save" styleClass="w-full sm:w-auto rounded-xl!" (onClick)="saveWorkspace()"
                 [disabled]="workspaceForm.invalid || isSaving" [loading]="isSaving" />
         </div>
     </div>
@@ -137,10 +137,10 @@
 
                 <ng-template #header>
                     <tr>
-                        <th class="text-left rounded-xl! border-none!">Member</th>
-                        <th class="text-left rounded-xl! border-none!">Role</th>
-                        <th class="text-left rounded-xl! border-none!">Joined</th>
-                        <th class="text-left rounded-xl! border-none!" *ngIf="canEditWorkspace()">Actions</th>
+                        <th class="text-left rounded-xl! border-none!" style="min-width: 250px">Member</th>
+                        <th class="text-left rounded-xl! border-none!" style="min-width: 150px">Role</th>
+                        <th class="text-left rounded-xl! border-none!" style="min-width: 150px">Joined</th>
+                        <th class="text-left rounded-xl! border-none!" style="min-width: 120px" *ngIf="canEditWorkspace()">Actions</th>
                     </tr>
                 </ng-template>
 
@@ -235,7 +235,7 @@
                         Permanently delete this workspace and all its data. This action cannot be undone.
                     </p>
                 </div>
-                <p-button label="Delete Workspace" icon="pi pi-trash" severity="danger" styleClass="rounded-xl!"
+                <p-button label="Delete Workspace" icon="pi pi-trash" severity="danger" styleClass="w-full md:w-auto rounded-xl!"
                     (onClick)="deleteWorkspace()" />
             </div>
         </p-card>

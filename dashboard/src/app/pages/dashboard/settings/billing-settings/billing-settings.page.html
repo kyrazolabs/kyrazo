@@ -1,7 +1,7 @@
 <div class="space-y-6 mb-4">
     <!-- Header -->
     <div
-        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+        class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <!-- Left section -->
         <div>
             <h1 class="text-2xl font-bold">Billing & Subscription</h1>
@@ -9,10 +9,10 @@
         </div>
 
         <!-- Right section -->
-        <div class="flex items-center gap-4">
+        <div class="flex flex-row items-center gap-4">
             <p-button label="Download Invoice" icon="pi pi-download" [outlined]="true" severity="secondary"
-                styleClass="rounded-xl!" (onClick)="downloadInvoice()" />
-            <p-button label="Upgrade Plan" icon="pi pi-arrow-up" styleClass="rounded-xl!"
+                styleClass="w-full sm:w-auto rounded-xl!" (onClick)="downloadInvoice()" />
+            <p-button label="Upgrade Plan" icon="pi pi-arrow-up" styleClass="w-full sm:w-auto rounded-xl!"
                 (onClick)="showUpgradeDialog = true" />
         </div>
     </div>
@@ -68,7 +68,7 @@
         class="card-panel">
         <div
             class="bg-primary-50 dark:bg-primary-400/10 border border-primary-200 dark:border-primary-400/20 rounded-xl p-4">
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                 <div>
                     <div class="flex items-center gap-3 mb-2">
                         <h3 class="text-2xl font-bold text-primary-900 dark:text-primary-100">{{currentPlanName}}</h3>
@@ -85,7 +85,7 @@
                         <span><i class="pi pi-credit-card mr-1"></i>Auto-renewal {{isAutoRenewEnabled ? 'enabled' : 'disabled'}}</span>
                     </div>
                 </div>
-                <div class="text-right">
+                <div class="text-left sm:text-right">
                     <div class="text-3xl font-bold text-primary-900 dark:text-primary-100">
                         {{getUsagePercentage()}}%
                     </div>
@@ -195,7 +195,7 @@
     <p-card header="Payment Method"
         class="card-panel">
         <div
-            class="flex items-center justify-between p-4 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-800">
+            class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-800 gap-4">
             <div class="flex items-center gap-4">
                 <!-- Card Icon -->
                 <div
@@ -211,9 +211,9 @@
                     </div>
                 </div>
             </div>
-            <div class="flex items-center gap-2">
-                <p-tag value="Primary" severity="success" [rounded]="true" class="text-xs" />
-                <p-button label="Update" icon="icon-[hugeicons--edit-03] size-5" [outlined]="true" size="small" styleClass="rounded-xl!"
+            <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                <p-tag value="Primary" severity="success" [rounded]="true" class="text-xs w-fit" />
+                <p-button label="Update" icon="icon-[hugeicons--edit-03] size-5" [outlined]="true" size="small" styleClass="w-full sm:w-auto rounded-xl!"
                     (onClick)="updatePaymentMethod()" />
             </div>
         </div>
@@ -222,14 +222,14 @@
     <!-- Billing History -->
     <p-card header="Billing History"
         class="card-panel">
-        <p-table [value]="billingHistory" styleClass="p-datatable-sm">
+        <p-table [value]="billingHistory" styleClass="p-datatable-sm" responsiveLayout="scroll">
             <ng-template pTemplate="header">
                 <tr>
-                    <th>Date</th>
-                    <th>Description</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th style="min-width: 120px">Date</th>
+                    <th style="min-width: 200px">Description</th>
+                    <th style="min-width: 100px">Amount</th>
+                    <th style="min-width: 100px">Status</th>
+                    <th style="min-width: 100px" class="text-right!">Actions</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-invoice>
@@ -241,7 +241,7 @@
                         <p-tag [value]="invoice.status" [severity]="getInvoiceStatusSeverity(invoice.status)"
                             [rounded]="true" class="text-xs" />
                     </td>
-                    <td>
+                    <td class="text-right!">
                         <p-button icon="pi pi-download" [outlined]="true" size="small" styleClass="rounded-xl!"
                             pTooltip="Download Invoice" (onClick)="downloadSpecificInvoice(invoice.id)" />
                     </td>

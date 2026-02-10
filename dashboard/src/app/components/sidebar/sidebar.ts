@@ -32,6 +32,7 @@ import { IWorkspace, IWorkspaceMembership } from '@models/workspaces.types';
 import { TooltipModule } from 'primeng/tooltip';
 import { SupportDialogComponent } from '@shared/components/support-dialog/support-dialog.component';
 import { ToastModule } from 'primeng/toast';
+import { LayoutService } from '../service/layout.service';
 
 @Component({
     selector: 'app-sidebar',
@@ -65,6 +66,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     private ws = inject(WorkspaceService);
     private router = inject(Router);
     private messageService = inject(MessageService);
+    public layoutService = inject(LayoutService);
 
     currentRoute = '';
     dispatchDropdownOpen = false;

@@ -44,28 +44,31 @@
 
     <!-- Table -->
     <p-card class="card-panel">
-        <p-table [value]="projects" [loading]="loading" [rowHover]="true" [paginator]="true" [rows]="10" dataKey="_id">
+        <p-table [value]="projects" [loading]="loading" [rowHover]="true" [paginator]="true" [rows]="10" dataKey="_id"
+                 responsiveLayout="scroll" [showGridlines]="false" styleClass="p-datatable-sm lg:p-datatable-md">
             <ng-template pTemplate="header">
                 <tr>
-                    <th pSortableColumn="name" class="rounded-xl! border-none!">
+                    <th pSortableColumn="name" class="rounded-xl! border-none!" style="min-width: 150px">
                         <div class="flex items-center gap-2">Name <p-sortIcon field="name" /></div>
                     </th>
-                     <th class="rounded-xl! border-none!">Description</th>
-                    <th pSortableColumn="createdAt" class="rounded-xl! border-none!">
+                    <th class="rounded-xl! border-none!" style="min-width: 250px">Description</th>
+                    <th pSortableColumn="createdAt" class="rounded-xl! border-none!" style="min-width: 120px">
                         <div class="flex items-center gap-2">Created <p-sortIcon field="createdAt" /></div>
                     </th>
-                    <th class="rounded-xl! border-none! text-center" style="width: 150px">Actions</th>
+                    <th class="rounded-xl! border-none! text-center" style="min-width: 120px">Actions</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-project>
                 <tr>
-                    <td>
-                        <span class="font-bold text-surface-900 dark:text-surface-0">{{ project.name }}</span>
+                    <td class="font-bold text-surface-900 dark:text-surface-0 truncate max-w-[200px]" [pTooltip]="project.name" tooltipPosition="top">
+                        {{ project.name }}
+                    </td>
+                    <td class="text-surface-600 dark:text-surface-400">
+                        <div class="truncate max-w-[300px]" [pTooltip]="project.description" tooltipPosition="top">
+                            {{ project.description || '-' }}
+                        </div>
                     </td>
                     <td>
-                        <span class="text-surface-600 dark:text-surface-400">{{ project.description || '-' }}</span>
-                    </td>
-                     <td>
                         <span class="text-sm text-surface-500">{{ project.createdAt | date:'mediumDate' }}</span>
                     </td>
                     <td>

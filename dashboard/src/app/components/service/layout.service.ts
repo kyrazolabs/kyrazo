@@ -31,6 +31,8 @@ export class LayoutService {
 
     appState = signal<AppState>(this._appState);
 
+    isMobile = signal<boolean>(false);
+
     transitionComplete: WritableSignal<boolean> = signal<boolean>(false);
 
     private initialized = false;
@@ -40,6 +42,10 @@ export class LayoutService {
     appStateUpdate$ = this.appStateUpdate.asObservable();
 
     constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+        if (isPlatformBrowser(this.platformId)) {
+            this.checkMobile();
+            window.addEventListener('resize', () => this.checkMobile());
+        }
         effect(() => {
             const appState = this.appState();
             if (appState) {
@@ -65,6 +71,19 @@ export class LayoutService {
                 this.handleSidebarStateChange(state.openSidebar);
             }
         });
+    }
+
+    private checkMobile(): void {
+        const mobile = window.matchMedia('(max-width: 1024px)').matches;
+        if (mobile !== this.isMobile()) {
+            this.isMobile.set(mobile);
+            if (mobile && this.appState().openSidebar) {
+                this.appState.update((state) => ({
+                    ...state,
+                    openSidebar: false,
+                }));
+            }
+        }
     }
 
     private handleDarkModeTransition(config: AppState): void {
@@ -161,5 +180,9 @@ export class LayoutService {
         console.log(
             `Updating layout for sidebar ${isOpen ? 'open' : 'closed'}`,
         );
+    }
+
+    closeSidebar(): void {
+        this.appState.update((state) => ({ ...state, openSidebar: false }));
     }
 }

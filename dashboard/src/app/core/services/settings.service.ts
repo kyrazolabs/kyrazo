@@ -58,7 +58,7 @@ export class SettingService {
         preferencesData: Partial<IUserPreference>,
     ): Observable<ApiResponse<IUserPreference>> {
         return this.http
-            .put<
+            .patch<
                 ApiResponse<IUserPreference>
             >(environment.profile.preference.update, preferencesData)
             .pipe(catchError(this.handleError));

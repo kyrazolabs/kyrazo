@@ -1,7 +1,6 @@
 <div class="space-y-6 mb-4">
     <!-- Header -->
-    <div
-        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <!-- Left section -->
         <div>
             <h1 class="text-2xl font-bold">Endpoints</h1>
@@ -11,9 +10,9 @@
         <!-- Right section -->
         <div class="flex items-center gap-4">
             <p-button label="Refresh" icon="pi pi-refresh" size="small" severity="secondary" [outlined]="true"
-                (onClick)="refreshEndpoints()" [loading]="loader.loading$ | async" styleClass="rounded-xl!" />
+                (onClick)="refreshEndpoints()" [loading]="loader.loading$ | async" styleClass="w-full sm:w-auto rounded-xl!" />
             <p-button label="Add Endpoint" icon="pi pi-plus" size="small" (onClick)="openCreateDialog()"
-                styleClass="rounded-xl!" />
+                styleClass="w-full sm:w-auto rounded-xl!" />
         </div>
     </div>
 
@@ -28,13 +27,13 @@
                     placeholder="Search endpoints..." class="w-full md:w-80 rounded-xl!" />
             </p-iconfield>
 
-            <div class="flex gap-2">
+            <div class="flex flex-wrap gap-2">
                 <p-button label="Active" [outlined]="activeFilter !== 'active'" severity="success" size="small"
-                    styleClass="rounded-xl!" (onClick)="filterByStatus('active')" />
+                    styleClass="flex-1 sm:flex-none rounded-xl!" (onClick)="filterByStatus('active')" />
                 <p-button label="Inactive" [outlined]="activeFilter !== 'inactive'" severity="danger" size="small"
-                    styleClass="rounded-xl!" (onClick)="filterByStatus('inactive')" />
+                    styleClass="flex-1 sm:flex-none rounded-xl!" (onClick)="filterByStatus('inactive')" />
                 <p-button label="All" [outlined]="activeFilter !== 'all'" severity="secondary" size="small"
-                    styleClass="rounded-xl!" (onClick)="filterByStatus('all')" />
+                    styleClass="flex-1 sm:flex-none rounded-xl!" (onClick)="filterByStatus('all')" />
             </div>
         </div>
     </p-card>
@@ -49,35 +48,36 @@
                 [rowsPerPageOptions]="[10,20,50,100]"
                 [totalRecords]="totalRecords"
                 (onLazyLoad)="loadEndpointsLazy($event)"
-                dataKey="_id">
+                dataKey="_id"
+                responsiveLayout="scroll">
             <ng-template #header>
                 <tr>
-                    <th class="rounded-xl! border-none!">
+                    <th class="rounded-xl! border-none!" style="min-width: 200px">
                         Name
                     </th>
-                    <th class="rounded-xl! border-none!">
+                    <th class="rounded-xl! border-none!" style="min-width: 200px">
                         URL
                     </th>
-                    <th class="rounded-xl! border-none!">Method</th>
-                    <th class="rounded-xl! border-none!">
+                    <th class="rounded-xl! border-none!" style="min-width: 100px">Method</th>
+                    <th class="rounded-xl! border-none!" style="min-width: 100px">
                         Status
                     </th>
-                    <th class="rounded-xl! border-none!">Enabled</th>
-                    <th class="rounded-xl! border-none!">
+                    <th class="rounded-xl! border-none!" style="min-width: 100px">Enabled</th>
+                    <th class="rounded-xl! border-none!" style="min-width: 150px">
                         Created
                     </th>
-                    <th class="rounded-xl! border-none!">Actions</th>
+                    <th class="rounded-xl! border-none!" style="min-width: 180px">Actions</th>
                 </tr>
             </ng-template>
 
             <ng-template #body let-endpoint>
                 <tr>
                     <td>
-                        <div class="flex flex-col">
+                        <div class="flex flex-col max-w-56">
                             <span class="font-semibold text-surface-900 dark:text-surface-0">
                                 {{ endpoint.name }}
                             </span>
-                            <span class="text-sm text-surface-600 dark:text-surface-400" *ngIf="endpoint.description">
+                            <span class="text-sm truncate text-surface-600 dark:text-surface-400" *ngIf="endpoint.description">
                                 {{ endpoint.description }}
                             </span>
                             <span class="text-xs text-surface-500 dark:text-surface-500">
@@ -86,10 +86,10 @@
                         </div>
                     </td>
                     <td>
-                        <code
-                            class="text-sm bg-surface-100 dark:bg-surface-800 px-2 py-1 rounded text-surface-900 dark:text-surface-0 break-all">
+                        <div
+                            class="font-mono text-sm text-surface-700 dark:text-surface-300 truncate max-w-56!">
                             {{ endpoint.url }}
-                        </code>
+                        </div>
                     </td>
                     <td>
                         <p-tag [rounded]="true" [value]="endpoint.method" severity="info" class="text-xs!" />

@@ -1,7 +1,6 @@
 <div class="space-y-6 mb-4">
     <!-- Header -->
-    <div
-        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <!-- Right section -->
         <div>
             <h1 class="text-2xl font-bold">{{ isEdit ? 'Edit' : 'Create' }} Endpoint</h1>
@@ -10,7 +9,7 @@
 
         <!-- Left section -->
         <div class="flex items-center gap-4">
-            <p-button label="Cancel" icon="pi pi-times" [outlined]="true" severity="secondary" styleClass="rounded-xl!"  routerLink="/events/ingest/endpoints" class="rounded-xl!" />
+            <p-button label="Cancel" icon="pi pi-times" [outlined]="true" severity="secondary" styleClass="w-full sm:w-auto rounded-xl!"  routerLink="/events/ingest/endpoints" />
         </div>
     </div>
 
@@ -169,11 +168,11 @@
         </p-card>
 
         <!-- Form Actions -->
-        <div class="flex items-center justify-end gap-3">
-            <p-button label="Cancel" icon="pi pi-times" [outlined]="true" severity="secondary" styleClass="rounded-xl!"
+        <div class="flex flex-col sm:flex-row items-center justify-end gap-3">
+            <p-button label="Cancel" icon="pi pi-times" [outlined]="true" severity="secondary" styleClass="w-full sm:w-auto rounded-xl!"
                 routerLink="/events/ingest/endpoints" />
             <p-button type="submit" [label]="(isEdit ? 'Update' : 'Create') + ' Endpoint'"
-                [icon]="loading ? 'pi pi-spin pi-spinner' : (isEdit ? 'pi pi-check' : 'pi pi-plus')" styleClass="rounded-xl!"
+                [icon]="loading ? 'pi pi-spin pi-spinner' : (isEdit ? 'pi pi-check' : 'pi pi-plus')" styleClass="w-full sm:w-auto rounded-xl!"
                 [disabled]="endpointForm.invalid || loading" [loading]="loading" />
         </div>
     </form>

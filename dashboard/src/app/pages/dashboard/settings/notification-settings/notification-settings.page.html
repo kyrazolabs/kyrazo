@@ -1,7 +1,7 @@
 <div class="space-y-2 mb-4">
     <!-- Header -->
     <div
-        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <!-- Left section -->
         <div>
             <h1 class="text-2xl font-bold">Notification Settings</h1>
@@ -9,10 +9,10 @@
         </div>
 
         <!-- Right section -->
-        <div class="flex items-center gap-4">
+        <div class="flex flex-row items-center gap-4">
             <p-button label="Reset to Default" icon="pi pi-refresh" [outlined]="true" severity="secondary"
-                styleClass="rounded-xl!" (onClick)="resetToDefaults()" [disabled]="isLoading" />
-            <p-button label="Save Settings" icon="pi pi-save" styleClass="rounded-xl!"
+                styleClass="w-full sm:w-auto rounded-xl!" (onClick)="resetToDefaults()" [disabled]="isLoading" />
+            <p-button label="Save Settings" icon="pi pi-save" styleClass="w-full sm:w-auto rounded-xl!"
                 (onClick)="saveNotifications()" [loading]="isLoading" />
         </div>
     </div>
