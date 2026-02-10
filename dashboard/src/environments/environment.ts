@@ -6,6 +6,7 @@ export const environment = {
     auth: {
         login: `https://api.kyrazo.com/dashboard/v1/auth/login`,
         googleLogin: `https://api.kyrazo.com/dashboard/v1/auth/google`,
+        googleClientId: `728508001048-ebmd262a7drc0k1o5t8q95o3hcrondh7.apps.googleusercontent.com`,
         register: `https://api.kyrazo.com/dashboard/v1/auth/register`,
         forgetPassword: `https://api.kyrazo.com/dashboard/v1/auth/forgot-password`,
         verifyEmail: `https://api.kyrazo.com/dashboard/v1/auth/verify-email`,

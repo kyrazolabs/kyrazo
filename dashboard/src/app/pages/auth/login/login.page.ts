@@ -25,6 +25,7 @@ import { AuthService } from '@core/auth/auth.service';
 import { LayoutService } from '@components/service/layout.service';
 import { DividerModule } from 'primeng/divider';
 import { AppConfig } from '@components/app.config';
+import { environment } from 'environments/environment';
 
 declare const google: any;
 
@@ -191,16 +192,14 @@ export class LoginPage implements OnInit {
 
     ngOnInit() {
         this.codeClient = google.accounts.oauth2.initCodeClient({
-            client_id:
-                '186041397422-044ckdegk8f5n9paeedif68t1kgj435p.apps.googleusercontent.com',
+            client_id: environment.auth.googleClientId,
             scope: 'openid email profile',
             ux_mode: 'popup',
             callback: (response: any) => this.onGoogleCode(response),
         });
 
         google.accounts.id.initialize({
-            client_id:
-                '186041397422-044ckdegk8f5n9paeedif68t1kgj435p.apps.googleusercontent.com',
+            client_id: environment.auth.googleClientId,
             callback: (res: any) => this.onGoogleResponse(res),
             ux_mode: 'popup',
         });
