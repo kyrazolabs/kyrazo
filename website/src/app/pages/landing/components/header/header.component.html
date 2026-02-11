@@ -60,29 +60,19 @@
                         (click)="toggleMobileMenu()"
                         [text]="true"
                         [rounded]="true"
-                        styleClass="w-9 h-9! rounded-xl!"
+                        styleClass="w-9! h-9! rounded-xl!"
                     />
                 </div>
 
-                <p-button
-                    [outlined]="true"
-                    [rounded]="true"
-                    [text]="true"
-                    (click)="toggleDarkMode()"
-                    [icon]="isDarkMode()? 'pi pi-moon' : 'pi pi-sun'"
-                    ariaLabel="Toggle color theme"
-                    styleClass="w-8 h-8 sm:w-9 sm:h-9 rounded-xl! hidden!"
-                />
-
-                <p-button label="Log In" (click)="trackLogin()" [text]="true" size="small" styleClass="text-xs sm:text-sm! w-14 sm:w-18! font-bold! rounded-xl!"></p-button>
-                <p-button label="Get Started" (click)="trackGetStarted()" severity="primary" size="small" styleClass="text-xs sm:text-sm! w-22 sm:w-26! font-bold! rounded-xl!"></p-button>
+                <p-button label="Log In" (click)="trackLogin()" [text]="true" size="small" styleClass="text-xs hidden! sm:block! sm:text-sm! w-14 sm:w-18! font-bold! rounded-xl!"></p-button>
+                <p-button label="Get Started" (click)="trackGetStarted()" severity="primary" size="small" styleClass="text-xs hidden! sm:block! sm:text-sm! w-22 sm:w-26! font-bold! rounded-xl!"></p-button>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Mobile Menu Drawer -->
-<p-drawer [visible]="isMobileMenuVisible()" (visibleChange)="isMobileMenuVisible.set($event)" position="right" [fullScreen]="true" [modal]="true">
+<p-drawer [visible]="isMobileMenuVisible()" (visibleChange)="isMobileMenuVisible.set($event)" position="right" [modal]="true" blockScroll>
     <ng-template pTemplate="header">
         <div class="flex items-center gap-2">
             <img [src]="isDarkMode() ? 'logo-dark.png' : 'logo-light.png'" alt="Kyrazo logo" width="32" height="32" class="h-8 w-8 p-1 rounded-lg bg-primary">
@@ -91,7 +81,7 @@
     </ng-template>
     <div class="flex flex-col gap-2 pt-4">
         @for (item of items; track $index) {
-            <div class="flex flex-col">
+            <div class="flex flex-col gap-1">
                 @if (item.items) {
                     <div class="px-3 py-2 text-xs font-bold text-surface-400 dark:text-surface-500 uppercase tracking-wider">
                         {{ item.label }}
@@ -100,33 +90,38 @@
                         <a
                             [routerLink]="subItem.routerLink"
                             (click)="subItem.command?.({originalEvent: $event}); isMobileMenuVisible.set(false)"
-                            class="flex items-center gap-3 px-4 py-3 rounded-xl text-surface-600 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors no-underline">
+                            class="flex items-center gap-3 px-4 py-2 rounded-xl text-surface-600 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors no-underline">
                             @if (subItem.icon) {
                                 <i [class]="subItem.icon + ' text-xl'"></i>
                             }
                             <span class="font-medium text-base">{{ subItem.label }}</span>
                         </a>
                     }
+                    <div class="h-px bg-surface-100 dark:bg-surface-800 my-1 mx-3"></div>
+
                 } @else {
                     <a
                         [routerLink]="item.routerLink"
                         (click)="item.command?.({originalEvent: $event}); isMobileMenuVisible.set(false)"
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl text-surface-600 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors no-underline">
+                        class="flex items-center gap-3 px-4 py-2 rounded-xl text-surface-600 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors no-underline">
                         @if (item.icon) {
-                            <i [class]="item.icon + ' text-xl'"></i>
+                            <!-- <i [class]="item.icon + ' text-xl'"></i> -->
                         }
-                        <span class="font-medium text-lg">{{ item.label }}</span>
+                        <span class="font-medium text-md">{{ item.label }}</span>
                     </a>
                 }
             </div>
-            @if (!$last) {
-                <div class="h-px bg-surface-100 dark:bg-surface-800 my-1 mx-3"></div>
-            }
+            <!-- @if (!$last) {
+            } -->
         }
 
-        <div class="mt-8 flex flex-col gap-3 px-2 md:hidden">
-            <p-button label="Log In" (click)="trackLogin(); isMobileMenuVisible.set(false)" [text]="true" styleClass="w-full font-bold! rounded-xl! py-3!"></p-button>
-            <p-button label="Get Started" (click)="trackGetStarted(); isMobileMenuVisible.set(false)" severity="primary" styleClass="w-full font-bold! rounded-xl! py-3!"></p-button>
-        </div>
+
     </div>
+    <ng-template #footer>
+        <div class="mt-8 flex flex-row justify-between gap-3 px-2 md:hidden">
+            <p-button label="Log In" (click)="trackLogin(); isMobileMenuVisible.set(false)" [text]="true" [size]="'small'" styleClass="w-full font-bold! rounded-xl! px-6!"></p-button>
+            <p-button label="Get Started" (click)="trackGetStarted(); isMobileMenuVisible.set(false)" severity="primary" [size]="'small'" styleClass="w-full font-bold! rounded-xl! px-6!"></p-button>
+        </div>
+    </ng-template>
 </p-drawer>
+

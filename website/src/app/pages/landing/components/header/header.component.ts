@@ -3,41 +3,31 @@ import {
     computed,
     inject,
     HostListener,
-    ElementRef,
-    ViewChild,
     signal,
 } from '@angular/core';
 import { dropdownAnimation } from '@shared/animations/dropdown.animation';
 import { FormsModule } from '@angular/forms';
 
 import { MenuItem } from 'primeng/api';
-import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { StyleClassModule } from 'primeng/styleclass';
 import { LayoutService } from '@components/service/layout.service';
-import { CommonModule } from '@angular/common';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
+import { CommonModule as NgCommonModule } from '@angular/common';
 import { AvatarModule } from 'primeng/avatar';
 import { BadgeModule } from 'primeng/badge';
 import { RouterLink } from '@angular/router';
 import { DrawerModule } from 'primeng/drawer';
 
-import { AppConfig } from '@components/app.config';
 import { PostHogService } from '@core/3rd-party/posthog';
 
 @Component({
     selector: 'app-landing-header',
     imports: [
-        CommonModule,
+        NgCommonModule,
         FormsModule,
         ButtonModule,
         BadgeModule,
         StyleClassModule,
-        AppConfig,
-        InputTextModule,
-        IconFieldModule,
-        InputIconModule,
         AvatarModule,
         RouterLink,
         DrawerModule,
@@ -49,34 +39,23 @@ import { PostHogService } from '@core/3rd-party/posthog';
 export class HeaderComponent {
     private posthog = inject(PostHogService);
     layoutService: LayoutService = inject(LayoutService);
-    value1: string = '';
 
     items: MenuItem[] | undefined;
     activeDropdown = signal<string | null>(null);
     isMobileMenuVisible = signal<boolean>(false);
     private dropdownTimeout: any;
 
+    isScrolled = false;
+
     isDarkMode = computed(() => this.layoutService.appState().darkMode);
 
-    isScrolled = false;
-    showConfig = false;
-
-    @ViewChild(AppConfig, { read: ElementRef }) configPanel!: ElementRef;
-    @ViewChild('settingsButton', { read: ElementRef })
-    settingsButton!: ElementRef;
+    @HostListener('window:scroll', [])
+    onWindowScroll() {
+        this.isScrolled = window.scrollY > 20;
+    }
 
     @HostListener('document:click', ['$event'])
     handleClickOutside(event: Event) {
-        if (
-            this.showConfig &&
-            this.configPanel &&
-            this.settingsButton &&
-            !this.configPanel.nativeElement.contains(event.target) &&
-            !this.settingsButton.nativeElement.contains(event.target)
-        ) {
-            this.showConfig = false;
-        }
-
         const target = event.target as HTMLElement;
         if (
             !target.closest('.dropdown-trigger') &&
@@ -84,11 +63,6 @@ export class HeaderComponent {
         ) {
             this.activeDropdown.set(null);
         }
-    }
-
-    @HostListener('window:scroll', [])
-    onWindowScroll() {
-        this.isScrolled = window.scrollY > 20;
     }
 
     ngOnInit() {
@@ -123,21 +97,21 @@ export class HeaderComponent {
                 routerLink: '/pricing',
             },
             {
+                label: 'Documentation',
+                icon: 'pi pi-code',
+                command: () => {
+                    window.open('https://docs.kyrazo.com', '_blank');
+                },
+            },
+            {
                 label: 'Blog',
-                icon: 'pi pi-calendar',
+                icon: 'icon-[hugeicons--blogger-03]',
                 routerLink: '/blog',
             },
             {
                 label: 'Changelog',
                 icon: 'pi pi-history',
                 routerLink: '/changelogs',
-            },
-            {
-                label: 'Documentation',
-                icon: 'pi pi-code',
-                command: () => {
-                    window.open('https://docs.kyrazo.com', '_blank');
-                },
             },
             {
                 label: 'Legals',
@@ -193,10 +167,6 @@ export class HeaderComponent {
             ...state,
             darkMode: !state.darkMode,
         }));
-    }
-
-    toggleConfig() {
-        this.showConfig = !this.showConfig;
     }
 
     toggleMobileMenu() {
