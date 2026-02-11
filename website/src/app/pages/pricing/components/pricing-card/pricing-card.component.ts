@@ -19,7 +19,7 @@ export class PricingCardComponent {
 
     get currentPrice(): number {
         return this.isYearly
-            ? this.plan.priceCentsYearly
+            ? this.plan.priceCentsYearly / 10
             : this.plan.priceCentsMonthly;
     }
 
