@@ -5,6 +5,9 @@ import { PricingComparisonComponent } from './comparison/pricing-comparison.comp
 import { CtaComponent } from '@pages/landing/components/cta/cta.component';
 import { FaqComponent } from '@pages/landing/components/faq/faq.component';
 import { Motivation } from '@pages/landing/components/motivation/motivation';
+import { PricingCardComponent } from './components/pricing-card/pricing-card.component';
+import { PRICING_PLANS } from './pricing.model';
+import { signal } from '@angular/core';
 
 import { PostHogService } from '@core/3rd-party/posthog';
 import { SeoService } from '@core/services/seo.service';
@@ -19,6 +22,7 @@ import { SeoService } from '@core/services/seo.service';
         CtaComponent,
         FaqComponent,
         Motivation,
+        PricingCardComponent,
     ],
     templateUrl: './pricing.page.html',
     styleUrl: './pricing.page.scss',
@@ -26,6 +30,9 @@ import { SeoService } from '@core/services/seo.service';
 export class PricingPage implements OnInit {
     private posthog = inject(PostHogService);
     private seoService = inject(SeoService);
+
+    billingCycle = signal<'monthly' | 'yearly'>('monthly');
+    plans = PRICING_PLANS;
 
     ngOnInit() {
         this.posthog.trackPageView();

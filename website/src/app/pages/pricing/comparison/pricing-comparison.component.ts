@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PRICING_PLANS, PricingPlan } from '../pricing.model';
 import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directive';
@@ -11,6 +11,7 @@ import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directiv
     styleUrl: './pricing-comparison.component.scss',
 })
 export class PricingComparisonComponent {
+    @Input() isYearly = false;
     plans: PricingPlan[] = PRICING_PLANS;
 
     featureGroups = [

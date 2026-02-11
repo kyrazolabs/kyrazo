@@ -11,16 +11,84 @@
                 Transparent Pricing, <br/>
                 <span class="text-primary-500">Unmatched Reliability.</span>
             </h1>
-            <p class="text-lg md:text-xl text-surface-600 dark:text-surface-400">
+            <p class="text-lg md:text-xl text-surface-600 dark:text-surface-400 mb-10">
                 Choose the plan that fits your scale. Start for free and upgrade as you grow. No hidden fees, just pure performance.
             </p>
+
+            <!-- Billing Toggle -->
+            <div class="flex items-center justify-center gap-4 mb-16">
+                <span class="text-sm font-medium" [class.opacity-50]="billingCycle() === 'yearly'">Monthly</span>
+                <button
+                    (click)="billingCycle.set(billingCycle() === 'monthly' ? 'yearly' : 'monthly')"
+                    class="relative w-14 h-7 rounded-full bg-surface-200 dark:bg-surface-800 transition-colors duration-300 focus:outline-none border-none cursor-pointer">
+                    <div
+                        [class.translate-x-7]="billingCycle() === 'yearly'"
+                        class="absolute top-1 left-1 w-5 h-5 rounded-full bg-primary-500 transition-transform duration-300 shadow-sm">
+                    </div>
+                </button>
+                <div class="flex items-center gap-2">
+                    <span class="text-sm font-medium" [class.opacity-50]="billingCycle() === 'monthly'">Yearly</span>
+                    <span class="px-2.5 py-0.5 rounded-full bg-green-500/10 text-green-500 text-[10px] font-bold uppercase tracking-wider">2 Months Free</span>
+                </div>
+            </div>
         </div>
 
         <!-- Pricing Cards Section -->
-        <app-landing-pricing></app-landing-pricing>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-24">
+            @for (plan of plans; track plan.slug) {
+                <app-pricing-card
+                    [plan]="plan"
+                    [isYearly]="billingCycle() === 'yearly'"
+                    [delay]="'delay-' + ($index * 100 + 100)">
+                </app-pricing-card>
+            }
+        </div>
+
+        <!-- Social Proof / Trusted By -->
+        <div class="mb-32 text-center" appScrollReveal>
+            <p class="text-xs font-bold uppercase tracking-[0.3em] text-surface-400 dark:text-surface-500 mb-10">Trusted by modern engineering teams</p>
+            <div class="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
+                <span class="text-2xl font-black italic">VELOCITY</span>
+                <span class="text-2xl font-bold tracking-tighter">CLOUD.io</span>
+                <span class="text-2xl font-black">NEXUS</span>
+                <span class="text-2xl font-serif font-bold">Lumina</span>
+                <span class="text-2xl font-mono font-bold">PROTO_</span>
+            </div>
+        </div>
+
+        <!-- Value Proposition Section -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-32">
+            <div class="flex flex-col gap-4" appScrollReveal delay="delay-100">
+                <div class="w-12 h-12 rounded-2xl bg-primary-500/10 flex items-center justify-center">
+                    <i class="pi pi-bolt text-primary-500 text-xl font-bold"></i>
+                </div>
+                <h3 class="text-xl font-bold">Global Low Latency</h3>
+                <p class="text-surface-600 dark:text-surface-400 leading-relaxed">
+                    Our edge network ensures your webhooks are delivered with sub-millisecond overhead, no matter where your targets are.
+                </p>
+            </div>
+            <div class="flex flex-col gap-4" appScrollReveal delay="delay-200">
+                <div class="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center">
+                    <i class="pi pi-shield text-blue-500 text-xl font-bold"></i>
+                </div>
+                <h3 class="text-xl font-bold">Enterprise Security</h3>
+                <p class="text-surface-600 dark:text-surface-400 leading-relaxed">
+                    End-to-end encryption, IP whitelisting, and SOC2 compliant infrastructure protect your sensitive event data.
+                </p>
+            </div>
+            <div class="flex flex-col gap-4" appScrollReveal delay="delay-300">
+                <div class="w-12 h-12 rounded-2xl bg-green-500/10 flex items-center justify-center">
+                    <i class="pi pi-sync text-green-500 text-xl font-bold"></i>
+                </div>
+                <h3 class="text-xl font-bold">Automatic Scaling</h3>
+                <p class="text-surface-600 dark:text-surface-400 leading-relaxed">
+                    Never worry about spikes. Our serverless architecture scales instantly to handle millions of concurrent events.
+                </p>
+            </div>
+        </div>
 
         <!-- Detailed Comparison Section -->
-        <app-pricing-comparison></app-pricing-comparison>
+        <app-pricing-comparison [isYearly]="billingCycle() === 'yearly'"></app-pricing-comparison>
 
         <!-- Motivation Section -->
         <div class="my-24 md:my-32">
