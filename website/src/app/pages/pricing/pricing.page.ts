@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { PricingComparisonComponent } from './comparison/pricing-comparison.component';
 import { CtaComponent } from '@pages/landing/components/cta/cta.component';
 import { PricingCardComponent } from './components/pricing-card/pricing-card.component';
+import { TrustComponent } from '@pages/landing/components/trust/trust.component';
 import { PRICING_PLANS } from './pricing.model';
 import { signal } from '@angular/core';
 
@@ -17,6 +18,7 @@ import { SeoService } from '@core/services/seo.service';
         PricingComparisonComponent,
         CtaComponent,
         PricingCardComponent,
+        TrustComponent,
     ],
     templateUrl: './pricing.page.html',
     styleUrl: './pricing.page.scss',
