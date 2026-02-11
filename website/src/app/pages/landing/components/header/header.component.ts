@@ -5,6 +5,7 @@ import {
     HostListener,
     ElementRef,
     ViewChild,
+    signal,
 } from '@angular/core';
 import { dropdownAnimation } from '@shared/animations/dropdown.animation';
 import { FormsModule } from '@angular/forms';
@@ -49,6 +50,7 @@ export class HeaderComponent {
     value1: string = '';
 
     items: MenuItem[] | undefined;
+    activeDropdown = signal<string | null>(null);
 
     isDarkMode = computed(() => this.layoutService.appState().darkMode);
 
@@ -70,6 +72,14 @@ export class HeaderComponent {
         ) {
             this.showConfig = false;
         }
+
+        const target = event.target as HTMLElement;
+        if (
+            !target.closest('.dropdown-trigger') &&
+            !target.closest('.dropdown-menu')
+        ) {
+            this.activeDropdown.set(null);
+        }
     }
 
     @HostListener('window:scroll', [])
@@ -80,25 +90,42 @@ export class HeaderComponent {
     ngOnInit() {
         this.items = [
             {
-                label: 'Features',
+                label: 'Products',
                 icon: 'pi pi-bolt',
+                items: [
+                    {
+                        label: 'Dispatch',
+                        icon: 'icon-[hugeicons--rocket-01]',
+                        command: () => {
+                            document
+                                .getElementById('features')
+                                ?.scrollIntoView({ behavior: 'smooth' });
+                            this.activeDropdown.set(null);
+                        },
+                    },
+                    {
+                        label: 'Ingest',
+                        icon: 'icon-[hugeicons--inbox-download]',
+                        command: () => {
+                            document
+                                .getElementById('features')
+                                ?.scrollIntoView({ behavior: 'smooth' });
+                            this.activeDropdown.set(null);
+                        },
+                    },
+                ],
+            },
+            {
+                label: 'Pricing',
+                icon: 'pi pi-tag',
                 command: () => {
                     document
-                        .getElementById('features')
+                        .getElementById('pricing')
                         ?.scrollIntoView({ behavior: 'smooth' });
                 },
             },
-            /* {
-        label: "Pricing",
-        icon: "pi pi-tag",
-        command: () => {
-          document
-            .getElementById("pricing")
-            ?.scrollIntoView({ behavior: "smooth" });
-        },
-      }, */
             {
-                label: 'Developers',
+                label: 'Documentation',
                 icon: 'pi pi-code',
                 command: () => {
                     document
@@ -106,7 +133,47 @@ export class HeaderComponent {
                         ?.scrollIntoView({ behavior: 'smooth' });
                 },
             },
+            {
+                label: 'Blog',
+                icon: 'pi pi-calendar',
+                command: () => {
+                    window.open('/blog', '_self');
+                },
+            },
+            {
+                label: 'Legals',
+                icon: 'pi pi-shield',
+                items: [
+                    {
+                        label: 'Privacy Policy',
+                        icon: 'pi pi-lock',
+                        routerLink: '/legal/policies/privacy',
+                        command: () => this.activeDropdown.set(null),
+                    },
+                    {
+                        label: 'Refund Policy',
+                        icon: 'pi pi-wallet',
+                        routerLink: '/legal/policies/refund',
+                        command: () => this.activeDropdown.set(null),
+                    },
+                    {
+                        label: 'Terms of Service',
+                        icon: 'pi pi-file',
+                        routerLink: '/legal/terms-of-service',
+                        command: () => this.activeDropdown.set(null),
+                    },
+                ],
+            },
         ];
+    }
+
+    toggleDropdown(event: Event, label: string) {
+        event.stopPropagation();
+        if (this.activeDropdown() === label) {
+            this.activeDropdown.set(null);
+        } else {
+            this.activeDropdown.set(label);
+        }
     }
 
     toggleDarkMode() {
