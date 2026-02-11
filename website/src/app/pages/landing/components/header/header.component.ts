@@ -73,39 +73,34 @@ export class HeaderComponent {
                 items: [
                     {
                         label: 'Dispatch',
-                        icon: 'icon-[hugeicons--rocket-01]',
+                        icon: 'icon-[hugeicons--rocket-01] size-5',
                         routerLink: '/features/dispatch',
                         command: () => this.activeDropdown.set(null),
                     },
                     {
                         label: 'Ingest',
-                        icon: 'icon-[hugeicons--inbox-download]',
+                        icon: 'icon-[hugeicons--inbox-download] size-5',
                         routerLink: '/features/ingest',
                         command: () => this.activeDropdown.set(null),
                     },
                     {
                         label: 'Architecture',
-                        icon: 'icon-[hugeicons--hierarchy-square-02]',
+                        icon: 'icon-[hugeicons--hierarchy-square-02] size-5',
                         routerLink: '/features/architecture',
                         command: () => this.activeDropdown.set(null),
                     },
                 ],
             },
             {
-                label: 'Pricing',
-                icon: 'pi pi-tag',
-                routerLink: '/pricing',
-            },
-            {
                 label: 'Developers',
                 icon: 'icon-[hugeicons--code-variable]',
                 items: [
                     {
-                        label: 'API Reference',
-                        icon: 'pi pi-code',
+                        label: 'Start in Minutes',
+                        icon: 'icon-[hugeicons--zap] size-5',
                         command: () => {
                             window.open(
-                                'https://docs.kyrazo.com/api-reference',
+                                'https://docs.kyrazo.com/introduction',
                                 '_blank',
                             );
                             this.activeDropdown.set(null);
@@ -113,18 +108,18 @@ export class HeaderComponent {
                     },
                     {
                         label: 'Documentation',
-                        icon: 'pi pi-book',
+                        icon: 'icon-[hugeicons--book-02] size-5',
                         command: () => {
                             window.open('https://docs.kyrazo.com', '_blank');
                             this.activeDropdown.set(null);
                         },
                     },
                     {
-                        label: 'Start in Minutes',
-                        icon: 'pi pi-bolt',
+                        label: 'API & SDKs Reference',
+                        icon: 'icon-[hugeicons--code-simple] size-5',
                         command: () => {
                             window.open(
-                                'https://docs.kyrazo.com/introduction',
+                                'https://docs.kyrazo.com/api-reference',
                                 '_blank',
                             );
                             this.activeDropdown.set(null);
@@ -139,6 +134,11 @@ export class HeaderComponent {
                 ],
             },
             {
+                label: 'Pricing',
+                icon: 'pi pi-tag',
+                routerLink: '/pricing',
+            },
+            {
                 label: 'Blog',
                 icon: 'icon-[hugeicons--blogger-03]',
                 routerLink: '/blog',
@@ -149,19 +149,19 @@ export class HeaderComponent {
                 items: [
                     {
                         label: 'Privacy Policy',
-                        icon: 'pi pi-lock',
+                        icon: 'icon-[hugeicons--file-locked] size-5',
                         routerLink: '/legal/privacy-policy',
                         command: () => this.activeDropdown.set(null),
                     },
                     {
                         label: 'Refund Policy',
-                        icon: 'pi pi-wallet',
+                        icon: 'icon-[hugeicons--file-euro] size-5',
                         routerLink: '/legal/policies/refund',
                         command: () => this.activeDropdown.set(null),
                     },
                     {
                         label: 'Terms of Service',
-                        icon: 'pi pi-file',
+                        icon: 'icon-[hugeicons--file-verified] size-5',
                         routerLink: '/legal/terms-of-service',
                         command: () => this.activeDropdown.set(null),
                     },

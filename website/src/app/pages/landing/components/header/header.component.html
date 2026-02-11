@@ -33,7 +33,7 @@
 
                         @if (item.items && activeDropdown() === item.label) {
                             <div @dropdownAnimation
-                                class="dropdown-menu absolute top-full left-0 mt-2 min-w-[200px] bg-surface-0/95 dark:bg-surface-950/75 backdrop-blur-sm! border border-surface-200 dark:border-surface-800 rounded-2xl shadow-xl p-2 z-50">
+                                class="dropdown-menu absolute top-full left-0 mt-2 min-w-[200px] max-w-[220px] bg-surface-0/95 dark:bg-surface-950/75 backdrop-blur-sm! border border-surface-200 dark:border-surface-800 rounded-2xl shadow-xl p-2 z-50">
                                 @for (subItem of item.items; track subItem.label) {
                                     <a
                                         [routerLink]="subItem.routerLink"
@@ -42,7 +42,7 @@
                                         @if (subItem.icon) {
                                             <i [class]="subItem.icon + ' text-lg'"></i>
                                         }
-                                        <span class="font-medium">{{ subItem.label }}</span>
+                                        <span class="font-medium truncate">{{ subItem.label }}</span>
                                     </a>
                                 }
                             </div>
