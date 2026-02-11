@@ -30,14 +30,25 @@
   }
 }
 
-@keyframes screen-shake {
+@keyframes hard-shake-1 {
   0%, 100% { transform: translate(0, 0) rotate(0); }
-  10% { transform: translate(-4px, -2px) rotate(-1deg); }
-  20% { transform: translate(4px, 2px) rotate(1deg); }
-  30% { transform: translate(-4px, 2px) rotate(-1deg); }
-  40% { transform: translate(4px, -2px) rotate(1deg); }
-  50% { transform: translate(-2px, 2px) rotate(-0.5deg); }
-  60% { transform: translate(2px, -2px) rotate(0.5deg); }
+  10% { transform: translate(-8px, -4px) rotate(-2deg); }
+  20% { transform: translate(8px, 4px) rotate(2deg); }
+  30% { transform: translate(-8px, 4px) rotate(-2deg); }
+  40% { transform: translate(8px, -4px) rotate(2deg); }
+  50% { transform: translate(-4px, 4px) rotate(-1deg); }
+  60% { transform: translate(4px, -4px) rotate(1deg); }
+  100% { transform: translate(0, 0) rotate(0); }
+}
+
+@keyframes hard-shake-2 {
+  0%, 100% { transform: translate(0, 0) rotate(0); }
+  10% { transform: translate(-8px, -4px) rotate(-2deg); }
+  20% { transform: translate(8px, 4px) rotate(2deg); }
+  30% { transform: translate(-8px, 4px) rotate(-2deg); }
+  40% { transform: translate(8px, -4px) rotate(2deg); }
+  50% { transform: translate(-4px, 4px) rotate(-1deg); }
+  60% { transform: translate(4px, -4px) rotate(1deg); }
   100% { transform: translate(0, 0) rotate(0); }
 }
 
@@ -45,8 +56,12 @@
   animation: epic-lightning 0.4s ease-out forwards;
 }
 
-.animate-shake-1, .animate-shake-2 {
-  animation: screen-shake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+.animate-shake-1 {
+  animation: hard-shake-1 0.2s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.animate-shake-2 {
+  animation: hard-shake-2 0.2s cubic-bezier(.36,.07,.19,.97) both;
 }
 
 @keyframes electric-bomb {
