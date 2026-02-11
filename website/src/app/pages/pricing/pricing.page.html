@@ -20,23 +20,19 @@
                 <span class="text-sm font-medium" [class.opacity-50]="billingCycle() === 'yearly'">Monthly</span>
                 <button
                     (click)="billingCycle.set(billingCycle() === 'monthly' ? 'yearly' : 'monthly')"
-                    class="relative w-16 h-8 rounded-full bg-surface-100 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 transition-colors duration-500 focus:outline-none cursor-pointer group hover:border-primary-500/40 overflow-hidden">
+                    class="relative w-16 h-8 rounded-full bg-surface-100 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 transition-colors duration-500 focus:outline-none cursor-pointer group overflow-hidden">
 
-                    <!-- Laser Track Beam -->
-                    <div class="absolute top-1/2 -translate-y-1/2 h-[2px] bg-linear-to-r from-transparent via-primary-500 to-transparent blur-[1px] transition-all duration-500 ease-[--timing-spring]"
-                        [class.w-0]="true"
-                        [class.left-0]="billingCycle() === 'monthly'"
-                        [class.right-0]="billingCycle() === 'yearly'"
-                        [class.w-full]="true"
-                        [class.opacity-0]="false"
-                        [class.opacity-100]="true">
-                    </div>
+                    <!-- Laser Streak Track -->
+                    <div class="absolute top-1/2 left-2 right-2 h-px bg-primary-500 shadow-[0_0_8px_rgba(var(--primary-500-rgb),0.8)] opacity-0 group-active:opacity-100 group-active:animate-laser-streak pointer-events-none"></div>
 
+                    <!-- Toggle Knob (Teleporting) -->
                     <div
-                        [class.translate-x-8]="billingCycle() === 'yearly'"
-                        class="absolute top-1 left-1 h-5.5 w-5.5 rounded-full bg-primary-500 transition-all duration-500 ease-[--timing-spring] shadow-[0_0_20px_rgba(var(--primary-500-rgb),0.6)] group-hover:scale-110 group-active:scale-90 z-10">
-                        <!-- Laser Glow Core -->
-                        <div class="absolute inset-0 rounded-full bg-white blur-[2px] opacity-30"></div>
+                        [class.animate-laser-zap-right]="billingCycle() === 'yearly'"
+                        [class.animate-laser-zap-left]="billingCycle() === 'monthly'"
+                        class="absolute top-1 left-1 h-5.5 w-5.5 rounded-full bg-primary-500 shadow-[0_0_15px_rgba(var(--primary-500-rgb),0.4)] z-10">
+
+                        <!-- Bolt Bomb Flash (on impact) -->
+                        <div class="absolute inset-0 rounded-full bg-white opacity-0 group-active:animate-bolt-bomb pointer-events-none"></div>
                     </div>
                 </button>
                 <div class="flex items-center gap-2">
@@ -71,10 +67,6 @@
 
         <!-- Value Proposition Wide Architecture Card -->
         <div class="relative bg-surface-950 dark:bg-surface-900 rounded-4xl p-10 md:p-16 mb-32 border border-surface-200 dark:border-surface-800 shadow-2xl shadow-primary-500/5 overflow-hidden ring-1 ring-white/10" appScrollReveal>
-             <!-- Laser Sweep Effect -->
-             <div class="absolute top-0 left-0 w-1/3 h-[2px] bg-linear-to-r from-transparent via-primary-500 to-transparent animate-laser blur-[1px] opacity-30"></div>
-             <div class="absolute bottom-0 right-0 w-1/4 h-[1px] bg-linear-to-r from-transparent via-blue-500 to-transparent animate-laser blur-[1px] opacity-20 [animation-delay:1s]"></div>
-
              <!-- Background Matrix Decor -->
              <div class="absolute inset-0 opacity-5 pointer-events-none" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 40px 40px;"></div>
              <div class="absolute top-0 right-0 w-[400px] h-[400px] bg-primary-500/15 blur-[120px] rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
