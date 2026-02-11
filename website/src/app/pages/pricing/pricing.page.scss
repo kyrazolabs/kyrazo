@@ -41,7 +41,7 @@
   animation: epic-lightning 0.4s ease-out forwards;
 }
 
-.animate-shake {
+.animate-shake-a, .animate-shake-b {
   animation: screen-shake 0.3s cubic-bezier(.36,.07,.19,.97) both;
 }
 

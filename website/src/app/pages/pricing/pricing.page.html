@@ -20,7 +20,8 @@
                 <span class="text-sm font-medium" [class.opacity-50]="billingCycle() === 'yearly'">Monthly</span>
                 <button
                     (click)="toggleCycle()"
-                    [class.animate-shake]="hasInteracted()"
+                    [class.animate-shake-a]="hasInteracted() && billingCycle() === 'yearly'"
+                    [class.animate-shake-b]="hasInteracted() && billingCycle() === 'monthly'"
                     class="relative w-16 h-8 rounded-full bg-surface-100 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 focus:outline-none cursor-pointer group active:scale-95 transition-transform duration-100">
 
                     <!-- The Teleporting Knob Container -->
