@@ -21,15 +21,22 @@
                     <div class="relative flex items-center"
                         (mouseenter)="item.items ? onMouseEnter(item.label!) : null"
                         (mouseleave)="item.items ? onMouseLeave() : null">
-                        <button
-                            (click)="item.items ? toggleDropdown($event, item.label!) : item.command?.({originalEvent: $event})"
-                            [class.dropdown-trigger]="item.items"
-                            class="bg-transparent border-none text-surface-600 dark:text-surface-300 hover:text-primary-500 hover:bg-surface-100 dark:hover:bg-surface-800 px-3 py-2 rounded-3xl font-medium transition-colors cursor-pointer text-sm flex items-center gap-1 group">
-                            {{ item.label }}
-                            @if (item.items) {
+
+                        @if (item.items) {
+                            <button
+                                (click)="toggleDropdown($event, item.label!)"
+                                class="dropdown-trigger bg-transparent border-none text-surface-600 dark:text-surface-300 hover:text-primary-500 hover:bg-surface-100 dark:hover:bg-surface-800 px-3 py-2 rounded-3xl font-medium transition-colors cursor-pointer text-sm flex items-center gap-1 group">
+                                {{ item.label }}
                                 <i class="pi pi-chevron-down text-[11px]! transition-transform duration-300" [class.rotate-180]="activeDropdown() === item.label"></i>
-                            }
-                        </button>
+                            </button>
+                        } @else {
+                            <a
+                                [routerLink]="item.routerLink"
+                                (click)="item.command?.({originalEvent: $event})"
+                                class="bg-transparent border-none text-surface-600 dark:text-surface-300 hover:text-primary-500 hover:bg-surface-100 dark:hover:bg-surface-800 px-3 py-2 rounded-3xl font-medium transition-colors cursor-pointer text-sm flex items-center gap-1 group no-underline">
+                                {{ item.label }}
+                            </a>
+                        }
 
                         @if (item.items && activeDropdown() === item.label) {
                             <div @dropdownAnimation
