@@ -40,6 +40,9 @@
   .text-shadow-primary-500 {
     text-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
   }
+  .text-shadow-primary-lg {
+    text-shadow: 0 0 35px rgba(59, 130, 246, 0.8), 0 0 15px rgba(59, 130, 246, 0.4);
+  }
 }
 
 

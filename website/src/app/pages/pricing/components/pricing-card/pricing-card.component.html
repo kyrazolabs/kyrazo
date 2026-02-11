@@ -25,8 +25,8 @@
                 @if (plan.slug === 'enterprise') { from }
                 €
             </span>
-            <span class="text-6xl font-black tracking-tighter font-sansation!"
-             [class]="plan.highlighted ? 'text-shadow-primary-500 text-shadow-md' : ''">{{ formatPrice(currentPrice) }}</span>
+            <span class="text-6xl font-black tracking-tighter font-sansation! transition-all duration-300"
+             [class]="plan.highlighted ? 'text-shadow-primary-500 text-shadow-md group-hover:text-shadow-primary-lg' : ''">{{ formatPrice(currentPrice) }}</span>
             <span class="text-sm opacity-60 font-medium">{{ intervalLabel }}</span>
         </div>
         @if (plan.priceCentsMonthly > 0) {
