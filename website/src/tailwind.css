@@ -31,40 +31,59 @@
   }
 
   /* Laser Teleport Keyframes */
-  @keyframes laser-zap-right {
+  @keyframes laser-teleport-right {
     0% { transform: translateX(0) scale(1); filter: brightness(1); opacity: 1; }
-    20% { transform: translateX(0) scale(0.2); filter: brightness(5); opacity: 0; }
-    80% { transform: translateX(2rem) scale(0.2); filter: brightness(5); opacity: 0; }
+    15% { transform: translateX(0) scale(0.1, 1.5); filter: brightness(10); opacity: 0.8; }
+    20% { transform: translateX(0) scale(0); filter: brightness(20); opacity: 0; }
+    80% { transform: translateX(2rem) scale(0); filter: brightness(20); opacity: 0; }
+    85% { transform: translateX(2rem) scale(0.1, 1.5); filter: brightness(10); opacity: 0.8; }
     100% { transform: translateX(2rem) scale(1); filter: brightness(1); opacity: 1; }
   }
 
-  @keyframes laser-zap-left {
+  @keyframes laser-teleport-left {
     0% { transform: translateX(2rem) scale(1); filter: brightness(1); opacity: 1; }
-    20% { transform: translateX(2rem) scale(0.2); filter: brightness(5); opacity: 0; }
-    80% { transform: translateX(0) scale(0.2); filter: brightness(5); opacity: 0; }
+    15% { transform: translateX(2rem) scale(0.1, 1.5); filter: brightness(10); opacity: 0.8; }
+    20% { transform: translateX(2rem) scale(0); filter: brightness(20); opacity: 0; }
+    80% { transform: translateX(0) scale(0); filter: brightness(20); opacity: 0; }
+    85% { transform: translateX(0) scale(0.1, 1.5); filter: brightness(10); opacity: 0.8; }
     100% { transform: translateX(0) scale(1); filter: brightness(1); opacity: 1; }
   }
 
-  @keyframes laser-streak {
+  @keyframes laser-streak-right {
     0% { transform: scaleX(0); opacity: 0; transform-origin: left; }
-    30% { transform: scaleX(1); opacity: 1; transform-origin: left; }
-    70% { transform: scaleX(1); opacity: 1; transform-origin: right; }
+    50% { transform: scaleX(1); opacity: 1; }
     100% { transform: scaleX(0); opacity: 0; transform-origin: right; }
   }
 
-  @keyframes bolt-bomb {
-    0% { transform: scale(0.5); opacity: 0; }
-    20% { transform: scale(1.5); opacity: 1; filter: brightness(2); }
-    100% { transform: scale(2); opacity: 0; filter: blur(10px); }
+  @keyframes laser-streak-left {
+    0% { transform: scaleX(0); opacity: 0; transform-origin: right; }
+    50% { transform: scaleX(1); opacity: 1; }
+    100% { transform: scaleX(0); opacity: 0; transform-origin: left; }
   }
 
-  --animate-laser-zap-right: laser-zap-right 0.4s cubic-bezier(0.19, 1, 0.22, 1) forwards;
-  --animate-laser-zap-left: laser-zap-left 0.4s cubic-bezier(0.19, 1, 0.22, 1) forwards;
-  --animate-laser-streak: laser-streak 0.4s ease-in-out;
-  --animate-bolt-bomb: bolt-bomb 0.4s ease-out;
+  @keyframes bolt-bomb-right {
+    0% { transform: scale(0.5); opacity: 0; }
+    20% { transform: scale(1.5); opacity: 1; filter: brightness(2); }
+    100% { transform: scale(2.5); opacity: 0; filter: blur(15px); }
+  }
+
+  @keyframes bolt-bomb-left {
+    0% { transform: scale(0.5); opacity: 0; }
+    20% { transform: scale(1.5); opacity: 1; filter: brightness(2); }
+    100% { transform: scale(2.5); opacity: 0; filter: blur(15px); }
+  }
+
+  /* Fixed animations */
+  --animate-laser-right: laser-teleport-right 0.4s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+  --animate-laser-left: laser-teleport-left 0.4s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+  --animate-streak-right: laser-streak-right 0.4s ease-in-out forwards;
+  --animate-streak-left: laser-streak-left 0.4s ease-in-out forwards;
+  --animate-bolt-right: bolt-bomb-right 0.4s ease-out forwards;
+  --animate-bolt-left: bolt-bomb-left 0.4s ease-out forwards;
 
   --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   --timing-spring: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+  --primary-500-rgb: 59, 130, 246;
 }
 
 @custom-variant dark (&:where(.p-dark, .p-dark *));
