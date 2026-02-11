@@ -17,8 +17,9 @@
                         @for (plan of plans; track plan.slug) {
                             <th class="py-6 px-4 text-center w-1/5" [class.bg-surface-50/50]="plan.highlighted" [class.dark:bg-surface-900/20]="plan.highlighted">
                                 <div class="text-lg font-bold mb-1">{{ plan.name }}</div>
-                                <div class="text-primary-500 font-bold">
+                                <div class="text-primary-500 font-bold font-sansation!">
                                     @let price = isYearly ? plan.priceCentsYearly : plan.priceCentsMonthly;
+                                    <span class="text-xs font-medium opacity-70 pr-0.5">@if (plan.slug === 'enterprise') { from }</span>
                                     {{ price === 0 ? '€0' : '€' + (price / 100) }}
                                     <span class="text-[10px] opacity-60 font-medium">/mo</span>
                                 </div>
@@ -45,7 +46,7 @@
                                         @if (feature.format === 'check') {
                                             <i [class]="value ? 'pi pi-check text-green-500' : 'pi pi-times text-surface-300 dark:text-surface-700'" class="text-lg"></i>
                                         } @else {
-                                            <span [class.font-semibold]="plan.highlighted">
+                                            <span [class.font-semibold]="plan.highlighted" class="font-sansation!">
                                                 {{ formatValue(value, feature.format) }}
                                             </span>
                                         }

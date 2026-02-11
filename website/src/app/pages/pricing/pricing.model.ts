@@ -64,7 +64,7 @@ export const PRICING_PLANS: PricingPlan[] = [
             customHeaders: true,
         },
         limits: {
-            eventsPerSecond: 25,
+            eventsPerSecond: 60,
             eventsPerMonth: 100000,
             maxProjects: 5,
             maxMembers: 5,
@@ -73,7 +73,7 @@ export const PRICING_PLANS: PricingPlan[] = [
             maxConcurrent: 20,
         },
         benefits: [
-            '25 events/sec throughput',
+            '60 events/sec throughput',
             '100k events included',
             '30 days data retention',
             'Standard analytics',
@@ -101,7 +101,7 @@ export const PRICING_PLANS: PricingPlan[] = [
             customHeaders: true,
         },
         limits: {
-            eventsPerSecond: 50,
+            eventsPerSecond: 100,
             eventsPerMonth: 250000,
             maxProjects: 10,
             maxMembers: 5,
@@ -111,7 +111,7 @@ export const PRICING_PLANS: PricingPlan[] = [
         },
         benefits: [
             'Everything in Free',
-            '50 events/sec capacity',
+            '100 events/sec capacity',
             '250k events included',
             'Custom domains enabled',
             'Priority email support',
