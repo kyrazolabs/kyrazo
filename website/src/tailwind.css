@@ -30,11 +30,27 @@
     50% { transform: translateY(0); animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }
   }
 
+  @keyframes laser-sweep {
+    0% { transform: translateX(-100%); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateX(200%); opacity: 0; }
+  }
+
   --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   --timing-spring: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+  --animate-laser: laser-sweep 3s linear infinite;
 }
 
 @custom-variant dark (&:where(.p-dark, .p-dark *));
+
+@layer utilities {
+  .text-shadow-md {
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+  .text-shadow-primary-500 {
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+  }
+}
 
 
 @layer base {
