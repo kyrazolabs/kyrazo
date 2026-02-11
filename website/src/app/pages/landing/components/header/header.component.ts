@@ -97,21 +97,51 @@ export class HeaderComponent {
                 routerLink: '/pricing',
             },
             {
-                label: 'Documentation',
-                icon: 'pi pi-code',
-                command: () => {
-                    window.open('https://docs.kyrazo.com', '_blank');
-                },
+                label: 'Developers',
+                icon: 'icon-[hugeicons--code-variable]',
+                items: [
+                    {
+                        label: 'API Reference',
+                        icon: 'pi pi-code',
+                        command: () => {
+                            window.open(
+                                'https://docs.kyrazo.com/api-reference',
+                                '_blank',
+                            );
+                            this.activeDropdown.set(null);
+                        },
+                    },
+                    {
+                        label: 'Documentation',
+                        icon: 'pi pi-book',
+                        command: () => {
+                            window.open('https://docs.kyrazo.com', '_blank');
+                            this.activeDropdown.set(null);
+                        },
+                    },
+                    {
+                        label: 'Start in Minutes',
+                        icon: 'pi pi-bolt',
+                        command: () => {
+                            window.open(
+                                'https://docs.kyrazo.com/introduction',
+                                '_blank',
+                            );
+                            this.activeDropdown.set(null);
+                        },
+                    },
+                    {
+                        label: 'Changelog',
+                        icon: 'pi pi-history',
+                        routerLink: '/changelogs',
+                        command: () => this.activeDropdown.set(null),
+                    },
+                ],
             },
             {
                 label: 'Blog',
                 icon: 'icon-[hugeicons--blogger-03]',
                 routerLink: '/blog',
-            },
-            {
-                label: 'Changelog',
-                icon: 'pi pi-history',
-                routerLink: '/changelogs',
             },
             {
                 label: 'Legals',
