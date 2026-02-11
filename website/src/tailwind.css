@@ -30,56 +30,35 @@
     50% { transform: translateY(0); animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }
   }
 
-  /* Laser Teleport Keyframes */
-  @keyframes laser-teleport-right {
-    0% { transform: translateX(0) scale(1); filter: brightness(1); opacity: 1; }
-    15% { transform: translateX(0) scale(0.1, 1.5); filter: brightness(10); opacity: 0.8; }
-    20% { transform: translateX(0) scale(0); filter: brightness(20); opacity: 0; }
-    80% { transform: translateX(2rem) scale(0); filter: brightness(20); opacity: 0; }
-    85% { transform: translateX(2rem) scale(0.1, 1.5); filter: brightness(10); opacity: 0.8; }
-    100% { transform: translateX(2rem) scale(1); filter: brightness(1); opacity: 1; }
+  /* Dramatic Laser Teleport Keyframes */
+  @keyframes teleport-in {
+    0% { transform: scale(0); filter: brightness(10) blur(10px); opacity: 0; }
+    30% { transform: scale(0.1, 2); filter: brightness(10) blur(2px); opacity: 1; }
+    100% { transform: scale(1); filter: brightness(1) blur(0); opacity: 1; }
   }
 
-  @keyframes laser-teleport-left {
-    0% { transform: translateX(2rem) scale(1); filter: brightness(1); opacity: 1; }
-    15% { transform: translateX(2rem) scale(0.1, 1.5); filter: brightness(10); opacity: 0.8; }
-    20% { transform: translateX(2rem) scale(0); filter: brightness(20); opacity: 0; }
-    80% { transform: translateX(0) scale(0); filter: brightness(20); opacity: 0; }
-    85% { transform: translateX(0) scale(0.1, 1.5); filter: brightness(10); opacity: 0.8; }
-    100% { transform: translateX(0) scale(1); filter: brightness(1); opacity: 1; }
+  @keyframes teleport-out {
+    0% { transform: scale(1); filter: brightness(1); opacity: 1; }
+    30% { transform: scale(0.1, 2); filter: brightness(10) blur(2px); opacity: 1; }
+    100% { transform: scale(0); filter: brightness(10) blur(10px); opacity: 0; }
   }
 
-  @keyframes laser-streak-right {
-    0% { transform: scaleX(0); opacity: 0; transform-origin: left; }
-    50% { transform: scaleX(1); opacity: 1; }
-    100% { transform: scaleX(0); opacity: 0; transform-origin: right; }
+  @keyframes laser-beam-firing {
+    0% { left: 0; width: 0; opacity: 0; }
+    30% { left: 0; width: 100%; opacity: 1; filter: brightness(2); }
+    100% { left: 100%; width: 0; opacity: 0; }
   }
 
-  @keyframes laser-streak-left {
-    0% { transform: scaleX(0); opacity: 0; transform-origin: right; }
-    50% { transform: scaleX(1); opacity: 1; }
-    100% { transform: scaleX(0); opacity: 0; transform-origin: left; }
+  @keyframes bolt-impact {
+    0% { transform: scale(0); opacity: 0; }
+    20% { transform: scale(1.5); opacity: 1; filter: brightness(2) blur(2px); }
+    100% { transform: scale(2.5); opacity: 0; filter: blur(20px); }
   }
 
-  @keyframes bolt-bomb-right {
-    0% { transform: scale(0.5); opacity: 0; }
-    20% { transform: scale(1.5); opacity: 1; filter: brightness(2); }
-    100% { transform: scale(2.5); opacity: 0; filter: blur(15px); }
-  }
-
-  @keyframes bolt-bomb-left {
-    0% { transform: scale(0.5); opacity: 0; }
-    20% { transform: scale(1.5); opacity: 1; filter: brightness(2); }
-    100% { transform: scale(2.5); opacity: 0; filter: blur(15px); }
-  }
-
-  /* Fixed animations */
-  --animate-laser-right: laser-teleport-right 0.4s cubic-bezier(0.19, 1, 0.22, 1) forwards;
-  --animate-laser-left: laser-teleport-left 0.4s cubic-bezier(0.19, 1, 0.22, 1) forwards;
-  --animate-streak-right: laser-streak-right 0.4s ease-in-out forwards;
-  --animate-streak-left: laser-streak-left 0.4s ease-in-out forwards;
-  --animate-bolt-right: bolt-bomb-right 0.4s ease-out forwards;
-  --animate-bolt-left: bolt-bomb-left 0.4s ease-out forwards;
+  --animate-teleport-in: teleport-in 0.3s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+  --animate-teleport-out: teleport-out 0.3s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+  --animate-laser-beam: laser-beam-firing 0.3s ease-in-out forwards;
+  --animate-bolt-impact: bolt-impact 0.4s ease-out forwards;
 
   --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   --timing-spring: cubic-bezier(0.68, -0.6, 0.32, 1.6);

@@ -26,7 +26,15 @@ export class PricingPage implements OnInit {
     private seoService = inject(SeoService);
 
     billingCycle = signal<'monthly' | 'yearly'>('monthly');
+    hasInteracted = signal(false);
     plans = PRICING_PLANS;
+
+    toggleCycle() {
+        this.hasInteracted.set(true);
+        this.billingCycle.update((c) =>
+            c === 'monthly' ? 'yearly' : 'monthly',
+        );
+    }
 
     ngOnInit() {
         this.posthog.trackPageView();

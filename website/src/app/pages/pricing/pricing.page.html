@@ -19,26 +19,50 @@
             <div class="flex items-center justify-center gap-4 mb-16">
                 <span class="text-sm font-medium" [class.opacity-50]="billingCycle() === 'yearly'">Monthly</span>
                 <button
-                    (click)="billingCycle.set(billingCycle() === 'monthly' ? 'yearly' : 'monthly')"
-                    class="relative w-16 h-8 rounded-full bg-surface-100 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 transition-colors duration-500 focus:outline-none cursor-pointer group overflow-hidden">
+                    (click)="toggleCycle()"
+                    class="relative w-16 h-8 rounded-full bg-surface-100 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 focus:outline-none cursor-pointer group overflow-hidden">
 
-                    <!-- Laser Streak -->
-                    <div
-                        [class.animate-laser-streak]="billingCycle() === 'yearly' || billingCycle() === 'monthly'"
-                        class="absolute top-1/2 left-2 right-2 h-[2px] bg-primary-400 shadow-[0_0_12px_rgba(59,130,246,0.8)] opacity-0 pointer-events-none z-0">
-                    </div>
+                    <!-- Permanent Track Line -->
+                    <div class="absolute top-1/2 left-2 right-2 h-[1px] bg-surface-200 dark:bg-surface-700 z-0"></div>
 
-                    <!-- Teleport Knob -->
-                    <div
-                        [class.animate-laser-right]="billingCycle() === 'yearly'"
-                        [class.animate-laser-left]="billingCycle() === 'monthly'"
-                        class="absolute top-1 left-1 h-5.5 w-5.5 rounded-full bg-primary-500 shadow-[0_0_20px_rgba(59,130,246,0.5)] z-10 flex items-center justify-center">
+                    <!-- Laser Beam Firing -->
+                    @if (hasInteracted()) {
+                        @if (billingCycle() === 'yearly') {
+                            <div class="absolute top-1/2 left-0 h-[2px] bg-primary-400 shadow-[0_0_15px_rgba(59,130,246,0.8)] z-0 animate-laser-beam pointer-events-none"></div>
+                        } @else {
+                            <div class="absolute top-1/2 left-0 h-[2px] bg-primary-400 shadow-[0_0_15px_rgba(59,130,246,0.8)] z-0 animate-laser-beam pointer-events-none"></div>
+                        }
+                    }
 
-                        <!-- Bolt bomb flash on arrival -->
-                         <div
-                            [class.animate-bolt-bomb]="billingCycle() === 'yearly' || billingCycle() === 'monthly'"
-                            class="absolute inset-0 rounded-full bg-white opacity-0 pointer-events-none">
-                         </div>
+                    <!-- The Teleporting Knob -->
+                    <div class="absolute inset-0 z-10 p-1">
+                        <div class="relative h-full w-full">
+                            @if (billingCycle() === 'yearly') {
+                                <div class="absolute right-0 top-0 h-5.5 w-5.5 rounded-full bg-primary-500 shadow-[0_0_20px_rgba(59,130,246,0.5)] flex items-center justify-center"
+                                     [class.animate-teleport-in]="hasInteracted()">
+                                     <!-- Impact Effect -->
+                                     @if (hasInteracted()) {
+                                        <div class="absolute inset-0 rounded-full bg-white opacity-0 animate-bolt-impact"></div>
+                                     }
+                                </div>
+                                <!-- Old Ghost position (zap out) -->
+                                @if (hasInteracted()) {
+                                    <div class="absolute left-0 top-0 h-5.5 w-5.5 rounded-full bg-primary-500 animate-teleport-out"></div>
+                                }
+                            } @else {
+                                <div class="absolute left-0 top-0 h-5.5 w-5.5 rounded-full bg-primary-500 shadow-[0_0_20px_rgba(59,130,246,0.5)] flex items-center justify-center"
+                                     [class.animate-teleport-in]="hasInteracted()">
+                                     <!-- Impact Effect -->
+                                     @if (hasInteracted()) {
+                                        <div class="absolute inset-0 rounded-full bg-white opacity-0 animate-bolt-impact"></div>
+                                     }
+                                </div>
+                                <!-- Old Ghost position (zap out) -->
+                                @if (hasInteracted()) {
+                                    <div class="absolute right-0 top-0 h-5.5 w-5.5 rounded-full bg-primary-500 animate-teleport-out"></div>
+                                }
+                            }
+                        </div>
                     </div>
                 </button>
                 <div class="flex items-center gap-2">
