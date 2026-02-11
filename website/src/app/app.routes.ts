@@ -128,6 +128,20 @@ export const routes: Routes = [
                     },
                 },
             },
+            {
+                path: 'pricing',
+                loadComponent: () =>
+                    import('@pages/pricing/pricing.page').then(
+                        (p) => p.PricingPage,
+                    ),
+                data: {
+                    title: 'Pricing - Kyrazo',
+                    meta: {
+                        description:
+                            'Flexible and transparent pricing for managed webhook infrastructure. From free starter plans to mission-critical enterprise solutions.',
+                    },
+                },
+            },
         ],
     },
     {

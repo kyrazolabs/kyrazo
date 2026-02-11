@@ -1,0 +1,38 @@
+<section class="relative pt-32 pb-16 overflow-hidden">
+    <!-- Hero Background gradient -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-(--breakpoint-2xl) h-full pointer-events-none -z-10">
+        <div class="absolute top-0 left-1/4 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-primary-500/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
+    </div>
+
+    <div class="max-w-[1400px] mx-auto px-6">
+        <div class="text-center mb-16 max-w-3xl mx-auto">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6 text-surface-900 dark:text-surface-0 tracking-tight leading-tight">
+                Transparent Pricing, <br/>
+                <span class="text-primary-500">Unmatched Reliability.</span>
+            </h1>
+            <p class="text-lg md:text-xl text-surface-600 dark:text-surface-400">
+                Choose the plan that fits your scale. Start for free and upgrade as you grow. No hidden fees, just pure performance.
+            </p>
+        </div>
+
+        <!-- Pricing Cards Section -->
+        <app-landing-pricing></app-landing-pricing>
+
+        <!-- Detailed Comparison Section -->
+        <app-pricing-comparison></app-pricing-comparison>
+
+        <!-- Motivation Section -->
+        <div class="my-24 md:my-32">
+            <app-landing-motivation></app-landing-motivation>
+        </div>
+
+        <!-- FAQ Section -->
+        <app-landing-faq></app-landing-faq>
+
+        <!-- Global CTA -->
+        <div class="mt-24 md:mt-32">
+            <app-landing-cta></app-landing-cta>
+        </div>
+    </div>
+</section>
