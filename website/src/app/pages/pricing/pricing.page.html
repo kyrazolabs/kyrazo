@@ -20,42 +20,37 @@
                 <span class="text-sm font-medium" [class.opacity-50]="billingCycle() === 'yearly'">Monthly</span>
                 <button
                     (click)="toggleCycle()"
-                    class="relative w-16 h-8 rounded-full bg-surface-100 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 focus:outline-none cursor-pointer group overflow-hidden">
+                    class="relative w-16 h-8 rounded-full bg-surface-100 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 focus:outline-none cursor-pointer group active:scale-95 transition-transform duration-100">
 
-                    <!-- Permanent Track Line -->
-                    <div class="absolute top-1/2 left-2 right-2 h-[1px] bg-surface-200 dark:bg-surface-700 z-0"></div>
-
-                    <!-- Laser Beam Firing -->
-                    @if (hasInteracted()) {
-                        @if (billingCycle() === 'yearly') {
-                            <div class="absolute top-1/2 left-0 h-[2px] bg-primary-400 shadow-[0_0_15px_rgba(59,130,246,0.8)] z-0 animate-laser-beam pointer-events-none"></div>
-                        } @else {
-                            <div class="absolute top-1/2 left-0 h-[2px] bg-primary-400 shadow-[0_0_15px_rgba(59,130,246,0.8)] z-0 animate-laser-beam pointer-events-none"></div>
-                        }
-                    }
-
-                    <!-- The Teleporting Knob -->
+                    <!-- The Teleporting Knob Container -->
                     <div class="absolute inset-0 z-10 p-1 pointer-events-none">
                         <div class="relative h-full w-full">
                             @if (billingCycle() === 'yearly') {
-                                <div class="absolute right-0 top-0 h-5.5 w-5.5 rounded-full bg-primary-500 shadow-[0_0_20px_rgba(59,130,246,0.5)] flex items-center justify-center animate-teleport-in pointer-events-auto">
-                                     <!-- Impact Effect -->
-                                     @if (hasInteracted()) {
-                                        <div class="absolute inset-0 rounded-full bg-white opacity-0 animate-bolt-impact"></div>
-                                     }
+                                <!-- Impact Flash & Lightning -->
+                                @if (hasInteracted()) {
+                                    <div class="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-24 bg-cyan-400 blur-sm opacity-0 animate-lightning z-0"></div>
+                                    <div class="absolute right-0 top-0 h-5.5 w-5.5 rounded-full border-4 border-cyan-400 opacity-0 animate-shockwave z-0"></div>
+                                }
+
+                                <div class="absolute right-0 top-0 h-5.5 w-5.5 rounded-full bg-primary-500 shadow-[0_0_20px_rgba(59,130,246,0.6)] flex items-center justify-center pointer-events-auto"
+                                     [class.animate-teleport-in]="hasInteracted()">
                                 </div>
+
                                 <!-- Old Ghost position (zap out) -->
                                 @if (hasInteracted()) {
                                     <div class="absolute left-0 top-0 h-5.5 w-5.5 rounded-full bg-primary-500 animate-teleport-out"></div>
                                 }
                             } @else {
-                                <div class="absolute left-0 top-0 h-5.5 w-5.5 rounded-full bg-primary-500 shadow-[0_0_20px_rgba(59,130,246,0.5)] flex items-center justify-center pointer-events-auto"
+                                <!-- Impact Flash & Lightning -->
+                                @if (hasInteracted()) {
+                                    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-24 bg-cyan-400 blur-sm opacity-0 animate-lightning z-0"></div>
+                                    <div class="absolute left-0 top-0 h-5.5 w-5.5 rounded-full border-4 border-cyan-400 opacity-0 animate-shockwave z-0"></div>
+                                }
+
+                                <div class="absolute left-0 top-0 h-5.5 w-5.5 rounded-full bg-primary-500 shadow-[0_0_20px_rgba(59,130,246,0.6)] flex items-center justify-center pointer-events-auto"
                                      [class.animate-teleport-in]="hasInteracted()">
-                                     <!-- Impact Effect -->
-                                     @if (hasInteracted()) {
-                                        <div class="absolute inset-0 rounded-full bg-white opacity-0 animate-bolt-impact"></div>
-                                     }
                                 </div>
+
                                 <!-- Old Ghost position (zap out) -->
                                 @if (hasInteracted()) {
                                     <div class="absolute right-0 top-0 h-5.5 w-5.5 rounded-full bg-primary-500 animate-teleport-out"></div>
