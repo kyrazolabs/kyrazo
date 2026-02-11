@@ -51,6 +51,7 @@ export class HeaderComponent {
 
     items: MenuItem[] | undefined;
     activeDropdown = signal<string | null>(null);
+    private dropdownTimeout: any;
 
     isDarkMode = computed(() => this.layoutService.appState().darkMode);
 
@@ -106,6 +107,16 @@ export class HeaderComponent {
                     {
                         label: 'Ingest',
                         icon: 'icon-[hugeicons--inbox-download]',
+                        command: () => {
+                            document
+                                .getElementById('features')
+                                ?.scrollIntoView({ behavior: 'smooth' });
+                            this.activeDropdown.set(null);
+                        },
+                    },
+                    {
+                        label: 'Dedicated Workers',
+                        icon: 'icon-[hugeicons--server-stack-03]',
                         command: () => {
                             document
                                 .getElementById('features')
@@ -174,6 +185,19 @@ export class HeaderComponent {
         } else {
             this.activeDropdown.set(label);
         }
+    }
+
+    onMouseEnter(label: string) {
+        if (this.dropdownTimeout) {
+            clearTimeout(this.dropdownTimeout);
+        }
+        this.activeDropdown.set(label);
+    }
+
+    onMouseLeave() {
+        this.dropdownTimeout = setTimeout(() => {
+            this.activeDropdown.set(null);
+        }, 150);
     }
 
     toggleDarkMode() {
