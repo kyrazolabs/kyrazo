@@ -57,33 +57,53 @@
         </div>
 
         <!-- Value Proposition Section -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-32">
-            <div class="flex flex-col gap-4" appScrollReveal delay="delay-100">
-                <div class="w-12 h-12 rounded-2xl bg-primary-500/10 flex items-center justify-center">
-                    <i class="pi pi-bolt text-primary-500 text-xl font-bold"></i>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-32">
+            <!-- Card 1 -->
+            <div appScrollReveal delay="delay-100"
+                class="group relative overflow-hidden rounded-[2rem] border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950/40 p-10 transition-all duration-500 hover:border-primary-500/50 hover:shadow-2xl hover:shadow-primary-500/5">
+                <div class="relative z-10">
+                    <div class="w-14 h-14 rounded-2xl bg-primary-500/10 flex items-center justify-center mb-8 border border-primary-500/20 transition-all duration-500 group-hover:scale-110 group-hover:bg-primary-500/20">
+                        <i class="pi pi-bolt text-primary-500 text-2xl font-bold"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 tracking-tight group-hover:text-primary-500 transition-colors">Global Low Latency</h3>
+                    <p class="text-surface-600 dark:text-surface-400 leading-relaxed text-lg">
+                        Our edge network ensures your webhooks are delivered with sub-millisecond overhead, no matter where your targets are.
+                    </p>
                 </div>
-                <h3 class="text-xl font-bold">Global Low Latency</h3>
-                <p class="text-surface-600 dark:text-surface-400 leading-relaxed">
-                    Our edge network ensures your webhooks are delivered with sub-millisecond overhead, no matter where your targets are.
-                </p>
+                <!-- Background Deco -->
+                <div class="absolute -bottom-12 -right-12 w-32 h-32 bg-primary-500/5 rounded-full blur-3xl group-hover:bg-primary-500/10 transition-all duration-700"></div>
             </div>
-            <div class="flex flex-col gap-4" appScrollReveal delay="delay-200">
-                <div class="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center">
-                    <i class="pi pi-shield text-blue-500 text-xl font-bold"></i>
+
+            <!-- Card 2 -->
+            <div appScrollReveal delay="delay-200"
+                class="group relative overflow-hidden rounded-[2rem] border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950/40 p-10 transition-all duration-500 hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/5">
+                <div class="relative z-10">
+                    <div class="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center mb-8 border border-blue-500/20 transition-all duration-500 group-hover:scale-110 group-hover:bg-blue-500/20">
+                        <i class="pi pi-shield text-blue-500 text-2xl font-bold"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 tracking-tight group-hover:text-blue-500 transition-colors">Enterprise Security</h3>
+                    <p class="text-surface-600 dark:text-surface-400 leading-relaxed text-lg">
+                        End-to-end encryption, IP whitelisting, and SOC2 compliant infrastructure protect your sensitive event data.
+                    </p>
                 </div>
-                <h3 class="text-xl font-bold">Enterprise Security</h3>
-                <p class="text-surface-600 dark:text-surface-400 leading-relaxed">
-                    End-to-end encryption, IP whitelisting, and SOC2 compliant infrastructure protect your sensitive event data.
-                </p>
+                <!-- Background Deco -->
+                <div class="absolute -bottom-12 -right-12 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl group-hover:bg-blue-500/10 transition-all duration-700"></div>
             </div>
-            <div class="flex flex-col gap-4" appScrollReveal delay="delay-300">
-                <div class="w-12 h-12 rounded-2xl bg-green-500/10 flex items-center justify-center">
-                    <i class="pi pi-sync text-green-500 text-xl font-bold"></i>
+
+            <!-- Card 3 -->
+            <div appScrollReveal delay="delay-300"
+                class="group relative overflow-hidden rounded-[2rem] border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950/40 p-10 transition-all duration-500 hover:border-green-500/50 hover:shadow-2xl hover:shadow-green-500/5">
+                <div class="relative z-10">
+                    <div class="w-14 h-14 rounded-2xl bg-green-500/10 flex items-center justify-center mb-8 border border-green-500/20 transition-all duration-500 group-hover:scale-110 group-hover:bg-green-500/20">
+                        <i class="pi pi-sync text-green-500 text-2xl font-bold"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 tracking-tight group-hover:text-green-500 transition-colors">Automatic Scaling</h3>
+                    <p class="text-surface-600 dark:text-surface-400 leading-relaxed text-lg">
+                        Never worry about spikes. Our serverless architecture scales instantly to handle millions of concurrent events.
+                    </p>
                 </div>
-                <h3 class="text-xl font-bold">Automatic Scaling</h3>
-                <p class="text-surface-600 dark:text-surface-400 leading-relaxed">
-                    Never worry about spikes. Our serverless architecture scales instantly to handle millions of concurrent events.
-                </p>
+                <!-- Background Deco -->
+                <div class="absolute -bottom-12 -right-12 w-32 h-32 bg-green-500/5 rounded-full blur-3xl group-hover:bg-green-500/10 transition-all duration-700"></div>
             </div>
         </div>
 
