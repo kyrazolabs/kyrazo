@@ -6,6 +6,7 @@ import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directiv
     standalone: true,
     selector: 'app-ingest-page',
     imports: [CommonModule, ScrollRevealDirective],
+    styleUrl: './ingest.page.scss',
     templateUrl: './ingest.page.html',
 })
 export class IngestPage {}
