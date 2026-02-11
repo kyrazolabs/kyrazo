@@ -27,10 +27,12 @@ export class PricingPage implements OnInit {
 
     billingCycle = signal<'monthly' | 'yearly'>('monthly');
     hasInteracted = signal(false);
+    lightningOffset = signal(0);
     plans = PRICING_PLANS;
 
     toggleCycle() {
         this.hasInteracted.set(true);
+        this.lightningOffset.set(Math.random() * 40 - 20); // -20 to +20 degree skew
         this.billingCycle.update((c) =>
             c === 'monthly' ? 'yearly' : 'monthly',
         );
