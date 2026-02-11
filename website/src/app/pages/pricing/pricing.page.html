@@ -29,12 +29,14 @@
                             @if (billingCycle() === 'yearly') {
                                 <!-- Impact Flash & Thor Lightning -->
                                 @if (hasInteracted()) {
-                                    <div class="absolute left-1/2 bottom-0 w-[120px] h-[100vh] -translate-x-1/2 pointer-events-none z-50 animate-thor-strike"
-                                         style="transform-origin: bottom center;"
-                                         [style.--lightning-skew]="lightningOffset() + 'deg'">
-                                         <svg viewBox="0 0 100 1000" preserveAspectRatio="none" class="w-full h-full fill-primary-400 filter drop-shadow-[0_0_20px_#4f46e5] drop-shadow-[0_0_40px_#4f46e5]">
-                                            <path d="M50,0 L60,100 L40,200 L70,300 L30,400 L80,550 L20,700 L60,850 L50,1000 L55,1000 L65,850 L25,700 L85,550 L35,400 L75,300 L45,200 L65,100 L50,0 Z" />
-                                         </svg>
+                                    <div class="absolute right-0 top-0 h-5.5 w-5.5 z-50">
+                                        <div class="absolute left-1/2 bottom-0 w-[120px] h-screen -translate-x-1/2 pointer-events-none animate-thor-strike"
+                                            style="transform-origin: bottom center;"
+                                            [style.--lightning-skew]="lightningOffset() + 'deg'">
+                                            <svg viewBox="0 0 100 1000" preserveAspectRatio="none" class="w-full h-full fill-primary-400 filter drop-shadow-[0_0_20px_#4f46e5] drop-shadow-[0_0_40px_#4f46e5]">
+                                                <path d="M50,0 L60,100 L40,200 L70,300 L30,400 L80,550 L20,700 L60,850 L50,1000 L55,1000 L65,850 L25,700 L85,550 L35,400 L75,300 L45,200 L65,100 L50,0 Z" />
+                                            </svg>
+                                        </div>
                                     </div>
                                     <div class="absolute right-0 top-0 h-5.5 w-5.5 rounded-full border-4 border-primary-400 opacity-0 animate-shockwave z-40"></div>
                                 }
@@ -50,12 +52,14 @@
                             } @else {
                                 <!-- Impact Flash & Thor Lightning -->
                                 @if (hasInteracted()) {
-                                    <div class="absolute left-1/2 bottom-0 w-[120px] h-[100vh] -translate-x-1/2 pointer-events-none z-50 animate-thor-strike"
-                                         style="transform-origin: bottom center;"
-                                         [style.--lightning-skew]="lightningOffset() + 'deg'">
-                                         <svg viewBox="0 0 100 1000" preserveAspectRatio="none" class="w-full h-full fill-primary-400 filter drop-shadow-[0_0_20px_#4f46e5] drop-shadow-[0_0_40px_#4f46e5]">
-                                            <path d="M50,0 L60,100 L40,200 L70,300 L30,400 L80,550 L20,700 L60,850 L50,1000 L55,1000 L65,850 L25,700 L85,550 L35,400 L75,300 L45,200 L65,100 L50,0 Z" />
-                                         </svg>
+                                    <div class="absolute left-0 top-0 h-5.5 w-5.5 z-50">
+                                        <div class="absolute left-1/2 bottom-0 w-[120px] h-screen -translate-x-1/2 pointer-events-none animate-thor-strike"
+                                            style="transform-origin: bottom center;"
+                                            [style.--lightning-skew]="lightningOffset() + 'deg'">
+                                            <svg viewBox="0 0 100 1000" preserveAspectRatio="none" class="w-full h-full fill-primary-400 filter drop-shadow-[0_0_20px_#4f46e5] drop-shadow-[0_0_40px_#4f46e5]">
+                                                <path d="M50,0 L60,100 L40,200 L70,300 L30,400 L80,550 L20,700 L60,850 L50,1000 L55,1000 L65,850 L25,700 L85,550 L35,400 L75,300 L45,200 L65,100 L50,0 Z" />
+                                            </svg>
+                                        </div>
                                     </div>
                                     <div class="absolute left-0 top-0 h-5.5 w-5.5 rounded-full border-4 border-primary-400 opacity-0 animate-shockwave z-40"></div>
                                 }

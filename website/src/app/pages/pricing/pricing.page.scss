@@ -14,18 +14,18 @@
 @keyframes epic-lightning {
   0% {
     opacity: 0;
-    transform: translateY(-100%) scaleY(0.1) skewX(var(--lightning-skew, 0deg));
+    transform: scaleY(0) skewX(var(--lightning-skew, 0deg));
     filter: brightness(20) contrast(200%) blur(1px);
   }
   10% {
     opacity: 1;
-    transform: translateY(-50%) scaleY(1.5) skewX(var(--lightning-skew, 0deg));
+    transform: scaleY(1.2) skewX(var(--lightning-skew, 0deg));
   }
-  20% { opacity: 1; transform: translateY(-50%) scaleY(1.2) skewX(calc(var(--lightning-skew, 0deg) + 5deg)); filter: brightness(15); }
-  30% { opacity: 1; transform: translateY(-50%) scaleY(1.4) skewX(calc(var(--lightning-skew, 0deg) - 3deg)); }
+  20% { opacity: 1; transform: scaleY(1.5) skewX(calc(var(--lightning-skew, 0deg) + 5deg)); filter: brightness(15) drop-shadow(0 0 10px #4f46e5); }
+  30% { opacity: 1; transform: scaleY(1.4) skewX(calc(var(--lightning-skew, 0deg) - 3deg)); }
   100% {
     opacity: 0;
-    transform: translateY(-50%) scaleY(1) skewX(var(--lightning-skew, 0deg));
+    transform: scaleY(1) skewX(var(--lightning-skew, 0deg));
     filter: brightness(1) blur(20px);
   }
 }
