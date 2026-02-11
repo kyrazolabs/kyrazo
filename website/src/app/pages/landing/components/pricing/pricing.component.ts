@@ -19,8 +19,4 @@ export class PricingComponent {
         if (cents === 0) return '€0';
         return `€${cents / 100}`;
     }
-
-    getIntervalLabel(interval: string): string {
-        return interval === 'month' ? '/month' : '/year';
-    }
 }

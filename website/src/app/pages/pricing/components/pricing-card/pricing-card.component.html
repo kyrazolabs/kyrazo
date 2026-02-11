@@ -1,7 +1,7 @@
 <div
     appScrollReveal
     [delay]="delay"
-    [class]="'group relative p-8 rounded-[2.5rem] border transition-all duration-500 flex flex-col h-full ' +
+    [class]="'group relative p-8 rounded-2xl border transition-all duration-500 flex flex-col h-full ' +
     (plan.highlighted ?
     'bg-surface-900 text-surface-0 border-surface-800 shadow-[0_20px_50px_rgba(0,0,0,0.3)] scale-105 z-10' :
     'bg-surface-0 dark:bg-surface-950/40 backdrop-blur-md! border-surface-200 dark:border-surface-800 hover:border-primary-500/50 hover:shadow-2xl hover:shadow-primary-500/5')">
@@ -21,8 +21,8 @@
 
     <div class="mb-8">
         <div class="flex items-baseline gap-1">
-            <span class="text-xs font-medium opacity-70 self-start mt-2">€</span>
-            <span class="text-6xl font-black tracking-tighter">{{ formatPrice(currentPrice) }}</span>
+            <span class="text-base font-medium opacity-70 self-start mt-2">€</span>
+            <span class="text-6xl font-black tracking-tighter font-dosis">{{ formatPrice(currentPrice) }}</span>
             <span class="text-sm opacity-60 font-medium">{{ intervalLabel }}</span>
         </div>
         @if (isYearly && plan.priceCentsMonthly > 0) {
@@ -33,8 +33,9 @@
     <p-button
         [label]="plan.slug === 'enterprise' ? 'Contact Sales' : (plan.slug === 'free' ? 'Start for Free' : 'Get Started')"
         [severity]="plan.highlighted ? 'primary' : 'secondary'"
-        [styleClass]="'w-full py-4 font-bold! rounded-2xl! transition-all duration-300 ' +
-        (plan.highlighted ? 'shadow-lg shadow-primary-500/40 hover:scale-[1.02]' : 'hover:bg-primary-500/10 hover:border-primary-500/30 hover:text-primary-500')"
+        size="small"
+        [styleClass]="'w-full py-4 font-bold! rounded-xl! transition-all duration-300 ' +
+        (plan.highlighted ? 'shadow-lg shadow-primary-500/40' : 'hover:bg-primary-500/10 hover:border-primary-500/30 hover:text-primary-500')"
         [outlined]="!plan.highlighted">
     </p-button>
 
@@ -43,8 +44,8 @@
         <ul class="space-y-4">
             @for (benefit of plan.benefits; track $index) {
                 <li class="flex items-start gap-3 group/item">
-                    <div class="mt-1 rounded-full p-0.5 bg-primary-500/10 dark:bg-primary-500/20 shrink-0 transition-transform group-hover/item:scale-110">
-                        <i class="pi pi-check text-[10px] text-primary-500 font-bold"></i>
+                    <div class="mt-1 rounded-full p-0.5 aspect-square! bg-primary-500/10 dark:bg-primary-500/20 shrink-0">
+                        <i class="pi pi-check text-[10px] text-primary-500 font-bold aspect-square!"></i>
                     </div>
                     <span class="text-sm opacity-80 group-hover/item:opacity-100 transition-opacity leading-snug">{{ benefit }}</span>
                 </li>

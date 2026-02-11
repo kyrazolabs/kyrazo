@@ -4,7 +4,6 @@ import { ButtonModule } from 'primeng/button';
 
 import { IngestDiagramComponent } from './diagrams/ingest/ingest.component';
 import { DispatchDiagramComponent } from './diagrams/dispatch/dispatch.component';
-import { WorkflowDiagramComponent } from './diagrams/workflow/workflow.component';
 
 import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directive';
 
@@ -24,7 +23,6 @@ interface TrustItem {
         ButtonModule,
         IngestDiagramComponent,
         DispatchDiagramComponent,
-        WorkflowDiagramComponent,
         ScrollRevealDirective,
     ],
     templateUrl: './features.component.html',
