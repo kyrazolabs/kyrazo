@@ -21,6 +21,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { AvatarModule } from 'primeng/avatar';
 import { BadgeModule } from 'primeng/badge';
 import { RouterLink } from '@angular/router';
+import { DrawerModule } from 'primeng/drawer';
 
 import { AppConfig } from '@components/app.config';
 import { PostHogService } from '@core/3rd-party/posthog';
@@ -39,6 +40,7 @@ import { PostHogService } from '@core/3rd-party/posthog';
         InputIconModule,
         AvatarModule,
         RouterLink,
+        DrawerModule,
     ],
     templateUrl: './header.component.html',
     styleUrl: './header.component.scss',
@@ -51,6 +53,7 @@ export class HeaderComponent {
 
     items: MenuItem[] | undefined;
     activeDropdown = signal<string | null>(null);
+    isMobileMenuVisible = signal<boolean>(false);
     private dropdownTimeout: any;
 
     isDarkMode = computed(() => this.layoutService.appState().darkMode);
@@ -97,58 +100,43 @@ export class HeaderComponent {
                     {
                         label: 'Dispatch',
                         icon: 'icon-[hugeicons--rocket-01]',
-                        command: () => {
-                            document
-                                .getElementById('features')
-                                ?.scrollIntoView({ behavior: 'smooth' });
-                            this.activeDropdown.set(null);
-                        },
+                        routerLink: '/features/dispatch',
+                        command: () => this.activeDropdown.set(null),
                     },
                     {
                         label: 'Ingest',
                         icon: 'icon-[hugeicons--inbox-download]',
-                        command: () => {
-                            document
-                                .getElementById('features')
-                                ?.scrollIntoView({ behavior: 'smooth' });
-                            this.activeDropdown.set(null);
-                        },
+                        routerLink: '/features/ingest',
+                        command: () => this.activeDropdown.set(null),
                     },
                     {
-                        label: 'Dedicated Workers',
-                        icon: 'icon-[hugeicons--server-stack-03]',
-                        command: () => {
-                            document
-                                .getElementById('features')
-                                ?.scrollIntoView({ behavior: 'smooth' });
-                            this.activeDropdown.set(null);
-                        },
+                        label: 'Architecture',
+                        icon: 'icon-[hugeicons--hierarchy-square-02]',
+                        routerLink: '/features/architecture',
+                        command: () => this.activeDropdown.set(null),
                     },
                 ],
             },
             {
                 label: 'Pricing',
                 icon: 'pi pi-tag',
-                command: () => {
-                    document
-                        .getElementById('pricing')
-                        ?.scrollIntoView({ behavior: 'smooth' });
-                },
+                routerLink: '/pricing',
+            },
+            {
+                label: 'Blog',
+                icon: 'pi pi-calendar',
+                routerLink: '/blog',
+            },
+            {
+                label: 'Changelog',
+                icon: 'pi pi-history',
+                routerLink: '/changelogs',
             },
             {
                 label: 'Documentation',
                 icon: 'pi pi-code',
                 command: () => {
-                    document
-                        .getElementById('dev-exp')
-                        ?.scrollIntoView({ behavior: 'smooth' });
-                },
-            },
-            {
-                label: 'Blog',
-                icon: 'pi pi-calendar',
-                command: () => {
-                    window.open('/blog', '_self');
+                    window.open('https://docs.kyrazo.com', '_blank');
                 },
             },
             {
@@ -158,7 +146,7 @@ export class HeaderComponent {
                     {
                         label: 'Privacy Policy',
                         icon: 'pi pi-lock',
-                        routerLink: '/legal/policies/privacy',
+                        routerLink: '/legal/privacy-policy',
                         command: () => this.activeDropdown.set(null),
                     },
                     {
@@ -209,6 +197,10 @@ export class HeaderComponent {
 
     toggleConfig() {
         this.showConfig = !this.showConfig;
+    }
+
+    toggleMobileMenu() {
+        this.isMobileMenuVisible.set(!this.isMobileMenuVisible());
     }
     trackGetStarted() {
         this.posthog.capture('header_get_started_clicked');
