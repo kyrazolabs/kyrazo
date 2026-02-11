@@ -5,6 +5,7 @@ import { CtaComponent } from '@pages/landing/components/cta/cta.component';
 import { PricingCardComponent } from './components/pricing-card/pricing-card.component';
 import { PRICING_PLANS } from './pricing.model';
 import { signal } from '@angular/core';
+import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directive';
 
 import { PostHogService } from '@core/3rd-party/posthog';
 import { SeoService } from '@core/services/seo.service';
@@ -17,6 +18,7 @@ import { SeoService } from '@core/services/seo.service';
         PricingComparisonComponent,
         CtaComponent,
         PricingCardComponent,
+        ScrollRevealDirective,
     ],
     templateUrl: './pricing.page.html',
     styleUrl: './pricing.page.scss',

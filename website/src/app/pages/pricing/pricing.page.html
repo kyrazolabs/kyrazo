@@ -6,7 +6,7 @@
     </div>
 
     <div class="max-w-[1500px] mx-auto px-6">
-        <div class="text-center mb-16 max-w-3xl mx-auto">
+        <div class="text-center mb-16 max-w-3xl mx-auto" appScrollReveal>
             <h1 class="text-4xl md:text-6xl font-bold mb-6 text-surface-900 dark:text-surface-0 tracking-tight leading-tight">
                 Transparent Pricing, <br/>
                 <span class="text-primary-500 font-sansation!">Unmatched Reliability.</span>
@@ -16,7 +16,7 @@
             </p>
 
             <!-- Billing Toggle -->
-            <div class="flex items-center justify-center gap-4 mb-16">
+            <div class="flex items-center justify-center gap-4 mb-16" appScrollReveal delay="delay-200">
                 <span class="text-sm font-medium" [class.opacity-50]="billingCycle() === 'yearly'">Monthly</span>
                 <button
                     (click)="toggleCycle()"
@@ -111,7 +111,7 @@
         </div>
 
         <!-- Pricing Cards Section -->
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-24">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 mb-24 relative z-10" appScrollReveal delay="delay-300">
             @for (plan of plans; track plan.slug) {
                 <app-pricing-card
                     [plan]="plan"
@@ -140,7 +140,7 @@
              <div class="absolute top-0 right-0 w-[400px] h-[400px] bg-primary-500/15 blur-[120px] rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
              <div class="absolute bottom-0 left-0 w-[300px] h-[300px] bg-blue-500/10 blur-[100px] rounded-full -translate-x-1/2 translate-y-1/2 pointer-events-none"></div>
 
-            <div class="relative z-10 grid xl:grid-cols-2 gap-12 items-center">
+            <div class="relative z-10 grid xl:grid-cols-2 gap-12 items-center" appScrollReveal>
                 <div>
                     <div class="flex items-center gap-3 mb-6">
                         <span class="text-primary-400 font-bold uppercase tracking-widest text-[10px] px-3 py-1 bg-primary-500/10 rounded-full border border-primary-500/20">
@@ -158,7 +158,7 @@
 
                 <!-- Matrix / Metrics Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="py-6 px-8  rounded-2xl bg-surface-900/40 border border-surface-800 backdrop-blur-md group hover:border-primary-500/30 transition-all duration-500 relative overflow-hidden">
+                    <div class="py-6 px-8  rounded-2xl bg-surface-900/40 border border-surface-800 backdrop-blur-md group hover:border-primary-500/30 transition-all duration-500 relative overflow-hidden" appScrollReveal delay="delay-100">
                         <div class="text-4xl -ml-2 md:text-4xl font-black text-white tracking-tighter mb-2 font-sansation! decoration-primary-500/20 underline decoration-10 underline-offset-[-12px] decoration-skip-ink-none text-shadow-primary-500 text-shadow-md!">SUB 1ms</div>
                         <h4 class="text-sm font-black text-primary-400 uppercase tracking-widest mb-2">Global Latency</h4>
                         <p class="text-sm text-surface-400 font-medium leading-relaxed">Edge-optimized mesh ensures instant data relay worldwide.</p>
@@ -166,7 +166,7 @@
                         <div class="absolute -bottom-10 -right-10 w-24 h-24 bg-primary-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     </div>
 
-                    <div class="py-6 px-8  rounded-2xl bg-surface-900/40 border border-surface-800 backdrop-blur-md group hover:border-blue-500/30 transition-all duration-500 relative overflow-hidden">
+                    <div class="py-6 px-8  rounded-2xl bg-surface-900/40 border border-surface-800 backdrop-blur-md group hover:border-blue-500/30 transition-all duration-500 relative overflow-hidden" appScrollReveal delay="delay-200">
                         <div class="text-4xl -ml-2 md:text-4xl font-black text-white tracking-tighter mb-2 font-sansation! decoration-blue-500/20 underline decoration-10 underline-offset-[-12px] decoration-skip-ink-none text-shadow-blue-500 text-shadow-md!">READY</div>
                         <h4 class="text-sm font-black text-blue-400 uppercase tracking-widest mb-2">Privacy Focus</h4>
                         <p class="text-sm text-surface-400 font-medium leading-relaxed">GDPR-aligned infrastructure with hardened isolation layers.</p>
@@ -174,7 +174,7 @@
                         <div class="absolute -bottom-10 -right-10 w-24 h-24 bg-blue-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     </div>
 
-                    <div class="py-6 px-8  rounded-2xl bg-surface-900/40 border border-surface-800 backdrop-blur-md group hover:border-green-500/30 transition-all duration-500 relative overflow-hidden">
+                    <div class="py-6 px-8  rounded-2xl bg-surface-900/40 border border-surface-800 backdrop-blur-md group hover:border-green-500/30 transition-all duration-500 relative overflow-hidden" appScrollReveal delay="delay-300">
                         <div class="text-4xl -ml-2 md:text-4xl font-black text-white tracking-tighter mb-2 font-sansation! decoration-green-500/20 underline decoration-10 underline-offset-[-12px] decoration-skip-ink-none text-shadow-green-500 text-shadow-md!">∞ SCALE</div>
                         <h4 class="text-sm font-black text-green-400 uppercase tracking-widest mb-2">Burst Capacity</h4>
                         <p class="text-sm text-surface-400 font-medium leading-relaxed">Dedicated high-performance infrastructure handles millions of concurrent events without throttling.</p>
@@ -182,7 +182,7 @@
                         <div class="absolute -bottom-10 -right-10 w-24 h-24 bg-green-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     </div>
 
-                    <div class="py-6 px-8  rounded-2xl bg-surface-900/40 border border-surface-800 backdrop-blur-md group hover:border-orange-500/30 transition-all duration-500 relative overflow-hidden">
+                    <div class="py-6 px-8  rounded-2xl bg-surface-900/40 border border-surface-800 backdrop-blur-md group hover:border-orange-500/30 transition-all duration-500 relative overflow-hidden" appScrollReveal delay="delay-400">
                         <div class="text-4xl -ml-2 md:text-4xl font-black text-white tracking-tighter mb-2 font-sansation! decoration-orange-500/20 underline decoration-10 underline-offset-[-12px] decoration-skip-ink-none text-shadow-orange-500 text-shadow-md!">99.99%</div>
                         <h4 class="text-sm font-black text-orange-400 uppercase tracking-widest mb-2">Delivery SLA</h4>
                         <p class="text-sm text-surface-400 font-medium leading-relaxed">Redundant multi-region mesh for mission-critical apps.</p>
