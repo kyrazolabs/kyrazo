@@ -161,66 +161,45 @@
 .animate-bomb {
     animation: electric-bomb 0.3s ease-out forwards;
 }
-@keyframes electric-badge-glow {
-    0%,
-    80%,
-    100% {
-        opacity: 0;
-        transform: scale(0.9);
-        box-shadow: 0 0 0px #4f46e5;
-    }
-    85% {
-        opacity: 1;
-        transform: scale(1.1);
-        box-shadow:
-            0 0 20px #4f46e5,
-            0 0 30px #4f46e5;
-    }
-    90% {
-        opacity: 0.7;
-        transform: scale(1.05);
-    }
-    95% {
-        opacity: 1;
-        transform: scale(1.1);
-        box-shadow:
-            0 0 25px #4f46e5,
-            0 0 40px #4f46e5;
-    }
+@keyframes glitch-interference {
+    0%, 80%, 100% { transform: translate(0,0) scale(1); clip-path: inset(0 0 0 0); opacity: 1; filter: none; }
+    81% { transform: translate(-4px, 2px); clip-path: inset(10% 0 40% 0); opacity: 0.8; filter: hue-rotate(90deg) contrast(150%); }
+    82% { transform: translate(4px, -2px); clip-path: inset(50% 0 10% 0); opacity: 0.5; }
+    83% { transform: translate(0,0); clip-path: inset(0 0 0 0); opacity: 0; }
+    85% { opacity: 0.2; transform: translate(-2px, -2px); filter: contrast(200%) brightness(2); }
+    86% { transform: translate(2px, 2px); opacity: 0; }
+    88% { opacity: 0.8; transform: translate(0, 5px); clip-path: inset(80% 0 0% 0); filter: hue-rotate(-90deg); }
+    89% { opacity: 0; }
+    91% { opacity: 1; transform: translate(0,0); clip-path: inset(0 0 0 0); filter: none; }
 }
 
-@keyframes electric-flicker {
-    0%,
-    80%,
-    100% {
-        filter: brightness(1);
-    }
-    82%,
-    88%,
-    94% {
-        filter: brightness(1.5) contrast(150%);
-    }
-    85%,
-    91%,
-    97% {
-        filter: brightness(1.2) contrast(120%);
-    }
+@keyframes glitch-chromatic {
+    0%, 80%, 100% { text-shadow: none; }
+    81% { text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff; }
+    83% { text-shadow: -3px 0 #ff00ff, 3px 0 #00ffff; }
+    85% { text-shadow: 1px 0 #ff00ff, -1px 0 #00ffff; }
 }
 
-.animate-electric-badge {
+@keyframes glitch-noise {
+    0%, 80%, 100% { background: var(--primary-500); opacity: 0; }
+    81%, 89% { background: repeating-linear-gradient(0deg, #fff, #fff 1px, transparent 1px, transparent 2px); opacity: 0.3; }
+    83%, 86% { background: repeating-linear-gradient(90deg, #fff, #fff 1px, transparent 1px, transparent 2px); opacity: 0.4; }
+}
+
+.animate-glitch-interference {
     position: relative;
-    &::after {
+    animation: glitch-interference 8s infinite, glitch-chromatic 8s infinite;
+
+    &::before {
         content: "";
         position: absolute;
-        inset: -4px;
-        border-radius: 9999px;
-        background: #4f46e5;
-        opacity: 0;
-        z-index: -1;
-        filter: blur(8px);
-        animation: electric-badge-glow 6s infinite;
+        inset: 0;
+        background: transparent;
+        z-index: 10;
+        pointer-events: none;
+        animation: glitch-noise 8s infinite;
+        border-radius: inherit;
     }
-    animation: electric-flicker 6s infinite;
 }
 
 .animate-spark {
