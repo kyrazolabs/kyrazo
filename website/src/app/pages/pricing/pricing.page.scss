@@ -164,17 +164,16 @@
 @keyframes infinite-hard-shake {
     0%, 100% { transform: translate(0, 0) rotate(0); }
     10% { transform: translate(-4px, -2px) rotate(-1deg); }
-    20% { transform: translate(4px, 2px) rotate(1deg); }
-    30% { transform: translate(-4px, 2px) rotate(-1deg); }
-    40% { transform: translate(4px, -2px) rotate(1deg); }
+    30% { transform: translate(4px, 2px) rotate(1deg); }
+    // 30% { transform: translate(-4px, 2px) rotate(-1deg); }
+    // 40% { transform: translate(4px, -2px) rotate(1deg); }
     50% { transform: translate(-2px, 2px) rotate(-0.5deg); }
-    60% { transform: translate(2px, -2px) rotate(0.5deg); }
+    70% { transform: translate(2px, -2px) rotate(0.5deg); }
 }
 
 .animate-infinite-shake {
-    animation: infinite-hard-shake 0.15s linear infinite;
+    animation: infinite-hard-shake 0.30s linear infinite;
     display: inline-block;
-    filter: drop-shadow(0 0 8px var(--primary-500));
 }
 
 .animate-spark {
