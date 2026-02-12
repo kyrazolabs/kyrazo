@@ -26,11 +26,12 @@ export class WorkspaceService {
 
         const workspace = await workspaceRepository.createWorkspace(workspaceData);
 
+        const membershipId = unprefixId(workspace.id);
         const memberData = {
-            userId: userId,
-            workspaceId: workspace._id,
+            userId: unprefixId(userId),
+            workspaceId: membershipId,
             role: 'owner',
-            invitedBy: userId,
+            invitedBy: unprefixId(userId),
             invitationAcceptedAt: new Date(),
         };
 
@@ -51,8 +52,8 @@ export class WorkspaceService {
         };
 
         await subscriptionRepository.create({
-            workspaceId: workspace?.id,
-            userId: new Types.ObjectId(unprefixId(userId)),
+            workspaceId: new Types.ObjectId(membershipId as string) as any,
+            userId: new Types.ObjectId(unprefixId(userId) as string),
             planId: plan?._id,
             planSnapshot: snapshot(plan),
             status: 'active',
