@@ -16,11 +16,12 @@ import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { DividerModule } from 'primeng/divider';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import { DialogModule } from 'primeng/dialog';
 import { TableModule } from 'primeng/table';
 import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 // Services and Types
 import { SettingService } from '@core/services/settings.service';
@@ -50,6 +51,7 @@ import { DialogService } from '@shared/services/dialog.service';
         TableModule,
         SelectModule,
         TooltipModule,
+        ConfirmDialogModule,
     ],
     templateUrl: './billing-dialog.component.html',
 })
@@ -57,6 +59,7 @@ export class BillingDialogComponent implements OnInit {
     private fb = inject(FormBuilder);
     private settingsService = inject(SettingService);
     private messageService = inject(MessageService);
+    private confirmationService = inject(ConfirmationService);
     private sentry = inject(SentryService);
     private dialogService = inject(DialogService);
     public loader = inject(LoaderService);
@@ -96,10 +99,15 @@ export class BillingDialogComponent implements OnInit {
     }
 
     private updateUpgradeOptions() {
-        this.upgradePlanOptions = this.availablePlans.map((plan) => ({
-            label: `${plan.name} - $${(plan.priceCents || 0) / 100}/${this.getFrequencyLabel(plan.interval || (plan as any).frequency || 'monthly')}`,
-            value: plan.id,
-        }));
+        this.upgradePlanOptions = this.availablePlans
+            .filter(
+                (plan) =>
+                    plan.slug !== 'free' && plan.name !== this.currentPlanName,
+            )
+            .map((plan) => ({
+                label: `${plan.name} - $${(plan.priceCents || 0) / 100}/${this.getFrequencyLabel(plan.interval || (plan as any).frequency || 'monthly')}`,
+                value: plan.id,
+            }));
     }
 
     loadBillingInfo() {
@@ -351,6 +359,41 @@ export class BillingDialogComponent implements OnInit {
                     });
                 },
             });
+    }
+
+    cancelSubscription() {
+        if (!this.currentSubscription) return;
+
+        this.confirmationService.confirm({
+            message:
+                'Are you sure you want to cancel your subscription? Your workspace will be downgraded to the Free plan at the end of the current billing period.',
+            header: 'Cancel Subscription',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                this.loader.show();
+                this.settingsService
+                    .cancelSubscription(this.currentSubscription!.id)
+                    .pipe(finalize(() => this.loader.hide()))
+                    .subscribe({
+                        next: () => {
+                            this.messageService.add({
+                                severity: 'success',
+                                summary: 'Cancelled',
+                                detail: 'Your subscription has been cancelled.',
+                            });
+                            this.loadBillingInfo();
+                        },
+                        error: (err) => {
+                            this.sentry.captureException(err);
+                            this.messageService.add({
+                                severity: 'error',
+                                summary: 'Error',
+                                detail: 'Failed to cancel subscription',
+                            });
+                        },
+                    });
+            },
+        });
     }
 
     hide() {

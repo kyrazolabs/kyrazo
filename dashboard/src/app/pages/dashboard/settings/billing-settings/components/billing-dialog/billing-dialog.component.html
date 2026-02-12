@@ -12,14 +12,16 @@
             <div class="flex items-center gap-3">
                 <p-button label="Billing Portal" icon="pi pi-external-link" [outlined]="true" severity="secondary"
                     styleClass="rounded-xl!" (onClick)="updatePaymentMethod()" size="small" />
+                <p-button *ngIf="currentPlanName !== 'Free'" label="Cancel Subscription" icon="pi pi-times" [outlined]="true" severity="danger"
+                    styleClass="rounded-xl!" (onClick)="cancelSubscription()" size="small" />
                 <p-button label="Upgrade" icon="pi pi-arrow-up" styleClass="rounded-xl!"
                     (onClick)="showUpgradeDialog = true" size="small" />
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Left Column: Plans & Usage -->
-            <div class="lg:col-span-2 space-y-6">
+        <div class="grid grid-cols-1 gap-6">
+            <!-- Usage & Billing History -->
+            <div class="space-y-6">
                 <!-- Current Plan Card -->
                 <p-card class="card-panel">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
@@ -88,36 +90,6 @@
                     </p-table>
                 </p-card>
             </div>
-
-            <!-- Right Column: Plans -->
-            <div class="space-y-6">
-                <p-card header="All Plans" class="card-panel">
-                    <div class="flex flex-col gap-4">
-                        <div *ngFor="let plan of availablePlans"
-                            class="p-4 rounded-xl border transition-all duration-300 group cursor-pointer"
-                            [ngClass]="{
-                                'border-primary bg-primary/5': currentPlanName === plan.name,
-                                'border-surface-200 dark:border-surface-800 hover:border-surface-400': currentPlanName !== plan.name
-                            }"
-                            (click)="selectPlan(plan)">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="font-bold text-surface-900 dark:text-surface-0">{{plan.name}}</span>
-                                <i *ngIf="currentPlanName === plan.name" class="pi pi-check-circle text-primary"></i>
-                            </div>
-                            <div class="flex items-baseline gap-1">
-                                <span class="text-xl font-bold text-surface-900 dark:text-surface-0">${{ (plan.priceCents || 0) / 100 }}</span>
-                                <span class="text-surface-500 text-xs">/{{plan.interval || 'month'}}</span>
-                            </div>
-                            <ul class="mt-3 space-y-1">
-                                <li *ngFor="let feat of (getPlanFeatures(plan) | slice:0:2)" class="text-[10px] text-surface-500 flex items-center gap-1">
-                                    <i class="pi pi-circle-fill text-[4px]"></i>
-                                    {{feat}}
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </p-card>
-            </div>
         </div>
     </div>
 </p-dialog>
@@ -137,3 +109,5 @@
         </div>
     </div>
 </p-dialog>
+
+<p-confirmDialog />
