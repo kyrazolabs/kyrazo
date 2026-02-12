@@ -9,33 +9,7 @@ import { planWriteRateLimiter, planReadRateLimiter } from './plan.ratelimiter';
 
 const plan = new Hono();
 
-// Middleware
-plan.use('*', authenticate);
-
-// Routes
-plan.post(
-    '/',
-    planWriteRateLimiter,
-    zValidator('json', CreatePlanDto, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
-    PlanController.createPlan
-);
-
-plan.use('*', requireWorkspaceMembership(['owner', 'admin']));
-
+// Public Routes
 plan.get(
     '/',
     planReadRateLimiter,
@@ -77,6 +51,33 @@ plan.get(
     }),
     PlanController.getPlanBySlug
 );
+
+// Middleware for authenticated routes
+plan.use('*', authenticate);
+
+// Protected Routes (require authentication)
+plan.post(
+    '/',
+    planWriteRateLimiter,
+    zValidator('json', CreatePlanDto, (result, c) => {
+        if (!result.success) {
+            return c.json(
+                {
+                    success: false,
+                    statusCode: 400,
+                    errors: JSON.parse(result.error.message).map((e: any) => ({
+                        field: e.path.join('.') || 'unknown',
+                        message: e.message,
+                    })),
+                },
+                400
+            );
+        }
+    }),
+    PlanController.createPlan
+);
+
+plan.use('*', requireWorkspaceMembership(['owner', 'admin']));
 
 plan.patch(
     '/:id',

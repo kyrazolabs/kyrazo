@@ -13,7 +13,21 @@ export const planReadRateLimiter = async (c: AppContext, next: () => Promise<voi
             duration: config.security.rateLimiter.protected.normal.duration,
             blockDuration: config.security.rateLimiter.protected.normal.blockDuration,
         }),
-        c => config.security.rateLimiter.protected.normal.keyPrefix((c as any).user.userId),
+        c => {
+            const user = (c as any).user;
+            if (user && user.userId) {
+                return config.security.rateLimiter.protected.normal.keyPrefix(user.userId);
+            }
+
+            // Fallback to IP for unauthenticated users
+            const ip =
+                c.req.header('CF-Connecting-IP') ||
+                c.req.header('X-Forwarded-For') ||
+                c.req.header('X-Real-IP') ||
+                'unknown';
+            const cleanIp = ip.split(',')[0].trim();
+            return `plan:read:ip:${cleanIp}`;
+        },
         'Too many plan read requests'
     );
     return limiter(c, next);
