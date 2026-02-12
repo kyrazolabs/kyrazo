@@ -22,6 +22,7 @@
                     (click)="toggleCycle()"
                     [class.animate-shake-1]="hasInteracted() && shakeToggle()"
                     [class.animate-shake-2]="hasInteracted() && !shakeToggle()"
+                    [class.animate-shake-interval]="billingCycle() === 'yearly'"
                     class="relative w-16 h-8 rounded-full bg-surface-100 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 focus:outline-none cursor-pointer group active:scale-95 transition-transform duration-100">
 
                     <!-- The Teleporting Knob Container -->
