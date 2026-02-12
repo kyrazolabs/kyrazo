@@ -226,9 +226,12 @@ export class BillingDialogComponent implements OnInit {
         return Math.round((this.usage.webhooksUsed / this.webhooksLimit) * 100);
     }
 
-    getPlanFeatures(plan: IPlan): string[] {
-        if (!plan?.features || typeof plan.features !== 'object') return [];
-        return Object.keys(plan.features);
+    getPlanFeatures(plan: any): string[] {
+        const features = plan?.features;
+        if (!features) return [];
+        if (Array.isArray(features)) return features;
+        if (typeof features === 'object') return Object.keys(features);
+        return [];
     }
 
     get selectedPlanControl() {
