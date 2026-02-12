@@ -137,31 +137,31 @@ plan.delete(
 );
 
 // Admin utility routes for fixing Stripe integration
-plan.post(
-    '/:id/regenerate-stripe-price',
-    planWriteRateLimiter,
-    zValidator('param', z.object({ id: z.string() }), (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
-    PlanController.regenerateStripePrice
-);
+// plan.post(
+//     '/:id/regenerate-stripe-price',
+//     planWriteRateLimiter,
+//     zValidator('param', z.object({ id: z.string() }), (result, c) => {
+//         if (!result.success) {
+//             return c.json(
+//                 {
+//                     success: false,
+//                     statusCode: 400,
+//                     errors: JSON.parse(result.error.message).map((e: any) => ({
+//                         field: e.path.join('.') || 'unknown',
+//                         message: e.message,
+//                     })),
+//                 },
+//                 400
+//             );
+//         }
+//     }),
+//     PlanController.regenerateStripePrice
+// );
 
-plan.post(
-    '/fix-stripe-prices',
-    planWriteRateLimiter,
-    PlanController.fixAllPlansWithoutStripePrices
-);
+// plan.post(
+//     '/fix-stripe-prices',
+//     planWriteRateLimiter,
+//     PlanController.fixAllPlansWithoutStripePrices
+// );
 
 export default plan;
