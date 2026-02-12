@@ -1,5 +1,5 @@
 import { redisConfig } from '@/configs/redis';
-import { subscriptionRepository } from '@/modules/subscriptions/subscription.repo';
+import { subscriptionRepository } from '@/modules/billing/subscriptions/subscription.repo';
 import { IPlanLimits, logger, unprefixId } from '@kyrazo/shared';
 
 export const FREE_PLAN_LIMITS: IPlanLimits = {

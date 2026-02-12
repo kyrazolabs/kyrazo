@@ -6,9 +6,7 @@ import endpointRouter from './v1/endpoints/endpoint.routes';
 import sourcesRouter from './v1/source/source.routes';
 import deliveryRouter from './v1/delivery/delivery.routes';
 import analyticsRouter from './v1/analytics/analytics.routes';
-import plansRouter from './plans';
-import subscriptionsRouter from './subscriptions';
-import paymentsRouter from './payments';
+import billingRouter from './billing';
 import projectRouter from './v1/project/project.routes';
 import targetRouter from './v1/target/target.routes';
 import ingestRouter from './v1/ingest/ingest.routes';
@@ -50,13 +48,9 @@ router.route('/ingest', ingestRouter);
 router.route('/support', supportRouter);
 
 // Mount billing routes
-router.route('/payments', paymentsRouter);
-
-// Mount plan routes
-router.route('/subscriptions', subscriptionsRouter);
-
-// Mount subscriptions routes
-router.route('/plans', plansRouter);
+router.route('/payments', billingRouter.payments);
+router.route('/subscriptions', billingRouter.subscriptions);
+router.route('/plans', billingRouter.plans);
 
 // Health check endpoint
 router.get('/health', async c => {

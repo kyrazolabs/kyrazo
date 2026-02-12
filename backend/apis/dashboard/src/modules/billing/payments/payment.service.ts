@@ -317,6 +317,10 @@ export class PaymentService {
                 await this.onSubscriptionDeleted(event.data.object as Stripe.Subscription);
                 break;
 
+            case 'customer.subscription.updated':
+                await this.onSubscriptionUpdated(event.data.object as Stripe.Subscription);
+                break;
+
             default:
                 logger.debug(`Unhandled event: ${event.type}`);
         }
@@ -394,11 +398,47 @@ export class PaymentService {
         );
     }
 
-    private async onSubscriptionDeleted(subscription: Stripe.Subscription) {
+    async onSubscriptionDeleted(subscription: Stripe.Subscription) {
         await subscriptionRepository.updateByStripeId(subscription.id, {
             status: 'canceled',
             canceledAt: new Date(),
         });
+    }
+
+    private async onSubscriptionUpdated(stripeSub: Stripe.Subscription) {
+        const stripeSubscriptionId = stripeSub.id;
+
+        const existing = await subscriptionRepository.findByStripeId(stripeSubscriptionId);
+        if (!existing) {
+            logger.warn(
+                `Subscription update received for unknown subscription: ${stripeSubscriptionId}`
+            );
+            return;
+        }
+
+        const priceId = stripeSub.items.data[0].price.id;
+        const plan = await planRepository.getPlanByStripePrice(priceId);
+
+        if (!plan) {
+            logger.error(
+                `Plan for price ID ${priceId} from customer.subscription.updated webhook does not exist`
+            );
+            return;
+        }
+
+        const sub = stripeSub as any;
+        await subscriptionRepository.updateByStripeId(stripeSubscriptionId, {
+            planId: plan._id,
+            planSnapshot: snapshot(plan),
+            status: sub.status,
+            currentPeriodStart: new Date(sub.current_period_start * 1000),
+            currentPeriodEnd: new Date(sub.current_period_end * 1000),
+            billingCycleAnchor: new Date(sub.billing_cycle_anchor * 1000),
+            quantity: sub.items.data[0].quantity ?? 1,
+            canceledAt: sub.canceled_at ? new Date(sub.canceled_at * 1000) : undefined,
+        });
+
+        await limitService.invalidateWorkspaceLimits(existing.workspaceId.toString());
     }
 
     private async handleCheckoutSessionCompleted(session: Stripe.Checkout.Session): Promise<void> {

@@ -76,6 +76,27 @@ export class SubscriptionService {
         };
     }
 
+    async createSubscription(
+        workspaceId: string,
+        userId: string,
+        subscriptionData: { planId: string; quantity?: number }
+    ): Promise<ISubscription> {
+        const plan = await planService.getPlanById(subscriptionData.planId);
+        if (!plan) throw new Error('Plan not found');
+
+        const subscription = await subscriptionRepository.create({
+            workspaceId: new Types.ObjectId(unprefixId(workspaceId)),
+            userId: new Types.ObjectId(unprefixId(userId)),
+            planId: plan._id,
+            planSnapshot: snapshot(plan),
+            status: 'incomplete', // Will be activated via webhook or success
+            quantity: subscriptionData.quantity ?? 1,
+        });
+
+        await limitService.invalidateWorkspaceLimits(workspaceId);
+        return subscription;
+    }
+
     async getSubscriptionById(id: string): Promise<ISubscription | null> {
         return await subscriptionRepository.findById(id);
     }
@@ -158,6 +179,20 @@ export class SubscriptionService {
             throw new Error('New plan not found');
         }
 
+        // 1️⃣ Update Stripe if it exists
+        if (subscription.stripeSubscriptionId) {
+            await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+                items: [
+                    {
+                        id: (await stripe.subscriptions.retrieve(subscription.stripeSubscriptionId))
+                            .items.data[0].id,
+                        price: newPlan.stripePriceId,
+                    },
+                ],
+                proration_behavior: 'always_invoice',
+            });
+        }
+
         // Create new plan snapshot
         const newPlanSnapshot: IPlanSnapshot = {
             planId: newPlan._id,
@@ -207,13 +242,20 @@ export class SubscriptionService {
             throw new Error('Subscription not found');
         }
 
+        // 1️⃣ Update Stripe if it exists
+        if (subscription.stripeSubscriptionId) {
+            await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+                cancel_at_period_end: true,
+            });
+        }
+
         const updateData: Partial<ISubscription> = {
             status: cancelData.cancelAtPeriodEnd ? 'active' : 'canceled',
             canceledAt: new Date(),
         };
 
         if (cancelData.cancelAtPeriodEnd) {
-            // Will be canceled at period end by a job
+            // Will be canceled at period end by a job or webhook
             updateData.metadata = {
                 ...subscription.metadata,
                 cancelAtPeriodEnd: true,

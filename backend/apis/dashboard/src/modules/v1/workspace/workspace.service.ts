@@ -4,10 +4,10 @@ import { config } from '@/configs';
 import { limitService } from '@/shared/services/limit.service';
 import { mailQueues } from '@/producers/jobs/v1/publishers';
 import { renderWorkspaceInvitationEmail } from '@/templates/emails';
-import { subscriptionRepository } from '@/modules/subscriptions/subscription.repo';
+import { subscriptionRepository } from '@/modules/billing/subscriptions/subscription.repo';
 import { Types } from 'mongoose';
 import { snapshot } from '@/core/utils/transformers';
-import { planRepository } from '@/modules/plans/plan.repo';
+import { planRepository } from '@/modules/billing/plans/plan.repo';
 import { unprefixId } from '@kyrazo/shared';
 
 export class WorkspaceService {
