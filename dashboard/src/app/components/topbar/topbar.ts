@@ -20,6 +20,7 @@ import { filter, map } from 'rxjs/operators';
 import { AppConfig } from '@components/app.config';
 import { LayoutService } from '../service/layout.service';
 import { dropdownAnimation } from '@shared/animations/dropdown.animation';
+import { DialogService } from '@shared/services/dialog.service';
 
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
@@ -65,6 +66,7 @@ export class TopbarComponent implements OnInit {
     private as = inject(AuthService);
     private ss = inject(StorageService);
     private ps = inject(ProjectService);
+    private dialogService = inject(DialogService);
 
     layoutService: LayoutService = inject(LayoutService);
 
@@ -102,7 +104,7 @@ export class TopbarComponent implements OnInit {
                 {
                     label: 'Billing',
                     icon: 'pi pi-credit-card',
-                    url: '/settings/billing',
+                    command: () => this.openBilling(),
                     description: 'Subscription & payments',
                     status: 'active',
                     shortcut: '⌘+B',
@@ -286,5 +288,9 @@ export class TopbarComponent implements OnInit {
     logout() {
         this.as.logout();
         this.router.navigate(['/auth/login']);
+    }
+
+    openBilling() {
+        this.dialogService.openBillingDialog();
     }
 }

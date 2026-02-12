@@ -268,3 +268,8 @@
         (onCancel)="onTargetDialogHide()"
     ></app-target-form>
 </p-dialog>
+
+<app-billing-dialog
+    [visible]="billingDialogVisible"
+    (onClose)="onBillingDialogClose()"
+></app-billing-dialog>

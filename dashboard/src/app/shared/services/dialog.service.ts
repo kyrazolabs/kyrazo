@@ -32,6 +32,12 @@ export class DialogService {
     }>({ visible: false, targetId: null });
     targetDialogState$ = this.targetDialogStateSubject.asObservable();
 
+    // Billing Dialog State
+    private billingDialogStateSubject = new BehaviorSubject<{
+        visible: boolean;
+    }>({ visible: false });
+    billingDialogState$ = this.billingDialogStateSubject.asObservable();
+
     // Event Sources
     private sourceSavedSource = new Subject<any>();
     sourceSaved$ = this.sourceSavedSource.asObservable();
@@ -93,5 +99,14 @@ export class DialogService {
 
     notifyTargetSaved(data?: any) {
         this.targetSavedSource.next(data);
+    }
+
+    // Billing Dialog Methods
+    openBillingDialog() {
+        this.billingDialogStateSubject.next({ visible: true });
+    }
+
+    closeBillingDialog() {
+        this.billingDialogStateSubject.next({ visible: false });
     }
 }
