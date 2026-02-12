@@ -39,14 +39,15 @@
         }
     </div>
 
-    <p-button
+    <a
+        [href]="plan.slug === 'enterprise' ? 'mailto:sales@kyrazo.com' : 'https://dash.kyrazo.com/auth/register'" pButton
         [label]="plan.slug === 'enterprise' ? 'Contact Sales' : (plan.slug === 'free' ? 'Start for Free' : 'Get Started')"
         [severity]="plan.highlighted ? 'primary' : 'secondary'"
         size="small"
-        [styleClass]="'w-full py-4 font-bold! rounded-xl! transition-all duration-300 ' +
+        [class]="'w-full py-4 font-bold! rounded-xl! transition-all duration-300 ' +
         (plan.highlighted ? 'shadow-lg shadow-primary-500/40' : 'hover:bg-primary-500/10 hover:border-primary-500/30 hover:text-primary-500')"
         [outlined]="!plan.highlighted">
-    </p-button>
+    </a>
 
     <div class="mt-10 grow">
         <p class="text-xs font-bold uppercase tracking-[0.2em] mb-6 opacity-40">What's included</p>
