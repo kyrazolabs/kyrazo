@@ -109,7 +109,7 @@
                                 <span class="text-surface-500 text-xs">/{{plan.interval || 'month'}}</span>
                             </div>
                             <ul class="mt-3 space-y-1">
-                                <li *ngFor="let feat of (plan.features | slice:0:2)" class="text-[10px] text-surface-500 flex items-center gap-1">
+                                <li *ngFor="let feat of (getPlanFeatures(plan) | slice:0:2)" class="text-[10px] text-surface-500 flex items-center gap-1">
                                     <i class="pi pi-circle-fill text-[4px]"></i>
                                     {{feat}}
                                 </li>
