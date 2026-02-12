@@ -1,66 +1,16 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
-import { AppContext, authenticate } from '@/core/middlewares/auth.middleware';
+import { authenticate } from '@/core/middlewares/auth.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
-import { config } from '@/configs/app';
-import {
-    createSlidingWindowLimiter,
-    createRateLimitMiddleware,
-} from '@/core/middlewares/rate-limiter.middleware';
-import {
-    CreatePlanDto,
-    UpdatePlanDto,
-    GetPlanBySlugDto,
-    ListPlansQueryDto,
-} from './plan.dto';
+import { CreatePlanDto, UpdatePlanDto, GetPlanBySlugDto, ListPlansQueryDto } from './plan.dto';
 import { PlanController } from './plan.controller';
+import { planWriteRateLimiter, planReadRateLimiter } from './plan.ratelimiter';
 
 const plan = new Hono();
 
 // Middleware
 plan.use('*', authenticate);
-
-// Rate limiters
-const planReadRateLimiter = async (
-    c: AppContext,
-    next: () => Promise<void>
-) => {
-    const limiter = createRateLimitMiddleware(
-        createSlidingWindowLimiter({
-            points: config.security.rateLimiter.protected.normal.points,
-            duration: config.security.rateLimiter.protected.normal.duration,
-            blockDuration:
-                config.security.rateLimiter.protected.normal.blockDuration,
-        }),
-        c =>
-            config.security.rateLimiter.protected.normal.keyPrefix(
-                (c as any).user.userId
-            ),
-        'Too many plan read requests'
-    );
-    return limiter(c, next);
-};
-
-const planWriteRateLimiter = async (
-    c: AppContext,
-    next: () => Promise<void>
-) => {
-    const limiter = createRateLimitMiddleware(
-        createSlidingWindowLimiter({
-            points: config.security.rateLimiter.protected.medium.points,
-            duration: config.security.rateLimiter.protected.medium.duration,
-            blockDuration:
-                config.security.rateLimiter.protected.medium.blockDuration,
-        }),
-        c =>
-            config.security.rateLimiter.protected.medium.keyPrefix(
-                (c as any).user.userId
-            ),
-        'Too many plan write requests'
-    );
-    return limiter(c, next);
-};
 
 // Routes
 plan.post(
