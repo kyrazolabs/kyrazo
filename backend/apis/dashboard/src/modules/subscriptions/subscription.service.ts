@@ -11,6 +11,7 @@ import { limitService } from '@/shared/services/limit.service';
 import { usageService } from '@/shared/services/usage.service';
 import { stripe } from '@/configs/stripe';
 import { config } from '@/configs';
+import { snapshot } from '@/core/utils/transformers';
 
 export class SubscriptionService {
     async createSubscriptionCheckout(
@@ -85,6 +86,57 @@ export class SubscriptionService {
 
     async getActiveWorkspaceSubscription(workspaceId: string): Promise<ISubscription | null> {
         return await subscriptionRepository.findActiveByWorkspace(workspaceId);
+    }
+
+    async getWorkspaceSubscriptionWithFallback(workspaceId: string): Promise<any> {
+        const subscription = await subscriptionRepository.findActiveByWorkspace(workspaceId);
+
+        if (subscription) {
+            return subscription;
+        }
+
+        return await this.createVirtualFreeSubscription(workspaceId);
+    }
+
+    async getWorkspaceSubscriptionsWithFallback(workspaceId: string): Promise<any[]> {
+        const subscriptions = await subscriptionRepository.findByWorkspace(workspaceId);
+
+        if (subscriptions.length > 0) {
+            return subscriptions;
+        }
+
+        // Fallback to history with virtual free plan
+        const virtualSub = await this.createVirtualFreeSubscription(workspaceId);
+        return [virtualSub];
+    }
+
+    private async createVirtualFreeSubscription(workspaceId: string): Promise<any> {
+        // Fallback to free plan
+        const freePlan = await planService.getPlanBySlug('free');
+        if (!freePlan) {
+            throw new Error('Free plan not found');
+        }
+
+        const now = new Date();
+        const nextMonth = new Date();
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+
+        // Return a virtual subscription object that looks like ISubscription
+        return {
+            _id: new Types.ObjectId(),
+            workspaceId: new Types.ObjectId(unprefixId(workspaceId)),
+            planId: freePlan._id,
+            planSnapshot: snapshot(freePlan),
+            status: 'active',
+            billingCycleAnchor: now,
+            paymentFailureCount: 0,
+            currentPeriodStart: now,
+            currentPeriodEnd: nextMonth,
+            quantity: 1,
+            createdAt: now,
+            updatedAt: now,
+            isVirtual: true,
+        };
     }
 
     async changePlan(

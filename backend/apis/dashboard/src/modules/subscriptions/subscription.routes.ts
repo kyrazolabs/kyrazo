@@ -43,6 +43,12 @@ subscription.get(
     SubscriptionController.getWorkspaceSubscriptions
 );
 
+subscription.get(
+    '/history',
+    subscriptionReadRateLimiter,
+    SubscriptionController.getWorkspaceSubscriptions
+);
+
 subscription.get('/limits', subscriptionReadRateLimiter, SubscriptionController.checkLimits);
 
 subscription.get(
