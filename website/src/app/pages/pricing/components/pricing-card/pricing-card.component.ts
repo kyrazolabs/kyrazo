@@ -18,8 +18,6 @@ export class PricingCardComponent {
     @Input() isYearly = false;
     @Input() delay = '';
 
-    private router = inject(Router);
-
     get currentPrice(): number {
         return this.isYearly
             ? this.plan.priceCentsYearly / 10
