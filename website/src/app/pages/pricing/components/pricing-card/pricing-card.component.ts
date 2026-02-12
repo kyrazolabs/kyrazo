@@ -24,7 +24,7 @@ export class PricingCardComponent {
     }
 
     get intervalLabel(): string {
-        return this.isYearly ? '/mo, billed yearly' : '/month';
+        return this.isYearly ? '/m, billed yearly' : '/month';
     }
 
     formatPrice(cents: number): string {
