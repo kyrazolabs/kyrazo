@@ -92,6 +92,8 @@ export class SubscriptionController {
                 subscription = await subscriptionService.getWorkspaceSubscriptionWithFallback(
                     workspace.workspaceId.toString()
                 );
+            } else if (id === 'history') {
+                return SubscriptionController.getWorkspaceSubscriptions(c);
             } else {
                 subscription = await subscriptionService.getSubscriptionById(id);
             }
