@@ -39,6 +39,7 @@ import { UserProfileResponse } from '@models/auth.types';
 import { finalize } from 'rxjs';
 import { SentryService } from '@core/3rd-party/sentry';
 import { PostHogService } from '@core/3rd-party/posthog';
+import { DialogService } from '@shared/services/dialog.service';
 
 @Component({
     selector: 'app-workspace-settings',
@@ -73,6 +74,7 @@ export class WorkspaceSettingsPage implements OnInit {
     private readonly router = inject(Router);
     private readonly sentry = inject(SentryService);
     private readonly posthog = inject(PostHogService);
+    private readonly dialogService = inject(DialogService);
 
     // Reactive forms
     workspaceForm!: FormGroup;
@@ -531,5 +533,9 @@ export class WorkspaceSettingsPage implements OnInit {
                 });
             },
         });
+    }
+
+    openBilling() {
+        this.dialogService.openBillingDialog();
     }
 }

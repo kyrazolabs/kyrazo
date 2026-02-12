@@ -8,6 +8,7 @@ import {
     HostListener,
 } from '@angular/core';
 import { dropdownAnimation } from '@shared/animations/dropdown.animation';
+import { DialogService } from '@shared/services/dialog.service';
 import { RouterLink, Router, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { filter } from 'rxjs/operators';
@@ -66,6 +67,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     private ws = inject(WorkspaceService);
     private router = inject(Router);
     private messageService = inject(MessageService);
+    private dialogService = inject(DialogService);
     public layoutService = inject(LayoutService);
 
     currentRoute = '';
@@ -101,7 +103,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
                 {
                     label: 'Billing',
                     icon: 'pi pi-credit-card',
-                    url: '/settings/billing',
+                    command: () => this.openBilling(),
                     description: 'Subscription & payments',
                     status: 'active',
                     shortcut: '⌘+B',
@@ -236,6 +238,10 @@ export class SidebarComponent implements OnInit, AfterViewInit {
 
     openSupportDialog() {
         this.supportDialogVisible = true;
+    }
+
+    openBilling() {
+        this.dialogService.openBillingDialog();
     }
 }
 
