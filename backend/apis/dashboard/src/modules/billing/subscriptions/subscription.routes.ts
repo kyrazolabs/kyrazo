@@ -49,6 +49,8 @@ subscription.get(
     SubscriptionController.getWorkspaceSubscriptions
 );
 
+subscription.get('/invoices', subscriptionReadRateLimiter, SubscriptionController.getInvoices);
+
 subscription.get('/limits', subscriptionReadRateLimiter, SubscriptionController.checkLimits);
 
 subscription.get(

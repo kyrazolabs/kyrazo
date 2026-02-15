@@ -27,8 +27,7 @@ export class SupportController {
 
             // JWTPayload doesn't have name, using email.
             // IUserWorkspace has workspace property which might have name if populated.
-            const workspaceName =
-                workspace.workspace?.name || workspace.workspaceId.toString();
+            const workspaceName = workspace.workspace?.name || workspace.workspaceId.toString();
 
             await supportService.createTicket(valid, {
                 email: user.email,
@@ -39,8 +38,7 @@ export class SupportController {
             return c.json(
                 {
                     success: true,
-                    message:
-                        'Your support ticket has been submitted successfully.',
+                    message: 'Your support ticket has been submitted successfully.',
                 },
                 201
             );

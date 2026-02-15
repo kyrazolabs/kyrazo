@@ -2,12 +2,12 @@ import Stripe from 'stripe';
 import { Types } from 'mongoose';
 import { stripe, stripeConfig } from '@/configs/stripe';
 import { paymentRepository } from './payment.repo';
-import { subscriptionService } from '../subscriptions/subscription.service';
-import { planService } from '../plans/plan.service';
-import { CreateSubscriptionPaymentInput, PaymentResponse } from './payment.dto';
-import { Invoice, logger, Plan, unprefixId } from '@kyrazo/shared';
-import { subscriptionRepository } from '../subscriptions/subscription.repo';
-import { planRepository } from '../plans/plan.repo';
+import { subscriptionService } from '@/modules/billing/subscriptions/subscription.service';
+import { planService } from '@/modules/billing/plans/plan.service';
+import { PaymentResponse } from './payment.dto';
+import { Invoice, logger, unprefixId } from '@kyrazo/shared';
+import { subscriptionRepository } from '@/modules/billing/subscriptions/subscription.repo';
+import { planRepository } from '@/modules/billing/plans/plan.repo';
 import { snapshot } from '@/core/utils/transformers';
 import { limitService } from '@/shared/services/limit.service';
 import { usageService } from '@/shared/services/usage.service';
@@ -45,155 +45,6 @@ export class PaymentService {
         } catch (error) {
             logger.error(`Failed to save local invoice: ${error}`);
         }
-    }
-    async createInitialPayment(
-        workspaceId: string,
-        userId: string,
-        userEmail: string,
-        input: CreateSubscriptionPaymentInput
-    ): Promise<PaymentResponse> {
-        // Get plan details
-        const plan = await planService.getPlanById(input.planId);
-        if (!plan) {
-            throw new Error('Plan not found');
-        }
-        logger.info(
-            `Creating subscription for plan: ${plan.name} (${plan._id}), Price: ${plan.priceCents} ${plan.currency}`
-        );
-
-        // Get or create Stripe customer
-        let customer = await paymentRepository.findCustomerByWorkspace(workspaceId);
-        if (!customer) {
-            const stripeCustomer = await stripe.customers.create({
-                email: userEmail,
-                metadata: {
-                    workspaceId,
-                    userId,
-                },
-            });
-
-            customer = await paymentRepository.createCustomer({
-                workspaceId: new Types.ObjectId(unprefixId(workspaceId)),
-                userId: new Types.ObjectId(unprefixId(userId)),
-                stripeCustomerId: stripeCustomer.id,
-                email: userEmail,
-                name: stripeCustomer.name || undefined,
-            });
-        }
-
-        // Create subscription in our system (incomplete status)
-        // Create subscription in our system (incomplete status)
-        const subscription = await subscriptionService.createSubscription(workspaceId, userId, {
-            planId: plan._id.toString(),
-            quantity: input.quantity,
-        });
-
-        // 1. Create Invoice (Empty Draft)
-        const invoice = await stripe.invoices.create({
-            customer: customer.stripeCustomerId,
-            collection_method: 'charge_automatically',
-            auto_advance: true,
-            metadata: {
-                subscriptionId: subscription._id.toString(),
-                workspaceId,
-            },
-            payment_settings: {
-                payment_method_types: ['card'],
-            },
-        });
-
-        // 2. Create Invoice Item (Attached to Invoice)
-        await stripe.invoiceItems.create({
-            customer: customer.stripeCustomerId,
-            invoice: invoice.id, // Explicitly attach to this invoice
-            amount: plan.priceCents,
-            currency: plan.currency,
-            description: `Subscription to ${plan.name}`,
-            metadata: {
-                subscriptionId: subscription._id.toString(),
-                workspaceId,
-            },
-        });
-
-        // Finalize invoice to get payment intent
-        let finalizedInvoiceResponse = await stripe.invoices.finalizeInvoice(invoice.id!, {
-            expand: ['payment_intent'],
-        });
-        let finalizedInvoice = finalizedInvoiceResponse as any;
-
-        // Poll for PaymentIntent if missing (up to 3 times)
-        let attempts = 0;
-        while (
-            !finalizedInvoice.payment_intent &&
-            finalizedInvoice.status === 'open' &&
-            attempts < 3
-        ) {
-            attempts++;
-            logger.warn(`PaymentIntent missing, attempt ${attempts}/3. Waiting 1s...`);
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            finalizedInvoiceResponse = await stripe.invoices.retrieve(invoice.id!, {
-                expand: ['payment_intent'],
-            });
-            finalizedInvoice = finalizedInvoiceResponse as any;
-        }
-
-        if (!finalizedInvoice.payment_intent) {
-            logger.error(
-                `Failed to get PaymentIntent after retries. Invoice dump: ${JSON.stringify(finalizedInvoice)}`
-            );
-        }
-
-        logger.info(
-            `Finalized Invoice: ${finalizedInvoice.id}, Status: ${finalizedInvoice.status}, Amount: ${finalizedInvoice.amount_due}, PaymentIntent: ${typeof finalizedInvoice.payment_intent}`
-        );
-        logger.info(
-            `Finalized Invoice: ${finalizedInvoice.id}, Status: ${finalizedInvoice.status}, Amount: ${finalizedInvoice.amount_due}, PaymentIntent: ${typeof finalizedInvoice.payment_intent}`
-        );
-
-        if (finalizedInvoice.payment_intent) {
-            const piId =
-                typeof finalizedInvoice.payment_intent === 'string'
-                    ? finalizedInvoice.payment_intent
-                    : finalizedInvoice.payment_intent.id;
-            const pi = await stripe.paymentIntents.retrieve(piId);
-
-            // Save Invoice to DB
-            await this.saveInvoiceFromStripe(
-                finalizedInvoice,
-                workspaceId,
-                subscription._id.toString()
-            );
-
-            return {
-                subscriptionId: subscription._id.toString(),
-                clientSecret: pi.client_secret!,
-                invoiceId: finalizedInvoice.id,
-                hostedInvoiceUrl: finalizedInvoice.hosted_invoice_url,
-            };
-        }
-
-        // Fallback: Return Hosted Invoice URL if PI is still missing
-        if (finalizedInvoice.hosted_invoice_url) {
-            logger.warn(`Returning Hosted Invoice URL as fallback for missing PI`);
-            // Save Invoice to DB
-            await this.saveInvoiceFromStripe(
-                finalizedInvoice,
-                workspaceId,
-                subscription._id.toString()
-            );
-
-            return {
-                subscriptionId: subscription._id.toString(),
-                clientSecret: '', // Frontend should handle empty secret by redirecting to hostedUrl
-                invoiceId: finalizedInvoice.id,
-                hostedInvoiceUrl: finalizedInvoice.hosted_invoice_url,
-            };
-        }
-
-        throw new Error(
-            `Failed to generate payment intent or hosted URL. Invoice status: ${finalizedInvoice.status}`
-        );
     }
 
     async createBillingPortalSession(

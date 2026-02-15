@@ -2,7 +2,7 @@ import { Queue, Worker } from 'bullmq';
 import { redisConfig } from '@/configs/redis';
 import { logger, Usage, unprefixId } from '@kyrazo/shared';
 import { Types } from 'mongoose';
-import { subscriptionService } from '@/modules/subscriptions/subscription.service';
+import { subscriptionService } from '@/modules/billing/subscriptions/subscription.service';
 import stripe from '@/configs/stripe';
 
 const USAGE_QUEUE_NAME = 'usage-tracking';

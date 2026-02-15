@@ -1,7 +1,7 @@
 import { AppContext } from '@/core/middlewares/auth.middleware';
 import { IErrorResponse, logger } from '@kyrazo/shared';
 import { subscriptionService } from './subscription.service';
-import { paymentService } from '../payments/payment.service';
+import { paymentService } from '@/modules/billing/payments/payment.service';
 import {
     CreateSubscriptionInput,
     ChangePlanInput,
@@ -32,7 +32,7 @@ export class SubscriptionController {
             const body = await c.req.json();
             const valid = body as CreateSubscriptionInput;
 
-            const subscription = await subscriptionService.createSubscriptionCheckout(
+            const result = await subscriptionService.createSubscriptionCheckout(
                 workspace.workspaceId.toString(),
                 userId,
                 valid
@@ -41,8 +41,8 @@ export class SubscriptionController {
             return c.json(
                 {
                     success: true,
-                    message: 'Subscription created successfully',
-                    data: subscription,
+                    message: 'Subscription checkout created successfully',
+                    data: result,
                 },
                 201
             );
@@ -400,6 +400,50 @@ export class SubscriptionController {
                     error: {
                         code: 'CHECK_LIMITS_FAILED',
                         message: 'Failed to check limits',
+                        requestId: c.get('requestId'),
+                    },
+                },
+                500
+            );
+        }
+    }
+
+    static async getInvoices(c: AppContext): Promise<Response> {
+        try {
+            const workspace = c.workspace;
+            if (!workspace) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'UNAUTHORIZED_USER',
+                            message: 'Unauthorized user',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    401
+                );
+            }
+
+            const invoices = await subscriptionService.getInvoices(
+                workspace.workspaceId.toString()
+            );
+
+            return c.json(
+                {
+                    success: true,
+                    data: invoices,
+                },
+                200
+            );
+        } catch (error: unknown) {
+            logger.error('Unexpected error in SubscriptionController.getInvoices', error as Error);
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'GET_INVOICES_FAILED',
+                        message: 'Failed to get invoices',
                         requestId: c.get('requestId'),
                     },
                 },

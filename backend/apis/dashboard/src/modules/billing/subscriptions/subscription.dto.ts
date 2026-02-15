@@ -21,7 +21,7 @@ export const ChangePlanDto = z.object({
 
 // Cancel subscription DTO
 export const CancelSubscriptionDto = z.object({
-    cancelAtPeriodEnd: z.boolean().default(false),
+    cancelAtPeriodEnd: z.boolean().default(true),
     reason: z.string().optional(),
 });
 
@@ -33,8 +33,14 @@ export const GetSubscriptionByIdDto = z.object({
 // List subscriptions query DTO
 export const ListSubscriptionsQueryDto = z.object({
     status: z.enum(['active', 'trial', 'past_due', 'canceled', 'incomplete']).optional(),
-    limit: z.string().transform(val => parseInt(val)).optional(),
-    offset: z.string().transform(val => parseInt(val)).optional(),
+    limit: z
+        .string()
+        .transform(val => parseInt(val))
+        .optional(),
+    offset: z
+        .string()
+        .transform(val => parseInt(val))
+        .optional(),
 });
 
 // Response DTOs

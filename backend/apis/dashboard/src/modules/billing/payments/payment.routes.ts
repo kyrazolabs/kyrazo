@@ -2,9 +2,9 @@ import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { authenticate } from '@/core/middlewares/auth.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
-import { CreateSubscriptionPaymentDto, CreateBillingPortalDto } from './payment.dto';
+import { CreateBillingPortalDto } from './payment.dto';
 import { PaymentController } from './payment.controller';
-import { paymentReadRateLimiter, paymentWriteRateLimiter } from './payment.ratelimiter';
+import { paymentReadRateLimiter } from './payment.ratelimiter';
 
 const payment = new Hono();
 

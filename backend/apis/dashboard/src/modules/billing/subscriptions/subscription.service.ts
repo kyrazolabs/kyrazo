@@ -1,6 +1,6 @@
 import { subscriptionRepository } from './subscription.repo';
-import { planService } from '../plans/plan.service';
-import { ISubscription, IPlanSnapshot, User, Customer, unprefixId } from '@kyrazo/shared';
+import { planService } from '@/modules/billing/plans/plan.service';
+import { ISubscription, IPlanSnapshot, User, Customer, unprefixId, Invoice } from '@kyrazo/shared';
 import {
     CreateSubscriptionInput,
     ChangePlanInput,
@@ -84,6 +84,10 @@ export class SubscriptionService {
         const plan = await planService.getPlanById(subscriptionData.planId);
         if (!plan) throw new Error('Plan not found');
 
+        const now = new Date();
+        const nextMonth = new Date();
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+
         const subscription = await subscriptionRepository.create({
             workspaceId: new Types.ObjectId(unprefixId(workspaceId)),
             userId: new Types.ObjectId(unprefixId(userId)),
@@ -91,6 +95,9 @@ export class SubscriptionService {
             planSnapshot: snapshot(plan),
             status: 'incomplete', // Will be activated via webhook or success
             quantity: subscriptionData.quantity ?? 1,
+            billingCycleAnchor: now,
+            currentPeriodStart: now,
+            currentPeriodEnd: nextMonth,
         });
 
         await limitService.invalidateWorkspaceLimits(workspaceId);
@@ -324,6 +331,14 @@ export class SubscriptionService {
 
     async getEndingSubscriptions(hoursFromNow: number = 24): Promise<ISubscription[]> {
         return await subscriptionRepository.findEndingSubscriptions(hoursFromNow);
+    }
+
+    async getInvoices(workspaceId: string): Promise<any[]> {
+        return await Invoice.find({
+            workspaceId: new Types.ObjectId(unprefixId(workspaceId)),
+        })
+            .sort({ createdAt: -1 })
+            .limit(20);
     }
 
     async checkWorkspaceLimits(workspaceId: string): Promise<{

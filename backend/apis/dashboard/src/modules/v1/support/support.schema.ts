@@ -11,12 +11,7 @@ export const SupportTypes = [
 ] as const;
 
 // Define Categories
-export const BugCategories = [
-    'API',
-    'Webhook Delivery',
-    'Dashboard',
-    'SDKs',
-] as const;
+export const BugCategories = ['API', 'Webhook Delivery', 'Dashboard', 'SDKs'] as const;
 export const FeatureCategories = [
     'Ingest',
     'Dispatch',
@@ -25,11 +20,7 @@ export const FeatureCategories = [
     'Sources',
     'Connecters',
 ] as const;
-export const BillingCategories = [
-    'Invoices',
-    'Refunds',
-    'Usage Limits',
-] as const;
+export const BillingCategories = ['Invoices', 'Refunds', 'Usage Limits'] as const;
 
 export const SupportTicketSchema = z
     .object({
@@ -43,6 +34,7 @@ export const SupportTicketSchema = z
             .max(5000, 'Message must be at most 5000 characters'),
         Types: z.enum(SupportTypes),
         Category: z.string().min(2, 'Category is required'),
+        kind: z.enum(['support', 'cancellation']).default('support'),
     })
     .superRefine((data, ctx) => {
         if (data.Types === 'Bug') {

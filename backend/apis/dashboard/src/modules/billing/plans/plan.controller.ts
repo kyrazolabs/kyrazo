@@ -28,10 +28,7 @@ export class PlanController {
             }
             const isSystemAdmin = await User.findByEmail(user?.email);
 
-            if (
-                !isSystemAdmin ||
-                isSystemAdmin.email !== 'work.nx.iq@gmail.com'
-            ) {
+            if (!isSystemAdmin || isSystemAdmin.email !== 'work.nx.iq@gmail.com') {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -58,15 +55,9 @@ export class PlanController {
                 201
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in PlanController.createPlan',
-                error as Error
-            );
+            logger.error('Unexpected error in PlanController.createPlan', error as Error);
 
-            const message =
-                error instanceof Error
-                    ? error.message
-                    : 'Failed to create plan';
+            const message = error instanceof Error ? error.message : 'Failed to create plan';
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -108,10 +99,7 @@ export class PlanController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in PlanController.getPlanBySlug',
-                error as Error
-            );
+            logger.error('Unexpected error in PlanController.getPlanBySlug', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -148,10 +136,7 @@ export class PlanController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in PlanController.getPlans',
-                error as Error
-            );
+            logger.error('Unexpected error in PlanController.getPlans', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -170,7 +155,7 @@ export class PlanController {
         try {
             const userId = c.user?.userId;
             const workspace = c.workspace;
-            const { id } = c.req.valid('param');
+            const { id } = c.req.param() as { id: string };
 
             if (!userId || !workspace) {
                 return c.json<IErrorResponse>(
@@ -227,15 +212,9 @@ export class PlanController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in PlanController.updatePlan',
-                error as Error
-            );
+            logger.error('Unexpected error in PlanController.updatePlan', error as Error);
 
-            const message =
-                error instanceof Error
-                    ? error.message
-                    : 'Failed to update plan';
+            const message = error instanceof Error ? error.message : 'Failed to update plan';
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -308,10 +287,7 @@ export class PlanController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in PlanController.deletePlan',
-                error as Error
-            );
+            logger.error('Unexpected error in PlanController.deletePlan', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -390,9 +366,7 @@ export class PlanController {
             );
 
             const message =
-                error instanceof Error
-                    ? error.message
-                    : 'Failed to regenerate Stripe price';
+                error instanceof Error ? error.message : 'Failed to regenerate Stripe price';
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -407,9 +381,7 @@ export class PlanController {
         }
     }
 
-    static async fixAllPlansWithoutStripePrices(
-        c: AppContext
-    ): Promise<Response> {
+    static async fixAllPlansWithoutStripePrices(c: AppContext): Promise<Response> {
         try {
             const userId = c.user?.userId;
             const workspace = c.workspace;
@@ -458,8 +430,7 @@ export class PlanController {
                 error as Error
             );
 
-            const message =
-                error instanceof Error ? error.message : 'Failed to fix plans';
+            const message = error instanceof Error ? error.message : 'Failed to fix plans';
             return c.json<IErrorResponse>(
                 {
                     success: false,
