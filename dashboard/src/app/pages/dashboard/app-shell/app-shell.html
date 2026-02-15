@@ -34,7 +34,7 @@
         [class.ml-0]="!layoutService.appState().openSidebar || layoutService.isMobile()"
     >
         <!-- Fixed Navbar (sticks to top of main content area) -->
-        <nav class="sticky top-0">
+    <nav class="sticky top-0 z-30">
             <app-topbar />
         </nav>
 
@@ -268,8 +268,3 @@
         (onCancel)="onTargetDialogHide()"
     ></app-target-form>
 </p-dialog>
-
-<app-billing-dialog
-    [visible]="billingDialogVisible"
-    (onClose)="onBillingDialogClose()"
-></app-billing-dialog>

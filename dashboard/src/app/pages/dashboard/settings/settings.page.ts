@@ -1,37 +1,38 @@
 import {
     Component,
-    OnInit,
     inject,
     ChangeDetectorRef,
+    OnInit,
     ViewChild,
-    AfterViewInit,
-    ElementRef,
-    HostListener,
 } from '@angular/core';
-import {
-    Router,
-    RouterLink,
-    RouterOutlet,
-    NavigationEnd,
-} from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { filter } from 'rxjs/operators';
 
-import { dropdownAnimation } from '@shared/animations/dropdown.animation';
-
+// PrimeNG Imports
 import { MenuModule } from 'primeng/menu';
 import { BadgeModule } from 'primeng/badge';
 import { RippleModule } from 'primeng/ripple';
 import { AvatarModule } from 'primeng/avatar';
 import { PopoverModule } from 'primeng/popover';
+import { TabsModule } from 'primeng/tabs';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { DrawerModule } from 'primeng/drawer';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
-import { CommonModule } from '@angular/common';
 import { CardModule } from 'primeng/card';
+import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+
+// Child Components
+import { ProfileSettingsPage } from './profile/profile.page';
+import { NotificationSettingsPage } from './notification/notification.page';
+import { WorkspaceSettingsPage } from './workspace/workspace.page';
+import { BillingSettingsPage } from './billing/billing.page';
 
 @Component({
     selector: 'app-settings.page',
@@ -39,7 +40,6 @@ import { CardModule } from 'primeng/card';
         CommonModule,
         FormsModule,
         MenuModule,
-        RouterLink,
         BadgeModule,
         DrawerModule,
         RippleModule,
@@ -51,48 +51,45 @@ import { CardModule } from 'primeng/card';
         InputTextModule,
         TextareaModule,
         CardModule,
-        RouterOutlet,
+        TabsModule,
+        IconFieldModule,
+        InputIconModule,
+        ProfileSettingsPage,
+        NotificationSettingsPage,
+        WorkspaceSettingsPage,
+        BillingSettingsPage,
+        ToastModule,
+        ConfirmDialogModule,
     ],
     templateUrl: './settings.page.html',
     styleUrl: './settings.page.scss',
 })
-export class SettingsPage {
-    @ViewChild('outlet', { static: true }) outlet!: RouterOutlet;
-
+export class SettingsPage implements OnInit {
     private cdr = inject(ChangeDetectorRef);
     private router = inject(Router);
+    private route = inject(ActivatedRoute);
 
-    animationState: string = '';
-    footerAnimationKey: string = '';
+    currentTab = 'profile';
 
-    currentRoute = '';
+    @ViewChild('profileComp') profileComp?: ProfileSettingsPage;
+    @ViewChild('notificationComp') notificationComp?: NotificationSettingsPage;
+    @ViewChild('workspaceComp') workspaceComp?: WorkspaceSettingsPage;
+    @ViewChild('billingComp') billingComp?: BillingSettingsPage;
 
-    childRoute(outlet: RouterOutlet) {
-        return outlet?.activatedRouteData?.['animation'];
-    }
     ngOnInit() {
-        this.router.events
-            .pipe(filter((event) => event instanceof NavigationEnd))
-            .subscribe(() => {
-                this.footerAnimationKey = this.router.url;
-            });
+        this.route.queryParams.subscribe((params) => {
+            if (params['tab']) {
+                this.currentTab = params['tab'];
+            }
+        });
     }
 
-    ngAfterViewInit() {
-        this.updateAnimationState();
-    }
-
-    private updateAnimationState() {
-        this.animationState = this.outlet?.isActivated
-            ? this.outlet.activatedRoute.snapshot.data['animation']
-            : '';
-        this.cdr.detectChanges();
-    }
-    // Method to check if a route is active
-    isRouteActive(route: string): boolean {
-        return (
-            this.currentRoute === route ||
-            this.currentRoute.startsWith(route + '/')
-        );
+    onTabChange(event: any) {
+        this.currentTab = event;
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { tab: event },
+            queryParamsHandling: 'merge',
+        });
     }
 }

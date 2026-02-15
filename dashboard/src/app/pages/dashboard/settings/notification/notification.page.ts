@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 // PrimeNG Imports
 import { CardModule } from 'primeng/card';
@@ -25,7 +25,6 @@ import { DialogService } from '@shared/services/dialog.service';
     imports: [
         CommonModule,
         ReactiveFormsModule,
-        RouterLink,
         CardModule,
         ToggleSwitchModule,
         ButtonModule,
@@ -34,8 +33,8 @@ import { DialogService } from '@shared/services/dialog.service';
         ToastModule,
         SelectModule,
     ],
-    templateUrl: './notification-settings.page.html',
-    styleUrl: './notification-settings.page.scss',
+    templateUrl: './notification.page.html',
+    styleUrl: './notification.page.scss',
 })
 export class NotificationSettingsPage implements OnInit {
     private fb = inject(FormBuilder);

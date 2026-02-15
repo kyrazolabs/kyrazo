@@ -23,7 +23,6 @@ import { LayoutService } from '@components/service/layout.service';
 import { SourceFormComponent } from '../events/ingest/sources/components/source-form/source-form.component';
 import { EndpointFormComponent } from '../events/ingest/endpoints/components/endpoint-form/endpoint-form.component';
 import { TargetFormComponent } from '../events/dispatch/targets/components/target-form/target-form.component';
-import { BillingDialogComponent } from '../settings/billing-settings/components/billing-dialog/billing-dialog.component';
 
 @Component({
     selector: 'app-shell',
@@ -38,7 +37,6 @@ import { BillingDialogComponent } from '../settings/billing-settings/components/
         SourceFormComponent,
         EndpointFormComponent,
         TargetFormComponent,
-        BillingDialogComponent,
     ],
     templateUrl: './app-shell.html',
     styleUrl: './app-shell.scss',
@@ -143,11 +141,6 @@ export class AppShell implements OnInit, AfterViewInit {
                 ? 'Edit Target'
                 : 'Create Target';
         });
-
-        // Listen for Billing Dialog State
-        this.dialogService.billingDialogState$.subscribe((state) => {
-            this.billingDialogVisible = state.visible;
-        });
     }
 
     ngAfterViewInit() {
@@ -215,9 +208,5 @@ export class AppShell implements OnInit, AfterViewInit {
 
     onTargetDialogHide() {
         this.dialogService.closeTargetDialog();
-    }
-
-    onBillingDialogClose() {
-        this.dialogService.closeBillingDialog();
     }
 }

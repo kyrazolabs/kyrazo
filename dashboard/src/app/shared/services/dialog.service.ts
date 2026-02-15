@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { BehaviorSubject, Subject } from 'rxjs';
 
 export interface DialogMessage {
@@ -47,6 +48,8 @@ export class DialogService {
 
     private targetSavedSource = new Subject<any>();
     targetSaved$ = this.targetSavedSource.asObservable();
+
+    private router = inject(Router);
 
     constructor() {}
 
@@ -103,6 +106,9 @@ export class DialogService {
 
     // Billing Dialog Methods
     openBillingDialog() {
+        this.router.navigate(['/dashboard/settings'], {
+            queryParams: { tab: 'billing' },
+        });
         this.billingDialogStateSubject.next({ visible: true });
     }
 

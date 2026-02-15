@@ -1,15 +1,119 @@
-<div class="min-h-screen relative w-full! px-6 flex flex-col gap-6">
-    <div class="flex flex-row justify-start card-panel w-full h-full">
-            
+<div class="flex flex-col w-full mx-auto gap-8 flex-1 animate-fade-in p-4 lg:p-6">
+    <!-- Header Section -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <!-- Left section: Titles -->
+        <div>
+            <ng-container [ngSwitch]="currentTab">
+                <div *ngSwitchCase="'profile'">
+                    <h1 class="text-3xl font-bold text-surface-900 dark:text-surface-0">Profile Settings</h1>
+                    <p class="text-surface-500 dark:text-surface-400">Manage your account information and preferences</p>
+                </div>
+                <div *ngSwitchCase="'notifications'">
+                    <h1 class="text-3xl font-bold text-surface-900 dark:text-surface-0">Notification Settings</h1>
+                    <p class="text-surface-500 dark:text-surface-400">Configure how and when you receive notifications</p>
+                </div>
+                <div *ngSwitchCase="'workspace'">
+                    <h1 class="text-3xl font-bold text-surface-900 dark:text-surface-0">Workspace Settings</h1>
+                    <p class="text-surface-500 dark:text-surface-400">Manage your workspace details and team members</p>
+                </div>
+                <div *ngSwitchCase="'billing'">
+                    <h1 class="text-3xl font-bold text-surface-900 dark:text-surface-0">Subscription Overview</h1>
+                    <p class="text-surface-500 dark:text-surface-400">Manage your workspace plan and track usage.</p>
+                </div>
+            </ng-container>
         </div>
-    <div
-    class="flex flex-col justify-center w-auto md:w-[296px] h-full overflow-y-auto">
+
+        <!-- Right section: Actions -->
+        <div class="flex flex-row items-center gap-3">
+            <!-- Profile Actions -->
+            <ng-container *ngIf="currentTab === 'profile'">
+                <p-button label="Reset" icon="pi pi-refresh" [outlined]="true" severity="secondary"
+                    styleClass="rounded-xl!" (onClick)="profileComp?.resetProfile()" />
+                <p-button label="Save Changes" icon="pi pi-save" styleClass="rounded-xl!"
+                    (onClick)="profileComp?.saveProfile()"
+                    [disabled]="profileComp?.profileForm?.invalid || profileComp?.isSaving"
+                    [loading]="profileComp?.isSaving" />
+            </ng-container>
+
+            <!-- Notification Actions -->
+            <ng-container *ngIf="currentTab === 'notifications'">
+                <p-button label="Reset to Default" icon="pi pi-refresh" [outlined]="true" severity="secondary"
+                    styleClass="rounded-xl!" (onClick)="notificationComp?.resetToDefaults()"
+                    [disabled]="notificationComp?.isLoading" />
+                <p-button label="Save Settings" icon="pi pi-save" styleClass="rounded-xl!"
+                    (onClick)="notificationComp?.saveNotifications()" [loading]="notificationComp?.isLoading" />
+            </ng-container>
+
+            <!-- Workspace Actions -->
+            <ng-container *ngIf="currentTab === 'workspace'">
+                <p-button label="Invite Member" icon="pi pi-user-plus" styleClass="rounded-xl!"
+                    (onClick)="workspaceComp?.openInviteDialog()" [disabled]="!workspaceComp?.canInviteMembers()" />
+                <p-button label="Save Changes" icon="pi pi-save" styleClass="rounded-xl!"
+                    (onClick)="workspaceComp?.saveWorkspace()"
+                    [disabled]="workspaceComp?.workspaceForm?.invalid || workspaceComp?.isSaving"
+                    [loading]="workspaceComp?.isSaving" />
+            </ng-container>
+
+            <!-- Billing Actions -->
+            <ng-container *ngIf="currentTab === 'billing'">
+                <p-button label="Billing Portal" icon="pi pi-external-link" [outlined]="true" severity="secondary"
+                    styleClass="rounded-xl!" (onClick)="billingComp?.updatePaymentMethod()" size="small" />
+                <p-button *ngIf="billingComp?.currentSubscription && billingComp?.currentPlanSlug !== 'free' && !billingComp?.currentSubscription?.isVirtual"
+                    label="Cancel" icon="pi pi-times" [outlined]="true" severity="danger"
+                    styleClass="rounded-xl!" (onClick)="billingComp?.cancelSubscription()" size="small" />
+                <p-button label="Upgrade" icon="pi pi-arrow-up" styleClass="rounded-xl!"
+                    (onClick)="billingComp!.showUpgradeDialog = true" size="small" />
+            </ng-container>
+        </div>
     </div>
-    <!-- Main content wrapper (with dynamic left margin based on sidebar state) -->
-    <div class="flex flex-col gap-6 w-full! transition-all duration-300 ease-in-out">
-        <!-- Scrollable Main content -->
-        <main class="flex-1 w-full! h-full overflow-y-auto relative overflow-hidden" [@routeAnimations]="childRoute(ChildOutlet)">
-            <router-outlet #ChildOutlet="outlet"></router-outlet>
-        </main>
-    </div>
+
+    <!-- Tabs Content -->
+    <p-tabs [value]="currentTab" (valueChange)="onTabChange($event)">
+        <p-tablist styleClass="gap-2 border-none!">
+            <p-tab value="profile">
+                <div class="flex items-center gap-2">
+                    <i class="icon-[hugeicons--user-03] text-lg!"></i>
+                    <span>Profile</span>
+                </div>
+            </p-tab>
+            <p-tab value="notifications">
+                <div class="flex items-center gap-2">
+                    <i class="icon-[hugeicons--notification-01] text-lg!"></i>
+                    <span>Notifications</span>
+                </div>
+            </p-tab>
+            <p-tab value="workspace">
+                <div class="flex items-center gap-2">
+                    <i class="icon-[hugeicons--briefcase-08] text-lg!"></i>
+                    <span>Workspace</span>
+                </div>
+            </p-tab>
+            <p-tab value="billing">
+                <div class="flex items-center gap-2">
+                    <i class="icon-[hugeicons--credit-card] text-lg!"></i>
+                    <span>Billing</span>
+                </div>
+            </p-tab>
+        </p-tablist>
+
+        <p-tabpanels class="mt-6">
+            <p-tabpanel value="profile">
+                <app-profile-settings #profileComp></app-profile-settings>
+            </p-tabpanel>
+            <p-tabpanel value="notifications">
+                <app-notification-settings #notificationComp></app-notification-settings>
+            </p-tabpanel>
+            <p-tabpanel value="workspace">
+                <app-workspace-settings #workspaceComp></app-workspace-settings>
+            </p-tabpanel>
+            <p-tabpanel value="billing">
+                <app-billing-settings #billingComp></app-billing-settings>
+            </p-tabpanel>
+        </p-tabpanels>
+    </p-tabs>
 </div>
+
+<p-toast />
+<p-confirmDialog [style]="{ width: '400px' }"
+    [breakpoints]="{ '960px': '90vw', '640px': '90vw' }"
+    styleClass="rounded-2xl!" />

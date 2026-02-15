@@ -43,24 +43,19 @@ export interface ISubscription {
     planSnapshot?: any;
     createdAt: string;
     updatedAt: string;
+    isVirtual?: boolean;
+    hostedInvoiceUrl?: string;
+    checkoutUrl?: string;
+    clientSecret?: string;
 }
 
 export interface SubscriptionResponse extends ISubscription {
-    paypalApprovalUrl?: string; // For PayPal redirect
+    paypalApprovalUrl?: string;
 }
 
 export interface CreateSubscriptionRequest {
     planId: string;
     trialDays?: number;
-}
-
-export interface BillingHistoryItem {
-    id: string;
-    date: string;
-    description: string;
-    amount: number;
-    status: 'paid' | 'pending' | 'failed' | 'overdue';
-    invoiceUrl?: string;
 }
 
 export interface UsageStats {

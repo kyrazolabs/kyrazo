@@ -76,42 +76,6 @@ export class TopbarComponent implements OnInit {
     pageTitle = '';
     searchVisible: boolean = false;
     avatar: string | null;
-    avatarItem = [
-        {
-            label: 'Settings',
-            icon: 'pi pi-cog',
-            url: '/settings',
-            description: 'System configuration',
-            shortcut: '⌘+S',
-            items: [
-                // Added nested items array
-                {
-                    label: 'Profile',
-                    icon: 'pi pi-user',
-                    url: '/settings/profile',
-                    description: 'Account information',
-                    shortcut: '⌘+P',
-                },
-                {
-                    label: 'Notifications',
-                    icon: 'pi pi-bell',
-                    url: '/settings/notifications',
-                    description: 'Alert preferences',
-                    badge: '3',
-                    badgeType: 'info',
-                    shortcut: '⌘+N',
-                },
-                {
-                    label: 'Billing',
-                    icon: 'pi pi-credit-card',
-                    command: () => this.openBilling(),
-                    description: 'Subscription & payments',
-                    status: 'active',
-                    shortcut: '⌘+B',
-                },
-            ],
-        },
-    ];
 
     isDarkMode = computed(() => this.layoutService.appState().darkMode);
     isOpenSidebar = computed(() => this.layoutService.appState().openSidebar);
@@ -221,9 +185,9 @@ export class TopbarComponent implements OnInit {
                     this.ss.setItem('project', this.selectedProject.id);
                 }
 
-                // Show first project dialog if no projects exist and none selected
-                if (this.projects.length === 0 && !this.selectedProject) {
-                    this.firstProjectDialogVisible = true;
+                // Redirect to Launchpad if no projects exist in this workspace
+                if (this.projects.length === 0) {
+                    this.router.navigate(['/launchpad']);
                 }
 
                 this.loadingProjects = false;
@@ -288,9 +252,5 @@ export class TopbarComponent implements OnInit {
     logout() {
         this.as.logout();
         this.router.navigate(['/auth/login']);
-    }
-
-    openBilling() {
-        this.dialogService.openBillingDialog();
     }
 }

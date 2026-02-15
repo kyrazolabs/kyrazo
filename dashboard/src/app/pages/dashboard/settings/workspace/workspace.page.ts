@@ -60,8 +60,8 @@ import { DialogService } from '@shared/services/dialog.service';
         SelectModule,
         ConfirmDialogModule,
     ],
-    templateUrl: './workspace-settings.page.html',
-    styleUrl: './workspace-settings.page.scss',
+    templateUrl: './workspace.page.html',
+    styleUrl: './workspace.page.scss',
 })
 export class WorkspaceSettingsPage implements OnInit {
     private route = inject(ActivatedRoute);

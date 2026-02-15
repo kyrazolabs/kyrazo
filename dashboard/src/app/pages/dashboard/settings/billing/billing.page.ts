@@ -1,11 +1,4 @@
-import {
-    Component,
-    OnInit,
-    inject,
-    Input,
-    Output,
-    EventEmitter,
-} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { finalize } from 'rxjs';
@@ -22,23 +15,23 @@ import { TableModule } from 'primeng/table';
 import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TextareaModule } from 'primeng/textarea';
+import { RadioButtonModule } from 'primeng/radiobutton';
 
 // Services and Types
 import { SettingService } from '@core/services/settings.service';
 import {
     ISubscription,
     IPlan,
-    BillingHistoryItem,
     UsageStats,
     BillingInfo,
 } from '@models/billing.types';
 import { SentryService } from '@core/3rd-party/sentry';
 import { LoaderService } from '@core/services/loader.service';
-import { DialogService } from '@shared/services/dialog.service';
+import { SupportService } from '@core/services/support.service';
 
 @Component({
-    selector: 'app-billing-dialog',
-    standalone: true,
+    selector: 'app-billing-settings',
     imports: [
         CommonModule,
         ReactiveFormsModule,
@@ -52,24 +45,23 @@ import { DialogService } from '@shared/services/dialog.service';
         SelectModule,
         TooltipModule,
         ConfirmDialogModule,
+        TextareaModule,
+        RadioButtonModule,
     ],
-    templateUrl: './billing-dialog.component.html',
+    templateUrl: './billing.page.html',
+    styleUrl: './billing.page.scss',
 })
-export class BillingDialogComponent implements OnInit {
+export class BillingSettingsPage implements OnInit {
     private fb = inject(FormBuilder);
     private settingsService = inject(SettingService);
     private messageService = inject(MessageService);
     private confirmationService = inject(ConfirmationService);
     private sentry = inject(SentryService);
-    private dialogService = inject(DialogService);
+    private supportService = inject(SupportService);
     public loader = inject(LoaderService);
-
-    @Input() visible = false;
-    @Output() onClose = new EventEmitter<void>();
 
     currentSubscription: ISubscription | null = null;
     availablePlans: IPlan[] = [];
-    billingHistory: BillingHistoryItem[] = [];
     usage: UsageStats | null = null;
     billing: BillingInfo | null = null;
 
@@ -77,9 +69,27 @@ export class BillingDialogComponent implements OnInit {
     showUpgradeDialog = false;
     upgradePlanOptions: { label: string; value: string }[] = [];
 
+    // Cancellation Flow
+    cancelForm!: FormGroup;
+    showCancelDialog = false;
+    cancellationStage: 'confirm' | 'feedback' | 'final' = 'confirm';
+    cancelReasons = [
+        { label: 'Too expensive', value: 'expensive' },
+        { label: 'Missing features', value: 'missing_features' },
+        { label: 'Difficult to use', value: 'difficult' },
+        { label: 'Found better alternative', value: 'alternative' },
+        { label: 'No longer need it', value: 'not_needed' },
+        { label: 'Other', value: 'other' },
+    ];
+
     ngOnInit() {
         this.upgradeForm = this.fb.group({
             selectedPlan: [''],
+        });
+
+        this.cancelForm = this.fb.group({
+            reason: [''],
+            comment: [''],
         });
 
         this.loadInitialData();
@@ -131,26 +141,11 @@ export class BillingDialogComponent implements OnInit {
 
                         if (activeSub) {
                             this.currentSubscription = activeSub;
-                            this.billingHistory = subscriptions.map(
-                                (sub: any) => ({
-                                    id: sub.id,
-                                    date: sub.startDate,
-                                    description: `${sub.planSnapshot?.name || sub.plan?.name || 'Unknown Plan'}`,
-                                    amount:
-                                        (sub.planSnapshot?.priceCents ||
-                                            sub.plan?.priceCents ||
-                                            0) / 100,
-                                    status:
-                                        sub.status === 'active'
-                                            ? 'paid'
-                                            : (sub.status as any),
-                                }),
-                            );
-
                             this.loadUsageStats();
                         } else {
                             this.currentSubscription = null;
                         }
+                        this.updateUpgradeOptions();
                     }
                 },
                 error: (err) => {
@@ -173,8 +168,8 @@ export class BillingDialogComponent implements OnInit {
                 1000;
             this.usage = {
                 webhooksUsed: Math.floor(Math.random() * webhooksLimit),
-                successRate: 0, // Not requested anymore
-                totalSaved: 0, // Not requested anymore
+                successRate: 0,
+                totalSaved: 0,
             } as any;
         }
     }
@@ -194,6 +189,13 @@ export class BillingDialogComponent implements OnInit {
             this.currentSubscription?.planSnapshot?.name ||
             this.currentSubscription?.plan?.name ||
             'No Plan'
+        );
+    }
+    get currentPlanSlug(): string {
+        return (
+            this.currentSubscription?.planSnapshot?.slug ||
+            this.currentSubscription?.plan?.slug ||
+            ''
         );
     }
     get currentPlanPrice(): number {
@@ -246,17 +248,18 @@ export class BillingDialogComponent implements OnInit {
         return this.upgradeForm.get('selectedPlan') as any;
     }
 
-    getStatusSeverity(status: string): 'success' | 'info' | 'warn' | 'danger' {
+    getStatusSeverity(status: string) {
         switch (status?.toLowerCase()) {
             case 'active':
-                return 'success';
+            case 'paid':
+                return 'bg-primary-500/10 border border-primary-500/30 text-primary-600 shadow-primary-500/20';
             case 'pending':
-                return 'warn';
+                return 'bg-amber-500/10 border border-amber-500/30 text-amber-600 shadow-amber-500/20';
             case 'inactive':
             case 'cancelled':
-                return 'danger';
+                return 'bg-red-500/10 border border-red-500/30 text-red-600 shadow-red-500/20';
             default:
-                return 'info';
+                return 'bg-sky-500/10 border border-sky-500/30 text-sky-600 shadow-sky-500/20';
         }
     }
 
@@ -289,11 +292,12 @@ export class BillingDialogComponent implements OnInit {
     selectPlan(plan: IPlan) {
         if (
             this.currentSubscription &&
-            this.currentSubscription.plan?.id === plan.id
+            (this.currentSubscription.plan?.id === plan.id ||
+                this.currentSubscription.planId === plan.id)
         )
             return;
 
-        if (!this.currentSubscription) {
+        if (!this.currentSubscription || this.currentSubscription.isVirtual) {
             this.loader.show();
             this.settingsService
                 .createSubscriptionPayment({ planId: plan.id })
@@ -301,14 +305,16 @@ export class BillingDialogComponent implements OnInit {
                 .subscribe({
                     next: (res) => {
                         const data = res.data as any;
-                        if (data?.hostedInvoiceUrl)
-                            window.location.href = data.hostedInvoiceUrl;
+                        if (data?.checkoutUrl || data?.hostedInvoiceUrl)
+                            window.location.href =
+                                data.checkoutUrl || data.hostedInvoiceUrl;
                         else {
                             this.messageService.add({
                                 severity: 'success',
                                 summary: 'Success',
                                 detail: 'Subscription created',
                             });
+                            this.showUpgradeDialog = false;
                             this.loadBillingInfo();
                         }
                     },
@@ -328,7 +334,24 @@ export class BillingDialogComponent implements OnInit {
 
     confirmUpgrade(plan?: IPlan) {
         const selectedPlanId = plan?.id || this.upgradeForm.value.selectedPlan;
-        if (!selectedPlanId || !this.currentSubscription) return;
+        if (!selectedPlanId) return;
+
+        // If no active subscription or it's virtual, treat as a new subscription
+        if (!this.currentSubscription || this.currentSubscription.isVirtual) {
+            const selectedPlan =
+                plan ||
+                this.availablePlans.find((p) => p.id === selectedPlanId);
+            if (selectedPlan) {
+                this.selectPlan(selectedPlan);
+            } else {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Please select a valid plan',
+                });
+            }
+            return;
+        }
 
         this.loader.show();
         this.settingsService
@@ -363,40 +386,69 @@ export class BillingDialogComponent implements OnInit {
 
     cancelSubscription() {
         if (!this.currentSubscription) return;
-
-        this.confirmationService.confirm({
-            message:
-                'Are you sure you want to cancel your subscription? Your workspace will be downgraded to the Free plan at the end of the current billing period.',
-            header: 'Cancel Subscription',
-            icon: 'pi pi-exclamation-triangle',
-            accept: () => {
-                this.loader.show();
-                this.settingsService
-                    .cancelSubscription(this.currentSubscription!.id)
-                    .pipe(finalize(() => this.loader.hide()))
-                    .subscribe({
-                        next: () => {
-                            this.messageService.add({
-                                severity: 'success',
-                                summary: 'Cancelled',
-                                detail: 'Your subscription has been cancelled.',
-                            });
-                            this.loadBillingInfo();
-                        },
-                        error: (err) => {
-                            this.sentry.captureException(err);
-                            this.messageService.add({
-                                severity: 'error',
-                                summary: 'Error',
-                                detail: 'Failed to cancel subscription',
-                            });
-                        },
-                    });
-            },
-        });
+        this.cancellationStage = 'confirm';
+        this.showCancelDialog = true;
     }
 
-    hide() {
-        this.onClose.emit();
+    nextCancellationStep() {
+        if (this.cancellationStage === 'confirm') {
+            this.cancellationStage = 'feedback';
+        } else if (this.cancellationStage === 'feedback') {
+            this.cancellationStage = 'final';
+        }
+    }
+
+    prevCancellationStep() {
+        if (this.cancellationStage === 'feedback') {
+            this.cancellationStage = 'confirm';
+        } else if (this.cancellationStage === 'final') {
+            this.cancellationStage = 'feedback';
+        }
+    }
+
+    confirmCancellation() {
+        if (!this.currentSubscription) return;
+
+        this.loader.show();
+
+        // 1. Submit Feedback if any
+        const feedback = this.cancelForm.value;
+        if (feedback.reason || feedback.comment) {
+            this.supportService
+                .createTicket({
+                    subject: 'Cancellation Feedback',
+                    message: `Reason: ${this.cancelReasons.find((r) => r.value === feedback.reason)?.label || 'None'}\nComment: ${feedback.comment || 'None'}`,
+                    Types: 'Billing' as any,
+                    Category: 'Usage Limits', // Fallback category
+                    kind: 'cancellation' as any,
+                } as any)
+                .subscribe({
+                    error: (err) => this.sentry.captureException(err),
+                });
+        }
+
+        // 2. Perform actual cancellation
+        this.settingsService
+            .cancelSubscription(this.currentSubscription.id, feedback.reason)
+            .pipe(finalize(() => this.loader.hide()))
+            .subscribe({
+                next: () => {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Cancelled',
+                        detail: 'Your subscription has been cancelled.',
+                    });
+                    this.showCancelDialog = false;
+                    this.loadBillingInfo();
+                },
+                error: (err) => {
+                    this.sentry.captureException(err);
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Failed to cancel subscription',
+                    });
+                },
+            });
     }
 }

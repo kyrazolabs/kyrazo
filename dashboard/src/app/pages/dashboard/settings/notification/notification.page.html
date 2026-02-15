@@ -1,67 +1,4 @@
-<div class="space-y-2 mb-4">
-    <!-- Header -->
-    <div
-        class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <!-- Left section -->
-        <div>
-            <h1 class="text-2xl font-bold">Notification Settings</h1>
-            <p class="opacity-80">Configure how and when you receive notifications</p>
-        </div>
-
-        <!-- Right section -->
-        <div class="flex flex-row items-center gap-4">
-            <p-button label="Reset to Default" icon="pi pi-refresh" [outlined]="true" severity="secondary"
-                styleClass="w-full sm:w-auto rounded-xl!" (onClick)="resetToDefaults()" [disabled]="isLoading" />
-            <p-button label="Save Settings" icon="pi pi-save" styleClass="w-full sm:w-auto rounded-xl!"
-                (onClick)="saveNotifications()" [loading]="isLoading" />
-        </div>
-    </div>
-
-    <div class="overflow-y-auto">
-        <ul class="list-none flex flex-row py-2 m-0">
-            <li>
-                <ul class="list-none p-0 m-0 space-y-1 overflow-hidden">
-                    <li>
-                        <ul
-                            class="list-none py-0 pr-0 m-0 flex flex-row gap-4 overflow-y-hidden transition-all duration-400 ease-in-out">
-                            <li>
-                                <a pRipple [routerLink]="'/settings/profile'"
-                                    class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
-                                    [class]="'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
-                                    <i class="icon-[hugeicons--user] size-5 mr-2"></i>
-                                    <span class="font-medium">Profile</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a pRipple [routerLink]="'/settings/workspace'"
-                                    class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
-                                    [class]="'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
-                                    <i class="icon-[hugeicons--dashboard-square-setting] size-5 mr-2"></i>
-                                    <span class="font-medium">Workspace</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a pRipple [routerLink]="'/settings/notifications'"
-                                    class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
-                                    [class]="'text-primary-50 bg-primary hover:bg-primary/90 dark:text-primary-950 dark:bg-primary-50 dark:hover:bg-primary-50/90'">
-                                    <i class="icon-[hugeicons--notification-01] size-5 mr-2"></i>
-                                    <span class="font-medium">Notifications</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a pRipple (click)="openBilling()"
-                                    class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
-                                    [class]="'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
-                                    <i class="icon-[hugeicons--credit-card] size-5 mr-2"></i>
-                                    <span class="font-medium">Billing</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </li>
-        </ul>
-    </div>
+<div class="space-y-6">
 
     <!-- Email Notifications -->
     <form [formGroup]="notificationForm" class="space-y-6 mb-6">
@@ -166,6 +103,3 @@
     </form>
 
 </div>
-
-<!-- Toast for notifications -->
-<p-toast />

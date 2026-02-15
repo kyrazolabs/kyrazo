@@ -30,7 +30,6 @@ import { DialogService } from '@shared/services/dialog.service';
 @Component({
     selector: 'app-profile-settings',
     imports: [
-        RouterLink,
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
@@ -42,8 +41,8 @@ import { DialogService } from '@shared/services/dialog.service';
         TooltipModule,
         ToastModule,
     ],
-    templateUrl: './profile-settings.page.html',
-    styleUrl: './profile-settings.page.scss',
+    templateUrl: './profile.page.html',
+    styleUrl: './profile.page.scss',
 })
 export class ProfileSettingsPage {
     private route = inject(ActivatedRoute);

@@ -148,15 +148,17 @@ export class SidebarComponent implements OnInit, AfterViewInit {
         this.ws.gets().subscribe({
             next: (response) => {
                 this.workspaceMemberships = response.data;
-                // Select first workspace by default if available
-                if (
-                    this.workspaceMemberships.length > 0 &&
-                    !this.selectedWorkspace
-                ) {
-                    this.selectedWorkspace =
-                        this.workspaceMemberships[0].workspace;
-                    this.ss.setItem('workspace', this.selectedWorkspace.id);
+
+                // Redirect to Launchpad if no workspaces exist
+                if (this.workspaceMemberships.length === 0) {
+                    this.router.navigate(['/launchpad']);
+                    return;
                 }
+
+                // Select first workspace by default if available
+                this.selectedWorkspace = this.workspaceMemberships[0].workspace;
+                this.ss.setItem('workspace', this.selectedWorkspace.id);
+
                 this.loading = false;
             },
             error: (error) => {
