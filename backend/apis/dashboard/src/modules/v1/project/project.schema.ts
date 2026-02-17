@@ -18,10 +18,11 @@ export const CreateProjectSchema = z.object({
     description: descriptionSchema,
     whiteLabelHeaderPrefix: z
         .string()
-        .min(1, 'Header prefix is required')
         .max(50, 'Prefix is too long')
-        .regex(/^[a-zA-Z0-9-]+$/, 'Prefix can only contain alphanumeric characters and hyphens')
-        .optional(),
+        .regex(/^[a-zA-Z0-9-]*$/, 'Prefix can only contain alphanumeric characters and hyphens')
+        .nullable()
+        .optional()
+        .or(z.literal('')),
 });
 
 export const UpdateProjectSchema = CreateProjectSchema.partial();
