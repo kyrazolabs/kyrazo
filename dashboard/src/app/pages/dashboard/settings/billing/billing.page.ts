@@ -31,6 +31,12 @@ import { LoaderService } from '@core/services/loader.service';
 import { SupportService } from '@core/services/support.service';
 import { SubscriptionService } from '@core/services/subscription.service';
 
+import { ProfileSettingsPage } from '../profile/profile.page';
+import { PricingPlan, MANUAL_CUSTOM_PLAN } from './pricing.model';
+import { PricingCardComponent } from './components/pricing-card/pricing-card.component';
+import { PricingComparisonComponent } from './comparison/pricing-comparison.component';
+import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directive';
+
 @Component({
     selector: 'app-billing-settings',
     imports: [
@@ -48,6 +54,9 @@ import { SubscriptionService } from '@core/services/subscription.service';
         ConfirmDialogModule,
         TextareaModule,
         RadioButtonModule,
+        PricingCardComponent,
+        PricingComparisonComponent,
+        ScrollRevealDirective,
     ],
     templateUrl: './billing.page.html',
     styleUrl: './billing.page.scss',
@@ -70,6 +79,12 @@ export class BillingSettingsPage implements OnInit {
 
     billingCycle = signal<'month' | 'year'>('month');
     isRedirectingToPortal = false;
+
+    // Premium UI Signals
+    hasInteracted = signal(false);
+    shakeToggle = signal(false);
+    lightningOffset = signal(0);
+    plans = signal<PricingPlan[]>([]);
 
     upgradeForm!: FormGroup;
     showUpgradeDialog = false;
@@ -106,12 +121,127 @@ export class BillingSettingsPage implements OnInit {
         this.settingsService.getPlans().subscribe({
             next: (res) => {
                 this.availablePlans = res.data || [];
+                this.plans.set(this.groupPlans(this.availablePlans));
                 this.updateUpgradeOptions();
             },
         });
 
         // Fetch subscriptions and usage
         this.loadBillingInfo();
+    }
+
+    private groupPlans(allPlans: any[]): PricingPlan[] {
+        const grouped = new Map<string, PricingPlan>();
+
+        const normalizeSlug = (slug: string) =>
+            slug.replace(/y$/, '').replace(/ly$/, '').toLowerCase();
+
+        const isYearly = (p: any) =>
+            p.interval?.startsWith('year') ||
+            p.slug?.endsWith('y') ||
+            p.slug?.endsWith('ly') ||
+            (p.priceCents || 0) > 50000;
+
+        allPlans.forEach((plan: any) => {
+            const groupKey = normalizeSlug(plan.slug || '');
+            const existing = grouped.get(groupKey);
+            const planIsYearly = isYearly(plan);
+
+            if (existing) {
+                if (planIsYearly) {
+                    existing.priceCentsYearly = plan.priceCents;
+                    if (existing.stripePriceId) {
+                        existing.stripePriceId.yearly = plan.stripePriceId;
+                    }
+                } else {
+                    existing.priceCentsMonthly = plan.priceCents;
+                    if (existing.stripePriceId) {
+                        existing.stripePriceId.monthly = plan.stripePriceId;
+                    }
+                }
+            } else {
+                const pricingPlan: PricingPlan = {
+                    id: plan.id,
+                    originalPlan: plan,
+                    name: (plan.name || '')
+                        .replace(/y$/, '')
+                        .replace(/ly$/, ''),
+                    slug: groupKey,
+                    description: plan.description || '',
+                    priceCentsMonthly: !planIsYearly
+                        ? plan.priceCents
+                        : plan.priceCents / 12, // rough estimate for display if only yearly exists
+                    priceCentsYearly: planIsYearly
+                        ? plan.priceCents
+                        : plan.priceCents * 12,
+                    currency: plan.currency || 'EUR',
+                    features: plan.features || {},
+                    limits: plan.limits || {},
+                    benefits: plan.benefits || [],
+                    stripePriceId: {
+                        monthly: !planIsYearly ? plan.stripePriceId : '',
+                        yearly: planIsYearly ? plan.stripePriceId : '',
+                    },
+                    overagePriceCents: plan.overagePriceCents || 0,
+                    meterId: plan.stripeMeterId || '',
+                    isActive: plan.isActive ?? true,
+                };
+                grouped.set(groupKey, pricingPlan);
+            }
+        });
+
+        const result = Array.from(grouped.values()).sort(
+            (a, b) => a.priceCentsMonthly - b.priceCentsMonthly,
+        );
+
+        // Add manual custom plan if not already there
+        if (!result.find((p) => p.slug === 'custom')) {
+            result.push(MANUAL_CUSTOM_PLAN);
+        }
+
+        return result;
+    }
+
+    toggleCycle() {
+        this.hasInteracted.set(true);
+        this.shakeToggle.update((s) => !s);
+        this.lightningOffset.set(Math.random() * 40 - 20);
+        this.billingCycle.update((c) => (c === 'month' ? 'year' : 'month'));
+        this.updateUpgradeOptions();
+    }
+
+    openFullComparison() {
+        window.open('https://kyrazo.com/pricing', '_blank');
+    }
+
+    selectPlanFromCard(plan: PricingPlan) {
+        if (plan.slug === 'custom' || plan.slug === 'enterprise') {
+            window.location.href = 'mailto:sales@kyrazo.com';
+            return;
+        }
+
+        // Logic to find the specific backend plan (IPlan) based on interval
+        const targetPlan = this.availablePlans.find((p) => {
+            const matchesSlug = (p.slug || '')
+                .toLowerCase()
+                .startsWith(plan.slug.toLowerCase());
+            const matchesInterval = (
+                p.interval ||
+                (p as any).frequency ||
+                'month'
+            ).includes(this.billingCycle());
+            return matchesSlug && matchesInterval;
+        });
+
+        if (targetPlan) {
+            this.selectPlan(targetPlan);
+        } else {
+            // Fallback to the original plan if interval matching fails but we have a reference
+            const fallback =
+                plan.originalPlan ||
+                this.availablePlans.find((p) => p.slug?.startsWith(plan.slug));
+            if (fallback) this.selectPlan(fallback);
+        }
     }
 
     private updateUpgradeOptions() {
