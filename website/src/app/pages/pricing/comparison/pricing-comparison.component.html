@@ -44,7 +44,9 @@
                                 @for (plan of plans; track plan.slug) {
                                     <td class="py-4 px-4 text-center text-sm" [class.bg-surface-50/30]="plan.highlighted" [class.dark:bg-surface-900/10]="plan.highlighted">
                                         @let value = getValue(plan, feature.key);
-                                        @if (feature.format === 'check') {
+                                        @if (plan.slug === 'custom' && (feature.key === 'limits.eventsPerMonth' || feature.key === 'limits.eventsPerSecond' || feature.key === 'features.retentionDays')) {
+                                            <span [class.font-semibold]="plan.highlighted" class="font-sansation!">Custom</span>
+                                        } @else if (feature.format === 'check') {
                                             <i [class]="value ? 'pi pi-check text-green-500' : 'pi pi-times text-surface-300 dark:text-surface-700'" class="text-lg"></i>
                                         } @else {
                                             <span [class.font-semibold]="plan.highlighted" class="font-sansation!">

@@ -1,123 +1,233 @@
 <section class="relative pt-32 pb-16 overflow-hidden">
     <!-- Hero Background gradient -->
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-(--breakpoint-2xl) h-full pointer-events-none -z-10">
-        <div class="absolute top-0 left-1/4 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-primary-500/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
+    <div
+        class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-(--breakpoint-2xl) h-full pointer-events-none -z-10"
+    >
+        <div
+            class="absolute top-0 left-1/4 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl animate-pulse"
+        ></div>
+        <div
+            class="absolute bottom-0 right-1/4 w-96 h-96 bg-primary-500/5 rounded-full blur-3xl animate-pulse delay-1000"
+        ></div>
     </div>
 
     <div class="max-w-[1500px] mx-auto px-6">
         <div class="text-center mb-16 max-w-3xl mx-auto" appScrollReveal>
-            <h1 class="text-4xl md:text-6xl font-bold mb-6 text-surface-900 dark:text-surface-0 tracking-tight leading-tight">
-                Transparent Pricing, <br/>
-                <span class="text-primary-500 font-sansation!">Unmatched Reliability.</span>
+            <h1
+                class="text-4xl md:text-6xl font-bold mb-6 text-surface-900 dark:text-surface-0 tracking-tight leading-tight"
+            >
+                Transparent Pricing, <br />
+                <span class="text-primary-500 font-sansation!"
+                    >Unmatched Reliability.</span
+                >
             </h1>
-            <p class="text-lg md:text-xl text-surface-600 dark:text-surface-400 mb-10">
-                Choose the plan that fits your scale. Start for free and upgrade as you grow. No hidden fees, just pure performance.
+            <p
+                class="text-lg md:text-xl text-surface-600 dark:text-surface-400 mb-10"
+            >
+                Choose the plan that fits your scale. Start for free and upgrade
+                as you grow. No hidden fees, just pure performance.
             </p>
 
             <!-- Billing Toggle -->
-            <div class="flex items-center justify-center gap-4 mb-16" appScrollReveal delay="delay-200">
-                <span class="text-sm font-medium" [class.opacity-50]="billingCycle() === 'yearly'">Monthly</span>
+            <div
+                class="flex items-center justify-center gap-4 mb-16"
+                appScrollReveal
+                delay="delay-200"
+            >
+                <span
+                    class="text-sm font-medium"
+                    [class.opacity-50]="billingCycle() === 'yearly'"
+                    >Monthly</span
+                >
                 <button
                     (click)="toggleCycle()"
                     [class.animate-shake-1]="hasInteracted() && shakeToggle()"
                     [class.animate-shake-2]="hasInteracted() && !shakeToggle()"
-                    class="relative w-16 h-8 rounded-full bg-surface-100 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 focus:outline-none cursor-pointer group active:scale-95 transition-transform duration-100">
-
+                    class="relative w-16 h-8 rounded-full bg-surface-100 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 focus:outline-none cursor-pointer group active:scale-95 transition-transform duration-100"
+                >
                     <!-- The Teleporting Knob Container -->
                     <div class="absolute inset-0 z-10 p-1 pointer-events-none">
                         <div class="relative h-full w-full">
                             @if (billingCycle() === 'yearly') {
-                                <!-- Impact Flash & Thor Lightning -->
-                                @if (hasInteracted()) {
-                                    <div class="absolute right-0 top-0 h-5.5 w-5.5 z-50">
-                                        <div class="absolute left-1/2 bottom-2 w-[120px] h-screen -translate-x-1/2 pointer-events-none animate-thor-strike"
-                                            style="transform-origin: bottom center;"
-                                            [style.--lightning-skew]="lightningOffset() + 'deg'">
-                                            <svg viewBox="0 0 100 1000" preserveAspectRatio="none" class="w-full h-full fill-primary-400 filter drop-shadow-[0_0_20px_#4f46e5] drop-shadow-[0_0_40px_#4f46e5]">
-                                                <path d="M50,0 L60,100 L40,200 L70,300 L30,400 L80,550 L20,700 L60,850 L50,1000 L55,1000 L65,850 L25,700 L85,550 L35,400 L75,300 L45,200 L65,100 L50,0 Z" />
-                                            </svg>
-                                        </div>
-
-                                        <!-- Electric Bomb -->
-                                        <div class="absolute inset-0 flex items-center justify-center animate-bomb">
-                                            <div class="w-full h-full rounded-full bg-white opacity-40 blur-sm"></div>
-                                            <!-- Sparks -->
-                                            <div class="absolute w-1 h-1 bg-white rounded-full animate-spark" style="--x: 40px; --y: -40px;"></div>
-                                            <div class="absolute w-1 h-1 bg-white rounded-full animate-spark" style="--x: -50px; --y: -10px;"></div>
-                                            <div class="absolute w-1 h-1 bg-white rounded-full animate-spark" style="--x: 20px; --y: 50px;"></div>
-                                            <div class="absolute w-1 h-1 bg-white rounded-full animate-spark" style="--x: -30px; --y: 40px;"></div>
-                                            <div class="absolute w-1 h-1 bg-white rounded-full animate-spark" style="--x: 0px; --y: -60px;"></div>
-                                            <div class="absolute w-1.5 h-1.5 bg-primary-400 rounded-full animate-spark" style="--x: 60px; --y: 10px;"></div>
-                                            <div class="absolute w-1.5 h-1.5 bg-primary-400 rounded-full animate-spark" style="--x: -60px; --y: -30px;"></div>
-                                        </div>
-                                    </div>
-                                    <div class="absolute right-0 top-0 h-5.5 w-5.5 rounded-full border-4 border-primary-400 opacity-0 animate-shockwave z-40"></div>
-                                }
-
-                                <div class="absolute right-0 top-0 h-5.5 w-5.5 rounded-full bg-primary-500 shadow-[0_0_20px_#4f46e5] flex items-center justify-center pointer-events-auto"
-                                     [class.animate-teleport-in]="hasInteracted()">
+                            <!-- Impact Flash & Thor Lightning -->
+                            @if (hasInteracted()) {
+                            <div
+                                class="absolute right-0 top-0 h-5.5 w-5.5 z-50"
+                            >
+                                <div
+                                    class="absolute left-1/2 bottom-2 w-[120px] h-screen -translate-x-1/2 pointer-events-none animate-thor-strike"
+                                    style="transform-origin: bottom center"
+                                    [style.--lightning-skew]="lightningOffset() + 'deg'"
+                                >
+                                    <svg
+                                        viewBox="0 0 100 1000"
+                                        preserveAspectRatio="none"
+                                        class="w-full h-full fill-primary-400 filter drop-shadow-[0_0_20px_#4f46e5] drop-shadow-[0_0_40px_#4f46e5]"
+                                    >
+                                        <path
+                                            d="M50,0 L60,100 L40,200 L70,300 L30,400 L80,550 L20,700 L60,850 L50,1000 L55,1000 L65,850 L25,700 L85,550 L35,400 L75,300 L45,200 L65,100 L50,0 Z"
+                                        />
+                                    </svg>
                                 </div>
 
-                                <!-- Old Ghost position (zap out) -->
-                                @if (hasInteracted()) {
-                                    <div class="absolute left-0 top-0 h-5.5 w-5.5 rounded-full bg-primary-500 animate-teleport-out"></div>
-                                }
-                            } @else {
-                                <!-- Impact Flash & Thor Lightning -->
-                                @if (hasInteracted()) {
-                                    <div class="absolute left-0 top-0 h-5.5 w-5.5 z-50">
-                                        <div class="absolute left-1/2 bottom-2 w-[120px] h-screen -translate-x-1/2 pointer-events-none animate-thor-strike"
-                                            style="transform-origin: bottom center;"
-                                            [style.--lightning-skew]="lightningOffset() + 'deg'">
-                                            <svg viewBox="0 0 100 1000" preserveAspectRatio="none" class="w-full h-full fill-primary-400 filter drop-shadow-[0_0_20px_#4f46e5] drop-shadow-[0_0_40px_#4f46e5]">
-                                                <path d="M50,0 L60,100 L40,200 L70,300 L30,400 L80,550 L20,700 L60,850 L50,1000 L55,1000 L65,850 L25,700 L85,550 L35,400 L75,300 L45,200 L65,100 L50,0 Z" />
-                                            </svg>
-                                        </div>
-
-                                        <!-- Electric Bomb -->
-                                        <div class="absolute inset-0 flex items-center justify-center animate-bomb">
-                                            <div class="w-full h-full rounded-full bg-white opacity-40 blur-sm"></div>
-                                            <!-- Sparks -->
-                                            <div class="absolute w-1 h-1 bg-white rounded-full animate-spark" style="--x: -40px; --y: -40px;"></div>
-                                            <div class="absolute w-1 h-1 bg-white rounded-full animate-spark" style="--x: 50px; --y: 10px;"></div>
-                                            <div class="absolute w-1 h-1 bg-white rounded-full animate-spark" style="--x: -20px; --y: 50px;"></div>
-                                            <div class="absolute w-1 h-1 bg-white rounded-full animate-spark" style="--x: 30px; --y: -40px;"></div>
-                                            <div class="absolute w-1 h-1 bg-white rounded-full animate-spark" style="--x: 0px; --y: 60px;"></div>
-                                            <div class="absolute w-1.5 h-1.5 bg-primary-400 rounded-full animate-spark" style="--x: -60px; --y: 20px;"></div>
-                                            <div class="absolute w-1.5 h-1.5 bg-primary-400 rounded-full animate-spark" style="--x: 60px; --y: -30px;"></div>
-                                        </div>
-                                    </div>
-                                    <div class="absolute left-0 top-0 h-5.5 w-5.5 rounded-full border-4 border-primary-400 opacity-0 animate-shockwave z-40"></div>
-                                }
-
-                                <div class="absolute left-0 top-0 h-5.5 w-5.5 rounded-full bg-primary-500 shadow-[0_0_20px_#4f46e5] flex items-center justify-center pointer-events-auto"
-                                     [class.animate-teleport-in]="hasInteracted()">
+                                <!-- Electric Bomb -->
+                                <div
+                                    class="absolute inset-0 flex items-center justify-center animate-bomb"
+                                >
+                                    <div
+                                        class="w-full h-full rounded-full bg-white opacity-40 blur-sm"
+                                    ></div>
+                                    <!-- Sparks -->
+                                    <div
+                                        class="absolute w-1 h-1 bg-white rounded-full animate-spark"
+                                        style="--x: 40px; --y: -40px"
+                                    ></div>
+                                    <div
+                                        class="absolute w-1 h-1 bg-white rounded-full animate-spark"
+                                        style="--x: -50px; --y: -10px"
+                                    ></div>
+                                    <div
+                                        class="absolute w-1 h-1 bg-white rounded-full animate-spark"
+                                        style="--x: 20px; --y: 50px"
+                                    ></div>
+                                    <div
+                                        class="absolute w-1 h-1 bg-white rounded-full animate-spark"
+                                        style="--x: -30px; --y: 40px"
+                                    ></div>
+                                    <div
+                                        class="absolute w-1 h-1 bg-white rounded-full animate-spark"
+                                        style="--x: 0px; --y: -60px"
+                                    ></div>
+                                    <div
+                                        class="absolute w-1.5 h-1.5 bg-primary-400 rounded-full animate-spark"
+                                        style="--x: 60px; --y: 10px"
+                                    ></div>
+                                    <div
+                                        class="absolute w-1.5 h-1.5 bg-primary-400 rounded-full animate-spark"
+                                        style="--x: -60px; --y: -30px"
+                                    ></div>
                                 </div>
-
-                                <!-- Old Ghost position (zap out) -->
-                                @if (hasInteracted()) {
-                                    <div class="absolute right-0 top-0 h-5.5 w-5.5 rounded-full bg-primary-500 animate-teleport-out"></div>
-                                }
+                            </div>
+                            <div
+                                class="absolute right-0 top-0 h-5.5 w-5.5 rounded-full border-4 border-primary-400 opacity-0 animate-shockwave z-40"
+                            ></div>
                             }
+
+                            <div
+                                class="absolute right-0 top-0 h-5.5 w-5.5 rounded-full bg-primary-500 shadow-[0_0_20px_#4f46e5] flex items-center justify-center pointer-events-auto"
+                                [class.animate-teleport-in]="hasInteracted()"
+                            ></div>
+
+                            <!-- Old Ghost position (zap out) -->
+                            @if (hasInteracted()) {
+                            <div
+                                class="absolute left-0 top-0 h-5.5 w-5.5 rounded-full bg-primary-500 animate-teleport-out"
+                            ></div>
+                            } } @else {
+                            <!-- Impact Flash & Thor Lightning -->
+                            @if (hasInteracted()) {
+                            <div class="absolute left-0 top-0 h-5.5 w-5.5 z-50">
+                                <div
+                                    class="absolute left-1/2 bottom-2 w-[120px] h-screen -translate-x-1/2 pointer-events-none animate-thor-strike"
+                                    style="transform-origin: bottom center"
+                                    [style.--lightning-skew]="lightningOffset() + 'deg'"
+                                >
+                                    <svg
+                                        viewBox="0 0 100 1000"
+                                        preserveAspectRatio="none"
+                                        class="w-full h-full fill-primary-400 filter drop-shadow-[0_0_20px_#4f46e5] drop-shadow-[0_0_40px_#4f46e5]"
+                                    >
+                                        <path
+                                            d="M50,0 L60,100 L40,200 L70,300 L30,400 L80,550 L20,700 L60,850 L50,1000 L55,1000 L65,850 L25,700 L85,550 L35,400 L75,300 L45,200 L65,100 L50,0 Z"
+                                        />
+                                    </svg>
+                                </div>
+
+                                <!-- Electric Bomb -->
+                                <div
+                                    class="absolute inset-0 flex items-center justify-center animate-bomb"
+                                >
+                                    <div
+                                        class="w-full h-full rounded-full bg-white opacity-40 blur-sm"
+                                    ></div>
+                                    <!-- Sparks -->
+                                    <div
+                                        class="absolute w-1 h-1 bg-white rounded-full animate-spark"
+                                        style="--x: -40px; --y: -40px"
+                                    ></div>
+                                    <div
+                                        class="absolute w-1 h-1 bg-white rounded-full animate-spark"
+                                        style="--x: 50px; --y: 10px"
+                                    ></div>
+                                    <div
+                                        class="absolute w-1 h-1 bg-white rounded-full animate-spark"
+                                        style="--x: -20px; --y: 50px"
+                                    ></div>
+                                    <div
+                                        class="absolute w-1 h-1 bg-white rounded-full animate-spark"
+                                        style="--x: 30px; --y: -40px"
+                                    ></div>
+                                    <div
+                                        class="absolute w-1 h-1 bg-white rounded-full animate-spark"
+                                        style="--x: 0px; --y: 60px"
+                                    ></div>
+                                    <div
+                                        class="absolute w-1.5 h-1.5 bg-primary-400 rounded-full animate-spark"
+                                        style="--x: -60px; --y: 20px"
+                                    ></div>
+                                    <div
+                                        class="absolute w-1.5 h-1.5 bg-primary-400 rounded-full animate-spark"
+                                        style="--x: 60px; --y: -30px"
+                                    ></div>
+                                </div>
+                            </div>
+                            <div
+                                class="absolute left-0 top-0 h-5.5 w-5.5 rounded-full border-4 border-primary-400 opacity-0 animate-shockwave z-40"
+                            ></div>
+                            }
+
+                            <div
+                                class="absolute left-0 top-0 h-5.5 w-5.5 rounded-full bg-primary-500 shadow-[0_0_20px_#4f46e5] flex items-center justify-center pointer-events-auto"
+                                [class.animate-teleport-in]="hasInteracted()"
+                            ></div>
+
+                            <!-- Old Ghost position (zap out) -->
+                            @if (hasInteracted()) {
+                            <div
+                                class="absolute right-0 top-0 h-5.5 w-5.5 rounded-full bg-primary-500 animate-teleport-out"
+                            ></div>
+                            } }
                         </div>
                     </div>
                 </button>
                 <div class="flex items-center gap-2">
-                    <span class="text-sm font-medium" [class.opacity-50]="billingCycle() === 'monthly'">Yearly</span>
-                    <span class="px-2.5 py-0.5 rounded-full bg-primary-500/10 border border-primary-500/30 text-primary-600 shadow-primary-500/20 text-[10px] font-bold uppercase tracking-wider" [class.animate-infinite-shake]="billingCycle() === 'yearly'">2 Months Free</span>
+                    <span
+                        class="text-sm font-medium"
+                        [class.opacity-50]="billingCycle() === 'monthly'"
+                        >Yearly</span
+                    >
+                    <span
+                        class="px-2.5 py-0.5 rounded-full bg-primary-500/10 border border-primary-500/30 text-primary-600 shadow-primary-500/20 text-[10px] font-bold uppercase tracking-wider"
+                        [class.animate-infinite-shake]="billingCycle() === 'yearly'"
+                        >2 Months Free</span
+                    >
                 </div>
             </div>
         </div>
 
         <!-- Pricing Cards Section -->
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 mb-24 relative z-10" appScrollReveal delay="delay-300">
-            @for (plan of plans; track plan.slug) {
-                <app-pricing-card
-                    [plan]="plan"
-                    [isYearly]="billingCycle() === 'yearly'"
-                    [delay]="'delay-' + ($index * 100 + 100)">
-                </app-pricing-card>
+        <div
+            class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 mb-24 relative z-10"
+            appScrollReveal
+            delay="delay-300"
+        >
+            @for (plan of plans(); track plan.slug) {
+            <app-pricing-card
+                [plan]="plan"
+                [isYearly]="billingCycle() === 'yearly'"
+                [delay]="'delay-' + ($index * 100 + 100)"
+            >
+            </app-pricing-card>
             }
         </div>
 
@@ -134,68 +244,176 @@
         </div> -->
 
         <!-- Value Proposition Wide Architecture Card -->
-        <div class="relative bg-surface-950 dark:bg-surface-900 rounded-4xl p-10 md:p-16 mb-32 border border-surface-200 dark:border-surface-800 shadow-2xl shadow-primary-500/5 overflow-hidden ring-1 ring-white/10" appScrollReveal>
-             <!-- Background Matrix Decor -->
-             <div class="absolute inset-0 opacity-5 pointer-events-none" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 40px 40px;"></div>
-             <div class="absolute top-0 right-0 w-[400px] h-[400px] bg-primary-500/15 blur-[120px] rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
-             <div class="absolute bottom-0 left-0 w-[300px] h-[300px] bg-blue-500/10 blur-[100px] rounded-full -translate-x-1/2 translate-y-1/2 pointer-events-none"></div>
+        <div
+            class="relative bg-surface-950 dark:bg-surface-900 rounded-4xl p-10 md:p-16 mb-32 border border-surface-200 dark:border-surface-800 shadow-2xl shadow-primary-500/5 overflow-hidden ring-1 ring-white/10"
+            appScrollReveal
+        >
+            <!-- Background Matrix Decor -->
+            <div
+                class="absolute inset-0 opacity-5 pointer-events-none"
+                style="
+                    background-image: radial-gradient(
+                        white 1px,
+                        transparent 1px
+                    );
+                    background-size: 40px 40px;
+                "
+            ></div>
+            <div
+                class="absolute top-0 right-0 w-[400px] h-[400px] bg-primary-500/15 blur-[120px] rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none"
+            ></div>
+            <div
+                class="absolute bottom-0 left-0 w-[300px] h-[300px] bg-blue-500/10 blur-[100px] rounded-full -translate-x-1/2 translate-y-1/2 pointer-events-none"
+            ></div>
 
-            <div class="relative z-10 grid xl:grid-cols-2 gap-12 items-center" appScrollReveal>
+            <div
+                class="relative z-10 grid xl:grid-cols-2 gap-12 items-center"
+                appScrollReveal
+            >
                 <div>
                     <div class="flex items-center gap-3 mb-6">
-                        <span class="text-primary-400 font-bold uppercase tracking-widest text-[10px] px-3 py-1 bg-primary-500/10 rounded-full border border-primary-500/20">
+                        <span
+                            class="text-primary-400 font-bold uppercase tracking-widest text-[10px] px-3 py-1 bg-primary-500/10 rounded-full border border-primary-500/20"
+                        >
                             Enterprise Infrastructure
                         </span>
                     </div>
-                    <h2 class="text-3xl md:text-5xl font-black text-white tracking-tighter leading-[1.1] mb-6">
-                        Built for Performance, <br/>
-                        <span class="text-white font-black font-sansation! text-shadow-green-500 text-shadow-md!">Secured for Scale.</span>
+                    <h2
+                        class="text-3xl md:text-5xl font-black text-white tracking-tighter leading-[1.1] mb-6"
+                    >
+                        Built for Performance, <br />
+                        <span
+                            class="text-white font-black font-sansation! text-shadow-green-500 text-shadow-md!"
+                            >Secured for Scale.</span
+                        >
                     </h2>
-                    <p class="text-lg text-surface-400 font-medium leading-relaxed max-w-xl">
-                        Kyrazo isn't just a relay. It's a global event mesh designed to handle mission-critical webhooks with absolute isolation and zero-latency overhead.
+                    <p
+                        class="text-lg text-surface-400 font-medium leading-relaxed max-w-xl"
+                    >
+                        Kyrazo isn't just a relay. It's a global event mesh
+                        designed to handle mission-critical webhooks with
+                        absolute isolation and zero-latency overhead.
                     </p>
                 </div>
 
                 <!-- Matrix / Metrics Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="py-6 px-8  rounded-2xl bg-surface-900/40 border border-surface-800 backdrop-blur-md group hover:border-primary-500/30 transition-all duration-500 relative overflow-hidden" appScrollReveal delay="delay-100">
-                        <div class="text-4xl -ml-2 md:text-4xl font-black text-white tracking-tighter mb-2 font-sansation! decoration-primary-500/20 underline decoration-10 underline-offset-[-12px] decoration-skip-ink-none text-shadow-primary-500 text-shadow-md!">SUB 1ms</div>
-                        <h4 class="text-sm font-black text-primary-400 uppercase tracking-widest mb-2">Global Latency</h4>
-                        <p class="text-sm text-surface-400 font-medium leading-relaxed">Edge-optimized mesh ensures instant data relay worldwide.</p>
+                    <div
+                        class="py-6 px-8 rounded-2xl bg-surface-900/40 border border-surface-800 backdrop-blur-md group hover:border-primary-500/30 transition-all duration-500 relative overflow-hidden"
+                        appScrollReveal
+                        delay="delay-100"
+                    >
+                        <div
+                            class="text-4xl -ml-2 md:text-4xl font-black text-white tracking-tighter mb-2 font-sansation! decoration-primary-500/20 underline decoration-10 underline-offset-[-12px] decoration-skip-ink-none text-shadow-primary-500 text-shadow-md!"
+                        >
+                            SUB 1ms
+                        </div>
+                        <h4
+                            class="text-sm font-black text-primary-400 uppercase tracking-widest mb-2"
+                        >
+                            Global Latency
+                        </h4>
+                        <p
+                            class="text-sm text-surface-400 font-medium leading-relaxed"
+                        >
+                            Edge-optimized mesh ensures instant data relay
+                            worldwide.
+                        </p>
                         <!-- Glow -->
-                        <div class="absolute -bottom-10 -right-10 w-24 h-24 bg-primary-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div
+                            class="absolute -bottom-10 -right-10 w-24 h-24 bg-primary-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"
+                        ></div>
                     </div>
 
-                    <div class="py-6 px-8  rounded-2xl bg-surface-900/40 border border-surface-800 backdrop-blur-md group hover:border-blue-500/30 transition-all duration-500 relative overflow-hidden" appScrollReveal delay="delay-200">
-                        <div class="text-4xl -ml-2 md:text-4xl font-black text-white tracking-tighter mb-2 font-sansation! decoration-blue-500/20 underline decoration-10 underline-offset-[-12px] decoration-skip-ink-none text-shadow-blue-500 text-shadow-md!">READY</div>
-                        <h4 class="text-sm font-black text-blue-400 uppercase tracking-widest mb-2">Privacy Focus</h4>
-                        <p class="text-sm text-surface-400 font-medium leading-relaxed">GDPR-aligned infrastructure with hardened isolation layers.</p>
+                    <div
+                        class="py-6 px-8 rounded-2xl bg-surface-900/40 border border-surface-800 backdrop-blur-md group hover:border-blue-500/30 transition-all duration-500 relative overflow-hidden"
+                        appScrollReveal
+                        delay="delay-200"
+                    >
+                        <div
+                            class="text-4xl -ml-2 md:text-4xl font-black text-white tracking-tighter mb-2 font-sansation! decoration-blue-500/20 underline decoration-10 underline-offset-[-12px] decoration-skip-ink-none text-shadow-blue-500 text-shadow-md!"
+                        >
+                            READY
+                        </div>
+                        <h4
+                            class="text-sm font-black text-blue-400 uppercase tracking-widest mb-2"
+                        >
+                            Privacy Focus
+                        </h4>
+                        <p
+                            class="text-sm text-surface-400 font-medium leading-relaxed"
+                        >
+                            GDPR-aligned infrastructure with hardened isolation
+                            layers.
+                        </p>
                         <!-- Glow -->
-                        <div class="absolute -bottom-10 -right-10 w-24 h-24 bg-blue-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div
+                            class="absolute -bottom-10 -right-10 w-24 h-24 bg-blue-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"
+                        ></div>
                     </div>
 
-                    <div class="py-6 px-8  rounded-2xl bg-surface-900/40 border border-surface-800 backdrop-blur-md group hover:border-green-500/30 transition-all duration-500 relative overflow-hidden" appScrollReveal delay="delay-300">
-                        <div class="text-4xl -ml-2 md:text-4xl font-black text-white tracking-tighter mb-2 font-sansation! decoration-green-500/20 underline decoration-10 underline-offset-[-12px] decoration-skip-ink-none text-shadow-green-500 text-shadow-md!">∞ SCALE</div>
-                        <h4 class="text-sm font-black text-green-400 uppercase tracking-widest mb-2">Burst Capacity</h4>
-                        <p class="text-sm text-surface-400 font-medium leading-relaxed">Dedicated high-performance infrastructure handles millions of concurrent events without throttling.</p>
+                    <div
+                        class="py-6 px-8 rounded-2xl bg-surface-900/40 border border-surface-800 backdrop-blur-md group hover:border-green-500/30 transition-all duration-500 relative overflow-hidden"
+                        appScrollReveal
+                        delay="delay-300"
+                    >
+                        <div
+                            class="text-4xl -ml-2 md:text-4xl font-black text-white tracking-tighter mb-2 font-sansation! decoration-green-500/20 underline decoration-10 underline-offset-[-12px] decoration-skip-ink-none text-shadow-green-500 text-shadow-md!"
+                        >
+                            ∞ SCALE
+                        </div>
+                        <h4
+                            class="text-sm font-black text-green-400 uppercase tracking-widest mb-2"
+                        >
+                            Burst Capacity
+                        </h4>
+                        <p
+                            class="text-sm text-surface-400 font-medium leading-relaxed"
+                        >
+                            Dedicated high-performance infrastructure handles
+                            millions of concurrent events without throttling.
+                        </p>
                         <!-- Glow -->
-                        <div class="absolute -bottom-10 -right-10 w-24 h-24 bg-green-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div
+                            class="absolute -bottom-10 -right-10 w-24 h-24 bg-green-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"
+                        ></div>
                     </div>
 
-                    <div class="py-6 px-8  rounded-2xl bg-surface-900/40 border border-surface-800 backdrop-blur-md group hover:border-orange-500/30 transition-all duration-500 relative overflow-hidden" appScrollReveal delay="delay-400">
-                        <div class="text-4xl -ml-2 md:text-4xl font-black text-white tracking-tighter mb-2 font-sansation! decoration-orange-500/20 underline decoration-10 underline-offset-[-12px] decoration-skip-ink-none text-shadow-orange-500 text-shadow-md!">99.99%</div>
-                        <h4 class="text-sm font-black text-orange-400 uppercase tracking-widest mb-2">Delivery SLA</h4>
-                        <p class="text-sm text-surface-400 font-medium leading-relaxed">Redundant multi-region mesh for mission-critical apps.</p>
+                    <div
+                        class="py-6 px-8 rounded-2xl bg-surface-900/40 border border-surface-800 backdrop-blur-md group hover:border-orange-500/30 transition-all duration-500 relative overflow-hidden"
+                        appScrollReveal
+                        delay="delay-400"
+                    >
+                        <div
+                            class="text-4xl -ml-2 md:text-4xl font-black text-white tracking-tighter mb-2 font-sansation! decoration-orange-500/20 underline decoration-10 underline-offset-[-12px] decoration-skip-ink-none text-shadow-orange-500 text-shadow-md!"
+                        >
+                            99.99%
+                        </div>
+                        <h4
+                            class="text-sm font-black text-orange-400 uppercase tracking-widest mb-2"
+                        >
+                            Delivery SLA
+                        </h4>
+                        <p
+                            class="text-sm text-surface-400 font-medium leading-relaxed"
+                        >
+                            Redundant multi-region mesh for mission-critical
+                            apps.
+                        </p>
                         <!-- Glow -->
-                        <div class="absolute -bottom-10 -right-10 w-24 h-24 bg-orange-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div
+                            class="absolute -bottom-10 -right-10 w-24 h-24 bg-orange-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"
+                        ></div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Detailed Comparison Section -->
-        <app-pricing-comparison [isYearly]="billingCycle() === 'yearly'"></app-pricing-comparison>
-
+        <app-pricing-comparison
+            [plans]="plans()"
+            [isYearly]="billingCycle() === 'yearly'"
+        ></app-pricing-comparison>
 
         <!-- Global CTA -->
         <div class="mt-24 md:mt-32">

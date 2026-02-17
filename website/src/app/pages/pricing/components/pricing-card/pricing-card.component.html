@@ -40,8 +40,8 @@
     </div>
 
     <a
-        [href]="plan.slug === 'enterprise' ? 'mailto:sales@kyrazo.com' : 'https://dash.kyrazo.com/auth/register'" pButton
-        [label]="plan.slug === 'enterprise' ? 'Contact Sales' : (plan.slug === 'free' ? 'Start for Free' : 'Get Started')"
+        [href]="(plan.slug === 'enterprise' || plan.slug === 'custom') ? 'mailto:sales@kyrazo.com' : 'https://dash.kyrazo.com/auth/register'" pButton
+        [label]="(plan.slug === 'enterprise' || plan.slug === 'custom') ? 'Contact Sales' : (plan.slug === 'free' ? 'Start for Free' : 'Get Started')"
         [severity]="plan.highlighted ? 'primary' : 'secondary'"
         size="small"
         [class]="'w-full py-4 font-bold! rounded-xl! transition-all duration-300 ' +

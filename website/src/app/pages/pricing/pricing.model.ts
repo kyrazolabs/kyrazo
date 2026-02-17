@@ -7,22 +7,25 @@ export interface PricingPlan {
     currency: string;
     features: {
         workers: number | string;
+        ingest: boolean;
+        dispatch: boolean;
         support: string;
         sla: string;
-        customDomain: boolean;
         analytics: string;
         retentionDays: number;
-        webhookRetries: number;
         customHeaders: boolean;
+        customTimeout: boolean;
+        customRetries: boolean;
+        forwardConfiguration: boolean;
+        apiAccess: boolean;
+        batchProcessing: boolean;
+
+        // custom plan features
         ipWhitelisting?: boolean;
-        customTransformations?: boolean;
-        batchProcessing?: boolean;
-        apiAccess?: string;
-        priorityQueue?: boolean;
+        whiteLabelHeaders?: boolean;
+        customSla?: boolean;
+        customDomain?: boolean;
         dedicatedInfrastructure?: boolean;
-        customIntegrations?: boolean;
-        accountManager?: boolean;
-        onboarding?: string;
         sso?: boolean;
     };
     limits: {
@@ -32,7 +35,7 @@ export interface PricingPlan {
         maxMembers: number;
         maxConnectors: number;
         maxIntegrations: number;
-        maxConcurrent: number;
+        maxWorkers: number;
     };
     benefits: string[];
     stripePriceId?: {
@@ -59,195 +62,53 @@ export interface PricingPlan {
  * - Enterprise: €349/mo, 500 req/sec, 10M+ events/month, 90+ days retention
  */
 
-export const PRICING_PLANS: PricingPlan[] = [
-    {
-        name: 'Free',
-        slug: 'free',
-        description:
-            'Perfect for exploring Kyrazo, testing, and side projects.',
-        priceCentsMonthly: 0,
-        priceCentsYearly: 0,
-        currency: 'EUR',
-        features: {
-            workers: 'shared',
-            support: 'Email support (24h response)',
-            sla: '99.9% uptime',
-            customDomain: false,
-            analytics: 'Standard',
-            retentionDays: 30,
-            webhookRetries: 5,
-            customHeaders: true,
-        },
-        limits: {
-            eventsPerSecond: 60,
-            eventsPerMonth: 100000,
-            maxProjects: 5,
-            maxMembers: 5,
-            maxConnectors: 10,
-            maxIntegrations: 15,
-            maxConcurrent: 20,
-        },
-        benefits: [
-            '60 events/sec throughput',
-            '50k events included',
-            '30 days data retention',
-            'Standard analytics',
-            'Community support',
-        ],
-        overagePriceCents: 0,
-        meterId: 'meter_free_plan',
-        isActive: true,
+export const MANUAL_CUSTOM_PLAN: PricingPlan = {
+    name: 'Custom',
+    slug: 'custom',
+    description:
+        'Bespoke infrastructure and dedicated support for large-scale operations.',
+    priceCentsMonthly: 0, // Contact sales
+    priceCentsYearly: 0,
+    currency: 'EUR',
+    features: {
+        workers: 'Custom',
+        ingest: true,
+        dispatch: true,
+        support: '24/7 Dedicated Account Manager',
+        sla: 'Custom Uptime SLA',
+        analytics: 'Custom Dashboards & Raw Data Export',
+        retentionDays: 365,
+        customHeaders: true,
+        customTimeout: true,
+        customRetries: true,
+        forwardConfiguration: true,
+        apiAccess: true,
+        batchProcessing: true,
+        ipWhitelisting: true,
+        whiteLabelHeaders: true,
+        customSla: true,
+        customDomain: true,
+        dedicatedInfrastructure: true,
+        sso: true,
     },
-    {
-        name: 'Starter',
-        slug: 'starter',
-        description:
-            'Perfect for startups and small platforms - production ready.',
-        priceCentsMonthly: 7900, // Changed from €29 to €79
-        priceCentsYearly: 79000, // €790 (10 months - 2 free)
-        currency: 'EUR',
-        features: {
-            workers: '2 dedicated', // Changed to show specs
-            support: 'Email support (24h response)',
-            sla: '99.9% uptime',
-            customDomain: true,
-            analytics: 'Advanced',
-            retentionDays: 30,
-            webhookRetries: 10, // Changed from 5 to 10
-            customHeaders: true,
-        },
-        limits: {
-            eventsPerSecond: 100,
-            eventsPerMonth: 1000000, // Changed from 250K to 1M
-            maxProjects: 5, // Changed from 10 to 5
-            maxMembers: 5,
-            maxConnectors: 15, // Changed from 25 to 15
-            maxIntegrations: 30,
-            maxConcurrent: 25, // Changed from 40 to 25
-        },
-        benefits: [
-            '2 Dedicated workers',
-            '100 events/sec capacity',
-            '1M events included',
-            '30 days data retention',
-            'Custom domains enabled',
-            'Email support',
-            // 'No watermark',
-        ],
-        stripePriceId: {
-            monthly: 'price_starter_monthly_eur',
-            yearly: 'price_starter_yearly_eur',
-        },
-        overagePriceCents: 200, // €2.00 per 100K events
-        meterId: 'meter_starter_webhook_events_001',
-        isActive: true,
+    limits: {
+        eventsPerSecond: 1000,
+        eventsPerMonth: -1,
+        maxProjects: -1,
+        maxMembers: -1,
+        maxConnectors: -1,
+        maxIntegrations: -1,
+        maxWorkers: -1,
     },
-    {
-        name: 'Professional',
-        slug: 'professional',
-        description:
-            'Built for growing companies - high performance and professional support.',
-        priceCentsMonthly: 14900, // Changed from €249 to €149
-        priceCentsYearly: 149000, // €1,490 (10 months - 2 free)
-        currency: 'EUR',
-        features: {
-            workers: '4 dedicated', // Changed to show specs
-            support: 'Email & chat support (8h response)',
-            sla: '99.99% uptime',
-            customDomain: true,
-            retentionDays: 90,
-            webhookRetries: 20, // Changed from 10 to 20
-            customHeaders: true,
-            priorityQueue: true, // Added
-            customTransformations: true,
-            batchProcessing: true,
-            apiAccess: 'Full REST API',
-            analytics: 'Advance',
-        },
-        limits: {
-            eventsPerSecond: 200, // Changed from 250 to 200
-            eventsPerMonth: 5000000, // Changed from 2M to 5M
-            maxProjects: 15, // Changed from 50 to 15
-            maxMembers: 10, // Changed from 20 to 10
-            maxConnectors: 50, // Changed from 100 to 50
-            maxIntegrations: 150, // Changed from 200 to 150
-            maxConcurrent: 50, // Changed from 100 to 50
-        },
-        benefits: [
-            '4 Dedicated workers',
-            '200 events/sec capacity',
-            '5M events included',
-            '90 days data retention',
-            'Priority queue',
-            'Custom transformations',
-            'Weekly reports',
-        ],
-        stripePriceId: {
-            monthly: 'price_professional_monthly_eur',
-            yearly: 'price_professional_yearly_eur',
-        },
-        overagePriceCents: 150, // €1.50 per 100K events
-        meterId: 'meter_professional_webhook_events_002',
-        isActive: true,
-        highlighted: true,
-        tag: 'MOST POPULAR',
-    },
-    {
-        name: 'Enterprise',
-        slug: 'enterprise',
-        description:
-            'Mission-critical infrastructure for large organizations - maximum performance.',
-        priceCentsMonthly: 34900, // Changed from €499 to €349
-        priceCentsYearly: 349000, // €3,490 (10 months - 2 free)
-        currency: 'EUR',
-        features: {
-            workers: '8 dedicated', // Changed to show specs
-            support: '24/7 dedicated support (1h response)',
-            sla: '99.99% uptime SLA + refund guarantee',
-            customDomain: true,
-            analytics: 'Enterprise analytics + custom dashboards',
-            retentionDays: 90, // Starting point, customizable
-            webhookRetries: 50, // Changed from -1 to 50
-            customHeaders: true,
-            ipWhitelisting: true,
-            customTransformations: true,
-            batchProcessing: true,
-            apiAccess: 'REST',
-            dedicatedInfrastructure: true,
-            customIntegrations: true,
-            accountManager: true,
-            onboarding: 'White-glove onboarding',
-            sso: true,
-        },
-        limits: {
-            eventsPerSecond: 500, // Changed from 1000 to 500
-            eventsPerMonth: 10000000, // Changed from 25M to 10M (starting point)
-            maxProjects: 50, // Changed from -1 to 50
-            maxMembers: 25, // Changed from -1 to 25
-            maxConnectors: 200, // Changed from -1 to 200
-            maxIntegrations: 1000, // Changed from -1 to 1000
-            maxConcurrent: 100, // Changed from 500 to 100
-        },
-        benefits: [
-            '8 Dedicated workers',
-            '500 events/sec capacity',
-            'Starting from 10M events/month',
-            '90+ days retention (customizable)',
-            '24/7 dedicated support',
-            'Custom integrations',
-            'White Label',
-            'White-glove onboarding',
-            'SAML/SSO enabled',
-            'Account manager',
-            'Custom SLA',
-            'Customizable limits',
-        ],
-        stripePriceId: {
-            monthly: 'price_enterprise_monthly_eur',
-            yearly: 'price_enterprise_yearly_eur',
-        },
-        overagePriceCents: 100, // €1.00 per 100K events
-        meterId: 'meter_enterprise_webhook_events_003',
-        isActive: true,
-    },
-];
+    benefits: [
+        'Unlimited event throughput',
+        'Unlimited data retention',
+        '24/7 Dedicated support',
+        'Custom billing & invoicing',
+        'White-label options',
+        'SAML/SSO & Advanced Security',
+    ],
+    isActive: true,
+    overagePriceCents: 0,
+    meterId: '',
+};

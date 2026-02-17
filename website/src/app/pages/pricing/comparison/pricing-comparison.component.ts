@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PRICING_PLANS, PricingPlan } from '../pricing.model';
+import { PricingPlan } from '../pricing.model';
 import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directive';
 
 @Component({
@@ -12,7 +12,7 @@ import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directiv
 })
 export class PricingComparisonComponent {
     @Input() isYearly = false;
-    plans: PricingPlan[] = PRICING_PLANS;
+    @Input() plans: PricingPlan[] = [];
 
     featureGroups = [
         {
@@ -39,12 +39,6 @@ export class PricingComparisonComponent {
                     key: 'limits.maxConnectors',
                     format: 'unlimited',
                 },
-                {
-                    label: 'Max Integrations',
-                    key: 'limits.maxIntegrations',
-                    format: 'unlimited',
-                },
-                { label: 'Concurrent Workers', key: 'limits.maxConcurrent' },
             ],
         },
         {
@@ -52,13 +46,18 @@ export class PricingComparisonComponent {
             features: [
                 { label: 'Dedicated Workers', key: 'features.workers' },
                 {
-                    label: 'Data Retention (Days)',
-                    key: 'features.retentionDays',
+                    label: 'Ingest Support',
+                    key: 'features.ingest',
+                    format: 'check',
                 },
                 {
-                    label: 'Webhook Retries',
-                    key: 'features.webhookRetries',
-                    format: 'unlimited',
+                    label: 'Dispatch Support',
+                    key: 'features.dispatch',
+                    format: 'check',
+                },
+                {
+                    label: 'Data Retention (Days)',
+                    key: 'features.retentionDays',
                 },
                 {
                     label: 'Custom Headers',
@@ -66,18 +65,18 @@ export class PricingComparisonComponent {
                     format: 'check',
                 },
                 {
-                    label: 'Custom Domain',
-                    key: 'features.customDomain',
+                    label: 'Custom Timeout',
+                    key: 'features.customTimeout',
                     format: 'check',
                 },
                 {
-                    label: 'IP Whitelisting',
-                    key: 'features.ipWhitelisting',
+                    label: 'Custom Retries',
+                    key: 'features.customRetries',
                     format: 'check',
                 },
                 {
-                    label: 'Custom Transformations',
-                    key: 'features.customTransformations',
+                    label: 'Forward Configuration',
+                    key: 'features.forwardConfiguration',
                     format: 'check',
                 },
                 {
@@ -88,7 +87,22 @@ export class PricingComparisonComponent {
                 {
                     label: 'API Access',
                     key: 'features.apiAccess',
-                    format: 'text',
+                    format: 'check',
+                },
+                {
+                    label: 'IP Whitelisting',
+                    key: 'features.ipWhitelisting',
+                    format: 'check',
+                },
+                {
+                    label: 'Header Prefix',
+                    key: 'features.whiteLabelHeaders',
+                    format: 'check',
+                },
+                {
+                    label: 'Custom Domain',
+                    key: 'features.customDomain',
+                    format: 'check',
                 },
                 { label: 'SAML/SSO', key: 'features.sso', format: 'check' },
             ],
@@ -104,13 +118,8 @@ export class PricingComparisonComponent {
                     format: 'check',
                 },
                 {
-                    label: 'Onboarding',
-                    key: 'features.onboarding',
-                    format: 'text',
-                },
-                {
-                    label: 'Account Manager',
-                    key: 'features.accountManager',
+                    label: 'Custom SLA',
+                    key: 'features.customSla',
                     format: 'check',
                 },
             ],
