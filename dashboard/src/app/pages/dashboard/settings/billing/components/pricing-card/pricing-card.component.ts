@@ -46,6 +46,14 @@ export class PricingCardComponent {
             format: 'check',
         },
         { label: 'SAML/SSO', key: 'features.sso', format: 'check' },
+        { label: 'Uptime SLA', key: 'features.sla' },
+        { label: 'Support Level', key: 'features.support' },
+        {
+            label: 'Dedicated Infrastructure',
+            key: 'features.dedicatedInfrastructure',
+            format: 'check',
+        },
+        { label: 'Custom SLA', key: 'features.customSla', format: 'check' },
     ];
 
     get currentPrice(): number {
