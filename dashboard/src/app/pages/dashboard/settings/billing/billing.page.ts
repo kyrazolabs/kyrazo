@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { finalize } from 'rxjs';
@@ -29,6 +29,7 @@ import {
 import { SentryService } from '@core/3rd-party/sentry';
 import { LoaderService } from '@core/services/loader.service';
 import { SupportService } from '@core/services/support.service';
+import { SubscriptionService } from '@core/services/subscription.service';
 
 @Component({
     selector: 'app-billing-settings',
@@ -59,11 +60,16 @@ export class BillingSettingsPage implements OnInit {
     private sentry = inject(SentryService);
     private supportService = inject(SupportService);
     public loader = inject(LoaderService);
+    public subscriptionService = inject(SubscriptionService);
 
     currentSubscription: ISubscription | null = null;
     availablePlans: IPlan[] = [];
+    filteredPlans: IPlan[] = [];
     usage: UsageStats | null = null;
     billing: BillingInfo | null = null;
+
+    billingCycle = signal<'month' | 'year'>('month');
+    isRedirectingToPortal = false;
 
     upgradeForm!: FormGroup;
     showUpgradeDialog = false;
@@ -109,15 +115,29 @@ export class BillingSettingsPage implements OnInit {
     }
 
     private updateUpgradeOptions() {
-        this.upgradePlanOptions = this.availablePlans
-            .filter(
-                (plan) =>
-                    plan.slug !== 'free' && plan.name !== this.currentPlanName,
-            )
+        this.filteredPlans = this.availablePlans
+            .filter((plan) => {
+                const isNotFree = plan.slug !== 'free';
+                const matchesInterval = (
+                    plan.interval ||
+                    (plan as any).frequency ||
+                    'month'
+                ).includes(this.billingCycle());
+                return isNotFree && matchesInterval;
+            })
+            .sort((a, b) => (a.priceCents || 0) - (b.priceCents || 0));
+
+        this.upgradePlanOptions = this.filteredPlans
+            .filter((plan) => plan.id !== this.currentSubscription?.planId)
             .map((plan) => ({
                 label: `${plan.name} - $${(plan.priceCents || 0) / 100}/${this.getFrequencyLabel(plan.interval || (plan as any).frequency || 'monthly')}`,
                 value: plan.id,
             }));
+    }
+
+    setBillingCycle(cycle: 'month' | 'year') {
+        this.billingCycle.set(cycle);
+        this.updateUpgradeOptions();
     }
 
     loadBillingInfo() {
@@ -141,6 +161,12 @@ export class BillingSettingsPage implements OnInit {
 
                         if (activeSub) {
                             this.currentSubscription = activeSub;
+                            const interval =
+                                activeSub.planSnapshot?.interval ||
+                                activeSub.plan?.interval;
+                            if (interval === 'month' || interval === 'year') {
+                                this.billingCycle.set(interval);
+                            }
                             this.loadUsageStats();
                         } else {
                             this.currentSubscription = null;
@@ -180,8 +206,10 @@ export class BillingSettingsPage implements OnInit {
             weekly: 'Weekly',
             monthly: 'Monthly',
             yearly: 'Yearly',
+            month: 'Month',
+            year: 'Year',
         };
-        return labels[frequency as keyof typeof labels] || 'Monthly';
+        return labels[frequency as keyof typeof labels] || 'Month';
     }
 
     get currentPlanName(): string {
@@ -274,19 +302,23 @@ export class BillingSettingsPage implements OnInit {
 
     updatePaymentMethod() {
         const returnUrl = window.location.href;
-        this.settingsService.createBillingPortalSession(returnUrl).subscribe({
-            next: (res) => {
-                if (res.data?.url) window.location.href = res.data.url;
-            },
-            error: (err) => {
-                this.sentry.captureException(err);
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: 'Could not redirect to billing portal',
-                });
-            },
-        });
+        this.isRedirectingToPortal = true;
+        this.settingsService
+            .createBillingPortalSession(returnUrl)
+            .pipe(finalize(() => (this.isRedirectingToPortal = false)))
+            .subscribe({
+                next: (res) => {
+                    if (res.data?.url) window.location.href = res.data.url;
+                },
+                error: (err) => {
+                    this.sentry.captureException(err);
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Could not redirect to billing portal',
+                    });
+                },
+            });
     }
 
     selectPlan(plan: IPlan) {

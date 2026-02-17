@@ -7,7 +7,7 @@ import {
     FormGroup,
     Validators,
 } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 // PrimeNG Imports
 import { CardModule } from 'primeng/card';
@@ -44,7 +44,6 @@ import { DialogService } from '@shared/services/dialog.service';
 @Component({
     selector: 'app-workspace-settings',
     imports: [
-        RouterLink,
         CommonModule,
         FormsModule,
         ReactiveFormsModule,

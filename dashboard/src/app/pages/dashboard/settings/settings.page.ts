@@ -72,7 +72,7 @@ export class SettingsPage implements OnInit {
     currentTab = 'profile';
 
     @ViewChild('profileComp') profileComp?: ProfileSettingsPage;
-    @ViewChild('notificationComp') notificationComp?: NotificationSettingsPage;
+    // @ViewChild('notificationComp') notificationComp?: NotificationSettingsPage;
     @ViewChild('workspaceComp') workspaceComp?: WorkspaceSettingsPage;
     @ViewChild('billingComp') billingComp?: BillingSettingsPage;
 
