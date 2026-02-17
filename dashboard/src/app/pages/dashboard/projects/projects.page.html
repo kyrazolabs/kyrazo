@@ -128,6 +128,30 @@
                 <label for="description" class="font-bold">Description</label>
                 <textarea id="description" pInputTextarea [(ngModel)]="projectForm.description" required rows="3" cols="20"></textarea>
             </div>
+            <div class="flex flex-col gap-2">
+                <div class="flex items-center justify-between">
+                    <label for="prefix" class="font-bold flex items-center gap-2">
+                        Header Prefix
+                        <i class="pi pi-info-circle text-sm opacity-60" pTooltip="Customize the HTTP header prefix for outbound webhooks (e.g., X-Webhook-Id becomes X-Stripe-Id)"></i>
+                    </label>
+                    @if (!hasWhiteLabelFeature) {
+                        <span (click)="dialogService.openBillingDialog()" pTooltip="Upgrade to Pro to customize header prefixes"
+                        class="px-2.5 py-0.5 rounded-full bg-primary-500/10 border border-primary-500/30 text-primary-600 shadow-primary-500/20 text-[10px] font-bold uppercase tracking-wider cursor-pointer">
+                        Professional</span>
+                    }
+                    <!-- <p-tag *ngIf="!" value="Pro" severity="warn" [rounded]="true" styleClass="text-[10px] py-1 cursor-pointer transition-transform hover:scale-105" (click)="dialogService.openBillingDialog()" pTooltip="Upgrade to Pro to customize header prefixes" /> -->
+                </div>
+                <input
+                    type="text"
+                    pInputText
+                    id="prefix"
+                    [(ngModel)]="projectForm.whiteLabelHeaderPrefix"
+                    [placeholder]="hasWhiteLabelFeature ? 'e.g. X-Kyrazo' : 'X-Webhook (Default)'"
+                    [disabled]="!hasWhiteLabelFeature"
+                    class="rounded-xl!"
+                />
+                <small class="opacity-60 text-xs" *ngIf="hasWhiteLabelFeature">This will replace the default "X-Webhook" prefix.</small>
+            </div>
         </div>
     </ng-template>
 

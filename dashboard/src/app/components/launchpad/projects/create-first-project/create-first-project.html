@@ -44,15 +44,15 @@
                     class="w-full"
                     [class.ng-invalid]="projectForm.get('name')?.invalid && projectForm.get('name')?.touched"
                 />
-                <small 
-                    *ngIf="projectForm.get('name')?.invalid && projectForm.get('name')?.touched" 
+                <small
+                    *ngIf="projectForm.get('name')?.invalid && projectForm.get('name')?.touched"
                     class="p-error block"
                 >
                     Project name is required and must be at least 3 characters
                 </small>
             </div>
 
-            <div appScrollReveal delay="delay-300" class="space-y-2">
+            <div appScrollReveal delay="delay-300" class="space-y-2 text-left">
                 <label for="projectDescription" class="block text-sm font-medium text-surface-700 dark:text-surface-300">
                     Description <span class="text-surface-500">(optional)</span>
                 </label>
@@ -63,6 +63,26 @@
                     placeholder="Brief description of your project..."
                     class="w-full"
                 />
+            </div>
+
+            <div appScrollReveal delay="delay-450" class="space-y-2 text-left">
+                <div class="flex items-center justify-between">
+                    <label for="prefix" class="block text-sm font-medium text-surface-700 dark:text-surface-300">
+                        Header Prefix
+                    </label>
+                    <p-tag *ngIf="!hasWhiteLabelFeature" value="Pro" severity="warn" [rounded]="true" styleClass="text-[10px] py-1 cursor-pointer transition-transform hover:scale-105" (click)="dialogService.openBillingDialog()" pTooltip="Upgrade to Pro to customize header prefixes" />
+                </div>
+                <input
+                    pInputText
+                    id="prefix"
+                    formControlName="whiteLabelHeaderPrefix"
+                    [placeholder]="hasWhiteLabelFeature ? 'e.g. X-Kyrazo' : 'X-Webhook (Default)'"
+                    [readonly]="!hasWhiteLabelFeature"
+                    class="w-full"
+                />
+                <p class="text-[11px] opacity-60">
+                    {{ hasWhiteLabelFeature ? 'Custom prefix for outbound webhook headers.' : 'Standard "X-Webhook" prefix will be used.' }}
+                </p>
             </div>
         </form>
 

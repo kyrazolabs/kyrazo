@@ -106,7 +106,7 @@ export class DialogService {
 
     // Billing Dialog Methods
     openBillingDialog() {
-        this.router.navigate(['/dashboard/settings'], {
+        this.router.navigate(['/settings'], {
             queryParams: { tab: 'billing' },
         });
         this.billingDialogStateSubject.next({ visible: true });

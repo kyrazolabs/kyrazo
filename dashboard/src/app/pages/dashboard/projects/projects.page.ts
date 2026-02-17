@@ -17,12 +17,15 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { TooltipModule } from 'primeng/tooltip';
 import { MenuModule } from 'primeng/menu';
+import { ISubscription } from '@models/billing.types';
+import { SubscriptionService } from '@core/services/subscription.service';
 
 // Services
 import { ProjectService } from '@core/services/project.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { GetProjectsResponse, IProject } from '@models/project.types';
 import { SentryService } from '@core/3rd-party/sentry';
+import { DialogService } from '@shared/services/dialog.service';
 
 @Component({
     selector: 'app-projects.page',
@@ -54,18 +57,33 @@ export class ProjectsPage implements OnInit {
     private messageService = inject(MessageService);
     private confirmationService = inject(ConfirmationService);
     private sentry = inject(SentryService);
+    public subscriptionService = inject(SubscriptionService);
+    public dialogService = inject(DialogService);
 
     projects: IProject[] = [];
     loading = false;
 
     // Dialog
     projectDialog = false;
-    projectForm: { name: string; description: string; _id?: string } = {
+    projectForm: {
+        name: string;
+        description: string;
+        whiteLabelHeaderPrefix: string;
+        _id?: string;
+    } = {
         name: '',
         description: '',
+        whiteLabelHeaderPrefix: '',
     };
     isSaving = false;
     isEdit = false;
+
+    // Subscription & Features
+
+    get hasWhiteLabelFeature(): boolean {
+        return !!this.subscriptionService.subscription()?.planSnapshot?.features
+            ?.whiteLabelHeaders;
+    }
 
     // Search
     searchQuery = '';
@@ -100,7 +118,11 @@ export class ProjectsPage implements OnInit {
     }
 
     openNew() {
-        this.projectForm = { name: '', description: '' };
+        this.projectForm = {
+            name: '',
+            description: '',
+            whiteLabelHeaderPrefix: '',
+        };
         this.isEdit = false;
         this.projectDialog = true;
     }
@@ -109,6 +131,7 @@ export class ProjectsPage implements OnInit {
         this.projectForm = {
             name: project.name,
             description: project.description || '',
+            whiteLabelHeaderPrefix: project.whiteLabelHeaderPrefix || '',
             _id: project.id,
         };
         this.isEdit = true;
@@ -131,6 +154,8 @@ export class ProjectsPage implements OnInit {
                 .update(this.projectForm._id, {
                     name: this.projectForm.name,
                     description: this.projectForm.description,
+                    whiteLabelHeaderPrefix:
+                        this.projectForm.whiteLabelHeaderPrefix,
                 })
                 .subscribe({
                     next: (res) => {
@@ -158,6 +183,8 @@ export class ProjectsPage implements OnInit {
                 .create({
                     name: this.projectForm.name,
                     description: this.projectForm.description,
+                    whiteLabelHeaderPrefix:
+                        this.projectForm.whiteLabelHeaderPrefix,
                 })
                 .subscribe({
                     next: (res) => {
