@@ -78,7 +78,7 @@ const subscriptionSchema = new Schema<ISubscription>(
                     type: Number,
                     required: true,
                 },
-                maxConcurrent: {
+                maxWorkers: {
                     type: Number,
                     required: true,
                 },

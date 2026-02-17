@@ -11,6 +11,7 @@ export interface IProject extends Document {
     isArchived: boolean;
     isDeleted: boolean;
     deletedAt?: Date;
+    whiteLabelHeaderPrefix?: string;
 
     // Virtual fields
     creator?: IUser;

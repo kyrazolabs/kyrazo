@@ -8,7 +8,31 @@ export interface IPlanLimits {
     maxMembers: number;
     maxConnectors: number;
     maxIntegrations: number;
-    maxConcurrent: number;
+    maxWorkers: number;
+}
+
+export interface IPlanFeatures {
+    workers: number | string;
+    ingest: boolean;
+    dispatch: boolean;
+    support: string;
+    sla: string;
+    analytics: string;
+    retentionDays: number;
+    customHeaders: boolean;
+    customTimeout: boolean;
+    customRetries: boolean;
+    forwardConfiguration: boolean;
+    apiAccess: boolean;
+    batchProcessing: boolean;
+
+    // custom plan features
+    ipWhitelisting?: boolean;
+    whiteLabelHeaders?: boolean;
+    customSla?: boolean;
+    customDomain?: boolean;
+    dedicatedInfrastructure?: boolean;
+    sso?: boolean;
 }
 
 export interface IPlan extends Document {
@@ -20,8 +44,9 @@ export interface IPlan extends Document {
     currency: string;
     interval: 'month' | 'year';
     overagePriceCents?: number;
-    features: Record<string, any>;
+    features: IPlanFeatures;
     limits: IPlanLimits;
+    benefits: Array<string>;
     stripeProductId: string;
     stripePriceId: string;
     stripeMeteredPriceId?: string;
@@ -45,8 +70,9 @@ export interface IPlanSnapshot {
     priceCents: number;
     currency: string;
     interval: 'month' | 'year';
-    features: Record<string, unknown>;
+    features: IPlanFeatures;
     limits: IPlanLimits;
+    benefits: Array<string>;
     stripeProductId: string;
     stripePriceId: string;
     stripeMeteredPriceId?: string;
@@ -157,11 +183,7 @@ export interface IUsage {
 }
 
 export interface IUsageModel extends Model<IUsage> {
-    aggregateUsage(
-        workspaceId: string,
-        periodStart: Date,
-        periodEnd: Date
-    ): Promise<IUsage[]>;
+    aggregateUsage(workspaceId: string, periodStart: Date, periodEnd: Date): Promise<IUsage[]>;
     bulkInsert(usages: Partial<IUsage>[]): Promise<IUsage[]>;
 }
 

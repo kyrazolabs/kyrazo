@@ -35,9 +35,8 @@ export class AutoScalerService {
         if (!plan) return;
 
         // 2. Identify State
-        const desiredWorkers = plan.limits.maxConcurrent;
-        const globalRunningIds =
-            Gateway.getInstance().getGlobalRunningWorkers();
+        const desiredWorkers = plan.limits.maxWorkers;
+        const globalRunningIds = Gateway.getInstance().getGlobalRunningWorkers();
         let runningWorkerRecords: (typeof workers.$inferSelect)[] = [];
 
         // Fetch DB records for workers that are ACTUALLY running according to Agent
@@ -47,10 +46,7 @@ export class AutoScalerService {
                 .from(workers)
                 .where(
                     and(
-                        eq(
-                            workers.client_id,
-                            subscription.workspaceId.toString()
-                        ),
+                        eq(workers.client_id, subscription.workspaceId.toString()),
                         inArray(workers.worker_id, globalRunningIds)
                     )
                 );
@@ -62,19 +58,14 @@ export class AutoScalerService {
         );
 
         // 3. Sync & Cleanup State
-        await this.syncState(
-            subscription.workspaceId.toString(),
-            globalRunningIds
-        );
+        await this.syncState(subscription.workspaceId.toString(), globalRunningIds);
 
         // 4. Scale UP
         if (actualWorkers < desiredWorkers) {
             const toCreate = desiredWorkers - actualWorkers;
             console.log(`[AutoScaler] Scaling UP by ${toCreate}`);
             for (let i = 0; i < toCreate; i++) {
-                await this.safeProvisionWorker(
-                    subscription.workspaceId.toString()
-                );
+                await this.safeProvisionWorker(subscription.workspaceId.toString());
             }
         }
 
@@ -84,11 +75,7 @@ export class AutoScalerService {
             console.log(`[AutoScaler] Scaling DOWN by ${toStop}`);
 
             const extraWorkers = runningWorkerRecords
-                .sort(
-                    (a, b) =>
-                        (b.created_at?.getTime() || 0) -
-                        (a.created_at?.getTime() || 0)
-                )
+                .sort((a, b) => (b.created_at?.getTime() || 0) - (a.created_at?.getTime() || 0))
                 .slice(0, toStop);
 
             for (const worker of extraWorkers) {
@@ -105,10 +92,7 @@ export class AutoScalerService {
      * Sync DB State with Actual State.
      * Marks "Zombie" workers as failed and corrects used_workers count.
      */
-    private static async syncState(
-        clientId: string,
-        runningWorkerIds: string[]
-    ) {
+    private static async syncState(clientId: string, runningWorkerIds: string[]) {
         const GRACE_PERIOD_MS = 60 * 1000; // 1 minute grace for "pending" starts
         const staleThreshold = new Date(Date.now() - GRACE_PERIOD_MS);
 
@@ -134,8 +118,7 @@ export class AutoScalerService {
 
         for (const w of zombieWorkers) {
             const isRunning = runningWorkerIds.includes(w.worker_id);
-            const isStale =
-                (w.created_at?.getTime() || 0) < staleThreshold.getTime();
+            const isStale = (w.created_at?.getTime() || 0) < staleThreshold.getTime();
 
             // Debug log
             // if (!isRunning) {
@@ -153,18 +136,13 @@ export class AutoScalerService {
             const gateway = Gateway.getInstance();
 
             for (const workerId of zombiesToKill) {
-                const worker = zombieWorkers.find(
-                    w => w.worker_id === workerId
-                );
+                const worker = zombieWorkers.find(w => w.worker_id === workerId);
                 if (!worker) continue;
 
                 if (!gateway.isAgentConnected(worker.server_id)) {
                     // Check if Agent is truly dead (no heartbeat for > 1 min)
-                    const lastHeartbeat = gateway.getLastHeartbeat(
-                        worker.server_id
-                    );
-                    const isDead =
-                        !lastHeartbeat || Date.now() - lastHeartbeat > 60000;
+                    const lastHeartbeat = gateway.getLastHeartbeat(worker.server_id);
+                    const isDead = !lastHeartbeat || Date.now() - lastHeartbeat > 60000;
 
                     if (isDead) {
                         console.log(

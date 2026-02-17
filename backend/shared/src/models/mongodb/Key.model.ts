@@ -57,6 +57,10 @@ const apiKeySchema = new Schema<IAPIKey>(
             type: String,
             required: true,
         },
+        ipWhitelist: {
+            type: [String],
+            default: [],
+        },
         isEnabled: {
             type: Boolean,
             default: true,

@@ -1,4 +1,6 @@
 import { Context, type Next } from 'hono';
+import { getConnInfo } from 'hono/bun';
+import { ipRestriction } from 'hono/ip-restriction';
 
 import type { IErrorResponse, IProject } from '@kyrazo/shared';
 import { Key, logger, Project, unprefixId } from '@kyrazo/shared';
@@ -164,6 +166,34 @@ export const authenticate = async (c: AppContext, next: Next) => {
                 },
                 401
             );
+        }
+
+        // IP Whitelisting Check
+        if (workspace.ipWhitelist && workspace.ipWhitelist.length > 0) {
+            const clientIp =
+                c.req.header('x-forwarded-for')?.split(',')[0].trim() ||
+                c.req.header('x-real-ip') ||
+                getConnInfo(c).remote.address ||
+                (c.req.raw as any).socket?.remoteAddress;
+
+            if (clientIp && !workspace.ipWhitelist.includes(clientIp)) {
+                logger.warn(`Auth failed: IP not whitelisted: ${clientIp}`, {
+                    requestId: c.get('requestId'),
+                    kid: key.parts.kid,
+                    whitelist: workspace.ipWhitelist,
+                });
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'IP_NOT_WHITELISTED',
+                            message: 'Your IP address is not whitelisted for this API key',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    403
+                );
+            }
         }
 
         const project = await Project.findById(unprefixId(projectId));

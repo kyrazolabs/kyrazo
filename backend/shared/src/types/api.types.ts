@@ -24,6 +24,7 @@ export interface IAPIKey extends Document {
         | 'ingest:endpoint:delete'
     >;
     lastFour: string;
+    ipWhitelist: string[];
     isEnabled: boolean;
     expiresAt?: Date | null;
     createdAt: Date;
