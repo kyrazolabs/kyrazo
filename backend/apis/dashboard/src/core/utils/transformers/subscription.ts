@@ -57,9 +57,17 @@ export function snapshot(plan: IPlan): IPlanSnapshot {
         currency: plan.currency,
         interval: plan.interval,
 
-        features: plan.features,
-        limits: plan.limits,
-        benefits: plan.benefits,
+        features: plan.features || {},
+        limits: {
+            eventsPerSecond: plan.limits?.eventsPerSecond ?? 10,
+            eventsPerMonth: plan.limits?.eventsPerMonth ?? 1000,
+            maxProjects: plan.limits?.maxProjects ?? 1,
+            maxMembers: plan.limits?.maxMembers ?? 1,
+            maxConnectors: plan.limits?.maxConnectors ?? 1,
+            maxIntegrations: plan.limits?.maxIntegrations ?? 1,
+            maxWorkers: plan.limits?.maxWorkers ?? 1,
+        },
+        benefits: plan.benefits || [],
 
         stripeProductId: plan.stripeProductId,
         stripePriceId: plan.stripePriceId,

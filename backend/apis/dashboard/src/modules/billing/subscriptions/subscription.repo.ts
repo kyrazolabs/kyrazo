@@ -1,9 +1,13 @@
+import { ClientSession } from 'mongoose';
 import { Subscription, ISubscription, unprefixId } from '@kyrazo/shared';
 
 export class SubscriptionRepository {
-    async create(subscriptionData: Partial<ISubscription>): Promise<ISubscription> {
+    async create(
+        subscriptionData: Partial<ISubscription>,
+        session?: ClientSession
+    ): Promise<ISubscription> {
         const subscription = new (Subscription as any)(subscriptionData);
-        return await subscription.save();
+        return await subscription.save({ session });
     }
 
     async findById(id: string): Promise<ISubscription | null> {

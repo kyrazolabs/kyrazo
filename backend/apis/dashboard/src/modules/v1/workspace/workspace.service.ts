@@ -9,6 +9,7 @@ import { Types } from 'mongoose';
 import { snapshot } from '@/core/utils/transformers';
 import { planRepository } from '@/modules/billing/plans/plan.repo';
 import { unprefixId } from '@kyrazo/shared';
+import mongoose from 'mongoose';
 
 export class WorkspaceService {
     async createWorkspace(userId: string, data: any): Promise<IWorkspace> {
@@ -19,51 +20,65 @@ export class WorkspaceService {
             );
         }
 
-        const workspaceData = {
-            ...data,
-            ownerId: userId,
-        };
+        const session = await mongoose.startSession();
+        session.startTransaction();
 
-        const workspace = await workspaceRepository.createWorkspace(workspaceData);
+        try {
+            const workspaceData = {
+                ...data,
+                ownerId: userId,
+            };
 
-        const membershipId = unprefixId(workspace.id);
-        const memberData = {
-            userId: unprefixId(userId),
-            workspaceId: membershipId,
-            role: 'owner',
-            invitedBy: unprefixId(userId),
-            invitationAcceptedAt: new Date(),
-        };
+            const workspace = await workspaceRepository.createWorkspace(workspaceData, session);
 
-        await workspaceRepository.createMembership(memberData);
-        const plan = await planRepository.findBySlug('free');
+            const workspaceIdRaw = unprefixId(workspace.id);
+            const memberData = {
+                userId: unprefixId(userId),
+                workspaceId: workspaceIdRaw,
+                role: 'owner',
+                invitedBy: unprefixId(userId),
+                invitationAcceptedAt: new Date(),
+            };
 
-        if (!plan) {
-            logger.error('Free plan not found');
-            throw new Error('Unknown Error');
+            await workspaceRepository.createMembership(memberData, session);
+            const plan = await planRepository.findBySlug('free');
+
+            if (!plan) {
+                logger.error('Free plan not found');
+                throw new Error('System error: Registration failed');
+            }
+
+            const now = new Date();
+            const addOneMonth = (date: Date) => {
+                const d = new Date(date);
+                d.setMonth(d.getMonth() + 1);
+                return d;
+            };
+
+            await subscriptionRepository.create(
+                {
+                    workspaceId: new Types.ObjectId(workspaceIdRaw as string) as any,
+                    userId: new Types.ObjectId(unprefixId(userId) as string),
+                    planId: plan?._id,
+                    planSnapshot: snapshot(plan),
+                    status: 'active',
+                    currentPeriodStart: now,
+                    currentPeriodEnd: addOneMonth(now),
+                    billingCycleAnchor: now,
+                    quantity: 1,
+                },
+                session
+            );
+
+            await session.commitTransaction();
+            return workspace;
+        } catch (error) {
+            await session.abortTransaction();
+            logger.error('Workspace creation failed, transaction aborted:', error as Error);
+            throw error;
+        } finally {
+            session.endSession();
         }
-
-        const now = new Date();
-
-        const addOneMonth = (date: Date) => {
-            const d = new Date(date);
-            d.setMonth(d.getMonth() + 1);
-            return d;
-        };
-
-        await subscriptionRepository.create({
-            workspaceId: new Types.ObjectId(membershipId as string) as any,
-            userId: new Types.ObjectId(unprefixId(userId) as string),
-            planId: plan?._id,
-            planSnapshot: snapshot(plan),
-            status: 'active',
-            currentPeriodStart: now,
-            currentPeriodEnd: addOneMonth(now),
-            billingCycleAnchor: now,
-            quantity: 1,
-        });
-
-        return workspace;
     }
 
     async getWorkspaceById(id: string): Promise<IWorkspace | null> {

@@ -1,3 +1,4 @@
+import { ClientSession } from 'mongoose';
 import {
     IWorkspace,
     IUserWorkspace,
@@ -43,15 +44,15 @@ export class WorkspaceRepository {
         return membership ? (transformWithId(membership, 'userWorkspace') as any) : null;
     }
 
-    async createWorkspace(data: any): Promise<IWorkspace> {
+    async createWorkspace(data: any, session?: ClientSession): Promise<IWorkspace> {
         const workspace = new Workspace(data);
-        const saved = await workspace.save();
+        const saved = await workspace.save({ session });
         return transformWithId(saved.toJSON(), 'workspace') as any;
     }
 
-    async createMembership(data: any): Promise<IUserWorkspace> {
+    async createMembership(data: any, session?: ClientSession): Promise<IUserWorkspace> {
         const userWorkspace = new UserWorkspace(data);
-        const saved = await userWorkspace.save();
+        const saved = await userWorkspace.save({ session });
         return transformWithId(saved.toJSON(), 'userWorkspace') as any;
     }
 
