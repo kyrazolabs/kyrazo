@@ -10,10 +10,12 @@ import {
     IProject,
     RestoreProjectResponse,
     UpdateProjectResponse,
+    Subscription,
     logger,
     transformWithId,
     unprefixId,
 } from '@kyrazo/shared';
+import { redisConfig } from '@/configs';
 import {
     CreateProjectInput,
     FilterProjectInput,
@@ -42,6 +44,36 @@ export class ProjectController {
             }
             // @ts-ignore
             const valid: CreateProjectInput = c.req.valid('json');
+
+            // White-label header prefix subscription check
+            if (valid.whiteLabelHeaderPrefix && valid.whiteLabelHeaderPrefix !== 'X-Webhook') {
+                const hasFeature = await redisConfig.cache(
+                    `workspace:${unprefixId(workspaceId.toString())}:feature:whiteLabelHeaders`,
+                    async () => {
+                        const subscription = await Subscription.findOne({
+                            workspaceId: unprefixId(workspaceId.toString()),
+                            status: 'active',
+                        });
+                        return !!subscription?.planSnapshot?.features?.whiteLabelHeaders;
+                    },
+                    60 * 15 // 15 minutes cache
+                );
+
+                if (!hasFeature) {
+                    return c.json<IErrorResponse>(
+                        {
+                            success: false,
+                            error: {
+                                code: 'FEATURE_NOT_AVAILABLE',
+                                message:
+                                    'Customizing the white-label header prefix is only available on selected plans. Please upgrade your subscription.',
+                                requestId: c.get('requestId'),
+                            },
+                        },
+                        403
+                    );
+                }
+            }
 
             const data = {
                 ...valid,
@@ -189,6 +221,36 @@ export class ProjectController {
             const { projectId: id }: GetProjectByIdInput = c.req.valid('param');
             // @ts-ignore
             const valid: UpdateProjectInput = c.req.valid('json');
+
+            // White-label headers subscription check
+            if (valid.whiteLabelHeaderPrefix && valid.whiteLabelHeaderPrefix.length > 0) {
+                const hasFeature = await redisConfig.cache(
+                    `workspace:${unprefixId(workspaceId.toString())}:feature:whiteLabelHeaders`,
+                    async () => {
+                        const subscription = await Subscription.findOne({
+                            workspaceId: unprefixId(workspaceId.toString()),
+                            status: 'active',
+                        });
+                        return !!subscription?.planSnapshot?.features?.whiteLabelHeaders;
+                    },
+                    60 * 15 // 15 minutes cache
+                );
+
+                if (!hasFeature) {
+                    return c.json<IErrorResponse>(
+                        {
+                            success: false,
+                            error: {
+                                code: 'FEATURE_NOT_AVAILABLE',
+                                message:
+                                    'White-label headers are only available on selected plans. Please upgrade your subscription.',
+                                requestId: c.get('requestId'),
+                            },
+                        },
+                        403
+                    );
+                }
+            }
 
             const updated = await Project.findOneAndUpdate(
                 {

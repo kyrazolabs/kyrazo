@@ -1,8 +1,6 @@
 import z from 'zod';
 
-const objectIdSchema = z
-    .string()
-    .regex(/^[0-9a-fA-F]{24}$/, 'Invalid ID format');
+const objectIdSchema = z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid ID format');
 
 export const createAPIKeySchema = z.object({
     name: z
@@ -37,11 +35,7 @@ export const createAPIKeySchema = z.object({
     ),
 
     expiresAt: z
-        .union([
-            z.nullable(z.string().datetime()),
-            z.number().int().positive(),
-            z.date(),
-        ])
+        .union([z.nullable(z.string().datetime()), z.number().int().positive(), z.date()])
         .optional()
         .transform(val => {
             if (!val) return null;
@@ -53,6 +47,17 @@ export const createAPIKeySchema = z.object({
         .refine(date => date === null || date > new Date(), {
             message: 'Expiration date must be in the future',
         }),
+    ipWhitelist: z
+        .array(
+            z
+                .string()
+                .regex(
+                    /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$|^(?:[A-F0-9]{1,4}:){7}[A-F0-9]{1,4}$/i,
+                    'Invalid IP address'
+                )
+        )
+        .optional()
+        .default([]),
 });
 
 export const getKeysSchema = z.object({

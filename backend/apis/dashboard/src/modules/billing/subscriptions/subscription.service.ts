@@ -201,22 +201,7 @@ export class SubscriptionService {
         }
 
         // Create new plan snapshot
-        const newPlanSnapshot: IPlanSnapshot = {
-            planId: newPlan._id,
-            name: newPlan.name,
-            slug: newPlan.slug,
-            priceCents: newPlan.priceCents,
-            currency: newPlan.currency,
-            interval: newPlan.interval,
-            features: newPlan.features,
-            limits: newPlan.limits,
-            stripeProductId: newPlan.stripeProductId,
-            stripePriceId: newPlan.stripePriceId,
-            stripeMeteredPriceId: newPlan.stripeMeteredPriceId,
-            stripeMeterId: newPlan.stripeMeterId,
-            stripeMeterEventName: newPlan.stripeMeterEventName,
-            createdAt: new Date(),
-        };
+        const newPlanSnapshot = snapshot(newPlan);
 
         // Update subscription
         const updateData: Partial<ISubscription> = {
@@ -350,7 +335,7 @@ export class SubscriptionService {
             maxMembers: number;
             maxConnectors: number;
             maxIntegrations: number;
-            maxConcurrent: number;
+            maxWorkers: number;
         };
         limits: {
             eventsPerSecond: number;
@@ -359,7 +344,7 @@ export class SubscriptionService {
             maxMembers: number;
             maxConnectors: number;
             maxIntegrations: number;
-            maxConcurrent: number;
+            maxWorkers: number;
         };
     }> {
         const subscription = await subscriptionRepository.findActiveByWorkspace(workspaceId);
@@ -375,7 +360,7 @@ export class SubscriptionService {
                     maxMembers: 0,
                     maxConnectors: 0,
                     maxIntegrations: 0,
-                    maxConcurrent: 0,
+                    maxWorkers: 0,
                 },
                 limits: {
                     eventsPerSecond: 10,
@@ -384,7 +369,7 @@ export class SubscriptionService {
                     maxMembers: 1,
                     maxConnectors: 1,
                     maxIntegrations: 1,
-                    maxConcurrent: 1,
+                    maxWorkers: 1,
                 },
             };
         }
@@ -401,7 +386,7 @@ export class SubscriptionService {
             maxMembers: 0,
             maxConnectors: 0,
             maxIntegrations: 0,
-            maxConcurrent: 0,
+            maxWorkers: 0,
         };
 
         return {

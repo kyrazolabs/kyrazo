@@ -16,6 +16,12 @@ const descriptionSchema = z.string().max(2000, 'Description is too long').option
 export const CreateProjectSchema = z.object({
     name: nameSchema,
     description: descriptionSchema,
+    whiteLabelHeaderPrefix: z
+        .string()
+        .min(1, 'Header prefix is required')
+        .max(50, 'Prefix is too long')
+        .regex(/^[a-zA-Z0-9-]+$/, 'Prefix can only contain alphanumeric characters and hyphens')
+        .optional(),
 });
 
 export const UpdateProjectSchema = CreateProjectSchema.partial();

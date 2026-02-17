@@ -35,6 +35,8 @@ export class SubscriptionTransformer {
                       currency: subscription.plan.currency,
                       frequency: subscription.plan.frequency,
                       limits: subscription.plan.limits,
+                      benefits: subscription.plan.benefits,
+                      features: subscription.plan.features,
                   }
                 : undefined,
             createdAt: subscription.createdAt,
@@ -57,6 +59,7 @@ export function snapshot(plan: IPlan): IPlanSnapshot {
 
         features: plan.features,
         limits: plan.limits,
+        benefits: plan.benefits,
 
         stripeProductId: plan.stripeProductId,
         stripePriceId: plan.stripePriceId,

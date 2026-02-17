@@ -9,7 +9,7 @@ export const FREE_PLAN_LIMITS: IPlanLimits = {
     maxMembers: 3,
     maxConnectors: 3,
     maxIntegrations: 1,
-    maxConcurrent: 0,
+    maxWorkers: 0,
 };
 
 export class LimitService {
