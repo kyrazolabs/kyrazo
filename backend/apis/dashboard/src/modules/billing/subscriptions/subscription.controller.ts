@@ -242,26 +242,6 @@ export class SubscriptionController {
                 );
             }
 
-            // If the NEW plan is a paid plan, we should generate an invoice/payment link
-            let paymentUrl: string | undefined;
-            if (subscription.planSnapshot?.priceCents > 0) {
-                try {
-                    const invoice = await paymentService.createRenewalInvoice(
-                        workspace.workspaceId.toString(),
-                        subscription._id.toString(),
-                        [
-                            {
-                                amount: subscription.planSnapshot.priceCents,
-                                description: `Upgrade to ${subscription.planSnapshot.name} Plan`,
-                            },
-                        ]
-                    );
-                    paymentUrl = (invoice as any).hosted_invoice_url;
-                } catch (payError) {
-                    logger.error('Failed to generate upgrade invoice:', payError as Error);
-                }
-            }
-
             const resData: any = (subscription as any).toJSON
                 ? (subscription as any).toJSON()
                 : subscription;
@@ -270,10 +250,7 @@ export class SubscriptionController {
                 {
                     success: true,
                     message: 'Plan changed successfully',
-                    data: {
-                        ...resData,
-                        paymentUrl,
-                    },
+                    data: resData,
                 },
                 200
             );

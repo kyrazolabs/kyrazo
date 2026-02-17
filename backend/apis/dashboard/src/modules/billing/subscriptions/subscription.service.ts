@@ -188,12 +188,17 @@ export class SubscriptionService {
 
         // 1️⃣ Update Stripe if it exists
         if (subscription.stripeSubscriptionId) {
+            const stripeSub = await stripe.subscriptions.retrieve(
+                subscription.stripeSubscriptionId
+            );
+            const itemId = stripeSub.items.data[0].id;
+
             await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
                 items: [
                     {
-                        id: (await stripe.subscriptions.retrieve(subscription.stripeSubscriptionId))
-                            .items.data[0].id,
+                        id: itemId,
                         price: newPlan.stripePriceId,
+                        quantity: changeData.quantity ?? subscription.quantity,
                     },
                 ],
                 proration_behavior: 'always_invoice',
