@@ -1,4 +1,3 @@
-import { ClientSession } from 'mongoose';
 import {
     IWorkspace,
     IUserWorkspace,
@@ -9,6 +8,7 @@ import {
     User,
     transformWithId,
     unprefixId,
+    ClientSession,
 } from '@kyrazo/shared';
 
 export class WorkspaceRepository {

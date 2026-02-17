@@ -1,5 +1,4 @@
-import { ClientSession } from 'mongoose';
-import { Subscription, ISubscription, unprefixId } from '@kyrazo/shared';
+import { Subscription, ISubscription, unprefixId, ClientSession } from '@kyrazo/shared';
 
 export class SubscriptionRepository {
     async create(
