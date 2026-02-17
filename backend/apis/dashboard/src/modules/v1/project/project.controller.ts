@@ -223,7 +223,7 @@ export class ProjectController {
             const valid: UpdateProjectInput = c.req.valid('json');
 
             // White-label headers subscription check
-            if (valid.whiteLabelHeaderPrefix && valid.whiteLabelHeaderPrefix.length > 0) {
+            if (valid.whiteLabelHeaderPrefix && valid.whiteLabelHeaderPrefix !== 'X-Webhook') {
                 const hasFeature = await redisConfig.cache(
                     `workspace:${unprefixId(workspaceId.toString())}:feature:whiteLabelHeaders`,
                     async () => {
