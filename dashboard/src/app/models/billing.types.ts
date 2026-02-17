@@ -47,6 +47,7 @@ export interface ISubscription {
     hostedInvoiceUrl?: string;
     checkoutUrl?: string;
     clientSecret?: string;
+    stripeSubscriptionId?: string;
 }
 
 export interface SubscriptionResponse extends ISubscription {

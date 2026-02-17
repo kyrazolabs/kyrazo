@@ -55,7 +55,7 @@ import { BillingSettingsPage } from './billing/billing.page';
         IconFieldModule,
         InputIconModule,
         ProfileSettingsPage,
-        NotificationSettingsPage,
+        // NotificationSettingsPage,
         WorkspaceSettingsPage,
         BillingSettingsPage,
         ToastModule,

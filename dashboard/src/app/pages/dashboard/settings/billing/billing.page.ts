@@ -458,7 +458,14 @@ export class BillingSettingsPage implements OnInit {
         )
             return;
 
-        if (!this.currentSubscription || this.currentSubscription.isVirtual) {
+        // If no active subscription OR it's a "virtual" free plan OR it lacks a Stripe ID (initial free),
+        // treat as a new subscription (Checkout)
+        const isNewSubscription =
+            !this.currentSubscription ||
+            this.currentSubscription.isVirtual ||
+            !this.currentSubscription.stripeSubscriptionId;
+
+        if (isNewSubscription) {
             this.loader.show();
             this.settingsService
                 .createSubscriptionPayment({ planId: plan.id })
@@ -490,6 +497,7 @@ export class BillingSettingsPage implements OnInit {
                 });
             return;
         }
+
         this.confirmUpgrade(plan);
     }
 
@@ -497,8 +505,13 @@ export class BillingSettingsPage implements OnInit {
         const selectedPlanId = plan?.id || this.upgradeForm.value.selectedPlan;
         if (!selectedPlanId) return;
 
-        // If no active subscription or it's virtual, treat as a new subscription
-        if (!this.currentSubscription || this.currentSubscription.isVirtual) {
+        // Same check as selectPlan: if unlinked, treat as new
+        const isNewSubscription =
+            !this.currentSubscription ||
+            this.currentSubscription.isVirtual ||
+            !this.currentSubscription.stripeSubscriptionId;
+
+        if (isNewSubscription) {
             const selectedPlan =
                 plan ||
                 this.availablePlans.find((p) => p.id === selectedPlanId);
