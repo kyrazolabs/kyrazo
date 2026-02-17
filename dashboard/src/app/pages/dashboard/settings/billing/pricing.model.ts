@@ -94,7 +94,7 @@ export const MANUAL_CUSTOM_PLAN: PricingPlan = {
         sso: true,
     },
     limits: {
-        eventsPerSecond: 1000,
+        eventsPerSecond: -1,
         eventsPerMonth: -1,
         maxProjects: -1,
         maxMembers: -1,

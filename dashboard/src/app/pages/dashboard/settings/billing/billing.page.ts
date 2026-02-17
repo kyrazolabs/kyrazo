@@ -56,7 +56,6 @@ import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directiv
         RadioButtonModule,
         PricingCardComponent,
         PricingComparisonComponent,
-        ScrollRevealDirective,
     ],
     templateUrl: './billing.page.html',
     styleUrl: './billing.page.scss',
