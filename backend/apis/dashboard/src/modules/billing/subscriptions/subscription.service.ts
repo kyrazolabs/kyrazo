@@ -23,7 +23,7 @@ export class SubscriptionService {
         if (!plan) throw new Error('Plan not found');
 
         const existing = await subscriptionRepository.findActiveByWorkspace(workspaceId);
-        if (existing) {
+        if (existing && existing.planSnapshot.slug !== 'free') {
             throw new Error('Workspace already has an active subscription');
         }
 
