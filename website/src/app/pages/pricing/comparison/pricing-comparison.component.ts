@@ -2,11 +2,12 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PricingPlan } from '../pricing.model';
 import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directive';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
     selector: 'app-pricing-comparison',
     standalone: true,
-    imports: [CommonModule, ScrollRevealDirective],
+    imports: [CommonModule, ScrollRevealDirective, TooltipModule],
     templateUrl: './pricing-comparison.component.html',
     styleUrl: './pricing-comparison.component.scss',
 })
@@ -98,6 +99,8 @@ export class PricingComparisonComponent {
                     label: 'Header Prefix',
                     key: 'features.whiteLabelHeaders',
                     format: 'check',
+                    tooltip:
+                        'Customize outbound event headers. E.g., x-kyrazo-event',
                 },
                 {
                     label: 'Custom Domain',

@@ -29,20 +29,8 @@ export class PricingPage implements OnInit {
     private seoService = inject(SeoService);
     private pricingService = inject(PricingService);
 
-    billingCycle = signal<'monthly' | 'yearly'>('monthly');
-    hasInteracted = signal(false);
-    shakeToggle = signal(false);
-    lightningOffset = signal(0);
+    billingCycle = signal<'monthly'>('monthly');
     plans = signal<PricingPlan[]>([]);
-
-    toggleCycle() {
-        this.hasInteracted.set(true);
-        this.shakeToggle.update((s) => !s);
-        this.lightningOffset.set(Math.random() * 40 - 20); // -20 to +20 degree skew
-        this.billingCycle.update((c) =>
-            c === 'monthly' ? 'yearly' : 'monthly',
-        );
-    }
 
     ngOnInit() {
         this.posthog.trackPageView();
