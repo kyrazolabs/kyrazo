@@ -212,6 +212,8 @@ export class PaymentService {
             planSnapshot: snapshot(plan),
             stripeSubscriptionId,
             status: (stripeSub as any).status,
+            // Access period dates directly from the subscription object, NOT the items.
+            // Items (stripeSub.items.data[0]) do not contain current_period_start.
             currentPeriodStart: new Date((stripeSub as any).current_period_start * 1000),
             currentPeriodEnd: new Date((stripeSub as any).current_period_end * 1000),
             billingCycleAnchor: new Date(stripeSub.billing_cycle_anchor * 1000),
@@ -239,6 +241,7 @@ export class PaymentService {
             status: (stripeSub as any).status,
             planId: plan._id,
             planSnapshot: snapshot(plan),
+            // Access period dates directly from the subscription object, NOT the items.
             currentPeriodStart: new Date((stripeSub as any).current_period_start * 1000),
             currentPeriodEnd: new Date((stripeSub as any).current_period_end * 1000),
             paymentFailureCount: 0,
