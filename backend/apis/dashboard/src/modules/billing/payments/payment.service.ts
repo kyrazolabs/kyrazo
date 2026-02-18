@@ -201,6 +201,10 @@ export class PaymentService {
             return;
         }
 
+        // Deactivate any existing active subscriptions for this workspace (e.g. the default Free plan)
+        const workspaceId = session.metadata!.workspaceId;
+        await subscriptionRepository.deactivateOtherSubscriptions(workspaceId);
+
         await subscriptionRepository.create({
             workspaceId: new Types.ObjectId(unprefixId(session.metadata!.workspaceId)),
             userId: new Types.ObjectId(unprefixId(session.metadata!.userId)),

@@ -125,6 +125,28 @@ export class SubscriptionRepository {
             }
         );
     }
+
+    async deactivateOtherSubscriptions(
+        workspaceId: string,
+        excludeStripeSubId?: string
+    ): Promise<void> {
+        const query: any = {
+            workspaceId: unprefixId(workspaceId),
+            status: { $in: ['active', 'trialing', 'past_due'] },
+        };
+
+        if (excludeStripeSubId) {
+            query.stripeSubscriptionId = { $ne: excludeStripeSubId };
+        }
+
+        await (Subscription as any).updateMany(query, {
+            $set: {
+                status: 'canceled',
+                canceledAt: new Date(),
+                updatedAt: new Date(),
+            },
+        });
+    }
 }
 
 export const subscriptionRepository = new SubscriptionRepository();
