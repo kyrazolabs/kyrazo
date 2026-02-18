@@ -54,7 +54,7 @@ export class PlanService {
                 product: product.id,
                 currency: planData.currency.toLowerCase(),
                 recurring: {
-                    interval: 'month',
+                    interval: planData.interval as 'month' | 'year',
                     usage_type: 'metered',
                     meter: meter.id, // Stripe Meter ID
                 },
@@ -67,8 +67,7 @@ export class PlanService {
                     }, // included in flat fee
                     {
                         up_to: 'inf',
-                        unit_amount_decimal:
-                            planData.overagePriceCents.toString(),
+                        unit_amount_decimal: planData.overagePriceCents.toString(),
                     },
                 ],
             });
@@ -118,10 +117,7 @@ export class PlanService {
         return { plans, total };
     }
 
-    async updatePlan(
-        id: string,
-        updateData: UpdatePlanInput
-    ): Promise<IPlan | null> {
+    async updatePlan(id: string, updateData: UpdatePlanInput): Promise<IPlan | null> {
         // If slug is being updated, check for uniqueness
         if (updateData.slug) {
             const existingPlan = await planRepository.exists(updateData.slug);
@@ -187,13 +183,8 @@ export class PlanService {
                 stripePriceId: stripePrice.id,
             });
         } catch (error) {
-            logger.error(
-                'Failed to regenerate Stripe price for plan:',
-                error as Error
-            );
-            throw new Error(
-                'Failed to regenerate payment configuration for plan'
-            );
+            logger.error('Failed to regenerate Stripe price for plan:', error as Error);
+            throw new Error('Failed to regenerate payment configuration for plan');
         }
     }
 
@@ -210,15 +201,10 @@ export class PlanService {
                 try {
                     await this.regenerateStripePrice(plan._id.toString());
                     fixed++;
-                    logger.info(
-                        `Fixed plan ${plan.slug} with new Stripe price`
-                    );
+                    logger.info(`Fixed plan ${plan.slug} with new Stripe price`);
                 } catch (error) {
                     errors++;
-                    logger.error(
-                        `Failed to fix plan ${plan.slug}:`,
-                        error as Error
-                    );
+                    logger.error(`Failed to fix plan ${plan.slug}:`, error as Error);
                 }
             }
         }

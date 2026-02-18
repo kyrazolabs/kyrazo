@@ -14,7 +14,10 @@ import {
     logger,
     transformWithId,
     unprefixId,
+    ISubscription,
 } from '@kyrazo/shared';
+import { subscriptionCacheService } from '@/shared/services/subscription-cache.service';
+import { subscriptionService } from '@/modules/billing/subscriptions/subscription.service';
 import { redisConfig } from '@/configs';
 import {
     CreateProjectInput,
@@ -46,18 +49,11 @@ export class ProjectController {
             const valid: CreateProjectInput = c.req.valid('json');
 
             // White-label header prefix subscription check
-            if (valid.whiteLabelHeaderPrefix && valid.whiteLabelHeaderPrefix !== 'X-Webhook') {
-                const hasFeature = await redisConfig.cache(
-                    `workspace:${unprefixId(workspaceId.toString())}:feature:whiteLabelHeaders`,
-                    async () => {
-                        const subscription = await Subscription.findOne({
-                            workspaceId: unprefixId(workspaceId.toString()),
-                            status: 'active',
-                        });
-                        return !!subscription?.planSnapshot?.features?.whiteLabelHeaders;
-                    },
-                    60 * 15 // 15 minutes cache
+            if (valid.whiteLabelHeaders && valid.whiteLabelHeaders !== 'X-Webhook') {
+                const subscription = await subscriptionService.getSubscriptionWithCache(
+                    workspaceId.toString()
                 );
+                const hasFeature = !!subscription?.planSnapshot?.features?.whiteLabelHeaders;
 
                 if (!hasFeature) {
                     return c.json<IErrorResponse>(
@@ -223,18 +219,11 @@ export class ProjectController {
             const valid: UpdateProjectInput = c.req.valid('json');
 
             // White-label headers subscription check
-            if (valid.whiteLabelHeaderPrefix && valid.whiteLabelHeaderPrefix !== 'X-Webhook') {
-                const hasFeature = await redisConfig.cache(
-                    `workspace:${unprefixId(workspaceId.toString())}:feature:whiteLabelHeaders`,
-                    async () => {
-                        const subscription = await Subscription.findOne({
-                            workspaceId: unprefixId(workspaceId.toString()),
-                            status: 'active',
-                        });
-                        return !!subscription?.planSnapshot?.features?.whiteLabelHeaders;
-                    },
-                    60 * 15 // 15 minutes cache
+            if (valid.whiteLabelHeaders && valid.whiteLabelHeaders !== 'X-Webhook') {
+                const subscription = await subscriptionService.getSubscriptionWithCache(
+                    workspaceId.toString()
                 );
+                const hasFeature = !!subscription?.planSnapshot?.features?.whiteLabelHeaders;
 
                 if (!hasFeature) {
                     return c.json<IErrorResponse>(

@@ -41,7 +41,7 @@ export class DispatcherHeaders {
                 60 * 10 // 10 minutes cache
             );
 
-            const prefix = project?.whiteLabelHeaderPrefix || 'X-Webhook';
+            const prefix = project?.whiteLabelHeaders || 'X-Webhook';
 
             if (prefix !== 'X-Webhook') {
                 // Check if feature is enabled in subscription (cached in Redis)

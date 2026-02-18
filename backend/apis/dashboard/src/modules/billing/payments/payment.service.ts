@@ -211,11 +211,9 @@ export class PaymentService {
             planId: plan?._id,
             planSnapshot: snapshot(plan),
             stripeSubscriptionId,
-            status: (stripeSub as any).status,
-            // Access period dates directly from the subscription object, NOT the items.
-            // Items (stripeSub.items.data[0]) do not contain current_period_start.
-            currentPeriodStart: new Date((stripeSub as any).current_period_start * 1000),
-            currentPeriodEnd: new Date((stripeSub as any).current_period_end * 1000),
+            status: stripeSub.status,
+            currentPeriodStart: new Date(stripeSub.items.data[0].current_period_start * 1000),
+            currentPeriodEnd: new Date(stripeSub.items.data[0].current_period_end * 1000),
             billingCycleAnchor: new Date(stripeSub.billing_cycle_anchor * 1000),
             quantity: stripeSub.items.data[0].quantity ?? 1,
         });
@@ -238,12 +236,11 @@ export class PaymentService {
         }
 
         await subscriptionRepository.updateByStripeId(stripeSubscriptionId, {
-            status: (stripeSub as any).status,
+            status: stripeSub.status,
             planId: plan._id,
             planSnapshot: snapshot(plan),
-            // Access period dates directly from the subscription object, NOT the items.
-            currentPeriodStart: new Date((stripeSub as any).current_period_start * 1000),
-            currentPeriodEnd: new Date((stripeSub as any).current_period_end * 1000),
+            currentPeriodStart: new Date(stripeSub.items.data[0].current_period_start * 1000),
+            currentPeriodEnd: new Date(stripeSub.items.data[0].current_period_end * 1000),
             paymentFailureCount: 0,
         });
     }
@@ -261,6 +258,14 @@ export class PaymentService {
             status: 'canceled',
             canceledAt: new Date(),
         });
+
+        // Revert to free plan
+        if (subscription.metadata.workspaceId && subscription.customer) {
+            await subscriptionService.revertToFreePlan(
+                subscription.metadata.workspaceId,
+                subscription.metadata.userId // metadata should have userId from createSubscriptionCheckout
+            );
+        }
     }
 
     private async onSubscriptionUpdated(stripeSub: Stripe.Subscription) {
@@ -284,17 +289,24 @@ export class PaymentService {
             return;
         }
 
-        const sub = stripeSub as any;
         await subscriptionRepository.updateByStripeId(stripeSubscriptionId, {
             planId: plan._id,
             planSnapshot: snapshot(plan),
-            status: sub.status,
-            currentPeriodStart: new Date(sub.current_period_start * 1000),
-            currentPeriodEnd: new Date(sub.current_period_end * 1000),
-            billingCycleAnchor: new Date(sub.billing_cycle_anchor * 1000),
-            quantity: sub.items.data[0].quantity ?? 1,
-            canceledAt: sub.canceled_at ? new Date(sub.canceled_at * 1000) : undefined,
+            status: stripeSub.status,
+            currentPeriodStart: new Date(stripeSub.items.data[0].current_period_start * 1000),
+            currentPeriodEnd: new Date(stripeSub.items.data[0].current_period_end * 1000),
+            billingCycleAnchor: new Date(stripeSub.billing_cycle_anchor * 1000),
+            quantity: stripeSub.items.data[0].quantity ?? 1,
+            canceledAt: stripeSub.canceled_at ? new Date(stripeSub.canceled_at * 1000) : undefined,
         });
+
+        // If it was just canceled (not deletion, but status change to canceled for some reason)
+        if (stripeSub.status === 'canceled') {
+            await subscriptionService.revertToFreePlan(
+                existing.workspaceId.toString(),
+                existing.userId.toString()
+            );
+        }
 
         await limitService.invalidateWorkspaceLimits(existing.workspaceId.toString());
     }

@@ -39,7 +39,7 @@ const ProjectSchema = new Schema<IProject>(
             type: Date,
             default: null,
         },
-        whiteLabelHeaderPrefix: {
+        whiteLabelHeaders: {
             type: String,
             trim: true,
         },

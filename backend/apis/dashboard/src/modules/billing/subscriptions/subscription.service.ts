@@ -12,6 +12,7 @@ import { usageService } from '@/shared/services/usage.service';
 import { stripe } from '@/configs/stripe';
 import { config } from '@/configs';
 import { snapshot } from '@/core/utils/transformers';
+import { subscriptionCacheService } from '@/shared/services/subscription-cache.service';
 
 export class SubscriptionService {
     async createSubscriptionCheckout(
@@ -55,6 +56,7 @@ export class SubscriptionService {
                     price: plan.stripePriceId,
                     quantity: subscriptionData.quantity ?? 1,
                 },
+                // Only add metered price if Stripe Checkout can handle it (same interval)
                 ...(plan.stripeMeteredPriceId ? [{ price: plan.stripeMeteredPriceId }] : []),
             ],
             success_url: `${config.stripe.baseUrl}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
@@ -114,6 +116,17 @@ export class SubscriptionService {
 
     async getActiveWorkspaceSubscription(workspaceId: string): Promise<ISubscription | null> {
         return await subscriptionRepository.findActiveByWorkspace(workspaceId);
+    }
+
+    async getSubscriptionWithCache(workspaceId: string): Promise<ISubscription | null> {
+        const cached = await subscriptionCacheService.get(workspaceId);
+        if (cached) return cached;
+
+        const subscription = await this.getActiveWorkspaceSubscription(workspaceId);
+        if (subscription) {
+            await subscriptionCacheService.set(workspaceId, subscription);
+        }
+        return subscription;
     }
 
     async getWorkspaceSubscriptionWithFallback(workspaceId: string): Promise<any> {
@@ -226,6 +239,10 @@ export class SubscriptionService {
             await limitService.invalidateWorkspaceLimits(
                 updatedSubscription.workspaceId.toString()
             );
+            await subscriptionCacheService.set(
+                updatedSubscription.workspaceId.toString(),
+                updatedSubscription
+            );
         }
         return updatedSubscription;
     }
@@ -241,9 +258,13 @@ export class SubscriptionService {
 
         // 1️⃣ Update Stripe if it exists
         if (subscription.stripeSubscriptionId) {
-            await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
-                cancel_at_period_end: true,
-            });
+            if (cancelData.cancelAtPeriodEnd) {
+                await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+                    cancel_at_period_end: true,
+                });
+            } else {
+                await stripe.subscriptions.cancel(subscription.stripeSubscriptionId);
+            }
         }
 
         const updateData: Partial<ISubscription> = {
@@ -264,12 +285,50 @@ export class SubscriptionService {
             subscriptionId,
             updateData
         );
+
         if (updatedSubscription) {
             await limitService.invalidateWorkspaceLimits(
                 updatedSubscription.workspaceId.toString()
             );
+
+            // If immediate cancellation (not at period end), revert to free plan right away
+            if (!cancelData.cancelAtPeriodEnd) {
+                await this.revertToFreePlan(
+                    updatedSubscription.workspaceId.toString(),
+                    updatedSubscription.userId.toString()
+                );
+            }
         }
         return updatedSubscription;
+    }
+
+    async revertToFreePlan(workspaceId: string, userId: string): Promise<ISubscription> {
+        const freePlan = await planService.getPlanBySlug('free');
+        if (!freePlan) {
+            throw new Error('Free plan not found');
+        }
+
+        // Deactivate any existing active subscriptions
+        await subscriptionRepository.deactivateOtherSubscriptions(workspaceId);
+
+        const now = new Date();
+        const nextMonth = new Date();
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+
+        const subscription = await subscriptionRepository.create({
+            workspaceId: new Types.ObjectId(unprefixId(workspaceId)),
+            userId: new Types.ObjectId(unprefixId(userId)),
+            planId: freePlan._id,
+            planSnapshot: snapshot(freePlan),
+            status: 'active',
+            billingCycleAnchor: now,
+            currentPeriodStart: now,
+            currentPeriodEnd: nextMonth,
+            quantity: 1,
+        });
+
+        await limitService.invalidateWorkspaceLimits(workspaceId);
+        return subscription;
     }
 
     async activateSubscription(subscriptionId: string): Promise<ISubscription | null> {
@@ -279,6 +338,10 @@ export class SubscriptionService {
         if (updatedSubscription) {
             await limitService.invalidateWorkspaceLimits(
                 updatedSubscription.workspaceId.toString()
+            );
+            await subscriptionCacheService.set(
+                updatedSubscription.workspaceId.toString(),
+                updatedSubscription
             );
         }
         return updatedSubscription;
@@ -295,6 +358,10 @@ export class SubscriptionService {
             await limitService.invalidateWorkspaceLimits(
                 updatedSubscription.workspaceId.toString()
             );
+            await subscriptionCacheService.set(
+                updatedSubscription.workspaceId.toString(),
+                updatedSubscription
+            );
         }
         return updatedSubscription;
     }
@@ -310,6 +377,10 @@ export class SubscriptionService {
         if (updatedSubscription) {
             await limitService.invalidateWorkspaceLimits(
                 updatedSubscription.workspaceId.toString()
+            );
+            await subscriptionCacheService.set(
+                updatedSubscription.workspaceId.toString(),
+                updatedSubscription
             );
         }
         return updatedSubscription;
