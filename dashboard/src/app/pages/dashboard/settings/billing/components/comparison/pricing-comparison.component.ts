@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PricingPlan } from '../pricing.model';
+import { PricingPlan } from '../../pricing.model';
 import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directive';
 
 @Component({

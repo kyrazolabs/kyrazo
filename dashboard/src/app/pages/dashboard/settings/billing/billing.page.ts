@@ -33,8 +33,8 @@ import { SubscriptionService } from '@core/services/subscription.service';
 
 import { ProfileSettingsPage } from '../profile/profile.page';
 import { PricingPlan, MANUAL_CUSTOM_PLAN } from './pricing.model';
-import { PricingCardComponent } from './components/pricing-card/pricing-card.component';
-import { PricingComparisonComponent } from './comparison/pricing-comparison.component';
+import { PricingCardComponent } from './components/card/pricing-card.component';
+import { PricingComparisonComponent } from './components/comparison/pricing-comparison.component';
 import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directive';
 
 @Component({
@@ -437,7 +437,7 @@ export class BillingSettingsPage implements OnInit {
             .pipe(finalize(() => (this.isRedirectingToPortal = false)))
             .subscribe({
                 next: (res) => {
-                    if (res.data?.url) window.location.href = res.data.url;
+                    if (res.data?.url) window.open(res.data.url, '_blank');
                 },
                 error: (err) => {
                     this.sentry.captureException(err);
@@ -474,8 +474,10 @@ export class BillingSettingsPage implements OnInit {
                     next: (res) => {
                         const data = res.data as any;
                         if (data?.checkoutUrl || data?.hostedInvoiceUrl)
-                            window.location.href =
-                                data.checkoutUrl || data.hostedInvoiceUrl;
+                            window.open(
+                                data.checkoutUrl || data.hostedInvoiceUrl,
+                                '_blank',
+                            );
                         else {
                             this.messageService.add({
                                 severity: 'success',
@@ -529,14 +531,16 @@ export class BillingSettingsPage implements OnInit {
 
         this.loader.show();
         this.settingsService
-            .changePlan(this.currentSubscription.id, selectedPlanId)
+            .changePlan(this.currentSubscription!.id, selectedPlanId)
             .pipe(finalize(() => this.loader.hide()))
             .subscribe({
                 next: (res) => {
                     const data = res.data as any;
                     if (data?.paymentUrl || data?.hostedInvoiceUrl) {
-                        window.location.href =
-                            data.paymentUrl || data.hostedInvoiceUrl;
+                        window.open(
+                            data.paymentUrl || data.hostedInvoiceUrl,
+                            '_blank',
+                        );
                     } else {
                         this.messageService.add({
                             severity: 'success',
