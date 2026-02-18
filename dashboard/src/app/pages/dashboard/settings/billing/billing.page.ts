@@ -76,7 +76,7 @@ export class BillingSettingsPage implements OnInit {
     usage: UsageStats | null = null;
     billing: BillingInfo | null = null;
 
-    billingCycle = signal<'month' | 'year'>('month');
+    billingCycle = signal<'month'>('month');
     isRedirectingToPortal = false;
 
     // Premium UI Signals
@@ -147,39 +147,31 @@ export class BillingSettingsPage implements OnInit {
             const planIsYearly = isYearly(plan);
 
             if (existing) {
-                if (planIsYearly) {
-                    existing.priceCentsYearly = plan.priceCents;
-                    if (existing.stripePriceId) {
-                        existing.stripePriceId.yearly = plan.stripePriceId;
-                    }
-                } else {
+                // We only care about monthly prices now
+                if (!planIsYearly) {
                     existing.priceCentsMonthly = plan.priceCents;
                     if (existing.stripePriceId) {
                         existing.stripePriceId.monthly = plan.stripePriceId;
                     }
                 }
             } else {
+                if (planIsYearly) return; // Skip yearly plans in grouping
+
                 const pricingPlan: PricingPlan = {
                     id: plan.id,
                     originalPlan: plan,
-                    name: (plan.name || '')
-                        .replace(/y$/, '')
-                        .replace(/ly$/, ''),
+                    name: plan.name || '',
                     slug: groupKey,
                     description: plan.description || '',
-                    priceCentsMonthly: !planIsYearly
-                        ? plan.priceCents
-                        : plan.priceCents / 12, // rough estimate for display if only yearly exists
-                    priceCentsYearly: planIsYearly
-                        ? plan.priceCents
-                        : plan.priceCents * 12,
+                    priceCentsMonthly: plan.priceCents,
+                    priceCentsYearly: plan.priceCents * 12, // legacy/display internal
                     currency: plan.currency || 'EUR',
                     features: plan.features || {},
                     limits: plan.limits || {},
                     benefits: plan.benefits || [],
                     stripePriceId: {
-                        monthly: !planIsYearly ? plan.stripePriceId : '',
-                        yearly: planIsYearly ? plan.stripePriceId : '',
+                        monthly: plan.stripePriceId,
+                        yearly: '',
                     },
                     overagePriceCents: plan.overagePriceCents || 0,
                     meterId: plan.stripeMeterId || '',
@@ -201,13 +193,7 @@ export class BillingSettingsPage implements OnInit {
         return result;
     }
 
-    toggleCycle() {
-        this.hasInteracted.set(true);
-        this.shakeToggle.update((s) => !s);
-        this.lightningOffset.set(Math.random() * 40 - 20);
-        this.billingCycle.update((c) => (c === 'month' ? 'year' : 'month'));
-        this.updateUpgradeOptions();
-    }
+    // Toggle cycle removed as only monthly is supported
 
     openFullComparison() {
         window.open('https://kyrazo.com/pricing', '_blank');
@@ -228,7 +214,7 @@ export class BillingSettingsPage implements OnInit {
                 p.interval ||
                 (p as any).frequency ||
                 'month'
-            ).includes(this.billingCycle());
+            ).includes('month');
             return matchesSlug && matchesInterval;
         });
 
@@ -251,7 +237,7 @@ export class BillingSettingsPage implements OnInit {
                     plan.interval ||
                     (plan as any).frequency ||
                     'month'
-                ).includes(this.billingCycle());
+                ).includes('month');
                 return isNotFree && matchesInterval;
             })
             .sort((a, b) => (a.priceCents || 0) - (b.priceCents || 0));
@@ -264,7 +250,7 @@ export class BillingSettingsPage implements OnInit {
             }));
     }
 
-    setBillingCycle(cycle: 'month' | 'year') {
+    setBillingCycle(cycle: 'month') {
         this.billingCycle.set(cycle);
         this.updateUpgradeOptions();
     }
@@ -294,7 +280,7 @@ export class BillingSettingsPage implements OnInit {
                                 activeSub.planSnapshot?.interval ||
                                 activeSub.plan?.interval;
                             if (interval === 'month' || interval === 'year') {
-                                this.billingCycle.set(interval);
+                                this.billingCycle.set('month');
                             }
                             this.loadUsageStats();
                         } else {

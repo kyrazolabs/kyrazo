@@ -68,12 +68,12 @@ export class ProjectsPage implements OnInit {
     projectForm: {
         name: string;
         description: string;
-        whiteLabelHeaderPrefix: string;
+        whiteLabelHeaders: string;
         _id?: string;
     } = {
         name: '',
         description: '',
-        whiteLabelHeaderPrefix: '',
+        whiteLabelHeaders: '',
     };
     isSaving = false;
     isEdit = false;
@@ -121,7 +121,7 @@ export class ProjectsPage implements OnInit {
         this.projectForm = {
             name: '',
             description: '',
-            whiteLabelHeaderPrefix: '',
+            whiteLabelHeaders: '',
         };
         this.isEdit = false;
         this.projectDialog = true;
@@ -131,7 +131,7 @@ export class ProjectsPage implements OnInit {
         this.projectForm = {
             name: project.name,
             description: project.description || '',
-            whiteLabelHeaderPrefix: project.whiteLabelHeaderPrefix || '',
+            whiteLabelHeaders: project.whiteLabelHeaders || '',
             _id: project.id,
         };
         this.isEdit = true;
@@ -154,8 +154,7 @@ export class ProjectsPage implements OnInit {
                 .update(this.projectForm._id, {
                     name: this.projectForm.name,
                     description: this.projectForm.description,
-                    whiteLabelHeaderPrefix:
-                        this.projectForm.whiteLabelHeaderPrefix,
+                    whiteLabelHeaders: this.projectForm.whiteLabelHeaders,
                 })
                 .subscribe({
                     next: (res) => {
@@ -183,8 +182,7 @@ export class ProjectsPage implements OnInit {
                 .create({
                     name: this.projectForm.name,
                     description: this.projectForm.description,
-                    whiteLabelHeaderPrefix:
-                        this.projectForm.whiteLabelHeaderPrefix,
+                    whiteLabelHeaders: this.projectForm.whiteLabelHeaders,
                 })
                 .subscribe({
                     next: (res) => {

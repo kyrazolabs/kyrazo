@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, effect, computed } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { StorageService } from './storage.service';
 import { SettingService } from './settings.service';
 import { ISubscription } from '@models/billing.types';
@@ -9,7 +9,7 @@ import { filter, map } from 'rxjs';
 })
 export class SubscriptionService {
     private storage = inject(StorageService);
-    private settingsService = inject(SettingService);
+    private settings = inject(SettingService);
 
     private _subscription = signal<ISubscription | null>(null);
     public subscription = this._subscription.asReadonly();
@@ -44,7 +44,7 @@ export class SubscriptionService {
             return;
         }
 
-        this.settingsService.getWorkspaceSubscriptions().subscribe({
+        this.settings.getWorkspaceSubscriptions().subscribe({
             next: (res) => {
                 if (res.success && res.data) {
                     const activeSub = res.data.find((sub) =>

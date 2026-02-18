@@ -63,7 +63,7 @@ export class CreateFirstProjectComponent {
                 ],
             ],
             description: ['', [Validators.maxLength(500)]],
-            whiteLabelHeaderPrefix: [''],
+            whiteLabelHeaders: [''],
         });
     }
 
@@ -92,7 +92,7 @@ export class CreateFirstProjectComponent {
             const projectData = {
                 name: formValue.name,
                 description: formValue.description || '',
-                whiteLabelHeaderPrefix: formValue.whiteLabelHeaderPrefix || '',
+                whiteLabelHeaders: formValue.whiteLabelHeaders || '',
                 workspaceId: this.workspaceId,
             };
 

@@ -27,60 +27,7 @@
                         </div>
                     </div>
 
-                    <!-- Premium Billing Toggle -->
-                    <div class="flex items-center gap-4">
-                        <span class="text-sm font-medium" [class.opacity-50]="billingCycle() === 'year'">Monthly</span>
-                        <button (click)="toggleCycle()"
-                            [class.animate-shake-1]="hasInteracted() && shakeToggle()"
-                            [class.animate-shake-2]="hasInteracted() && !shakeToggle()"
-                            class="relative w-16 h-8 rounded-full bg-surface-100 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 focus:outline-none cursor-pointer group active:scale-95 transition-transform duration-100">
-                            <!-- The Teleporting Knob Container -->
-                            <div class="absolute inset-0 z-999 p-1 pointer-events-none">
-                                <div class="relative h-full w-full">
-                                    @if (billingCycle() === 'year') {
-                                        @if (hasInteracted()) {
-                                            <div class="absolute right-0 top-0 h-5.5 w-5.5 z-999!">
-                                                <div class="absolute left-1/2 bottom-2 w-[120px] h-screen -translate-x-1/2 pointer-events-none animate-thor-strike"
-                                                    style="transform-origin: bottom center"
-                                                    [style.--lightning-skew]="lightningOffset() + 'deg'">
-                                                    <svg viewBox="0 0 100 1000" preserveAspectRatio="none" class="w-full h-full fill-primary-400 filter drop-shadow-[0_0_40px_#4f46e5]">
-                                                        <path d="M50,0 L60,100 L40,200 L70,300 L30,400 L80,550 L20,700 L60,850 L50,1000 L55,1000 L65,850 L25,700 L85,550 L35,400 L75,300 L45,200 L65,100 L50,0 Z" />
-                                                    </svg>
-                                                </div>
-                                            </div>
-                                        }
-                                        <div class="absolute right-0 top-0 h-5.5 w-5.5 rounded-full bg-primary-500 shadow-[0_0_20px_#4f46e5] flex items-center justify-center pointer-events-auto"
-                                            [class.animate-teleport-in]="hasInteracted()"></div>
-                                        @if (hasInteracted()) {
-                                            <div class="absolute left-0 top-0 h-5.5 w-5.5 rounded-full bg-primary-500 animate-teleport-out"></div>
-                                        }
-                                    } @else {
-                                        @if (hasInteracted()) {
-                                            <div class="absolute left-0 top-0 h-5.5 w-5.5 z-999!">
-                                                <div class="absolute left-1/2 bottom-2 w-[120px] h-screen -translate-x-1/2 pointer-events-none animate-thor-strike"
-                                                    style="transform-origin: bottom center"
-                                                    [style.--lightning-skew]="lightningOffset() + 'deg'">
-                                                     <svg viewBox="0 0 100 1000" preserveAspectRatio="none" class="w-full h-full fill-primary-400 filter drop-shadow-[0_0_40px_#4f46e5]">
-                                                        <path d="M50,0 L60,100 L40,200 L70,300 L30,400 L80,550 L20,700 L60,850 L50,1000 L55,1000 L65,850 L25,700 L85,550 L35,400 L75,300 L45,200 L65,100 L50,0 Z" />
-                                                    </svg>
-                                                </div>
-                                            </div>
-                                        }
-                                        <div class="absolute left-0 top-0 h-5.5 w-5.5 rounded-full bg-primary-500 shadow-[0_0_20px_#4f46e5] flex items-center justify-center pointer-events-auto"
-                                            [class.animate-teleport-in]="hasInteracted()"></div>
-                                         @if (hasInteracted()) {
-                                            <div class="absolute right-0 top-0 h-5.5 w-5.5 rounded-full bg-primary-500 animate-teleport-out"></div>
-                                        }
-                                    }
-                                </div>
-                            </div>
-                        </button>
-                        <div class="flex items-center gap-2">
-                             <span class="text-sm font-medium" [class.opacity-50]="billingCycle() === 'month'">Yearly</span>
-                             <span class="px-2.5 py-0.5 rounded-full bg-primary-500/10 border border-primary-500/30 text-primary-600 shadow-primary-500/20 text-[10px] font-bold uppercase tracking-wider"
-                                [class.animate-infinite-shake]="billingCycle() === 'year'">2 Months Free</span>
-                        </div>
-                    </div>
+                    <!-- Premium Billing Toggle Hidden -->
                 </div>
             </p-card>
 
@@ -99,7 +46,7 @@
                     @for (plan of plans(); track plan.slug) {
                         <app-pricing-card
                             [plan]="plan"
-                            [isYearly]="billingCycle() === 'year'"
+                            [isYearly]="false"
                             [isCurrent]="currentPlanSlug === plan.slug"
                             [delay]="'delay-' + ($index * 100 + 100)"
                             (select)="selectPlanFromCard($event)">
@@ -112,7 +59,7 @@
              <div class="mt-24">
                  <app-pricing-comparison
                     [plans]="plans()"
-                    [isYearly]="billingCycle() === 'year'">
+                    [isYearly]="false">
                  </app-pricing-comparison>
              </div>
         </div>

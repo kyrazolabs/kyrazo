@@ -9,20 +9,20 @@ export interface IProject {
     deletedAt?: Date;
     createdAt: Date;
     updatedAt: Date;
-    whiteLabelHeaderPrefix?: string;
+    whiteLabelHeaders?: string;
 }
 
 // Project Request Types
 export interface CreateProjectRequest {
     name: string;
     description?: string;
-    whiteLabelHeaderPrefix?: string;
+    whiteLabelHeaders?: string;
 }
 
 export interface UpdateProjectRequest {
     name?: string;
     description?: string;
-    whiteLabelHeaderPrefix?: string;
+    whiteLabelHeaders?: string;
 }
 
 // Project Response Types

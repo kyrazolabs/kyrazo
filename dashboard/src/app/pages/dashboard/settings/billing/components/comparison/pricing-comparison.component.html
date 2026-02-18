@@ -42,7 +42,9 @@
                         @for (feature of group.features; track feature.label) {
                             <tr class="border-b border-surface-100 dark:border-surface-900 hover:bg-surface-50/30 dark:hover:bg-surface-900/10 transition-colors">
                                 <td class="py-4 px-4 text-sm text-surface-700 dark:text-surface-300">
-                                    {{ feature.label }}
+                                    <span [pTooltip]="feature.tooltip || ''" tooltipPosition="bottom" [attr.cursor]="feature.tooltip ? 'help' : null">
+                                        {{ feature.label }}
+                                    </span>
                                 </td>
                                 @for (plan of plans; track plan.slug) {
                                     <td class="py-4 px-4 text-center text-sm" [class.bg-surface-50/30]="plan.highlighted" [class.dark:bg-surface-900/10]="plan.highlighted">

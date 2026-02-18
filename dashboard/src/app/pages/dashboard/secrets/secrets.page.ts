@@ -63,6 +63,7 @@ export class SecretsPage implements OnInit {
     private sentry = inject(SentryService);
     public subscriptionService = inject(SubscriptionService);
 
+    minDate: Date | undefined;
     showCreateForm = false;
     isCreated = false;
     generatedApiKey = '';
@@ -119,7 +120,7 @@ export class SecretsPage implements OnInit {
 
     get hasIpWhitelistFeature(): boolean {
         return !!this.subscriptionService.subscription()?.planSnapshot?.features
-            ?.ipWhitelist;
+            ?.ipWhitelisting;
     }
 
     constructor(
@@ -136,6 +137,9 @@ export class SecretsPage implements OnInit {
 
     ngOnInit() {
         this.loadSecrets();
+        this.minDate = new Date();
+        this.minDate.setDate(this.minDate.getDate() + 1);
+        this.minDate.setHours(0, 0, 0, 0);
     }
 
     searchIPs(event: any) {
