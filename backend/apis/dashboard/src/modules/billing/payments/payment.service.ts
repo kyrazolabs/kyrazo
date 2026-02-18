@@ -211,9 +211,9 @@ export class PaymentService {
             planId: plan?._id,
             planSnapshot: snapshot(plan),
             stripeSubscriptionId,
-            status: stripeSub.status,
-            currentPeriodStart: new Date(stripeSub.items.data[0].current_period_start * 1000),
-            currentPeriodEnd: new Date(stripeSub.items.data[0].current_period_end * 1000),
+            status: (stripeSub as any).status,
+            currentPeriodStart: new Date((stripeSub as any).current_period_start * 1000),
+            currentPeriodEnd: new Date((stripeSub as any).current_period_end * 1000),
             billingCycleAnchor: new Date(stripeSub.billing_cycle_anchor * 1000),
             quantity: stripeSub.items.data[0].quantity ?? 1,
         });
@@ -236,11 +236,11 @@ export class PaymentService {
         }
 
         await subscriptionRepository.updateByStripeId(stripeSubscriptionId, {
-            status: stripeSub.status,
+            status: (stripeSub as any).status,
             planId: plan._id,
             planSnapshot: snapshot(plan),
-            currentPeriodStart: new Date(stripeSub.items.data[0].current_period_start * 1000),
-            currentPeriodEnd: new Date(stripeSub.items.data[0].current_period_end * 1000),
+            currentPeriodStart: new Date((stripeSub as any).current_period_start * 1000),
+            currentPeriodEnd: new Date((stripeSub as any).current_period_end * 1000),
             paymentFailureCount: 0,
         });
     }
