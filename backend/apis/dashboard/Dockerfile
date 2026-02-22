@@ -6,7 +6,7 @@ WORKDIR /app
 # Stage 1: Builder (Install & Build everything in strict order)
 FROM base AS builder
 
-RUN apk update && apk add curl
+RUN apk update && apk add wget
 
 # 1. Install Shared Dependencies
 COPY shared/package.json shared/bun.lock ./shared/
@@ -60,7 +60,7 @@ EXPOSE 3000
 
 # Healthcheck
 HEALTHCHECK  --start-period=20s --interval=30s --timeout=3s --retries=3 \
-    CMD curl -qO- http://localhost:3000/v1/health || exit 1
+    CMD wget -qO- http://localhost:3000/v1/health || exit 1
 
 # Start the application
 CMD ["bun", "run", "src/index.ts"]
