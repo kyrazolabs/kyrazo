@@ -57,8 +57,8 @@ USER bun
 EXPOSE 3000
 
 # Healthcheck
-# HEALTHCHECK  --start-period=20s --interval=30s --timeout=3s --retries=3 \
-#     CMD wget -qO- http://localhost:3000/v1/health || exit 1
+HEALTHCHECK  --start-period=20s --interval=30s --timeout=3s --retries=3 \
+    CMD wget -qO- http://localhost:3000/v1/health || exit 1
 
 # Start the application
 CMD ["bun", "run", "src/index.ts"]
