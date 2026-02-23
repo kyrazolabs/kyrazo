@@ -75,7 +75,7 @@ export class Gateway {
 
             switch (data.type) {
                 case 'CONNECT':
-                    this.handleConnect(ws, data.payload.agentKey, data);
+                    this.handleConnect(ws, data.payload);
                     break;
                 case 'HEARTBEAT':
                     this.handleHeartbeat(ws, data.payload);
@@ -157,73 +157,59 @@ export class Gateway {
         }
     }
 
-    public async handleConnect(ws: ServerWebSocket<any>, agentKey: string, data: any) {
-        // Validate Agent Key against DB
+    public async handleConnect(ws: ServerWebSocket<any>, payload: any) {
         try {
-            // Find server by API Key
-            // We need to import db and servers schema.
-            // Since this is inside class, let's use global db or import it at top.
-            // I'll add imports in a separate block.
-
-            // Temporary: Direct DB access here might be "messy" but practical for now.
-            // Better: Use ServerController or Service.
-            // Let's assume we can import `db` and `servers`.
-
-            // import { db } from '@/db';
-            // import { servers } from '@/db/schema';
-            // import { eq } from 'drizzle-orm';
-
-            // const [server] = await db.select().from(servers).where(eq(servers.api_key, agentKey));
-
-            // Since I cannot change imports in the same chunk easily if they are far away,
-            // I will implement the logic and add imports in another step or assume they are available
-            // if I add them to the top of the file.
-
-            // For this step, I will add the logic assuming imports exist.
-
-            // Mocking the logic for the "replace" tool to succeed first, then I add imports.
-            this.authenticateAgent(ws, agentKey, data.payload.ip);
+            await this.authenticateAgent(ws, payload);
         } catch (err) {
             console.error('Auth Failed', err);
             ws.close(1011, 'Auth Error');
         }
     }
 
-    private async authenticateAgent(
-        ws: ServerWebSocket<any>,
-        agentKey: string,
-        providedIp?: string
-    ) {
-        // Dynamic import to avoid circular dep issues at top level if any?
-        // Or just standard import is fine.
+    private async authenticateAgent(ws: ServerWebSocket<any>, payload: any) {
+        const clusterSecretEnv = process.env.CLUSTER_SECRET;
+
+        // 1. Verify Cluster Secret
+        if (!clusterSecretEnv || payload.clusterSecret !== clusterSecretEnv) {
+            console.log(`❌ Invalid Cluster Secret from Agent`);
+            ws.close(1008, 'Invalid Cluster Secret');
+            return;
+        }
+
+        const agentId = payload.nodeId;
+        const remoteIp = payload.ip || ws.remoteAddress || null;
+
+        // Dynamic import to avoid circular dep issues at top level
         const { db } = await import('@/db');
         const { servers } = await import('@/db/schema');
         const { eq } = await import('drizzle-orm');
 
-        const [server] = await db.select().from(servers).where(eq(servers.api_key, agentKey));
-
-        if (!server) {
-            console.log(`❌ Invalid Agent Key: ${agentKey}`);
-            ws.close(1008, 'Invalid API Key');
-            return;
-        }
-
-        const agentId = server.server_id;
-        const remoteIp = providedIp || ws.remoteAddress || null;
-
         console.log(
-            `✅ Agent Authenticated: ${agentId} (Server: ${server.server_id}) from IP: ${remoteIp}`
+            `✅ Agent Authenticated via Cluster Secret: Node ${agentId} from IP: ${remoteIp}`
         );
 
-        // Update server IP and mark as active
+        // 2. Database Upsert using the robust payload
         await db
-            .update(servers)
-            .set({
-                ip: remoteIp,
+            .insert(servers)
+            .values({
+                server_id: agentId,
+                api_key: agentId, // satisfy notNull
+                cores: payload.system.cores,
+                max_workers: payload.system.maxWorkers,
                 status: 'active',
+                ip: remoteIp,
                 last_heartbeat: new Date(),
             })
-            .where(eq(servers.server_id, agentId));
+            .onConflictDoUpdate({
+                target: servers.server_id,
+                set: {
+                    cores: payload.system.cores,
+                    max_workers: payload.system.maxWorkers,
+                    status: 'active',
+                    ip: remoteIp,
+                    last_heartbeat: new Date(),
+                },
+            });
 
         this.agents.set(agentId, ws);
         ws.data = { agentId };

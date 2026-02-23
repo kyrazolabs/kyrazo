@@ -12,13 +12,6 @@ export class ServerController {
     // Here we keep static methods for the logic, and we'll apply middleware in main.ts or route definition.
 
     static async register(c: Context) {
-        const clusterSecretReq = c.req.header('x-cluster-secret');
-        const clusterSecretEnv = process.env.CLUSTER_SECRET;
-
-        if (!clusterSecretEnv || clusterSecretReq !== clusterSecretEnv) {
-            throw new AppError('Unauthorized: Invalid or missing Cluster Secret', 401);
-        }
-
         const { cores, max_workers } = await c.req.json(); // Validated by middleware
         const result = await ServerService.register({ cores, max_workers });
         return c.json(result, 201);

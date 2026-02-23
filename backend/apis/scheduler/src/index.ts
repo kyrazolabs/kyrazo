@@ -81,7 +81,7 @@ app.get('/v1/health', async c => {
     }
 });
 
-app.post('/servers/register', zValidator('json', RegisterServerSchema), ServerController.register);
+// app.post('/servers/register', zValidator('json', RegisterServerSchema), ServerController.register);
 
 // --- Authenticated Server Routes ---
 app.use('/servers/*', serverAuth);

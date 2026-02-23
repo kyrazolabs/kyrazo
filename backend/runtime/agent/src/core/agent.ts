@@ -1,22 +1,24 @@
 import { RpcClient } from './rpc-client';
 import { DockerManager } from './docker';
 import type { StartWorkerPayload, StopWorkerPayload } from '@kyrazo/shared';
+import * as crypto from 'crypto'; // Added for crypto.randomUUID()
 
 export class Agent {
     private rpc!: RpcClient;
 
     private schedulerUrl: string;
+    private clusterSecret: string;
+    private nodeId: string;
 
     constructor() {
         this.schedulerUrl = process.env.SCHEDULER_URL || 'ws://localhost:8000';
-    }
+        this.clusterSecret = process.env.CLUSTER_SECRET || '';
 
-    async ensureRegistered(): Promise<string> {
+        // Generate or load persistent Node ID for zero-config registration
         const fs = require('fs');
         const path = require('path');
-        const keyPath = path.join(process.cwd(), 'data', '.agent_key');
+        const keyPath = path.join(process.cwd(), 'data', '.node_id');
 
-        // Ensure data directory exists for persistent volume (e.g. Coolify)
         if (!fs.existsSync(path.dirname(keyPath))) {
             fs.mkdirSync(path.dirname(keyPath), { recursive: true });
         }
@@ -24,60 +26,27 @@ export class Agent {
         if (fs.existsSync(keyPath)) {
             const key = fs.readFileSync(keyPath, 'utf-8').trim();
             if (key) {
-                console.log(`🔑 Using existing Agent Key from ${keyPath}`);
-                return key;
+                this.nodeId = key;
+                console.log(`🔑 Using existing Node ID: ${this.nodeId}`);
+            } else {
+                this.nodeId = crypto.randomUUID();
+                fs.writeFileSync(keyPath, this.nodeId, 'utf-8');
             }
+        } else {
+            console.log(`🔑 Generating new persistent Node ID...`);
+            this.nodeId = crypto.randomUUID();
+            fs.writeFileSync(keyPath, this.nodeId, 'utf-8');
         }
 
-        console.log(`🔑 No valid Agent Key found. Registering with Scheduler...`);
-        const clusterSecret = process.env.CLUSTER_SECRET;
-        if (!clusterSecret) {
-            throw new Error(
-                'CLUSTER_SECRET environment variable is missing. Cannot auto-register.'
-            );
-        }
-
-        const httpUrl = this.schedulerUrl.replace(/^ws/, 'http');
-        const os = require('os');
-        const response = await fetch(`${httpUrl}/servers/register`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-cluster-secret': clusterSecret,
-            },
-            body: JSON.stringify({
-                cores: os.cpus().length || 1,
-                max_workers: parseInt(process.env.MAX_WORKERS || '5', 10),
-            }),
-        });
-
-        if (!response.ok) {
-            const errText = await response.text();
-            throw new Error(`Failed to register Agent: ${response.status} ${errText}`);
-        }
-
-        const data: any = await response.json();
-        if (!data.apiKey) {
-            throw new Error('Scheduler responded successfully but did not return an apiKey.');
-        }
-
-        fs.writeFileSync(keyPath, data.apiKey, 'utf-8');
-        console.log(`✅ Successfully registered and saved new Agent Key to ${keyPath}`);
-        return data.apiKey;
+        this.rpc = new RpcClient(this, this.schedulerUrl, this.clusterSecret, this.nodeId);
     }
+
+    // The ensureRegistered method is removed as registration is now handled via nodeId and clusterSecret in the constructor.
 
     async start() {
         console.log('🤖 Starting Server Agent (Docker Mode)...');
 
-        let agentKey: string;
-        try {
-            agentKey = await this.ensureRegistered();
-        } catch (err) {
-            console.error('❌ Agent Registration failed:', err);
-            process.exit(1);
-        }
-
-        this.rpc = new RpcClient(this, this.schedulerUrl, agentKey);
+        // The agentKey registration logic is removed as nodeId and clusterSecret are now handled in the constructor.
 
         try {
             await DockerManager.checkHealth();

@@ -75,7 +75,17 @@ export type WorkerStatusPayload = z.infer<typeof WorkerStatusPayloadSchema>;
 export const AgentToServerSchema = z.discriminatedUnion('type', [
     z.object({
         type: z.literal('CONNECT'),
-        payload: z.object({ agentKey: z.string(), ip: z.string().optional() }),
+        payload: z.object({
+            clusterSecret: z.string(),
+            nodeId: z.string(),
+            system: z.object({
+                cores: z.number(),
+                memoryMB: z.number(),
+                os: z.string(),
+                maxWorkers: z.number(),
+            }),
+            ip: z.string().optional(),
+        }),
         id: z.string(),
         timestamp: z.number(),
     }),

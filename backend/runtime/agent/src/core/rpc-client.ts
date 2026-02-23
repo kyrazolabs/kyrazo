@@ -17,17 +17,19 @@ export class RpcClient {
     private ws: WebSocket | null = null;
     private url: string;
     private heartbeatInterval: Timer | null = null;
-    private agentKey: string;
+    private clusterSecret: string;
+    private nodeId: string;
     private shouldReconnect = true;
     private reconnectInterval = 5000;
     private agent: Agent;
 
-    constructor(agent: Agent, schedulerUrl: string, agentKey: string) {
+    constructor(agent: Agent, schedulerUrl: string, clusterSecret: string, nodeId: string) {
         this.agent = agent;
         // Ensure 'ws' if 'http'
         this.url = schedulerUrl.replace(/^http/, 'ws');
         console.log(`[RpcClient] Scheduler URL resolved to: ${this.url}`);
-        this.agentKey = agentKey;
+        this.clusterSecret = clusterSecret;
+        this.nodeId = nodeId;
     }
 
     public connect() {
@@ -66,11 +68,22 @@ export class RpcClient {
 
     private authenticate() {
         const ip = process.env.PUBLIC_IP;
+        const os = require('os');
         const msg: AgentToServerMessage = {
             type: 'CONNECT',
             id: crypto.randomUUID(),
             timestamp: Date.now(),
-            payload: { agentKey: this.agentKey, ip },
+            payload: {
+                clusterSecret: this.clusterSecret,
+                nodeId: this.nodeId,
+                system: {
+                    cores: os.cpus().length || 1,
+                    memoryMB: Math.floor(os.totalmem() / (1024 * 1024)),
+                    os: os.platform(),
+                    maxWorkers: parseInt(process.env.MAX_WORKERS || '5', 10),
+                },
+                ip,
+            },
         };
         this.send(msg);
     }
