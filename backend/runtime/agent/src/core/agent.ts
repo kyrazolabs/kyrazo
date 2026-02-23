@@ -3,17 +3,81 @@ import { DockerManager } from './docker';
 import type { StartWorkerPayload, StopWorkerPayload } from '@kyrazo/shared';
 
 export class Agent {
-    private rpc: RpcClient;
+    private rpc!: RpcClient;
+
+    private schedulerUrl: string;
 
     constructor() {
-        const schedulerUrl = process.env.SCHEDULER_URL || 'ws://localhost:3300';
-        const agentKey = process.env.AGENT_KEY || 'default-agent-key';
+        this.schedulerUrl = process.env.SCHEDULER_URL || 'ws://localhost:8000';
+    }
 
-        this.rpc = new RpcClient(this, schedulerUrl, agentKey);
+    async ensureRegistered(): Promise<string> {
+        const fs = require('fs');
+        const path = require('path');
+        const keyPath = path.join(process.cwd(), 'data', '.agent_key');
+
+        // Ensure data directory exists for persistent volume (e.g. Coolify)
+        if (!fs.existsSync(path.dirname(keyPath))) {
+            fs.mkdirSync(path.dirname(keyPath), { recursive: true });
+        }
+
+        if (fs.existsSync(keyPath)) {
+            const key = fs.readFileSync(keyPath, 'utf-8').trim();
+            if (key) {
+                console.log(`🔑 Using existing Agent Key from ${keyPath}`);
+                return key;
+            }
+        }
+
+        console.log(`🔑 No valid Agent Key found. Registering with Scheduler...`);
+        const clusterSecret = process.env.CLUSTER_SECRET;
+        if (!clusterSecret) {
+            throw new Error(
+                'CLUSTER_SECRET environment variable is missing. Cannot auto-register.'
+            );
+        }
+
+        const httpUrl = this.schedulerUrl.replace(/^ws/, 'http');
+        const os = require('os');
+        const response = await fetch(`${httpUrl}/servers/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-cluster-secret': clusterSecret,
+            },
+            body: JSON.stringify({
+                cores: os.cpus().length || 1,
+                max_workers: parseInt(process.env.MAX_WORKERS || '5', 10),
+            }),
+        });
+
+        if (!response.ok) {
+            const errText = await response.text();
+            throw new Error(`Failed to register Agent: ${response.status} ${errText}`);
+        }
+
+        const data: any = await response.json();
+        if (!data.apiKey) {
+            throw new Error('Scheduler responded successfully but did not return an apiKey.');
+        }
+
+        fs.writeFileSync(keyPath, data.apiKey, 'utf-8');
+        console.log(`✅ Successfully registered and saved new Agent Key to ${keyPath}`);
+        return data.apiKey;
     }
 
     async start() {
         console.log('🤖 Starting Server Agent (Docker Mode)...');
+
+        let agentKey: string;
+        try {
+            agentKey = await this.ensureRegistered();
+        } catch (err) {
+            console.error('❌ Agent Registration failed:', err);
+            process.exit(1);
+        }
+
+        this.rpc = new RpcClient(this, this.schedulerUrl, agentKey);
 
         try {
             await DockerManager.checkHealth();
@@ -32,9 +96,7 @@ export class Agent {
     async reconcileContainers() {
         try {
             const containers = await DockerManager.getRunningContainers();
-            console.log(
-                `🔄 Reconciling ${containers.length} existing containers...`
-            );
+            console.log(`🔄 Reconciling ${containers.length} existing containers...`);
 
             for (const workerId of containers) {
                 this.rpc.send({
@@ -158,12 +220,9 @@ export class Agent {
         const runningWorkers = await DockerManager.getRunningContainers();
 
         return {
-            success:
-                dockerHealthy.status === 'healthy' &&
-                rpcHealthy.status === 'healthy',
+            success: dockerHealthy.status === 'healthy' && rpcHealthy.status === 'healthy',
             message:
-                dockerHealthy.status === 'healthy' &&
-                rpcHealthy.status === 'healthy'
+                dockerHealthy.status === 'healthy' && rpcHealthy.status === 'healthy'
                     ? 'Agent is healthy'
                     : 'Agent is unhealthy',
             services: {
