@@ -2,12 +2,14 @@ import { RedisSnapshotConsumer } from './consumers/redis-snapshot.consumer';
 import { DispatchAggregator } from './aggregators/dispatch.aggregator';
 import { IngestAggregator } from './aggregators/ingest.aggregator';
 import { Config } from './config';
-import { db } from './db/client';
-import { sql } from 'drizzle-orm';
 import Redis from 'ioredis';
 
 async function main() {
+    const { clickhouseConfig } = await import('@kyrazo/shared');
+    await clickhouseConfig.connect();
+
     const dispatchAgg = new DispatchAggregator();
+
     const ingestAgg = new IngestAggregator();
 
     const consumer = new RedisSnapshotConsumer(dispatchAgg, ingestAgg);
@@ -25,16 +27,20 @@ async function main() {
             if (url.pathname === '/v1/health') {
                 try {
                     // Check all database services in parallel
-                    const [postgres, redis] = await Promise.all([
-                        // PostgreSQL health check
+                    const [clickhouse, redis] = await Promise.all([
+                        // ClickHouse health check
                         (async () => {
                             try {
-                                await db.execute(sql`SELECT 1`);
+                                const { clickhouseConfig } = await import('@kyrazo/shared');
+
+                                const client = clickhouseConfig.getClient();
+                                if (!client) throw new Error('ClickHouse client not available');
+                                await client.query({ query: 'SELECT 1', format: 'JSONEachRow' });
                                 return {
                                     status: 'healthy',
                                     details: {
                                         connected: true,
-                                        database: 'PostgreSQL',
+                                        database: 'ClickHouse',
                                     },
                                 };
                             } catch (error) {
@@ -42,7 +48,7 @@ async function main() {
                                     status: 'unhealthy',
                                     details: {
                                         connected: false,
-                                        database: 'PostgreSQL',
+                                        database: 'ClickHouse',
                                         error:
                                             error instanceof Error
                                                 ? error.message
@@ -61,10 +67,7 @@ async function main() {
                                     details: {
                                         connected: true,
                                         ping,
-                                        serverInfo: info
-                                            .split('\r\n')
-                                            .slice(0, 5)
-                                            .join('\n'),
+                                        serverInfo: info.split('\r\n').slice(0, 5).join('\n'),
                                     },
                                 };
                             } catch (error) {
@@ -83,7 +86,7 @@ async function main() {
                     ]);
 
                     // Determine overall health status
-                    const allHealthy = [postgres, redis].every(
+                    const allHealthy = [clickhouse, redis].every(
                         service => service.status === 'healthy'
                     );
 
@@ -94,10 +97,10 @@ async function main() {
                                 ? 'All services are healthy'
                                 : 'Some services are unhealthy',
                             services: {
-                                postgres,
+                                clickhouse,
                                 redis,
+                                timestamp: new Date().toISOString(),
                             },
-                            timestamp: new Date().toISOString(),
                             version: '1.0.0',
                         }),
                         {
@@ -110,10 +113,7 @@ async function main() {
                         JSON.stringify({
                             success: false,
                             message: 'Health check failed',
-                            error:
-                                error instanceof Error
-                                    ? error.message
-                                    : 'Unknown error',
+                            error: error instanceof Error ? error.message : 'Unknown error',
                             timestamp: new Date().toISOString(),
                             version: '1.0.0',
                         }),
