@@ -138,14 +138,15 @@
                             [disabled]="delivery.request_header === '{}'"
                         />
                     </div>
-                    <div class="card-panel min-h-[132px] max-h-[132px] overflow-y-auto scrollbar-thin scrollbar-thumb-surface-300 dark:scrollbar-thumb-surface-600 scrollbar-track-surface-100 dark:scrollbar-track-surface-800 scroll-smooth">
+                    <div class="card-panel min-h-[132px] max-h-[132px] overflow-auto scrollbar-thin scrollbar-thumb-surface-300 dark:scrollbar-thumb-surface-600 scrollbar-track-surface-100 dark:scrollbar-track-surface-800 scroll-smooth">
                         <ngx-json-viewer
                             *ngIf="!rawView && delivery.request_header !== '{}'"
                             [json]="delivery.request_header"
+                            class="overflow-x-auto block"
                         ></ngx-json-viewer>
                         <pre
                             *ngIf="rawView && delivery.request_header !== '{}'"
-                            class="text-sm text-surface-900 dark:text-surface-0 whitespace-pre-wrap"
+                            class="text-sm text-surface-900 dark:text-surface-0 whitespace-pre overflow-x-auto"
                         >{{ delivery.request_header | json }}</pre>
                         <p
                             *ngIf="delivery.request_header === '{}'"
@@ -167,14 +168,15 @@
                             [disabled]="delivery.request_body === '{}'"
                         />
                     </div>
-                    <div class="card-panel min-h-[132px] max-h-[132px] overflow-y-auto scrollbar-thin scrollbar-thumb-surface-300 dark:scrollbar-thumb-surface-600 scrollbar-track-surface-100 dark:scrollbar-track-surface-800 scroll-smooth">
+                    <div class="card-panel min-h-[132px] max-h-[132px] overflow-auto scrollbar-thin scrollbar-thumb-surface-300 dark:scrollbar-thumb-surface-600 scrollbar-track-surface-100 dark:scrollbar-track-surface-800 scroll-smooth">
                         <ngx-json-viewer
                             *ngIf="!rawView && delivery.request_body !== '{}'"
                             [json]="delivery.request_body"
+                            class="overflow-x-auto block"
                         ></ngx-json-viewer>
                         <pre
                             *ngIf="rawView && delivery.request_body !== '{}'"
-                            class="text-sm text-surface-900 dark:text-surface-0 whitespace-pre-wrap"
+                            class="text-sm text-surface-900 dark:text-surface-0 whitespace-pre overflow-x-auto"
                         >{{ delivery.request_body | json }}</pre>
                         <p
                             *ngIf="delivery.request_body === '{}'"
@@ -205,14 +207,15 @@
                         [disabled]="delivery.response_header === '{}'"
                     />
                 </div>
-                <div class="card-panel h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-surface-300 dark:scrollbar-thumb-surface-600 scrollbar-track-surface-100 dark:scrollbar-track-surface-800 scroll-smooth">
+                <div class="card-panel h-64 overflow-auto scrollbar-thin scrollbar-thumb-surface-300 dark:scrollbar-thumb-surface-600 scrollbar-track-surface-100 dark:scrollbar-track-surface-800 scroll-smooth">
                     <ngx-json-viewer
                         *ngIf="!rawView && delivery.response_header !== '{}'"
                         [json]="delivery.response_header"
+                        class="overflow-x-auto block"
                     ></ngx-json-viewer>
                     <pre
                         *ngIf="rawView && delivery.response_header !== '{}'"
-                        class="text-sm text-surface-900 dark:text-surface-0 whitespace-pre-wrap"
+                        class="text-sm text-surface-900 dark:text-surface-0 whitespace-pre overflow-x-auto"
                     >{{ delivery.response_header | json }}</pre>
                     <p
                         *ngIf="delivery.response_header === '{}'"
@@ -234,14 +237,15 @@
                         [disabled]="delivery.response_body === '{}'"
                     />
                 </div>
-                <div class="card-panel h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-surface-300 dark:scrollbar-thumb-surface-600 scrollbar-track-surface-100 dark:scrollbar-track-surface-800 scroll-smooth">
+                <div class="card-panel h-64 overflow-auto scrollbar-thin scrollbar-thumb-surface-300 dark:scrollbar-thumb-surface-600 scrollbar-track-surface-100 dark:scrollbar-track-surface-800 scroll-smooth">
                     <ngx-json-viewer
                         *ngIf="!rawView && delivery.response_body !== '{}'"
                         [json]="delivery.response_body"
+                        class="overflow-x-auto block"
                     ></ngx-json-viewer>
                     <pre
                         *ngIf="rawView && delivery.response_body !== '{}'"
-                        class="text-sm text-surface-900 dark:text-surface-0 whitespace-pre-wrap"
+                        class="text-sm text-surface-900 dark:text-surface-0 whitespace-pre overflow-x-auto"
                     >{{ delivery.response_body | json }}</pre>
                     <p
                         *ngIf="delivery.response_body === '{}'"
@@ -254,13 +258,13 @@
         <p-divider />
 
         <!-- Additional Actions -->
-        <div class="flex items-center justify-end gap-3">
+        <div class="flex flex-row items-center justify-end gap-3">
             <p-button
                 label="Retry Delivery"
                 icon="pi pi-refresh"
                 [outlined]="true"
                 severity="secondary"
-                styleClass="rounded-xl!"
+                styleClass="w-full sm:w-auto rounded-xl!"
                 [disabled]="delivery.status === 'delivered'"
             />
             <p-button
@@ -268,7 +272,7 @@
                 [icon]="rawView ? 'pi pi-sitemap' : 'pi pi-file-o'"
                 [outlined]="!rawView"
                 [severity]="rawView ? 'primary' : 'secondary'"
-                [styleClass]="rawView ? 'w-full rounded-xl!' : 'rounded-xl!'"
+                styleClass="w-full sm:w-auto rounded-xl!"
                 (onClick)="toggleRawView()"
             />
         </div>

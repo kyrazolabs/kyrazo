@@ -1,7 +1,7 @@
 <div class="space-y-6 mb-4">
     <!-- Header -->
     <div
-        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6"
+        class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6"
     >
         <!-- Left section -->
         <div>
@@ -19,7 +19,7 @@
                 [outlined]="true"
                 severity="secondary"
                 routerLink="/events/ingest/logs"
-                styleClass="rounded-2xl!"
+                styleClass="w-full sm:w-auto rounded-2xl!"
             />
         </div>
     </div>
@@ -59,7 +59,7 @@
                         class="w-full rounded-xl!"
                     />
                 </div>
-                <div class="flex flex-row gap-4">
+                <div class="flex flex-col sm:flex-row gap-4">
                     <div>
                         <label
                             class="block text-sm font-semibold text-surface-900 dark:text-surface-0 mb-1"
@@ -261,13 +261,13 @@
     </div>
 
     <!-- Additional Actions -->
-    <div class="flex items-center justify-end gap-3">
+    <div class="flex flex-col sm:flex-row items-center justify-end gap-3">
         <p-button
             [label]="rawView ? 'View Tree Data' : 'View Raw Data'"
             [icon]="rawView ? 'pi pi-sitemap' : 'pi pi-file-o'"
             [outlined]="!rawView"
             [severity]="rawView ? 'primary' : 'secondary'"
-            [styleClass]="rawView ? 'w-full rounded-xl!' : 'rounded-xl!'"
+            [styleClass]="'w-full sm:w-auto rounded-xl!'"
             (onClick)="toggleRawView()"
         />
     </div>

@@ -34,47 +34,32 @@
         <p-table #dt [value]="filteredDeliveries" [lazy]="true" [paginator]="true" [rows]="rows"
             [rowsPerPageOptions]="[10,20,50,100]" [totalRecords]="totalRecords"
             (onLazyLoad)="loadDeliveriesLazy($event)" dataKey="id" [sortField]="'timestamp'" [sortOrder]="-1"
-            [tableStyle]="{'min-width': '60rem'}" [loading]="loader.loading$ | async">
+            responsiveLayout="scroll" [loading]="loader.loading$ | async" styleClass="p-datatable-sm lg:p-datatable-md">
 
             <ng-template #header>
                 <tr>
-                    <th class="text-left rounded-xl! border-none!">
+                    <th class="text-left rounded-xl! border-none!" style="min-width: 120px">
                         ID
-                        <!-- <div class="flex items-center gap-2">
-                            <p-sortIcon field="delivery_id" />
-                        </div> -->
                     </th>
-                    <th class="text-left rounded-xl! border-none!">
+                    <th class="text-left rounded-xl! border-none!" style="min-width: 120px">
                         Event Type
                     </th>
-                    <th class="text-left rounded-xl! border-none!">
+                    <th class="text-left rounded-xl! border-none!" style="min-width: 250px">
                         Target
                     </th>
-                    <!-- <th pSortableColumn="status" class="text-left rounded-xl! border-none!"> -->
-                    <th class="text-left rounded-xl! border-none!">
+                    <th class="text-left rounded-xl! border-none!" style="min-width: 120px">
                         Status
-                        <!-- <div class="flex items-center gap-2">
-                            <p-sortIcon field="status" />
-                        </div> -->
                     </th>
-                    <!-- <th pSortableColumn="response_code" class="text-left rounded-xl! border-none!"> -->
-                    <th class="text-left rounded-xl! border-none!">
+                    <th class="text-left rounded-xl! border-none!" style="min-width: 100px">
                         Response
-                        <!-- <p-sortIcon field="response_code" /> -->
                     </th>
-                    <!-- <th pSortableColumn="response_time_ms" class="text-left rounded-xl! border-none!"> -->
-                    <th class="text-left rounded-xl! border-none!">
+                    <th class="text-left rounded-xl! border-none!" style="min-width: 100px">
                         Latency
-                        <!-- <p-sortIcon field="response_time_ms" /> -->
                     </th>
-                    <!-- <th pSortableColumn="processed_at" class="text-left rounded-xl! border-none!"> -->
-                    <th class="text-left rounded-xl! border-none!">
+                    <th class="text-left rounded-xl! border-none!" style="min-width: 150px">
                         Timestamp
-                        <!-- <div class="flex items-center gap-2">
-                            <p-sortIcon field="processed_at" />
-                        </div> -->
                     </th>
-                    <th class="text-left rounded-xl! border-none!">Actions</th>
+                    <th class="text-left rounded-xl! border-none!" style="min-width: 120px">Actions</th>
                 </tr>
             </ng-template>
 
@@ -94,11 +79,11 @@
 
                     <!-- Endpoint -->
                     <td>
-                        <div class="flex flex-col gap-1">
-                            <div class="text-sm font-medium text-surface-900 dark:text-surface-0">
+                        <div class="flex flex-col gap-1 min-w-0">
+                            <div class="text-sm font-medium text-surface-900 dark:text-surface-0 truncate" [pTooltip]="delivery.webhook_type | titlecase">
                                 {{ delivery.webhook_type | titlecase }} Webhook
                             </div>
-                            <div class="text-xs font-mono text-surface-600 dark:text-surface-400 truncate max-w-xs">
+                            <div class="text-xs font-mono text-surface-600 dark:text-surface-400 truncate max-w-[200px]" [pTooltip]="delivery.target">
                                 {{ delivery.target }}
                             </div>
                         </div>
@@ -111,7 +96,7 @@
                                 styleClass="text-xs font-medium" />
                             <span *ngIf="delivery.attempt_number && delivery.attempt_number > 1"
                                 class="text-xs text-surface-500 dark:text-surface-400">
-                                ({{ delivery.attempt_number }} attempts)
+                                ({{ delivery.attempt_number }})
                             </span>
                         </div>
                     </td>

@@ -1,7 +1,6 @@
 <div class="space-y-6 mb-4">
     <!-- Header -->
-    <div
-        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <!-- Left section -->
         <div>
             <h1 class="text-2xl font-bold">Endpoint Details</h1>
@@ -10,10 +9,10 @@
 
         <!-- Right section -->
         <div class="flex items-center gap-4">
-            <p-button label="Edit" icon="icon-[hugeicons--edit-03] size-5" styleClass="rounded-xl!" size="small"
+            <p-button label="Edit" icon="icon-[hugeicons--edit-03] size-5" styleClass="w-full sm:w-auto rounded-xl!" size="small"
                 (onClick)="openEditDialog()" />
             <p-button label="Back" icon="pi pi-arrow-left" [outlined]="true" severity="secondary"
-                styleClass="rounded-xl!" size="small" routerLink="/events/ingest/endpoints" />
+                styleClass="w-full sm:w-auto rounded-xl!" size="small" routerLink="/events/ingest/endpoints" />
         </div>
     </div>
 
@@ -55,11 +54,11 @@
             <p-card header="Custom Headers" class="card-panel">
                  @if (endpoint().customHeaders && (endpoint().customHeaders | keyvalue)?.length !== 0) {
                     <div class="space-y-4">
-                        <div *ngFor="let header of endpoint().customHeaders | keyvalue" class="flex flex-wrap md:flex-nowrap gap-3 items-center">
+                        <div *ngFor="let header of endpoint().customHeaders | keyvalue" class="flex flex-col md:flex-row gap-3 items-center">
                             <input pInputText [value]="header.key" [disabled]="true" class="w-full md:w-1/3 rounded-xl!" placeholder="Key" />
                             <div class="flex flex-1 items-center gap-2 w-full">
                                 <input pInputText [value]="header.value" [disabled]="true" class="w-full rounded-xl! font-mono text-sm" placeholder="Value" />
-                                <p-button icon="pi pi-copy" [outlined]="true" size="small" styleClass="rounded-xl!"
+                                <p-button icon="pi pi-copy" [outlined]="true" size="small" styleClass="shrink-0 rounded-xl!"
                                     pTooltip="Copy Value" tooltipPosition="left" tooltipStyleClass="text-xs! rounded-xl!"
                                     (onClick)="copyToClipboard(header.value)" />
                             </div>

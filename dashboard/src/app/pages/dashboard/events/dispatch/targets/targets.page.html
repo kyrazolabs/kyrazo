@@ -40,39 +40,40 @@
                 [value]="targets"
                 [lazy]="true"
                 [paginator]="true"
-                [scrollable]="true"
                 [rows]="rows"
                 [rowsPerPageOptions]="[10,20,50,100]"
                 [totalRecords]="totalRecords"
                 (onLazyLoad)="loadTargetsLazy($event)"
-                dataKey="id">
+                dataKey="id"
+                responsiveLayout="scroll"
+                styleClass="p-datatable-sm lg:p-datatable-md">
             <ng-template #header>
                 <tr>
-                    <th class="rounded-xl! border-none!" style="min-width:200px">
+                    <th class="rounded-xl! border-none!" style="min-width:180px">
                         Name
-                        <!-- <p-sortIcon field="name" /> -->
                     </th>
-                    <th class="rounded-xl! border-none!" style="min-width:300px">
+                    <th class="rounded-xl! border-none!" style="min-width:250px">
                         URL
-                        <!-- <p-sortIcon field="url" /> -->
                     </th>
-                    <th class="rounded-xl! border-none!">Method</th>
-                    <th class="rounded-xl! border-none!" style="max-width:100px">Status</th>
-                    <th class="rounded-xl! border-none! text-center!">Config</th>
-                    <th class="rounded-xl! border-none! text-center!">Actions</th>
+                    <th class="rounded-xl! border-none!" style="min-width:100px">Method</th>
+                    <th class="rounded-xl! border-none!" style="min-width:100px">Status</th>
+                    <th class="rounded-xl! border-none! text-center!" style="min-width:150px">Config</th>
+                    <th class="rounded-xl! border-none! text-center!" style="min-width:150px">Actions</th>
                 </tr>
             </ng-template>
 
             <ng-template #body let-target>
                 <tr class="hover:bg-surface-50! dark:hover:bg-surface-900/50!">
                     <td [routerLink]="[target.id]" class="cursor-pointer">
-                        <div class="flex flex-col">
-                            <span class="font-semibold text-surface-900 dark:text-surface-0">{{ target.name }}</span>
-                            <span class="text-xs text-surface-500 dark:text-surface-400" *ngIf="target.description">{{ target.description }}</span>
+                        <div class="flex flex-col min-w-0">
+                            <span class="font-semibold text-surface-900 dark:text-surface-0 truncate" [pTooltip]="target.name">{{ target.name }}</span>
+                            <span class="text-xs text-surface-500 dark:text-surface-400 truncate max-w-[150px]" *ngIf="target.description" [pTooltip]="target.description">{{ target.description }}</span>
                         </div>
                     </td>
-                    <td class="break-all">
-                        <span class="font-mono text-sm text-surface-700 dark:text-surface-300">{{ target.url }}</span>
+                    <td>
+                        <div class="font-mono text-sm text-surface-700 dark:text-surface-300 truncate max-w-[200px]" [pTooltip]="target.url">
+                            {{ target.url }}
+                        </div>
                     </td>
                     <td>
                         <p-tag [rounded]="true" [value]="target.method || 'POST'" severity="info" class="text-xs!" />
@@ -81,17 +82,17 @@
                         <p-tag [severity]="target.enabled ? 'success' : 'danger'" [value]="target.enabled ? 'Active' : 'Inactive'"  [rounded]="true" class="uppercase text-xs! font-bold" />
                     </td>
                     <td class="text-center!">
-                        <div class="flex justify-center flex-wrap gap-2 text-xs">
-                            <div class="flex items-center gap-1 bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 rounded-lg text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800" pTooltip="Timeout" tooltipPosition="top">
+                        <div class="flex justify-center flex-wrap gap-2 text-xs min-w-[120px]">
+                            <div class="flex items-center gap-1 bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 rounded-lg text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 shrink-0" pTooltip="Timeout" tooltipPosition="top">
                                 <span class="icon-[hugeicons--stop-watch] text-sm!"></span>
                                 <span class="font-medium font-mono">{{ target.config.timeout / 1000 }}s</span>
                             </div>
-                            <div class="flex items-center gap-1 bg-sky-100 dark:bg-sky-900/30 px-2 py-0.5 rounded-lg text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800" pTooltip="Retries" tooltipPosition="top">
+                            <div class="flex items-center gap-1 bg-sky-100 dark:bg-sky-900/30 px-2 py-0.5 rounded-lg text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 shrink-0" pTooltip="Retries" tooltipPosition="top">
                                 <span class="icon-[hugeicons--arrow-reload-horizontal] text-sm!"></span>
                                 <span class="font-medium font-mono">{{ target.config.retryCount }}</span>
                             </div>
                              @if (target.config.rateLimit) {
-                                <div class="flex items-center gap-1 bg-purple-100 dark:bg-purple-900/30 px-2 py-0.5 rounded-lg text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800" pTooltip="Rate Limit" tooltipPosition="top">
+                                <div class="flex items-center gap-1 bg-purple-100 dark:bg-purple-900/30 px-2 py-0.5 rounded-lg text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800 shrink-0" pTooltip="Rate Limit" tooltipPosition="top">
                                     <span class="icon-[hugeicons--zap] text-sm!"></span>
                                     <span class="font-medium font-mono">{{ target.config.rateLimit }}/s</span>
                                 </div>
@@ -104,13 +105,13 @@
                                 [outlined]="true" size="small"
                                 [severity]="target.enabled ? 'warn' : 'success'"
                                 (onClick)="toggleStatus(target)"
-                                [pTooltip]="target.enabled ? 'Pause Target' : 'Activate Target'" tooltipPosition="top"
+                                [pTooltip]="target.enabled ? 'Pause' : 'Activate'" tooltipPosition="top"
                                 styleClass="rounded-xl!" tooltipStyleClass="text-xs! rounded-xl!" />
                             <p-button icon="pi pi-pencil" [outlined]="true" size="small" severity="secondary"
-                                (onClick)="openEditDialog(target.id)" pTooltip="Edit Target" tooltipPosition="top"
+                                (onClick)="openEditDialog(target.id)" pTooltip="Edit" tooltipPosition="top"
                                 styleClass="rounded-xl!" tooltipStyleClass="text-xs! rounded-xl!" />
                             <p-button icon="pi pi-trash" [outlined]="true" size="small" severity="danger"
-                                (onClick)="deleteTarget(target)" pTooltip="Delete Target" tooltipPosition="top"
+                                (onClick)="deleteTarget(target)" pTooltip="Delete" tooltipPosition="top"
                                 styleClass="rounded-xl!" tooltipStyleClass="text-xs! rounded-xl!" />
                         </div>
                     </td>

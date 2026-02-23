@@ -8,6 +8,7 @@ import {
     HostListener,
 } from '@angular/core';
 import { dropdownAnimation } from '@shared/animations/dropdown.animation';
+import { DialogService } from '@shared/services/dialog.service';
 import { RouterLink, Router, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { filter } from 'rxjs/operators';
@@ -32,6 +33,7 @@ import { IWorkspace, IWorkspaceMembership } from '@models/workspaces.types';
 import { TooltipModule } from 'primeng/tooltip';
 import { SupportDialogComponent } from '@shared/components/support-dialog/support-dialog.component';
 import { ToastModule } from 'primeng/toast';
+import { LayoutService } from '../service/layout.service';
 
 @Component({
     selector: 'app-sidebar',
@@ -65,6 +67,8 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     private ws = inject(WorkspaceService);
     private router = inject(Router);
     private messageService = inject(MessageService);
+    private dialogService = inject(DialogService);
+    public layoutService = inject(LayoutService);
 
     currentRoute = '';
     dispatchDropdownOpen = false;
@@ -99,7 +103,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
                 {
                     label: 'Billing',
                     icon: 'pi pi-credit-card',
-                    url: '/settings/billing',
+                    command: () => this.openBilling(),
                     description: 'Subscription & payments',
                     status: 'active',
                     shortcut: '⌘+B',
@@ -144,15 +148,17 @@ export class SidebarComponent implements OnInit, AfterViewInit {
         this.ws.gets().subscribe({
             next: (response) => {
                 this.workspaceMemberships = response.data;
-                // Select first workspace by default if available
-                if (
-                    this.workspaceMemberships.length > 0 &&
-                    !this.selectedWorkspace
-                ) {
-                    this.selectedWorkspace =
-                        this.workspaceMemberships[0].workspace;
-                    this.ss.setItem('workspace', this.selectedWorkspace.id);
+
+                // Redirect to Launchpad if no workspaces exist
+                if (this.workspaceMemberships.length === 0) {
+                    this.router.navigate(['/launchpad']);
+                    return;
                 }
+
+                // Select first workspace by default if available
+                this.selectedWorkspace = this.workspaceMemberships[0].workspace;
+                this.ss.setItem('workspace', this.selectedWorkspace.id);
+
                 this.loading = false;
             },
             error: (error) => {
@@ -234,6 +240,10 @@ export class SidebarComponent implements OnInit, AfterViewInit {
 
     openSupportDialog() {
         this.supportDialogVisible = true;
+    }
+
+    openBilling() {
+        this.dialogService.openBillingDialog();
     }
 }
 

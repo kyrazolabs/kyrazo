@@ -16,7 +16,6 @@ import {
     ISubscription,
     SubscriptionResponse,
     CreateSubscriptionRequest,
-    BillingHistoryItem,
     UsageStats,
     BillingInfo,
     PaymentMethod,
@@ -58,7 +57,7 @@ export class SettingService {
         preferencesData: Partial<IUserPreference>,
     ): Observable<ApiResponse<IUserPreference>> {
         return this.http
-            .put<
+            .patch<
                 ApiResponse<IUserPreference>
             >(environment.profile.preference.update, preferencesData)
             .pipe(catchError(this.handleError));
@@ -77,7 +76,7 @@ export class SettingService {
         return this.http
             .post<
                 ApiResponse<SubscriptionResponse>
-            >(environment.payment.subscribe, subscriptionData)
+            >(environment.subscription.base, subscriptionData)
             .pipe(catchError(this.handleError));
     }
 

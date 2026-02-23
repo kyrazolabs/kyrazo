@@ -117,7 +117,7 @@
 
                 @if (sourceForm.get('showEventTypes')?.value) {
                     <div class="flex flex-col gap-4 mt-4">
-                        <p-autoComplete
+                        <p-autocomplete
                             formControlName="eventTypes"
                             [suggestions]="filteredEventTypes()"
                             (completeMethod)="searchEventTypes($event)"
@@ -130,7 +130,7 @@
                             [unique]="true"
                             [size]="'small'"
                             [addOnBlur]="true"
-                        ></p-autoComplete>
+                        ></p-autocomplete>
                         <small class="text-surface-500 dark:text-surface-400">
                             Define which event types this source should accept. Leave empty to accept all.
                         </small>

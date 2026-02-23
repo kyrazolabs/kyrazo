@@ -1,67 +1,4 @@
-<div class="space-y-2 mb-4">
-
-    <!-- Header -->
-    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <!-- Left section -->
-        <div>
-            <h1 class="text-2xl font-bold">Profile Settings</h1>
-            <p class="opacity-80">Manage your account information and preferences</p>
-        </div>
-
-        <!-- Right section -->
-        <div class="flex items-center gap-4">
-            <p-button label="Reset" icon="pi pi-refresh" [outlined]="true" severity="secondary"
-                styleClass="rounded-xl!" (onClick)="resetProfile()" />
-            <p-button label="Save Changes" icon="pi pi-save" styleClass="rounded-xl!" (onClick)="saveProfile()"
-                [disabled]="profileForm.invalid || isSaving" [loading]="isSaving" />
-        </div>
-    </div>
-
-    <div class="overflow-y-auto">
-        <ul class="list-none flex flex-row py-2 m-0">
-            <li>
-                <ul class="list-none p-0 m-0 space-y-1 overflow-hidden">
-                    <li>
-                        <ul
-                            class="list-none py-0 pr-0 m-0 flex flex-row gap-4 overflow-y-hidden transition-all duration-400 ease-in-out">
-                            <li>
-                                <a pRipple [routerLink]="'/settings/profile'"
-                                    class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
-                                    [class]="'text-primary-50 bg-primary hover:bg-primary/90 dark:text-primary-950 dark:bg-primary-50 dark:hover:bg-primary-50/90'">
-                                    <i class="icon-[hugeicons--user] size-5 mr-2"></i>
-                                    <span class="font-medium">Profile</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a pRipple [routerLink]="'/settings/workspace'"
-                                    class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
-                                    [class]="'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
-                                    <i class="icon-[hugeicons--dashboard-square-setting] size-5 mr-2"></i>
-                                    <span class="font-medium">Workspace</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a pRipple [routerLink]="'/settings/notifications'"
-                                    class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
-                                    [class]="'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
-                                    <i class="icon-[hugeicons--notification-01] size-5 mr-2"></i>
-                                    <span class="font-medium">Notifications</span>
-                                </a>
-                            </li>
-                            <!-- <li>
-                                <a pRipple [routerLink]="'/settings/billing'"
-                                    class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
-                                    [class]="'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
-                                    <i class="icon-[hugeicons--credit-card] size-5 mr-2"></i>
-                                    <span class="font-medium">Billing</span>
-                                </a>
-                            </li> -->
-                        </ul>
-                    </li>
-                </ul>
-            </li>
-        </ul>
-    </div>
+<div class="space-y-6">
 
     <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="flex flex-col gap-6">
         <!-- Basic Information -->
@@ -147,29 +84,26 @@
                 <!-- Member Since -->
                 <div class="flex flex-col gap-2">
                     <label class="font-semibold text-surface-900 dark:text-surface-0">Member Since</label>
-                    <div
-                        class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-800">
-                        {{originalProfile?.createdAt ? formatDate(originalProfile!.createdAt) : 'N/A'}}
-                    </div>
+                    <input pInputText type="text" [value]="originalProfile?.createdAt ? formatDate(originalProfile!.createdAt) : 'N/A'" placeholder="Enter workspace name"
+                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
+                        readonly disabled />
                 </div>
 
                 <!-- Last Login -->
                 <div class="flex flex-col gap-2">
                     <label class="font-semibold text-surface-900 dark:text-surface-0">Last Login</label>
-                    <div
-                        class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-800">
-                        {{originalProfile?.lastLogin ? formatDate(originalProfile!.lastLogin) : 'Never'}}
-                    </div>
+                    <input pInputText type="text" [value]="originalProfile?.lastLogin ? formatDate(originalProfile!.lastLogin) : 'Never'" placeholder="Enter workspace name"
+                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
+                        readonly disabled />
                 </div>
 
                 <!-- Account ID -->
                 <div class="flex flex-col gap-2">
                     <label class="font-semibold text-surface-900 dark:text-surface-0">Account ID</label>
                     <div class="flex items-center gap-2">
-                        <div
-                            class="text-surface-800 dark:text-surface-200 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-800 flex-1 font-mono text-sm">
-                            {{originalProfile?.id || 'N/A'}}
-                        </div>
+                        <input pInputText type="text" [value]="originalProfile?.id || 'N/A'" placeholder="Enter workspace name"
+                            class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
+                            readonly disabled />
                         <p-button icon="pi pi-copy" [outlined]="true" size="small" styleClass="rounded-xl!"
                             pTooltip="Copy Account ID" tooltipStyleClass="text-xs! rounded-xl!" tooltipPosition="top"
                             (onClick)="copyToClipboard(originalProfile?.id || '')" />
@@ -185,7 +119,7 @@
                 <!-- Current Password -->
                 <div class="flex flex-col gap-2">
                     <label class="font-semibold text-surface-900 dark:text-surface-0">Current Password</label>
-                    <input pInputText type="password" formControlName="currentPassword" placeholder="••••••••"
+                    <input pInputText type="password" formControlName="currentPassword" placeholder="********"
                         class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
                         [class.border-red-500]="passwordForm.get('currentPassword')?.invalid && passwordForm.get('currentPassword')?.touched" />
                 </div>
@@ -193,7 +127,7 @@
                 <!-- New Password -->
                 <div class="flex flex-col gap-2">
                     <label class="font-semibold text-surface-900 dark:text-surface-0">New Password</label>
-                    <input pInputText type="password" formControlName="newPassword" placeholder="••••••••"
+                    <input pInputText type="password" formControlName="newPassword" placeholder="********"
                         class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
                         [class.border-red-500]="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched" />
                     <small class="text-xs opacity-60">Min. 8 characters</small>
@@ -203,7 +137,7 @@
                 <div class="flex flex-col gap-2">
                     <label class="font-semibold text-surface-900 dark:text-surface-0">Confirm New Password</label>
                     <div class="flex flex-col gap-2">
-                        <input pInputText type="password" formControlName="confirmPassword" placeholder="••••••••"
+                        <input pInputText type="password" formControlName="confirmPassword" placeholder="********"
                             class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
                             [class.border-red-500]="passwordForm.hasError('mismatch') && passwordForm.get('confirmPassword')?.touched" />
                         <p-button label="Update Password" icon="pi pi-lock" styleClass="rounded-xl! w-full"
@@ -220,6 +154,3 @@
     </form>
 
 </div>
-
-<!-- Toast for notifications -->
-<p-toast />

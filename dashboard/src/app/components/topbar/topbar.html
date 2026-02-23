@@ -2,23 +2,23 @@
     class="border-b-2 border-surface-200 dark:border-surface-900 p-2 mx-auto w-full"
 >
     <div class="flex justify-between items-center">
-        <div class="flex gap-3 p-1 items-center">
+        <div class="flex gap-1 lg:gap-3 p-1 items-center">
             <p-button
                 [outlined]="true"
                 [text]="true"
                 (click)="openSidebar()"
                 [icon]="isOpenSidebar()? 'pi pi-chevron-left' : 'pi pi-chevron-right'"
                 class="after:border after:border-surface-300 dark:after:border-surface-600" />
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1 lg:gap-2 overflow-hidden">
                 <!-- Project Selector (shown only when workspace is selected) -->
-                <div class="flex items-center justify-between cursor-pointer duration-300 hover:bg-surface-50 dark:hover:bg-surface-800/50 transition-all" (click)="toggleProjectSelector($event)">
-                    <div class="flex justify-between items-center gap-2">
-                        <h3 class="text-lg font-medium">{{ selectedProject?.name || 'Select Project' }}</h3>
-                        <i class="icon-[lucide--chevrons-up-down] size-5 aspect-square text-surface-400 dark:text-surface-500"></i>
+                <div class="flex items-center justify-between cursor-pointer duration-300 hover:bg-surface-50 dark:hover:bg-surface-800/50 transition-all shrink-0" (click)="toggleProjectSelector($event)">
+                    <div class="flex justify-between items-center gap-1 lg:gap-2">
+                        <h3 class="text-sm lg:text-lg font-medium truncate max-w-[100px] lg:max-w-none">{{ selectedProject?.name || 'Select Project' }}</h3>
+                        <i class="icon-[lucide--chevrons-up-down] size-4 lg:size-5 aspect-square text-surface-400 dark:text-surface-500"></i>
                     </div>
                 </div>
-                <p class="text-lg font-medium"> {{ pageTitle ? '/' : '' }} </p>
-                <p class="text-lg font-medium"> {{ pageTitle ? pageTitle : '' }} </p>
+                <p class="text-sm lg:text-lg font-medium shrink-0"> {{ pageTitle ? '/' : '' }} </p>
+                <p class="text-sm lg:text-lg font-medium truncate"> {{ pageTitle ? pageTitle : '' }} </p>
             </div>
         </div>
         <!-- Project Popover -->
@@ -93,8 +93,9 @@
                 [text]="true"
                 (click)="toggleDarkMode()"
                 [icon]="isDarkMode()? 'pi pi-moon' : 'pi pi-sun'"
+                class="hidden lg:inline-flex"
             />
-            <div class="relative">
+            <div class="relative hidden lg:block z-50">
                 <p-button
                     #settingsButton
                     (click)="toggleConfig()"
@@ -127,34 +128,60 @@
 
             <p-popover #op
                 styleClass="rounded-2xl! -mb-10! shadow-2xl! border-2! border-surface-200! dark:border-surface-800!">
-                <div class="flex flex-col gap-4 w-36">
+                <div class="flex flex-col gap-4 w-40">
                             <ul
                                 class="list-none py-0 pr-0 m-0 transition-all duration-400 ease-in-out">
                                 <li>
-                                    <a pRipple [routerLink]="'/settings/profile'"
+                                    <a pRipple [routerLink]="'/settings'" [queryParams]="{ tab: 'profile' }"
                                         class="flex items-center cursor-pointer p-2 rounded-xl text-sm text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-150 transition-colors p-ripple">
-                                        <i class="pi pi-user mr-2"></i>
+                                        <i class="icon-[hugeicons--user-03] text-lg! mr-2"></i>
                                         <span class="font-medium">Profile</span>
                                     </a>
                                 </li>
-                                <li>
-                                    <a pRipple [routerLink]="'/settings/notifications'"
-                                        class="flex items-center cursor-pointer p-2 rounded-xl text-sm text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-150 transition-colors p-ripple">
-                                        <i class="pi pi-bell mr-2"></i>
-                                        <span class="font-medium">Notifications</span>
-                                    </a>
-                                </li>
                                 <!-- <li>
-                                    <a pRipple [routerLink]="'/settings/billing'"
+                                    <a pRipple [routerLink]="'/settings'" [queryParams]="{ tab: 'notifications' }"
                                         class="flex items-center cursor-pointer p-2 rounded-xl text-sm text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-150 transition-colors p-ripple">
-                                        <i class="pi pi-credit-card mr-2"></i>
-                                        <span class="font-medium">Billing</span>
+                                        <i class="icon-[hugeicons--notification-01] text-lg! mr-2"></i>
+                                        <span class="font-medium">Notifications</span>
                                     </a>
                                 </li> -->
                                 <li>
+                                    <a pRipple [routerLink]="'/settings'" [queryParams]="{ tab: 'billing' }"
+                                        class="flex items-center cursor-pointer p-2 rounded-xl text-sm text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-150 transition-colors p-ripple">
+                                        <i class="icon-[hugeicons--credit-card] text-lg! mr-2"></i>
+                                        <span class="font-medium">Billing</span>
+                                    </a>
+                                </li>
+
+                                <!-- Mobile only Theme/Config -->
+                                @if (layoutService.isMobile()) {
+                                    <div class="my-1 border-t border-surface-200 dark:border-surface-800"></div>
+                                    <li>
+                                        <a pRipple (click)="toggleDarkMode()"
+                                            class="flex items-center cursor-pointer p-2 rounded-xl text-sm text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-150 transition-colors p-ripple">
+                                            <i [class]="isDarkMode() ? 'pi pi-moon' : 'pi pi-sun'" class="mr-2"></i>
+                                            <span class="font-medium">{{ isDarkMode() ? 'Dark Mode' : 'Light Mode' }}</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <div class="relative">
+                                            <a pRipple (click)="toggleConfig()"
+                                                class="flex items-center cursor-pointer p-2 rounded-xl text-sm text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-150 transition-colors p-ripple">
+                                                <i class="pi pi-palette mr-2"></i>
+                                                <span class="font-medium">Theme Settings</span>
+                                            </a>
+                                            <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-60" *ngIf="showConfig">
+                                                <app-config @dropdownAnimation />
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <div class="my-1 border-t border-surface-200 dark:border-surface-800"></div>
+                                }
+
+                                <li>
                                     <a pRipple (click)="logout()"
                                         class="flex items-center cursor-pointer p-2 rounded-xl text-sm text-surface-700 dark:text-surface-100 hover:text-red-700 dark:hover:text-red-500 hover:bg-red-100 dark:hover:bg-red-700/30 duration-150 transition-colors p-ripple">
-                                        <i class="pi pi-sign-out mr-2"></i>
+                                        <i class="icon-[hugeicons--logout-05] text-lg! mr-2"></i>
                                         <span class="font-medium">Logout</span>
                                     </a>
                                 </li>

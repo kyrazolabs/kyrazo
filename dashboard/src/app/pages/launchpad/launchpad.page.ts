@@ -1,9 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CreateFirstWorkspace } from '@components/launchpad/workspaces/create-first-workspace/create-first-workspace';
 import { CreateFirstProjectComponent } from '@components/launchpad/projects/create-first-project/create-first-project';
 import { StorageService } from '@core/services/storage.service';
+import { WorkspaceService } from '@core/services/workspace.service';
+import { ProjectService } from '@core/services/project.service';
 import { ButtonModule } from 'primeng/button';
 import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directive';
 
@@ -20,17 +22,54 @@ import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directiv
     templateUrl: './launchpad.page.html',
     styleUrl: './launchpad.page.scss',
 })
-export class LaunchpadPage {
+export class LaunchpadPage implements OnInit {
     private router = inject(Router);
     private storage = inject(StorageService);
+    private ws = inject(WorkspaceService);
+    private ps = inject(ProjectService);
 
     currentStep = signal(1); // 1: Workspace, 2: Project, 3: Success
     createdWorkspaceId = signal<string | null>(null);
     confettiParticles = signal<any[]>([]);
 
+    ngOnInit() {
+        this.checkInitialState();
+    }
+
+    private checkInitialState() {
+        this.ws.gets().subscribe({
+            next: (response) => {
+                const memberships = response.data || [];
+                if (memberships.length > 0) {
+                    const workspace = memberships[0].workspace;
+                    this.createdWorkspaceId.set(workspace.id);
+                    this.storage.setItem('workspace', workspace.id);
+
+                    // Check for projects in this workspace
+                    this.ps.getWorkspaceProjects().subscribe({
+                        next: (projResponse) => {
+                            const projects = projResponse.data || [];
+                            if (projects.length > 0) {
+                                this.currentStep.set(3);
+                                this.triggerConfetti();
+                            } else {
+                                this.currentStep.set(2);
+                            }
+                        },
+                        error: () => this.currentStep.set(2),
+                    });
+                } else {
+                    this.currentStep.set(1);
+                }
+            },
+            error: () => this.currentStep.set(1),
+        });
+    }
+
     onWorkspaceCreated(workspace: any) {
-        this.createdWorkspaceId.set(workspace._id);
-        this.storage.setItem('workspace', workspace._id);
+        const id = workspace.id || workspace._id;
+        this.createdWorkspaceId.set(id);
+        this.storage.setItem('workspace', id);
         this.currentStep.set(2);
     }
 

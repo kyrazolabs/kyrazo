@@ -7,7 +7,7 @@ import {
     FormGroup,
     Validators,
 } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 // PrimeNG Imports
 import { CardModule } from 'primeng/card';
@@ -39,11 +39,11 @@ import { UserProfileResponse } from '@models/auth.types';
 import { finalize } from 'rxjs';
 import { SentryService } from '@core/3rd-party/sentry';
 import { PostHogService } from '@core/3rd-party/posthog';
+import { DialogService } from '@shared/services/dialog.service';
 
 @Component({
     selector: 'app-workspace-settings',
     imports: [
-        RouterLink,
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
@@ -59,8 +59,8 @@ import { PostHogService } from '@core/3rd-party/posthog';
         SelectModule,
         ConfirmDialogModule,
     ],
-    templateUrl: './workspace-settings.page.html',
-    styleUrl: './workspace-settings.page.scss',
+    templateUrl: './workspace.page.html',
+    styleUrl: './workspace.page.scss',
 })
 export class WorkspaceSettingsPage implements OnInit {
     private route = inject(ActivatedRoute);
@@ -73,6 +73,7 @@ export class WorkspaceSettingsPage implements OnInit {
     private readonly router = inject(Router);
     private readonly sentry = inject(SentryService);
     private readonly posthog = inject(PostHogService);
+    private readonly dialogService = inject(DialogService);
 
     // Reactive forms
     workspaceForm!: FormGroup;
@@ -531,5 +532,9 @@ export class WorkspaceSettingsPage implements OnInit {
                 });
             },
         });
+    }
+
+    openBilling() {
+        this.dialogService.openBillingDialog();
     }
 }

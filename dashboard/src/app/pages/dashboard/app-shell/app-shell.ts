@@ -83,6 +83,9 @@ export class AppShell implements OnInit, AfterViewInit {
     targetDialogId: string | null = null;
     targetDialogHeader = 'Create Target';
 
+    // Billing Dialog
+    billingDialogVisible = false;
+
     constructor(private dialogService: DialogService) {}
 
     childRoute(outlet: RouterOutlet) {
