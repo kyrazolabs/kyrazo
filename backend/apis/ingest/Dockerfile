@@ -59,8 +59,8 @@ ENV NODE_ENV=production
 EXPOSE ${PORT}
 
 # Healthcheck
-HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
-    CMD wget -qO- http://localhost:${PORT}/v1/health || exit 1
+HEALTHCHECK  --start-period=20s --interval=30s --timeout=3s --retries=3 \
+    CMD wget -qO- http://127.0.0.1:${PORT}/v1/health || exit 1
 
 # Start the application
 CMD ["bun", "run", "src/index.ts"]

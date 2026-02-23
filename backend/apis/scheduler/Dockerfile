@@ -57,7 +57,7 @@ USER bun
 EXPOSE ${PORT}
 
 # Healthcheck
-HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
+HEALTHCHECK  --start-period=20s --interval=30s --timeout=3s --retries=3 \
     CMD wget -qO- http://127.0.0.1:${PORT}/v1/health || exit 1
 
 # Start the application
