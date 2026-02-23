@@ -1,12 +1,10 @@
 import { AppContext } from '@/core/middlewares/auth.middleware';
 import { redisConfig } from '@/configs';
 import { OverviewFilterInput, TargetQueryInput } from '@/core/utils/libs/zod';
-import { IErrorResponse, logger, Source, Target } from '@kyrazo/shared';
+import { IErrorResponse, logger, Source, Target, unprefixId } from '@kyrazo/shared';
 import { AnalyticsService } from './analytics.service';
-import {
-    IAnalyticsDispatchResponse,
-    IAnalyticsIngestResponse,
-} from './analytics.schema';
+import { IAnalyticsDispatchResponse, IAnalyticsIngestResponse } from './analytics.schema';
+import { Types } from 'mongoose';
 
 export class AnalyticsController {
     static async getDispatchUsage(c: AppContext): Promise<Response> {
@@ -28,35 +26,29 @@ export class AnalyticsController {
                 );
             }
 
+            // @ts-ignore
             const { days }: OverviewFilterInput = c.req.valid('query');
 
             const last = days.replace(/\D/g, '');
 
-            const {
-                stats,
-                deliveryTrends,
-                topEventTypes,
-                statusCodeDistribution,
-            } = await AnalyticsService.getDispatchOverview(
-                parseInt(last),
-                workspaceId.toString(),
-                projectId.toString()
-            );
+            const { stats, deliveryTrends, topEventTypes, statusCodeDistribution } =
+                await AnalyticsService.getDispatchOverview(
+                    parseInt(last),
+                    workspaceId.toString(),
+                    projectId.toString()
+                );
 
             // Fetch active targets count
             const activeTargets = await Target.countDocuments({
-                workspaceId,
-                projectId,
+                workspaceId: new Types.ObjectId(unprefixId(workspaceId.toString())),
+                projectId: new Types.ObjectId(unprefixId(projectId.toString())),
                 enabled: true,
             });
 
             // Calculate success rate
             const total = Number(stats.total_deliveries) || 0;
             const successful = Number(stats.successful_deliveries) || 0;
-            const successRate =
-                total > 0
-                    ? Math.round((successful / total) * 100 * 100) / 100
-                    : 0; // Round to 2 decimal places
+            const successRate = total > 0 ? Math.round((successful / total) * 100 * 100) / 100 : 0; // Round to 2 decimal places
 
             return c.json<{
                 success: boolean;
@@ -115,28 +107,24 @@ export class AnalyticsController {
                 );
             }
 
+            // @ts-ignore
             const { days }: OverviewFilterInput = c.req.valid('query');
 
             const last = days.replace(/\D/g, '');
 
-            const {
-                stats,
-                receiveTrends,
-                topSources,
-                processStatusDistribution,
-                failureTrends,
-            } = await AnalyticsService.getIngestOverview(
-                parseInt(last),
-                workspaceId.toString(),
-                projectId.toString()
-            );
+            const { stats, receiveTrends, topSources, processStatusDistribution, failureTrends } =
+                await AnalyticsService.getIngestOverview(
+                    parseInt(last),
+                    workspaceId.toString(),
+                    projectId.toString()
+                );
 
             const sources = await redisConfig.cache(
-                `workspace:${workspaceId}:project:${projectId}:sources`,
+                `workspace:${unprefixId(workspaceId.toString())}:project:${unprefixId(projectId.toString())}:sources`,
                 async () => {
                     return await Source.find({
-                        workspaceId,
-                        projectId,
+                        workspaceId: new Types.ObjectId(unprefixId(workspaceId.toString())),
+                        projectId: new Types.ObjectId(unprefixId(projectId.toString())),
                         type: 'receive',
                     });
                 },
@@ -148,10 +136,7 @@ export class AnalyticsController {
             const successful = Number(stats.successful_events) || 0;
             const ingests = sources.length; // Use redis source count
 
-            const successRate =
-                total > 0
-                    ? Math.round((successful / total) * 100 * 100) / 100
-                    : 0; // Round to 2 decimal places
+            const successRate = total > 0 ? Math.round((successful / total) * 100 * 100) / 100 : 0; // Round to 2 decimal places
 
             return c.json<{
                 success: boolean;
@@ -174,10 +159,7 @@ export class AnalyticsController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in AnalyticsController.getIngestUsage',
-                error as Error
-            );
+            logger.error('Unexpected error in AnalyticsController.getIngestUsage', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -211,30 +193,25 @@ export class AnalyticsController {
                 );
             }
 
+            // @ts-ignore
             const { target }: TargetQueryInput = c.req.valid('param');
+            // @ts-ignore
             const { days }: OverviewFilterInput = c.req.valid('query');
 
             const last = days.replace(/\D/g, '');
 
-            const {
-                stats,
-                deliveryTrends,
-                topEventTypes,
-                statusCodeDistribution,
-            } = await AnalyticsService.getTargetOverview(
-                parseInt(last),
-                workspaceId.toString(),
-                target,
-                projectId.toString()
-            );
+            const { stats, deliveryTrends, topEventTypes, statusCodeDistribution } =
+                await AnalyticsService.getTargetOverview(
+                    parseInt(last),
+                    workspaceId.toString(),
+                    target,
+                    projectId.toString()
+                );
 
             // Calculate success rate
             const total = Number(stats.total_deliveries) || 0;
             const successful = Number(stats.successful_deliveries) || 0;
-            const successRate =
-                total > 0
-                    ? Math.round((successful / total) * 100 * 100) / 100
-                    : 0; // Round to 2 decimal places
+            const successRate = total > 0 ? Math.round((successful / total) * 100 * 100) / 100 : 0; // Round to 2 decimal places
 
             return c.json<{
                 success: boolean;
@@ -255,10 +232,7 @@ export class AnalyticsController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in AnalyticsController.getTargetStats',
-                error as Error
-            );
+            logger.error('Unexpected error in AnalyticsController.getTargetStats', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,

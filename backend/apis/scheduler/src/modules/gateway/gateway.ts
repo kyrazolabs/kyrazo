@@ -57,18 +57,12 @@ export class Gateway {
 
     public handleConnection(ws: ServerWebSocket<any>) {
         console.log('New WebSocket connection established');
-        console.log(
-            `[Gateway] New connection. Current Map Size: ${this.agents.size}`
-        );
+        console.log(`[Gateway] New connection. Current Map Size: ${this.agents.size}`);
     }
 
-    public async handleMessage(
-        ws: ServerWebSocket<any>,
-        message: string | Buffer
-    ) {
+    public async handleMessage(ws: ServerWebSocket<any>, message: string | Buffer) {
         try {
-            const raw =
-                typeof message === 'string' ? message : message.toString();
+            const raw = typeof message === 'string' ? message : message.toString();
             const json = JSON.parse(raw);
             const parsed = AgentToServerSchema.safeParse(json);
 
@@ -81,7 +75,7 @@ export class Gateway {
 
             switch (data.type) {
                 case 'CONNECT':
-                    this.handleConnect(ws, data.payload.agentKey);
+                    this.handleConnect(ws, data.payload);
                     break;
                 case 'HEARTBEAT':
                     this.handleHeartbeat(ws, data.payload);
@@ -89,8 +83,7 @@ export class Gateway {
                 case 'WORKER_UPDATE':
                     // Update Worker Status in DB
                     console.log('Worker Update:', data.payload);
-                    const { WorkerService } =
-                        await import('@/modules/workers/worker.service');
+                    const { WorkerService } = await import('@/modules/workers/worker.service');
                     await WorkerService.updateWorkerStatus(
                         data.payload.workerId,
                         data.payload.status
@@ -118,9 +111,7 @@ export class Gateway {
                             // Remove if stopped/failed
                             this.runningWorkers.set(
                                 agentId,
-                                current.filter(
-                                    id => id !== data.payload.workerId
-                                )
+                                current.filter(id => id !== data.payload.workerId)
                             );
                         }
                     }
@@ -137,7 +128,7 @@ export class Gateway {
         }
     }
 
-    public handleClose(ws: ServerWebSocket<any>) {
+    public async handleClose(ws: ServerWebSocket<any>) {
         // Find agent by WS and remove
         for (const [agentId, socket] of this.agents.entries()) {
             if (socket === ws) {
@@ -145,65 +136,80 @@ export class Gateway {
                 this.agents.delete(agentId);
                 this.lastHeartbeat.delete(agentId);
                 this.runningWorkers.delete(agentId);
+
+                try {
+                    const { db } = await import('@/db');
+                    const { servers } = await import('@/db/schema');
+                    const { eq } = await import('drizzle-orm');
+
+                    // Immediately mark server as down for better reliability
+                    await db
+                        .update(servers)
+                        .set({ status: 'down', active_workers: 0 })
+                        .where(eq(servers.server_id, agentId));
+                    console.log(`✅ Marked agent ${agentId} as DOWN in database.`);
+                } catch (dbErr) {
+                    console.error(`❌ Failed to update DB on agent ${agentId} disconnect:`, dbErr);
+                }
+
                 break;
             }
         }
     }
 
-    public async handleConnect(ws: ServerWebSocket<any>, agentKey: string) {
-        // Validate Agent Key against DB
+    public async handleConnect(ws: ServerWebSocket<any>, payload: any) {
         try {
-            // Find server by API Key
-            // We need to import db and servers schema.
-            // Since this is inside class, let's use global db or import it at top.
-            // I'll add imports in a separate block.
-
-            // Temporary: Direct DB access here might be "messy" but practical for now.
-            // Better: Use ServerController or Service.
-            // Let's assume we can import `db` and `servers`.
-
-            // import { db } from '@/db';
-            // import { servers } from '@/db/schema';
-            // import { eq } from 'drizzle-orm';
-
-            // const [server] = await db.select().from(servers).where(eq(servers.api_key, agentKey));
-
-            // Since I cannot change imports in the same chunk easily if they are far away,
-            // I will implement the logic and add imports in another step or assume they are available
-            // if I add them to the top of the file.
-
-            // For this step, I will add the logic assuming imports exist.
-
-            // Mocking the logic for the "replace" tool to succeed first, then I add imports.
-            this.authenticateAgent(ws, agentKey);
+            await this.authenticateAgent(ws, payload);
         } catch (err) {
             console.error('Auth Failed', err);
             ws.close(1011, 'Auth Error');
         }
     }
 
-    private async authenticateAgent(ws: ServerWebSocket<any>, apiKey: string) {
-        // Dynamic import to avoid circular dep issues at top level if any?
-        // Or just standard import is fine.
+    private async authenticateAgent(ws: ServerWebSocket<any>, payload: any) {
+        const clusterSecretEnv = process.env.CLUSTER_SECRET;
+
+        // 1. Verify Cluster Secret
+        if (!clusterSecretEnv || payload.clusterSecret !== clusterSecretEnv) {
+            console.log(`❌ Invalid Cluster Secret from Agent`);
+            ws.close(1008, 'Invalid Cluster Secret');
+            return;
+        }
+
+        const agentId = payload.nodeId;
+        const remoteIp = payload.ip || ws.remoteAddress || null;
+
+        // Dynamic import to avoid circular dep issues at top level
         const { db } = await import('@/db');
         const { servers } = await import('@/db/schema');
         const { eq } = await import('drizzle-orm');
 
-        const [server] = await db
-            .select()
-            .from(servers)
-            .where(eq(servers.api_key, apiKey));
-
-        if (!server) {
-            console.log(`❌ Invalid Agent Key: ${apiKey}`);
-            ws.close(1008, 'Invalid API Key');
-            return;
-        }
-
-        const agentId = server.server_id;
         console.log(
-            `✅ Agent Authenticated: ${agentId} (Server: ${server.server_id})`
+            `✅ Agent Authenticated via Cluster Secret: Node ${agentId} from IP: ${remoteIp}`
         );
+
+        // 2. Database Upsert using the robust payload
+        await db
+            .insert(servers)
+            .values({
+                server_id: agentId,
+                api_key: agentId, // satisfy notNull
+                cores: payload.system.cores,
+                max_workers: payload.system.maxWorkers,
+                status: 'active',
+                ip: remoteIp,
+                last_heartbeat: new Date(),
+            })
+            .onConflictDoUpdate({
+                target: servers.server_id,
+                set: {
+                    cores: payload.system.cores,
+                    max_workers: payload.system.maxWorkers,
+                    status: 'active',
+                    ip: remoteIp,
+                    last_heartbeat: new Date(),
+                },
+            });
 
         this.agents.set(agentId, ws);
         ws.data = { agentId };
@@ -222,9 +228,7 @@ export class Gateway {
         } else {
             // If payload is missing runningWorkers, assume empty or don't update?
             // Safest is to not update if undefined, but Agent SHOULD send it.
-            console.log(
-                `[Gateway] ❤️ Heartbeat from ${agentId} (No worker data)`
-            );
+            console.log(`[Gateway] ❤️ Heartbeat from ${agentId} (No worker data)`);
         }
     }
 

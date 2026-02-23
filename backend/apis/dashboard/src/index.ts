@@ -8,19 +8,10 @@ import { redisConfig, config } from './configs';
 import cron from 'node-cron';
 import { billingJob } from './jobs/billing.job';
 
-import {
-    databaseConfig,
-    clickhouseConfig,
-    Endpoint,
-    postgresConfig,
-    logger,
-} from '@kyrazo/shared';
+import { databaseConfig, clickhouseConfig, Endpoint, postgresConfig, logger } from '@kyrazo/shared';
 // import { arcjetMiddleware } from '@/core/middlewares/arcjet.middleware'
 import { errorHandler } from 'hono-error-handler';
-import {
-    handleMongooseErrors,
-    zodErrorHandler,
-} from '@/core/middlewares/error.middleware';
+import { handleMongooseErrors, zodErrorHandler } from '@/core/middlewares/error.middleware';
 
 // BullMQ Board
 import { createBullBoard } from '@bull-board/api';
@@ -156,9 +147,7 @@ const gracefulShutdown = async (signal: string) => {
 
     // Force close after 30 seconds
     setTimeout(() => {
-        logger.error(
-            'Could not close connections in time, forcefully shutting down'
-        );
+        logger.error('Could not close connections in time, forcefully shutting down');
         process.exit(1);
     }, 30000);
 };
@@ -186,15 +175,9 @@ const startServer = async () => {
             fetch: app.fetch,
         });
 
-        logger.info(
-            `Server running on port ${config.server.port} in ${config.server.env} mode`
-        );
-        logger.info(
-            `API documentation available at http://localhost:${config.server.port}/api/v1`
-        );
-        logger.info(
-            `Health check available at http://localhost:${config.server.port}/health`
-        );
+        logger.info(`Server running on port ${config.server.port} in ${config.server.env} mode`);
+        logger.info(`API documentation available at http://localhost:${config.server.port}/api/v1`);
+        logger.info(`Health check available at http://localhost:${config.server.port}/v1/health`);
 
         // Bun.serve() doesn't return a server object like Node.js
         // It starts the server immediately and throws if there's an error

@@ -123,6 +123,7 @@ export const requireWorkspaceMembershipParam = (requiredRole?: string[]) => {
                 );
             }
 
+            // @ts-ignore
             const { workspaceId }: GetWorkspaceByIdInput = c.req.valid('param');
             if (!workspaceId) {
                 return c.json<IErrorResponse>(

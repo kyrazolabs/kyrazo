@@ -39,6 +39,10 @@ const ProjectSchema = new Schema<IProject>(
             type: Date,
             default: null,
         },
+        whiteLabelHeaders: {
+            type: String,
+            trim: true,
+        },
     },
     {
         timestamps: true,

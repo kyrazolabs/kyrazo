@@ -1,13 +1,5 @@
 import { z } from 'zod';
 
-// Create checkout session DTO
-// Create subscription payment DTO
-export const CreateSubscriptionPaymentDto = z.object({
-    planId: z.string(),
-    quantity: z.number().int().min(1).default(1),
-    metadata: z.record(z.string(), z.string()).optional(),
-});
-
 // Checkout session response
 // Payment response
 export const PaymentResponseDto = z.object({
@@ -49,9 +41,6 @@ export const BillingPortalResponseDto = z.object({
 });
 
 // Type exports
-export type CreateSubscriptionPaymentInput = z.infer<
-    typeof CreateSubscriptionPaymentDto
->;
 export type PaymentResponse = z.infer<typeof PaymentResponseDto>;
 export type StripeSourceInput = z.infer<typeof StripeSourceDto>;
 export type CreateBillingPortalInput = z.infer<typeof CreateBillingPortalDto>;

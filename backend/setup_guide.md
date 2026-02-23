@@ -1,105 +1,87 @@
-# Kyrazo Scheduler & Agent Setup Guide
+# Kyrazo Backend Setup & Deployment Guide
 
-This guide describes how to set up and run the new refactored Scheduler <--> Agent architecture using RPC and Docker.
+This guide details the process for deploying the Kyrazo Scheduler and Server Agent(s) in a Coolify environment, utilizing our **Zero-Config RPC Registration** architecture.
 
-## Prerequisites
+## 1. Prerequisites
 
-- **Bun** (v1.0+)
-- **Docker** (Running and accessible by current user)
-- **Node.js** (Optional, but recommended for some tools)
+- A running instance of Coolify.
+- Access to the Kyrazo repository.
+- A secure 32+ character string for `ENCRYPTION_KEY` and another for `CLUSTER_SECRET`.
 
-## Architecture Overview
+## 2. Deploying the Scheduler (Master Node)
 
-- **Scheduler**: Manages workers, client logic, and connects to Agents via WebSocket.
-- **Agent**: Runs on a worker server, connects to Scheduler via WebSocket, and manages Docker containers for workers.
-- **Shared**: Common types and logic (RPC schemas).
+The Scheduler manages the cluster, exposes the API, and handles WebSocket connections from the Agents.
 
-## Step-by-Step Setup
+### Coolify App Configuration
 
-### 1. Build Shared Library
+1. **Source:** Select the Kyrazo Git Repository.
+2. **Build Pack:** Dockerfile.
+3. **Base Directory:** `/backend`
+4. **Dockerfile Location:** `apis/scheduler/Dockerfile`
 
-The shared library contains the RPC definitions. It must be built before starting other services.
+### Environment Variables
 
-```bash
-cd backend/shared
-bun install
-bun run build
+Set these essential variables in the Coolify Environment tab:
+
+```env
+# Server details
+PORT=8000
+NODE_ENV=production
+
+# Security & Cluster Auth
+ENCRYPTION_KEY=<your_32_char_secret>
+CLUSTER_SECRET=<your_secure_cluster_secret>
+
+# Database Connections
+DATABASE_URL=postgresql://<user>:<password>@<host>:5432/<database>
+MONGODB_URI=mongodb+srv://...
+REDIS_URL=redis://...
+NATS_SERVERS=nats://...
+CLICKHOUSE_HOST=...
 ```
 
-### 2. Setup Scheduler
+## 3. Deploying the Agent (Worker Nodes)
 
-The Scheduler listens for API requests and Agent connections.
+Agents connect to the Scheduler securely over WebSocket using the shared `CLUSTER_SECRET`. Upon startup, they automatically calculate their hardware capacity (CPU cores, Memory) and upsert themselves into the database—meaning **zero manual API keys or database entries are required**.
 
-1. Navigate to directory:
-   ```bash
-   cd backend/apis/scheduler
-   ```
-2. Install dependencies:
-   ```bash
-   bun install
-   ```
-3. Start the Scheduler:
-   ```bash
-   bun run dev
-   ```
-   _Runs on port defined in `.env` (default 3300)._
+You can deploy as many Agent apps in Coolify as you need across different servers.
 
-### 3. Setup Agent
+### Coolify App Configuration
 
-The Agent connects to the Scheduler and manages Docker containers.
+1. **Source:** Select the Kyrazo Git Repository.
+2. **Build Pack:** Dockerfile.
+3. **Base Directory:** `/backend`
+4. **Dockerfile Location:** `runtime/agent/Dockerfile`
 
-1. Navigate to directory:
-   ```bash
-   cd backend/runtime/agent
-   ```
-2. Install dependencies:
-   ```bash
-   bun install
-   ```
-3. Configure Environment:
-   Create `.env` (or use existing):
+### Persistent Volume (Required)
 
-   ```env
-   SCHEDULER_URL=ws://localhost:3300/servers/gateway
-   AGENT_KEY=my-secure-agent-key
-   ```
+Because the Agent generates a unique `nodeId` to identify itself across restarts, you **must map a persistent volume** so it doesn't appear as a brand new server in the database every time the container restarts.
 
-   _(Note: Ensure `AGENT_KEY` matches what the Scheduler expects/validates if implemented)._
+1. Scroll to the **Storage** section of your Coolify App Configuration.
+2. Add a Volume:
+   - **Source mapped path:** `/data/kyrazo-agent` (or another host path)
+   - **Destination mapped path:** `/app/runtime/agent/data`
 
-4. Start the Agent:
-   ```bash
-   bun run dev
-   ```
-   _The Agent will connect to the Scheduler and log "✅ Connected to Scheduler"._
+### Environment Variables
 
-### 4. Running Workers (Usage)
+Set these variables for _every_ Agent you deploy:
 
-To start a worker, send a request to the Scheduler API (or use the frontend if integrated).
+```env
+NODE_ENV=production
 
-**API Endpoint:** `POST /schedule/worker/start`
+# Security (Must match the Scheduler!)
+CLUSTER_SECRET=<your_secure_cluster_secret>
 
-```json
-{
-  "clientId": "client-123"
-}
+# Connection & Identity
+SCHEDULER_URL=ws://<SCHEDULER_COOLIFY_DOMAIN>:8000
+PUBLIC_IP=<THE_PUBLIC_IP_OF_THIS_SPECIFIC_SERVER>
+MAX_WORKERS=5
 ```
 
-**Flow:**
+> **Note on Worker Environment Variables:** The `.env.prod` file located within `backend/runtime/agent/` is injected directly into the ephemeral Docker worker containers that the Agent spawns. Do not place sensitive Agent-level secrets (like `CLUSTER_SECRET`) in that file.
 
-1. Scheduler validates request.
-2. Scheduler selects an available Agent.
-3. Scheduler sends `START_WORKER` RPC to Agent.
-4. Agent pulls/runs Docker container `hookify/worker:latest` with limits (1 CPU, 2GB RAM).
-5. Agent sends `ACK` and `WORKER_UPDATE` back to Scheduler.
+## 4. Verification
 
-## Troubleshooting
-
-- **"Docker daemon is not running"**: Ensure Docker is started (`sudo systemctl start docker` or open Docker Desktop).
-- **"WebSocket Error"**: Check if Scheduler is running and `SCHEDULER_URL` is correct.
-- **"Invalid Key"**: Verify `AGENT_KEY`.
-
-## Security
-
-- **Agents** are authenticated via `AGENT_KEY`.
-- **Containers** are isolated using Docker with strict resource limits.
-- **Communication** is over WebSocket (use WSS in production).
+1. Deploy the Scheduler and wait for it to become healthy.
+2. Deploy the Agent.
+3. Check the Scheduler's logs or the PostgreSQL `servers` table. You should instantly see a new server registered and marked as `active`, accurately reflecting the CPU cores and memory of the Agent's host machine.

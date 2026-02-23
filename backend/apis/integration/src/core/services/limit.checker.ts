@@ -10,7 +10,7 @@ const FREE_PLAN_LIMITS = {
     maxMembers: 3,
     maxConnectors: 3,
     maxIntegrations: 1,
-    maxConcurrent: 0,
+    maxWorkers: 0,
 };
 
 export class LimitChecker {
@@ -19,18 +19,19 @@ export class LimitChecker {
             `workspace:${workspaceId}`,
             async () => {
                 const subscription =
-                    await subscriptionRepository.findActiveByWorkspace(
-                        workspaceId
-                    );
+                    await subscriptionRepository.findActiveByWorkspace(workspaceId);
                 const subs = {
                     ...(subscription
-                        ? subscription.planSnapshot.limits
-                        : FREE_PLAN_LIMITS),
-
+                        ? {
+                              ...subscription.planSnapshot.limits,
+                              dispatch: subscription.planSnapshot.features.dispatch,
+                          }
+                        : {
+                              ...FREE_PLAN_LIMITS,
+                              dispatch: false,
+                          }),
                     subId: subscription?._id,
-                    planSlug: subscription
-                        ? subscription?.planSnapshot.slug
-                        : 'free',
+                    planSlug: subscription ? subscription?.planSnapshot.slug : 'free',
                 };
                 return subs;
             },
@@ -41,6 +42,15 @@ export class LimitChecker {
     static async checkEventLimit(workspaceId: string): Promise<boolean> {
         try {
             const limits = await this.getWorkspaceSub(workspaceId);
+
+            // Check if dispatch is enabled for this plan
+            if (limits.dispatch === false) {
+                logger.warn(
+                    `Workspace ${workspaceId} tried to dispatch an event but dispatch is disabled in their plan.`
+                );
+                return false;
+            }
+
             const limit = limits.eventsPerMonth;
 
             if (limit === -1) return true; // Unlimited

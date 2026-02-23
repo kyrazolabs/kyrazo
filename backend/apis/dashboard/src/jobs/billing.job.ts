@@ -1,7 +1,7 @@
-import { subscriptionRepository } from '@/modules/subscriptions/subscription.repo';
-import { subscriptionService } from '@/modules/subscriptions/subscription.service';
-import { paymentService } from '@/modules/payments/payment.service';
-import { planService } from '@/modules/plans/plan.service';
+import { subscriptionRepository } from '@/modules/billing/subscriptions/subscription.repo';
+import { subscriptionService } from '@/modules/billing/subscriptions/subscription.service';
+import { paymentService } from '@/modules/billing/payments/payment.service';
+import { planService } from '@/modules/billing/plans/plan.service';
 import { usageService } from '@/shared/services/usage.service';
 import { logger } from '@kyrazo/shared';
 
@@ -14,12 +14,9 @@ export class BillingJob {
         logger.info('Starting Billing Job...');
         try {
             // 1. Find subscriptions due for renewal
-            const dueSubscriptions =
-                await subscriptionRepository.findSubscriptionsDueForRenewal();
+            const dueSubscriptions = await subscriptionRepository.findSubscriptionsDueForRenewal();
 
-            logger.info(
-                `Found ${dueSubscriptions.length} subscriptions due for renewal.`
-            );
+            logger.info(`Found ${dueSubscriptions.length} subscriptions due for renewal.`);
 
             for (const subscription of dueSubscriptions) {
                 try {
@@ -43,14 +40,10 @@ export class BillingJob {
         const subId = subscription._id.toString();
         const workspaceId = subscription.workspaceId.toString();
 
-        logger.info(
-            `Renewing subscription ${subId} (Workspace: ${workspaceId})`
-        );
+        logger.info(`Renewing subscription ${subId} (Workspace: ${workspaceId})`);
 
         // 2. Get Plan
-        const plan = await planService.getPlanById(
-            subscription.planId.toString()
-        );
+        const plan = await planService.getPlanById(subscription.planId.toString());
         if (!plan) {
             logger.error(`Plan not found for subscription ${subId}`);
             return;
@@ -105,15 +98,9 @@ export class BillingJob {
         });
 
         // 6. Create Invoice
-        const invoice = await paymentService.createRenewalInvoice(
-            workspaceId,
-            subId,
-            items
-        );
+        const invoice = await paymentService.createRenewalInvoice(workspaceId, subId, items);
 
-        logger.info(
-            `Created renewal invoice ${invoice.id} for subscription ${subId}`
-        );
+        logger.info(`Created renewal invoice ${invoice.id} for subscription ${subId}`);
 
         // 7. Update Subscription Dates
         const now = new Date();

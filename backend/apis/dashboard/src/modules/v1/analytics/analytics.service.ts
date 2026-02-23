@@ -1,15 +1,12 @@
+import { unprefixId } from '@kyrazo/shared';
 import { AnalyticsRepo } from './analytics.repo';
 
 export class AnalyticsService {
-    static async getDispatchOverview(
-        days: number,
-        workspaceId: string,
-        projectId: string
-    ) {
+    static async getDispatchOverview(days: number, workspaceId: string, projectId: string) {
         return await AnalyticsRepo.getDispatchOverview(
             days,
-            workspaceId,
-            projectId
+            unprefixId(workspaceId) ?? '',
+            unprefixId(projectId) ?? ''
         );
     }
 
@@ -21,21 +18,17 @@ export class AnalyticsService {
     ) {
         return await AnalyticsRepo.getTargetOverview(
             days,
-            workspaceId,
-            targetId,
-            projectId
+            unprefixId(workspaceId) ?? '',
+            unprefixId(targetId) ?? '',
+            unprefixId(projectId) ?? ''
         );
     }
 
-    static async getIngestOverview(
-        days: number,
-        workspaceId: string,
-        projectId: string
-    ) {
+    static async getIngestOverview(days: number, workspaceId: string, projectId: string) {
         return await AnalyticsRepo.getIngestOverview(
             days,
-            workspaceId,
-            projectId
+            unprefixId(workspaceId) ?? '',
+            unprefixId(projectId) ?? ''
         );
     }
 }

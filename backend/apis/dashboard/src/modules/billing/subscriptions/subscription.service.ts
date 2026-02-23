@@ -1,6 +1,6 @@
 import { subscriptionRepository } from './subscription.repo';
-import { planService } from '../plans/plan.service';
-import { ISubscription, IPlanSnapshot, User, Customer, unprefixId } from '@kyrazo/shared';
+import { planService } from '@/modules/billing/plans/plan.service';
+import { ISubscription, IPlanSnapshot, User, Customer, unprefixId, Invoice } from '@kyrazo/shared';
 import {
     CreateSubscriptionInput,
     ChangePlanInput,
@@ -11,6 +11,8 @@ import { limitService } from '@/shared/services/limit.service';
 import { usageService } from '@/shared/services/usage.service';
 import { stripe } from '@/configs/stripe';
 import { config } from '@/configs';
+import { snapshot } from '@/core/utils/transformers';
+import { subscriptionCacheService } from '@/shared/services/subscription-cache.service';
 
 export class SubscriptionService {
     async createSubscriptionCheckout(
@@ -22,7 +24,7 @@ export class SubscriptionService {
         if (!plan) throw new Error('Plan not found');
 
         const existing = await subscriptionRepository.findActiveByWorkspace(workspaceId);
-        if (existing) {
+        if (existing && existing.planSnapshot.slug !== 'free') {
             throw new Error('Workspace already has an active subscription');
         }
 
@@ -54,6 +56,7 @@ export class SubscriptionService {
                     price: plan.stripePriceId,
                     quantity: subscriptionData.quantity ?? 1,
                 },
+                // Only add metered price if Stripe Checkout can handle it (same interval)
                 ...(plan.stripeMeteredPriceId ? [{ price: plan.stripeMeteredPriceId }] : []),
             ],
             success_url: `${config.stripe.baseUrl}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
@@ -75,6 +78,34 @@ export class SubscriptionService {
         };
     }
 
+    async createSubscription(
+        workspaceId: string,
+        userId: string,
+        subscriptionData: { planId: string; quantity?: number }
+    ): Promise<ISubscription> {
+        const plan = await planService.getPlanById(subscriptionData.planId);
+        if (!plan) throw new Error('Plan not found');
+
+        const now = new Date();
+        const nextMonth = new Date();
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+
+        const subscription = await subscriptionRepository.create({
+            workspaceId: new Types.ObjectId(unprefixId(workspaceId)),
+            userId: new Types.ObjectId(unprefixId(userId)),
+            planId: plan._id,
+            planSnapshot: snapshot(plan),
+            status: 'incomplete', // Will be activated via webhook or success
+            quantity: subscriptionData.quantity ?? 1,
+            billingCycleAnchor: now,
+            currentPeriodStart: now,
+            currentPeriodEnd: nextMonth,
+        });
+
+        await limitService.invalidateWorkspaceLimits(workspaceId);
+        return subscription;
+    }
+
     async getSubscriptionById(id: string): Promise<ISubscription | null> {
         return await subscriptionRepository.findById(id);
     }
@@ -85,6 +116,68 @@ export class SubscriptionService {
 
     async getActiveWorkspaceSubscription(workspaceId: string): Promise<ISubscription | null> {
         return await subscriptionRepository.findActiveByWorkspace(workspaceId);
+    }
+
+    async getSubscriptionWithCache(workspaceId: string): Promise<ISubscription | null> {
+        const cached = await subscriptionCacheService.get(workspaceId);
+        if (cached) return cached;
+
+        const subscription = await this.getActiveWorkspaceSubscription(workspaceId);
+        if (subscription) {
+            await subscriptionCacheService.set(workspaceId, subscription);
+        }
+        return subscription;
+    }
+
+    async getWorkspaceSubscriptionWithFallback(workspaceId: string): Promise<any> {
+        const subscription = await subscriptionRepository.findActiveByWorkspace(workspaceId);
+
+        if (subscription) {
+            return subscription;
+        }
+
+        return await this.createVirtualFreeSubscription(workspaceId);
+    }
+
+    async getWorkspaceSubscriptionsWithFallback(workspaceId: string): Promise<any[]> {
+        const subscriptions = await subscriptionRepository.findByWorkspace(workspaceId);
+
+        if (subscriptions.length > 0) {
+            return subscriptions;
+        }
+
+        // Fallback to history with virtual free plan
+        const virtualSub = await this.createVirtualFreeSubscription(workspaceId);
+        return [virtualSub];
+    }
+
+    private async createVirtualFreeSubscription(workspaceId: string): Promise<any> {
+        // Fallback to free plan
+        const freePlan = await planService.getPlanBySlug('free');
+        if (!freePlan) {
+            throw new Error('Free plan not found');
+        }
+
+        const now = new Date();
+        const nextMonth = new Date();
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+
+        // Return a virtual subscription object that looks like ISubscription
+        return {
+            _id: new Types.ObjectId(),
+            workspaceId: new Types.ObjectId(unprefixId(workspaceId)),
+            planId: freePlan._id,
+            planSnapshot: snapshot(freePlan),
+            status: 'active',
+            billingCycleAnchor: now,
+            paymentFailureCount: 0,
+            currentPeriodStart: now,
+            currentPeriodEnd: nextMonth,
+            quantity: 1,
+            createdAt: now,
+            updatedAt: now,
+            isVirtual: true,
+        };
     }
 
     async changePlan(
@@ -106,23 +199,27 @@ export class SubscriptionService {
             throw new Error('New plan not found');
         }
 
+        // 1️⃣ Update Stripe if it exists
+        if (subscription.stripeSubscriptionId) {
+            const stripeSub = await stripe.subscriptions.retrieve(
+                subscription.stripeSubscriptionId
+            );
+            const itemId = stripeSub.items.data[0].id;
+
+            await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+                items: [
+                    {
+                        id: itemId,
+                        price: newPlan.stripePriceId,
+                        quantity: changeData.quantity ?? subscription.quantity,
+                    },
+                ],
+                proration_behavior: 'always_invoice',
+            });
+        }
+
         // Create new plan snapshot
-        const newPlanSnapshot: IPlanSnapshot = {
-            planId: newPlan._id,
-            name: newPlan.name,
-            slug: newPlan.slug,
-            priceCents: newPlan.priceCents,
-            currency: newPlan.currency,
-            interval: newPlan.interval,
-            features: newPlan.features,
-            limits: newPlan.limits,
-            stripeProductId: newPlan.stripeProductId,
-            stripePriceId: newPlan.stripePriceId,
-            stripeMeteredPriceId: newPlan.stripeMeteredPriceId,
-            stripeMeterId: newPlan.stripeMeterId,
-            stripeMeterEventName: newPlan.stripeMeterEventName,
-            createdAt: new Date(),
-        };
+        const newPlanSnapshot = snapshot(newPlan);
 
         // Update subscription
         const updateData: Partial<ISubscription> = {
@@ -142,6 +239,10 @@ export class SubscriptionService {
             await limitService.invalidateWorkspaceLimits(
                 updatedSubscription.workspaceId.toString()
             );
+            await subscriptionCacheService.set(
+                updatedSubscription.workspaceId.toString(),
+                updatedSubscription
+            );
         }
         return updatedSubscription;
     }
@@ -155,13 +256,24 @@ export class SubscriptionService {
             throw new Error('Subscription not found');
         }
 
+        // 1️⃣ Update Stripe if it exists
+        if (subscription.stripeSubscriptionId) {
+            if (cancelData.cancelAtPeriodEnd) {
+                await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+                    cancel_at_period_end: true,
+                });
+            } else {
+                await stripe.subscriptions.cancel(subscription.stripeSubscriptionId);
+            }
+        }
+
         const updateData: Partial<ISubscription> = {
             status: cancelData.cancelAtPeriodEnd ? 'active' : 'canceled',
             canceledAt: new Date(),
         };
 
         if (cancelData.cancelAtPeriodEnd) {
-            // Will be canceled at period end by a job
+            // Will be canceled at period end by a job or webhook
             updateData.metadata = {
                 ...subscription.metadata,
                 cancelAtPeriodEnd: true,
@@ -173,12 +285,50 @@ export class SubscriptionService {
             subscriptionId,
             updateData
         );
+
         if (updatedSubscription) {
             await limitService.invalidateWorkspaceLimits(
                 updatedSubscription.workspaceId.toString()
             );
+
+            // If immediate cancellation (not at period end), revert to free plan right away
+            if (!cancelData.cancelAtPeriodEnd) {
+                await this.revertToFreePlan(
+                    updatedSubscription.workspaceId.toString(),
+                    updatedSubscription.userId.toString()
+                );
+            }
         }
         return updatedSubscription;
+    }
+
+    async revertToFreePlan(workspaceId: string, userId: string): Promise<ISubscription> {
+        const freePlan = await planService.getPlanBySlug('free');
+        if (!freePlan) {
+            throw new Error('Free plan not found');
+        }
+
+        // Deactivate any existing active subscriptions
+        await subscriptionRepository.deactivateOtherSubscriptions(workspaceId);
+
+        const now = new Date();
+        const nextMonth = new Date();
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+
+        const subscription = await subscriptionRepository.create({
+            workspaceId: new Types.ObjectId(unprefixId(workspaceId)),
+            userId: new Types.ObjectId(unprefixId(userId)),
+            planId: freePlan._id,
+            planSnapshot: snapshot(freePlan),
+            status: 'active',
+            billingCycleAnchor: now,
+            currentPeriodStart: now,
+            currentPeriodEnd: nextMonth,
+            quantity: 1,
+        });
+
+        await limitService.invalidateWorkspaceLimits(workspaceId);
+        return subscription;
     }
 
     async activateSubscription(subscriptionId: string): Promise<ISubscription | null> {
@@ -188,6 +338,10 @@ export class SubscriptionService {
         if (updatedSubscription) {
             await limitService.invalidateWorkspaceLimits(
                 updatedSubscription.workspaceId.toString()
+            );
+            await subscriptionCacheService.set(
+                updatedSubscription.workspaceId.toString(),
+                updatedSubscription
             );
         }
         return updatedSubscription;
@@ -203,6 +357,10 @@ export class SubscriptionService {
         if (updatedSubscription) {
             await limitService.invalidateWorkspaceLimits(
                 updatedSubscription.workspaceId.toString()
+            );
+            await subscriptionCacheService.set(
+                updatedSubscription.workspaceId.toString(),
+                updatedSubscription
             );
         }
         return updatedSubscription;
@@ -220,6 +378,10 @@ export class SubscriptionService {
             await limitService.invalidateWorkspaceLimits(
                 updatedSubscription.workspaceId.toString()
             );
+            await subscriptionCacheService.set(
+                updatedSubscription.workspaceId.toString(),
+                updatedSubscription
+            );
         }
         return updatedSubscription;
     }
@@ -232,6 +394,14 @@ export class SubscriptionService {
         return await subscriptionRepository.findEndingSubscriptions(hoursFromNow);
     }
 
+    async getInvoices(workspaceId: string): Promise<any[]> {
+        return await Invoice.find({
+            workspaceId: new Types.ObjectId(unprefixId(workspaceId)),
+        })
+            .sort({ createdAt: -1 })
+            .limit(20);
+    }
+
     async checkWorkspaceLimits(workspaceId: string): Promise<{
         canCreate: boolean;
         currentUsage: {
@@ -241,7 +411,7 @@ export class SubscriptionService {
             maxMembers: number;
             maxConnectors: number;
             maxIntegrations: number;
-            maxConcurrent: number;
+            maxWorkers: number;
         };
         limits: {
             eventsPerSecond: number;
@@ -250,7 +420,7 @@ export class SubscriptionService {
             maxMembers: number;
             maxConnectors: number;
             maxIntegrations: number;
-            maxConcurrent: number;
+            maxWorkers: number;
         };
     }> {
         const subscription = await subscriptionRepository.findActiveByWorkspace(workspaceId);
@@ -266,7 +436,7 @@ export class SubscriptionService {
                     maxMembers: 0,
                     maxConnectors: 0,
                     maxIntegrations: 0,
-                    maxConcurrent: 0,
+                    maxWorkers: 0,
                 },
                 limits: {
                     eventsPerSecond: 10,
@@ -275,7 +445,7 @@ export class SubscriptionService {
                     maxMembers: 1,
                     maxConnectors: 1,
                     maxIntegrations: 1,
-                    maxConcurrent: 1,
+                    maxWorkers: 1,
                 },
             };
         }
@@ -292,7 +462,7 @@ export class SubscriptionService {
             maxMembers: 0,
             maxConnectors: 0,
             maxIntegrations: 0,
-            maxConcurrent: 0,
+            maxWorkers: 0,
         };
 
         return {

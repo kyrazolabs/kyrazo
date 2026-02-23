@@ -47,10 +47,7 @@ app.get('/v1/health', async c => {
                         details: {
                             connected: false,
                             database: 'PostgreSQL',
-                            error:
-                                error instanceof Error
-                                    ? error.message
-                                    : 'Unknown error',
+                            error: error instanceof Error ? error.message : 'Unknown error',
                         },
                     };
                 }
@@ -58,15 +55,11 @@ app.get('/v1/health', async c => {
         ]);
 
         // Determine overall health status
-        const allHealthy = [mongo, postgres].every(
-            service => service.status === 'healthy'
-        );
+        const allHealthy = [mongo, postgres].every(service => service.status === 'healthy');
 
         return c.json({
             success: allHealthy,
-            message: allHealthy
-                ? 'All services are healthy'
-                : 'Some services are unhealthy',
+            message: allHealthy ? 'All services are healthy' : 'Some services are unhealthy',
             services: {
                 mongo,
                 postgres,
@@ -88,11 +81,7 @@ app.get('/v1/health', async c => {
     }
 });
 
-// app.post(
-//     '/servers/register',
-//     zValidator('json', RegisterServerSchema),
-//     ServerController.register
-// );
+// app.post('/servers/register', zValidator('json', RegisterServerSchema), ServerController.register);
 
 // --- Authenticated Server Routes ---
 app.use('/servers/*', serverAuth);
@@ -105,25 +94,17 @@ app.post(
 );
 
 // --- Admin / Client API Routes ---
-app.post(
-    '/schedule/worker/start',
-    zValidator('json', StartWorkerSchema),
-    async c => {
-        const { clientId } = await c.req.json();
-        const worker = await WorkerService.provisionWorker(clientId);
-        return c.json({ worker });
-    }
-);
+app.post('/schedule/worker/start', zValidator('json', StartWorkerSchema), async c => {
+    const { clientId } = await c.req.json();
+    const worker = await WorkerService.provisionWorker(clientId);
+    return c.json({ worker });
+});
 
-app.post(
-    '/schedule/worker/stop',
-    zValidator('json', StopWorkerSchema),
-    async c => {
-        const { workerId } = await c.req.json();
-        await WorkerService.decommissionWorker(workerId);
-        return c.json({ success: true });
-    }
-);
+app.post('/schedule/worker/stop', zValidator('json', StopWorkerSchema), async c => {
+    const { workerId } = await c.req.json();
+    await WorkerService.decommissionWorker(workerId);
+    return c.json({ success: true });
+});
 
 // --- Background Jobs ---
 console.log('⏱️ Starting Background Jobs...');
@@ -159,8 +140,7 @@ const startServer = async () => {
                 return app.fetch(req, server);
             },
             websocket: {
-                message: (ws, msg) =>
-                    Gateway.getInstance().handleMessage(ws, msg),
+                message: (ws, msg) => Gateway.getInstance().handleMessage(ws, msg),
                 open: ws => Gateway.getInstance().handleConnection(ws),
                 close: ws => Gateway.getInstance().handleClose(ws),
             },
@@ -179,9 +159,7 @@ let server: any;
 startServer()
     .then(startedServer => {
         server = startedServer;
-        console.log(
-            `🚀 Scheduler running at http://${server.hostname}:${server.port}`
-        );
+        console.log(`🚀 Scheduler running at http://${server.hostname}:${server.port}`);
     })
     .catch(error => {
         console.error('Failed to start server:', error as Error);

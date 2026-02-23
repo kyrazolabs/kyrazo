@@ -1,19 +1,52 @@
 import { RpcClient } from './rpc-client';
 import { DockerManager } from './docker';
 import type { StartWorkerPayload, StopWorkerPayload } from '@kyrazo/shared';
+import * as crypto from 'crypto'; // Added for crypto.randomUUID()
 
 export class Agent {
-    private rpc: RpcClient;
+    private rpc!: RpcClient;
+
+    private schedulerUrl: string;
+    private clusterSecret: string;
+    private nodeId: string;
 
     constructor() {
-        const schedulerUrl = process.env.SCHEDULER_URL || 'ws://localhost:3300';
-        const agentKey = process.env.AGENT_KEY || 'default-agent-key';
+        this.schedulerUrl = process.env.SCHEDULER_URL || 'ws://localhost:8000';
+        this.clusterSecret = process.env.CLUSTER_SECRET || '';
 
-        this.rpc = new RpcClient(this, schedulerUrl, agentKey);
+        // Generate or load persistent Node ID for zero-config registration
+        const fs = require('fs');
+        const path = require('path');
+        const keyPath = path.join(process.cwd(), 'data', '.node_id');
+
+        if (!fs.existsSync(path.dirname(keyPath))) {
+            fs.mkdirSync(path.dirname(keyPath), { recursive: true });
+        }
+
+        if (fs.existsSync(keyPath)) {
+            const key = fs.readFileSync(keyPath, 'utf-8').trim();
+            if (key) {
+                this.nodeId = key;
+                console.log(`🔑 Using existing Node ID: ${this.nodeId}`);
+            } else {
+                this.nodeId = crypto.randomUUID();
+                fs.writeFileSync(keyPath, this.nodeId, 'utf-8');
+            }
+        } else {
+            console.log(`🔑 Generating new persistent Node ID...`);
+            this.nodeId = crypto.randomUUID();
+            fs.writeFileSync(keyPath, this.nodeId, 'utf-8');
+        }
+
+        this.rpc = new RpcClient(this, this.schedulerUrl, this.clusterSecret, this.nodeId);
     }
+
+    // The ensureRegistered method is removed as registration is now handled via nodeId and clusterSecret in the constructor.
 
     async start() {
         console.log('🤖 Starting Server Agent (Docker Mode)...');
+
+        // The agentKey registration logic is removed as nodeId and clusterSecret are now handled in the constructor.
 
         try {
             await DockerManager.checkHealth();
@@ -32,9 +65,7 @@ export class Agent {
     async reconcileContainers() {
         try {
             const containers = await DockerManager.getRunningContainers();
-            console.log(
-                `🔄 Reconciling ${containers.length} existing containers...`
-            );
+            console.log(`🔄 Reconciling ${containers.length} existing containers...`);
 
             for (const workerId of containers) {
                 this.rpc.send({
@@ -158,12 +189,9 @@ export class Agent {
         const runningWorkers = await DockerManager.getRunningContainers();
 
         return {
-            success:
-                dockerHealthy.status === 'healthy' &&
-                rpcHealthy.status === 'healthy',
+            success: dockerHealthy.status === 'healthy' && rpcHealthy.status === 'healthy',
             message:
-                dockerHealthy.status === 'healthy' &&
-                rpcHealthy.status === 'healthy'
+                dockerHealthy.status === 'healthy' && rpcHealthy.status === 'healthy'
                     ? 'Agent is healthy'
                     : 'Agent is unhealthy',
             services: {

@@ -50,8 +50,27 @@ const planSchema = new Schema<IPlan>(
             min: [0, 'Overage price cannot be negative'],
         },
         features: {
-            type: Schema.Types.Mixed,
-            default: {},
+            workers: { type: Schema.Types.Mixed, required: true },
+            ingest: { type: Boolean, required: true },
+            dispatch: { type: Boolean, required: true },
+            support: { type: String, required: true },
+            sla: { type: String, required: true },
+            analytics: { type: String, required: true },
+            retentionDays: { type: Number, required: true },
+            customHeaders: { type: Boolean, required: true },
+            customTimeout: { type: Boolean, required: true },
+            customRetries: { type: Boolean, required: true },
+            forwardConfiguration: { type: Boolean, required: true },
+            apiAccess: { type: Boolean, required: true },
+            batchProcessing: { type: Boolean, required: true },
+
+            // custom plan features
+            ipWhitelisting: { type: Boolean },
+            whiteLabelHeaders: { type: Boolean },
+            customSla: { type: Boolean },
+            customDomain: { type: Boolean },
+            dedicatedInfrastructure: { type: Boolean },
+            sso: { type: Boolean },
         },
         limits: {
             eventsPerSecond: {
@@ -84,12 +103,17 @@ const planSchema = new Schema<IPlan>(
                 required: [true, 'Max integrations limit is required'],
                 min: [0, 'Max integrations cannot be negative'],
             },
-            maxConcurrent: {
+            maxWorkers: {
                 type: Number,
-                required: [true, 'Max concurrent limit is required'],
-                min: [0, 'Max concurrent cannot be negative'],
+                required: [true, 'Max workers limit is required'],
+                min: [0, 'Max workers cannot be negative'],
             },
         },
+        benefits: [
+            {
+                type: String,
+            },
+        ],
         stripeProductId: { type: String, required: true },
         stripePriceId: { type: String, required: true },
         stripeMeteredPriceId: { type: String },

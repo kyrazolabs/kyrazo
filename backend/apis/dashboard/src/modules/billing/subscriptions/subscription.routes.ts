@@ -1,67 +1,20 @@
+import { z } from 'zod';
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
-import { z } from 'zod';
-import { AppContext, authenticate } from '@/core/middlewares/auth.middleware';
+import { authenticate } from '@/core/middlewares/auth.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
-import { config } from '@/configs/app';
-import {
-    createSlidingWindowLimiter,
-    createRateLimitMiddleware,
-} from '@/core/middlewares/rate-limiter.middleware';
-import {
-    CreateSubscriptionDto,
-    ChangePlanDto,
-    CancelSubscriptionDto,
-} from './subscription.dto';
+import { CreateSubscriptionDto, ChangePlanDto, CancelSubscriptionDto } from './subscription.dto';
 import { SubscriptionController } from './subscription.controller';
+import {
+    subscriptionWriteRateLimiter,
+    subscriptionReadRateLimiter,
+} from './subscription.ratelimiter';
 
 const subscription = new Hono();
 
 // Middleware
 subscription.use('*', authenticate);
 subscription.use('*', requireWorkspaceMembership());
-
-// Rate limiters
-const subscriptionReadRateLimiter = async (
-    c: AppContext,
-    next: () => Promise<void>
-) => {
-    const limiter = createRateLimitMiddleware(
-        createSlidingWindowLimiter({
-            points: config.security.rateLimiter.protected.normal.points,
-            duration: config.security.rateLimiter.protected.normal.duration,
-            blockDuration:
-                config.security.rateLimiter.protected.normal.blockDuration,
-        }),
-        c =>
-            config.security.rateLimiter.protected.normal.keyPrefix(
-                (c as any).user.userId
-            ),
-        'Too many subscription read requests'
-    );
-    return limiter(c, next);
-};
-
-const subscriptionWriteRateLimiter = async (
-    c: AppContext,
-    next: () => Promise<void>
-) => {
-    const limiter = createRateLimitMiddleware(
-        createSlidingWindowLimiter({
-            points: config.security.rateLimiter.protected.medium.points,
-            duration: config.security.rateLimiter.protected.medium.duration,
-            blockDuration:
-                config.security.rateLimiter.protected.medium.blockDuration,
-        }),
-        c =>
-            config.security.rateLimiter.protected.medium.keyPrefix(
-                (c as any).user.userId
-            ),
-        'Too many subscription write requests'
-    );
-    return limiter(c, next);
-};
-
 // Routes
 subscription.post(
     '/',
@@ -91,10 +44,14 @@ subscription.get(
 );
 
 subscription.get(
-    '/limits',
+    '/history',
     subscriptionReadRateLimiter,
-    SubscriptionController.checkLimits
+    SubscriptionController.getWorkspaceSubscriptions
 );
+
+subscription.get('/invoices', subscriptionReadRateLimiter, SubscriptionController.getInvoices);
+
+subscription.get('/limits', subscriptionReadRateLimiter, SubscriptionController.checkLimits);
 
 subscription.get(
     '/:id',

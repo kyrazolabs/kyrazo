@@ -1,6 +1,6 @@
 import { AppContext } from '@/core/middlewares/auth.middleware';
 
-import { Key, IErrorResponse, logger, unprefixId } from '@kyrazo/shared';
+import { Key, IErrorResponse, logger, unprefixId, Subscription } from '@kyrazo/shared';
 import { keyCrypto, secretCrypto } from '@kyrazo/shared';
 import { ICheckScopes, ICreateKey, IGetKey, IRevokeKey } from './key.schema';
 
@@ -23,24 +23,47 @@ export class KeyController {
                     401
                 );
             }
-            const { name, scopes, expiresAt }: ICreateKey = c.req.valid('json');
+            // @ts-ignore
+            const { name, scopes, expiresAt, ipWhitelist }: ICreateKey = c.req.valid('json');
+
+            // IP Whitelisting subscription check
+            if (ipWhitelist && ipWhitelist.length > 0) {
+                const subscription = await Subscription.findOne({
+                    workspaceId: unprefixId(workspaceId.toString()),
+                    status: 'active',
+                });
+
+                if (!subscription || !subscription.planSnapshot?.features?.ipWhitelisting) {
+                    return c.json<IErrorResponse>(
+                        {
+                            success: false,
+                            error: {
+                                code: 'FEATURE_NOT_AVAILABLE',
+                                message:
+                                    'IP Whitelisting is only available on selected plans. Please upgrade your subscription.',
+                                requestId: c.get('requestId'),
+                            },
+                        },
+                        403
+                    );
+                }
+            }
 
             const { apiKey, metadata } = keyCrypto.generateComplexApiKey({});
 
             const hashedKey = secretCrypto.hash(apiKey, workspaceId.toString());
 
-            const key = new Key(
-                {
-                    kid: metadata.kid,
-                    key: hashedKey,
-                    name,
-                    workspace: unprefixId(workspaceId.toString()),
-                    createBy: unprefixId(userId.toString()),
-                    scopes,
-                    lastFour: apiKey.slice(-4),
-                },
-                expiresAt
-            );
+            const key = new Key({
+                kid: metadata.kid,
+                key: hashedKey,
+                name,
+                workspace: unprefixId(workspaceId.toString()),
+                createBy: unprefixId(userId.toString()),
+                scopes,
+                lastFour: apiKey.slice(-4),
+                ipWhitelist,
+                expiresAt,
+            });
             const saved = await key.save();
 
             return c.json(
@@ -91,6 +114,7 @@ export class KeyController {
                     401
                 );
             }
+            // @ts-ignore
             const { q, limit = 10, page = 1 }: IGetKey = c.req.valid('query');
 
             const query: any = { workspace: unprefixId(workspaceId.toString()) };
@@ -149,6 +173,7 @@ export class KeyController {
                     401
                 );
             }
+            // @ts-ignore
             const { keyId }: ICheckScopes = c.req.valid('param');
 
             const data = await Key.findOne({
@@ -198,6 +223,7 @@ export class KeyController {
                     401
                 );
             }
+            // @ts-ignore
             const { keyId }: IRevokeKey = c.req.valid('param');
 
             await Key.findOneAndDelete({

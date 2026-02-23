@@ -1,6 +1,7 @@
 import { redisConfig } from '@/configs/redis';
-import { subscriptionRepository } from '@/modules/subscriptions/subscription.repo';
+import { subscriptionRepository } from '@/modules/billing/subscriptions/subscription.repo';
 import { IPlanLimits, logger, unprefixId } from '@kyrazo/shared';
+import { subscriptionCacheService } from './subscription-cache.service';
 
 export const FREE_PLAN_LIMITS: IPlanLimits = {
     eventsPerSecond: 25,
@@ -9,16 +10,10 @@ export const FREE_PLAN_LIMITS: IPlanLimits = {
     maxMembers: 3,
     maxConnectors: 3,
     maxIntegrations: 1,
-    maxConcurrent: 0,
+    maxWorkers: 0,
 };
 
 export class LimitService {
-    private readonly LIMITS_TTL = 60 * 60 * 24; // 24 hours
-
-    private getLimitsKey(workspaceId: string): string {
-        return `workspace:limits:${unprefixId(workspaceId)}`;
-    }
-
     /**
      * Get workspace limits from cache or DB
      */
@@ -27,16 +22,14 @@ export class LimitService {
             return FREE_PLAN_LIMITS;
         }
 
-        const key = this.getLimitsKey(workspaceId);
-
         try {
-            // Try to get from Redis
-            const cached = await redisConfig.get(key);
-            if (cached) {
-                return JSON.parse(cached);
+            // Try to get centralized subscription from Redis
+            const subscription = await subscriptionCacheService.get(workspaceId);
+            if (subscription?.planSnapshot?.limits) {
+                return subscription.planSnapshot.limits;
             }
         } catch (error) {
-            logger.error('Error fetching limits from Redis', error as Error);
+            logger.error('Error fetching cached subscription for limits', error as Error);
         }
 
         // Fallback to DB
@@ -45,15 +38,10 @@ export class LimitService {
         let limits: IPlanLimits;
         if (subscription) {
             limits = subscription.planSnapshot.limits;
+            // Prime the centralized cache while we're here
+            await subscriptionCacheService.set(workspaceId, subscription);
         } else {
             limits = FREE_PLAN_LIMITS;
-        }
-
-        // Cache the result
-        try {
-            await redisConfig.set(key, JSON.stringify(limits), this.LIMITS_TTL);
-        } catch (error) {
-            logger.error('Error caching limits to Redis', error as Error);
         }
 
         return limits;
@@ -63,12 +51,7 @@ export class LimitService {
      * Invalidate workspace limits cache
      */
     async invalidateWorkspaceLimits(workspaceId: string): Promise<void> {
-        const key = this.getLimitsKey(workspaceId);
-        try {
-            await redisConfig.del(key);
-        } catch (error) {
-            logger.error('Error invalidating limits cache', error as Error);
-        }
+        await subscriptionCacheService.invalidate(workspaceId);
     }
 
     /**

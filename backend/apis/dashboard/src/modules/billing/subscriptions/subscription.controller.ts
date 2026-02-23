@@ -1,7 +1,7 @@
 import { AppContext } from '@/core/middlewares/auth.middleware';
 import { IErrorResponse, logger } from '@kyrazo/shared';
 import { subscriptionService } from './subscription.service';
-import { paymentService } from '../payments/payment.service';
+import { paymentService } from '@/modules/billing/payments/payment.service';
 import {
     CreateSubscriptionInput,
     ChangePlanInput,
@@ -32,18 +32,17 @@ export class SubscriptionController {
             const body = await c.req.json();
             const valid = body as CreateSubscriptionInput;
 
-            const subscription =
-                await subscriptionService.createSubscriptionCheckout(
-                    workspace.workspaceId.toString(),
-                    userId,
-                    valid
-                );
+            const result = await subscriptionService.createSubscriptionCheckout(
+                workspace.workspaceId.toString(),
+                userId,
+                valid
+            );
 
             return c.json(
                 {
                     success: true,
-                    message: 'Subscription created successfully',
-                    data: subscription,
+                    message: 'Subscription checkout created successfully',
+                    data: result,
                 },
                 201
             );
@@ -54,9 +53,7 @@ export class SubscriptionController {
             );
 
             const message =
-                error instanceof Error
-                    ? error.message
-                    : 'Failed to create subscription';
+                error instanceof Error ? error.message : 'Failed to create subscription';
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -90,8 +87,16 @@ export class SubscriptionController {
                 );
             }
 
-            const subscription =
-                await subscriptionService.getSubscriptionById(id);
+            let subscription;
+            if (id === 'current') {
+                subscription = await subscriptionService.getWorkspaceSubscriptionWithFallback(
+                    workspace.workspaceId.toString()
+                );
+            } else if (id === 'history') {
+                return SubscriptionController.getWorkspaceSubscriptions(c);
+            } else {
+                subscription = await subscriptionService.getSubscriptionById(id);
+            }
 
             if (!subscription) {
                 return c.json<IErrorResponse>(
@@ -107,10 +112,10 @@ export class SubscriptionController {
                 );
             }
 
-            // Check if subscription belongs to workspace
+            // Check if subscription belongs to workspace (skip for 'current' as it's already scoped)
             if (
-                subscription.workspaceId.toString() !==
-                workspace.workspaceId.toString()
+                id !== 'current' &&
+                subscription.workspaceId.toString() !== workspace.workspaceId.toString()
             ) {
                 return c.json<IErrorResponse>(
                     {
@@ -169,10 +174,9 @@ export class SubscriptionController {
                 );
             }
 
-            const subscriptions =
-                await subscriptionService.getWorkspaceSubscriptions(
-                    workspace.workspaceId.toString()
-                );
+            const subscriptions = await subscriptionService.getWorkspaceSubscriptionsWithFallback(
+                workspace.workspaceId.toString()
+            );
 
             return c.json(
                 {
@@ -222,10 +226,7 @@ export class SubscriptionController {
             const body = await c.req.json();
             const valid = body as ChangePlanInput;
 
-            const subscription = await subscriptionService.changePlan(
-                id,
-                valid
-            );
+            const subscription = await subscriptionService.changePlan(id, valid);
 
             if (!subscription) {
                 return c.json<IErrorResponse>(
@@ -241,54 +242,22 @@ export class SubscriptionController {
                 );
             }
 
-            // If the NEW plan is a paid plan, we should generate an invoice/payment link
-            let paymentUrl: string | undefined;
-            if (subscription.planSnapshot?.priceCents > 0) {
-                try {
-                    const invoice = await paymentService.createRenewalInvoice(
-                        workspace.workspaceId.toString(),
-                        subscription._id.toString(),
-                        [
-                            {
-                                amount: subscription.planSnapshot.priceCents,
-                                description: `Upgrade to ${subscription.planSnapshot.name} Plan`,
-                            },
-                        ]
-                    );
-                    paymentUrl = (invoice as any).hosted_invoice_url;
-                } catch (payError) {
-                    logger.error(
-                        'Failed to generate upgrade invoice:',
-                        payError as Error
-                    );
-                }
-            }
-
-            const resData: any = subscription.toJSON
-                ? subscription.toJSON()
+            const resData: any = (subscription as any).toJSON
+                ? (subscription as any).toJSON()
                 : subscription;
 
             return c.json(
                 {
                     success: true,
                     message: 'Plan changed successfully',
-                    data: {
-                        ...resData,
-                        paymentUrl,
-                    },
+                    data: resData,
                 },
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in SubscriptionController.changePlan',
-                error as Error
-            );
+            logger.error('Unexpected error in SubscriptionController.changePlan', error as Error);
 
-            const message =
-                error instanceof Error
-                    ? error.message
-                    : 'Failed to change plan';
+            const message = error instanceof Error ? error.message : 'Failed to change plan';
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -325,10 +294,7 @@ export class SubscriptionController {
             const body = await c.req.json();
             const valid = body as CancelSubscriptionInput;
 
-            const subscription = await subscriptionService.cancelSubscription(
-                id,
-                valid
-            );
+            const subscription = await subscriptionService.cancelSubscription(id, valid);
 
             if (!subscription) {
                 return c.json<IErrorResponse>(
@@ -359,9 +325,7 @@ export class SubscriptionController {
             );
 
             const message =
-                error instanceof Error
-                    ? error.message
-                    : 'Failed to cancel subscription';
+                error instanceof Error ? error.message : 'Failed to cancel subscription';
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -406,16 +370,57 @@ export class SubscriptionController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in SubscriptionController.checkLimits',
-                error as Error
-            );
+            logger.error('Unexpected error in SubscriptionController.checkLimits', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
                     error: {
                         code: 'CHECK_LIMITS_FAILED',
                         message: 'Failed to check limits',
+                        requestId: c.get('requestId'),
+                    },
+                },
+                500
+            );
+        }
+    }
+
+    static async getInvoices(c: AppContext): Promise<Response> {
+        try {
+            const workspace = c.workspace;
+            if (!workspace) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'UNAUTHORIZED_USER',
+                            message: 'Unauthorized user',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    401
+                );
+            }
+
+            const invoices = await subscriptionService.getInvoices(
+                workspace.workspaceId.toString()
+            );
+
+            return c.json(
+                {
+                    success: true,
+                    data: invoices,
+                },
+                200
+            );
+        } catch (error: unknown) {
+            logger.error('Unexpected error in SubscriptionController.getInvoices', error as Error);
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'GET_INVOICES_FAILED',
+                        message: 'Failed to get invoices',
                         requestId: c.get('requestId'),
                     },
                 },

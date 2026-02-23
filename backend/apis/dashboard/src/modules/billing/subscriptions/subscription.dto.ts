@@ -21,7 +21,7 @@ export const ChangePlanDto = z.object({
 
 // Cancel subscription DTO
 export const CancelSubscriptionDto = z.object({
-    cancelAtPeriodEnd: z.boolean().default(false),
+    cancelAtPeriodEnd: z.boolean().default(true),
     reason: z.string().optional(),
 });
 
@@ -33,8 +33,14 @@ export const GetSubscriptionByIdDto = z.object({
 // List subscriptions query DTO
 export const ListSubscriptionsQueryDto = z.object({
     status: z.enum(['active', 'trial', 'past_due', 'canceled', 'incomplete']).optional(),
-    limit: z.string().transform(val => parseInt(val)).optional(),
-    offset: z.string().transform(val => parseInt(val)).optional(),
+    limit: z
+        .string()
+        .transform(val => parseInt(val))
+        .optional(),
+    offset: z
+        .string()
+        .transform(val => parseInt(val))
+        .optional(),
 });
 
 // Response DTOs
@@ -50,7 +56,26 @@ export const SubscriptionResponseDto = z.object({
         priceCents: z.number(),
         currency: z.string(),
         interval: z.enum(['month', 'year']),
-        features: z.record(z.string(), z.unknown()),
+        features: z.object({
+            workers: z.union([z.number(), z.string()]),
+            ingest: z.boolean(),
+            dispatch: z.boolean(),
+            support: z.string(),
+            sla: z.string(),
+            analytics: z.string(),
+            retentionDays: z.number().int().min(0),
+            customHeaders: z.boolean(),
+            customTimeout: z.boolean(),
+            customRetries: z.boolean(),
+            forwardConfiguration: z.boolean(),
+            apiAccess: z.boolean(),
+            batchProcessing: z.boolean(),
+            ipWhitelisting: z.boolean().optional(),
+            customSla: z.boolean().optional(),
+            customDomain: z.boolean().optional(),
+            dedicatedInfrastructure: z.boolean().optional(),
+            sso: z.boolean().optional(),
+        }),
         limits: z.object({
             eventsPerSecond: z.number(),
             eventsPerMonth: z.number(),
@@ -58,7 +83,7 @@ export const SubscriptionResponseDto = z.object({
             maxMembers: z.number(),
             maxConnectors: z.number(),
             maxIntegrations: z.number(),
-            maxConcurrent: z.number(),
+            maxWorkers: z.number(),
         }),
         stripePriceId: z.string().optional(),
     }),

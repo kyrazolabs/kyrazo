@@ -51,9 +51,7 @@ export class DatabaseConfig {
         try {
             const mongoUri = config.database.uri;
             if (!mongoUri) {
-                throw new Error(
-                    'MONGODB_URI environment variable is not defined'
-                );
+                throw new Error('MONGODB_URI environment variable is not defined');
             }
 
             await mongoose.connect(mongoUri, {
@@ -152,10 +150,7 @@ export class DatabaseConfig {
                 details: {
                     connected: this.isConnected,
                     readyState: mongoose.connection.readyState,
-                    error:
-                        error instanceof Error
-                            ? error.message
-                            : 'Unknown error',
+                    error: error instanceof Error ? error.message : 'Unknown error',
                 },
             };
         }
@@ -170,3 +165,5 @@ export class DatabaseConfig {
  * await databaseConfig.connect();
  */
 export const databaseConfig = DatabaseConfig.getInstance();
+const Types = mongoose.Types;
+export { mongoose, Types };
