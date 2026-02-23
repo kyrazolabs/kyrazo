@@ -9,6 +9,7 @@ export const servers = pgTable('servers', {
     status: text('status', { enum: ['active', 'draining', 'down'] })
         .default('active')
         .notNull(),
+    ip: text('ip'), // Server's public IP address
     last_heartbeat: timestamp('last_heartbeat').defaultNow().notNull(),
     created_at: timestamp('created_at').defaultNow(),
 });

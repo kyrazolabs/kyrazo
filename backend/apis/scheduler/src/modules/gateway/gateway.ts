@@ -57,18 +57,12 @@ export class Gateway {
 
     public handleConnection(ws: ServerWebSocket<any>) {
         console.log('New WebSocket connection established');
-        console.log(
-            `[Gateway] New connection. Current Map Size: ${this.agents.size}`
-        );
+        console.log(`[Gateway] New connection. Current Map Size: ${this.agents.size}`);
     }
 
-    public async handleMessage(
-        ws: ServerWebSocket<any>,
-        message: string | Buffer
-    ) {
+    public async handleMessage(ws: ServerWebSocket<any>, message: string | Buffer) {
         try {
-            const raw =
-                typeof message === 'string' ? message : message.toString();
+            const raw = typeof message === 'string' ? message : message.toString();
             const json = JSON.parse(raw);
             const parsed = AgentToServerSchema.safeParse(json);
 
@@ -81,7 +75,7 @@ export class Gateway {
 
             switch (data.type) {
                 case 'CONNECT':
-                    this.handleConnect(ws, data.payload.agentKey);
+                    this.handleConnect(ws, data.payload.agentKey, data);
                     break;
                 case 'HEARTBEAT':
                     this.handleHeartbeat(ws, data.payload);
@@ -89,8 +83,7 @@ export class Gateway {
                 case 'WORKER_UPDATE':
                     // Update Worker Status in DB
                     console.log('Worker Update:', data.payload);
-                    const { WorkerService } =
-                        await import('@/modules/workers/worker.service');
+                    const { WorkerService } = await import('@/modules/workers/worker.service');
                     await WorkerService.updateWorkerStatus(
                         data.payload.workerId,
                         data.payload.status
@@ -118,9 +111,7 @@ export class Gateway {
                             // Remove if stopped/failed
                             this.runningWorkers.set(
                                 agentId,
-                                current.filter(
-                                    id => id !== data.payload.workerId
-                                )
+                                current.filter(id => id !== data.payload.workerId)
                             );
                         }
                     }
@@ -137,7 +128,7 @@ export class Gateway {
         }
     }
 
-    public handleClose(ws: ServerWebSocket<any>) {
+    public async handleClose(ws: ServerWebSocket<any>) {
         // Find agent by WS and remove
         for (const [agentId, socket] of this.agents.entries()) {
             if (socket === ws) {
@@ -145,12 +136,28 @@ export class Gateway {
                 this.agents.delete(agentId);
                 this.lastHeartbeat.delete(agentId);
                 this.runningWorkers.delete(agentId);
+
+                try {
+                    const { db } = await import('@/db');
+                    const { servers } = await import('@/db/schema');
+                    const { eq } = await import('drizzle-orm');
+
+                    // Immediately mark server as down for better reliability
+                    await db
+                        .update(servers)
+                        .set({ status: 'down', active_workers: 0 })
+                        .where(eq(servers.server_id, agentId));
+                    console.log(`✅ Marked agent ${agentId} as DOWN in database.`);
+                } catch (dbErr) {
+                    console.error(`❌ Failed to update DB on agent ${agentId} disconnect:`, dbErr);
+                }
+
                 break;
             }
         }
     }
 
-    public async handleConnect(ws: ServerWebSocket<any>, agentKey: string) {
+    public async handleConnect(ws: ServerWebSocket<any>, agentKey: string, data: any) {
         // Validate Agent Key against DB
         try {
             // Find server by API Key
@@ -175,35 +182,48 @@ export class Gateway {
             // For this step, I will add the logic assuming imports exist.
 
             // Mocking the logic for the "replace" tool to succeed first, then I add imports.
-            this.authenticateAgent(ws, agentKey);
+            this.authenticateAgent(ws, agentKey, data.payload.ip);
         } catch (err) {
             console.error('Auth Failed', err);
             ws.close(1011, 'Auth Error');
         }
     }
 
-    private async authenticateAgent(ws: ServerWebSocket<any>, apiKey: string) {
+    private async authenticateAgent(
+        ws: ServerWebSocket<any>,
+        agentKey: string,
+        providedIp?: string
+    ) {
         // Dynamic import to avoid circular dep issues at top level if any?
         // Or just standard import is fine.
         const { db } = await import('@/db');
         const { servers } = await import('@/db/schema');
         const { eq } = await import('drizzle-orm');
 
-        const [server] = await db
-            .select()
-            .from(servers)
-            .where(eq(servers.api_key, apiKey));
+        const [server] = await db.select().from(servers).where(eq(servers.api_key, agentKey));
 
         if (!server) {
-            console.log(`❌ Invalid Agent Key: ${apiKey}`);
+            console.log(`❌ Invalid Agent Key: ${agentKey}`);
             ws.close(1008, 'Invalid API Key');
             return;
         }
 
         const agentId = server.server_id;
+        const remoteIp = providedIp || ws.remoteAddress || null;
+
         console.log(
-            `✅ Agent Authenticated: ${agentId} (Server: ${server.server_id})`
+            `✅ Agent Authenticated: ${agentId} (Server: ${server.server_id}) from IP: ${remoteIp}`
         );
+
+        // Update server IP and mark as active
+        await db
+            .update(servers)
+            .set({
+                ip: remoteIp,
+                status: 'active',
+                last_heartbeat: new Date(),
+            })
+            .where(eq(servers.server_id, agentId));
 
         this.agents.set(agentId, ws);
         ws.data = { agentId };
@@ -222,9 +242,7 @@ export class Gateway {
         } else {
             // If payload is missing runningWorkers, assume empty or don't update?
             // Safest is to not update if undefined, but Agent SHOULD send it.
-            console.log(
-                `[Gateway] ❤️ Heartbeat from ${agentId} (No worker data)`
-            );
+            console.log(`[Gateway] ❤️ Heartbeat from ${agentId} (No worker data)`);
         }
     }
 

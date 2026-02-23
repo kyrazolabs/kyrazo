@@ -36,6 +36,7 @@ export class RpcClient {
 
         this.ws.onopen = () => {
             console.log('✅ Connected to Scheduler');
+            this.reconnectInterval = 5000; // Reset backoff on success
             this.authenticate();
             this.startHeartbeatLoop();
         };
@@ -49,10 +50,11 @@ export class RpcClient {
             this.stopHeartbeatLoop();
             this.ws = null;
             if (this.shouldReconnect) {
-                console.log(
-                    `Reconnecting in ${this.reconnectInterval / 1000}s...`
-                );
-                setTimeout(() => this.connect(), this.reconnectInterval);
+                // Add simple backoff (max 30s)
+                const delay = Math.min(this.reconnectInterval, 30000);
+                console.log(`Reconnecting in ${delay / 1000}s...`);
+                setTimeout(() => this.connect(), delay);
+                this.reconnectInterval *= 1.5; // Exponential backoff
             }
         };
 
@@ -63,11 +65,12 @@ export class RpcClient {
     }
 
     private authenticate() {
+        const ip = process.env.PUBLIC_IP;
         const msg: AgentToServerMessage = {
             type: 'CONNECT',
             id: crypto.randomUUID(),
             timestamp: Date.now(),
-            payload: { agentKey: this.agentKey },
+            payload: { agentKey: this.agentKey, ip },
         };
         this.send(msg);
     }
@@ -122,12 +125,7 @@ export class RpcClient {
         }, 15000); // 15 seconds
     }
 
-    public getStatus():
-        | 'connecting'
-        | 'open'
-        | 'closing'
-        | 'closed'
-        | 'not_initialized' {
+    public getStatus(): 'connecting' | 'open' | 'closing' | 'closed' | 'not_initialized' {
         if (!this.ws) return 'not_initialized';
         switch (this.ws.readyState) {
             case WebSocket.CONNECTING:
