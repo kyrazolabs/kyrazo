@@ -40,7 +40,9 @@ interface FaqItem {
                         class="text-3xl md:text-6xl font-black text-surface-950 dark:text-white tracking-tighter mb-6 leading-tight"
                     >
                         Frequently Asked
-                        <span class="text-primary-500">Questions.</span>
+                        <span class="text-primary-500 font-sansation!"
+                            >Questions.</span
+                        >
                     </h2>
                     <p
                         class="text-base md:text-xl text-surface-600 dark:text-surface-400 font-medium max-w-2xl mx-auto px-2 md:px-0"

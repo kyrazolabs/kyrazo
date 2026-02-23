@@ -1,4 +1,4 @@
-<div class="container mx-auto px-4 py-12 mt-24 max-w-5xl">
+<div class="container mx-auto px-4 py-8 sm:py-12 mt-20 sm:mt-24 max-w-5xl">
   <!-- Loading State -->
   @if (isLoading$()) {
       <div class="flex justify-center py-20">
@@ -18,7 +18,7 @@
   @if (article$(); as article) {
       <article class="bg-surface-0 dark:bg-surface-900 rounded-2xl shadow-sm overflow-hidden">
           <!-- Cover Image -->
-          <div class="w-full h-64 md:h-[400px] relative bg-surface-100 dark:bg-surface-800">
+          <div class="w-full aspect-video sm:h-[300px] md:h-[400px] relative bg-surface-100 dark:bg-surface-800">
               @if (article.cover) {
                   <img
                        [src]="cmsService.getImageUrl(article.cover!.url)"
@@ -26,41 +26,41 @@
                        class="w-full h-full object-cover">
               } @else {
                   <div class="w-full h-full flex items-center justify-center text-surface-400">
-                     <span class="text-6xl italic opacity-30">Kyrazo</span>
+                     <span class="text-4xl sm:text-6xl italic opacity-30 font-serif">Kyrazo</span>
                   </div>
               }
           </div>
 
-          <div class="p-8 md:p-12 lg:px-16">
+          <div class="p-5 sm:p-8 md:p-12 lg:px-16">
               <!-- Meta -->
-              <div class="flex flex-wrap items-center gap-4 text-sm text-surface-500 dark:text-surface-400 mb-8">
-                  <a routerLink="/blog" class="text-primary hover:text-primary-emphasis font-medium transition-colors">&larr; Back to Blog</a>
-                  <span class="w-1 h-1 bg-surface-300 rounded-full"></span>
+              <div class="flex flex-wrap items-center gap-x-3 gap-y-2 sm:gap-4 text-xs sm:text-sm text-surface-500 dark:text-surface-400 mb-6 sm:mb-10">
+                  <a routerLink="/blog" class="text-primary hover:text-primary-emphasis font-bold transition-colors">&larr; Blog</a>
+                  <span class="hidden sm:block w-1 h-1 bg-surface-300 dark:bg-surface-600 rounded-full"></span>
                   @if (article.category) {
-                      <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                      <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider">
                           {{ article.category!.name }}
                       </span>
                   }
-                  <span class="w-1 h-1 bg-surface-300 rounded-full"></span>
+                  <span class="hidden sm:block w-1 h-1 bg-surface-300 dark:bg-surface-600 rounded-full"></span>
                   <span>{{ article.publishedAt | date:'longDate' }}</span>
               </div>
 
               <!-- Title -->
-              <h1 class="text-4xl md:text-5xl font-bold text-surface-900 dark:text-surface-0 mb-6 leading-tight tracking-tight">
+              <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-surface-900 dark:text-surface-0 mb-6 leading-tight tracking-tight">
                   {{ article.title }}
               </h1>
 
               <!-- Author -->
               @if (article.author) {
-                  <div class="flex items-center mb-10 pb-10 border-b border-surface-200 dark:border-surface-700">
+                  <div class="flex flex-col sm:flex-row sm:items-center mb-8 pb-8 sm:mb-10 sm:pb-10 border-b border-surface-100 dark:border-surface-800">
                        @if (article.author!.picture) {
                            <img
                                [src]="cmsService.getImageUrl(article.author!.picture!.url)"
-                               class="w-12 h-12 rounded-full object-cover mr-4 ring-2 ring-primary/20">
+                               class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover mb-4 sm:mb-0 sm:mr-4 ring-2 ring-primary/20">
                        }
                       <div>
-                          <div class="font-bold text-surface-900 dark:text-surface-0">{{ article.author!.name }}</div>
-                          <div class="text-sm text-surface-500">{{ article.author!.email }}</div>
+                          <div class="font-bold text-surface-900 dark:text-surface-0 text-base sm:text-lg">{{ article.author!.name }}</div>
+                          <div class="text-xs sm:text-sm text-surface-500 dark:text-surface-400">{{ article.author!.email }}</div>
                       </div>
                   </div>
               }
@@ -72,23 +72,23 @@
                       <!-- Rich Text Block -->
                       @if (block.__component === 'shared.rich-text') {
                           <div
-                               class="prose prose-lg dark:prose-invert max-w-none
+                               class="prose prose-base sm:prose-lg dark:prose-invert max-w-none
                                       prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-surface-900 dark:prose-headings:text-surface-0
                                       prose-p:text-surface-600 dark:prose-p:text-surface-300 prose-p:leading-relaxed
                                       prose-a:text-primary prose-a:font-medium prose-a:no-underline hover:prose-a:underline
                                       prose-strong:text-surface-900 dark:prose-strong:text-surface-0
-                                      prose-img:rounded-2xl prose-img:shadow-md">
+                                      prose-img:rounded-xl sm:prose-img:rounded-2xl prose-img:shadow-md">
                                <div [innerHTML]="$any(block).body | markdown"></div>
                           </div>
                       }
 
                       <!-- Quote Block -->
                       @if (block.__component === 'shared.quote') {
-                          <div class="border-l-4 border-primary pl-8 py-6 my-10 bg-surface-50 dark:bg-surface-800/30 rounded-r-xl">
-                              <blockquote class="text-2xl italic font-serif text-surface-900 dark:text-surface-100 mb-4 leading-relaxed">
+                          <div class="border-l-4 border-primary pl-5 sm:pl-8 py-4 sm:py-6 my-8 sm:my-10 bg-surface-50 dark:bg-surface-800/30 rounded-r-xl">
+                              <blockquote class="text-lg sm:text-2xl italic font-serif text-surface-900 dark:text-surface-100 mb-3 sm:mb-4 leading-relaxed">
                                   "{{ $any(block).body }}"
                               </blockquote>
-                              <cite class="text-sm font-bold text-primary uppercase tracking-widest block not-italic">
+                              <cite class="text-[10px] sm:text-sm font-bold text-primary uppercase tracking-widest block not-italic">
                                   — {{ $any(block).title }}
                               </cite>
                           </div>

@@ -12,7 +12,7 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 items-start">
-            @for (plan of plans; track plan.name) {
+            @for (plan of plans(); track plan.name) {
                 <div
                      appScrollReveal
                      [delay]="'delay-' + ($index * 100 + 100)"
@@ -24,22 +24,43 @@
                         </div>
                     }
 
-                    <h3 class="text-xl font-bold mb-2 opacity-90">{{ plan.name }}</h3>
                     <div class="flex items-baseline gap-1 mb-6">
-                        <span class="text-4xl font-bold">{{ plan.price }}</span>
-                        <span class="opacity-70 text-sm">{{ plan.period }}</span>
+                        <span class="text-base font-medium opacity-70 self-start mt-1">@if (plan.slug === 'enterprise') { from }</span>
+                        <span class="text-4xl font-bold font-sansation!">{{ formatPrice(plan.priceCentsMonthly) }}</span>
+                        <span class="opacity-70 text-sm">/month</span>
                     </div>
 
-                    <!-- Enforced rounded-xl! -->
-                    <p-button [label]="plan.cta" [outlined]="!plan.highlighted" [severity]="plan.highlighted ? 'primary' : 'secondary'" [ariaLabel]="'Select ' + plan.name + ' plan'" styleClass="w-full mb-8 font-bold! rounded-2xl!"></p-button>
+                    <p-button
+                        [label]="plan.slug === 'enterprise' ? 'Contact Sales' : (plan.slug === 'free' ? 'Start Free' : 'Go ' + plan.name)"
+                        [outlined]="!plan.highlighted"
+                        [severity]="plan.highlighted ? 'primary' : 'secondary'"
+                        [ariaLabel]="'Select ' + plan.name + ' plan'"
+                        styleClass="w-full mb-8 font-bold! rounded-2xl!">
+                    </p-button>
+
+                    <p class="text-sm opacity-70 mb-6 min-h-[48px]">{{ plan.description }}</p>
 
                     <ul class="space-y-4">
-                        @for (feature of plan.features; track $index) {
-                            <li class="flex items-center gap-3 text-sm opacity-80">
-                                <i class="pi pi-check text-green-500" aria-hidden="true"></i>
-                                <span>{{ feature }}</span>
-                            </li>
-                        }
+                        <li class="flex items-center gap-3 text-sm opacity-80">
+                            <i class="pi pi-check text-green-500" aria-hidden="true"></i>
+                            <span>{{ plan.limits.eventsPerMonth | number }} events / mo</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-sm opacity-80">
+                            <i class="pi pi-check text-green-500" aria-hidden="true"></i>
+                            <span>{{ plan.limits.eventsPerSecond }} events / sec</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-sm opacity-80">
+                            <i class="pi pi-check text-green-500" aria-hidden="true"></i>
+                            <span>{{ plan.features.workers === 'shared' ? 'Shared' : plan.features.workers }} Dedicated Workers</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-sm opacity-80">
+                            <i class="pi pi-check text-green-500" aria-hidden="true"></i>
+                            <span>{{ plan.features.retentionDays }} Days retention</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-sm opacity-80">
+                            <i class="pi pi-check text-green-500" aria-hidden="true"></i>
+                            <span>{{ plan.features.support }}</span>
+                        </li>
                     </ul>
                 </div>
             }
