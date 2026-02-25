@@ -81,10 +81,13 @@ async function main() {
         Bun.serve({
             port,
             hostname: '0.0.0.0',
+            reusePort: true,
             fetch: app.fetch,
         });
 
-        appLogger.info(`🚀 Worker HTTP Healthcheck server running on port ${port}`);
+        appLogger.info(
+            `🚀 Worker HTTP Healthcheck server running on port ${port} (reusePort active)`
+        );
     } catch (error) {
         console.error('❌ Failed to start worker service:', error);
         process.exit(1);
