@@ -1,22 +1,10 @@
 import { Hono } from 'hono';
 import cron from 'node-cron';
 import { logger } from 'hono/logger';
-import { zValidator } from '@hono/zod-validator';
-import { ServerController } from '@/modules/servers/server.controller';
-import { WorkerService } from '@/modules/workers/worker.service';
-import { serverAuth } from '@/auth/server.auth';
-import { monitorDeadServers } from '@/jobs/monitor';
 import { config } from '@/common/config'; // Validation runs on import
 import { globalErrorHandler } from '@/common/error';
-import {
-    RegisterServerSchema,
-    AckCommandSchema,
-    StartWorkerSchema,
-    StopWorkerSchema,
-} from '@/modules/servers/server.dto';
 import { subscriptionsJob } from './jobs/subscriptions.job';
 import { databaseConfig } from '@kyrazo/shared';
-import { Gateway } from '@/modules/gateway/gateway';
 import { db } from '@/db';
 import { sql } from 'drizzle-orm';
 
@@ -81,31 +69,6 @@ app.get('/v1/health', async c => {
     }
 });
 
-// app.post('/servers/register', zValidator('json', RegisterServerSchema), ServerController.register);
-
-// --- Authenticated Server Routes ---
-app.use('/servers/*', serverAuth);
-app.post('/servers/heartbeat', ServerController.heartbeat);
-app.get('/servers/commands', ServerController.getCommands);
-app.post(
-    '/servers/commands/ack',
-    zValidator('json', AckCommandSchema),
-    ServerController.ackCommand
-);
-
-// --- Admin / Client API Routes ---
-app.post('/schedule/worker/start', zValidator('json', StartWorkerSchema), async c => {
-    const { clientId } = await c.req.json();
-    const worker = await WorkerService.provisionWorker(clientId);
-    return c.json({ worker });
-});
-
-app.post('/schedule/worker/stop', zValidator('json', StopWorkerSchema), async c => {
-    const { workerId } = await c.req.json();
-    await WorkerService.decommissionWorker(workerId);
-    return c.json({ success: true });
-});
-
 // --- Background Jobs ---
 console.log('⏱️ Starting Background Jobs...');
 
@@ -134,15 +97,7 @@ const startServer = async () => {
             hostname: '0.0.0.0', // Ensure binding to all interfaces
 
             fetch: (req, server) => {
-                if (server.upgrade(req)) {
-                    return undefined; // Bun automatically handles the 101 Switching Protocols response
-                }
                 return app.fetch(req, server);
-            },
-            websocket: {
-                message: (ws, msg) => Gateway.getInstance().handleMessage(ws, msg),
-                open: ws => Gateway.getInstance().handleConnection(ws),
-                close: ws => Gateway.getInstance().handleClose(ws),
             },
         });
 

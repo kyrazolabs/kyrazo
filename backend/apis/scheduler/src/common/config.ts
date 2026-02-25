@@ -9,9 +9,12 @@ const envSchema = z.object({
         .string()
         .transform(v => parseInt(v, 10))
         .default(3000),
-    NODE_ENV: z
-        .enum(['development', 'production', 'test'])
-        .default('development'),
+    NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+    COOLIFY_API_URL: z.string().default('https://coolify.io/api/v1'),
+    COOLIFY_API_TOKEN: z.string().min(1, 'COOLIFY_API_TOKEN is required'),
+    COOLIFY_GITHUB_APP_UUID: z.string().min(1, 'COOLIFY_GITHUB_APP_UUID is required'),
+    COOLIFY_REPOSITORY: z.string().default('nxion/kyrazo-worker'),
+    COOLIFY_BRANCH: z.string().default('main'),
 });
 
 const parsed = envSchema.safeParse(process.env);

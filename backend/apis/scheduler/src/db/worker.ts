@@ -11,14 +11,7 @@ export const workers = pgTable('workers', {
         .references(() => servers.server_id)
         .notNull(),
     status: text('status', {
-        enum: [
-            'pending',
-            'starting',
-            'running',
-            'stopping',
-            'stopped',
-            'failed',
-        ],
+        enum: ['pending', 'starting', 'running', 'stopping', 'stopped', 'failed'],
     })
         .default('pending')
         .notNull(),
