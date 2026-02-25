@@ -1,35 +1,98 @@
 #!/usr/bin/env bun
 
-import { bootstrap } from "./app/worker.bootstrap";
-import { logger } from "@kyrazo/shared";
+import { Hono } from 'hono';
+import { logger } from 'hono/logger';
+import { bootstrap } from './app/worker.bootstrap';
+import { logger as appLogger, databaseConfig, clickhouseConfig } from '@kyrazo/shared';
+import { redisConfig, natsConfig } from '@/config';
+import { env } from './app/worker.env';
 
 /**
  * @title Worker Service
  * @description Standalone NATS JetStream consumer service for processing webhook events.
- * Runs independently from the API server.
+ * Runs independently from the API server but exposes a healthcheck endpoint.
  *
  * @example
  * bun run src/index.ts
  */
 
+const app = new Hono();
+
+app.use('*', logger());
+
+app.get('/v1/health', async c => {
+    try {
+        // Check all services in parallel utilizing their native health checks where applicable
+        const [mongo, redis, nats, clickhouse] = await Promise.all([
+            databaseConfig.healthCheck(),
+            redisConfig.healthCheck(),
+            natsConfig.healthCheck(),
+            (async () => {
+                try {
+                    const isConnected = await clickhouseConfig.getClient().ping();
+                    return {
+                        status: isConnected ? 'healthy' : 'unhealthy',
+                        details: { connected: isConnected, database: 'ClickHouse' },
+                    };
+                } catch (e: any) {
+                    return {
+                        status: 'unhealthy',
+                        details: { connected: false, database: 'ClickHouse', error: e.message },
+                    };
+                }
+            })(),
+        ]);
+
+        const allHealthy = [mongo, redis, nats, clickhouse].every(s => s.status === 'healthy');
+
+        return c.json({
+            success: allHealthy,
+            message: allHealthy ? 'All services are healthy' : 'Some services are unhealthy',
+            services: { mongo, redis, nats, clickhouse },
+            timestamp: new Date().toISOString(),
+            version: env.worker.VERSION || '1.0.0',
+        });
+    } catch (error: any) {
+        return c.json(
+            {
+                success: false,
+                message: 'Health check failed',
+                error: error.message || 'Unknown error',
+                timestamp: new Date().toISOString(),
+                version: env.worker.VERSION || '1.0.0',
+            },
+            500
+        );
+    }
+});
+
 async function main() {
-    console.log("🚀 Starting NATS JetStream Worker Service...");
+    appLogger.info('🚀 Starting NATS JetStream Worker Service...');
 
     try {
         const success = await bootstrap();
         if (!success) {
-            logger.error("Worker failed to start during bootstrap. Exiting.");
+            appLogger.error('Worker failed to start during bootstrap. Exiting.');
             process.exit(1);
         }
-        logger.info("Worker started successfully");
+        appLogger.info('Worker started successfully');
+
+        const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
+        Bun.serve({
+            port,
+            hostname: '0.0.0.0',
+            fetch: app.fetch,
+        });
+
+        appLogger.info(`🚀 Worker HTTP Healthcheck server running on port ${port}`);
     } catch (error) {
-        console.error("❌ Failed to start worker service:", error);
+        console.error('❌ Failed to start worker service:', error);
         process.exit(1);
     }
 }
 
 // Start the worker service
-main().catch((error) => {
-    logger.error("Failed to start worker:", error);
+main().catch(error => {
+    appLogger.error('Failed to start worker:', error);
     process.exit(1);
 });

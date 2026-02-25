@@ -42,6 +42,7 @@ COPY --from=builder /app/shared /app/shared
 # Copy scheduler package binaries and config
 COPY --from=builder /app/apis/scheduler/package.json /app/apis/scheduler/package.json
 COPY --from=builder /app/apis/scheduler/tsconfig.json /app/apis/scheduler/tsconfig.json
+COPY --from=builder /app/apis/scheduler/drizzle.config.ts /app/apis/scheduler/drizzle.config.ts
 COPY --from=builder /app/apis/scheduler/src /app/apis/scheduler/src
 
 # Set working directory to scheduler package
@@ -61,4 +62,4 @@ HEALTHCHECK  --start-period=20s --interval=30s --timeout=3s --retries=3 \
     CMD wget -qO- http://127.0.0.1:${PORT}/v1/health || exit 1
 
 # Start the application
-CMD ["bun", "run", "src/index.ts"]
+CMD ["sh", "-c", "bun run prod && bun run start"]
