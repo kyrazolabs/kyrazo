@@ -10,12 +10,12 @@ describe('SourceController (Integration)', () => {
         query: any = {},
         userId: string = '507f1f77bcf86cd799439011',
         workspaceId: string = '507f1f77bcf86cd799439012',
-        projectId: string = '507f1f77bcf86cd799439013'
+        namespaceId: string = '507f1f77bcf86cd799439013'
     ) => {
         return {
             userId: userId,
             workspace: { workspaceId: new Types.ObjectId(workspaceId) },
-            project: { projectId: new Types.ObjectId(projectId) },
+            namespace: { namespaceId: new Types.ObjectId(namespaceId) },
             req: {
                 valid: (type: string) => {
                     if (type === 'json') return body;

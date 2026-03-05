@@ -34,7 +34,7 @@ export class IngestRepo {
     static async getIngestEventById(
         eventId: string,
         workspaceId: string,
-        projectId: string
+        namespaceId: string
     ): Promise<SQLIngestEvent[]> {
         try {
             const client = this.getClient();
@@ -45,13 +45,13 @@ export class IngestRepo {
 
             const query = `
                     SELECT * FROM ingest_events
-                    WHERE event_id = {eventId:String} AND workspace_id = {workspaceId:String} AND project_id = {projectId:String}
+                    WHERE event_id = {eventId:String} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
                     LIMIT 1
                 `;
             const params: Record<string, string | number> = {
                 eventId: unprefixId(eventId)!,
                 workspaceId: unprefixId(workspaceId)!,
-                projectId: unprefixId(projectId)!,
+                namespaceId: unprefixId(namespaceId)!,
             };
 
             const rows = await client.query({
@@ -69,7 +69,7 @@ export class IngestRepo {
     }
     static async getIngestEvents(
         workspaceId: string,
-        projectId: string,
+        namespaceId: string,
         status: string | undefined,
         limit: number,
         page: number
@@ -86,11 +86,11 @@ export class IngestRepo {
 
             const conditions = [
                 'workspace_id = {workspaceId:String}',
-                'project_id = {projectId:String}',
+                'namespace_id = {namespaceId:String}',
             ];
             const params: Record<string, string | number> = {
                 workspaceId: unprefixId(workspaceId)!,
-                projectId: unprefixId(projectId)!,
+                namespaceId: unprefixId(namespaceId)!,
                 limit: perPage,
                 offset: skip,
             };
@@ -140,7 +140,7 @@ export class IngestRepo {
     static async getReceivedEventsBySource(
         sourceId: string,
         workspaceId: string,
-        projectId: string,
+        namespaceId: string,
         limit: number,
         page: number
     ): Promise<{ data: SQLIngestEvent[]; total: number }> {
@@ -156,13 +156,13 @@ export class IngestRepo {
 
             const query = `
                       SELECT * FROM ingest_events
-                      WHERE source_id = {sourceId:String} AND workspace_id = {workspaceId:String} AND project_id = {projectId:String}
+                      WHERE source_id = {sourceId:String} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
                       ORDER BY processed_at DESC
                       LIMIT {limit:Int32} OFFSET {offset:Int32}
                   `;
             const countQuery = `
                       SELECT count() AS total FROM ingest_events
-                      WHERE source_id = {sourceId:String} AND workspace_id = {workspaceId:String} AND project_id = {projectId:String}
+                      WHERE source_id = {sourceId:String} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
                   `;
             const [rows, countRows] = await Promise.all([
                 client.query({
@@ -171,7 +171,7 @@ export class IngestRepo {
                     query_params: {
                         sourceId: unprefixId(sourceId)!,
                         workspaceId: unprefixId(workspaceId)!,
-                        projectId: unprefixId(projectId)!,
+                        namespaceId: unprefixId(namespaceId)!,
                         limit: perPage,
                         offset: skip,
                     },
@@ -182,7 +182,7 @@ export class IngestRepo {
                     query_params: {
                         sourceId: unprefixId(sourceId)!,
                         workspaceId: unprefixId(workspaceId)!,
-                        projectId: unprefixId(projectId)!,
+                        namespaceId: unprefixId(namespaceId)!,
                     },
                 }),
             ]);
@@ -199,7 +199,7 @@ export class IngestRepo {
     static async getIngestOverview(
         days: number = 7,
         workspaceId: string,
-        projectId: string
+        namespaceId: string
     ): Promise<{
         stats: {
             total_events: number;
@@ -265,7 +265,7 @@ export class IngestRepo {
             const params: Record<string, string | number> = {
                 days,
                 workspaceId: unprefixId(workspaceId)!,
-                projectId: unprefixId(projectId)!,
+                namespaceId: unprefixId(namespaceId)!,
             };
 
             const statsQuery = `
@@ -277,7 +277,7 @@ export class IngestRepo {
                 FROM ingest_events
                 WHERE toDate(received_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
-                    AND project_id = {projectId:String}
+                    AND namespace_id = {namespaceId:String}
             `;
 
             const receiveTrendsQuery = `
@@ -287,7 +287,7 @@ export class IngestRepo {
                 FROM ingest_events
                 WHERE toDate(received_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
-                    AND project_id = {projectId:String}
+                    AND namespace_id = {namespaceId:String}
                 GROUP BY day
                 ORDER BY day DESC;
             `;
@@ -299,7 +299,7 @@ export class IngestRepo {
                 FROM ingest_events
                 WHERE toDate(received_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
-                    AND project_id = {projectId:String}
+                    AND namespace_id = {namespaceId:String}
                 GROUP BY source
                 ORDER BY total DESC
                 LIMIT 10;
@@ -312,7 +312,7 @@ export class IngestRepo {
                 FROM ingest_events
                 WHERE toDate(received_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
-                    AND project_id = {projectId:String}
+                    AND namespace_id = {namespaceId:String}
                 GROUP BY processing_status
                 ORDER BY total DESC;
             `;
@@ -324,7 +324,7 @@ export class IngestRepo {
                 FROM ingest_events
                 WHERE toDate(received_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
-                    AND project_id = {projectId:String}
+                    AND namespace_id = {namespaceId:String}
                 GROUP BY day
                 ORDER BY day DESC;
             `;

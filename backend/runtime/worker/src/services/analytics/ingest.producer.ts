@@ -1,15 +1,15 @@
-import { ProcessingStatus } from "@kyrazo/shared";
-import { BaseProducer } from "./base.producer";
-import type { IngestEventInput } from "./producer.type";
+import { ProcessingStatus } from '@kyrazo/shared';
+import { BaseProducer } from './base.producer';
+import type { IngestEventInput } from './producer.type';
 
 class IngestProducer extends BaseProducer {
     async record(event: IngestEventInput): Promise<void> {
         const minute = this.getMinuteBucket(event.timestamp);
-        const key = `analytics:rt:${event.projectId}:ingest:${minute}:${event.sourceId}:${event.status}`;
+        const key = `analytics:rt:${event.namespaceId}:ingest:${minute}:${event.sourceId}:${event.status}`;
 
         const pipeline = this.redis.pipeline();
 
-        pipeline.hincrby(key, "total", 1);
+        pipeline.hincrby(key, 'total', 1);
 
         if (event.status === ProcessingStatus.PROCESSED) {
             pipeline.hincrby(key, ProcessingStatus.PROCESSED, 1);

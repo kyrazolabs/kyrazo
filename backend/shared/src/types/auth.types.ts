@@ -32,7 +32,7 @@ export interface Setup2FAResponse {
 }
 
 export interface OTPActionRequest {
-    action: 'update_profile' | 'delete_workspace' | 'delete_project' | 'manage_keys';
+    action: 'update_profile' | 'delete_workspace' | 'delete_namespace' | 'manage_keys';
 }
 export type AuthRefreshResponse = Omit<AuthResponse, 'data'> & {
     data: {

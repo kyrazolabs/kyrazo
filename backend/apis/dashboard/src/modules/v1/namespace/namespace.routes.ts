@@ -2,25 +2,29 @@ import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { authenticate } from '@/core/middlewares/auth.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
-import { requireProjectAccessParam } from '@/core/middlewares/project.middleware';
+import { requireNamespaceAccessParam } from '@/core/middlewares/namespace.middleware';
 import { checkWorkspaceLimits } from '@/core/middlewares/limits.middleware';
 import { requireRecentOTP } from '@/core/middlewares/otp.middleware';
 
-import { ProjectController } from '@/modules/v1/project/project.controller';
+import { NamespaceController } from '@/modules/v1/namespace/namespace.controller';
 
-import { CreateProjectSchema, GetProjectByIdSchema, FilterProjectSchema } from './project.schema';
-import { projectWriteRateLimiter, projectReadRateLimiter } from './project.rate-limiter';
+import {
+    CreateNamespaceSchema,
+    GetNamespaceByIdSchema,
+    FilterNamespaceSchema,
+} from './namespace.schema';
+import { namespaceWriteRateLimiter, namespaceReadRateLimiter } from './namespace.rate-limiter';
 
 const router = new Hono();
 
-// All project routes require authentication
+// All namespace routes require authentication
 router.use(authenticate);
 
-// Create project (requires workspace membership with admin/owner role)
+// Create namespace (requires workspace membership with admin/owner role)
 router.post(
     '/',
-    projectWriteRateLimiter,
-    zValidator('json', CreateProjectSchema, (result, c) => {
+    namespaceWriteRateLimiter,
+    zValidator('json', CreateNamespaceSchema, (result, c) => {
         if (!result.success) {
             return c.json(
                 {
@@ -36,15 +40,15 @@ router.post(
         }
     }),
     requireWorkspaceMembership(['admin', 'owner']),
-    checkWorkspaceLimits('maxProjects'),
-    ProjectController.createProject
+    checkWorkspaceLimits('maxNamespaces'),
+    NamespaceController.createNamespace
 );
 
-// List projects for a specific workspace
+// List namespaces for a specific workspace
 router.get(
     '/workspace',
-    projectReadRateLimiter,
-    zValidator('query', FilterProjectSchema, (result, c) => {
+    namespaceReadRateLimiter,
+    zValidator('query', FilterNamespaceSchema, (result, c) => {
         if (!result.success) {
             return c.json(
                 {
@@ -60,13 +64,13 @@ router.get(
         }
     }),
     requireWorkspaceMembership(),
-    ProjectController.listWorkspaceProjects
+    NamespaceController.listWorkspaceNamespaces
 );
 
-// Routes requiring project ownership or workspace membership
+// Routes requiring namespace ownership or workspace membership
 router.use(
-    '/:projectId/*',
-    zValidator('param', GetProjectByIdSchema, (result, c) => {
+    '/:namespaceId/*',
+    zValidator('param', GetNamespaceByIdSchema, (result, c) => {
         if (!result.success) {
             return c.json(
                 {
@@ -82,12 +86,12 @@ router.use(
         }
     }),
     requireWorkspaceMembership(['owner', 'admin', 'member'])
-); // Assuming project access is tied to workspace membership
+); // Assuming namespace access is tied to workspace membership
 
 router.get(
-    '/:projectId',
-    projectReadRateLimiter,
-    zValidator('param', GetProjectByIdSchema, (result, c) => {
+    '/:namespaceId',
+    namespaceReadRateLimiter,
+    zValidator('param', GetNamespaceByIdSchema, (result, c) => {
         if (!result.success) {
             return c.json(
                 {
@@ -102,13 +106,13 @@ router.get(
             );
         }
     }),
-    ProjectController.getProjectById
+    NamespaceController.getNamespaceById
 );
 
 router.patch(
-    '/:projectId',
-    projectWriteRateLimiter,
-    zValidator('param', GetProjectByIdSchema, (result, c) => {
+    '/:namespaceId',
+    namespaceWriteRateLimiter,
+    zValidator('param', GetNamespaceByIdSchema, (result, c) => {
         if (!result.success) {
             return c.json(
                 {
@@ -123,7 +127,7 @@ router.patch(
             );
         }
     }),
-    zValidator('json', CreateProjectSchema, (result, c) => {
+    zValidator('json', CreateNamespaceSchema, (result, c) => {
         if (!result.success) {
             return c.json(
                 {
@@ -138,15 +142,15 @@ router.patch(
             );
         }
     }),
-    requireProjectAccessParam(['owner', 'admin']), // Project deletion requires ownership
-    requireRecentOTP('update_project'),
-    ProjectController.updateProject
+    requireNamespaceAccessParam(['owner', 'admin']), // Namespace deletion requires ownership
+    requireRecentOTP('update_namespace'),
+    NamespaceController.updateNamespace
 );
 
 router.delete(
-    '/:projectId',
-    projectWriteRateLimiter,
-    zValidator('param', GetProjectByIdSchema, (result, c) => {
+    '/:namespaceId',
+    namespaceWriteRateLimiter,
+    zValidator('param', GetNamespaceByIdSchema, (result, c) => {
         if (!result.success) {
             return c.json(
                 {
@@ -161,15 +165,15 @@ router.delete(
             );
         }
     }),
-    requireProjectAccessParam(['owner', 'admin']), // Project deletion requires ownership
-    requireRecentOTP('delete_project'),
-    ProjectController.deleteProject
+    requireNamespaceAccessParam(['owner', 'admin']), // Namespace deletion requires ownership
+    requireRecentOTP('delete_namespace'),
+    NamespaceController.deleteNamespace
 );
 
 router.post(
-    '/:projectId/restore',
-    projectWriteRateLimiter,
-    zValidator('param', GetProjectByIdSchema, (result, c) => {
+    '/:namespaceId/restore',
+    namespaceWriteRateLimiter,
+    zValidator('param', GetNamespaceByIdSchema, (result, c) => {
         if (!result.success) {
             return c.json(
                 {
@@ -184,8 +188,8 @@ router.post(
             );
         }
     }),
-    requireProjectAccessParam(['owner', 'admin'], { allowDeleted: true }), // Allow access to deleted projects for restore
-    ProjectController.restoreProject
+    requireNamespaceAccessParam(['owner', 'admin'], { allowDeleted: true }), // Allow access to deleted namespaces for restore
+    NamespaceController.restoreNamespace
 );
 
 export default router;

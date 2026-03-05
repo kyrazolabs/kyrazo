@@ -16,7 +16,7 @@ export class SourceService {
         valid: CreateSourceInput,
         userId: string,
         workspaceId: string,
-        projectId: string
+        namespaceId: string
     ) {
         if (!valid.authentication?.enabled) {
             throw new Error('Authentication is required for receive type sources.');
@@ -26,7 +26,10 @@ export class SourceService {
         let processedAuth: any;
 
         if (valid.authentication.type === 'service' && valid.authentication.service) {
-            const encrypted = secretCrypto.encrypt(projectId, valid.authentication.service.secret);
+            const encrypted = secretCrypto.encrypt(
+                namespaceId,
+                valid.authentication.service.secret
+            );
             processedAuth = {
                 enabled: true,
                 type: 'service' as SourceAuthType,
@@ -41,7 +44,7 @@ export class SourceService {
         //     valid.authentication.apiKey
         // ) {
         //     const encrypted = secretCrypto.encrypt(
-        //         projectId,
+        //         namespaceId,
         //         valid.authentication.apiKey.apiKey
         //     );
         //     processedAuth = {
@@ -58,7 +61,7 @@ export class SourceService {
         //     valid.authentication.basicAuth
         // ) {
         //     const encrypted = secretCrypto.encrypt(
-        //         projectId,
+        //         namespaceId,
         //         valid.authentication.basicAuth.password
         //     );
         //     processedAuth = {
@@ -79,7 +82,7 @@ export class SourceService {
             endpoints: valid.endpoints?.map((id: string) => new Types.ObjectId(unprefixId(id)!)),
             userId: new Types.ObjectId(userId),
             workspaceId: new Types.ObjectId(workspaceId),
-            projectId: new Types.ObjectId(projectId),
+            namespaceId: new Types.ObjectId(namespaceId),
             ingressId: generateIngressId(userId),
             ingressUrl: config.app.ingest.v1 + valid.service + '/' + ingress,
             authentication: processedAuth,
@@ -119,9 +122,9 @@ export class SourceService {
         }
     }
 
-    async getSourceById(sourceId: string, workspaceId: string, projectId: string) {
+    async getSourceById(sourceId: string, workspaceId: string, namespaceId: string) {
         try {
-            const source = await sourceRepository.findById(sourceId, workspaceId, projectId);
+            const source = await sourceRepository.findById(sourceId, workspaceId, namespaceId);
             if (!source) {
                 throw new Error('Source not found');
             }
@@ -139,16 +142,21 @@ export class SourceService {
     async updateSource(
         sourceId: string,
         workspaceId: string,
-        projectId: string,
+        namespaceId: string,
         valid: UpdateSourceInput
     ) {
         try {
-            const source = await sourceRepository.findById(sourceId, workspaceId, projectId);
+            const source = await sourceRepository.findById(sourceId, workspaceId, namespaceId);
             if (!source) {
                 throw new Error('Source not found');
             }
 
-            const updated = await sourceRepository.update(sourceId, workspaceId, projectId, valid);
+            const updated = await sourceRepository.update(
+                sourceId,
+                workspaceId,
+                namespaceId,
+                valid
+            );
             if (!updated) {
                 throw new Error('Failed to update source');
             }
@@ -161,9 +169,13 @@ export class SourceService {
         }
     }
 
-    async deleteSource(sourceId: string, workspaceId: string, projectId: string): Promise<boolean> {
+    async deleteSource(
+        sourceId: string,
+        workspaceId: string,
+        namespaceId: string
+    ): Promise<boolean> {
         try {
-            const deleted = await sourceRepository.deleteById(sourceId, workspaceId, projectId);
+            const deleted = await sourceRepository.deleteById(sourceId, workspaceId, namespaceId);
             if (!deleted) {
                 throw new Error('Failed to delete source');
             }

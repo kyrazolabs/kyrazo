@@ -9,7 +9,7 @@ describe('WebflowTransformer', () => {
         const event: IReceivedEvent<WebflowWebhookPayload> = {
             eventId: 'evt_123',
             workspaceId: 'ws_123',
-            projectId: 'proj_123',
+            namespaceId: 'proj_123',
             userId: 'user_123',
             sourceId: 'src_123',
             sourceType: 'receive',

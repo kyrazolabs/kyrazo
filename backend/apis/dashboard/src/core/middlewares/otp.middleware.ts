@@ -7,8 +7,8 @@ export type SensitiveAction =
     | 'update_profile'
     | 'delete_workspace'
     | 'update_workspace'
-    | 'delete_project'
-    | 'update_project'
+    | 'delete_namespace'
+    | 'update_namespace'
     | 'manage_keys'
     | 'disable_2fa';
 

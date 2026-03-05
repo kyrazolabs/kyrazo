@@ -1,6 +1,6 @@
-import type { IDispatchedEvent } from "@/core/dispatcher/dispatcher.types";
-import type { PayPalWebhookEvent } from "./paypal.types";
-import type { IReceivedEvent } from "@/types/events/event.types";
+import type { IDispatchedEvent } from '@/core/dispatcher/dispatcher.types';
+import type { PayPalWebhookEvent } from './paypal.types';
+import type { IReceivedEvent } from '@/types/events/event.types';
 
 export class PayPalTransformer {
     static instance: PayPalTransformer;
@@ -16,7 +16,7 @@ export class PayPalTransformer {
 
     public transform(
         event: IReceivedEvent<PayPalWebhookEvent>,
-        endpoints: object[],
+        endpoints: object[]
     ): IDispatchedEvent {
         return {
             id: event.eventId,
@@ -24,13 +24,13 @@ export class PayPalTransformer {
             timestamp: new Date(event.body.create_time).getTime(),
 
             workspaceId: event.workspaceId,
-            projectId: event.projectId,
+            namespaceId: event.namespaceId,
 
             sourceId: event.sourceId,
             sourceType: event.sourceType,
 
             provider: {
-                name: "paypal",
+                name: 'paypal',
                 eventId: event.body.id,
                 resourceId: event.body.resource?.id as string,
             },
@@ -55,11 +55,11 @@ export class PayPalTransformer {
             })),
 
             meta: {
-                priority: "normal",
+                priority: 'normal',
                 maxRetries: 3,
                 insertedAt: new Date(),
                 nonce: crypto.randomUUID(),
-                version: "1.0.0",
+                version: '1.0.0',
                 source: event.source,
             },
         };

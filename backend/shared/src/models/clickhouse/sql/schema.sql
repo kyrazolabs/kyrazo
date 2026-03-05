@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS delivery_attempts (
     delivery_id UUID DEFAULT generateUUIDv4(),
     workspace_id String,
-    project_id String CODEC(ZSTD(3)),
+    namespace_id String CODEC(ZSTD(3)),
     producer_id String,
     source_type String,
 
@@ -39,14 +39,14 @@ CREATE TABLE IF NOT EXISTS delivery_attempts (
 )
 ENGINE = MergeTree()
 PARTITION BY toYYYYMM(scheduled_at)
-ORDER BY (delivery_id, workspace_id, project_id, event_id)
+ORDER BY (delivery_id, workspace_id, namespace_id, event_id)
 PRIMARY KEY (delivery_id);
 
 
 CREATE TABLE IF NOT EXISTS published_events (
     event_id UUID,
     workspace_id String,
-    project_id String CODEC(ZSTD(3)),
+    namespace_id String CODEC(ZSTD(3)),
     source_id String,
     producer_id String,
     event_type String,
@@ -62,14 +62,14 @@ CREATE TABLE IF NOT EXISTS published_events (
 )
 ENGINE = MergeTree()
 PARTITION BY toYYYYMM(meta_inserted_at)
-ORDER BY (event_id, workspace_id, project_id, source_id)
+ORDER BY (event_id, workspace_id, namespace_id, source_id)
 PRIMARY KEY (event_id);
 
 CREATE TABLE IF NOT EXISTS published_event_targets (
     event_id String,
     target_id String,
     target_url String,
-    status Enum8( 'pending' = 1, 'processing' = 2, 'delivered' = 3, 'failed' = 4, 'timeout' = 5, 'network_error' = 6 ), 
+    status Enum8( 'pending' = 1, 'processing' = 2, 'delivered' = 3, 'failed' = 4, 'timeout' = 5, 'network_error' = 6 ),
 )
 ENGINE = MergeTree()
 ORDER BY (event_id, target_id);
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS ingest_events (
     event_id UUID DEFAULT generateUUIDv4(),
     source_id String CODEC(ZSTD(3)),
     workspace_id String CODEC(ZSTD(3)),
-    project_id String CODEC(ZSTD(3)),
+    namespace_id String CODEC(ZSTD(3)),
     user_id String CODEC(ZSTD(3)),
     ingress_id String CODEC(ZSTD(3)),
     source LowCardinality(String) CODEC(ZSTD(3)),
@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS ingest_events (
 )
 ENGINE = MergeTree()
 PARTITION BY toYYYYMM(created_at)
-ORDER BY (event_id, workspace_id, project_id, received_at)
+ORDER BY (event_id, workspace_id, namespace_id, received_at)
 PRIMARY KEY (event_id)
 TTL created_at + INTERVAL 90 DAY DELETE;
 
@@ -110,7 +110,7 @@ TTL created_at + INTERVAL 90 DAY DELETE;
 CREATE TABLE IF NOT EXISTS routed_events (
     route_id UUID DEFAULT generateUUIDv4(),
     workspace_id String,
-    project_id String CODEC(ZSTD(3)),
+    namespace_id String CODEC(ZSTD(3)),
     user_id String,
     source_id String,
     target_url String,
@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS routed_events (
 )
 ENGINE = MergeTree()
 PARTITION BY toYYYYMM(created_at)
-ORDER BY (route_id, workspace_id, project_id)
+ORDER BY (route_id, workspace_id, namespace_id)
 PRIMARY KEY (route_id);
 
 

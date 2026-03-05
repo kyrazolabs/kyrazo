@@ -25,14 +25,14 @@ export class EndpointController {
             const valid: CreateEndpointInput = c.req.valid('json');
 
             const workspaceId = c.workspace!.workspaceId;
-            const projectId = c.project!.projectId;
+            const namespaceId = c.namespace!.namespaceId;
             const userId = c.userId!;
 
             const endpoint = await endpointService.createEndpoint(
                 valid,
                 userId,
                 workspaceId,
-                projectId
+                namespaceId
             );
 
             return c.json<CreateEndpointResponse>(
@@ -51,10 +51,7 @@ export class EndpointController {
                 {
                     success: false,
                     message: 'Failed to create endpoint',
-                    error:
-                        error instanceof Error
-                            ? error.message
-                            : 'Unknown error',
+                    error: error instanceof Error ? error.message : 'Unknown error',
                 },
                 500
             );
@@ -64,19 +61,14 @@ export class EndpointController {
     static async getEndpoints(c: AppContext) {
         try {
             // @ts-ignore
-            const {
-                q,
-                status,
-                limit = 10,
-                page = 1,
-            }: FilterEndpointInput = c.req.valid('query');
+            const { q, status, limit = 10, page = 1 }: FilterEndpointInput = c.req.valid('query');
 
             const workspaceId = c.workspace!.workspaceId;
-            const projectId = c.project!.projectId;
+            const namespaceId = c.namespace!.namespaceId;
 
             const query: any = {
                 workspaceId: new Types.ObjectId(workspaceId),
-                projectId: new Types.ObjectId(projectId),
+                namespaceId: new Types.ObjectId(namespaceId),
             };
 
             if (q) {
@@ -86,11 +78,7 @@ export class EndpointController {
                 query.status = status;
             }
 
-            const { endpoints, total } = await endpointService.getEndpoints(
-                query,
-                limit,
-                page
-            );
+            const { endpoints, total } = await endpointService.getEndpoints(query, limit, page);
 
             return c.json<GetEndpointsResponse>(
                 {
@@ -122,12 +110,12 @@ export class EndpointController {
             // @ts-ignore
             const { endpointId }: GetEndpointByIdInput = c.req.valid('param');
             const workspaceId = c.workspace!.workspaceId.toString();
-            const projectId = c.project!.projectId.toString();
+            const namespaceId = c.namespace!.namespaceId.toString();
 
             const endpoint = await endpointService.getEndpointById(
                 endpointId,
                 workspaceId,
-                projectId
+                namespaceId
             );
 
             return c.json<GetEndpointResponse>(
@@ -164,12 +152,12 @@ export class EndpointController {
             // @ts-ignore
             const { endpointId }: GetEndpointByIdInput = c.req.valid('param');
             const workspaceId = c.workspace!.workspaceId.toString();
-            const projectId = c.project!.projectId.toString();
+            const namespaceId = c.namespace!.namespaceId.toString();
 
             const secret = await endpointService.getEndpointSecret(
                 endpointId,
                 workspaceId,
-                projectId
+                namespaceId
             );
 
             return c.json<GetEndpointSecretResponse>(
@@ -212,12 +200,12 @@ export class EndpointController {
             const data: UpdateEndpointInput = c.req.valid('json');
 
             const workspaceId = c.workspace!.workspaceId.toString();
-            const projectId = c.project!.projectId.toString();
+            const namespaceId = c.namespace!.namespaceId.toString();
 
             const updated = await endpointService.updateEndpoint(
                 endpointId,
                 workspaceId,
-                projectId,
+                namespaceId,
                 data
             );
 
@@ -255,12 +243,12 @@ export class EndpointController {
             // @ts-ignore
             const { endpointId }: GetEndpointByIdInput = c.req.valid('param');
             const workspaceId = c.workspace!.workspaceId.toString();
-            const projectId = c.project!.projectId.toString();
+            const namespaceId = c.namespace!.namespaceId.toString();
 
             const deleted = await endpointService.deleteEndpoint(
                 endpointId,
                 workspaceId,
-                projectId
+                namespaceId
             );
 
             return c.json<DeleteEndpointResponse>(

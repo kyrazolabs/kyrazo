@@ -47,7 +47,7 @@ export class ShopifyPipeline {
                 body: dispatchedEvent.data,
                 source: 'shopify',
                 sourceId: event.sourceId,
-                projectId: event.projectId,
+                namespaceId: event.namespaceId,
                 workspaceId: event.workspaceId,
             });
 
@@ -66,7 +66,7 @@ export class ShopifyPipeline {
                 sourceSecret = secretCrypto.decrypt(
                     credentials.secret,
                     credentials.iv,
-                    source.projectId.toString()
+                    source.namespaceId.toString()
                 );
             } catch (error) {
                 logger.warn(
@@ -113,7 +113,7 @@ export class ShopifyPipeline {
                 verified,
             });
         await ingestAnalyticsProducer.record({
-            projectId: data.project_id,
+            namespaceId: data.namespace_id,
             sourceId: data.source_id,
             status: data.processing_status,
             timestamp: data.processed_at,

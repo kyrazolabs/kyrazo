@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS analytics_dispatch_day (
-    project_id String CODEC(ZSTD(3)),
+    namespace_id String CODEC(ZSTD(3)),
     target_id String CODEC(ZSTD(3)),
     event_type String CODEC(ZSTD(3)),
     response_code UInt16,
@@ -13,10 +13,10 @@ CREATE TABLE IF NOT EXISTS analytics_dispatch_day (
 )
 ENGINE = SummingMergeTree((total_deliveries, successful_deliveries, failed_deliveries, pending_deliveries, delivery_time_sum))
 PARTITION BY toYYYYMM(bucket_day)
-ORDER BY (project_id, bucket_day, target_id, event_type, response_code);
+ORDER BY (namespace_id, bucket_day, target_id, event_type, response_code);
 
 CREATE TABLE IF NOT EXISTS analytics_ingest_day (
-    project_id String CODEC(ZSTD(3)),
+    namespace_id String CODEC(ZSTD(3)),
     source_id String CODEC(ZSTD(3)),
     processing_status UInt8,
     bucket_day Date,
@@ -28,4 +28,4 @@ CREATE TABLE IF NOT EXISTS analytics_ingest_day (
 )
 ENGINE = SummingMergeTree((total_events, successful_events, failed_events, pending_events))
 PARTITION BY toYYYYMM(bucket_day)
-ORDER BY (project_id, bucket_day, source_id, processing_status);
+ORDER BY (namespace_id, bucket_day, source_id, processing_status);

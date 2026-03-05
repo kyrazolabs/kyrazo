@@ -33,7 +33,7 @@ export class ShopifyTransformer {
                 : new Date().getTime(),
 
             workspaceId: event.workspaceId,
-            projectId: event.projectId,
+            namespaceId: event.namespaceId,
 
             sourceId: event.sourceId,
             sourceType: event.sourceType,

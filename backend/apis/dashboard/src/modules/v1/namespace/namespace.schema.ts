@@ -12,8 +12,8 @@ const nameSchema = z
     .trim();
 const descriptionSchema = z.string().max(2000, 'Description is too long').optional().nullable();
 
-// Project schemas
-export const CreateProjectSchema = z.object({
+// Namespace schemas
+export const CreateNamespaceSchema = z.object({
     name: nameSchema,
     description: descriptionSchema,
     whiteLabelHeaders: z
@@ -25,20 +25,20 @@ export const CreateProjectSchema = z.object({
         .or(z.literal('')),
 });
 
-export const UpdateProjectSchema = CreateProjectSchema.partial();
+export const UpdateNamespaceSchema = CreateNamespaceSchema.partial();
 
-export const GetProjectByIdSchema = z.object({
-    projectId: objectIdSchema,
+export const GetNamespaceByIdSchema = z.object({
+    namespaceId: objectIdSchema,
 });
 
-export const FilterProjectSchema = z.object({
+export const FilterNamespaceSchema = z.object({
     q: z.string().optional().default(''),
     limit: z.coerce.number().min(1).max(100).default(10),
     page: z.coerce.number().min(1).default(1),
 });
 
 // Type exports
-export type CreateProjectInput = z.infer<typeof CreateProjectSchema>;
-export type UpdateProjectInput = z.infer<typeof UpdateProjectSchema>;
-export type GetProjectByIdInput = z.infer<typeof GetProjectByIdSchema>;
-export type FilterProjectInput = z.infer<typeof FilterProjectSchema>;
+export type CreateNamespaceInput = z.infer<typeof CreateNamespaceSchema>;
+export type UpdateNamespaceInput = z.infer<typeof UpdateNamespaceSchema>;
+export type GetNamespaceByIdInput = z.infer<typeof GetNamespaceByIdSchema>;
+export type FilterNamespaceInput = z.infer<typeof FilterNamespaceSchema>;

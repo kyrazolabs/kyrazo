@@ -1,11 +1,5 @@
 import { config, logger } from '../../../../configs';
-import {
-    createCipheriv,
-    createDecipheriv,
-    randomBytes,
-    CipherGCMTypes,
-    hkdfSync,
-} from 'crypto';
+import { createCipheriv, createDecipheriv, randomBytes, CipherGCMTypes, hkdfSync } from 'crypto';
 
 interface IGenerateOptions {
     length?: number;
@@ -31,13 +25,10 @@ export class SecretCrypto {
     }
 
     /**
-     * Derives a Project Key from the Master Key using HKDF
+     * Derives a Namespace Key from the Master Key using HKDF
      */
-    private deriveProjectKey(projectId: string): Buffer {
-        if (
-            !config.security.encryptions.key ||
-            config.security.encryptions.key.length !== 32
-        ) {
+    private deriveNamespaceKey(namespaceId: string): Buffer {
+        if (!config.security.encryptions.key || config.security.encryptions.key.length !== 32) {
             throw new Error(
                 'ENCRYPTION_KEY environment variable must be set and be 32 characters long.'
             );
@@ -46,8 +37,8 @@ export class SecretCrypto {
             hkdfSync(
                 'sha256',
                 Buffer.from(config.security.encryptions.key),
-                Buffer.from('kyrazo-project-key'),
-                Buffer.from(projectId),
+                Buffer.from('kyrazo-namespace-key'),
+                Buffer.from(namespaceId),
                 this.KEY_LENGTH
             )
         );
@@ -57,10 +48,7 @@ export class SecretCrypto {
      * Derives a Workspace Key from the Master Key using HKDF
      */
     private deriveWorkspaceKey(workspaceId: string): Buffer {
-        if (
-            !config.security.encryptions.key ||
-            config.security.encryptions.key.length !== 32
-        ) {
+        if (!config.security.encryptions.key || config.security.encryptions.key.length !== 32) {
             throw new Error(
                 'ENCRYPTION_KEY environment variable must be set and be 32 characters long.'
             );
@@ -82,20 +70,17 @@ export class SecretCrypto {
      * @returns An object containing the encrypted secret and the initialization vector (iv).
      */
     public encrypt(
-        projectId: string,
+        namespaceId: string,
         plaintext: string
     ): {
         encrypted: string;
         iv: string;
     } {
-        const key = this.deriveProjectKey(projectId);
+        const key = this.deriveNamespaceKey(namespaceId);
         const iv = randomBytes(this.IV_LENGTH);
         const cipher = createCipheriv(this.ALGORITHM, key, iv);
 
-        const encrypted = Buffer.concat([
-            cipher.update(plaintext, 'utf8'),
-            cipher.final(),
-        ]);
+        const encrypted = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
 
         const authTag = cipher.getAuthTag();
 
@@ -111,25 +96,18 @@ export class SecretCrypto {
      * @param iv - The hex-encoded initialization vector.
      * @returns The decrypted plain text secret.
      */
-    public decrypt(encrypted: string, iv: string, projectId: string): string {
-        const key = this.deriveProjectKey(projectId);
+    public decrypt(encrypted: string, iv: string, namespaceId: string): string {
+        const key = this.deriveNamespaceKey(namespaceId);
         const buffer = Buffer.from(encrypted, 'base64');
         const authTag = buffer.slice(-this.AUTH_TAG_LENGTH);
         const data = buffer.slice(0, -this.AUTH_TAG_LENGTH);
 
-        const decipher = createDecipheriv(
-            this.ALGORITHM,
-            key,
-            Buffer.from(iv, 'base64')
-        );
+        const decipher = createDecipheriv(this.ALGORITHM, key, Buffer.from(iv, 'base64'));
 
         // Separate AuthTag from encrypted data
         decipher.setAuthTag(authTag);
 
-        const decrypted = Buffer.concat([
-            decipher.update(data),
-            decipher.final(),
-        ]);
+        const decrypted = Buffer.concat([decipher.update(data), decipher.final()]);
 
         return decrypted.toString('utf8');
     }
@@ -168,11 +146,11 @@ export class SecretCrypto {
     /**
      * @title Hashing (one-way) a given string.
      * @param data - The string to hash.
-     * @param projectId - The project ID to derive the key from.
+     * @param namespaceId - The namespace ID to derive the key from.
      * @returns The hashed string.
      */
-    public hash(data: string, projectId: string): string {
-        const key = this.deriveProjectKey(projectId);
+    public hash(data: string, namespaceId: string): string {
+        const key = this.deriveNamespaceKey(namespaceId);
         const hasher = new Bun.CryptoHasher('sha256', key);
         hasher.update(data);
         return hasher.digest('hex');

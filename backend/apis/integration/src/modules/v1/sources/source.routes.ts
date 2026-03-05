@@ -8,50 +8,50 @@ import {
     UpdateSourceSchema,
 } from './source.schema';
 import { SourceController } from './source.controller';
-import { GetProjectByIdSchema } from '@/core/utils/libs/zod';
+import { GetNamespaceByIdSchema } from '@/core/utils/libs/zod';
 
 const source = new Hono();
 
 source.post(
-    '/:projectId',
+    '/:namespaceId',
     authenticate,
     checkScope('ingest:source:create'),
-    zValidator('param', GetProjectByIdSchema),
+    zValidator('param', GetNamespaceByIdSchema),
     zValidator('json', CreateSourceSchema),
     SourceController.createSource
 );
 
 source.get(
-    '/:projectId',
+    '/:namespaceId',
     authenticate,
     checkScope('ingest:source:read'),
-    zValidator('param', GetProjectByIdSchema),
+    zValidator('param', GetNamespaceByIdSchema),
     zValidator('query', SearchSourceSchema),
     SourceController.getSources
 );
 
 source.get(
-    '/:projectId/:sourceId',
+    '/:namespaceId/:sourceId',
     authenticate,
     checkScope('ingest:source:read'),
-    zValidator('param', GetProjectByIdSchema.extend(GetSourceByIdSchema.shape)),
+    zValidator('param', GetNamespaceByIdSchema.extend(GetSourceByIdSchema.shape)),
     SourceController.getSource
 );
 
 source.patch(
-    '/:projectId/:sourceId',
+    '/:namespaceId/:sourceId',
     authenticate,
     checkScope('ingest:source:update'),
-    zValidator('param', GetProjectByIdSchema.extend(GetSourceByIdSchema.shape)),
+    zValidator('param', GetNamespaceByIdSchema.extend(GetSourceByIdSchema.shape)),
     zValidator('json', UpdateSourceSchema),
     SourceController.updateSource
 );
 
 source.delete(
-    '/:projectId/:sourceId',
+    '/:namespaceId/:sourceId',
     authenticate,
     checkScope('ingest:source:delete'),
-    zValidator('param', GetProjectByIdSchema.extend(GetSourceByIdSchema.shape)),
+    zValidator('param', GetNamespaceByIdSchema.extend(GetSourceByIdSchema.shape)),
     SourceController.deleteSource
 );
 

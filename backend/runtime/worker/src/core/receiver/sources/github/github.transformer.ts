@@ -30,7 +30,7 @@ export class GitHubTransformer {
             timestamp: new Date().getTime(), // GitHub doesn't always provide a top-level timestamp like Stripe
 
             workspaceId: event.workspaceId,
-            projectId: event.projectId,
+            namespaceId: event.namespaceId,
 
             sourceId: event.sourceId,
             sourceType: event.sourceType,

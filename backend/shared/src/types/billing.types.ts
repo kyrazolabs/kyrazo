@@ -4,7 +4,7 @@ import { Types, Model, Document } from 'mongoose';
 export interface IPlanLimits {
     eventsPerSecond: number;
     eventsPerMonth: number;
-    maxProjects: number;
+    maxNamespaces: number;
     maxMembers: number;
     maxConnectors: number;
     maxIntegrations: number;

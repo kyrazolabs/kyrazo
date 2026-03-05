@@ -213,8 +213,8 @@ workspaceSchema.virtual('users', {
     localField: '_id',
     foreignField: 'workspaceId',
 });
-workspaceSchema.virtual('projects', {
-    ref: 'Project',
+workspaceSchema.virtual('namespaces', {
+    ref: 'Namespace',
     localField: '_id',
     foreignField: 'workspaceId',
 });
@@ -347,7 +347,7 @@ workspaceSchema.statics.getWorkspaceStats = async function (): Promise<{
             },
         },
         {
-            $project: {
+            $namespace: {
                 _id: 0,
                 totalWorkspaces: 1,
                 activeWorkspaces: 1,

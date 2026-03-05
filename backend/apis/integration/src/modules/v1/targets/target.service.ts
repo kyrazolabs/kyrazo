@@ -10,15 +10,15 @@ export class TargetService {
         valid: CreateTargetInput,
         userId: string,
         workspaceId: Types.ObjectId,
-        projectId: Types.ObjectId
+        namespaceId: Types.ObjectId
     ) {
         const secret = secretCrypto.generateSourceSecret();
-        const encryptedSecret = secretCrypto.encrypt(projectId.toString(), secret);
+        const encryptedSecret = secretCrypto.encrypt(namespaceId.toString(), secret);
         const data = {
             ...valid,
             userId: new Types.ObjectId(userId),
             workspaceId: workspaceId,
-            projectId: projectId,
+            namespaceId: namespaceId,
             secrets: [
                 {
                     kid: `k${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -50,9 +50,9 @@ export class TargetService {
         }
     }
 
-    async getTargetById(targetId: string, workspaceId: string, projectId: string) {
+    async getTargetById(targetId: string, workspaceId: string, namespaceId: string) {
         try {
-            const target = await targetRepository.findById(targetId, workspaceId, projectId);
+            const target = await targetRepository.findById(targetId, workspaceId, namespaceId);
             if (!target) {
                 throw new Error('Target not found');
             }
@@ -66,10 +66,14 @@ export class TargetService {
     async getTargetSecret(
         targetId: string,
         workspaceId: string,
-        projectId: string
+        namespaceId: string
     ): Promise<string> {
         try {
-            const target = await targetRepository.findSecretById(targetId, workspaceId, projectId);
+            const target = await targetRepository.findSecretById(
+                targetId,
+                workspaceId,
+                namespaceId
+            );
             if (!target) {
                 throw new Error('Target not found');
             }
@@ -77,7 +81,11 @@ export class TargetService {
             if (!activeSecret) {
                 throw new Error('Active secret not found');
             }
-            const secret = secretCrypto.decrypt(activeSecret.value_enc, activeSecret.iv, projectId);
+            const secret = secretCrypto.decrypt(
+                activeSecret.value_enc,
+                activeSecret.iv,
+                namespaceId
+            );
             return secret;
         } catch (error) {
             logger.error('Failed to get target secret:', error as Error);
@@ -88,20 +96,25 @@ export class TargetService {
     async updateTarget(
         targetId: string,
         workspaceId: string,
-        projectId: string,
+        namespaceId: string,
         valid: UpdateTargetInput
     ): Promise<ITarget> {
         try {
-            const target = await targetRepository.findById(targetId, workspaceId, projectId);
+            const target = await targetRepository.findById(targetId, workspaceId, namespaceId);
             if (!target) {
                 throw new Error('Target not found');
             }
-            const updated = await targetRepository.update(targetId, workspaceId, projectId, valid);
+            const updated = await targetRepository.update(
+                targetId,
+                workspaceId,
+                namespaceId,
+                valid
+            );
             if (!updated) {
                 throw new Error('Failed to update target');
             }
             await redisConfig.del(
-                `workspace:${unprefixId(workspaceId)}:project:${unprefixId(projectId)}:targets`
+                `workspace:${unprefixId(workspaceId)}:namespace:${unprefixId(namespaceId)}:targets`
             );
             return updated;
         } catch (error) {
@@ -110,14 +123,18 @@ export class TargetService {
         }
     }
 
-    async deleteTarget(targetId: string, workspaceId: string, projectId: string): Promise<boolean> {
+    async deleteTarget(
+        targetId: string,
+        workspaceId: string,
+        namespaceId: string
+    ): Promise<boolean> {
         try {
-            const deleted = await targetRepository.deleteById(targetId, workspaceId, projectId);
+            const deleted = await targetRepository.deleteById(targetId, workspaceId, namespaceId);
             if (!deleted) {
                 throw new Error('Failed to delete target');
             }
             await redisConfig.del(
-                `workspace:${unprefixId(workspaceId)}:project:${unprefixId(projectId)}:targets`
+                `workspace:${unprefixId(workspaceId)}:namespace:${unprefixId(namespaceId)}:targets`
             );
             return deleted;
         } catch (error) {

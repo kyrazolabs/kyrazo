@@ -4,15 +4,15 @@ import { zValidator } from '@hono/zod-validator';
 import { PublishEventSchema, BatchPublishEventsSchema } from './event.schema';
 import { authenticate, checkScope } from '@/core/middlewares/auth.middleware';
 import { EventController } from '@/modules/v1/events/event.controller';
-import { GetProjectByIdSchema } from '@/core/utils/libs/zod';
+import { GetNamespaceByIdSchema } from '@/core/utils/libs/zod';
 import { createDynamicRateLimiter } from '@/core/middlewares/security.middleware';
 import { idempotencyMiddleware } from '@/core/middlewares/idem.middleware';
 
 const event = new Hono();
 
 event.post(
-    '/:projectId/publish',
-    zValidator('param', GetProjectByIdSchema, (result, c) => {
+    '/:namespaceId/publish',
+    zValidator('param', GetNamespaceByIdSchema, (result, c) => {
         if (!result.success) {
             return c.json(
                 {
@@ -51,8 +51,8 @@ event.post(
 );
 
 event.post(
-    '/:projectId/publish/batch',
-    zValidator('param', GetProjectByIdSchema, (result, c) => {
+    '/:namespaceId/publish/batch',
+    zValidator('param', GetNamespaceByIdSchema, (result, c) => {
         if (!result.success) {
             return c.json(
                 {

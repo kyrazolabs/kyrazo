@@ -83,10 +83,10 @@ const planSchema = new Schema<IPlan>(
                 required: [true, 'Events per month limit is required'],
                 min: [0, 'Events per month cannot be negative'],
             },
-            maxProjects: {
+            maxNamespaces: {
                 type: Number,
-                required: [true, 'Max projects limit is required'],
-                min: [0, 'Max projects cannot be negative'],
+                required: [true, 'Max namespaces limit is required'],
+                min: [0, 'Max namespaces cannot be negative'],
             },
             maxMembers: {
                 type: Number,
@@ -139,7 +139,7 @@ const planSchema = new Schema<IPlan>(
 planSchema.index({ isActive: 1 });
 planSchema.index({ 'limits.eventsPerSecond': 1 });
 planSchema.index({ 'limits.eventsPerMonth': 1 });
-planSchema.index({ 'limits.maxProjects': 1 });
+planSchema.index({ 'limits.maxNamespaces': 1 });
 planSchema.index({ 'limits.maxMembers': 1 });
 planSchema.index({ createdAt: -1 });
 

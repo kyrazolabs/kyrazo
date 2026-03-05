@@ -95,7 +95,7 @@ usageSchema.statics.aggregateUsage = function (
             },
         },
         {
-            $project: {
+            $namespace: {
                 _id: 0,
                 subscriptionId: '$_id.subscriptionId',
                 eventType: '$_id.eventType',

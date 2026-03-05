@@ -1,10 +1,10 @@
-import { logger, secretCrypto } from "@kyrazo/shared";
+import { logger, secretCrypto } from '@kyrazo/shared';
 import {
     DeliveryRepo,
     IngestRepo,
     type SQLDeliveryAttempt,
     type SQLIngestEvent,
-} from "@kyrazo/shared";
+} from '@kyrazo/shared';
 
 export class BatchWriter {
     private static instance: BatchWriter;
@@ -22,9 +22,7 @@ export class BatchWriter {
      * Save a batch of delivery attempts to ClickHouse
      * @param attempts Array of delivery attempts
      */
-    public async saveBatchedDeliveryAttempts(
-        attempts: SQLDeliveryAttempt[],
-    ): Promise<void> {
+    public async saveBatchedDeliveryAttempts(attempts: SQLDeliveryAttempt[]): Promise<void> {
         if (!attempts.length) return;
 
         try {
@@ -32,20 +30,20 @@ export class BatchWriter {
 
             for (const attempt of attempts) {
                 const requestBody = secretCrypto.encrypt(
-                    attempt.project_id,
-                    attempt.request_body,
+                    attempt.namespace_id,
+                    attempt.request_body
                 );
                 const requestHeader = secretCrypto.encrypt(
-                    attempt.project_id,
-                    attempt.request_header,
+                    attempt.namespace_id,
+                    attempt.request_header
                 );
                 const responseBody = secretCrypto.encrypt(
-                    attempt.project_id,
-                    attempt.response_body,
+                    attempt.namespace_id,
+                    attempt.response_body
                 );
                 const responseHeader = secretCrypto.encrypt(
-                    attempt.project_id,
-                    attempt.response_header,
+                    attempt.namespace_id,
+                    attempt.response_header
                 );
 
                 encryptedAttempts.push({
@@ -60,13 +58,10 @@ export class BatchWriter {
             await DeliveryRepo.insert(encryptedAttempts);
 
             logger.info(
-                `✅ Successfully flushed ${attempts.length} delivery attempts to ClickHouse`,
+                `✅ Successfully flushed ${attempts.length} delivery attempts to ClickHouse`
             );
         } catch (error: any) {
-            logger.error(
-                "❌ Failed to flush delivery attempts batch to ClickHouse",
-                error,
-            );
+            logger.error('❌ Failed to flush delivery attempts batch to ClickHouse', error);
             throw error; // Let caller handle retry/error
         }
     }
@@ -75,20 +70,15 @@ export class BatchWriter {
      * Save a batch of ingest events to ClickHouse
      * @param events Array of ingest events
      */
-    public async saveBatchedIngestEvents(
-        events: SQLIngestEvent[],
-    ): Promise<void> {
+    public async saveBatchedIngestEvents(events: SQLIngestEvent[]): Promise<void> {
         if (!events.length) return;
 
         try {
             const encryptedEvents: SQLIngestEvent[] = [];
 
             for (const event of events) {
-                const headers = secretCrypto.encrypt(
-                    event.project_id,
-                    event.headers,
-                );
-                const body = secretCrypto.encrypt(event.project_id, event.body);
+                const headers = secretCrypto.encrypt(event.namespace_id, event.headers);
+                const body = secretCrypto.encrypt(event.namespace_id, event.body);
 
                 encryptedEvents.push({
                     ...event,
@@ -99,14 +89,9 @@ export class BatchWriter {
 
             await IngestRepo.insert(encryptedEvents);
 
-            logger.info(
-                `✅ Successfully flushed ${events.length} ingest events to ClickHouse`,
-            );
+            logger.info(`✅ Successfully flushed ${events.length} ingest events to ClickHouse`);
         } catch (error: any) {
-            logger.error(
-                "❌ Failed to flush ingest events batch to ClickHouse",
-                error,
-            );
+            logger.error('❌ Failed to flush ingest events batch to ClickHouse', error);
             throw error; // Let caller handle retry/error
         }
     }

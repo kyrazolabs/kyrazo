@@ -9,18 +9,15 @@ export class EndpointService {
         valid: CreateEndpointInput,
         userId: string,
         workspaceId: Types.ObjectId,
-        projectId: Types.ObjectId
+        namespaceId: Types.ObjectId
     ) {
         const secret = secretCrypto.generateSourceSecret();
-        const encryptedSecret = secretCrypto.encrypt(
-            projectId.toString(),
-            secret
-        );
+        const encryptedSecret = secretCrypto.encrypt(namespaceId.toString(), secret);
         const data = {
             ...valid,
             userId: new Types.ObjectId(userId),
             workspaceId: workspaceId,
-            projectId: projectId,
+            namespaceId: namespaceId,
             secrets: [
                 {
                     kid: `k${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -39,11 +36,7 @@ export class EndpointService {
         }
     }
 
-    async getEndpoints(
-        query: Record<string, unknown>,
-        limit: number,
-        page: number
-    ) {
+    async getEndpoints(query: Record<string, unknown>, limit: number, page: number) {
         try {
             return await endpointRepository.findAll({
                 query,
@@ -56,16 +49,12 @@ export class EndpointService {
         }
     }
 
-    async getEndpointById(
-        endpointId: string,
-        workspaceId: string,
-        projectId: string
-    ) {
+    async getEndpointById(endpointId: string, workspaceId: string, namespaceId: string) {
         try {
             const endpoint = await endpointRepository.findById(
                 endpointId,
                 workspaceId,
-                projectId
+                namespaceId
             );
             if (!endpoint) {
                 throw new Error('Endpoint not found');
@@ -80,20 +69,18 @@ export class EndpointService {
     async getEndpointSecret(
         endpointId: string,
         workspaceId: string,
-        projectId: string
+        namespaceId: string
     ): Promise<string> {
         try {
             const endpoint = await endpointRepository.findSecretById(
                 endpointId,
                 workspaceId,
-                projectId
+                namespaceId
             );
             if (!endpoint) {
                 throw new Error('Endpoint not found');
             }
-            const activeSecret = endpoint.secrets?.find(
-                (secret: any) => secret.active
-            );
+            const activeSecret = endpoint.secrets?.find((secret: any) => secret.active);
 
             if (!activeSecret) {
                 throw new Error('Active secret not found');
@@ -101,7 +88,7 @@ export class EndpointService {
             const secret = secretCrypto.decrypt(
                 activeSecret.value_enc,
                 activeSecret.iv,
-                projectId
+                namespaceId
             );
             return secret;
         } catch (error) {
@@ -113,14 +100,14 @@ export class EndpointService {
     async updateEndpoint(
         endpointId: string,
         workspaceId: string,
-        projectId: string,
+        namespaceId: string,
         valid: Partial<CreateEndpointInput> | Record<string, unknown>
     ) {
         try {
             const endpoint = await endpointRepository.findById(
                 endpointId,
                 workspaceId,
-                projectId
+                namespaceId
             );
             if (!endpoint) {
                 throw new Error('Endpoint not found');
@@ -128,7 +115,7 @@ export class EndpointService {
             const updated = await endpointRepository.update(
                 endpointId,
                 workspaceId,
-                projectId,
+                namespaceId,
                 valid
             );
             if (!updated) {
@@ -144,13 +131,13 @@ export class EndpointService {
     async deleteEndpoint(
         endpointId: string,
         workspaceId: string,
-        projectId: string
+        namespaceId: string
     ): Promise<boolean> {
         try {
             const deleted = await endpointRepository.deleteById(
                 endpointId,
                 workspaceId,
-                projectId
+                namespaceId
             );
             if (!deleted) {
                 throw new Error('Failed to delete endpoint');

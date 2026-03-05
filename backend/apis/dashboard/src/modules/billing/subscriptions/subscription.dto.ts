@@ -79,7 +79,7 @@ export const SubscriptionResponseDto = z.object({
         limits: z.object({
             eventsPerSecond: z.number(),
             eventsPerMonth: z.number(),
-            maxProjects: z.number(),
+            maxNamespaces: z.number(),
             maxMembers: z.number(),
             maxConnectors: z.number(),
             maxIntegrations: z.number(),

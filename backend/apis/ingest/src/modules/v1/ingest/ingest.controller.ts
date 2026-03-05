@@ -140,7 +140,7 @@ export class ingestController {
                 sourceType: 'receive',
                 sourceId: source._id.toString(),
                 workspaceId: source.workspaceId.toString(),
-                projectId: source.projectId.toString(),
+                namespaceId: source.namespaceId.toString(),
                 ingressId: source.ingressId,
                 userId: source.userId.toString(),
 

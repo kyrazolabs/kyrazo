@@ -407,7 +407,7 @@ export class SubscriptionService {
         currentUsage: {
             eventsPerSecond: number;
             eventsPerMonth: number;
-            maxProjects: number;
+            maxNamespaces: number;
             maxMembers: number;
             maxConnectors: number;
             maxIntegrations: number;
@@ -416,7 +416,7 @@ export class SubscriptionService {
         limits: {
             eventsPerSecond: number;
             eventsPerMonth: number;
-            maxProjects: number;
+            maxNamespaces: number;
             maxMembers: number;
             maxConnectors: number;
             maxIntegrations: number;
@@ -432,7 +432,7 @@ export class SubscriptionService {
                 currentUsage: {
                     eventsPerSecond: 0,
                     eventsPerMonth: 0,
-                    maxProjects: 0,
+                    maxNamespaces: 0,
                     maxMembers: 0,
                     maxConnectors: 0,
                     maxIntegrations: 0,
@@ -441,7 +441,7 @@ export class SubscriptionService {
                 limits: {
                     eventsPerSecond: 10,
                     eventsPerMonth: 1000,
-                    maxProjects: 1,
+                    maxNamespaces: 1,
                     maxMembers: 1,
                     maxConnectors: 1,
                     maxIntegrations: 1,
@@ -458,7 +458,7 @@ export class SubscriptionService {
         const currentUsage = {
             eventsPerSecond: 0, // We don't have real-time RPS tracking here yet, but we can default to 0 or use Redis
             eventsPerMonth: currentMonthUsage,
-            maxProjects: 0,
+            maxNamespaces: 0,
             maxMembers: 0,
             maxConnectors: 0,
             maxIntegrations: 0,

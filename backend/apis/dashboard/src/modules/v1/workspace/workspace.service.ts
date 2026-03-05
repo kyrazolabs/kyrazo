@@ -24,7 +24,7 @@ export class WorkspaceService {
         try {
             const workspaceData = {
                 ...data,
-                ownerId: userId,
+                ownerId: unprefixId(userId),
             };
 
             const workspace = await workspaceRepository.createWorkspace(workspaceData, session);

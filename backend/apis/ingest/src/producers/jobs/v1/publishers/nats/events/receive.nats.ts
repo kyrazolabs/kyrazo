@@ -123,7 +123,7 @@ export class ReceiveEventPublisher {
                 sourceType: 'receive',
                 sourceId: data.sourceId,
                 workspaceId: data.workspaceId,
-                projectId: data.projectId,
+                namespaceId: data.namespaceId,
                 ingressId: data.ingressId,
                 userId: data.userId,
 

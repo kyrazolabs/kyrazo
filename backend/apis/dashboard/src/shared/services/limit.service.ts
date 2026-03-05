@@ -6,7 +6,7 @@ import { subscriptionCacheService } from './subscription-cache.service';
 export const FREE_PLAN_LIMITS: IPlanLimits = {
     eventsPerSecond: 25,
     eventsPerMonth: 100000,
-    maxProjects: 3,
+    maxNamespaces: 3,
     maxMembers: 3,
     maxConnectors: 3,
     maxIntegrations: 1,

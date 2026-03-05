@@ -12,11 +12,11 @@ export class TargetRepository {
         return targetWithoutSecrets as unknown as ITarget;
     }
 
-    async findById(id: string, workspaceId: string, projectId: string): Promise<ITarget | null> {
+    async findById(id: string, workspaceId: string, namespaceId: string): Promise<ITarget | null> {
         return await Target.findOne({
             _id: unprefixId(id),
             workspaceId: unprefixId(workspaceId),
-            projectId: unprefixId(projectId),
+            namespaceId: unprefixId(namespaceId),
         })
             .select('-secrets -userId -workspaceId -__v')
             .exec();
@@ -24,12 +24,12 @@ export class TargetRepository {
     async findSecretById(
         id: string,
         workspaceId: string,
-        projectId: string
+        namespaceId: string
     ): Promise<ITarget | null> {
         return await Target.findOne({
             _id: unprefixId(id),
             workspaceId: unprefixId(workspaceId),
-            projectId: unprefixId(projectId),
+            namespaceId: unprefixId(namespaceId),
         })
             .select('+secrets -userId -workspaceId -__v')
             .exec();
@@ -44,8 +44,8 @@ export class TargetRepository {
     ): Promise<{ targets: ITarget[]; total: number }> {
         if (options.query?.workspaceId)
             options.query.workspaceId = unprefixId(options.query.workspaceId as string);
-        if (options.query?.projectId)
-            options.query.projectId = unprefixId(options.query.projectId as string);
+        if (options.query?.namespaceId)
+            options.query.namespaceId = unprefixId(options.query.namespaceId as string);
 
         const skip = options.page ? (options.page - 1) * (options.limit || 10) : 0;
         const [targets, total] = await Promise.all([
@@ -66,14 +66,14 @@ export class TargetRepository {
     async update(
         id: string,
         workspaceId: string,
-        projectId: string,
+        namespaceId: string,
         data: Partial<ITarget>
     ): Promise<ITarget | null> {
         return await Target.findOneAndUpdate(
             {
                 _id: unprefixId(id),
                 workspaceId: unprefixId(workspaceId),
-                projectId: unprefixId(projectId),
+                namespaceId: unprefixId(namespaceId),
             },
             data,
             {
@@ -84,25 +84,25 @@ export class TargetRepository {
             .exec();
     }
 
-    async deleteById(id: string, workspaceId: string, projectId: string): Promise<boolean> {
+    async deleteById(id: string, workspaceId: string, namespaceId: string): Promise<boolean> {
         const deleted = await Target.findOneAndDelete({
             _id: unprefixId(id),
             workspaceId: unprefixId(workspaceId),
-            projectId: unprefixId(projectId),
+            namespaceId: unprefixId(namespaceId),
         })
             .select('-secrets -userId -workspaceId -__v')
             .exec();
         return deleted !== null;
     }
 
-    async getTargetsByWorkspaceIdAndProjectIdAndTargetIds(
+    async getTargetsByWorkspaceIdAndNamespaceIdAndTargetIds(
         workspaceId: string,
-        projectId: string,
+        namespaceId: string,
         targetIds: string[]
     ): Promise<ITarget[]> {
-        return await Target.findActiveByWorkspaceAndProjectAndTargetIds(
+        return await Target.findActiveByWorkspaceAndNamespaceAndTargetIds(
             workspaceId,
-            projectId,
+            namespaceId,
             targetIds
         );
     }

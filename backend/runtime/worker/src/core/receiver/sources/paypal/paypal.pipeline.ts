@@ -1,16 +1,11 @@
-import {
-    logger,
-    type SQLIngestEvent,
-    Source,
-    secretCrypto,
-} from "@kyrazo/shared";
-import { paypalValidator } from "./paypal.validator";
-import { paypalSignature } from "./paypal.signature";
-import type { IReceivedEvent } from "@/types/events/event.types";
-import { redisConfig } from "@/config";
-import { ingestProducer } from "@/consumers/batch/ingest.producer";
-import { receiverTransformer } from "../../receiver.transformer";
-import { ingestAnalyticsProducer } from "@/services/analytics/ingest.producer";
+import { logger, type SQLIngestEvent, Source, secretCrypto } from '@kyrazo/shared';
+import { paypalValidator } from './paypal.validator';
+import { paypalSignature } from './paypal.signature';
+import type { IReceivedEvent } from '@/types/events/event.types';
+import { redisConfig } from '@/config';
+import { ingestProducer } from '@/consumers/batch/ingest.producer';
+import { receiverTransformer } from '../../receiver.transformer';
+import { ingestAnalyticsProducer } from '@/services/analytics/ingest.producer';
 
 export class PayPalPipeline {
     private static instance: PayPalPipeline;
@@ -25,18 +20,16 @@ export class PayPalPipeline {
     public async process(event: IReceivedEvent): Promise<void> {
         try {
             if (!paypalValidator.validate(event)) {
-                logger.debug("Invalid event structure, skipping");
+                logger.debug('Invalid event structure, skipping');
                 return;
             }
 
             const source = await redisConfig.cache(
                 `source:${event.sourceId}`,
                 async () => {
-                    return await Source.findById(event.sourceId).populate(
-                        "endpoints",
-                    );
+                    return await Source.findById(event.sourceId).populate('endpoints');
                 },
-                60 * 60 * 24,
+                60 * 60 * 24
             );
 
             if (!source) {
@@ -52,16 +45,16 @@ export class PayPalPipeline {
                 !(source.authentication?.credentials as any)?.iv
             ) {
                 logger.warn(
-                    `Source ${event.sourceId} is missing authentication credentials, skipping signature verification`,
+                    `Source ${event.sourceId} is missing authentication credentials, skipping signature verification`
                 );
                 await ingestProducer
                     .getQueues()
-                    .IngestQueue.add(
-                        ingestProducer.getQueueNames().IngestQueue,
-                        { ...data, verified: false },
-                    );
+                    .IngestQueue.add(ingestProducer.getQueueNames().IngestQueue, {
+                        ...data,
+                        verified: false,
+                    });
                 await ingestAnalyticsProducer.record({
-                    projectId: data.project_id,
+                    namespaceId: data.namespace_id,
                     sourceId: data.source_id,
                     status: data.processing_status,
                     timestamp: data.processed_at,
@@ -74,40 +67,34 @@ export class PayPalPipeline {
                 // Cast to any to avoid TS error with Mixed type
                 const credentials = source.authentication?.credentials as any;
                 if (!credentials?.secret) {
-                    throw new Error("Missing secret");
+                    throw new Error('Missing secret');
                 }
                 sourceSecret = secretCrypto.decrypt(
                     credentials.secret,
                     credentials.iv,
-                    source.projectId.toString(),
+                    source.namespaceId.toString()
                 );
             } catch (error) {
                 logger.warn(
                     `Failed to decrypt source secret for ${event.sourceId}, attempting fallback to raw value:`,
-                    error as Error,
+                    error as Error
                 );
                 // Fallback: use the raw secret value (in case it was stored plaintext or user error)
                 // Cast to any to avoid TS error with Mixed type
-                sourceSecret = (source.authentication?.credentials as any)
-                    ?.secret;
+                sourceSecret = (source.authentication?.credentials as any)?.secret;
             }
 
             if (!sourceSecret) {
-                logger.error(
-                    `No source secret available for ${event.sourceId}`,
-                );
+                logger.error(`No source secret available for ${event.sourceId}`);
                 // ... error handling logic ...
                 await ingestProducer
                     .getQueues()
-                    .IngestQueue.add(
-                        ingestProducer.getQueueNames().IngestQueue,
-                        {
-                            ...data,
-                            verified: false,
-                        },
-                    );
+                    .IngestQueue.add(ingestProducer.getQueueNames().IngestQueue, {
+                        ...data,
+                        verified: false,
+                    });
                 await ingestAnalyticsProducer.record({
-                    projectId: data.project_id,
+                    namespaceId: data.namespace_id,
                     sourceId: data.source_id,
                     status: data.processing_status,
                     timestamp: data.processed_at,
@@ -117,25 +104,17 @@ export class PayPalPipeline {
 
             const payloadToVerify = event.rawBody || JSON.stringify(event.body);
 
-            if (
-                !(await paypalSignature.verify(
-                    payloadToVerify,
-                    event.headers,
-                    sourceSecret,
-                ))
-            ) {
-                logger.warn(
-                    `Invalid PayPal signature for event: ${event.eventId}`,
-                );
+            if (!(await paypalSignature.verify(payloadToVerify, event.headers, sourceSecret))) {
+                logger.warn(`Invalid PayPal signature for event: ${event.eventId}`);
 
                 await ingestProducer
                     .getQueues()
-                    .IngestQueue.add(
-                        ingestProducer.getQueueNames().IngestQueue,
-                        { ...data, verified: false },
-                    );
+                    .IngestQueue.add(ingestProducer.getQueueNames().IngestQueue, {
+                        ...data,
+                        verified: false,
+                    });
                 await ingestAnalyticsProducer.record({
-                    projectId: data.project_id,
+                    namespaceId: data.namespace_id,
                     sourceId: data.source_id,
                     status: data.processing_status,
                     timestamp: data.processed_at,
@@ -150,18 +129,15 @@ export class PayPalPipeline {
                     verified: true,
                 });
             await ingestAnalyticsProducer.record({
-                projectId: data.project_id,
+                namespaceId: data.namespace_id,
                 sourceId: data.source_id,
                 status: data.processing_status,
                 timestamp: data.processed_at,
             });
 
-            logger.info(
-                "✅ Successfully processed paypal event",
-                event.eventId,
-            );
+            logger.info('✅ Successfully processed paypal event', event.eventId);
         } catch (error) {
-            logger.error("❌ Error processing paypal event:", error as Error);
+            logger.error('❌ Error processing paypal event:', error as Error);
             throw error;
         }
     }

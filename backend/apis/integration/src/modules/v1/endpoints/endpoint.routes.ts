@@ -9,67 +9,67 @@ import {
     UpdateEndpointStatusSchema,
 } from './endpoint.schema';
 import { EndpointController } from './endpoint.controller';
-import { GetProjectByIdSchema } from '@/core/utils/libs/zod';
+import { GetNamespaceByIdSchema } from '@/core/utils/libs/zod';
 
 const endpoint = new Hono();
 
 endpoint.post(
-    '/:projectId',
+    '/:namespaceId',
     authenticate,
     checkScope('ingest:endpoint:create'),
-    zValidator('param', GetProjectByIdSchema),
+    zValidator('param', GetNamespaceByIdSchema),
     zValidator('json', CreateEndpointSchema),
     EndpointController.createEndpoint
 );
 
 endpoint.get(
-    '/:projectId',
+    '/:namespaceId',
     authenticate,
     checkScope('ingest:endpoint:read'),
-    zValidator('param', GetProjectByIdSchema),
+    zValidator('param', GetNamespaceByIdSchema),
     zValidator('query', SearchEndpointSchema),
     EndpointController.getEndpoints
 );
 
 endpoint.get(
-    '/:projectId/:endpointId',
+    '/:namespaceId/:endpointId',
     authenticate,
     checkScope('ingest:endpoint:read'),
-    zValidator('param', GetProjectByIdSchema.extend(GetEndpointByIdSchema.shape)),
+    zValidator('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
     EndpointController.getEndpoint
 );
 
 endpoint.get(
-    '/:projectId/:endpointId/secret',
+    '/:namespaceId/:endpointId/secret',
     authenticate,
     checkScope('ingest:endpoint:read'),
-    zValidator('param', GetProjectByIdSchema.extend(GetEndpointByIdSchema.shape)),
+    zValidator('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
     EndpointController.getEndpointSecret
 );
 
 endpoint.patch(
-    '/:projectId/:endpointId',
+    '/:namespaceId/:endpointId',
     authenticate,
     checkScope('ingest:endpoint:update'),
-    zValidator('param', GetProjectByIdSchema.extend(GetEndpointByIdSchema.shape)),
+    zValidator('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
     zValidator('json', UpdateEndpointSchema),
     EndpointController.updateEndpoint
 );
 
 endpoint.put(
-    '/:projectId/:endpointId',
+    '/:namespaceId/:endpointId',
     authenticate,
     checkScope('ingest:endpoint:update'),
-    zValidator('param', GetProjectByIdSchema.extend(GetEndpointByIdSchema.shape)),
+    zValidator('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
     zValidator('json', UpdateEndpointStatusSchema),
     EndpointController.updateEndpoint
 );
 
 endpoint.delete(
-    '/:projectId/:endpointId',
+    '/:namespaceId/:endpointId',
     authenticate,
     checkScope('ingest:endpoint:delete'),
-    zValidator('param', GetProjectByIdSchema.extend(GetEndpointByIdSchema.shape)),
+    zValidator('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
     EndpointController.deleteEndpoint
 );
 

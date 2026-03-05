@@ -35,7 +35,7 @@ export class DeliveryRepo {
 
     static async getDeliveries(
         workspaceId: string,
-        projectId: string,
+        namespaceId: string,
         status: string | undefined,
         limit: number,
         page: number
@@ -52,11 +52,11 @@ export class DeliveryRepo {
 
             const conditions = [
                 'workspace_id = {workspaceId:String}',
-                'project_id = {projectId:String}',
+                'namespace_id = {namespaceId:String}',
             ];
             const params: Record<string, string | number> = {
                 workspaceId: unprefixId(workspaceId)!,
-                projectId: unprefixId(projectId)!,
+                namespaceId: unprefixId(namespaceId)!,
                 limit: perPage,
                 offset: skip,
             };
@@ -105,7 +105,7 @@ export class DeliveryRepo {
 
     static async getTargets(
         workspaceId: string,
-        projectId: string,
+        namespaceId: string,
         limit: number,
         page: number
     ): Promise<{
@@ -129,11 +129,11 @@ export class DeliveryRepo {
 
             const conditions = [
                 'workspace_id = {workspaceId:String}',
-                'project_id = {projectId:String}',
+                'namespace_id = {namespaceId:String}',
             ];
             const params: Record<string, string | number> = {
                 workspaceId: unprefixId(workspaceId)!,
-                projectId: unprefixId(projectId)!,
+                namespaceId: unprefixId(namespaceId)!,
                 limit: perPage,
                 offset: skip,
             };
@@ -199,7 +199,7 @@ export class DeliveryRepo {
     static async getDeliveriesByTarget(
         target: string,
         workspaceId: string,
-        projectId: string,
+        namespaceId: string,
         limit: number,
         page: number
     ): Promise<{ data: SQLDeliveryAttempt[]; total: number }> {
@@ -217,21 +217,21 @@ export class DeliveryRepo {
             const params: Record<string, string | number> = {
                 targeet,
                 workspaceId: unprefixId(workspaceId)!,
-                projectId: unprefixId(projectId)!,
+                namespaceId: unprefixId(namespaceId)!,
                 limit: perPage,
                 offset: skip,
             };
 
             const query = `
                 SELECT * FROM delivery_attempts
-                WHERE target = {targeet:String} AND workspace_id = {workspaceId:String} AND project_id = {projectId:String}
+                WHERE target = {targeet:String} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
                 ORDER BY processed_at DESC
                 LIMIT {limit:Int32} OFFSET {offset:Int32}
             `;
 
             const countQuery = `
                 SELECT count() AS total FROM delivery_attempts
-                WHERE target = {targeet:String} AND workspace_id = {workspaceId:String} AND project_id = {projectId:String}
+                WHERE target = {targeet:String} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
             `;
 
             const [rows, countRows] = await Promise.all([
@@ -260,7 +260,7 @@ export class DeliveryRepo {
     static async getDeliveriesBySource(
         sourceId: string,
         workspaceId: string,
-        projectId: string,
+        namespaceId: string,
         limit: number,
         page: number
     ): Promise<{ data: SQLDeliveryAttempt[]; total: number }> {
@@ -276,13 +276,13 @@ export class DeliveryRepo {
 
             const query = `
                 SELECT * FROM delivery_attempts
-                WHERE source_id = {sourceId:String} AND workspace_id = {workspaceId:String} AND project_id = {projectId:String}
+                WHERE source_id = {sourceId:String} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
                 ORDER BY received_at DESC
                 LIMIT {limit:Int32} OFFSET {offset:Int32}
             `;
             const countQuery = `
                 SELECT count() AS total FROM delivery_attempts
-                WHERE source_id = {sourceId:String} AND workspace_id = {workspaceId:String} AND project_id = {projectId:String}
+                WHERE source_id = {sourceId:String} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
             `;
             const [rows, countRows] = await Promise.all([
                 client.query({
@@ -291,7 +291,7 @@ export class DeliveryRepo {
                     query_params: {
                         sourceId: unprefixId(sourceId)!,
                         workspaceId: unprefixId(workspaceId)!,
-                        projectId: unprefixId(projectId)!,
+                        namespaceId: unprefixId(namespaceId)!,
                         limit: perPage,
                         offset: skip,
                     },
@@ -302,7 +302,7 @@ export class DeliveryRepo {
                     query_params: {
                         sourceId: unprefixId(sourceId)!,
                         workspaceId: unprefixId(workspaceId)!,
-                        projectId: unprefixId(projectId)!,
+                        namespaceId: unprefixId(namespaceId)!,
                     },
                 }),
             ]);
@@ -319,7 +319,7 @@ export class DeliveryRepo {
     static async getDeliveryById(
         deliveryId: string,
         workspaceId: string,
-        projectId: string
+        namespaceId: string
     ): Promise<SQLDeliveryAttempt[]> {
         try {
             const client = this.getClient();
@@ -330,7 +330,7 @@ export class DeliveryRepo {
 
             const query = `
                 SELECT * FROM delivery_attempts
-                WHERE delivery_id = '${unprefixId(deliveryId)}' AND workspace_id = '${unprefixId(workspaceId)}' AND project_id = '${unprefixId(projectId)}'
+                WHERE delivery_id = '${unprefixId(deliveryId)}' AND workspace_id = '${unprefixId(workspaceId)}' AND namespace_id = '${unprefixId(namespaceId)}'
                 LIMIT 1
             `;
 
@@ -375,7 +375,7 @@ export class DeliveryRepo {
 
     static async getStats(
         workspace_id: string,
-        project_id: string
+        namespace_id: string
     ): Promise<{
         total_deliveries: number;
         successful_deliveries: number;
@@ -405,8 +405,8 @@ export class DeliveryRepo {
                 FROM delivery_attempts
             `;
 
-            if (workspace_id && project_id) {
-                query += ` WHERE workspace_id = '${unprefixId(workspace_id)}' AND project_id = '${unprefixId(project_id)}'`;
+            if (workspace_id && namespace_id) {
+                query += ` WHERE workspace_id = '${unprefixId(workspace_id)}' AND namespace_id = '${unprefixId(namespace_id)}'`;
             } else if (workspace_id) {
                 query += ` WHERE workspace_id = '${unprefixId(workspace_id)}'`;
             }
@@ -441,7 +441,7 @@ export class DeliveryRepo {
         days: number = 7,
         target: string,
         workspaceId: string,
-        projectId: string
+        namespaceId: string
     ): Promise<{
         stats: {
             total_deliveries: number;
@@ -509,7 +509,7 @@ export class DeliveryRepo {
             const params: Record<string, string | number> = {
                 days,
                 workspaceId: unprefixId(workspaceId)!,
-                projectId: unprefixId(projectId)!,
+                namespaceId: unprefixId(namespaceId)!,
                 targeet,
             };
 
@@ -523,7 +523,7 @@ export class DeliveryRepo {
                 FROM delivery_attempts
                 WHERE toDate(scheduled_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
-                    AND project_id = {projectId:String}
+                    AND namespace_id = {namespaceId:String}
                     AND target = {targeet:String};
             `;
             const deliveryTrendsQuery = `
@@ -534,7 +534,7 @@ export class DeliveryRepo {
                 FROM delivery_attempts
                 WHERE toDate(scheduled_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
-                    AND project_id = {projectId:String}
+                    AND namespace_id = {namespaceId:String}
                     AND target = {targeet:String}
                 GROUP BY day
                 ORDER BY day DESC;
@@ -547,7 +547,7 @@ export class DeliveryRepo {
                 FROM delivery_attempts
                 WHERE toDate(scheduled_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
-                    AND project_id = {projectId:String}
+                    AND namespace_id = {namespaceId:String}
                     AND target = {targeet:String}
                 GROUP BY event_type
                 ORDER BY total DESC
@@ -561,7 +561,7 @@ export class DeliveryRepo {
                 FROM delivery_attempts
                 WHERE toDate(scheduled_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
-                    AND project_id = {projectId:String}
+                    AND namespace_id = {namespaceId:String}
                     AND target = {targeet:String}
                     AND response_code != 0
                 GROUP BY response_code
@@ -601,7 +601,7 @@ export class DeliveryRepo {
             }>();
             const resultDeliveryTrends = await deliveryTrends.json<{
                 workspace_id: string;
-                project_id: string;
+                namespace_id: string;
                 day: string;
                 target: string;
                 successful: number;
@@ -609,14 +609,14 @@ export class DeliveryRepo {
             }>();
             const resultTopEventTypes = await topEventTypes.json<{
                 workspace_id: string;
-                project_id: string;
+                namespace_id: string;
                 target: string;
                 event_type: string;
                 total: number;
             }>();
             const resultStatusCodeDistribution = await statusCodeDistribution.json<{
                 workspace_id: string;
-                project_id: string;
+                namespace_id: string;
                 target: string;
                 response_code: number;
                 total: number;
@@ -654,7 +654,7 @@ export class DeliveryRepo {
     static async getDispatchOverview(
         days: number = 7,
         workspaceId: string,
-        projectId: string
+        namespaceId: string
     ): Promise<{
         stats: {
             total_targets: number;
@@ -722,7 +722,7 @@ export class DeliveryRepo {
             const params: Record<string, string | number> = {
                 days,
                 workspaceId: unprefixId(workspaceId)!,
-                projectId: unprefixId(projectId)!,
+                namespaceId: unprefixId(namespaceId)!,
             };
 
             const statsQuery = `
@@ -736,7 +736,7 @@ export class DeliveryRepo {
                 FROM delivery_attempts
                 WHERE toDate(scheduled_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
-                    AND project_id = {projectId:String}
+                    AND namespace_id = {namespaceId:String}
             `;
 
             const deliveryTrendsQuery = `
@@ -747,7 +747,7 @@ export class DeliveryRepo {
                 FROM delivery_attempts
                 WHERE toDate(scheduled_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
-                    AND project_id = {projectId:String}
+                    AND namespace_id = {namespaceId:String}
                 GROUP BY day
                 ORDER BY day DESC;
             `;
@@ -759,7 +759,7 @@ export class DeliveryRepo {
                 FROM delivery_attempts
                 WHERE toDate(scheduled_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
-                    AND project_id = {projectId:String}
+                    AND namespace_id = {namespaceId:String}
                 GROUP BY event_type
                 ORDER BY total DESC
                 LIMIT 10;
@@ -772,7 +772,7 @@ export class DeliveryRepo {
                 FROM delivery_attempts
                 WHERE toDate(scheduled_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
-                    AND project_id = {projectId:String}
+                    AND namespace_id = {namespaceId:String}
                     AND response_code != 0
                 GROUP BY response_code
                 ORDER BY total DESC;
@@ -812,7 +812,7 @@ export class DeliveryRepo {
             }>();
             const resultDeliveryTrends = await deliveryTrends.json<{
                 workspace_id: string;
-                project_id: string;
+                namespace_id: string;
                 day: string;
                 target: string;
                 successful: number;
@@ -820,14 +820,14 @@ export class DeliveryRepo {
             }>();
             const resultTopEventTypes = await topEventTypes.json<{
                 workspace_id: string;
-                project_id: string;
+                namespace_id: string;
                 target: string;
                 event_type: string;
                 total: number;
             }>();
             const resultStatusCodeDistribution = await statusCodeDistribution.json<{
                 workspace_id: string;
-                project_id: string;
+                namespace_id: string;
                 target: string;
                 response_code: number;
                 total: number;

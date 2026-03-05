@@ -9,7 +9,7 @@ describe('GitHubTransformer', () => {
         const event: IReceivedEvent<GitHubWebhookPayload> = {
             eventId: 'evt_123',
             workspaceId: 'ws_123',
-            projectId: 'proj_123',
+            namespaceId: 'proj_123',
             userId: 'user_123',
             sourceId: 'src_123',
             sourceType: 'github',
@@ -50,7 +50,7 @@ describe('GitHubTransformer', () => {
         const event: IReceivedEvent<GitHubWebhookPayload> = {
             eventId: 'evt_456',
             workspaceId: 'ws_123',
-            projectId: 'proj_123',
+            namespaceId: 'proj_123',
             userId: 'user_123',
             sourceId: 'src_123',
             sourceType: 'github',

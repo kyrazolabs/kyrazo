@@ -4,7 +4,7 @@ export interface SQLDispatchedEvent {
     event_id: string; // UUID
 
     workspace_id: string;
-    project_id: string;
+    namespace_id: string;
     event_type: string;
 
     occurred_at: string; // DateTime64

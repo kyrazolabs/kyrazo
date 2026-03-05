@@ -1,23 +1,15 @@
 import { AppContext } from '@/core/middlewares/auth.middleware';
-import {
-    IErrorResponse,
-    IngestRepo,
-    logger,
-    secretCrypto,
-} from '@kyrazo/shared';
+import { IErrorResponse, IngestRepo, logger, secretCrypto } from '@kyrazo/shared';
 import { GetIngestsBySourceIdInput, IFilterIngest } from './ingest.schema';
-import {
-    IGetIngestEventResponse,
-    IGetIngestEventsResponse,
-} from './ingest.type';
+import { IGetIngestEventResponse, IGetIngestEventsResponse } from './ingest.type';
 
 export class IngestController {
     static async getIngestEvents(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
+            const namespaceId = c.namespace?.namespaceId;
 
-            if (!workspaceId || !projectId) {
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -31,20 +23,15 @@ export class IngestController {
                 );
             }
 
-            const {
-                status,
-                limit = 10,
-                page = 1,
-            }: IFilterIngest = c.req.valid('query');
+            const { status, limit = 10, page = 1 }: IFilterIngest = c.req.valid('query');
 
-            const { data: deliveries, total } =
-                await IngestRepo.getIngestEvents(
-                    workspaceId.toString(),
-                    projectId.toString(),
-                    status,
-                    limit,
-                    page
-                );
+            const { data: deliveries, total } = await IngestRepo.getIngestEvents(
+                workspaceId.toString(),
+                namespaceId.toString(),
+                status,
+                limit,
+                page
+            );
 
             return c.json<IGetIngestEventsResponse>(
                 {
@@ -60,10 +47,7 @@ export class IngestController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in IngestController.getDeliveries',
-                error as Error
-            );
+            logger.error('Unexpected error in IngestController.getDeliveries', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -81,9 +65,9 @@ export class IngestController {
     static async getIngestEventsBySource(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
+            const namespaceId = c.namespace?.namespaceId;
 
-            if (!workspaceId || !projectId) {
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -97,7 +81,7 @@ export class IngestController {
                 );
             }
 
-            if (!workspaceId || !projectId) {
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -111,19 +95,16 @@ export class IngestController {
                 );
             }
 
-            const { sourceId }: GetIngestsBySourceIdInput =
-                c.req.valid('param');
-            const { limit = 10, page = 1 }: IFilterIngest =
-                c.req.valid('query');
+            const { sourceId }: GetIngestsBySourceIdInput = c.req.valid('param');
+            const { limit = 10, page = 1 }: IFilterIngest = c.req.valid('query');
 
-            const { data: deliveries, total } =
-                await IngestRepo.getReceivedEventsBySource(
-                    sourceId,
-                    workspaceId.toString(),
-                    projectId.toString(),
-                    limit,
-                    page
-                );
+            const { data: deliveries, total } = await IngestRepo.getReceivedEventsBySource(
+                sourceId,
+                workspaceId.toString(),
+                namespaceId.toString(),
+                limit,
+                page
+            );
 
             return c.json<IGetIngestEventsResponse>(
                 {
@@ -160,9 +141,9 @@ export class IngestController {
     static async getIngestEventById(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
+            const namespaceId = c.namespace?.namespaceId;
 
-            if (!workspaceId || !projectId) {
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -180,7 +161,7 @@ export class IngestController {
             const result = await IngestRepo.getIngestEventById(
                 eventId,
                 workspaceId.toString(),
-                projectId.toString()
+                namespaceId.toString()
             );
             const delivery = result[0] || null;
 
@@ -192,10 +173,7 @@ export class IngestController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in IngestController.getDeliveryById',
-                error as Error
-            );
+            logger.error('Unexpected error in IngestController.getDeliveryById', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -212,16 +190,15 @@ export class IngestController {
 
     private static decryptIngestEvent(event: any) {
         if (!event) return event;
-        const projectId = event.project_id;
-        if (!projectId) return event;
+        const namespaceId = event.namespace_id;
+        if (!namespaceId) return event;
 
         const tryDecrypt = (field: string) => {
-            if (!field || typeof field !== 'string' || !field.includes(':'))
-                return field;
+            if (!field || typeof field !== 'string' || !field.includes(':')) return field;
             const [iv, encrypted] = field.split(':');
             if (!iv || !encrypted) return field;
             try {
-                return secretCrypto.decrypt(encrypted, iv, projectId);
+                return secretCrypto.decrypt(encrypted, iv, namespaceId);
             } catch (e) {
                 return field;
             }

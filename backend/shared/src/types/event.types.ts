@@ -21,7 +21,7 @@ export interface IPublishedEvent {
     eventId: string;
     workspaceId: string;
     sourceType: 'publish' | 'receive';
-    projectId: string;
+    namespaceId: string;
     eventType: string;
     timestamp: number;
     data: Record<string, any>;
@@ -50,7 +50,7 @@ export interface IPublishedEvent {
 export interface IForwardedEvent {
     eventId: string;
     workspaceId: string;
-    projectId: string;
+    namespaceId: string;
     sourceId: string;
     ingressId: string;
     userId: string;
@@ -76,7 +76,7 @@ export interface IForwardedEvent {
 export interface IReceivedEvent {
     eventId: string;
     workspaceId: string;
-    projectId: string;
+    namespaceId: string;
     sourceId: string;
     ingressId: string;
     userId?: string;
@@ -96,7 +96,7 @@ export interface IReceivedEvent {
 export interface SQLPublishedEvent {
     event_id: string;
     workspace_id: string;
-    project_id: string;
+    namespace_id: string;
     source_id: string;
     producer_id: string;
     event_type: string;
@@ -115,20 +115,14 @@ export interface SQLPublishedEventTarget {
     event_id: string;
     target_id: string;
     target_url: string;
-    status:
-        | 'pending'
-        | 'processing'
-        | 'delivered'
-        | 'failed'
-        | 'timeout'
-        | 'network_error';
+    status: 'pending' | 'processing' | 'delivered' | 'failed' | 'timeout' | 'network_error';
 }
 
 export interface SQLReceivedEvent {
     event_id: string;
     source_id: string;
     workspace_id: string;
-    project_id: string;
+    namespace_id: string;
     user_id: string;
     ingress_id: string;
     source: string;
@@ -154,7 +148,7 @@ export interface SQLReceivedEvent {
 export interface SQLRoutedEvent {
     route_id: string;
     workspace_id: string;
-    project_id: string;
+    namespace_id: string;
     user_id: string;
     source_id: string;
     target_url: string;

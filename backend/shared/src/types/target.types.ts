@@ -6,7 +6,7 @@ export type TargetStatus = 'active' | 'inactive';
 export interface ITarget<T = string> extends BaseDocument {
     id: string;
     workspaceId: Types.ObjectId;
-    projectId: Types.ObjectId;
+    namespaceId: Types.ObjectId;
     name: string;
     url: string;
     method: TargetMethods;
@@ -35,16 +35,16 @@ export interface ITarget<T = string> extends BaseDocument {
 }
 
 export interface ITargetModel extends Model<ITarget> {
-    findByWorkspaceAndProject(workspaceId: string, projectId: string): Promise<ITarget[]>;
-    findActiveByWorkspaceAndProject(workspaceId: string, projectId: string): Promise<ITarget[]>;
-    findActiveByWorkspaceAndProjectAndTargetId(
+    findByWorkspaceAndNamespace(workspaceId: string, namespaceId: string): Promise<ITarget[]>;
+    findActiveByWorkspaceAndNamespace(workspaceId: string, namespaceId: string): Promise<ITarget[]>;
+    findActiveByWorkspaceAndNamespaceAndTargetId(
         workspaceId: string,
-        projectId: string,
+        namespaceId: string,
         targetId: string
     ): Promise<ITarget | null>;
-    findActiveByWorkspaceAndProjectAndTargetIds(
+    findActiveByWorkspaceAndNamespaceAndTargetIds(
         workspaceId: string,
-        projectId: string,
+        namespaceId: string,
         targetIds: string[]
     ): Promise<ITarget[]>;
 }

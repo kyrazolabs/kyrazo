@@ -34,7 +34,7 @@ export function snapshot(plan: IPlan): IPlanSnapshot {
         limits: {
             eventsPerSecond: plan.limits?.eventsPerSecond ?? 10,
             eventsPerMonth: plan.limits?.eventsPerMonth ?? 1000,
-            maxProjects: plan.limits?.maxProjects ?? 1,
+            maxNamespaces: plan.limits?.maxNamespaces ?? 1,
             maxMembers: plan.limits?.maxMembers ?? 1,
             maxConnectors: plan.limits?.maxConnectors ?? 1,
             maxIntegrations: plan.limits?.maxIntegrations ?? 1,

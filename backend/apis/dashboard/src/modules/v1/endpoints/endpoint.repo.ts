@@ -8,11 +8,15 @@ export class EndpointRepository {
         delete (endpointWithoutSecrets as any).secrets;
         return transformWithId(endpointWithoutSecrets, 'endpoint') as any;
     }
-    async findById(id: string, workspaceId: string, projectId: string): Promise<IEndpoint | null> {
+    async findById(
+        id: string,
+        workspaceId: string,
+        namespaceId: string
+    ): Promise<IEndpoint | null> {
         const endpoint = await Endpoint.findOne({
             _id: unprefixId(id),
             workspaceId: unprefixId(workspaceId),
-            projectId: unprefixId(projectId),
+            namespaceId: unprefixId(namespaceId),
         })
             .select('-secrets')
             .lean();
@@ -22,12 +26,12 @@ export class EndpointRepository {
     async findSecretById(
         id: string,
         workspaceId: string,
-        projectId: string
+        namespaceId: string
     ): Promise<IEndpoint | null> {
         const endpoint = await Endpoint.findOne({
             _id: unprefixId(id),
             workspaceId: unprefixId(workspaceId),
-            projectId: unprefixId(projectId),
+            namespaceId: unprefixId(namespaceId),
         })
             .select('+secrets')
             .lean();
@@ -43,8 +47,8 @@ export class EndpointRepository {
     ): Promise<{ endpoints: IEndpoint[]; total: number }> {
         if (options.query?.workspaceId)
             options.query.workspaceId = unprefixId(options.query.workspaceId as string);
-        if (options.query?.projectId)
-            options.query.projectId = unprefixId(options.query.projectId as string);
+        if (options.query?.namespaceId)
+            options.query.namespaceId = unprefixId(options.query.namespaceId as string);
 
         const skip = options.page ? (options.page - 1) * (options.limit || 10) : 0;
         const [endpoints, total] = await Promise.all([
@@ -65,7 +69,7 @@ export class EndpointRepository {
     async update(
         id: string,
         workspaceId: string,
-        projectId: string,
+        namespaceId: string,
         data: Partial<IEndpoint> | Record<string, unknown>
     ): Promise<IEndpoint | null> {
         // Handle $set operators if present
@@ -75,7 +79,7 @@ export class EndpointRepository {
             {
                 _id: unprefixId(id),
                 workspaceId: unprefixId(workspaceId),
-                projectId: unprefixId(projectId),
+                namespaceId: unprefixId(namespaceId),
             },
             updateOp,
             { new: true, runValidators: true }
@@ -85,11 +89,11 @@ export class EndpointRepository {
         return updated ? (transformWithId(updated, 'endpoint') as unknown as IEndpoint) : null;
     }
 
-    async deleteById(id: string, workspaceId: string, projectId: string): Promise<boolean> {
+    async deleteById(id: string, workspaceId: string, namespaceId: string): Promise<boolean> {
         const deleted = await Endpoint.findOneAndDelete({
             _id: unprefixId(id),
             workspaceId: unprefixId(workspaceId),
-            projectId: unprefixId(projectId),
+            namespaceId: unprefixId(namespaceId),
         })
             .select('-secrets')
             .exec();

@@ -5,8 +5,8 @@ import {
     createRateLimitMiddleware,
 } from '@/core/middlewares/rate-limiter.middleware';
 
-// Lazy wrappers for project routes rate limiter (user-based)
-export const projectReadRateLimiter = async (c: AppContext, next: () => Promise<void>) => {
+// Lazy wrappers for namespace routes rate limiter (user-based)
+export const namespaceReadRateLimiter = async (c: AppContext, next: () => Promise<void>) => {
     const limiter = createRateLimitMiddleware(
         createSlidingWindowLimiter({
             points: config.security.rateLimiter.protected.normal.points,
@@ -14,12 +14,12 @@ export const projectReadRateLimiter = async (c: AppContext, next: () => Promise<
             blockDuration: config.security.rateLimiter.protected.normal.blockDuration,
         }),
         c => config.security.rateLimiter.protected.normal.keyPrefix((c as any).user.userId),
-        'Too many project read requests'
+        'Too many namespace read requests'
     );
     return limiter(c, next);
 };
 
-export const projectWriteRateLimiter = async (c: AppContext, next: () => Promise<void>) => {
+export const namespaceWriteRateLimiter = async (c: AppContext, next: () => Promise<void>) => {
     const limiter = createRateLimitMiddleware(
         createSlidingWindowLimiter({
             points: config.security.rateLimiter.protected.medium.points,
@@ -27,7 +27,7 @@ export const projectWriteRateLimiter = async (c: AppContext, next: () => Promise
             blockDuration: config.security.rateLimiter.protected.medium.blockDuration,
         }),
         c => config.security.rateLimiter.protected.medium.keyPrefix((c as any).user.userId),
-        'Too many project write requests'
+        'Too many namespace write requests'
     );
     return limiter(c, next);
 };

@@ -1,5 +1,5 @@
 export interface SQLAnalyticsDispatchDay {
-    project_id: string;
+    namespace_id: string;
     target_id: string | null;
     event_type: string | null;
     response_code: number | null;
@@ -13,7 +13,7 @@ export interface SQLAnalyticsDispatchDay {
 }
 
 export interface SQLAnalyticsIngestDay {
-    project_id: string;
+    namespace_id: string;
     source_id: string | null;
     processing_status: number | null;
     bucket_day: string; // Date string YYYY-MM-DD

@@ -1,16 +1,16 @@
-import { DeliveryStatus } from "@kyrazo/shared";
-import { BaseProducer } from "./base.producer";
-import type { DispatchEventInput } from "./producer.type";
+import { DeliveryStatus } from '@kyrazo/shared';
+import { BaseProducer } from './base.producer';
+import type { DispatchEventInput } from './producer.type';
 
 class DispatchProducer extends BaseProducer {
     async record(event: DispatchEventInput): Promise<void> {
         const minute = this.getMinuteBucket(event.timestamp);
-        const key = `analytics:rt:${event.projectId}:dispatch:${minute}:${event.targetId}:${event.eventType}:${event.responseCode}`;
+        const key = `analytics:rt:${event.namespaceId}:dispatch:${minute}:${event.targetId}:${event.eventType}:${event.responseCode}`;
 
         // Idempotency check
         if (event.deliveryId) {
             const dedupKey = `analytics:dedup:${event.deliveryId}:${event.status}`;
-            const isNew = await this.redis.set(dedupKey, "1", "EX", 3600, "NX");
+            const isNew = await this.redis.set(dedupKey, '1', 'EX', 3600, 'NX');
             if (!isNew) return;
         }
 
@@ -23,7 +23,7 @@ class DispatchProducer extends BaseProducer {
         // If we exclude PROCESSING from Total:
         // Retry: Processing(0) -> Delivered(1) = 1 Total. Correct.
         if (event.status !== DeliveryStatus.PROCESSING) {
-            pipeline.hincrby(key, "total", 1);
+            pipeline.hincrby(key, 'total', 1);
         }
 
         if (event.status === DeliveryStatus.DELIVERED) {
@@ -41,8 +41,8 @@ class DispatchProducer extends BaseProducer {
             pipeline.hincrby(key, event.status, 1);
         }
 
-        pipeline.hincrby(key, "latency_sum", event.latencyMs);
-        pipeline.hincrby(key, "latency_count", 1);
+        pipeline.hincrby(key, 'latency_sum', event.latencyMs);
+        pipeline.hincrby(key, 'latency_count', 1);
 
         pipeline.eval(
             `
@@ -54,7 +54,7 @@ class DispatchProducer extends BaseProducer {
       `,
             1,
             key,
-            event.latencyMs,
+            event.latencyMs
         );
 
         pipeline.expire(key, 120);

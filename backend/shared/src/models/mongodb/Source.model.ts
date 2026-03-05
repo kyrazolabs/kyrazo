@@ -65,9 +65,9 @@ const SourceSchema = new Schema<ISource>(
             required: true,
             index: true,
         },
-        projectId: {
+        namespaceId: {
             type: Schema.Types.ObjectId,
-            ref: 'Project',
+            ref: 'Namespace',
             required: true,
             index: true,
         },
@@ -189,8 +189,8 @@ SourceSchema.statics.findByWorkspace = function (workspaceId: string) {
     return this.find({ workspaceId: unprefixId(workspaceId) });
 };
 
-SourceSchema.statics.findByProject = function (projectId: string) {
-    return this.find({ projectId: unprefixId(projectId) });
+SourceSchema.statics.findByNamespace = function (namespaceId: string) {
+    return this.find({ namespaceId: unprefixId(namespaceId) });
 };
 
 SourceSchema.statics.findActive = function () {

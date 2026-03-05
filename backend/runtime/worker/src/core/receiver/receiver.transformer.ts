@@ -21,7 +21,7 @@ export class ReceiverTransformer {
             event_id: event.eventId,
 
             workspace_id: event.workspaceId,
-            project_id: event.projectId,
+            namespace_id: event.namespaceId,
             user_id: event.userId ?? '',
 
             source_id: event.sourceId,

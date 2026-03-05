@@ -2,10 +2,10 @@ import { Context, Next } from 'hono';
 
 import {
     IErrorResponse,
-    IProject,
+    INamespace,
     IUserWorkspace,
     logger,
-    Project,
+    Namespace,
     UserWorkspace,
     unprefixId,
 } from '@kyrazo/shared';
@@ -17,7 +17,7 @@ import { Types } from 'mongoose';
 export interface AppContext extends Context {
     user?: JWTPayload;
     workspace?: IUserWorkspace;
-    project?: IProject & { projectId: Types.ObjectId };
+    namespace?: INamespace & { namespaceId: Types.ObjectId };
 }
 
 /**
@@ -87,9 +87,9 @@ export const authenticate = async (c: AppContext, next: Next) => {
 
 /**
  * @title requireOwnership Middleware
- * @description Middleware to require ownership of a resource (ws, pr, etc.). Proceeds only if the user is the owner.
+ * @description Middleware to require ownership of a resource (ws, ns, etc.). Proceeds only if the user is the owner.
  */
-export const requireOwnership = (resourceType: 'workspace' | 'project') => {
+export const requireOwnership = (resourceType: 'workspace' | 'namespace') => {
     return async (c: AppContext, next: Next) => {
         try {
             const userId = c.user?.userId;
@@ -136,8 +136,8 @@ export const requireOwnership = (resourceType: 'workspace' | 'project') => {
                         unprefixId(resourceId)!
                     );
                     break;
-                case 'project':
-                    isOwner = await Project.isUserOwner(
+                case 'namespace':
+                    isOwner = await Namespace.isUserOwner(
                         unprefixId(userId)!,
                         unprefixId(resourceId)!
                     );

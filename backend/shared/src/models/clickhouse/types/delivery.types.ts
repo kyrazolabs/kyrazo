@@ -11,7 +11,7 @@ export interface SQLDeliveryAttempt {
     delivery_id: string; // UUID
 
     workspace_id: string;
-    project_id: string;
+    namespace_id: string;
 
     event_id: string; // UUID
     event_type: string;

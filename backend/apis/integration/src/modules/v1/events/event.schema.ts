@@ -58,7 +58,7 @@ export type PublishedEventInput = z.infer<typeof PublishEventSchema>;
 export type CreatePublishedEvent = z.infer<typeof PublishEventSchema> & {
     eventId: string;
     workspaceId: string;
-    projectId: string;
+    namespaceId: string;
     sourceType: 'publish';
     timestamp: number;
     shard: number;

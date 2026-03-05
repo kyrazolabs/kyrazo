@@ -1,27 +1,27 @@
-import { Target, type ITarget } from "@kyrazo/shared";
+import { Target, type ITarget } from '@kyrazo/shared';
 
 export class TargetRepository {
-    async getTargetsByWorkspaceIdAndProjectIdAndTargetIds(
+    async getTargetsByWorkspaceIdAndNamespaceIdAndTargetIds(
         workspaceId: string,
-        projectId: string,
-        targetIds: string[],
+        namespaceId: string,
+        targetIds: string[]
     ): Promise<ITarget[]> {
-        return await Target.findActiveByWorkspaceAndProjectAndTargetIds(
+        return await Target.findActiveByWorkspaceAndNamespaceAndTargetIds(
             workspaceId,
-            projectId,
-            targetIds,
+            namespaceId,
+            targetIds
         );
     }
 
     async getTargetById(
         targetId: string,
         workspaceId: string,
-        projectId: string,
+        namespaceId: string
     ): Promise<ITarget | null> {
-        return await Target.findActiveByWorkspaceAndProjectAndTargetId(
+        return await Target.findActiveByWorkspaceAndNamespaceAndTargetId(
             workspaceId,
-            projectId,
-            targetId,
+            namespaceId,
+            targetId
         );
     }
 }

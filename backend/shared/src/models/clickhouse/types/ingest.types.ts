@@ -4,7 +4,7 @@ export interface SQLIngestEvent {
     event_id: string; // UUID
 
     workspace_id: string;
-    project_id: string;
+    namespace_id: string;
     user_id: string;
 
     source_id: string;

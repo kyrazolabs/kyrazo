@@ -62,7 +62,7 @@ const subscriptionSchema = new Schema<ISubscription>(
                     type: Number,
                     required: true,
                 },
-                maxProjects: {
+                maxNamespaces: {
                     type: Number,
                     required: true,
                 },

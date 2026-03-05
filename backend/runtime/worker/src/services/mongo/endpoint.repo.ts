@@ -1,27 +1,27 @@
-import { Endpoint, type IEndpoint } from "@kyrazo/shared";
+import { Endpoint, type IEndpoint } from '@kyrazo/shared';
 
 export class EndpointRepository {
-    async getEndpointsByWorkspaceIdAndProjectIdAndEndpointIds(
+    async getEndpointsByWorkspaceIdAndNamespaceIdAndEndpointIds(
         workspaceId: string,
-        projectId: string,
-        endpointIds: string[],
+        namespaceId: string,
+        endpointIds: string[]
     ): Promise<IEndpoint[]> {
-        return await Endpoint.findActiveByWorkspaceAndProjectAndIds(
+        return await Endpoint.findActiveByWorkspaceAndNamespaceAndIds(
             workspaceId,
-            projectId,
-            endpointIds,
+            namespaceId,
+            endpointIds
         );
     }
 
     async getEndpointById(
         endpointId: string,
         workspaceId: string,
-        projectId: string,
+        namespaceId: string
     ): Promise<IEndpoint | null> {
-        return await Endpoint.findActiveByWorkspaceAndProjectAndId(
+        return await Endpoint.findActiveByWorkspaceAndNamespaceAndId(
             workspaceId,
-            projectId,
-            endpointId,
+            namespaceId,
+            endpointId
         );
     }
 }

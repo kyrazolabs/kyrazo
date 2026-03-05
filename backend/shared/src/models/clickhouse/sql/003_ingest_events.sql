@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS ingest_events (
     event_id UUID CODEC(ZSTD(3)),
     workspace_id LowCardinality(String),
-    project_id   LowCardinality(String),
+    namespace_id   LowCardinality(String),
     user_id      LowCardinality(String),
 
     source_id    LowCardinality(String),
@@ -33,7 +33,7 @@ ENGINE = MergeTree
 PARTITION BY toYYYYMM(created_at)
 ORDER BY (
     workspace_id,
-    project_id,
+    namespace_id,
     created_at,
     processing_status,
     event_id

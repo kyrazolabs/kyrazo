@@ -12,7 +12,7 @@ import {
 export const analyticsDispatchDay = pgTable(
     'analytics_dispatch_day',
     {
-        projectId: varchar('project_id', { length: 50 }).notNull(),
+        namespaceId: varchar('namespace_id', { length: 50 }).notNull(),
 
         // nullable للتوسعة
         targetId: varchar('target_id', { length: 50 }),
@@ -38,25 +38,16 @@ export const analyticsDispatchDay = pgTable(
     },
     t => ({
         pk: primaryKey({
-            columns: [
-                t.projectId,
-                t.bucketDay,
-                t.targetId,
-                t.eventType,
-                t.responseCode,
-            ],
+            columns: [t.namespaceId, t.bucketDay, t.targetId, t.eventType, t.responseCode],
         }),
-        projectDayIdx: index('dispatch_day_project_idx').on(
-            t.projectId,
-            t.bucketDay
-        ),
+        namespaceDayIdx: index('dispatch_day_namespace_idx').on(t.namespaceId, t.bucketDay),
     })
 );
 
 export const analyticsIngestDay = pgTable(
     'analytics_ingest_day',
     {
-        projectId: varchar('project_id', { length: 50 }).notNull(),
+        namespaceId: varchar('namespace_id', { length: 50 }).notNull(),
 
         sourceId: varchar('source_id', { length: 50 }),
         processingStatus: smallint('processing_status'), // 0 pending, 1 success, 2 failed
@@ -72,11 +63,8 @@ export const analyticsIngestDay = pgTable(
     },
     t => ({
         pk: primaryKey({
-            columns: [t.projectId, t.bucketDay, t.sourceId, t.processingStatus],
+            columns: [t.namespaceId, t.bucketDay, t.sourceId, t.processingStatus],
         }),
-        projectDayIdx: index('ingest_day_project_idx').on(
-            t.projectId,
-            t.bucketDay
-        ),
+        namespaceDayIdx: index('ingest_day_namespace_idx').on(t.namespaceId, t.bucketDay),
     })
 );

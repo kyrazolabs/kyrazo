@@ -10,7 +10,7 @@ export interface ISource extends Document {
     id: string;
     userId: Types.ObjectId;
     workspaceId: Types.ObjectId;
-    projectId: Types.ObjectId;
+    namespaceId: Types.ObjectId;
     name: string;
     description?: string;
     status: 'active' | 'inactive';

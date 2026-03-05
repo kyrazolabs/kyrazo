@@ -1,7 +1,7 @@
 import { Types } from 'mongoose';
 
 export const ID_PREFIXES = {
-    project: 'pro',
+    namespace: 'ns',
     source: 'src',
     target: 'trg',
     endpoint: 'end',
@@ -98,7 +98,7 @@ export function transformWithId<T>(data: T, type: IdType): TransformedWithId<T> 
         // Common ID fields that should be prefixed
         const idFields: Record<string, IdType> = {
             workspaceId: 'workspace',
-            projectId: 'project',
+            namespaceId: 'namespace',
             sourceId: 'source',
             targetId: 'target',
             endpointId: 'endpoint',
@@ -113,7 +113,7 @@ export function transformWithId<T>(data: T, type: IdType): TransformedWithId<T> 
                     value instanceof Types.ObjectId ||
                     (typeof value === 'string' && /^[0-9a-fA-F]{24}$/.test(value))
                 ) {
-                    obj[field] = prefixId(value, idType);
+                    obj[field] = prefixId(value, idType as IdType);
                 }
             }
         }
@@ -121,7 +121,7 @@ export function transformWithId<T>(data: T, type: IdType): TransformedWithId<T> 
         // Recurse into populated objects/arrays
         const commonRefFields: Record<string, IdType> = {
             workspace: 'workspace',
-            project: 'project',
+            namespace: 'namespace',
             source: 'source',
             target: 'target',
             endpoint: 'endpoint',
@@ -130,7 +130,7 @@ export function transformWithId<T>(data: T, type: IdType): TransformedWithId<T> 
 
         for (const [field, idType] of Object.entries(commonRefFields)) {
             if (obj[field] && typeof obj[field] === 'object') {
-                obj[field] = transformWithId(obj[field], idType);
+                obj[field] = transformWithId(obj[field], idType as IdType);
             }
         }
 

@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS dispatched_events (
     event_id UUID CODEC(ZSTD(3)),
 
     workspace_id LowCardinality(String),
-    project_id   LowCardinality(String),
+    namespace_id   LowCardinality(String),
     event_type   LowCardinality(String),
 
     occurred_at DateTime64(3, 'UTC') CODEC(Delta, ZSTD),
@@ -21,7 +21,7 @@ ENGINE = MergeTree
 PARTITION BY toYYYYMM(meta_inserted_at)
 ORDER BY (
     workspace_id,
-    project_id,
+    namespace_id,
     meta_inserted_at,
     event_type,
     event_id

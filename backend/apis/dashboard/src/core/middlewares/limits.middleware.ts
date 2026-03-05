@@ -1,5 +1,5 @@
 import { MiddlewareHandler } from 'hono';
-import { IErrorResponse, IPlanLimits, Project, unprefixId } from '@kyrazo/shared';
+import { IErrorResponse, IPlanLimits, Namespace, unprefixId } from '@kyrazo/shared';
 import { AppContext } from './auth.middleware';
 import { limitService } from '@/shared/services/limit.service';
 import { workspaceRepository } from '@/modules/v1/workspace/workspace.repo';
@@ -18,13 +18,13 @@ export const checkWorkspaceLimits = (limitKey: keyof IPlanLimits): MiddlewareHan
 
         let currentCount = 0;
 
-        if (limitKey === 'maxProjects') {
+        if (limitKey === 'maxNamespaces') {
             if (!workspaceId) {
-                // If no workspace, technically we can't create projects that require workspaceId
+                // If no workspace, technically we can't create namespaces that require workspaceId
                 // But for safety, let's assume 0 if it's not present yet
                 currentCount = 0;
             } else {
-                currentCount = await Project.countDocuments({
+                currentCount = await Namespace.countDocuments({
                     workspaceId: unprefixId(workspaceId.toString()),
                     isDeleted: false,
                 });
