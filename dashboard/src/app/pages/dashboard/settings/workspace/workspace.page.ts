@@ -368,6 +368,8 @@ export class WorkspaceSettingsPage implements OnInit {
             message: `Are you sure you want to remove ${member.user?.firstName} ${member.user?.lastName} from this workspace?`,
             header: 'Remove Member',
             icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Remove',
+            acceptIcon: 'pi pi-trash',
             accept: () => {
                 this.workspaceService
                     .removeUser(this.workspace!.id, member.userId)
@@ -484,6 +486,57 @@ export class WorkspaceSettingsPage implements OnInit {
             });
     }
 
+    leaveWorkspace() {
+        if (!this.workspace || this.currentUserRole === 'owner') {
+            return;
+        }
+
+        this.confirmationService.confirm({
+            message: `Are you sure you want to leave the workspace "${this.workspace.name}"? You will lost access to all resources in this workspace.`,
+            header: 'Leave Workspace',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Leave',
+            acceptIcon: 'pi pi-sign-out',
+            acceptButtonStyleClass: 'p-button-danger rounded-xl!',
+            rejectButtonStyleClass: 'p-button-text rounded-xl!',
+            accept: () => {
+                this.workspaceService.leave(this.workspace!.id).subscribe({
+                    next: (response) => {
+                        if (response.success) {
+                            this.messageService.add({
+                                severity: 'success',
+                                detail: 'You have left the workspace successfully!',
+                            });
+                            this.posthog.capture('workspace_left', {
+                                workspace_id: this.workspace?.id,
+                            });
+
+                            this.storageService.removeItem('workspace');
+                            this.router.navigate(['/']);
+                        } else {
+                            this.messageService.add({
+                                severity: 'error',
+                                summary: 'Error',
+                                detail: 'Failed to leave workspace',
+                            });
+                        }
+                    },
+                    error: (error: any) => {
+                        this.sentry.captureException(error);
+                        this.messageService.add({
+                            severity: 'error',
+                            summary: 'Error',
+                            detail:
+                                error.error?.error?.message ||
+                                'Failed to leave workspace',
+                        });
+                        console.error('Error leaving workspace:', error);
+                    },
+                });
+            },
+        });
+    }
+
     deleteWorkspace() {
         if (!this.workspace || this.currentUserRole !== 'owner') {
             return;
@@ -493,6 +546,8 @@ export class WorkspaceSettingsPage implements OnInit {
             message: `Are you sure you want to delete the workspace "${this.workspace.name}"? This action is permanent and will delete all associated data.`,
             header: 'Delete Workspace',
             icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Delete',
+            acceptIcon: 'pi pi-trash',
             acceptButtonStyleClass: 'p-button-danger rounded-xl!',
             rejectButtonStyleClass: 'p-button-text rounded-xl!',
             accept: () => {
@@ -508,9 +563,7 @@ export class WorkspaceSettingsPage implements OnInit {
                             });
                             // Force storage update and navigate to dash
 
-                            this.storageService.removeItem(
-                                'currentWorkspaceId',
-                            );
+                            this.storageService.removeItem('workspace');
                             this.router.navigate(['/']);
                         } else {
                             this.messageService.add({
