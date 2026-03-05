@@ -1,20 +1,26 @@
-import {
-  queuesName,
-  redisBullmqClient,
-} from "@mail/lib/bullMQ/config.bullmq.js";
+import { queuesName, redisBullmqClient } from "@mail/lib/bullMQ/config.bullmq";
 import type { MailPayloadSchema } from "@mailq/utils/zod";
 import { Worker } from "bullmq";
 import type z from "zod";
-import { HandleMailSend } from "./handle-mail-send.handler.js";
-import type { CreateEmailResponseSuccess } from "resend";
+import { HandleMailSend } from "./handle-mail-send.handler";
+import type nodemailer from "nodemailer";
 
 const worker = new Worker<
   Omit<z.infer<typeof MailPayloadSchema>, "priority">,
-  CreateEmailResponseSuccess
+  nodemailer.SentMessageInfo
 >(
   queuesName.sendMailQueueName,
   async (job) => {
-    return await HandleMailSend.send(job.data);
+    console.log("Worker processing job.id:", job.id);
+    console.log("Worker job.data:", JSON.stringify(job.data, null, 2));
+    try {
+      const result = await HandleMailSend.send(job.data);
+      console.log("HandleMailSend.send result:", result);
+      return result;
+    } catch (error) {
+      console.error("Error in HandleMailSend.send:", error);
+      throw error;
+    }
   },
   {
     connection: redisBullmqClient,
@@ -26,7 +32,7 @@ const worker = new Worker<
       duration: 1000,
     },
     prefix: "mailq",
-  }
+  },
 );
 
 worker.on("completed", async (job, result) => {
