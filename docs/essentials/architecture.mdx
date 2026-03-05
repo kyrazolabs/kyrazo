@@ -53,7 +53,7 @@ To ensure reliability, every accepted event is immediately placed into a **Distr
 A fleet of **Distributed Workers** pulls events from the queue concurrently. This horizontal scaling allows Kyrazo to process millions of events per hour. 
 
 Workers are responsible for:
-- **Routing**: Determining where the event needs to go based on your project configuration.
+- **Routing**: Determining where the event needs to go based on your namespace configuration.
 - **Processing**: Formatting the payload and preparing security signatures.
 - **Dispatching**: Sending the event to its final destination in the background.
 
