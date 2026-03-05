@@ -681,6 +681,55 @@ export class WorkspaceController {
         }
     }
     /**
+     * @title Leave Workspace
+     * @description Allows a user to leave a workspace.
+     */
+    static async leaveWorkspace(c: AppContext): Promise<Response> {
+        try {
+            const userId = c.user?.userId;
+            if (!userId) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'UNAUTHORIZED_USER',
+                            message: 'Unauthorized user',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    401
+                );
+            }
+
+            // @ts-ignore
+            const { workspaceId }: GetWorkspaceByIdInput = c.req.valid('param');
+
+            await workspaceService.leaveWorkspace(workspaceId, userId);
+
+            return c.json<WorkspaceActionResponse>(
+                {
+                    success: true,
+                    message: 'You have left the workspace successfully',
+                },
+                200
+            );
+        } catch (error: any) {
+            logger.error('Leave workspace controller error:', error);
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'LEAVE_WORKSPACE_FAILED',
+                        message: error.message || 'Failed to leave workspace',
+                        requestId: c.get('requestId'),
+                    },
+                },
+                500
+            );
+        }
+    }
+
+    /**
      * @title Get Invitation Details
      * @description Retrieves invitation details by token.
      */

@@ -251,6 +251,23 @@ export class WorkspaceService {
         return workspaceRepository.removeMember(workspaceId, userId);
     }
 
+    async leaveWorkspace(workspaceId: string, userId: string): Promise<boolean> {
+        const workspace = await this.getWorkspaceById(workspaceId);
+        if (!workspace) throw new Error('Workspace not found');
+
+        // Check if user is the owner
+        if (workspace.ownerId.toString() === unprefixId(userId)) {
+            throw new Error(
+                'As the owner, you cannot leave the workspace. You must transfer ownership or delete the workspace first.'
+            );
+        }
+
+        const membership = await workspaceRepository.findMembership(workspaceId, userId);
+        if (!membership) throw new Error('You are not a member of this workspace');
+
+        return workspaceRepository.removeMember(workspaceId, userId);
+    }
+
     async updateMemberRole(
         workspaceId: string,
         userId: string,
