@@ -23,6 +23,7 @@ import { LayoutService } from '@components/service/layout.service';
 import { SourceFormComponent } from '../events/ingest/sources/components/source-form/source-form.component';
 import { EndpointFormComponent } from '../events/ingest/endpoints/components/endpoint-form/endpoint-form.component';
 import { TargetFormComponent } from '../events/dispatch/targets/components/target-form/target-form.component';
+import { TwofaSetupDialogComponent } from '@shared/components/twofa-setup-dialog/twofa-setup-dialog.component';
 
 @Component({
     selector: 'app-shell',
@@ -37,6 +38,7 @@ import { TargetFormComponent } from '../events/dispatch/targets/components/targe
         SourceFormComponent,
         EndpointFormComponent,
         TargetFormComponent,
+        TwofaSetupDialogComponent,
     ],
     templateUrl: './app-shell.html',
     styleUrl: './app-shell.scss',

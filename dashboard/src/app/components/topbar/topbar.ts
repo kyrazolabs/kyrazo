@@ -185,8 +185,11 @@ export class TopbarComponent implements OnInit {
                     this.ss.setItem('project', this.selectedProject.id);
                 }
 
-                // Redirect to Launchpad if no projects exist in this workspace
-                if (this.projects.length === 0) {
+                // Only redirect to Launchpad if no projects exist AND we are not in a settings page
+                if (
+                    this.projects.length === 0 &&
+                    !this.router.url.includes('/settings')
+                ) {
                     this.router.navigate(['/launchpad']);
                 }
 
