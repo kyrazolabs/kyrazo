@@ -1,53 +1,61 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject } from '@angular/core';
 import {
-  Router,
-  NavigationStart,
-  NavigationEnd,
-  NavigationCancel,
-  NavigationError,
-  RouterOutlet,
-} from "@angular/router";
-import { CommonModule } from "@angular/common";
+    Router,
+    NavigationStart,
+    NavigationEnd,
+    NavigationCancel,
+    NavigationError,
+    RouterOutlet,
+} from '@angular/router';
+import { CommonModule } from '@angular/common';
 
-import { ButtonModule } from "primeng/button";
-import { ToastModule } from "primeng/toast";
-import { LoaderService } from "@core/services/loader.service";
-import { SeoService } from "@core/services/seo.service";
-import { PostHogService } from "@core/3rd-party/posthog";
+import { ButtonModule } from 'primeng/button';
+import { ToastModule } from 'primeng/toast';
+import { LoaderService } from '@core/services/loader.service';
+import { SeoService } from '@core/services/seo.service';
+import { PostHogService } from '@core/3rd-party/posthog';
 
-import { routeTransitionAnimations } from "@shared/animations/route.animation";
-import { AppConfig } from "@components/app.config";
+import { routeTransitionAnimations } from '@shared/animations/route.animation';
+import { AppConfig } from '@components/app.config';
+import { OtpDialogComponent } from '@shared/components/otp-dialog/otp-dialog.component';
 @Component({
-  selector: "app-root",
-  imports: [RouterOutlet, CommonModule, ButtonModule, ToastModule, AppConfig],
-  templateUrl: "./app.component.html",
-  styleUrl: "./app.component.scss",
-  animations: [routeTransitionAnimations],
+    selector: 'app-root',
+    imports: [
+        RouterOutlet,
+        CommonModule,
+        ButtonModule,
+        ToastModule,
+        AppConfig,
+        OtpDialogComponent,
+    ],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.scss',
+    animations: [routeTransitionAnimations],
 })
 export class AppComponent {
-  public loader = inject(LoaderService);
-  private posthog = inject(PostHogService);
-  private seoService = inject(SeoService);
+    public loader = inject(LoaderService);
+    private posthog = inject(PostHogService);
+    private seoService = inject(SeoService);
 
-  constructor(private router: Router) {
-    this.seoService.init();
-    this.router.events.subscribe((event) => {
-      if (event instanceof NavigationStart) {
-        this.loader.show();
-      } else if (
-        event instanceof NavigationEnd ||
-        event instanceof NavigationCancel ||
-        event instanceof NavigationError
-      ) {
-        this.loader.hide();
-        if (event instanceof NavigationEnd) {
-          this.posthog.trackPageView();
-        }
-      }
-    });
-  }
+    constructor(private router: Router) {
+        this.seoService.init();
+        this.router.events.subscribe((event) => {
+            if (event instanceof NavigationStart) {
+                this.loader.show();
+            } else if (
+                event instanceof NavigationEnd ||
+                event instanceof NavigationCancel ||
+                event instanceof NavigationError
+            ) {
+                this.loader.hide();
+                if (event instanceof NavigationEnd) {
+                    this.posthog.trackPageView();
+                }
+            }
+        });
+    }
 
-  prepareRoute(outlet: RouterOutlet) {
-    return outlet?.activatedRouteData?.["animation"];
-  }
+    prepareRoute(outlet: RouterOutlet) {
+        return outlet?.activatedRouteData?.['animation'];
+    }
 }

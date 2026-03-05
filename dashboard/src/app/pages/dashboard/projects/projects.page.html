@@ -122,7 +122,9 @@
             <div class="flex flex-col gap-2">
                 <label for="name" class="font-bold">Name</label>
                 <input type="text" pInputText id="name" [(ngModel)]="projectForm.name" required autofocus placeholder="e.g., My Web App, E-commerce API" />
-                <small class="text-red-500" *ngIf="!projectForm.name">Name is required.</small>
+                @if (!projectForm.name) {
+                    <small class="text-red-500">Name is required.</small>
+                }
             </div>
             <div class="flex flex-col gap-2">
                 <label for="description" class="font-bold">Description</label>
@@ -137,7 +139,7 @@
                     @if (!hasWhiteLabelFeature) {
                         <span (click)="dialogService.openBillingDialog()" pTooltip="Upgrade to Pro to customize header prefixes"
                         class="px-2.5 py-0.5 rounded-full bg-primary-500/10 border border-primary-500/30 text-primary-600 shadow-primary-500/20 text-[10px] font-bold uppercase tracking-wider cursor-pointer">
-                        Professional</span>
+                        Pro</span>
                     }
                     <!-- <p-tag *ngIf="!" value="Pro" severity="warn" [rounded]="true" styleClass="text-[10px] py-1 cursor-pointer transition-transform hover:scale-105" (click)="dialogService.openBillingDialog()" pTooltip="Upgrade to Pro to customize header prefixes" /> -->
                 </div>
@@ -150,7 +152,9 @@
                     [disabled]="!hasWhiteLabelFeature"
                     class="rounded-xl!"
                 />
-                <small class="opacity-60 text-xs" *ngIf="hasWhiteLabelFeature">This will replace the default "X-Webhook" prefix.</small>
+                @if (hasWhiteLabelFeature) {
+                    <small class="opacity-60 text-xs">This will replace the default "X-Webhook" prefix.</small>
+                }
             </div>
         </div>
     </ng-template>
