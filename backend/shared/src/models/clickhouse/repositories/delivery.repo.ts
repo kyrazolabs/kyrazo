@@ -1,6 +1,7 @@
 import { clickhouseConfig } from '../../../configs/clickhouse';
 import logger from '../../../configs/logger';
 import { SQLDeliveryAttempt } from '../types';
+import { unprefixId } from '../../../utils/id';
 
 export class DeliveryRepo {
     private static getClient() {
@@ -14,10 +15,7 @@ export class DeliveryRepo {
                 logger.warn(
                     `ClickHouse client not available, skipping insert into delivery_attempts`
                 );
-                logger.debug(
-                    `Data that would be inserted:`,
-                    JSON.stringify(data, null, 2)
-                );
+                logger.debug(`Data that would be inserted:`, JSON.stringify(data, null, 2));
                 return;
             }
 
@@ -27,14 +25,9 @@ export class DeliveryRepo {
                 format: 'JSONEachRow',
             });
 
-            logger.info(
-                `Successfully inserted ${data.length} record(s) into delivery_attempts`
-            );
+            logger.info(`Successfully inserted ${data.length} record(s) into delivery_attempts`);
         } catch (error) {
-            logger.error(
-                `Failed to insert data into delivery_attempts:`,
-                error as Error
-            );
+            logger.error(`Failed to insert data into delivery_attempts:`, error as Error);
             logger.warn('Continuing without ClickHouse analytics storage');
             throw error;
         }
@@ -50,9 +43,7 @@ export class DeliveryRepo {
         try {
             const client = this.getClient();
             if (!client) {
-                logger.warn(
-                    'ClickHouse client not available, returning empty result for query'
-                );
+                logger.warn('ClickHouse client not available, returning empty result for query');
                 return { data: [], total: 0 };
             }
 
@@ -64,8 +55,8 @@ export class DeliveryRepo {
                 'project_id = {projectId:String}',
             ];
             const params: Record<string, string | number> = {
-                workspaceId,
-                projectId,
+                workspaceId: unprefixId(workspaceId)!,
+                projectId: unprefixId(projectId)!,
                 limit: perPage,
                 offset: skip,
             };
@@ -103,15 +94,11 @@ export class DeliveryRepo {
             ]);
 
             const data = await rows.json<SQLDeliveryAttempt>();
-            const total =
-                (await countRows.json<{ total: number }>())[0]?.total ?? 0;
+            const total = (await countRows.json<{ total: number }>())[0]?.total ?? 0;
 
             return { data, total };
         } catch (error) {
-            logger.error(
-                'Unexpected error in DeliveryRepo.getDeliveries',
-                error as Error
-            );
+            logger.error('Unexpected error in DeliveryRepo.getDeliveries', error as Error);
             throw error;
         }
     }
@@ -133,9 +120,7 @@ export class DeliveryRepo {
         try {
             const client = this.getClient();
             if (!client) {
-                logger.warn(
-                    'ClickHouse client not available, returning empty result for query'
-                );
+                logger.warn('ClickHouse client not available, returning empty result for query');
                 return { data: [], total: 0 };
             }
 
@@ -147,8 +132,8 @@ export class DeliveryRepo {
                 'project_id = {projectId:String}',
             ];
             const params: Record<string, string | number> = {
-                workspaceId,
-                projectId,
+                workspaceId: unprefixId(workspaceId)!,
+                projectId: unprefixId(projectId)!,
                 limit: perPage,
                 offset: skip,
             };
@@ -197,15 +182,11 @@ export class DeliveryRepo {
                 success: number;
                 failed: number;
             }>();
-            const total =
-                (await countRows.json<{ total: number }>())[0]?.total ?? 0;
+            const total = (await countRows.json<{ total: number }>())[0]?.total ?? 0;
 
             return { data, total };
         } catch (error) {
-            logger.error(
-                'Unexpected error in DeliveryRepo.getTargets',
-                error as Error
-            );
+            logger.error('Unexpected error in DeliveryRepo.getTargets', error as Error);
             throw error;
         }
     }
@@ -225,9 +206,7 @@ export class DeliveryRepo {
         try {
             const client = this.getClient();
             if (!client) {
-                logger.warn(
-                    'ClickHouse client not available, returning empty result for query'
-                );
+                logger.warn('ClickHouse client not available, returning empty result for query');
                 return { data: [], total: 0 };
             }
 
@@ -237,8 +216,8 @@ export class DeliveryRepo {
             const targeet = this.decodeTarget(target);
             const params: Record<string, string | number> = {
                 targeet,
-                workspaceId,
-                projectId,
+                workspaceId: unprefixId(workspaceId)!,
+                projectId: unprefixId(projectId)!,
                 limit: perPage,
                 offset: skip,
             };
@@ -269,8 +248,7 @@ export class DeliveryRepo {
             ]);
 
             const data = await rows.json<SQLDeliveryAttempt>();
-            const total =
-                (await countRows.json<{ total: number }>())[0]?.total ?? 0;
+            const total = (await countRows.json<{ total: number }>())[0]?.total ?? 0;
 
             return { data, total };
         } catch (error) {
@@ -289,9 +267,7 @@ export class DeliveryRepo {
         try {
             const client = this.getClient();
             if (!client) {
-                logger.warn(
-                    'ClickHouse client not available, returning empty result for query'
-                );
+                logger.warn('ClickHouse client not available, returning empty result for query');
                 return { data: [], total: 0 };
             }
 
@@ -313,9 +289,9 @@ export class DeliveryRepo {
                     query,
                     format: 'JSONEachRow',
                     query_params: {
-                        sourceId,
-                        workspaceId,
-                        projectId,
+                        sourceId: unprefixId(sourceId)!,
+                        workspaceId: unprefixId(workspaceId)!,
+                        projectId: unprefixId(projectId)!,
                         limit: perPage,
                         offset: skip,
                     },
@@ -323,7 +299,11 @@ export class DeliveryRepo {
                 client.query({
                     query: countQuery,
                     format: 'JSONEachRow',
-                    query_params: { sourceId, workspaceId, projectId },
+                    query_params: {
+                        sourceId: unprefixId(sourceId)!,
+                        workspaceId: unprefixId(workspaceId)!,
+                        projectId: unprefixId(projectId)!,
+                    },
                 }),
             ]);
 
@@ -331,10 +311,7 @@ export class DeliveryRepo {
             const total = (await countRows.json<{ total: number }>())[0].total;
             return { data, total };
         } catch (error) {
-            logger.error(
-                'Unexpected error in DeliveryRepo.getDeliveriesBySource',
-                error as Error
-            );
+            logger.error('Unexpected error in DeliveryRepo.getDeliveriesBySource', error as Error);
             throw error;
         }
     }
@@ -347,15 +324,13 @@ export class DeliveryRepo {
         try {
             const client = this.getClient();
             if (!client) {
-                logger.warn(
-                    'ClickHouse client not available, returning empty result for query'
-                );
+                logger.warn('ClickHouse client not available, returning empty result for query');
                 return [];
             }
 
             const query = `
                 SELECT * FROM delivery_attempts
-                WHERE delivery_id = '${deliveryId}' AND workspace_id = '${workspaceId}' AND project_id = '${projectId}'
+                WHERE delivery_id = '${unprefixId(deliveryId)}' AND workspace_id = '${unprefixId(workspaceId)}' AND project_id = '${unprefixId(projectId)}'
                 LIMIT 1
             `;
 
@@ -372,16 +347,11 @@ export class DeliveryRepo {
         }
     }
 
-    static async getPendingEvents(
-        workspaceId: string,
-        limit = 100
-    ): Promise<SQLDeliveryAttempt[]> {
+    static async getPendingEvents(workspaceId: string, limit = 100): Promise<SQLDeliveryAttempt[]> {
         try {
             const client = this.getClient();
             if (!client) {
-                logger.warn(
-                    'ClickHouse client not available, returning empty result for query'
-                );
+                logger.warn('ClickHouse client not available, returning empty result for query');
                 return [];
             }
             const query = `
@@ -416,9 +386,7 @@ export class DeliveryRepo {
         try {
             const client = this.getClient();
             if (!client) {
-                logger.warn(
-                    'ClickHouse client not available, returning empty result for query'
-                );
+                logger.warn('ClickHouse client not available, returning empty result for query');
                 return {
                     total_deliveries: 0,
                     successful_deliveries: 0,
@@ -438,9 +406,9 @@ export class DeliveryRepo {
             `;
 
             if (workspace_id && project_id) {
-                query += ` WHERE workspace_id = '${workspace_id}' AND project_id = '${project_id}'`;
+                query += ` WHERE workspace_id = '${unprefixId(workspace_id)}' AND project_id = '${unprefixId(project_id)}'`;
             } else if (workspace_id) {
-                query += ` WHERE workspace_id = '${workspace_id}'`;
+                query += ` WHERE workspace_id = '${unprefixId(workspace_id)}'`;
             }
 
             const rows = await client.query({
@@ -502,9 +470,7 @@ export class DeliveryRepo {
         try {
             const client = this.getClient();
             if (!client) {
-                logger.warn(
-                    'ClickHouse client not available, returning empty result for query'
-                );
+                logger.warn('ClickHouse client not available, returning empty result for query');
                 return {
                     stats: {
                         total_deliveries: 0,
@@ -542,8 +508,8 @@ export class DeliveryRepo {
 
             const params: Record<string, string | number> = {
                 days,
-                workspaceId,
-                projectId,
+                workspaceId: unprefixId(workspaceId)!,
+                projectId: unprefixId(projectId)!,
                 targeet,
             };
 
@@ -568,7 +534,7 @@ export class DeliveryRepo {
                 FROM delivery_attempts
                 WHERE toDate(scheduled_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
-                    AND project_id = {projectId:String} 
+                    AND project_id = {projectId:String}
                     AND target = {targeet:String}
                 GROUP BY day
                 ORDER BY day DESC;
@@ -581,7 +547,7 @@ export class DeliveryRepo {
                 FROM delivery_attempts
                 WHERE toDate(scheduled_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
-                    AND project_id = {projectId:String} 
+                    AND project_id = {projectId:String}
                     AND target = {targeet:String}
                 GROUP BY event_type
                 ORDER BY total DESC
@@ -602,33 +568,29 @@ export class DeliveryRepo {
                 ORDER BY total DESC;
             `;
 
-            const [
-                stats,
-                deliveryTrends,
-                topEventTypes,
-                statusCodeDistribution,
-            ] = await Promise.all([
-                client.query({
-                    query: statsQuery,
-                    format: 'JSONEachRow',
-                    query_params: params,
-                }),
-                client.query({
-                    query: deliveryTrendsQuery,
-                    format: 'JSONEachRow',
-                    query_params: params,
-                }),
-                client.query({
-                    query: topEventTypesQuery,
-                    format: 'JSONEachRow',
-                    query_params: params,
-                }),
-                client.query({
-                    query: statusCodeDistributionQuery,
-                    format: 'JSONEachRow',
-                    query_params: params,
-                }),
-            ]);
+            const [stats, deliveryTrends, topEventTypes, statusCodeDistribution] =
+                await Promise.all([
+                    client.query({
+                        query: statsQuery,
+                        format: 'JSONEachRow',
+                        query_params: params,
+                    }),
+                    client.query({
+                        query: deliveryTrendsQuery,
+                        format: 'JSONEachRow',
+                        query_params: params,
+                    }),
+                    client.query({
+                        query: topEventTypesQuery,
+                        format: 'JSONEachRow',
+                        query_params: params,
+                    }),
+                    client.query({
+                        query: statusCodeDistributionQuery,
+                        format: 'JSONEachRow',
+                        query_params: params,
+                    }),
+                ]);
 
             const resultStats = await stats.json<{
                 total_deliveries: number;
@@ -652,14 +614,13 @@ export class DeliveryRepo {
                 event_type: string;
                 total: number;
             }>();
-            const resultStatusCodeDistribution =
-                await statusCodeDistribution.json<{
-                    workspace_id: string;
-                    project_id: string;
-                    target: string;
-                    response_code: number;
-                    total: number;
-                }>();
+            const resultStatusCodeDistribution = await statusCodeDistribution.json<{
+                workspace_id: string;
+                project_id: string;
+                target: string;
+                response_code: number;
+                total: number;
+            }>();
 
             return {
                 stats: resultStats[0] || {
@@ -669,9 +630,7 @@ export class DeliveryRepo {
                     pending_deliveries: 0,
                     average_delivery_time: null,
                 },
-                deliveryTrends: resultDeliveryTrends.length
-                    ? resultDeliveryTrends
-                    : [],
+                deliveryTrends: resultDeliveryTrends.length ? resultDeliveryTrends : [],
                 topEventTypes: resultTopEventTypes || [
                     {
                         target: '',
@@ -725,9 +684,7 @@ export class DeliveryRepo {
         try {
             const client = this.getClient();
             if (!client) {
-                logger.warn(
-                    'ClickHouse client not available, returning empty result for query'
-                );
+                logger.warn('ClickHouse client not available, returning empty result for query');
                 return {
                     stats: {
                         total_targets: 0,
@@ -764,8 +721,8 @@ export class DeliveryRepo {
 
             const params: Record<string, string | number> = {
                 days,
-                workspaceId,
-                projectId,
+                workspaceId: unprefixId(workspaceId)!,
+                projectId: unprefixId(projectId)!,
             };
 
             const statsQuery = `
@@ -790,7 +747,7 @@ export class DeliveryRepo {
                 FROM delivery_attempts
                 WHERE toDate(scheduled_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
-                    AND project_id = {projectId:String} 
+                    AND project_id = {projectId:String}
                 GROUP BY day
                 ORDER BY day DESC;
             `;
@@ -802,7 +759,7 @@ export class DeliveryRepo {
                 FROM delivery_attempts
                 WHERE toDate(scheduled_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
-                    AND project_id = {projectId:String} 
+                    AND project_id = {projectId:String}
                 GROUP BY event_type
                 ORDER BY total DESC
                 LIMIT 10;
@@ -821,33 +778,29 @@ export class DeliveryRepo {
                 ORDER BY total DESC;
             `;
 
-            const [
-                stats,
-                deliveryTrends,
-                topEventTypes,
-                statusCodeDistribution,
-            ] = await Promise.all([
-                client.query({
-                    query: statsQuery,
-                    format: 'JSONEachRow',
-                    query_params: params,
-                }),
-                client.query({
-                    query: deliveryTrendsQuery,
-                    format: 'JSONEachRow',
-                    query_params: params,
-                }),
-                client.query({
-                    query: topEventTypesQuery,
-                    format: 'JSONEachRow',
-                    query_params: params,
-                }),
-                client.query({
-                    query: statusCodeDistributionQuery,
-                    format: 'JSONEachRow',
-                    query_params: params,
-                }),
-            ]);
+            const [stats, deliveryTrends, topEventTypes, statusCodeDistribution] =
+                await Promise.all([
+                    client.query({
+                        query: statsQuery,
+                        format: 'JSONEachRow',
+                        query_params: params,
+                    }),
+                    client.query({
+                        query: deliveryTrendsQuery,
+                        format: 'JSONEachRow',
+                        query_params: params,
+                    }),
+                    client.query({
+                        query: topEventTypesQuery,
+                        format: 'JSONEachRow',
+                        query_params: params,
+                    }),
+                    client.query({
+                        query: statusCodeDistributionQuery,
+                        format: 'JSONEachRow',
+                        query_params: params,
+                    }),
+                ]);
 
             const resultStats = await stats.json<{
                 total_targets: number;
@@ -872,14 +825,13 @@ export class DeliveryRepo {
                 event_type: string;
                 total: number;
             }>();
-            const resultStatusCodeDistribution =
-                await statusCodeDistribution.json<{
-                    workspace_id: string;
-                    project_id: string;
-                    target: string;
-                    response_code: number;
-                    total: number;
-                }>();
+            const resultStatusCodeDistribution = await statusCodeDistribution.json<{
+                workspace_id: string;
+                project_id: string;
+                target: string;
+                response_code: number;
+                total: number;
+            }>();
 
             return {
                 stats: resultStats[0] || {
@@ -890,9 +842,7 @@ export class DeliveryRepo {
                     pending_deliveries: 0,
                     average_delivery_time: null,
                 },
-                deliveryTrends: resultDeliveryTrends.length
-                    ? resultDeliveryTrends
-                    : [],
+                deliveryTrends: resultDeliveryTrends.length ? resultDeliveryTrends : [],
                 topEventTypes: resultTopEventTypes || [
                     {
                         target: '',

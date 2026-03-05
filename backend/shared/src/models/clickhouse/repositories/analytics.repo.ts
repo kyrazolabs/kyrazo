@@ -1,6 +1,7 @@
 import { clickhouseConfig } from '../../../configs/clickhouse';
 import logger from '../../../configs/logger';
 import { SQLAnalyticsDispatchDay, SQLAnalyticsIngestDay } from '../types';
+import { unprefixId } from '../../../utils/id';
 
 export class AnalyticsRepo {
     private static getClient() {
@@ -108,7 +109,7 @@ export class AnalyticsRepo {
             const client = this.getClient();
             if (!client) return null;
 
-            const params = { days, projectId };
+            const params = { days, projectId: unprefixId(projectId) };
 
             // 1. Overall Stats
             const statsQuery = `
@@ -228,7 +229,11 @@ export class AnalyticsRepo {
             const client = this.getClient();
             if (!client) return null;
 
-            const params = { days, projectId, targetId };
+            const params = {
+                days,
+                projectId: unprefixId(projectId),
+                targetId: unprefixId(targetId),
+            };
 
             const statsQuery = `
                 SELECT
@@ -343,7 +348,7 @@ export class AnalyticsRepo {
             const client = this.getClient();
             if (!client) return null;
 
-            const params = { days, projectId };
+            const params = { days, projectId: unprefixId(projectId) };
 
             const statsQuery = `
                 SELECT

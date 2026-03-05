@@ -1,5 +1,6 @@
 import { clickhouseConfig, logger } from '../../../configs';
 import { SQLIngestEvent } from '../types';
+import { unprefixId } from '../../../utils/id';
 
 export class IngestRepo {
     private static getClient() {
@@ -12,10 +13,7 @@ export class IngestRepo {
                 logger.warn(
                     `ClickHouse client not available, skipping insert into delivery_attempts`
                 );
-                logger.debug(
-                    `Data that would be inserted:`,
-                    JSON.stringify(data, null, 2)
-                );
+                logger.debug(`Data that would be inserted:`, JSON.stringify(data, null, 2));
                 return;
             }
 
@@ -25,14 +23,9 @@ export class IngestRepo {
                 format: 'JSONEachRow',
             });
 
-            logger.info(
-                `Successfully inserted ${data.length} record(s) into ingest_events`
-            );
+            logger.info(`Successfully inserted ${data.length} record(s) into ingest_events`);
         } catch (error) {
-            logger.error(
-                `Failed to insert data into ingest_events:`,
-                error as Error
-            );
+            logger.error(`Failed to insert data into ingest_events:`, error as Error);
             logger.warn('Continuing without ClickHouse analytics storage');
             throw error;
         }
@@ -46,9 +39,7 @@ export class IngestRepo {
         try {
             const client = this.getClient();
             if (!client) {
-                logger.warn(
-                    'ClickHouse client not available, returning empty result for query'
-                );
+                logger.warn('ClickHouse client not available, returning empty result for query');
                 return [];
             }
 
@@ -58,9 +49,9 @@ export class IngestRepo {
                     LIMIT 1
                 `;
             const params: Record<string, string | number> = {
-                eventId,
-                workspaceId,
-                projectId,
+                eventId: unprefixId(eventId)!,
+                workspaceId: unprefixId(workspaceId)!,
+                projectId: unprefixId(projectId)!,
             };
 
             const rows = await client.query({
@@ -86,9 +77,7 @@ export class IngestRepo {
         try {
             const client = this.getClient();
             if (!client) {
-                logger.warn(
-                    'ClickHouse client not available, returning empty result for query'
-                );
+                logger.warn('ClickHouse client not available, returning empty result for query');
                 return { data: [], total: 0 };
             }
 
@@ -100,8 +89,8 @@ export class IngestRepo {
                 'project_id = {projectId:String}',
             ];
             const params: Record<string, string | number> = {
-                workspaceId,
-                projectId,
+                workspaceId: unprefixId(workspaceId)!,
+                projectId: unprefixId(projectId)!,
                 limit: perPage,
                 offset: skip,
             };
@@ -139,15 +128,11 @@ export class IngestRepo {
             ]);
 
             const data = await rows.json<SQLIngestEvent>();
-            const total =
-                (await countRows.json<{ total: number }>())[0]?.total ?? 0;
+            const total = (await countRows.json<{ total: number }>())[0]?.total ?? 0;
 
             return { data, total };
         } catch (error) {
-            logger.error(
-                'Unexpected error in DeliveryRepo.getDeliveries',
-                error as Error
-            );
+            logger.error('Unexpected error in DeliveryRepo.getDeliveries', error as Error);
             throw error;
         }
     }
@@ -162,9 +147,7 @@ export class IngestRepo {
         try {
             const client = this.getClient();
             if (!client) {
-                logger.warn(
-                    'ClickHouse client not available, returning empty result for query'
-                );
+                logger.warn('ClickHouse client not available, returning empty result for query');
                 return { data: [], total: 0 };
             }
 
@@ -186,9 +169,9 @@ export class IngestRepo {
                     query,
                     format: 'JSONEachRow',
                     query_params: {
-                        sourceId,
-                        workspaceId,
-                        projectId,
+                        sourceId: unprefixId(sourceId)!,
+                        workspaceId: unprefixId(workspaceId)!,
+                        projectId: unprefixId(projectId)!,
                         limit: perPage,
                         offset: skip,
                     },
@@ -196,7 +179,11 @@ export class IngestRepo {
                 client.query({
                     query: countQuery,
                     format: 'JSONEachRow',
-                    query_params: { sourceId, workspaceId, projectId },
+                    query_params: {
+                        sourceId: unprefixId(sourceId)!,
+                        workspaceId: unprefixId(workspaceId)!,
+                        projectId: unprefixId(projectId)!,
+                    },
                 }),
             ]);
 
@@ -204,10 +191,7 @@ export class IngestRepo {
             const total = (await countRows.json<{ total: number }>())[0].total;
             return { data, total };
         } catch (error) {
-            logger.error(
-                'Unexpected error in DeliveryRepo.getDeliveriesBySource',
-                error as Error
-            );
+            logger.error('Unexpected error in DeliveryRepo.getDeliveriesBySource', error as Error);
             throw error;
         }
     }
@@ -243,9 +227,7 @@ export class IngestRepo {
         try {
             const client = this.getClient();
             if (!client) {
-                logger.warn(
-                    'ClickHouse client not available, returning empty result for query'
-                );
+                logger.warn('ClickHouse client not available, returning empty result for query');
                 return {
                     stats: {
                         total_events: 0,
@@ -282,8 +264,8 @@ export class IngestRepo {
 
             const params: Record<string, string | number> = {
                 days,
-                workspaceId,
-                projectId,
+                workspaceId: unprefixId(workspaceId)!,
+                projectId: unprefixId(projectId)!,
             };
 
             const statsQuery = `
@@ -305,7 +287,7 @@ export class IngestRepo {
                 FROM ingest_events
                 WHERE toDate(received_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
-                    AND project_id = {projectId:String} 
+                    AND project_id = {projectId:String}
                 GROUP BY day
                 ORDER BY day DESC;
             `;
@@ -317,7 +299,7 @@ export class IngestRepo {
                 FROM ingest_events
                 WHERE toDate(received_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
-                    AND project_id = {projectId:String} 
+                    AND project_id = {projectId:String}
                 GROUP BY source
                 ORDER BY total DESC
                 LIMIT 10;
@@ -347,39 +329,34 @@ export class IngestRepo {
                 ORDER BY day DESC;
             `;
 
-            const [
-                stats,
-                receiveTrends,
-                topSources,
-                processStatusDistribution,
-                failureTrends,
-            ] = await Promise.all([
-                client.query({
-                    query: statsQuery,
-                    format: 'JSONEachRow',
-                    query_params: params,
-                }),
-                client.query({
-                    query: receiveTrendsQuery,
-                    format: 'JSONEachRow',
-                    query_params: params,
-                }),
-                client.query({
-                    query: topSourcesQuery,
-                    format: 'JSONEachRow',
-                    query_params: params,
-                }),
-                client.query({
-                    query: processStatusDistributionQuery,
-                    format: 'JSONEachRow',
-                    query_params: params,
-                }),
-                client.query({
-                    query: failureTrendsQuery,
-                    format: 'JSONEachRow',
-                    query_params: params,
-                }),
-            ]);
+            const [stats, receiveTrends, topSources, processStatusDistribution, failureTrends] =
+                await Promise.all([
+                    client.query({
+                        query: statsQuery,
+                        format: 'JSONEachRow',
+                        query_params: params,
+                    }),
+                    client.query({
+                        query: receiveTrendsQuery,
+                        format: 'JSONEachRow',
+                        query_params: params,
+                    }),
+                    client.query({
+                        query: topSourcesQuery,
+                        format: 'JSONEachRow',
+                        query_params: params,
+                    }),
+                    client.query({
+                        query: processStatusDistributionQuery,
+                        format: 'JSONEachRow',
+                        query_params: params,
+                    }),
+                    client.query({
+                        query: failureTrendsQuery,
+                        format: 'JSONEachRow',
+                        query_params: params,
+                    }),
+                ]);
 
             const resultStats = await stats.json<{
                 total_events: number;
@@ -395,11 +372,10 @@ export class IngestRepo {
                 source: string;
                 total: number;
             }>();
-            const resultProcessStatusDistribution =
-                await processStatusDistribution.json<{
-                    processing_status: number;
-                    total: number;
-                }>();
+            const resultProcessStatusDistribution = await processStatusDistribution.json<{
+                processing_status: number;
+                total: number;
+            }>();
             const resultFailureTrends = await failureTrends.json<{
                 day: string;
                 total: number;
