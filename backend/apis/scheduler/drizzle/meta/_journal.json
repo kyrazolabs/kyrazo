@@ -1,41 +1,13 @@
 {
-    "version": "7",
-    "dialect": "postgresql",
-    "entries": [
-        {
-            "idx": 0,
-            "version": "7",
-            "when": 1766081634149,
-            "tag": "0000_lethal_natasha_romanoff",
-            "breakpoints": true
-        },
-        {
-            "idx": 1,
-            "version": "7",
-            "when": 1768563030547,
-            "tag": "0001_hard_gamma_corps",
-            "breakpoints": true
-        },
-        {
-            "idx": 2,
-            "version": "7",
-            "when": 1771840399030,
-            "tag": "0002_fuzzy_jigsaw",
-            "breakpoints": true
-        },
-        {
-            "idx": 3,
-            "version": "7",
-            "when": 1771947026531,
-            "tag": "0003_striped_colossus",
-            "breakpoints": true
-        },
-        {
-            "idx": 4,
-            "version": "7",
-            "when": 1771953048403,
-            "tag": "0004_slow_gateway",
-            "breakpoints": true
-        }
-    ]
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1772053190450,
+      "tag": "0000_freezing_slayback",
+      "breakpoints": true
+    }
+  ]
 }
