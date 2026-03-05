@@ -19,7 +19,7 @@ const kyrazo = new Kyrazo({
 });
 
 // Publish an event
-const response = await kyrazo.events.single("project-id", {
+const response = await kyrazo.events.single("namespace-id", {
   eventType: "user.created",
   payload: {
     user_id: "u_334",
@@ -46,7 +46,7 @@ console.log("Event queued:", response.eventId);
 ### Publish Single Event
 
 ```typescript
-const response = await kyrazo.events.single(projectId, {
+const response = await kyrazo.events.single(namespaceId, {
   eventType: "...",      // Required: Event type (e.g., "user.created")
   payload: { ... },      // Required: Event data
   previous: { ... },     // Optional: Previous state of the resource
@@ -76,7 +76,7 @@ const response = await kyrazo.events.single(projectId, {
 ### Batch Publish (up to 1000 events)
 
 ```typescript
-const response = await kyrazo.events.batch(projectId, [
+const response = await kyrazo.events.batch(namespaceId, [
   { eventType: "user.created", payload: {...}, targets: [{ targetId: "..." }] },
   { eventType: "user.updated", payload: {...}, targets: [{ targetId: "..." }] },
 ]);
@@ -96,7 +96,7 @@ import {
 } from "@kyrazo/sdk";
 
 try {
-  await kyrazo.events.single(projectId, payload);
+  await kyrazo.events.single(namespaceId, payload);
 } catch (error) {
   if (error instanceof RateLimitError) {
     console.log(`Rate limited. Retry in ${error.retryAfter}s`);

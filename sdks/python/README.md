@@ -19,7 +19,7 @@ client = Kyrazo(api_key="your_api_key")
 
 # Publish an event
 response = client.events.publish(
-    project_id="proj_123",
+    namespace_id="proj_123",
     body={
         "eventType": "user.created",
         "payload": {"id": 1, "name": "Alice"},

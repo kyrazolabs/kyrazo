@@ -35,7 +35,7 @@ export interface APIErrorResponse {
  * @example
  * ```typescript
  * try {
- *   await kyrazo.dispatch.publishEvent(projectId, payload);
+ *   await kyrazo.dispatch.publishEvent(namespaceId, payload);
  * } catch (error) {
  *   if (error instanceof KyrazoError) {
  *     console.log('Error code:', error.code);

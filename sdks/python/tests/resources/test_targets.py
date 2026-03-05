@@ -3,7 +3,7 @@ from kyrazo.resources.targets import CreateTargetInput
 
 
 def test_create_target_success(client, mock_api):
-    project_id = "proj_123"
+    namespace_id = "proj_123"
     payload = {
         "name": "My Target",
         "url": "https://example.com/target",
@@ -33,12 +33,12 @@ def test_create_target_success(client, mock_api):
         }
     }
 
-    mock_api.post(f"/v1/targets/{project_id}").mock(
+    mock_api.post(f"/v1/targets/{namespace_id}").mock(
         return_value=Response(201, json=response_data)
     )
 
     target_input = CreateTargetInput(**payload)
-    target = client.targets.create(project_id, target_input)
+    target = client.targets.create(namespace_id, target_input)
 
     assert target.id == "tgt_123"
     assert target.name == "My Target"
@@ -46,34 +46,34 @@ def test_create_target_success(client, mock_api):
 
 
 def test_delete_target(client, mock_api):
-    project_id = "proj_123"
+    namespace_id = "proj_123"
     target_id = "tgt_123"
 
-    mock_api.delete(f"/v1/targets/{project_id}/{target_id}").mock(
+    mock_api.delete(f"/v1/targets/{namespace_id}/{target_id}").mock(
         return_value=Response(200, json={"success": True})
     )
 
-    success = client.targets.delete(project_id, target_id)
+    success = client.targets.delete(namespace_id, target_id)
     assert success is True
 
 
 def test_get_target_secret(client, mock_api):
-    project_id = "proj_123"
+    namespace_id = "proj_123"
     target_id = "tgt_123"
     secret = "whsec_12345"
 
-    mock_api.get(f"/v1/targets/{project_id}/{target_id}/secret").mock(
+    mock_api.get(f"/v1/targets/{namespace_id}/{target_id}/secret").mock(
         return_value=Response(
             200, json={"success": True, "data": secret}
         )
     )
 
-    result = client.targets.get_secret(project_id, target_id)
+    result = client.targets.get_secret(namespace_id, target_id)
     assert result == secret
 
 
 def test_update_target_status(client, mock_api):
-    project_id = "proj_123"
+    namespace_id = "proj_123"
     target_id = "tgt_123"
     enabled = False
 
@@ -97,11 +97,11 @@ def test_update_target_status(client, mock_api):
         },
     }
 
-    route = mock_api.put(f"/v1/targets/{project_id}/{target_id}").mock(
+    route = mock_api.put(f"/v1/targets/{namespace_id}/{target_id}").mock(
         return_value=Response(200, json=response_data)
     )
 
-    target = client.targets.update_status(project_id, target_id, enabled)
+    target = client.targets.update_status(namespace_id, target_id, enabled)
     assert target.enabled is False
     import json
     assert json.loads(route.calls.last.request.content) == {"targetId": target_id, "enabled": enabled}

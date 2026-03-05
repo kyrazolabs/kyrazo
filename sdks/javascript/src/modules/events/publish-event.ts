@@ -1,7 +1,7 @@
 /**
  * Publish Event Function
  *
- * Publishes a single event to the specified project for webhook delivery.
+ * Publishes a single event to the specified namespace for webhook delivery.
  *
  * @module modules/dispatch/publish-event
  */
@@ -20,12 +20,12 @@ import type {
  */
 export function createPublishEvent(httpClient: HttpClient) {
   /**
-   * Publish an event to the specified project
+   * Publish an event to the specified namespace
    *
    * Sends an event to the Kyrazo API for delivery to the configured webhook targets.
    * The event is queued for asynchronous delivery with automatic retries.
    *
-   * @param projectId - The project ID to publish the event to (MongoDB ObjectId format)
+   * @param namespaceId - The namespace ID to publish the event to (MongoDB ObjectId format)
    * @param payload - The event configuration and data
    * @param options - Optional configuration including idempotency key
    * @returns Promise resolving to the queued event details
@@ -38,7 +38,7 @@ export function createPublishEvent(httpClient: HttpClient) {
    *
    * @example Basic usage
    * ```typescript
-   * const response = await kyrazo.events.single("project-123", {
+   * const response = await kyrazo.events.single("namespace-123", {
    *   eventType: "user.created",
    *   payload: {
    *     userId: "u_123",
@@ -53,7 +53,7 @@ export function createPublishEvent(httpClient: HttpClient) {
    *
    * @example With targetId
    * ```typescript
-   * const response = await kyrazo.events.single("project-123", {
+   * const response = await kyrazo.events.single("namespace-123", {
    *   eventType: "payment.completed",
    *   payload: { orderId: "order_456", amount: 99.99 },
    *   targets: [
@@ -67,18 +67,18 @@ export function createPublishEvent(httpClient: HttpClient) {
    * ```
    */
   return async function publishEvent(
-    projectId: string,
+    namespaceId: string,
     payload: PublishEventPayload,
     options?: PublishEventOptions,
   ): Promise<PublishEventResponse> {
-    // Validate projectId
+    // Validate namespaceId
     if (
-      !projectId ||
-      typeof projectId !== "string" ||
-      projectId.trim() === ""
+      !namespaceId ||
+      typeof namespaceId !== "string" ||
+      namespaceId.trim() === ""
     ) {
       throw new ValidationError(
-        "projectId is required and must be a non-empty string",
+        "namespaceId is required and must be a non-empty string",
       );
     }
 
@@ -148,7 +148,7 @@ export function createPublishEvent(httpClient: HttpClient) {
       : undefined;
 
     const response = await httpClient.post<PublishEventResponse>(
-      `/v1/events/${projectId}/publish`,
+      `/v1/events/${namespaceId}/publish`,
       payload,
       requestOptions,
     );
