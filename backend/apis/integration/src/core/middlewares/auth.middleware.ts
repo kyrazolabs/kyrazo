@@ -220,7 +220,7 @@ export const authenticate = async (c: AppContext, next: Next) => {
         c.workspace = workspacePayload;
         // @ts-ignore - project is IProject & { projectId: Types.ObjectId }
         c.project = Object.assign(project, { projectId: project._id });
-        c.userId = workspace.createBy.toString();
+        c.userId = unprefixId(workspace.createBy.toString());
         c.key = {
             name: workspace.name,
             permissions: workspace.scopes,

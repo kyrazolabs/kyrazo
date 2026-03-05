@@ -3,7 +3,7 @@ import { redisConfig } from '@/configs';
 import { Context } from 'hono';
 import { getConnInfo } from 'hono/bun';
 import { LimitChecker } from '../services/limit.checker';
-import { logger } from '@kyrazo/shared';
+import { logger, unprefixId } from '@kyrazo/shared';
 
 /**
  * @title Rate Limiter Configuration
@@ -21,9 +21,7 @@ export interface RateLimiterConfig {
  * @description Creates a sliding window rate limiter that tracks requests by user ID
  * @param config - Rate limiter configuration
  */
-export function createSlidingWindowLimiter(
-    config: RateLimiterConfig
-): RateLimiterRedis {
+export function createSlidingWindowLimiter(config: RateLimiterConfig): RateLimiterRedis {
     return new RateLimiterRedis({
         storeClient: redisConfig.getClient(),
         keyPrefix: config.keyPrefix || 'sliding_window',
@@ -38,9 +36,7 @@ export function createSlidingWindowLimiter(
  * @description Creates a fixed window rate limiter that tracks requests by user ID
  * @param config - Rate limiter configuration
  */
-export function createFixedWindowLimiter(
-    config: RateLimiterConfig
-): RateLimiterRedis {
+export function createFixedWindowLimiter(config: RateLimiterConfig): RateLimiterRedis {
     return new RateLimiterRedis({
         storeClient: redisConfig.getClient(),
         keyPrefix: config.keyPrefix || 'fixed_window',
@@ -55,9 +51,7 @@ export function createFixedWindowLimiter(
  * @description Creates a token bucket rate limiter that tracks requests by any key
  * @param config - Rate limiter configuration
  */
-export function createTokenBucketLimiter(
-    config: RateLimiterConfig
-): RateLimiterRedis {
+export function createTokenBucketLimiter(config: RateLimiterConfig): RateLimiterRedis {
     return new RateLimiterRedis({
         storeClient: redisConfig.getClient(),
         keyPrefix: config.keyPrefix || 'token_bucket',
@@ -91,8 +85,7 @@ export function createRateLimitMiddleware(
                         success: false,
                         error: {
                             code: 'RATE_LIMIT_KEY_MISSING',
-                            message:
-                                'Unable to identify request for rate limiting',
+                            message: 'Unable to identify request for rate limiting',
                         },
                     },
                     400
@@ -185,9 +178,7 @@ const getLimiterByRPS = (rps: number): RateLimiterRedis => {
  * @param keyExtractor Function to extract workspaceId from context
  */
 export function createWorkspaceRateLimiter(
-    keyExtractor: (
-        c: Context
-    ) => string | undefined | Promise<string | undefined>
+    keyExtractor: (c: Context) => string | undefined | Promise<string | undefined>
 ) {
     return async (c: Context, next: () => Promise<void>) => {
         try {
@@ -196,9 +187,7 @@ export function createWorkspaceRateLimiter(
             if (!workspaceId) {
                 // If no workspaceId, strict fallback (e.g. 5 req/s)
                 const fallbackLimiter = getLimiterByRPS(0);
-                await fallbackLimiter.consume(
-                    getConnInfo(c).remote.address || 'unknown'
-                );
+                await fallbackLimiter.consume(getConnInfo(c).remote.address || 'unknown');
                 await next();
                 return;
             }
@@ -209,22 +198,19 @@ export function createWorkspaceRateLimiter(
 
             const limiter = getLimiterByRPS(rps);
 
-            await limiter.consume(workspaceId);
+            await limiter.consume(unprefixId(workspaceId)!);
             await next();
         } catch (rejRes: any) {
             const msBeforeNext = rejRes.msBeforeNext || 0;
             const key = (await keyExtractor(c)) || 'unknown';
-            logger.warn(
-                `Rate limit exceeded for workspace ${key}, retry in ${msBeforeNext}ms`
-            );
+            logger.warn(`Rate limit exceeded for workspace ${key}, retry in ${msBeforeNext}ms`);
 
             return c.json(
                 {
                     success: false,
                     error: {
                         code: 'RATE_LIMIT_EXCEEDED',
-                        message:
-                            'Too many requests. Please upgrade your plan or slow down.',
+                        message: 'Too many requests. Please upgrade your plan or slow down.',
                         retryAfter: Math.ceil(msBeforeNext / 1000),
                     },
                 },
@@ -240,9 +226,7 @@ export function createWorkspaceRateLimiter(
  */
 
 // Lazy initialization for ingest rate limiter
-let _ingestRateLimiterInstance: ReturnType<
-    typeof createRateLimitMiddleware
-> | null = null;
+let _ingestRateLimiterInstance: ReturnType<typeof createRateLimitMiddleware> | null = null;
 
 export const getIngestRateLimiter = () => {
     return async (c: Context, next: () => Promise<void>) => {
@@ -261,10 +245,7 @@ export class RateLimiterUtils {
     /**
      * Get remaining points for a key
      */
-    static async getRemainingPoints(
-        limiter: RateLimiterRedis,
-        key: string
-    ): Promise<number> {
+    static async getRemainingPoints(limiter: RateLimiterRedis, key: string): Promise<number> {
         try {
             const res = await limiter.get(key);
             return res ? res.remainingPoints : limiter.points;
@@ -277,10 +258,7 @@ export class RateLimiterUtils {
     /**
      * Get time until next reset for a key
      */
-    static async getMsBeforeNext(
-        limiter: RateLimiterRedis,
-        key: string
-    ): Promise<number> {
+    static async getMsBeforeNext(limiter: RateLimiterRedis, key: string): Promise<number> {
         try {
             const res = await limiter.get(key);
             return res ? res.msBeforeNext : 0;
@@ -293,10 +271,7 @@ export class RateLimiterUtils {
     /**
      * Delete rate limit data for a key
      */
-    static async deleteKey(
-        limiter: RateLimiterRedis,
-        key: string
-    ): Promise<boolean> {
+    static async deleteKey(limiter: RateLimiterRedis, key: string): Promise<boolean> {
         try {
             await limiter.delete(key);
             return true;
