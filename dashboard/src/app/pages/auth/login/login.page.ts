@@ -20,12 +20,14 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { InputText } from 'primeng/inputtext';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { PasswordModule } from 'primeng/password';
+import { InputOtpModule } from 'primeng/inputotp';
 
 import { AuthService } from '@core/auth/auth.service';
 import { LayoutService } from '@components/service/layout.service';
 import { DividerModule } from 'primeng/divider';
 import { AppConfig } from '@components/app.config';
 import { environment } from 'environments/environment';
+import { AutoFocusModule } from 'primeng/autofocus';
 
 declare const google: any;
 
@@ -35,6 +37,7 @@ declare const google: any;
     imports: [
         CommonModule,
         ReactiveFormsModule,
+        AutoFocusModule,
         FormsModule,
         CardModule,
         ButtonModule,
@@ -45,6 +48,7 @@ declare const google: any;
         RouterLink,
         DividerModule,
         AppConfig,
+        InputOtpModule,
     ],
     templateUrl: './login.page.html',
     styleUrls: ['./login.page.scss'],
@@ -68,6 +72,11 @@ export class LoginPage implements OnInit {
 
     readonly loading = signal(false);
     readonly showPassword = signal(false);
+    readonly pending2FA = signal(false);
+    readonly twofaMethod = signal<'app' | 'email' | null>(null);
+    readonly tempToken = signal<string | null>(null);
+    readonly otpCode = signal('');
+    readonly isBackupCode = signal(false);
 
     // Computed properties for better UX
     get isFormValid(): boolean {
@@ -132,6 +141,20 @@ export class LoginPage implements OnInit {
         this.authService.login({ email, password }).subscribe({
             next: (response) => {
                 this.loading.set(false);
+
+                if (response.pending_2fa) {
+                    this.pending2FA.set(true);
+                    this.twofaMethod.set(response.method || 'email');
+                    this.tempToken.set(response.temp_token || null);
+                    this.messageService.add({
+                        severity: 'info',
+                        summary: '2FA Required',
+                        detail: 'Please enter your verification code',
+                        life: 3000,
+                    });
+                    return;
+                }
+
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Welcome back!',
@@ -139,20 +162,7 @@ export class LoginPage implements OnInit {
                     life: 3000,
                 });
 
-                setTimeout(() => {
-                    if (this.route.snapshot.queryParamMap.get('returnUrl')) {
-                        this.router.navigate(
-                            [
-                                this.route.snapshot.queryParamMap.get(
-                                    'returnUrl',
-                                ),
-                            ],
-                            { replaceUrl: true },
-                        );
-                    } else {
-                        this.router.navigate(['/'], { replaceUrl: true });
-                    }
-                }, 1000);
+                this.onLoginSuccess();
             },
             error: (error) => {
                 this.loading.set(false);
@@ -190,6 +200,84 @@ export class LoginPage implements OnInit {
         });
     }
 
+    private onLoginSuccess(): void {
+        setTimeout(() => {
+            const returnUrl =
+                this.route.snapshot.queryParamMap.get('returnUrl');
+            if (returnUrl) {
+                this.router.navigate([returnUrl], { replaceUrl: true });
+            } else {
+                this.router.navigate(['/'], { replaceUrl: true });
+            }
+        }, 1000);
+    }
+
+    verify2FA(): void {
+        const code = this.otpCode();
+        const tempToken = this.tempToken();
+
+        if (
+            !tempToken ||
+            (this.isBackupCode() ? code.length < 8 : code.length < 6)
+        )
+            return;
+
+        this.loading.set(true);
+        this.authService.login2FA({ code, tempToken }).subscribe({
+            next: (res) => {
+                this.loading.set(false);
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Welcome back!',
+                    detail: 'Successfully signed in',
+                    life: 3000,
+                });
+                this.onLoginSuccess();
+            },
+            error: (err) => {
+                this.loading.set(false);
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Verification Failed',
+                    detail:
+                        err.error?.error?.message ||
+                        'Invalid verification code',
+                    life: 5000,
+                });
+            },
+        });
+    }
+
+    resendOTP(): void {
+        const tempToken = this.tempToken();
+        if (!tempToken) return;
+
+        this.loading.set(true);
+        this.authService.resend2FA(tempToken).subscribe({
+            next: (res) => {
+                this.loading.set(false);
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Code Resent',
+                    detail: 'A new verification code has been sent to your email',
+                    life: 5000,
+                });
+                this.otpCode.set('');
+            },
+            error: (err) => {
+                this.loading.set(false);
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Resend Failed',
+                    detail:
+                        err.error?.error?.message ||
+                        'Failed to resend verification code',
+                    life: 5000,
+                });
+            },
+        });
+    }
+
     ngOnInit() {
         this.codeClient = google.accounts.oauth2.initCodeClient({
             client_id: environment.auth.googleClientId,
@@ -212,12 +300,27 @@ export class LoginPage implements OnInit {
 
     async onGoogleResponse(res: any) {
         const idToken = res.credential;
+        this.loading.set(true);
         this.authService.onGoogleResponse(idToken).subscribe({
-            next: (res) => {
-                this.authService.handleAuthSuccess(res);
+            next: (response) => {
+                this.loading.set(false);
+                if (response.pending_2fa) {
+                    this.pending2FA.set(true);
+                    this.twofaMethod.set(response.method || 'email');
+                    this.tempToken.set(response.temp_token || null);
+                    this.messageService.add({
+                        severity: 'info',
+                        summary: '2FA Required',
+                        detail: 'Please enter your verification code',
+                        life: 3000,
+                    });
+                    return;
+                }
+                this.authService.handleAuthSuccess(response);
                 this.router.navigate(['/'], { replaceUrl: true });
             },
             error: (error) => {
+                this.loading.set(false);
                 this.messageService.add({
                     severity: 'error',
                     summary: 'Login Failed',
@@ -232,12 +335,27 @@ export class LoginPage implements OnInit {
 
     async onGoogleCode(res: any) {
         if (!res?.code) return;
+        this.loading.set(true);
         this.authService.onGoogleCode(res.code).subscribe({
-            next: (res) => {
-                this.authService.handleAuthSuccess(res);
+            next: (response) => {
+                this.loading.set(false);
+                if (response.pending_2fa) {
+                    this.pending2FA.set(true);
+                    this.twofaMethod.set(response.method || 'email');
+                    this.tempToken.set(response.temp_token || null);
+                    this.messageService.add({
+                        severity: 'info',
+                        summary: '2FA Required',
+                        detail: 'Please enter your verification code',
+                        life: 3000,
+                    });
+                    return;
+                }
+                this.authService.handleAuthSuccess(response);
                 this.router.navigate(['/'], { replaceUrl: true });
             },
             error: (error) => {
+                this.loading.set(false);
                 this.messageService.add({
                     severity: 'error',
                     summary: 'Login Failed',
@@ -263,7 +381,6 @@ export class LoginPage implements OnInit {
         }, 300);
     }
 
-    // Navigate to forgot password page
     onForgotPassword(): void {
         // You can implement forgot password functionality here
         this.messageService.add({
@@ -273,5 +390,10 @@ export class LoginPage implements OnInit {
             life: 3000,
         });
         this.router.navigate(['/auth/forget-password']);
+    }
+
+    toggleBackupCode(): void {
+        this.isBackupCode.set(!this.isBackupCode());
+        this.otpCode.set('');
     }
 }
