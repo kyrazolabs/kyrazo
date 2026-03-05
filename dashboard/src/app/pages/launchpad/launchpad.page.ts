@@ -41,7 +41,16 @@ export class LaunchpadPage implements OnInit {
             next: (response) => {
                 const memberships = response.data || [];
                 if (memberships.length > 0) {
-                    const workspace = memberships[0].workspace;
+                    const storedWorkspaceId =
+                        this.storage.getItem<string>('workspace');
+                    const matchingMembership = memberships.find(
+                        (m) => m.workspaceId === storedWorkspaceId,
+                    );
+
+                    const workspace = matchingMembership
+                        ? matchingMembership.workspace
+                        : memberships[0].workspace;
+
                     this.createdWorkspaceId.set(workspace.id);
                     this.storage.setItem('workspace', workspace.id);
 

@@ -39,6 +39,12 @@ export class DialogService {
     }>({ visible: false });
     billingDialogState$ = this.billingDialogStateSubject.asObservable();
 
+    // 2FA Setup Dialog State
+    private twofaSetupDialogStateSubject = new BehaviorSubject<{
+        visible: boolean;
+    }>({ visible: false });
+    twofaSetupDialogState$ = this.twofaSetupDialogStateSubject.asObservable();
+
     // Event Sources
     private sourceSavedSource = new Subject<any>();
     sourceSaved$ = this.sourceSavedSource.asObservable();
@@ -48,6 +54,9 @@ export class DialogService {
 
     private targetSavedSource = new Subject<any>();
     targetSaved$ = this.targetSavedSource.asObservable();
+
+    private twofaEnabledSource = new Subject<void>();
+    twofaEnabled$ = this.twofaEnabledSource.asObservable();
 
     private router = inject(Router);
 
@@ -114,5 +123,18 @@ export class DialogService {
 
     closeBillingDialog() {
         this.billingDialogStateSubject.next({ visible: false });
+    }
+
+    // 2FA Setup Dialog Methods
+    openTwofaSetupDialog() {
+        this.twofaSetupDialogStateSubject.next({ visible: true });
+    }
+
+    closeTwofaSetupDialog() {
+        this.twofaSetupDialogStateSubject.next({ visible: false });
+    }
+
+    notifyTwofaEnabled() {
+        this.twofaEnabledSource.next();
     }
 }
