@@ -1,5 +1,5 @@
 import { SubscriptionResponse } from '@/shared/types';
-import { IPlan, IPlanSnapshot } from '@kyrazo/shared';
+import { IPlan, IPlanSnapshot, transformWithId } from '@kyrazo/shared';
 
 export class SubscriptionTransformer {
     private static instance: SubscriptionTransformer;
@@ -14,34 +14,7 @@ export class SubscriptionTransformer {
     }
 
     public transformToResponse(subscription: any): SubscriptionResponse {
-        return {
-            id: subscription._id.toString(),
-            userId: subscription.userId.toString(),
-            planId: subscription.planId.toString(),
-            status: subscription.status,
-            startDate: subscription.startDate,
-            endDate: subscription.endDate,
-            trialEndDate: subscription.trialEndDate,
-            nextBillingDate: subscription.nextBillingDate,
-            autoRenew: subscription.autoRenew,
-            paymentMethod: subscription.paymentMethod,
-            currentPeriodStart: subscription.currentPeriodStart,
-            currentPeriodEnd: subscription.currentPeriodEnd,
-            plan: subscription.plan
-                ? {
-                      id: subscription.plan._id.toString(),
-                      name: subscription.plan.name,
-                      price: subscription.plan.price,
-                      currency: subscription.plan.currency,
-                      frequency: subscription.plan.frequency,
-                      limits: subscription.plan.limits,
-                      benefits: subscription.plan.benefits,
-                      features: subscription.plan.features,
-                  }
-                : undefined,
-            createdAt: subscription.createdAt,
-            updatedAt: subscription.updatedAt,
-        };
+        return transformWithId(subscription, 'subscription') as any;
     }
 }
 

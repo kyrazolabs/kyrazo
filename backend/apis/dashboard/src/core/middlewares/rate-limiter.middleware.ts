@@ -1,7 +1,7 @@
 import { AppContext } from '@/core/middlewares/auth.middleware';
 import { RateLimiterRedis } from 'rate-limiter-flexible';
 import { config, redisConfig } from '@/configs';
-import { logger } from '@kyrazo/shared';
+import { logger, unprefixId } from '@kyrazo/shared';
 
 /**
  * @title Rate Limiter Configuration
@@ -19,9 +19,7 @@ export interface RateLimiterConfig {
  * @description Creates a sliding window rate limiter that tracks requests by user ID
  * @param config - Rate limiter configuration
  */
-export function createSlidingWindowLimiter(
-    config: RateLimiterConfig
-): RateLimiterRedis {
+export function createSlidingWindowLimiter(config: RateLimiterConfig): RateLimiterRedis {
     return new RateLimiterRedis({
         storeClient: redisConfig.getClient(),
         keyPrefix: config.keyPrefix || 'sliding_window',
@@ -36,9 +34,7 @@ export function createSlidingWindowLimiter(
  * @description Creates a fixed window rate limiter that tracks requests by user ID
  * @param config - Rate limiter configuration
  */
-export function createFixedWindowLimiter(
-    config: RateLimiterConfig
-): RateLimiterRedis {
+export function createFixedWindowLimiter(config: RateLimiterConfig): RateLimiterRedis {
     return new RateLimiterRedis({
         storeClient: redisConfig.getClient(),
         keyPrefix: config.keyPrefix || 'fixed_window',
@@ -53,9 +49,7 @@ export function createFixedWindowLimiter(
  * @description Creates a token bucket rate limiter that tracks requests by any key
  * @param config - Rate limiter configuration
  */
-export function createTokenBucketLimiter(
-    config: RateLimiterConfig
-): RateLimiterRedis {
+export function createTokenBucketLimiter(config: RateLimiterConfig): RateLimiterRedis {
     return new RateLimiterRedis({
         storeClient: redisConfig.getClient(),
         keyPrefix: config.keyPrefix || 'token_bucket',
@@ -89,8 +83,7 @@ export function createRateLimitMiddleware(
                         success: false,
                         error: {
                             code: 'RATE_LIMIT_KEY_MISSING',
-                            message:
-                                'Unable to identify request for rate limiting',
+                            message: 'Unable to identify request for rate limiting',
                         },
                     },
                     400
@@ -156,7 +149,7 @@ export function createSDKsRateLimiter(
             // Fallback to user ID if authenticated
             const user = (c as any).user;
             if (user && user.userId) {
-                return `publish:user:${user.userId}`;
+                return `publish:user:${unprefixId(user.userId)}`;
             }
 
             // Fallback to IP
@@ -182,8 +175,7 @@ export function createSDKsRateLimiter(
  */
 
 // Lazy initialization for SDK rate limiter
-let _sdksRateLimiter: ReturnType<typeof createRateLimitMiddleware> | null =
-    null;
+let _sdksRateLimiter: ReturnType<typeof createRateLimitMiddleware> | null = null;
 
 export const getSDKsRateLimiter = () => {
     if (!_sdksRateLimiter) {
@@ -200,15 +192,12 @@ export class RateLimiterUtils {
     /**
      * Get remaining points for a key
      */
-    static async getRemainingPoints(
-        limiter: RateLimiterRedis,
-        key: string
-    ): Promise<number> {
+    static async getRemainingPoints(limiter: RateLimiterRedis, key: string): Promise<number> {
         try {
             const res = await limiter.get(key);
             return res ? res.remainingPoints : limiter.points;
         } catch (error) {
-            logger.error('Error getting remaining points:', error);
+            logger.error('Error getting remaining points:', error as Error);
             return 0;
         }
     }
@@ -216,15 +205,12 @@ export class RateLimiterUtils {
     /**
      * Get time until next reset for a key
      */
-    static async getMsBeforeNext(
-        limiter: RateLimiterRedis,
-        key: string
-    ): Promise<number> {
+    static async getMsBeforeNext(limiter: RateLimiterRedis, key: string): Promise<number> {
         try {
             const res = await limiter.get(key);
             return res ? res.msBeforeNext : 0;
         } catch (error) {
-            logger.error('Error getting ms before next:', error);
+            logger.error('Error getting ms before next:', error as Error);
             return 0;
         }
     }
@@ -232,15 +218,12 @@ export class RateLimiterUtils {
     /**
      * Delete rate limit data for a key
      */
-    static async deleteKey(
-        limiter: RateLimiterRedis,
-        key: string
-    ): Promise<boolean> {
+    static async deleteKey(limiter: RateLimiterRedis, key: string): Promise<boolean> {
         try {
             await limiter.delete(key);
             return true;
         } catch (error) {
-            logger.error('Error deleting rate limit key:', error);
+            logger.error('Error deleting rate limit key:', error as Error);
             return false;
         }
     }

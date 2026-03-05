@@ -1,19 +1,15 @@
 import { MiddlewareHandler } from 'hono';
-import { IErrorResponse, IPlanLimits, Project } from '@kyrazo/shared';
+import { IErrorResponse, IPlanLimits, Project, unprefixId } from '@kyrazo/shared';
 import { AppContext } from './auth.middleware';
 import { limitService } from '@/shared/services/limit.service';
 import { workspaceRepository } from '@/modules/v1/workspace/workspace.repo';
 
-export const checkWorkspaceLimits = (
-    limitKey: keyof IPlanLimits
-): MiddlewareHandler => {
+export const checkWorkspaceLimits = (limitKey: keyof IPlanLimits): MiddlewareHandler => {
     return async (c: AppContext, next) => {
         const workspaceId = c.workspace?.workspaceId;
 
         // If no workspaceId, we use FREE_PLAN_LIMITS as per user request
-        const limits = await limitService.getWorkspaceLimits(
-            workspaceId?.toString()
-        );
+        const limits = await limitService.getWorkspaceLimits(unprefixId(workspaceId?.toString()));
         const limit = limits[limitKey];
 
         if (limit === -1) {
@@ -29,7 +25,7 @@ export const checkWorkspaceLimits = (
                 currentCount = 0;
             } else {
                 currentCount = await Project.countDocuments({
-                    workspaceId,
+                    workspaceId: unprefixId(workspaceId.toString()),
                     isDeleted: false,
                 });
             }
@@ -37,13 +33,10 @@ export const checkWorkspaceLimits = (
             if (!workspaceId) {
                 currentCount = 0;
             } else {
-                const membersCount = await workspaceRepository.countMembers(
+                const membersCount = await workspaceRepository.countMembers(workspaceId.toString());
+                const pendingInvitations = await workspaceRepository.countPendingInvitations(
                     workspaceId.toString()
                 );
-                const pendingInvitations =
-                    await workspaceRepository.countPendingInvitations(
-                        workspaceId.toString()
-                    );
                 currentCount = membersCount + pendingInvitations;
             }
         }

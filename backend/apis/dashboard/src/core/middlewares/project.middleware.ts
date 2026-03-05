@@ -61,11 +61,10 @@ export const requireProjectAccess = (options?: { allowDeleted?: boolean }) => {
                 );
             }
 
-            const project = {
+            c.project = {
                 ...access,
                 projectId: new Types.ObjectId(unprefixId(access.id)),
-            };
-            c.project = project as IProject & { projectId: Types.ObjectId };
+            } as any;
             await next();
         } catch (error: unknown) {
             logger.error('Unexpected error in requireProjectAccess middleware', error as Error);
@@ -97,7 +96,7 @@ export const requireProjectAccessParam = (
         try {
             const userId = c.user?.userId;
             const workspace = c.workspace;
-            const { projectId } = c.req.valid('param');
+            const projectId = c.req.param('projectId');
 
             if (!workspace || !projectId || !userId) {
                 return c.json<IErrorResponse>(
@@ -163,11 +162,10 @@ export const requireProjectAccessParam = (
                 );
             }
 
-            const project = {
+            c.project = {
                 ...access,
                 projectId: new Types.ObjectId(unprefixId(access.id)),
-            };
-            c.project = project as IProject & { projectId: Types.ObjectId };
+            } as any;
             await next();
         } catch (error: unknown) {
             logger.error(

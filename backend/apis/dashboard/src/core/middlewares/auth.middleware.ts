@@ -7,6 +7,7 @@ import {
     logger,
     Project,
     UserWorkspace,
+    unprefixId,
 } from '@kyrazo/shared';
 import { config } from '@/configs';
 import { getSignedCookie } from 'hono/cookie';
@@ -25,14 +26,9 @@ export interface AppContext extends Context {
 export const authenticate = async (c: AppContext, next: Next) => {
     try {
         const authHeader = c.req.header('Authorization');
-        const cookieToken = await getSignedCookie(
-            c,
-            config.jwt.secrets.access,
-            'access_token'
-        );
+        const cookieToken = await getSignedCookie(c, config.jwt.secrets.access, 'access_token');
         const hasHeader = authHeader && authHeader.startsWith('Bearer ');
-        const hasCookie =
-            typeof cookieToken === 'string' && cookieToken.length > 0;
+        const hasCookie = typeof cookieToken === 'string' && cookieToken.length > 0;
 
         // If neither header token nor cookie token exists
         if (!hasHeader && !hasCookie) {
@@ -50,15 +46,12 @@ export const authenticate = async (c: AppContext, next: Next) => {
         }
 
         // Pick whichever is available
-        const token = hasHeader
-            ? authHeader!.substring(7)
-            : (cookieToken as string);
+        const token = hasHeader ? authHeader!.substring(7) : (cookieToken as string);
 
         const result = authUtils.verifyAccessToken(token);
 
         if (!result.valid) {
-            const code =
-                result.reason === 'expired' ? 'TOKEN_EXPIRED' : 'INVALID_TOKEN';
+            const code = result.reason === 'expired' ? 'TOKEN_EXPIRED' : 'INVALID_TOKEN';
             const message =
                 result.reason === 'expired'
                     ? 'Access token expired, please refresh'
@@ -139,12 +132,15 @@ export const requireOwnership = (resourceType: 'workspace' | 'project') => {
             switch (resourceType) {
                 case 'workspace':
                     isOwner = await UserWorkspace.isUserOwner(
-                        userId,
-                        resourceId
+                        unprefixId(userId)!,
+                        unprefixId(resourceId)!
                     );
                     break;
                 case 'project':
-                    isOwner = await Project.isUserOwner(userId, resourceId);
+                    isOwner = await Project.isUserOwner(
+                        unprefixId(userId)!,
+                        unprefixId(resourceId)!
+                    );
                     break;
                 default:
                     break;
