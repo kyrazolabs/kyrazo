@@ -1,64 +1,17 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
-import { AppContext, authenticate } from '@/core/middlewares/auth.middleware';
+import { authenticate } from '@/core/middlewares/auth.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
 import { requireProjectAccessParam } from '@/core/middlewares/project.middleware';
 import { checkWorkspaceLimits } from '@/core/middlewares/limits.middleware';
+import { requireRecentOTP } from '@/core/middlewares/otp.middleware';
 
 import { ProjectController } from '@/modules/v1/project/project.controller';
-import { config } from '@/configs/app';
-import {
-    createSlidingWindowLimiter,
-    createRateLimitMiddleware,
-} from '@/core/middlewares/rate-limiter.middleware';
-import {
-    CreateProjectSchema,
-    GetProjectByIdSchema,
-    FilterProjectSchema,
-} from './project.schema';
+
+import { CreateProjectSchema, GetProjectByIdSchema, FilterProjectSchema } from './project.schema';
+import { projectWriteRateLimiter, projectReadRateLimiter } from './project.rate-limiter';
 
 const router = new Hono();
-
-// Lazy wrappers for project routes rate limiter (user-based)
-const projectReadRateLimiter = async (
-    c: AppContext,
-    next: () => Promise<void>
-) => {
-    const limiter = createRateLimitMiddleware(
-        createSlidingWindowLimiter({
-            points: config.security.rateLimiter.protected.normal.points,
-            duration: config.security.rateLimiter.protected.normal.duration,
-            blockDuration:
-                config.security.rateLimiter.protected.normal.blockDuration,
-        }),
-        c =>
-            config.security.rateLimiter.protected.normal.keyPrefix(
-                (c as any).user.userId
-            ),
-        'Too many project read requests'
-    );
-    return limiter(c, next);
-};
-
-const projectWriteRateLimiter = async (
-    c: AppContext,
-    next: () => Promise<void>
-) => {
-    const limiter = createRateLimitMiddleware(
-        createSlidingWindowLimiter({
-            points: config.security.rateLimiter.protected.medium.points,
-            duration: config.security.rateLimiter.protected.medium.duration,
-            blockDuration:
-                config.security.rateLimiter.protected.medium.blockDuration,
-        }),
-        c =>
-            config.security.rateLimiter.protected.medium.keyPrefix(
-                (c as any).user.userId
-            ),
-        'Too many project write requests'
-    );
-    return limiter(c, next);
-};
 
 // All project routes require authentication
 router.use(authenticate);
@@ -186,6 +139,7 @@ router.patch(
         }
     }),
     requireProjectAccessParam(['owner', 'admin']), // Project deletion requires ownership
+    requireRecentOTP('update_project'),
     ProjectController.updateProject
 );
 
@@ -208,6 +162,7 @@ router.delete(
         }
     }),
     requireProjectAccessParam(['owner', 'admin']), // Project deletion requires ownership
+    requireRecentOTP('delete_project'),
     ProjectController.deleteProject
 );
 

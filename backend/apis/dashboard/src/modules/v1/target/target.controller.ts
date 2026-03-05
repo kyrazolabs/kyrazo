@@ -38,12 +38,7 @@ export class TargetController {
                 );
             }
             const valid: CreateTargetInput = c.req.valid('json');
-            const saved = await targetService.createTarget(
-                valid,
-                userId,
-                workspaceId,
-                projectId
-            );
+            const saved = await targetService.createTarget(valid, userId, workspaceId, projectId);
 
             return c.json<CreateTargetResponse>(
                 {
@@ -54,10 +49,7 @@ export class TargetController {
                 201
             );
         } catch (error) {
-            logger.error(
-                'Unexpected error in TargetController.createTarget',
-                error as Error
-            );
+            logger.error('Unexpected error in TargetController.createTarget', error as Error);
             if ((error as Error).message.includes('E11000')) {
                 return c.json<IErrorResponse>(
                     {
@@ -101,23 +93,14 @@ export class TargetController {
                     401
                 );
             }
-            const {
-                q,
-                enabled,
-                limit = 10,
-                page = 1,
-            }: FilterTargetInput = c.req.valid('query');
+            const { q, enabled, limit = 10, page = 1 }: FilterTargetInput = c.req.valid('query');
 
             const query: Record<string, unknown> = { workspaceId, projectId };
             if (q) query.$text = { $search: q };
             if (enabled) query.enabled = enabled;
             const perPage = Math.min(limit, 100);
 
-            const { targets, total } = await targetService.getTargets(
-                query,
-                perPage,
-                page
-            );
+            const { targets, total } = await targetService.getTargets(query, perPage, page);
 
             return c.json<GetTargetsResponse>(
                 {
@@ -134,10 +117,7 @@ export class TargetController {
                 200
             );
         } catch (error) {
-            logger.error(
-                'Unexpected error in TargetController.getTargets',
-                error as Error
-            );
+            logger.error('Unexpected error in TargetController.getTargets', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -184,10 +164,7 @@ export class TargetController {
                 200
             );
         } catch (error) {
-            logger.error(
-                'Unexpected error in TargetController.getTarget',
-                error as Error
-            );
+            logger.error('Unexpected error in TargetController.getTarget', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -234,10 +211,7 @@ export class TargetController {
                 200
             );
         } catch (error) {
-            logger.error(
-                'Unexpected error in TargetController.getTargetSecret',
-                error as Error
-            );
+            logger.error('Unexpected error in TargetController.getTargetSecret', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -285,10 +259,7 @@ export class TargetController {
                 200
             );
         } catch (error) {
-            logger.error(
-                'Unexpected error in TargetController.updateTarget',
-                error as Error
-            );
+            logger.error('Unexpected error in TargetController.updateTarget', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -319,8 +290,7 @@ export class TargetController {
                     401
                 );
             }
-            const { targetId, enabled }: UpdateTargetStatusInput =
-                c.req.valid('json');
+            const { targetId, enabled }: UpdateTargetStatusInput = c.req.valid('json');
             const target = await targetService.updateTarget(
                 targetId,
                 workspaceId.toString(),
@@ -336,10 +306,7 @@ export class TargetController {
                 200
             );
         } catch (error) {
-            logger.error(
-                'Unexpected error in TargetController.updateTarget',
-                error as Error
-            );
+            logger.error('Unexpected error in TargetController.updateTarget', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -385,10 +352,7 @@ export class TargetController {
                 200
             );
         } catch (error) {
-            logger.error(
-                'Unexpected error in TargetController.deleteTarget',
-                error as Error
-            );
+            logger.error('Unexpected error in TargetController.deleteTarget', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,

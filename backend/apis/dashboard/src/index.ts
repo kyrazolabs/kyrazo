@@ -53,7 +53,14 @@ app.route('/v1', v1Router);
 
 // Error handler
 const errorHandlers = [handleMongooseErrors];
-app.onError(errorHandler(errorHandlers));
+app.onError((err, c) => {
+    logger.error('Unhandled Application Error', err as Error, {
+        path: c.req.path,
+        method: c.req.method,
+        requestId: c.get('requestId'),
+    });
+    return errorHandler(errorHandlers)(err, c);
+});
 
 // Initialize database and Redis connections
 const initializeConnections = async () => {

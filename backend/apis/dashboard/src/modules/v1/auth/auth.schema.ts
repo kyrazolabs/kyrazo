@@ -30,9 +30,7 @@ export const RegisterSchema = z.object({
         .default('https://avatar.iran.liara.run/public/boy'),
     jobTitle: z.string(),
     timeZone: z.string().default('UTC'),
-    language: z
-        .enum(['en', 'ar', 'es', 'fr', 'de', 'it', 'pt', 'ru', 'zh', 'ja'])
-        .default('en'),
+    language: z.enum(['en', 'ar', 'es', 'fr', 'de', 'it', 'pt', 'ru', 'zh', 'ja']).default('en'),
 });
 
 export const LoginSchema = z.object({
@@ -99,17 +97,54 @@ export const UpdatePreferencesSchema = z
             securityAlerts: z.boolean().optional(),
             weeklyReports: z.boolean().optional(),
             preferences: z.object({
-                emailFrequency: z
-                    .string()
-                    .min(1, 'Email frequency is required'),
-                quietHours: z
-                    .string()
-                    .min(1, 'Quiet hours is required')
-                    .optional(),
+                emailFrequency: z.string().min(1, 'Email frequency is required'),
+                quietHours: z.string().min(1, 'Quiet hours is required').optional(),
             }),
         }),
     })
     .partial();
+
+export const Setup2FASchema = z.object({
+    method: z.enum(['email', 'app']),
+});
+
+export const Verify2FASetupSchema = z.object({
+    code: z.string().min(1, 'Verification code is required'),
+});
+
+export const Login2FASchema = z.object({
+    code: z.string().min(1, 'Verification code is required'),
+    tempToken: z.string().min(1, 'Temporary token is required'),
+});
+
+export const Resend2FAOTPSchema = z.object({
+    tempToken: z.string().min(1, 'Temporary token is required'),
+});
+
+export const RequestSensitiveOTPSchema = z.object({
+    action: z.enum([
+        'update_profile',
+        'delete_workspace',
+        'update_workspace',
+        'delete_project',
+        'update_project',
+        'manage_keys',
+        'disable_2fa',
+    ]),
+});
+
+export const VerifySensitiveOTPSchema = z.object({
+    action: z.enum([
+        'update_profile',
+        'delete_workspace',
+        'update_workspace',
+        'delete_project',
+        'update_project',
+        'manage_keys',
+        'disable_2fa',
+    ]),
+    code: z.string().min(1, 'Verification code is required'),
+});
 
 export type RegisterInput = z.infer<typeof RegisterSchema>;
 export type LoginInput = z.infer<typeof LoginSchema>;
@@ -124,3 +159,10 @@ export type VerifyEmailInput = z.infer<typeof VerifyEmailSchema>;
 
 export type UpdateProfileInput = z.infer<typeof UpdateProfileSchema>;
 export type UpdatePreferencesInput = z.infer<typeof UpdatePreferencesSchema>;
+
+export type Setup2FAInput = z.infer<typeof Setup2FASchema>;
+export type Verify2FASetupInput = z.infer<typeof Verify2FASetupSchema>;
+export type Login2FAInput = z.infer<typeof Login2FASchema>;
+export type Resend2FAOTPInput = z.infer<typeof Resend2FAOTPSchema>;
+export type RequestSensitiveOTPInput = z.infer<typeof RequestSensitiveOTPSchema>;
+export type VerifySensitiveOTPInput = z.infer<typeof VerifySensitiveOTPSchema>;

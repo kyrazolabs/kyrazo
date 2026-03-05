@@ -1,14 +1,10 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
-import { getConnInfo } from 'hono/bun';
 
 import { AuthController } from '@/modules/v1/auth/auth.controller';
-import { AppContext, authenticate } from '@/core/middlewares/auth.middleware';
-import { config } from '@/configs/app';
-import {
-    createSlidingWindowLimiter,
-    createRateLimitMiddleware,
-} from '@/core/middlewares/rate-limiter.middleware';
+import { authenticate } from '@/core/middlewares/auth.middleware';
+import { requireRecentOTP } from '@/core/middlewares/otp.middleware';
+
 import {
     RegisterSchema,
     LoginSchema,
@@ -20,258 +16,29 @@ import {
     UpdateProfileSchema,
     UpdatePreferencesSchema,
     GoogleLoginSchema,
+    Setup2FASchema,
+    Verify2FASetupSchema,
+    Login2FASchema,
+    Resend2FAOTPSchema,
+    RequestSensitiveOTPSchema,
+    VerifySensitiveOTPSchema,
 } from './auth.schema';
-import { IErrorResponse } from '@kyrazo/shared';
+import {
+    registerRateLimiter,
+    loginRateLimiter,
+    refreshTokenRateLimiter,
+    forgotPasswordRateLimiter,
+    resetPasswordRateLimiter,
+    verifyEmailRateLimiter,
+    profileUpdateRateLimiter,
+    preferencesReadRateLimiter,
+    preferencesUpdateRateLimiter,
+    changePasswordProtectedRateLimiter,
+    logoutProtectedRateLimiter,
+    profileReadRateLimiter,
+} from './auth.rate-limiter';
 
 const auth = new Hono();
-
-// Helper function to get IP
-const getIp = (c: AppContext) => {
-    const ip = getConnInfo(c).remote.address;
-    return ip || 'unknown';
-};
-
-// Lazy rate limiter wrappers for auth routes
-const registerRateLimiter = async (
-    c: AppContext,
-    next: () => Promise<void>
-) => {
-    const limiter = createRateLimitMiddleware(
-        createSlidingWindowLimiter({
-            points: config.security.rateLimiter.auth.register.points,
-            duration: config.security.rateLimiter.auth.register.duration,
-            blockDuration:
-                config.security.rateLimiter.auth.register.blockDuration,
-        }),
-        c => config.security.rateLimiter.auth.register.keyPrefix(getIp(c)),
-        'Too many registration attempts'
-    );
-    return limiter(c, next);
-};
-
-const loginRateLimiter = async (c: AppContext, next: () => Promise<void>) => {
-    const limiter = createRateLimitMiddleware(
-        createSlidingWindowLimiter({
-            points: config.security.rateLimiter.auth.login.points,
-            duration: config.security.rateLimiter.auth.login.duration,
-            blockDuration: config.security.rateLimiter.auth.login.blockDuration,
-        }),
-        c => config.security.rateLimiter.auth.login.bots.keyPrefix(getIp(c)),
-        'Too many login attempts'
-    );
-    return limiter(c, next);
-};
-
-const refreshTokenRateLimiter = async (
-    c: AppContext,
-    next: () => Promise<void>
-) => {
-    const limiter = createSlidingWindowLimiter({
-        points: config.security.rateLimiter.auth.token.refresh.points,
-        duration: config.security.rateLimiter.auth.token.refresh.duration,
-        blockDuration:
-            config.security.rateLimiter.auth.token.refresh.blockDuration,
-    });
-
-    try {
-        const key = config.security.rateLimiter.auth.token.refresh.keyPrefix(
-            getIp(c)
-        );
-        await limiter.consume(key);
-        await next();
-    } catch (rejRes: any) {
-        return c.json<IErrorResponse>(
-            {
-                success: false,
-                error: {
-                    code: 'REFRESH_TOKEN_INVALID_OR_SUSPENDED',
-                    message: 'Refresh token is invalid or suspended.',
-                    requestId: c.get('requestId'),
-                },
-            },
-            401
-        );
-    }
-};
-
-const forgotPasswordRateLimiter = async (
-    c: AppContext,
-    next: () => Promise<void>
-) => {
-    const limiter = createRateLimitMiddleware(
-        createSlidingWindowLimiter({
-            points: config.security.rateLimiter.auth.password.forgot.points,
-            duration: config.security.rateLimiter.auth.password.forgot.duration,
-            blockDuration:
-                config.security.rateLimiter.auth.password.forgot.blockDuration,
-        }),
-        c =>
-            config.security.rateLimiter.auth.password.forgot.keyPrefix(
-                (c.req as any).valid('json').email
-            ),
-        'Too many password reset requests'
-    );
-    return limiter(c, next);
-};
-
-const resetPasswordRateLimiter = async (
-    c: AppContext,
-    next: () => Promise<void>
-) => {
-    const limiter = createRateLimitMiddleware(
-        createSlidingWindowLimiter({
-            points: config.security.rateLimiter.auth.password.reset.points,
-            duration: config.security.rateLimiter.auth.password.reset.duration,
-            blockDuration:
-                config.security.rateLimiter.auth.password.reset.blockDuration,
-        }),
-        c =>
-            config.security.rateLimiter.auth.password.reset.keyPrefix(getIp(c)),
-        'Too many password reset attempts'
-    );
-    return limiter(c, next);
-};
-
-const verifyEmailRateLimiter = async (
-    c: AppContext,
-    next: () => Promise<void>
-) => {
-    const limiter = createRateLimitMiddleware(
-        createSlidingWindowLimiter({
-            points: config.security.rateLimiter.auth.email.verify.points,
-            duration: config.security.rateLimiter.auth.email.verify.duration,
-            blockDuration:
-                config.security.rateLimiter.auth.email.verify.blockDuration,
-        }),
-        c =>
-            config.security.rateLimiter.auth.email.verify.keyPrefix(
-                (c.req as any).valid('json').email
-            ),
-        'Too many email verification attempts'
-    );
-    return limiter(c, next);
-};
-
-// Lazy wrappers for protected routes rate limiters (user-based)
-const profileReadRateLimiter = async (
-    c: AppContext,
-    next: () => Promise<void>
-) => {
-    const limiter = createRateLimitMiddleware(
-        createSlidingWindowLimiter({
-            points: config.security.rateLimiter.protected.normal.points,
-            duration: config.security.rateLimiter.protected.normal.duration,
-            blockDuration:
-                config.security.rateLimiter.protected.normal.blockDuration,
-        }),
-        c =>
-            config.security.rateLimiter.protected.normal.keyPrefix(
-                (c as any).user.userId
-            ),
-        'Too many profile read requests'
-    );
-    return limiter(c, next);
-};
-
-const profileUpdateRateLimiter = async (
-    c: AppContext,
-    next: () => Promise<void>
-) => {
-    const limiter = createRateLimitMiddleware(
-        createSlidingWindowLimiter({
-            points: config.security.rateLimiter.protected.medium.points,
-            duration: config.security.rateLimiter.protected.medium.duration,
-            blockDuration:
-                config.security.rateLimiter.protected.medium.blockDuration,
-        }),
-        c =>
-            config.security.rateLimiter.protected.medium.keyPrefix(
-                (c as any).user.userId
-            ),
-        'Too many profile update requests'
-    );
-    return limiter(c, next);
-};
-
-const preferencesReadRateLimiter = async (
-    c: AppContext,
-    next: () => Promise<void>
-) => {
-    const limiter = createRateLimitMiddleware(
-        createSlidingWindowLimiter({
-            points: config.security.rateLimiter.protected.normal.points,
-            duration: config.security.rateLimiter.protected.normal.duration,
-            blockDuration:
-                config.security.rateLimiter.protected.normal.blockDuration,
-        }),
-        c =>
-            config.security.rateLimiter.protected.normal.keyPrefix(
-                (c as any).user.userId
-            ),
-        'Too many preferences read requests'
-    );
-    return limiter(c, next);
-};
-
-const preferencesUpdateRateLimiter = async (
-    c: AppContext,
-    next: () => Promise<void>
-) => {
-    const limiter = createRateLimitMiddleware(
-        createSlidingWindowLimiter({
-            points: config.security.rateLimiter.protected.medium.points,
-            duration: config.security.rateLimiter.protected.medium.duration,
-            blockDuration:
-                config.security.rateLimiter.protected.medium.blockDuration,
-        }),
-        c =>
-            config.security.rateLimiter.protected.medium.keyPrefix(
-                (c as any).user.userId
-            ),
-        'Too many preferences update requests'
-    );
-    return limiter(c, next);
-};
-
-const changePasswordProtectedRateLimiter = async (
-    c: AppContext,
-    next: () => Promise<void>
-) => {
-    const limiter = createRateLimitMiddleware(
-        createSlidingWindowLimiter({
-            points: config.security.rateLimiter.protected.sensitive.points,
-            duration: config.security.rateLimiter.protected.sensitive.duration,
-            blockDuration:
-                config.security.rateLimiter.protected.sensitive.blockDuration,
-        }),
-        c =>
-            config.security.rateLimiter.protected.sensitive.keyPrefix(
-                (c as any).user.userId
-            ),
-        'Too many password change requests'
-    );
-    return limiter(c, next);
-};
-
-const logoutProtectedRateLimiter = async (
-    c: AppContext,
-    next: () => Promise<void>
-) => {
-    const limiter = createRateLimitMiddleware(
-        createSlidingWindowLimiter({
-            points: config.security.rateLimiter.protected.normal.points,
-            duration: config.security.rateLimiter.protected.normal.duration,
-            blockDuration:
-                config.security.rateLimiter.protected.normal.blockDuration,
-        }),
-        c =>
-            config.security.rateLimiter.protected.normal.keyPrefix(
-                (c as any).user.userId
-            ),
-        'Too many logout requests'
-    );
-    return limiter(c, next);
-};
 
 // Public routes (no authentication required)
 auth.post(
@@ -429,6 +196,7 @@ auth.get('/profile', profileReadRateLimiter, AuthController.getProfile);
 auth.patch(
     '/profile',
     profileUpdateRateLimiter,
+    requireRecentOTP('update_profile'),
     zValidator('json', UpdateProfileSchema, (result, c) => {
         if (!result.success) {
             return c.json(
@@ -447,11 +215,7 @@ auth.patch(
     AuthController.updateProfile
 );
 
-auth.get(
-    '/profile/preferences',
-    preferencesReadRateLimiter,
-    AuthController.getPreferences
-);
+auth.get('/profile/preferences', preferencesReadRateLimiter, AuthController.getPreferences);
 auth.patch(
     '/profile/preferences',
     preferencesUpdateRateLimiter,
@@ -520,10 +284,136 @@ auth.get(
     profileReadRateLimiter,
     AuthController.getEmailVerificationStatus
 );
+auth.post('/resend-verification', profileUpdateRateLimiter, AuthController.resendEmailVerification);
+
+// 2FA Routes
 auth.post(
-    '/resend-verification',
-    profileUpdateRateLimiter,
-    AuthController.resendEmailVerification
+    '/2fa/setup',
+    authenticate,
+    zValidator('json', Setup2FASchema, (result, c) => {
+        if (!result.success) {
+            return c.json(
+                {
+                    success: false,
+                    statusCode: 400,
+                    errors: JSON.parse(result.error.message).map((e: any) => ({
+                        field: e.path.join('.') || 'unknown',
+                        message: e.message,
+                    })),
+                },
+                400
+            );
+        }
+    }),
+    AuthController.setup2FA
+);
+
+auth.post(
+    '/2fa/verify-setup',
+    authenticate,
+    zValidator('json', Verify2FASetupSchema, (result, c) => {
+        if (!result.success) {
+            return c.json(
+                {
+                    success: false,
+                    statusCode: 400,
+                    errors: JSON.parse(result.error.message).map((e: any) => ({
+                        field: e.path.join('.') || 'unknown',
+                        message: e.message,
+                    })),
+                },
+                400
+            );
+        }
+    }),
+    AuthController.verify2FASetup
+);
+
+auth.post(
+    '/2fa/login',
+    loginRateLimiter,
+    zValidator('json', Login2FASchema, (result, c) => {
+        if (!result.success) {
+            return c.json(
+                {
+                    success: false,
+                    statusCode: 400,
+                    errors: JSON.parse(result.error.message).map((e: any) => ({
+                        field: e.path.join('.') || 'unknown',
+                        message: e.message,
+                    })),
+                },
+                400
+            );
+        }
+    }),
+    AuthController.login2FA
+);
+
+auth.post(
+    '/2fa/resend',
+    loginRateLimiter,
+    zValidator('json', Resend2FAOTPSchema, (result, c) => {
+        if (!result.success) {
+            return c.json(
+                {
+                    success: false,
+                    statusCode: 400,
+                    errors: JSON.parse(result.error.message).map((e: any) => ({
+                        field: e.path.join('.') || 'unknown',
+                        message: e.message,
+                    })),
+                },
+                400
+            );
+        }
+    }),
+    AuthController.resend2FAOTP
+);
+
+auth.post('/2fa/disable', authenticate, requireRecentOTP('disable_2fa'), AuthController.disable2FA);
+
+// OTP for sensitive actions
+auth.post(
+    '/otp/request',
+    authenticate,
+    zValidator('json', RequestSensitiveOTPSchema, (result, c) => {
+        if (!result.success) {
+            return c.json(
+                {
+                    success: false,
+                    statusCode: 400,
+                    errors: JSON.parse(result.error.message).map((e: any) => ({
+                        field: e.path.join('.') || 'unknown',
+                        message: e.message,
+                    })),
+                },
+                400
+            );
+        }
+    }),
+    AuthController.requestSensitiveOTP
+);
+
+auth.post(
+    '/otp/verify',
+    authenticate,
+    zValidator('json', VerifySensitiveOTPSchema, (result, c) => {
+        if (!result.success) {
+            return c.json(
+                {
+                    success: false,
+                    statusCode: 400,
+                    errors: JSON.parse(result.error.message).map((e: any) => ({
+                        field: e.path.join('.') || 'unknown',
+                        message: e.message,
+                    })),
+                },
+                400
+            );
+        }
+    }),
+    AuthController.verifySensitiveOTP
 );
 
 // Admin routes (admin role required)
