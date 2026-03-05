@@ -1,5 +1,5 @@
 import { Schema, model, Document, Types } from 'mongoose';
-import { IRefreshToken } from '../../types';
+import { IRefreshToken, IRefreshTokenModel } from '../../types';
 import { unprefixId } from '../../utils/id';
 
 // Define a Mongoose schema for the Refresh Token
@@ -67,6 +67,9 @@ RefreshTokenSchema.statics.revokeAllUserTokens = async function (userId: string)
 };
 
 // Create and export the Mongoose model
-export const RefreshToken = model<IRefreshToken & Document>('RefreshToken', RefreshTokenSchema);
+export const RefreshToken = model<IRefreshToken & Document, IRefreshTokenModel>(
+    'RefreshToken',
+    RefreshTokenSchema
+);
 
 export default RefreshToken;

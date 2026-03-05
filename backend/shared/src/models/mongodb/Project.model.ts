@@ -138,8 +138,8 @@ ProjectSchema.methods.isOverdue = function (): boolean {
 };
 
 // Static methods
-ProjectSchema.statics.findByOwner = function (ownerId: string) {
-    return this.find({ ownerId, isDeleted: false });
+ProjectSchema.statics.findByOwner = function (userId: string) {
+    return this.find({ createBy: unprefixId(userId), isDeleted: false });
 };
 
 ProjectSchema.statics.findByWorkspace = function (workspaceId: string) {
