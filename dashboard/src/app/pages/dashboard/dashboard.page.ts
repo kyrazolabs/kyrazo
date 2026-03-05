@@ -20,7 +20,7 @@ import { MessageService } from 'primeng/api';
 import { SupportDialogComponent } from '@shared/components/support-dialog/support-dialog.component';
 
 // Services
-import { ProjectService } from '@core/services/project.service';
+import { NamespaceService } from '@core/services/namespace.service';
 import { SentryService } from '@core/3rd-party/sentry';
 
 @Component({
@@ -45,16 +45,16 @@ import { SentryService } from '@core/3rd-party/sentry';
     providers: [MessageService],
 })
 export class DashboardPage {
-    private projectService = inject(ProjectService);
+    private namespaceService = inject(NamespaceService);
     private messageService = inject(MessageService);
     private sentry = inject(SentryService);
 
     // Dialog State
-    projectDialogVisible = false;
+    namespaceDialogVisible = false;
     isCreating = false;
 
     // Form Data
-    projectForm = {
+    namespaceForm = {
         name: '',
         description: '',
     };
@@ -107,28 +107,28 @@ export class DashboardPage {
     ];
 
     handleQuickAction(actionId: string) {
-        if (actionId === 'new-project') {
-            this.openCreateProjectDialog();
+        if (actionId === 'new-namespace') {
+            this.openCreateNamespaceDialog();
         }
     }
 
-    openCreateProjectDialog() {
-        this.projectForm = { name: '', description: '' };
-        this.projectDialogVisible = true;
+    openCreateNamespaceDialog() {
+        this.namespaceForm = { name: '', description: '' };
+        this.namespaceDialogVisible = true;
     }
 
-    createProject() {
-        if (!this.projectForm.name.trim()) return;
+    createNamespace() {
+        if (!this.namespaceForm.name.trim()) return;
 
         this.isCreating = true;
-        this.projectService.create(this.projectForm).subscribe({
+        this.namespaceService.create(this.namespaceForm).subscribe({
             next: (response) => {
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Success',
-                    detail: 'Project created successfully',
+                    detail: 'Namespace created successfully',
                 });
-                this.projectDialogVisible = false;
+                this.namespaceDialogVisible = false;
                 this.isCreating = false;
             },
             error: (err) => {
@@ -136,7 +136,7 @@ export class DashboardPage {
                 this.messageService.add({
                     severity: 'error',
                     summary: 'Error',
-                    detail: 'Failed to create project',
+                    detail: 'Failed to create namespace',
                 });
                 this.isCreating = false;
             },

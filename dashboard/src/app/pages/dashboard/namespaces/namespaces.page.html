@@ -2,8 +2,8 @@
     <!-- Header -->
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
         <div>
-            <h1 class="text-2xl font-bold">Projects</h1>
-            <p class="opacity-80">Manage your workspace projects and environments</p>
+            <h1 class="text-2xl font-bold">Namespaces</h1>
+            <p class="opacity-80">Manage your workspace namespaces and environments</p>
         </div>
         <div class="flex items-center gap-4">
              <p-button
@@ -12,11 +12,11 @@
                 size="small"
                 severity="secondary"
                 [outlined]="true"
-                (onClick)="loadProjects()"
+                (onClick)="loadNamespaces()"
                 [loading]="loading"
                 styleClass="rounded-xl!" />
              <p-button
-                label="New Project"
+                label="New Namespace"
                 icon="pi pi-plus"
                 size="small"
                 (onClick)="openNew()"
@@ -36,7 +36,7 @@
                     type="text"
                     [(ngModel)]="searchQuery"
                     (input)="onSearch()"
-                    placeholder="Search projects..."
+                    placeholder="Search namespaces..."
                     class="w-full md:w-80 rounded-xl!" />
             </p-iconfield>
         </div>
@@ -44,7 +44,7 @@
 
     <!-- Table -->
     <p-card class="card-panel">
-        <p-table [value]="projects" [loading]="loading" [rowHover]="true" [paginator]="true" [rows]="10" dataKey="_id"
+        <p-table [value]="namespaces" [loading]="loading" [rowHover]="true" [paginator]="true" [rows]="10" dataKey="_id"
                  responsiveLayout="scroll" [showGridlines]="false" styleClass="p-datatable-sm lg:p-datatable-md">
             <ng-template pTemplate="header">
                 <tr>
@@ -58,18 +58,18 @@
                     <th class="rounded-xl! border-none! text-center" style="min-width: 120px">Actions</th>
                 </tr>
             </ng-template>
-            <ng-template pTemplate="body" let-project>
+            <ng-template pTemplate="body" let-namespace>
                 <tr>
-                    <td class="font-bold text-surface-900 dark:text-surface-0 truncate max-w-[200px]" [pTooltip]="project.name" tooltipPosition="top">
-                        {{ project.name }}
+                    <td class="font-bold text-surface-900 dark:text-surface-0 truncate max-w-[200px]" [pTooltip]="namespace.name" tooltipPosition="top">
+                        {{ namespace.name }}
                     </td>
                     <td class="text-surface-600 dark:text-surface-400">
-                        <div class="truncate max-w-[300px]" [pTooltip]="project.description" tooltipPosition="top">
-                            {{ project.description || '-' }}
+                        <div class="truncate max-w-[300px]" [pTooltip]="namespace.description" tooltipPosition="top">
+                            {{ namespace.description || '-' }}
                         </div>
                     </td>
                     <td>
-                        <span class="text-sm text-surface-500">{{ project.createdAt | date:'mediumDate' }}</span>
+                        <span class="text-sm text-surface-500">{{ namespace.createdAt | date:'mediumDate' }}</span>
                     </td>
                     <td>
                         <div class="flex justify-center gap-2">
@@ -79,7 +79,7 @@
                                 size="small"
                                 severity="secondary"
                                 styleClass="rounded-xl!"
-                                (onClick)="editProject(project)"
+                                (onClick)="editNamespace(namespace)"
                                 pTooltip="Edit" />
                             <p-button
                                 icon="pi pi-trash"
@@ -87,7 +87,7 @@
                                 size="small"
                                 severity="danger"
                                 styleClass="rounded-xl!"
-                                (onClick)="deleteProject(project)"
+                                (onClick)="deleteNamespace(namespace)"
                                 pTooltip="Delete" />
                         </div>
                     </td>
@@ -98,8 +98,8 @@
                     <td colspan="4" class="text-center py-12!">
                         <div class="flex flex-col items-center gap-4">
                             <i class="icon-[hugeicons--dashboard-square-01] text-6xl! text-surface-400"></i>
-                            <div class="text-lg! font-semibold text-surface-500">No projects found.</div>
-                            <p-button label="Create Project" severity="primary" styleClass="rounded-xl!" size="small" (onClick)="openNew()" />
+                            <div class="text-lg! font-semibold text-surface-500">No namespaces found.</div>
+                            <p-button label="Create Namespace" severity="primary" styleClass="rounded-xl!" size="small" (onClick)="openNew()" />
                         </div>
                     </td>
                 </tr>
@@ -110,9 +110,9 @@
 
 <!-- Create/Edit Dialog -->
 <p-dialog
-    [(visible)]="projectDialog"
+    [(visible)]="namespaceDialog"
     [style]="{ width: '450px' }"
-    [header]="isEdit ? 'Edit Project' : 'New Project'"
+    [header]="isEdit ? 'Edit Namespace' : 'New Namespace'"
     [modal]="true"
     styleClass="p-fluid rounded-2xl!"
     [draggable]="false"
@@ -121,14 +121,14 @@
         <div class="flex flex-col gap-4 mt-2">
             <div class="flex flex-col gap-2">
                 <label for="name" class="font-bold">Name</label>
-                <input type="text" pInputText id="name" [(ngModel)]="projectForm.name" required autofocus placeholder="e.g., My Web App, E-commerce API" />
-                @if (!projectForm.name) {
+                <input type="text" pInputText id="name" [(ngModel)]="namespaceForm.name" required autofocus placeholder="e.g., My Web App, E-commerce API" />
+                @if (!namespaceForm.name) {
                     <small class="text-red-500">Name is required.</small>
                 }
             </div>
             <div class="flex flex-col gap-2">
                 <label for="description" class="font-bold">Description</label>
-                <textarea id="description" pInputTextarea [(ngModel)]="projectForm.description" required rows="3" cols="20" placeholder="Brief description of your project..."></textarea>
+                <textarea id="description" pInputTextarea [(ngModel)]="namespaceForm.description" required rows="3" cols="20" placeholder="Brief description of your namespace..."></textarea>
             </div>
             <div class="flex flex-col gap-2">
                 <div class="flex items-center justify-between">
@@ -141,13 +141,12 @@
                         class="px-2.5 py-0.5 rounded-full bg-primary-500/10 border border-primary-500/30 text-primary-600 shadow-primary-500/20 text-[10px] font-bold uppercase tracking-wider cursor-pointer">
                         Pro</span>
                     }
-                    <!-- <p-tag *ngIf="!" value="Pro" severity="warn" [rounded]="true" styleClass="text-[10px] py-1 cursor-pointer transition-transform hover:scale-105" (click)="dialogService.openBillingDialog()" pTooltip="Upgrade to Pro to customize header prefixes" /> -->
                 </div>
                 <input
                     type="text"
                     pInputText
                     id="prefix"
-                    [(ngModel)]="projectForm.whiteLabelHeaders"
+                    [(ngModel)]="namespaceForm.whiteLabelHeaders"
                     [placeholder]="hasWhiteLabelFeature ? 'e.g. X-Kyrazo' : 'X-Webhook (Default)'"
                     [disabled]="!hasWhiteLabelFeature"
                     class="rounded-xl!"
@@ -161,9 +160,7 @@
 
     <ng-template pTemplate="footer">
         <p-button label="Cancel" icon="pi pi-times" [text]="true" severity="secondary" (onClick)="hideDialog()" styleClass="rounded-xl!" />
-        <p-button label="Save" icon="pi pi-check" (onClick)="saveProject()" [disabled]="!projectForm.name" styleClass="rounded-xl!" />
-        <!-- <p-button label="Cancel" icon="pi pi-times" [text]="true" (onClick)="hideDialog()" />
-        <p-button label="Save" icon="pi pi-check" [text]="true" (onClick)="saveProject()" [disabled]="!projectForm.name" /> -->
+        <p-button label="Save" icon="pi pi-check" (onClick)="saveNamespace()" [disabled]="!namespaceForm.name" styleClass="rounded-xl!" />
     </ng-template>
 </p-dialog>
 

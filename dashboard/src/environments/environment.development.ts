@@ -110,13 +110,13 @@ export const environment = {
         leave: (id: string) => `${baseUrl}/v1/workspaces/${id}/leave`,
     },
 
-    project: {
-        create: `${baseUrl}/v1/projects`,
-        getWorkspaceProjects: `${baseUrl}/v1/projects/workspace`,
-        get: (id: string) => `${baseUrl}/v1/projects/${id}`,
-        update: (id: string) => `${baseUrl}/v1/projects/${id}`,
-        delete: (id: string) => `${baseUrl}/v1/projects/${id}`,
-        restore: (id: string) => `${baseUrl}/v1/projects/${id}/restore`,
+    namespace: {
+        create: `${baseUrl}/v1/namespaces`,
+        getWorkspaceNamespaces: `${baseUrl}/v1/namespaces/workspace`,
+        get: (id: string) => `${baseUrl}/v1/namespaces/${id}`,
+        update: (id: string) => `${baseUrl}/v1/namespaces/${id}`,
+        delete: (id: string) => `${baseUrl}/v1/namespaces/${id}`,
+        restore: (id: string) => `${baseUrl}/v1/namespaces/${id}/restore`,
     },
     analytics: {
         dispatchUsage: `${baseUrl}/v1/analytics/dispatch/usage`,

@@ -136,17 +136,17 @@ export const environment = {
             `https://api.kyrazo.com/dashboard/v1/workspaces/${id}/leave`,
     },
 
-    project: {
-        create: `https://api.kyrazo.com/dashboard/v1/projects`,
-        getWorkspaceProjects: `https://api.kyrazo.com/dashboard/v1/projects/workspace`,
+    namespace: {
+        create: `https://api.kyrazo.com/dashboard/v1/namespaces`,
+        getWorkspaceNamespaces: `https://api.kyrazo.com/dashboard/v1/namespaces/workspace`,
         get: (id: string) =>
-            `https://api.kyrazo.com/dashboard/v1/projects/${id}`,
+            `https://api.kyrazo.com/dashboard/v1/namespaces/${id}`,
         update: (id: string) =>
-            `https://api.kyrazo.com/dashboard/v1/projects/${id}`,
+            `https://api.kyrazo.com/dashboard/v1/namespaces/${id}`,
         delete: (id: string) =>
-            `https://api.kyrazo.com/dashboard/v1/projects/${id}`,
+            `https://api.kyrazo.com/dashboard/v1/namespaces/${id}`,
         restore: (id: string) =>
-            `https://api.kyrazo.com/dashboard/v1/projects/${id}/restore`,
+            `https://api.kyrazo.com/dashboard/v1/namespaces/${id}/restore`,
     },
     analytics: {
         dispatchUsage: `https://api.kyrazo.com/dashboard/v1/analytics/dispatch/usage`,

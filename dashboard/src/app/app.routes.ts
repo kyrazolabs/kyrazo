@@ -34,12 +34,12 @@ export const routes: Routes = [
                 data: { title: 'Dashboard', animation: 'dashboard-home' },
             },
             {
-                path: 'projects',
+                path: 'namespaces',
                 loadComponent: () =>
-                    import('@pages/dashboard/projects/projects.page').then(
-                        (p) => p.ProjectsPage,
+                    import('@pages/dashboard/namespaces/namespaces.page').then(
+                        (p) => p.NamespacesPage,
                     ),
-                data: { title: 'Projects', animation: 'projects' },
+                data: { title: 'Namespaces', animation: 'namespaces' },
             },
             {
                 path: 'connectors',

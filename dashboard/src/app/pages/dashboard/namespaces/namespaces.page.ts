@@ -21,14 +21,14 @@ import { ISubscription } from '@models/billing.types';
 import { SubscriptionService } from '@core/services/subscription.service';
 
 // Services
-import { ProjectService } from '@core/services/project.service';
+import { NamespaceService } from '@core/services/namespace.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { GetProjectsResponse, IProject } from '@models/project.types';
+import { GetNamespacesResponse, INamespace } from '@models/namespace.types';
 import { SentryService } from '@core/3rd-party/sentry';
 import { DialogService } from '@shared/services/dialog.service';
 
 @Component({
-    selector: 'app-projects.page',
+    selector: 'app-namespaces.page',
     standalone: true,
     imports: [
         CommonModule,
@@ -48,24 +48,24 @@ import { DialogService } from '@shared/services/dialog.service';
         TooltipModule,
         MenuModule,
     ],
-    templateUrl: './projects.page.html',
-    styleUrl: './projects.page.scss',
+    templateUrl: './namespaces.page.html',
+    styleUrl: './namespaces.page.scss',
     providers: [MessageService, ConfirmationService],
 })
-export class ProjectsPage implements OnInit {
-    private projectService = inject(ProjectService);
+export class NamespacesPage implements OnInit {
+    private namespaceService = inject(NamespaceService);
     private messageService = inject(MessageService);
     private confirmationService = inject(ConfirmationService);
     private sentry = inject(SentryService);
     public subscriptionService = inject(SubscriptionService);
     public dialogService = inject(DialogService);
 
-    projects: IProject[] = [];
+    namespaces: INamespace[] = [];
     loading = false;
 
     // Dialog
-    projectDialog = false;
-    projectForm: {
+    namespaceDialog = false;
+    namespaceForm: {
         name: string;
         description: string;
         whiteLabelHeaders: string;
@@ -89,16 +89,16 @@ export class ProjectsPage implements OnInit {
     searchQuery = '';
 
     ngOnInit() {
-        this.loadProjects();
+        this.loadNamespaces();
     }
 
-    loadProjects() {
+    loadNamespaces() {
         this.loading = true;
-        this.projectService
-            .getWorkspaceProjects({ q: this.searchQuery })
+        this.namespaceService
+            .getWorkspaceNamespaces({ q: this.searchQuery })
             .subscribe({
                 next: (res) => {
-                    this.projects = res.data;
+                    this.namespaces = res.data;
                     this.loading = false;
                 },
                 error: (err) => {
@@ -107,63 +107,63 @@ export class ProjectsPage implements OnInit {
                     this.messageService.add({
                         severity: 'error',
                         summary: 'Error',
-                        detail: 'Failed to load projects',
+                        detail: 'Failed to load namespaces',
                     });
                 },
             });
     }
 
     onSearch() {
-        this.loadProjects();
+        this.loadNamespaces();
     }
 
     openNew() {
-        this.projectForm = {
+        this.namespaceForm = {
             name: '',
             description: '',
             whiteLabelHeaders: '',
         };
         this.isEdit = false;
-        this.projectDialog = true;
+        this.namespaceDialog = true;
     }
 
-    editProject(project: IProject) {
-        this.projectForm = {
-            name: project.name,
-            description: project.description || '',
-            whiteLabelHeaders: project.whiteLabelHeaders || '',
-            _id: project.id,
+    editNamespace(namespace: INamespace) {
+        this.namespaceForm = {
+            name: namespace.name,
+            description: namespace.description || '',
+            whiteLabelHeaders: namespace.whiteLabelHeaders || '',
+            _id: namespace.id,
         };
         this.isEdit = true;
-        this.projectDialog = true;
+        this.namespaceDialog = true;
     }
 
     hideDialog() {
-        this.projectDialog = false;
+        this.namespaceDialog = false;
         this.isSaving = false;
     }
 
-    saveProject() {
-        if (!this.projectForm.name.trim()) return;
+    saveNamespace() {
+        if (!this.namespaceForm.name.trim()) return;
 
         this.isSaving = true;
 
-        if (this.isEdit && this.projectForm._id) {
+        if (this.isEdit && this.namespaceForm._id) {
             // Update
-            this.projectService
-                .update(this.projectForm._id, {
-                    name: this.projectForm.name,
-                    description: this.projectForm.description,
-                    whiteLabelHeaders: this.projectForm.whiteLabelHeaders,
+            this.namespaceService
+                .update(this.namespaceForm._id, {
+                    name: this.namespaceForm.name,
+                    description: this.namespaceForm.description,
+                    whiteLabelHeaders: this.namespaceForm.whiteLabelHeaders,
                 })
                 .subscribe({
                     next: (res) => {
                         this.messageService.add({
                             severity: 'success',
                             summary: 'Success',
-                            detail: 'Project updated',
+                            detail: 'Namespace updated',
                         });
-                        this.loadProjects();
+                        this.loadNamespaces();
                         this.hideDialog();
                     },
                     error: (err) => {
@@ -171,30 +171,30 @@ export class ProjectsPage implements OnInit {
                         this.messageService.add({
                             severity: 'error',
                             summary: 'Error',
-                            detail: 'Failed to update project',
+                            detail: 'Failed to update namespace',
                         });
                         this.isSaving = false;
                     },
                 });
         } else {
             // Create
-            this.projectService
+            this.namespaceService
                 .create({
-                    name: this.projectForm.name,
-                    description: this.projectForm.description,
-                    whiteLabelHeaders: this.projectForm.whiteLabelHeaders,
+                    name: this.namespaceForm.name,
+                    description: this.namespaceForm.description,
+                    whiteLabelHeaders: this.namespaceForm.whiteLabelHeaders,
                 })
                 .subscribe({
                     next: (res) => {
                         this.messageService.add({
                             severity: 'success',
                             summary: 'Success',
-                            detail: 'Project created',
+                            detail: 'Namespace created',
                         });
-                        this.loadProjects();
+                        this.loadNamespaces();
                         this.hideDialog();
                         // Optionally reload window if we want to update topbar list immediately,
-                        // but for this page managing its own list, loadProjects is enough for the table view.
+                        // but for this page managing its own list, loadNamespaces is enough for the table view.
                         // If topbar sync is critical, we might need a signal or subject in a shared service.
                         // For now, let's just refresh the table.
                     },
@@ -202,10 +202,10 @@ export class ProjectsPage implements OnInit {
                         this.sentry.captureException(err);
                         const errorMessage =
                             err.error?.error?.code === 'LIMIT_EXCEEDED'
-                                ? 'Project limit exceeded for your current plan.'
+                                ? 'Namespace limit exceeded for your current plan.'
                                 : err.error?.error?.message ||
                                   err.message ||
-                                  'Failed to create project';
+                                  'Failed to create namespace';
 
                         this.messageService.add({
                             severity: 'error',
@@ -218,27 +218,27 @@ export class ProjectsPage implements OnInit {
         }
     }
 
-    deleteProject(project: IProject) {
+    deleteNamespace(namespace: INamespace) {
         this.confirmationService.confirm({
-            message: `Are you sure you want to delete the project "${project.name}"? This will permanently remove all associated configurations and data.`,
-            header: 'Delete Project',
+            message: `Are you sure you want to delete the namespace "${namespace.name}"? This will permanently remove all associated configurations and data.`,
+            header: 'Delete Namespace',
             icon: 'pi pi-exclamation-triangle',
             accept: () => {
-                this.projectService.delete(project.id).subscribe({
+                this.namespaceService.delete(namespace.id).subscribe({
                     next: () => {
                         this.messageService.add({
                             severity: 'success',
                             summary: 'Success',
-                            detail: 'Project deleted successfully',
+                            detail: 'Namespace deleted successfully',
                         });
-                        this.loadProjects();
+                        this.loadNamespaces();
                     },
                     error: (err) => {
                         this.sentry.captureException(err);
                         this.messageService.add({
                             severity: 'error',
                             summary: 'Error',
-                            detail: 'Failed to delete project',
+                            detail: 'Failed to delete namespace',
                         });
                     },
                 });

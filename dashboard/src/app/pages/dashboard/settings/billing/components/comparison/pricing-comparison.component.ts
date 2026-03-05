@@ -26,8 +26,8 @@ export class PricingComparisonComponent {
                     format: 'number',
                 },
                 {
-                    label: 'Max Projects',
-                    key: 'limits.maxProjects',
+                    label: 'Max Namespaces',
+                    key: 'limits.maxNamespaces',
                     format: 'unlimited',
                 },
                 {

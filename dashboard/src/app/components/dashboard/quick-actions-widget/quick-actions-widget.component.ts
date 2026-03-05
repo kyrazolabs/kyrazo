@@ -15,12 +15,12 @@ export class QuickActionsWidgetComponent {
 
     actions = [
         {
-            id: 'new-project',
-            label: 'New Project',
+            id: 'new-namespace',
+            label: 'New Namespace',
             icon: 'icon-[hugeicons--dashboard-square-01] size-6',
             color: 'text-indigo-500',
             bg: 'bg-indigo-50 dark:bg-indigo-900/10',
-            desc: 'Create a new workspace project',
+            desc: 'Create a new workspace namespace',
         },
         {
             label: 'New Source',

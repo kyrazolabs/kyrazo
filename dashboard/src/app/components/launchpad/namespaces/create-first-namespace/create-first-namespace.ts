@@ -11,8 +11,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
-import { ProjectService } from '@core/services/project.service';
-import { IProject } from '@models/project.types';
+import { NamespaceService } from '@core/services/namespace.service';
+import { INamespace } from '@models/namespace.types';
 import { TagModule } from 'primeng/tag';
 import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directive';
 import { ISubscription } from '@models/billing.types';
@@ -20,7 +20,7 @@ import { DialogService } from '@shared/services/dialog.service';
 import { SubscriptionService } from '@core/services/subscription.service';
 
 @Component({
-    selector: 'app-create-first-project',
+    selector: 'app-create-first-namespace',
     standalone: true,
     imports: [
         CommonModule,
@@ -33,27 +33,27 @@ import { SubscriptionService } from '@core/services/subscription.service';
         ScrollRevealDirective,
     ],
     providers: [MessageService],
-    templateUrl: './create-first-project.html',
-    styleUrls: ['./create-first-project.scss'],
+    templateUrl: './create-first-namespace.html',
+    styleUrls: ['./create-first-namespace.scss'],
 })
-export class CreateFirstProjectComponent {
+export class CreateFirstNamespaceComponent {
     @Input() visible = false;
     @Input() workspaceId?: string;
     @Output() visibleChange = new EventEmitter<boolean>();
-    @Output() projectCreated = new EventEmitter<IProject>();
+    @Output() namespaceCreated = new EventEmitter<INamespace>();
     @Output() skipped = new EventEmitter<void>();
 
-    projectForm: FormGroup;
+    namespaceForm: FormGroup;
     isCreating = false;
 
     constructor(
         private fb: FormBuilder,
-        private projectService: ProjectService,
+        private namespaceService: NamespaceService,
         private messageService: MessageService,
         public subscriptionService: SubscriptionService,
         public dialogService: DialogService,
     ) {
-        this.projectForm = this.fb.group({
+        this.namespaceForm = this.fb.group({
             name: [
                 '',
                 [
@@ -73,10 +73,10 @@ export class CreateFirstProjectComponent {
     }
 
     ngOnInit() {
-        // Auto-focus the project name input when dialog opens
+        // Auto-focus the namespace name input when dialog opens
         setTimeout(() => {
             const nameInput = document.getElementById(
-                'projectName',
+                'namespaceName',
             ) as HTMLInputElement;
             if (nameInput) {
                 nameInput.focus();
@@ -85,35 +85,35 @@ export class CreateFirstProjectComponent {
     }
 
     onCreate() {
-        if (this.projectForm.valid && this.workspaceId) {
+        if (this.namespaceForm.valid && this.workspaceId) {
             this.isCreating = true;
 
-            const formValue = this.projectForm.value;
-            const projectData = {
+            const formValue = this.namespaceForm.value;
+            const namespaceData = {
                 name: formValue.name,
                 description: formValue.description || '',
                 whiteLabelHeaders: formValue.whiteLabelHeaders || '',
                 workspaceId: this.workspaceId,
             };
 
-            this.projectService.create(projectData).subscribe({
+            this.namespaceService.create(namespaceData).subscribe({
                 next: (response) => {
                     this.messageService.add({
                         severity: 'success',
                         summary: 'Success!',
-                        detail: 'Your first project has been created successfully! 🎉',
+                        detail: 'Your first namespace has been created successfully! 🎉',
                     });
 
-                    this.projectCreated.emit(response.data.project);
+                    this.namespaceCreated.emit(response.data.namespace);
                     this.closeDialog();
                     this.isCreating = false;
                 },
                 error: (error) => {
-                    console.error('Failed to create project:', error);
+                    console.error('Failed to create namespace:', error);
                     const errorMessage =
                         error.error?.error?.code === 'LIMIT_EXCEEDED'
-                            ? 'Project limit exceeded for your current plan.'
-                            : 'Failed to create project. Please try again.';
+                            ? 'Namespace limit exceeded for your current plan.'
+                            : 'Failed to create namespace. Please try again.';
 
                     this.messageService.add({
                         severity: 'error',
@@ -125,8 +125,8 @@ export class CreateFirstProjectComponent {
             });
         } else {
             // Mark all fields as touched to show validation errors
-            Object.keys(this.projectForm.controls).forEach((key) => {
-                this.projectForm.get(key)?.markAsTouched();
+            Object.keys(this.namespaceForm.controls).forEach((key) => {
+                this.namespaceForm.get(key)?.markAsTouched();
             });
         }
     }
@@ -139,7 +139,7 @@ export class CreateFirstProjectComponent {
     closeDialog() {
         this.visible = false;
         this.visibleChange.emit(false);
-        this.projectForm.reset();
+        this.namespaceForm.reset();
         this.isCreating = false;
     }
 
@@ -147,6 +147,6 @@ export class CreateFirstProjectComponent {
     open() {
         this.visible = true;
         this.visibleChange.emit(true);
-        this.projectForm.reset();
+        this.namespaceForm.reset();
     }
 }

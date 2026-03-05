@@ -10,10 +10,10 @@
                 [icon]="isOpenSidebar()? 'pi pi-chevron-left' : 'pi pi-chevron-right'"
                 class="after:border after:border-surface-300 dark:after:border-surface-600" />
             <div class="flex items-center gap-1 lg:gap-2 overflow-hidden">
-                <!-- Project Selector (shown only when workspace is selected) -->
-                <div class="flex items-center justify-between cursor-pointer duration-300 hover:bg-surface-50 dark:hover:bg-surface-800/50 transition-all shrink-0 click-effect" (click)="toggleProjectSelector($event)">
+                <!-- Namespace Selector (shown only when workspace is selected) -->
+                <div class="flex items-center justify-between cursor-pointer duration-300 hover:bg-surface-50 dark:hover:bg-surface-800/50 transition-all shrink-0 click-effect" (click)="toggleNamespaceSelector($event)">
                     <div class="flex justify-between items-center gap-1 lg:gap-2">
-                        <h3 class="text-sm lg:text-lg font-medium truncate max-w-[100px] lg:max-w-none">{{ selectedProject?.name || 'Select Project' }}</h3>
+                        <h3 class="text-sm lg:text-lg font-medium truncate max-w-[100px] lg:max-w-none">{{ selectedNamespace?.name || 'Select Namespace' }}</h3>
                         <i class="icon-[lucide--chevrons-up-down] size-4 lg:size-5 aspect-square text-surface-400 dark:text-surface-500"></i>
                     </div>
                 </div>
@@ -21,22 +21,22 @@
                 <p class="text-sm lg:text-lg font-medium truncate"> {{ pageTitle ? pageTitle : '' }} </p>
             </div>
         </div>
-        <!-- Project Popover -->
+        <!-- Namespace Popover -->
         <p-popover #pp styleClass="rounded-2xl!">
             <div class="flex flex-col gap-2">
                 <div>
-                    <div *ngIf="loadingProjects" class="flex flex-col items-center justify-center p-2">
+                    <div *ngIf="loadingNamespaces" class="flex flex-col items-center justify-center p-2">
                         <i class="pi pi-spinner pi-spin"></i>
-                        <span class="text-sm">Loading projects...</span>
+                        <span class="text-sm">Loading namespaces...</span>
                     </div>
-                    <ul *ngIf="!loadingProjects" class="list-none p-0 m-0 flex flex-col">
-                        <li *ngFor="let project of projects" class="flex items-center gap-2 px-2 py-1 hover:bg-emphasis cursor-pointer rounded-lg click-effect" (click)="selectProject(project)">
+                    <ul *ngIf="!loadingNamespaces" class="list-none p-0 m-0 flex flex-col">
+                        <li *ngFor="let namespace of namespaces" class="flex items-center gap-2 px-2 py-1 hover:bg-emphasis cursor-pointer rounded-lg click-effect" (click)="selectNamespace(namespace)">
                             <div>
-                                <span class="text-sm font-medium">{{ project.name }}</span>
+                                <span class="text-sm font-medium">{{ namespace.name }}</span>
                             </div>
                         </li>
-                        <li *ngIf="projects.length === 0 && !loadingProjects" class="flex flex-col items-center justify-center p-2 text-sm text-center text-surface-500 dark:text-surface-400 line-clamp-2 click-effect">
-                            <i class="pi pi-plus" (click)="showCreateProject()"></i>
+                        <li *ngIf="namespaces.length === 0 && !loadingNamespaces" class="flex flex-col items-center justify-center p-2 text-sm text-center text-surface-500 dark:text-surface-400 line-clamp-2 click-effect">
+                            <i class="pi pi-plus" (click)="showCreateNamespace()"></i>
                             <span class="text-sm">Create One</span>
                         </li>
                     </ul>
@@ -194,7 +194,7 @@
 
 
 
-<p-dialog header="Create Project" [(visible)]="visible" [modal]="true" [style]="{ width: '50rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
+<p-dialog header="Create Namespace" [(visible)]="visible" [modal]="true" [style]="{ width: '50rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
     <div class="grid grid-cols-5">
 
     </div>

@@ -27,8 +27,8 @@ export class PricingCardComponent {
             format: 'number',
         },
         {
-            label: 'Max Projects',
-            key: 'limits.maxProjects',
+            label: 'Max Namespaces',
+            key: 'limits.maxNamespaces',
             format: 'unlimited',
         },
         { label: 'Max Members', key: 'limits.maxMembers', format: 'unlimited' },

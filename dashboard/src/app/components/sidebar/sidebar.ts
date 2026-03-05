@@ -130,8 +130,8 @@ export class SidebarComponent implements OnInit, AfterViewInit {
         this.selectedWorkspace = workspace;
         this.ss.setItem('workspace', workspace.id);
         this.wp.hide();
-        // Clear project selection when switching workspace
-        this.ss.removeItem('project');
+        // Clear namespace selection when switching workspace
+        this.ss.removeItem('namespace');
         // Navigate to dashboard root to reload all data for the new workspace
         this.router.navigate(['/']);
     }
