@@ -28,9 +28,7 @@ requiredEnvVars.forEach(envVar => {
 const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
 
 if (missingEnvVars.length > 0) {
-    throw new Error(
-        `Missing required environment variables: ${missingEnvVars.join(', ')}`
-    );
+    throw new Error(`Missing required environment variables: ${missingEnvVars.join(', ')}`);
 }
 
 /**
@@ -51,7 +49,7 @@ export const config = {
 
     // Application Configuration
     app: {
-        name: process.env.APP_NAME || 'B2B Todo App',
+        name: process.env.APP_NAME || 'Kyrazo',
         version: process.env.APP_VERSION || '1.0.0',
         url: process.env.APP_URL || 'http://localhost:3003',
         frontendUrl: process.env.FRONTEND_URL || 'http://localhost:4200',
@@ -77,13 +75,8 @@ export const config = {
         queue: {
             url: process.env.QUEUE_REDIS_URL,
             host: process.env.QUEUE_REDIS_HOST || process.env.REDIS_HOST!,
-            port: parseInt(
-                process.env.QUEUE_REDIS_PORT || process.env.REDIS_PORT!
-            ),
-            password:
-                process.env.QUEUE_REDIS_PASSWORD ||
-                process.env.REDIS_PASSWORD ||
-                '',
+            port: parseInt(process.env.QUEUE_REDIS_PORT || process.env.REDIS_PORT!),
+            password: process.env.QUEUE_REDIS_PASSWORD || process.env.REDIS_PASSWORD || '',
             db: parseInt(process.env.QUEUE_REDIS_DB || '1'),
         },
     },
@@ -145,22 +138,19 @@ export const config = {
                         points: 3, // 3req/h per email
                         duration: 60 * 60, // every hour
                         blockDuration: 0,
-                        keyPrefix: (email: string) =>
-                            `ratelimit:password:forgot:${email}`,
+                        keyPrefix: (email: string) => `ratelimit:password:forgot:${email}`,
                     },
                     reset: {
                         points: 10, // 10req/h
                         duration: 60 * 60, // every hour
                         blockDuration: 0,
-                        keyPrefix: (ip: string) =>
-                            `ratelimit:password:reset:${ip}`,
+                        keyPrefix: (ip: string) => `ratelimit:password:reset:${ip}`,
                     },
                     change: {
                         points: 10, // 10req/h
                         duration: 60 * 60, // every hour
                         blockDuration: 0,
-                        keyPrefix: (userId: string) =>
-                            `ratelimit:password:reset:${userId}`,
+                        keyPrefix: (userId: string) => `ratelimit:password:reset:${userId}`,
                     },
                 },
                 email: {
@@ -168,16 +158,14 @@ export const config = {
                         points: 3, // 3req/h per email
                         duration: 60 * 60, // every hour
                         blockDuration: 0,
-                        keyPrefix: (email: string) =>
-                            `ratelimit:email:verify:${email}`,
+                        keyPrefix: (email: string) => `ratelimit:email:verify:${email}`,
                     },
                 },
                 multiFa: {
                     points: 5, // 5req/10min
                     duration: 60 * 10, // every 10 min
                     blockDuration: 0,
-                    keyPrefix: (userId: string) =>
-                        `ratelimit:2fa:user:${userId}`,
+                    keyPrefix: (userId: string) => `ratelimit:2fa:user:${userId}`,
                 },
             },
             protected: {
@@ -185,22 +173,19 @@ export const config = {
                     points: 60, // 60 requests per minute
                     duration: 60,
                     blockDuration: 0,
-                    keyPrefix: (userId: string) =>
-                        `ratelimit:protected:normal:${userId}`,
+                    keyPrefix: (userId: string) => `ratelimit:protected:normal:${userId}`,
                 },
                 medium: {
                     points: 40, // 40 requests per minute
                     duration: 60,
                     blockDuration: 60, // 1 minute block
-                    keyPrefix: (userId: string) =>
-                        `ratelimit:protected:medium:${userId}`,
+                    keyPrefix: (userId: string) => `ratelimit:protected:medium:${userId}`,
                 },
                 sensitive: {
                     points: 20, // 20 requests per minute
                     duration: 60,
                     blockDuration: 300, // 5 minutes block
-                    keyPrefix: (userId: string) =>
-                        `ratelimit:protected:sensitive:${userId}`,
+                    keyPrefix: (userId: string) => `ratelimit:protected:sensitive:${userId}`,
                 },
             },
         },
@@ -232,12 +217,8 @@ export const config = {
         resend: {
             apiKey: process.env.RESEND_KEY!,
             rateLimit: {
-                maxRequestsPerSecond: parseInt(
-                    process.env.RESEND_RATE_LIMIT || '10'
-                ),
-                maxRequestsPerMinute: parseInt(
-                    process.env.RESEND_RATE_LIMIT_MINUTE || '100'
-                ),
+                maxRequestsPerSecond: parseInt(process.env.RESEND_RATE_LIMIT || '10'),
+                maxRequestsPerMinute: parseInt(process.env.RESEND_RATE_LIMIT_MINUTE || '100'),
             },
         },
         from: {
@@ -272,8 +253,7 @@ export const config = {
     contacts: {
         support: process.env.SUPPORT_EMAIL || 'support@yourdomain.com',
         abuse: process.env.ABUSE_EMAIL || 'abuse@yourdomain.com',
-        partnerships:
-            process.env.PARTNERSHIPS_EMAIL || 'partners@yourdomain.com',
+        partnerships: process.env.PARTNERSHIPS_EMAIL || 'partners@yourdomain.com',
     },
 
     // Development Configuration
@@ -294,20 +274,12 @@ export function validateConfig(): void {
     const errors: string[] = [];
 
     // Validate server port
-    if (
-        isNaN(config.server.port) ||
-        config.server.port < 1 ||
-        config.server.port > 65535
-    ) {
+    if (isNaN(config.server.port) || config.server.port < 1 || config.server.port > 65535) {
         errors.push('Invalid server port');
     }
 
     // Validate Redis port
-    if (
-        isNaN(config.redis.port) ||
-        config.redis.port < 1 ||
-        config.redis.port > 65535
-    ) {
+    if (isNaN(config.redis.port) || config.redis.port < 1 || config.redis.port > 65535) {
         errors.push('Invalid Redis port');
     }
 
@@ -321,9 +293,7 @@ export function validateConfig(): void {
     }
 
     if (errors.length > 0) {
-        throw new Error(
-            `Configuration validation failed: ${errors.join(', ')}`
-        );
+        throw new Error(`Configuration validation failed: ${errors.join(', ')}`);
     }
 }
 
