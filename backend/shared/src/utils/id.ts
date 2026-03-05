@@ -8,6 +8,8 @@ export const ID_PREFIXES = {
     workspace: 'wsp',
     userWorkspace: 'uw',
     workspaceInvitation: 'winv',
+    user: 'usr',
+    subscription: 'sub',
 } as const;
 
 export type IdType = keyof typeof ID_PREFIXES;
@@ -100,6 +102,8 @@ export function transformWithId<T>(data: T, type: IdType): TransformedWithId<T> 
             sourceId: 'source',
             targetId: 'target',
             endpointId: 'endpoint',
+            userId: 'user',
+            subscriptionId: 'subscription',
         };
 
         for (const [field, idType] of Object.entries(idFields)) {
@@ -121,6 +125,7 @@ export function transformWithId<T>(data: T, type: IdType): TransformedWithId<T> 
             source: 'source',
             target: 'target',
             endpoint: 'endpoint',
+            user: 'user',
         };
 
         for (const [field, idType] of Object.entries(commonRefFields)) {

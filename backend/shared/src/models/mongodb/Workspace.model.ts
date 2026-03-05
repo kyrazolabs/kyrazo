@@ -297,7 +297,7 @@ userWorkspaceSchema.methods.canManageSettings = function (): boolean {
 
 // Static methods
 workspaceSchema.statics.findByOwner = function (ownerId: string): Promise<IWorkspace[]> {
-    return this.find({ ownerId, isArchived: false });
+    return this.find({ ownerId: unprefixId(ownerId), isArchived: false });
 };
 workspaceSchema.statics.searchWorkspaces = function (
     query: string,
@@ -399,7 +399,10 @@ userWorkspaceSchema.statics.findByUserAndWorkspace = async function (
     userId: string,
     workspaceId: string
 ) {
-    return await this.findOne({ userId, workspaceId: unprefixId(workspaceId) });
+    return await this.findOne({
+        userId: unprefixId(userId),
+        workspaceId: unprefixId(workspaceId),
+    });
 };
 userWorkspaceSchema.statics.findByEmailAndWorkspace = async function (
     email: string,
@@ -428,14 +431,20 @@ userWorkspaceSchema.statics.getUserRole = async function (
     userId: string,
     workspaceId: string
 ): Promise<WorkspaceRole | null> {
-    const membership = await this.findOne({ userId, workspaceId: unprefixId(workspaceId) });
+    const membership = await this.findOne({
+        userId: unprefixId(userId),
+        workspaceId: unprefixId(workspaceId),
+    });
     return membership ? membership.role : null;
 };
 userWorkspaceSchema.statics.isUserMember = async function (
     userId: string,
     workspaceId: string
 ): Promise<boolean> {
-    const membership = await this.findOne({ userId, workspaceId: unprefixId(workspaceId) });
+    const membership = await this.findOne({
+        userId: unprefixId(userId),
+        workspaceId: unprefixId(workspaceId),
+    });
     return !!membership;
 };
 userWorkspaceSchema.statics.isUserOwner = async function (
@@ -443,7 +452,7 @@ userWorkspaceSchema.statics.isUserOwner = async function (
     workspaceId: string
 ): Promise<boolean> {
     const membership = await this.findOne({
-        userId,
+        userId: unprefixId(userId),
         workspaceId: unprefixId(workspaceId),
         role: 'owner',
     });
@@ -454,7 +463,7 @@ userWorkspaceSchema.statics.isUserAdmin = async function (
     workspaceId: string
 ): Promise<boolean> {
     const membership = await this.findOne({
-        userId,
+        userId: unprefixId(userId),
         workspaceId: unprefixId(workspaceId),
         role: { $in: ['owner', 'admin'] },
     });

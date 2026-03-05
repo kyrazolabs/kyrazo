@@ -143,9 +143,21 @@ const subscriptionSchema = new Schema<ISubscription>(
         timestamps: true,
         toJSON: {
             virtuals: true,
+            transform: function (doc, ret: any) {
+                ret.id = `sub_${ret._id.toString()}`;
+                delete ret._id;
+                delete (ret as any).__v;
+                return ret;
+            },
         },
         toObject: {
             virtuals: true,
+            transform: function (doc, ret: any) {
+                ret.id = `sub_${ret._id.toString()}`;
+                delete ret._id;
+                delete (ret as any).__v;
+                return ret;
+            },
         },
     }
 );
