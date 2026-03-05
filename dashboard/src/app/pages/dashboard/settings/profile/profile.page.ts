@@ -15,8 +15,11 @@ import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogModule } from 'primeng/dialog';
+import { InputOtpModule } from 'primeng/inputotp';
 import { SettingService } from '@core/services/settings.service';
 import { AuthService } from '@core/auth/auth.service';
 import { UserProfileResponse } from '@models/auth.types';
@@ -40,6 +43,9 @@ import { DialogService } from '@shared/services/dialog.service';
         TagModule,
         TooltipModule,
         ToastModule,
+        ConfirmDialogModule,
+        DialogModule,
+        InputOtpModule,
     ],
     templateUrl: './profile.page.html',
     styleUrl: './profile.page.scss',
@@ -53,6 +59,7 @@ export class ProfileSettingsPage {
     private readonly sentry = inject(SentryService);
     private readonly posthog = inject(PostHogService);
     private readonly dialogService = inject(DialogService);
+    private readonly confirmationService = inject(ConfirmationService);
 
     // Reactive forms
     profileForm!: FormGroup;
@@ -60,6 +67,8 @@ export class ProfileSettingsPage {
     originalProfile: UserProfileResponse | null = null;
     isSaving = false;
     isChangingPassword = false;
+
+    // 2FA state from DialogService is now used
 
     timezoneOptions = [
         { label: 'UTC', value: 'UTC' },
@@ -138,6 +147,13 @@ export class ProfileSettingsPage {
                 language: this.originalProfile.language,
             });
         }
+
+        // Listen for 2FA enablement from global dialog
+        this.dialogService.twofaEnabled$.subscribe(() => {
+            if (this.originalProfile) {
+                this.originalProfile.is2FAEnabled = true;
+            }
+        });
     }
 
     private initializeForm() {
@@ -353,5 +369,46 @@ export class ProfileSettingsPage {
 
     openBilling() {
         this.dialogService.openBillingDialog();
+    }
+
+    start2FASetup() {
+        this.dialogService.openTwofaSetupDialog();
+    }
+
+    disable2FA() {
+        this.confirmationService.confirm({
+            message:
+                'Are you sure you want to disable Two-Factor Authentication? This will make your account less secure.',
+            header: 'Disable 2FA',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                this.authService.disable2FA().subscribe({
+                    next: (res) => {
+                        if (res.success) {
+                            if (this.originalProfile) {
+                                this.originalProfile.is2FAEnabled = false;
+                            }
+                            this.messageService.add({
+                                severity: 'success',
+                                summary: 'Success',
+                                detail: '2FA has been disabled',
+                            });
+                        }
+                    },
+                    error: (err) => {
+                        // If the error status is 403 (handled by interceptor), we don't need to show another error here
+                        if (err.status !== 403) {
+                            this.messageService.add({
+                                severity: 'error',
+                                summary: 'Error',
+                                detail:
+                                    err.error?.error?.message ||
+                                    'Failed to disable 2FA',
+                            });
+                        }
+                    },
+                });
+            },
+        });
     }
 }
