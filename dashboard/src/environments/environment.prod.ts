@@ -14,6 +14,13 @@ export const environment = {
         changePassword: `${baseUrl}/v1/auth/change-password`,
         resetPassword: `${baseUrl}/v1/auth/reset-password`,
         refreshToken: `${baseUrl}/v1/auth/refresh-token`,
+        verify2fa: `${baseUrl}/v1/auth/2fa/login`,
+        setup2fa: `${baseUrl}/v1/auth/2fa/setup`,
+        verify2faSetup: `${baseUrl}/v1/auth/2fa/verify-setup`,
+        requestOTP: `${baseUrl}/v1/auth/otp/request`,
+        verifyOTP: `${baseUrl}/v1/auth/otp/verify`,
+        disable2fa: `${baseUrl}/v1/auth/2fa/disable`,
+        resend2fa: `${baseUrl}/v1/auth/2fa/resend`,
     },
     source: {
         create: `${baseUrl}/v1/sources`,
@@ -100,6 +107,7 @@ export const environment = {
         getMembers: (id: string) => `${baseUrl}/v1/workspaces/${id}/members`,
         getInvitationDetails: (token: string) =>
             `${baseUrl}/v1/workspaces/invitations/details/${token}`,
+        leave: (id: string) => `${baseUrl}/v1/workspaces/${id}/leave`,
     },
 
     project: {

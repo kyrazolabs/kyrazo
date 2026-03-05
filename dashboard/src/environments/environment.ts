@@ -13,6 +13,13 @@ export const environment = {
         changePassword: `https://api.kyrazo.com/dashboard/v1/auth/change-password`,
         resetPassword: `https://api.kyrazo.com/dashboard/v1/auth/reset-password`,
         refreshToken: `https://api.kyrazo.com/dashboard/v1/auth/refresh-token`,
+        verify2fa: `https://api.kyrazo.com/dashboard/v1/auth/2fa/login`,
+        setup2fa: `https://api.kyrazo.com/dashboard/v1/auth/2fa/setup`,
+        verify2faSetup: `https://api.kyrazo.com/dashboard/v1/auth/2fa/verify-setup`,
+        requestOTP: `https://api.kyrazo.com/dashboard/v1/auth/otp/request`,
+        verifyOTP: `https://api.kyrazo.com/dashboard/v1/auth/otp/verify`,
+        disable2fa: `https://api.kyrazo.com/dashboard/v1/auth/2fa/disable`,
+        resend2fa: `https://api.kyrazo.com/dashboard/v1/auth/2fa/resend`,
     },
     source: {
         create: `https://api.kyrazo.com/dashboard/v1/sources`,
@@ -125,6 +132,8 @@ export const environment = {
             `https://api.kyrazo.com/dashboard/v1/workspaces/${id}/members`,
         getInvitationDetails: (token: string) =>
             `https://api.kyrazo.com/dashboard/v1/workspaces/invitations/details/${token}`,
+        leave: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v1/workspaces/${id}/leave`,
     },
 
     project: {
