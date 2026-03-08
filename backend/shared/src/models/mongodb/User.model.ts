@@ -187,14 +187,14 @@ userSchema.statics.getUserStats = async function () {
             },
         },
         {
-            $namespace: {
+            $project: {
                 _id: 0,
                 totalUsers: 1,
                 activeUsers: 1,
                 inactiveUsers: 1,
             },
         },
-    ]);
+    ] as any[]);
 
     return stats[0] || { totalUsers: 0, activeUsers: 0, inactiveUsers: 0 };
 };

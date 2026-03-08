@@ -28,10 +28,10 @@ export class SubscriptionService {
             throw new Error('Workspace already has an active subscription');
         }
 
-        const user = await User.findById(userId);
+        const user = await User.findById(unprefixId(userId));
         if (!user) throw new Error('User not found');
 
-        let customer = await Customer.findOne({ userId });
+        let customer = await Customer.findOne({ userId: unprefixId(userId) });
         if (!customer) {
             const stripeCustomer = await stripe.customers.create({
                 email: user.email,

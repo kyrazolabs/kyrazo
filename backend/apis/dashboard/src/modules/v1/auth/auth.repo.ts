@@ -11,8 +11,13 @@ import {
 export class AuthRepository {
     private _transformUser(user: any): IUser | null {
         if (!user) return null;
-        // transformWithId handles _id -> id with 'usr_' prefix
-        return transformWithId(user, 'user') as any;
+        const transformed = transformWithId(user, 'user') as any;
+        if (transformed) {
+            delete transformed.passwordHash;
+            delete transformed.emailVerificationToken;
+            delete transformed.__v;
+        }
+        return transformed;
     }
 
     async findUserById(id: string, includePasswordHash: boolean = false): Promise<IUser | null> {

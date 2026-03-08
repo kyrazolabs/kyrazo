@@ -275,7 +275,8 @@ export class SubscriptionController {
     static async cancelSubscription(c: AppContext): Promise<Response> {
         try {
             const workspace = c.workspace;
-            const { id } = c.req.param();
+            // @ts-ignore
+            const { id } = c.req.valid('param');
 
             if (!workspace) {
                 return c.json<IErrorResponse>(

@@ -23,7 +23,7 @@ export interface IPagination {
 
 export interface IErrorResponse {
     success: false;
-    error: {
+    error?: {
         code: string;
         message: string;
         details?: unknown;

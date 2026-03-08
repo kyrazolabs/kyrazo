@@ -11,6 +11,7 @@ import namespaceRouter from './v1/namespace/namespace.routes';
 import targetRouter from './v1/target/target.routes';
 import ingestRouter from './v1/ingest/ingest.routes';
 import supportRouter from './v1/support/support.routes';
+import workerRouter from './v1/worker/worker.routes';
 import { clickhouseConfig, databaseConfig, postgresConfig } from '@kyrazo/shared';
 import { redisConfig } from '@/configs';
 
@@ -46,6 +47,9 @@ router.route('/ingest', ingestRouter);
 
 // Mount support routes
 router.route('/support', supportRouter);
+
+// Mount worker routes
+router.route('/workers', workerRouter);
 
 // Mount billing routes
 router.route('/payments', billingRouter.payments);

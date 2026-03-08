@@ -95,7 +95,7 @@ usageSchema.statics.aggregateUsage = function (
             },
         },
         {
-            $namespace: {
+            $project: {
                 _id: 0,
                 subscriptionId: '$_id.subscriptionId',
                 eventType: '$_id.eventType',
@@ -105,7 +105,7 @@ usageSchema.statics.aggregateUsage = function (
                 periodEnd: 1,
             },
         },
-    ]);
+    ] as any[]);
 };
 
 usageSchema.statics.bulkInsert = function (usages: Partial<IUsage>[]) {

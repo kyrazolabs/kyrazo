@@ -411,15 +411,25 @@ export class AuthController {
      */
     static async refreshToken(c: AppContext): Promise<Response> {
         try {
-            const refresh = await getSignedCookie(c, config.jwt.secrets.refresh, 'refresh_token');
+            let refresh = await getSignedCookie(c, config.jwt.secrets.refresh, 'refresh_token');
 
-            if (typeof refresh !== 'string') {
+            // Fallback to request body if cookie is missing
+            if (!refresh) {
+                try {
+                    const body = await c.req.json();
+                    refresh = body.refreshToken;
+                } catch (e) {
+                    // Ignore body parse errors if cookie was already checked
+                }
+            }
+
+            if (typeof refresh !== 'string' || !refresh) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
                         error: {
                             code: 'INVALID_TOKEN',
-                            message: 'Refresh token cookie is missing',
+                            message: 'Refresh token is missing',
                             requestId: c.get('requestId'),
                         },
                     },
@@ -480,15 +490,19 @@ export class AuthController {
                 logger.error('Failed to store refresh token in MongoDB', err as Error);
             }
 
-            await setSignedCookie(c, 'access_token', tokens.access, config.jwt.secrets.key, {
+            await setSignedCookie(c, 'access_token', tokens.access, config.jwt.secrets.access, {
+                domain: config.app.frontendUrl.split('/')[2],
                 path: '/',
-                secure: true,
-                domain: config.app.frontendUrl,
+                secure: config.isProduction,
+                httpOnly: true,
+                sameSite: 'Lax',
             });
-            await setSignedCookie(c, 'refresh_token', tokens.refresh, config.jwt.secrets.key, {
+            await setSignedCookie(c, 'refresh_token', tokens.refresh, config.jwt.secrets.refresh, {
+                domain: config.app.frontendUrl.split('/')[2],
                 path: '/',
-                secure: true,
-                domain: config.app.frontendUrl,
+                secure: config.isProduction,
+                httpOnly: true,
+                sameSite: 'Lax',
             });
 
             return c.json<AuthRefreshResponse>(
@@ -1636,15 +1650,19 @@ export class AuthController {
             await authRepository.updateLastLogin((user as any).id);
             await OTPService.invalidateTempToken(data.tempToken);
 
-            await setSignedCookie(c, 'access_token', tokens.access, config.jwt.secrets.key, {
+            await setSignedCookie(c, 'access_token', tokens.access, config.jwt.secrets.access, {
+                domain: config.app.frontendUrl.split('/')[2],
                 path: '/',
-                secure: true,
-                domain: config.app.frontendUrl,
+                secure: config.isProduction,
+                httpOnly: true,
+                sameSite: 'Lax',
             });
-            await setSignedCookie(c, 'refresh_token', tokens.refresh, config.jwt.secrets.key, {
+            await setSignedCookie(c, 'refresh_token', tokens.refresh, config.jwt.secrets.refresh, {
+                domain: config.app.frontendUrl.split('/')[2],
                 path: '/',
-                secure: true,
-                domain: config.app.frontendUrl,
+                secure: config.isProduction,
+                httpOnly: true,
+                sameSite: 'Lax',
             });
 
             return c.json<AuthResponse>(

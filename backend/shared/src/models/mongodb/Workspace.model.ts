@@ -347,7 +347,7 @@ workspaceSchema.statics.getWorkspaceStats = async function (): Promise<{
             },
         },
         {
-            $namespace: {
+            $project: {
                 _id: 0,
                 totalWorkspaces: 1,
                 activeWorkspaces: 1,
@@ -355,7 +355,7 @@ workspaceSchema.statics.getWorkspaceStats = async function (): Promise<{
                 archivedWorkspaces: 1,
             },
         },
-    ]);
+    ] as any[]);
 
     return (
         stats[0] || {
@@ -481,7 +481,7 @@ userWorkspaceSchema.statics.getRoleStats = async function (workspaceId: string) 
                 count: { $sum: 1 },
             },
         },
-    ]);
+    ] as any[]);
 
     const result: Record<WorkspaceRole, number> = {
         owner: 0,
