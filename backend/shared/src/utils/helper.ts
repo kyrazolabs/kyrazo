@@ -27,8 +27,7 @@ export function generateIngressId(userId: string): string {
  * @param buf A string which wanted to encode
  */
 export function base62Encode(buf: Buffer): string {
-    const alphabet =
-        '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
     let num = BigInt('0x' + buf.toString('hex'));
     if (num === 0n) return '0';
     let out = '';
@@ -45,8 +44,7 @@ export function base62Encode(buf: Buffer): string {
  * @param s An encoded string which wanted to decode
  */
 export function base62Decode(s: string): Buffer {
-    const alphabet =
-        '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
     let num = 0n;
     for (const ch of s) {
         const idx = BigInt(alphabet.indexOf(ch));
@@ -97,12 +95,11 @@ export function decryptSourceSecrets(source: ISource): ISource {
         decryptedSource.authentication?.credentials?.iv
     ) {
         try {
-            decryptedSource.authentication.credentials.secret =
-                secretCrypto.decrypt(
-                    decryptedSource.authentication.credentials.secret,
-                    decryptedSource.authentication.credentials.iv,
-                    decryptedSource.projectId
-                );
+            decryptedSource.authentication.credentials.secret = secretCrypto.decrypt(
+                decryptedSource.authentication.credentials.secret,
+                decryptedSource.authentication.credentials.iv,
+                decryptedSource.namespaceId
+            );
             // Remove IV from response for security
             delete decryptedSource.authentication.credentials.iv;
         } catch (error) {
@@ -117,12 +114,11 @@ export function decryptSourceSecrets(source: ISource): ISource {
         decryptedSource.authentication?.credentials?.iv
     ) {
         try {
-            decryptedSource.authentication.credentials.signingSecret =
-                secretCrypto.decrypt(
-                    decryptedSource.authentication.credentials.signingSecret,
-                    decryptedSource.authentication.credentials.iv,
-                    decryptedSource.projectId
-                );
+            decryptedSource.authentication.credentials.signingSecret = secretCrypto.decrypt(
+                decryptedSource.authentication.credentials.signingSecret,
+                decryptedSource.authentication.credentials.iv,
+                decryptedSource.namespaceId
+            );
             // Remove IV from response for security
             delete decryptedSource.authentication.credentials.iv;
         } catch (error) {
@@ -137,12 +133,11 @@ export function decryptSourceSecrets(source: ISource): ISource {
         decryptedSource.authentication?.credentials?.iv
     ) {
         try {
-            decryptedSource.authentication.credentials.apiKey =
-                secretCrypto.decrypt(
-                    decryptedSource.authentication.credentials.apiKey,
-                    decryptedSource.authentication.credentials.iv,
-                    decryptedSource.projectId
-                );
+            decryptedSource.authentication.credentials.apiKey = secretCrypto.decrypt(
+                decryptedSource.authentication.credentials.apiKey,
+                decryptedSource.authentication.credentials.iv,
+                decryptedSource.namespaceId
+            );
             // Remove IV from response for security
             delete decryptedSource.authentication.credentials.iv;
         } catch (error) {
@@ -157,19 +152,15 @@ export function decryptSourceSecrets(source: ISource): ISource {
         decryptedSource.authentication?.credentials?.iv
     ) {
         try {
-            decryptedSource.authentication.credentials.password =
-                secretCrypto.decrypt(
-                    decryptedSource.authentication.credentials.password,
-                    decryptedSource.authentication.credentials.iv,
-                    decryptedSource.projectId
-                );
+            decryptedSource.authentication.credentials.password = secretCrypto.decrypt(
+                decryptedSource.authentication.credentials.password,
+                decryptedSource.authentication.credentials.iv,
+                decryptedSource.namespaceId
+            );
             // Remove IV from response for security
             delete decryptedSource.authentication.credentials.iv;
         } catch (error) {
-            logger.error(
-                'Failed to decrypt basic auth password:',
-                error as Error
-            );
+            logger.error('Failed to decrypt basic auth password:', error as Error);
             // Keep the encrypted version if decryption fails
         }
     }

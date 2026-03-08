@@ -50,9 +50,7 @@ const devFormat = winston.format.combine(
     winston.format.colorize({ all: true }),
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
     winston.format.printf(info => {
-        const meta = info.metadata
-            ? JSON.stringify(info.metadata, null, 2)
-            : '';
+        const meta = info.metadata ? JSON.stringify(info.metadata, null, 2) : '';
         return `${info.timestamp} ${info.level}: ${info.message}${meta ? `\n${meta}` : ''}`;
     })
 );
@@ -164,7 +162,7 @@ export const logger = {
         details?: any,
         workspaceId?: string,
         teamId?: string,
-        projectId?: string
+        namespaceId?: string
     ) => {
         log.info('User Activity', {
             activity: {
@@ -175,7 +173,7 @@ export const logger = {
                 details: sanitize(details),
                 workspaceId,
                 teamId,
-                projectId,
+                namespaceId,
                 timestamp: new Date().toISOString(),
             },
         });

@@ -1,7 +1,7 @@
-import type { DeliveryStatus, ProcessingStatus } from "@kyrazo/shared";
+import type { DeliveryStatus, ProcessingStatus } from '@kyrazo/shared';
 
 export interface DispatchEventInput {
-    projectId: string;
+    namespaceId: string;
     targetId: string;
     eventType: string;
     responseCode: number;
@@ -12,7 +12,7 @@ export interface DispatchEventInput {
 }
 
 export interface IngestEventInput {
-    projectId: string;
+    namespaceId: string;
     sourceId: string;
     status: ProcessingStatus;
     timestamp?: string;

@@ -1,19 +1,15 @@
 import { MiddlewareHandler } from 'hono';
-import { IErrorResponse, IPlanLimits, Project } from '@kyrazo/shared';
+import { IErrorResponse, IPlanLimits, Namespace, unprefixId } from '@kyrazo/shared';
 import { AppContext } from './auth.middleware';
 import { limitService } from '@/shared/services/limit.service';
 import { workspaceRepository } from '@/modules/v1/workspace/workspace.repo';
 
-export const checkWorkspaceLimits = (
-    limitKey: keyof IPlanLimits
-): MiddlewareHandler => {
+export const checkWorkspaceLimits = (limitKey: keyof IPlanLimits): MiddlewareHandler => {
     return async (c: AppContext, next) => {
         const workspaceId = c.workspace?.workspaceId;
 
         // If no workspaceId, we use FREE_PLAN_LIMITS as per user request
-        const limits = await limitService.getWorkspaceLimits(
-            workspaceId?.toString()
-        );
+        const limits = await limitService.getWorkspaceLimits(unprefixId(workspaceId?.toString()));
         const limit = limits[limitKey];
 
         if (limit === -1) {
@@ -22,14 +18,14 @@ export const checkWorkspaceLimits = (
 
         let currentCount = 0;
 
-        if (limitKey === 'maxProjects') {
+        if (limitKey === 'maxNamespaces') {
             if (!workspaceId) {
-                // If no workspace, technically we can't create projects that require workspaceId
+                // If no workspace, technically we can't create namespaces that require workspaceId
                 // But for safety, let's assume 0 if it's not present yet
                 currentCount = 0;
             } else {
-                currentCount = await Project.countDocuments({
-                    workspaceId,
+                currentCount = await Namespace.countDocuments({
+                    workspaceId: unprefixId(workspaceId.toString()),
                     isDeleted: false,
                 });
             }
@@ -37,13 +33,10 @@ export const checkWorkspaceLimits = (
             if (!workspaceId) {
                 currentCount = 0;
             } else {
-                const membersCount = await workspaceRepository.countMembers(
+                const membersCount = await workspaceRepository.countMembers(workspaceId.toString());
+                const pendingInvitations = await workspaceRepository.countPendingInvitations(
                     workspaceId.toString()
                 );
-                const pendingInvitations =
-                    await workspaceRepository.countPendingInvitations(
-                        workspaceId.toString()
-                    );
                 currentCount = membersCount + pendingInvitations;
             }
         }

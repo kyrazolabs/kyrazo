@@ -24,10 +24,10 @@ export class SourceController {
             const valid: CreateSourceInput = c.req.valid('json');
 
             const workspaceId = c.workspace!.workspaceId.toString();
-            const projectId = c.project!.projectId.toString();
+            const namespaceId = c.namespace!.namespaceId.toString();
             const userId = c.userId!;
 
-            const saved = await sourceService.createSource(valid, userId, workspaceId, projectId);
+            const saved = await sourceService.createSource(valid, userId, workspaceId, namespaceId);
 
             return c.json<CreateSourceResponse>(
                 {
@@ -59,11 +59,11 @@ export class SourceController {
             const { q, status, limit = 10, page = 1 }: FilterSourcesInput = c.req.valid('query');
 
             const workspaceId = c.workspace!.workspaceId.toString();
-            const projectId = c.project!.projectId.toString();
+            const namespaceId = c.namespace!.namespaceId.toString();
 
             const query: any = {
                 workspaceId: new Types.ObjectId(workspaceId),
-                projectId: new Types.ObjectId(projectId),
+                namespaceId: new Types.ObjectId(namespaceId),
             };
 
             if (q) {
@@ -100,9 +100,9 @@ export class SourceController {
             // @ts-ignore
             const { sourceId }: GetSourceByIdInput = c.req.valid('param');
             const workspaceId = c.workspace!.workspaceId.toString();
-            const projectId = c.project!.projectId.toString();
+            const namespaceId = c.namespace!.namespaceId.toString();
 
-            const source = await sourceService.getSourceById(sourceId, workspaceId, projectId);
+            const source = await sourceService.getSourceById(sourceId, workspaceId, namespaceId);
 
             return c.json<GetSourceResponse>(
                 {
@@ -141,12 +141,12 @@ export class SourceController {
             const data: UpdateSourceInput = c.req.valid('json');
 
             const workspaceId = c.workspace!.workspaceId.toString();
-            const projectId = c.project!.projectId.toString();
+            const namespaceId = c.namespace!.namespaceId.toString();
 
             const updated = await sourceService.updateSource(
                 sourceId,
                 workspaceId,
-                projectId,
+                namespaceId,
                 data
             );
 
@@ -184,9 +184,9 @@ export class SourceController {
             // @ts-ignore
             const { sourceId }: GetSourceByIdInput = c.req.valid('param');
             const workspaceId = c.workspace!.workspaceId.toString();
-            const projectId = c.project!.projectId.toString();
+            const namespaceId = c.namespace!.namespaceId.toString();
 
-            const deleted = await sourceService.deleteSource(sourceId, workspaceId, projectId);
+            const deleted = await sourceService.deleteSource(sourceId, workspaceId, namespaceId);
 
             return c.json<DeleteSourceResponse>(
                 {

@@ -9,9 +9,9 @@ const EndpointSchema = new Schema<IEndpoint>(
             ref: 'Workspace',
             required: true,
         },
-        projectId: {
+        namespaceId: {
             type: Schema.Types.ObjectId,
-            ref: 'Project',
+            ref: 'Namespace',
             required: true,
         },
         name: { type: String, required: true, trim: true },
@@ -88,7 +88,7 @@ EndpointSchema.index({
 EndpointSchema.index(
     {
         workspaceId: 1,
-        projectId: 1,
+        namespaceId: 1,
         url: 1,
         method: 1,
     },
@@ -97,20 +97,20 @@ EndpointSchema.index(
 EndpointSchema.index(
     {
         workspaceId: 1,
-        projectId: 1,
+        namespaceId: 1,
         enabled: 1,
     },
-    { name: 'idx_workspace_project_enabled' }
+    { name: 'idx_workspace_namespace_enabled' }
 );
 
 EndpointSchema.index(
     {
         workspaceId: 1,
-        projectId: 1,
+        namespaceId: 1,
         'secrets.kid': 1,
         'secrets.active': 1,
     },
-    { name: 'idx_workspace_project_kid_active' }
+    { name: 'idx_workspace_namespace_kid_active' }
 );
 
 /**
@@ -123,48 +123,48 @@ EndpointSchema.virtual('isDisabled').get(function (this: IEndpoint) {
 /**
  * 🔹 Static Methods
  */
-EndpointSchema.statics.findByWorkspaceAndProject = function (
+EndpointSchema.statics.findByWorkspaceAndNamespace = function (
     workspaceId: string,
-    projectId: string
+    namespaceId: string
 ) {
     return this.find({
         workspaceId: unprefixId(workspaceId),
-        projectId: unprefixId(projectId),
+        namespaceId: unprefixId(namespaceId),
     });
 };
 
-EndpointSchema.statics.findActiveByWorkspaceAndProject = function (
+EndpointSchema.statics.findActiveByWorkspaceAndNamespace = function (
     workspaceId: string,
-    projectId: string
+    namespaceId: string
 ) {
     return this.find({
         enabled: true,
-        projectId: unprefixId(projectId),
+        namespaceId: unprefixId(namespaceId),
         workspaceId: unprefixId(workspaceId),
     });
 };
 
-EndpointSchema.statics.findActiveByWorkspaceAndProjectAndIds = function (
+EndpointSchema.statics.findActiveByWorkspaceAndNamespaceAndIds = function (
     workspaceId: string,
-    projectId: string,
+    namespaceId: string,
     endpointIds: string[]
 ): Promise<IEndpoint[]> {
     return this.find({
         enabled: true,
         workspaceId: unprefixId(workspaceId),
-        projectId: unprefixId(projectId),
+        namespaceId: unprefixId(namespaceId),
         _id: { $in: endpointIds.map(id => unprefixId(id)).filter((id): id is string => !!id) },
     });
 };
 
-EndpointSchema.statics.findActiveByWorkspaceAndProjectAndId = function (
+EndpointSchema.statics.findActiveByWorkspaceAndNamespaceAndId = function (
     workspaceId: string,
-    projectId: string,
+    namespaceId: string,
     endpointId: string
 ) {
     return this.findOne({
         enabled: true,
-        projectId: unprefixId(projectId),
+        namespaceId: unprefixId(namespaceId),
         workspaceId: unprefixId(workspaceId),
         _id: unprefixId(endpointId),
     });

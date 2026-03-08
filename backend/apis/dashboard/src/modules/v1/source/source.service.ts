@@ -21,7 +21,7 @@ export class SourceService {
         valid: CreateSourceInput,
         userId: string,
         workspaceId: string,
-        projectId: string
+        namespaceId: string
     ) {
         if (!valid.authentication?.enabled) {
             throw new Error('Authentication is required for receive type sources.');
@@ -31,7 +31,10 @@ export class SourceService {
         let processedAuth: any;
 
         if (valid.authentication.type === 'service' && valid.authentication.service) {
-            const encrypted = secretCrypto.encrypt(projectId, valid.authentication.service.secret);
+            const encrypted = secretCrypto.encrypt(
+                namespaceId,
+                valid.authentication.service.secret
+            );
             processedAuth = {
                 enabled: true,
                 type: 'service' as SourceAuthType,
@@ -46,7 +49,7 @@ export class SourceService {
         //     valid.authentication.apiKey
         // ) {
         //     const encrypted = secretCrypto.encrypt(
-        //         projectId,
+        //         namespaceId,
         //         valid.authentication.apiKey.apiKey
         //     );
         //     processedAuth = {
@@ -63,7 +66,7 @@ export class SourceService {
         //     valid.authentication.basicAuth
         // ) {
         //     const encrypted = secretCrypto.encrypt(
-        //         projectId,
+        //         namespaceId,
         //         valid.authentication.basicAuth.password
         //     );
         //     processedAuth = {
@@ -84,7 +87,7 @@ export class SourceService {
             endpoints: valid.endpoints?.map(id => new Types.ObjectId(unprefixId(id))),
             userId: new Types.ObjectId(unprefixId(userId)),
             workspaceId: new Types.ObjectId(unprefixId(workspaceId)),
-            projectId: new Types.ObjectId(unprefixId(projectId)),
+            namespaceId: new Types.ObjectId(unprefixId(namespaceId)),
             ingressId: ingress,
             ingressUrl: config.app.ingest.v1 + valid.service + '/' + ingress,
             authentication: processedAuth,
@@ -122,9 +125,9 @@ export class SourceService {
         }
     }
 
-    async getSourceById(sourceId: string, workspaceId: string, projectId: string) {
+    async getSourceById(sourceId: string, workspaceId: string, namespaceId: string) {
         try {
-            const source = await sourceRepository.findById(sourceId, workspaceId, projectId);
+            const source = await sourceRepository.findById(sourceId, workspaceId, namespaceId);
             if (!source) {
                 throw new Error('Source not found');
             }
@@ -142,18 +145,23 @@ export class SourceService {
     async updateSource(
         sourceId: string,
         workspaceId: string,
-        projectId: string,
+        namespaceId: string,
         valid: UpdateSourceInput
     ) {
         try {
-            const source = await sourceRepository.findById(sourceId, workspaceId, projectId);
+            const source = await sourceRepository.findById(sourceId, workspaceId, namespaceId);
             if (!source) {
                 throw new Error('Source not found');
             }
             // TODO: Handle auth update if necessary, keeping simple update for now based on existing controller
             // If authentication is being updated, we might need to re-encrypt.
 
-            const updated = await sourceRepository.update(sourceId, workspaceId, projectId, valid);
+            const updated = await sourceRepository.update(
+                sourceId,
+                workspaceId,
+                namespaceId,
+                valid
+            );
             if (!updated) {
                 throw new Error('Failed to update source');
             }
@@ -164,9 +172,13 @@ export class SourceService {
         }
     }
 
-    async deleteSource(sourceId: string, workspaceId: string, projectId: string): Promise<boolean> {
+    async deleteSource(
+        sourceId: string,
+        workspaceId: string,
+        namespaceId: string
+    ): Promise<boolean> {
         try {
-            const deleted = await sourceRepository.deleteById(sourceId, workspaceId, projectId);
+            const deleted = await sourceRepository.deleteById(sourceId, workspaceId, namespaceId);
             if (!deleted) {
                 throw new Error('Failed to delete source');
             }
@@ -179,11 +191,11 @@ export class SourceService {
     async updateSourceAuth(
         sourceId: string,
         workspaceId: string,
-        projectId: string,
+        namespaceId: string,
         valid: UpdateSourceAuthInput
     ) {
         try {
-            const source = await sourceRepository.findById(sourceId, workspaceId, projectId);
+            const source = await sourceRepository.findById(sourceId, workspaceId, namespaceId);
             if (!source) {
                 throw new Error('Source not found');
             }
@@ -192,7 +204,7 @@ export class SourceService {
 
             if (valid.authentication.type === 'service' && valid.authentication.service) {
                 const encrypted = secretCrypto.encrypt(
-                    projectId,
+                    namespaceId,
                     valid.authentication.service.secret
                 );
                 processedAuth = {
@@ -205,7 +217,7 @@ export class SourceService {
                 };
             }
 
-            const updated = await sourceRepository.update(sourceId, workspaceId, projectId, {
+            const updated = await sourceRepository.update(sourceId, workspaceId, namespaceId, {
                 authentication: processedAuth,
             });
 

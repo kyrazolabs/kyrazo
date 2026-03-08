@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { AppContext, authenticate } from '@/core/middlewares/auth.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
-import { requireProjectAccess } from '@/core/middlewares/project.middleware';
+import { requireNamespaceAccess } from '@/core/middlewares/namespace.middleware';
 import { config } from '@/configs/app';
 import {
     createSlidingWindowLimiter,
@@ -17,56 +17,45 @@ import {
     OverviewFilterSchema,
     TargetQuerySchema,
 } from './delivery.schema';
-import { ProjectHeadersSchema } from '@/core/utils/libs/zod';
+import { NamespaceHeadersSchema } from '@/core/utils/libs/zod';
 
 const delivery = new Hono();
 
 // Header validation using zValidator
-const validateProjectHeaders = zValidator(
-    'header',
-    ProjectHeadersSchema,
-    (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
+const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema, (result, c) => {
+    if (!result.success) {
+        return c.json(
+            {
+                success: false,
+                statusCode: 400,
+                errors: JSON.parse(result.error.message).map((e: any) => ({
+                    field: e.path.join('.') || 'unknown',
+                    message: e.message,
+                })),
+            },
+            400
+        );
     }
-);
+});
 
 // Lazy wrapper for delivery routes rate limiter (user-based, normal level for read operations)
-const deliveryRateLimiter = async (
-    c: AppContext,
-    next: () => Promise<void>
-) => {
+const deliveryRateLimiter = async (c: AppContext, next: () => Promise<void>) => {
     const limiter = createRateLimitMiddleware(
         createSlidingWindowLimiter({
             points: config.security.rateLimiter.protected.normal.points,
             duration: config.security.rateLimiter.protected.normal.duration,
-            blockDuration:
-                config.security.rateLimiter.protected.normal.blockDuration,
+            blockDuration: config.security.rateLimiter.protected.normal.blockDuration,
         }),
-        c =>
-            config.security.rateLimiter.protected.normal.keyPrefix(
-                (c as any).user.userId
-            ),
+        c => config.security.rateLimiter.protected.normal.keyPrefix((c as any).user.userId),
         'Too many delivery requests'
     );
     return limiter(c, next);
 };
 
 delivery.use('*', authenticate);
-delivery.use('*', validateProjectHeaders);
+delivery.use('*', validateNamespaceHeaders);
 delivery.use('*', requireWorkspaceMembership(['owner', 'admin', 'member']));
-delivery.use('*', requireProjectAccess());
+delivery.use('*', requireNamespaceAccess());
 
 /**
  * @title Get All Deliveries
@@ -98,27 +87,21 @@ delivery.get(
 delivery.get(
     '/targets',
     deliveryRateLimiter,
-    zValidator(
-        'query',
-        GetDeliveriesSchema.omit({ status: true }),
-        (result, c) => {
-            if (!result.success) {
-                return c.json(
-                    {
-                        success: false,
-                        statusCode: 400,
-                        errors: JSON.parse(result.error.message).map(
-                            (e: any) => ({
-                                field: e.path.join('.') || 'unknown',
-                                message: e.message,
-                            })
-                        ),
-                    },
-                    400
-                );
-            }
+    zValidator('query', GetDeliveriesSchema.omit({ status: true }), (result, c) => {
+        if (!result.success) {
+            return c.json(
+                {
+                    success: false,
+                    statusCode: 400,
+                    errors: JSON.parse(result.error.message).map((e: any) => ({
+                        field: e.path.join('.') || 'unknown',
+                        message: e.message,
+                    })),
+                },
+                400
+            );
         }
-    ),
+    }),
     DeliveryController.getTargets
 );
 

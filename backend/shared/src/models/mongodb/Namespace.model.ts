@@ -1,16 +1,16 @@
 import { Schema, model } from 'mongoose';
-import { IProject, IProjectModel } from '../../types';
+import { INamespace, INamespaceModel } from '../../types';
 import { unprefixId } from '../../utils/id';
 
-// Project schema
-const ProjectSchema = new Schema<IProject>(
+// Namespace schema
+const NamespaceSchema = new Schema<INamespace>(
     {
         name: {
             type: String,
-            required: [true, 'Project name is required'],
+            required: [true, 'Namespace name is required'],
             trim: true,
-            minlength: [2, 'Project name must be at least 2 characters long'],
-            maxlength: [100, 'Project name cannot exceed 100 characters'],
+            minlength: [2, 'Namespace name must be at least 2 characters long'],
+            maxlength: [100, 'Namespace name cannot exceed 100 characters'],
         },
         description: {
             type: String,
@@ -49,7 +49,7 @@ const ProjectSchema = new Schema<IProject>(
         toJSON: {
             virtuals: true,
             transform: function (doc, ret: any) {
-                ret.id = `pro_${ret._id.toString()}`;
+                ret.id = `ns_${ret._id.toString()}`;
                 delete (ret as any)._id;
                 delete (ret as any).__v;
                 return ret;
@@ -58,7 +58,7 @@ const ProjectSchema = new Schema<IProject>(
         toObject: {
             virtuals: true,
             transform: function (doc, ret: any) {
-                ret.id = `pro_${ret._id.toString()}`;
+                ret.id = `ns_${ret._id.toString()}`;
                 delete (ret as any)._id;
                 delete (ret as any).__v;
                 return ret;
@@ -68,64 +68,64 @@ const ProjectSchema = new Schema<IProject>(
 );
 
 // Indexes
-ProjectSchema.index({ name: 1 });
-ProjectSchema.index({ workspaceId: 1 });
-ProjectSchema.index({ createBy: 1 });
-ProjectSchema.index({ isArchived: 1 });
-ProjectSchema.index({ isDeleted: 1 });
-ProjectSchema.index({ createdAt: -1 });
-ProjectSchema.index({ name: 'text', description: 'text' });
+NamespaceSchema.index({ name: 1 });
+NamespaceSchema.index({ workspaceId: 1 });
+NamespaceSchema.index({ createBy: 1 });
+NamespaceSchema.index({ isArchived: 1 });
+NamespaceSchema.index({ isDeleted: 1 });
+NamespaceSchema.index({ createdAt: -1 });
+NamespaceSchema.index({ name: 'text', description: 'text' });
 
 // Virtual fields
-ProjectSchema.virtual('creator', {
+NamespaceSchema.virtual('creator', {
     ref: 'User',
     localField: 'createBy',
     foreignField: '_id',
     justOne: true,
 });
 
-ProjectSchema.virtual('workspace', {
+NamespaceSchema.virtual('workspace', {
     ref: 'Workspace',
     localField: 'workspaceId',
     foreignField: '_id',
     justOne: true,
 });
 
-ProjectSchema.virtual('tasks', {
+NamespaceSchema.virtual('tasks', {
     ref: 'Task',
     localField: '_id',
-    foreignField: 'ProjectId',
+    foreignField: 'namespaceId',
 });
 
 // Instance methods
-ProjectSchema.methods.softDelete = async function (): Promise<IProject> {
+NamespaceSchema.methods.softDelete = async function (): Promise<INamespace> {
     this.isDeleted = true;
     this.deletedAt = new Date();
     return this.save();
 };
 
-ProjectSchema.methods.restore = async function (): Promise<IProject> {
+NamespaceSchema.methods.restore = async function (): Promise<INamespace> {
     this.isDeleted = false;
     this.deletedAt = null;
     return this.save();
 };
 
-ProjectSchema.methods.archive = async function (): Promise<IProject> {
+NamespaceSchema.methods.archive = async function (): Promise<INamespace> {
     this.isArchived = true;
     return this.save();
 };
 
-ProjectSchema.methods.unarchive = async function (): Promise<IProject> {
+NamespaceSchema.methods.unarchive = async function (): Promise<INamespace> {
     this.isArchived = false;
     return this.save();
 };
 
-ProjectSchema.methods.updateSettings = async function (settings: any): Promise<IProject> {
+NamespaceSchema.methods.updateSettings = async function (settings: any): Promise<INamespace> {
     Object.assign(this.settings, settings);
     return this.save();
 };
 
-ProjectSchema.methods.updateProgress = async function (newProgress: number): Promise<IProject> {
+NamespaceSchema.methods.updateProgress = async function (newProgress: number): Promise<INamespace> {
     this.progress = newProgress;
     if (newProgress >= 100 && this.status !== 'completed') {
         this.status = 'completed';
@@ -133,35 +133,35 @@ ProjectSchema.methods.updateProgress = async function (newProgress: number): Pro
     return this.save();
 };
 
-ProjectSchema.methods.isOverdue = function (): boolean {
+NamespaceSchema.methods.isOverdue = function (): boolean {
     return this.deadline ? this.deadline < new Date() && this.status !== 'completed' : false;
 };
 
 // Static methods
-ProjectSchema.statics.findByOwner = function (ownerId: string) {
-    return this.find({ ownerId, isDeleted: false });
+NamespaceSchema.statics.findByOwner = function (userId: string) {
+    return this.find({ createBy: unprefixId(userId), isDeleted: false });
 };
 
-ProjectSchema.statics.findByWorkspace = function (workspaceId: string) {
+NamespaceSchema.statics.findByWorkspace = function (workspaceId: string) {
     return this.find({ workspaceId: unprefixId(workspaceId), isDeleted: false });
 };
 
-ProjectSchema.statics.findByWorkspaceAndProject = async function (
+NamespaceSchema.statics.findByWorkspaceAndNamespace = async function (
     workspaceId: string,
-    projectId: string
+    namespaceId: string
 ) {
     return await this.findOne({
-        _id: unprefixId(projectId),
+        _id: unprefixId(namespaceId),
         workspaceId: unprefixId(workspaceId),
         isDeleted: false,
     });
 };
 
-ProjectSchema.statics.findPublic = function () {
+NamespaceSchema.statics.findPublic = function () {
     return this.find({ visibility: 'public', isDeleted: false });
 };
 
-ProjectSchema.statics.searchProjects = function (query: string, limit: number = 10) {
+NamespaceSchema.statics.searchNamespaces = function (query: string, limit: number = 10) {
     return this.find(
         {
             $text: { $search: query },
@@ -173,50 +173,50 @@ ProjectSchema.statics.searchProjects = function (query: string, limit: number = 
         .limit(limit);
 };
 
-ProjectSchema.statics.getProjectStats = async function () {
+NamespaceSchema.statics.getNamespaceStats = async function () {
     const stats = await this.aggregate([
         {
             $group: {
                 _id: null,
-                totalProjects: { $sum: 1 },
-                activeProjects: {
+                totalNamespaces: { $sum: 1 },
+                activeNamespaces: {
                     $sum: { $cond: [{ $eq: ['$isDeleted', false] }, 1, 0] },
                 },
-                completedProjects: {
+                completedNamespaces: {
                     $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] },
                 },
-                archivedProjects: {
+                archivedNamespaces: {
                     $sum: { $cond: [{ $eq: ['$isArchived', true] }, 1, 0] },
                 },
-                deletedProjects: {
+                deletedNamespaces: {
                     $sum: { $cond: [{ $eq: ['$isDeleted', true] }, 1, 0] },
                 },
             },
         },
         {
-            $project: {
+            $namespace: {
                 _id: 0,
-                totalProjects: 1,
-                activeProjects: 1,
-                completedProjects: 1,
-                archivedProjects: 1,
-                deletedProjects: 1,
+                totalNamespaces: 1,
+                activeNamespaces: 1,
+                completedNamespaces: 1,
+                archivedNamespaces: 1,
+                deletedNamespaces: 1,
             },
         },
     ]);
 
     return (
         stats[0] || {
-            totalProjects: 0,
-            activeProjects: 0,
-            completedProjects: 0,
-            archivedProjects: 0,
-            deletedProjects: 0,
+            totalNamespaces: 0,
+            activeNamespaces: 0,
+            completedNamespaces: 0,
+            archivedNamespaces: 0,
+            deletedNamespaces: 0,
         }
     );
 };
 
-ProjectSchema.statics.getStatusStats = async function () {
+NamespaceSchema.statics.getStatusStats = async function () {
     const stats = await this.aggregate([
         { $match: { isDeleted: false } },
         {
@@ -241,7 +241,7 @@ ProjectSchema.statics.getStatusStats = async function () {
     return result;
 };
 
-ProjectSchema.statics.getRecentProjects = function (days: number = 30) {
+NamespaceSchema.statics.getRecentNamespaces = function (days: number = 30) {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
@@ -251,7 +251,7 @@ ProjectSchema.statics.getRecentProjects = function (days: number = 30) {
     }).sort({ createdAt: -1 });
 };
 
-ProjectSchema.statics.findOverdue = function () {
+NamespaceSchema.statics.findOverdue = function () {
     return this.find({
         deadline: { $lt: new Date() },
         status: { $ne: 'completed' },
@@ -259,21 +259,21 @@ ProjectSchema.statics.findOverdue = function () {
     });
 };
 
-ProjectSchema.statics.permanentlyDelete = function (projectId: string) {
-    return this.findByIdAndDelete(unprefixId(projectId));
+NamespaceSchema.statics.permanentlyDelete = function (namespaceId: string) {
+    return this.findByIdAndDelete(unprefixId(namespaceId));
 };
 
-ProjectSchema.statics.isUserOwner = async function (
+NamespaceSchema.statics.isUserOwner = async function (
     userId: string,
-    projectId: string
+    namespaceId: string
 ): Promise<boolean> {
-    const project = await this.findOne({
-        _id: unprefixId(projectId),
+    const namespace = await this.findOne({
+        _id: unprefixId(namespaceId),
         createBy: unprefixId(userId),
     });
-    return !!project;
+    return !!namespace;
 };
 
 // Export the model
-export const Project = model<IProject, IProjectModel>('Project', ProjectSchema);
-export default Project;
+export const Namespace = model<INamespace, INamespaceModel>('Namespace', NamespaceSchema);
+export default Namespace;

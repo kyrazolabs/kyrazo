@@ -4,7 +4,7 @@ import { redisConfig } from '@/configs';
 import { PerformanceTimer } from '@/core/utils';
 import { logger, type IErrorResponse } from '@kyrazo/shared';
 import { publishEventPublisher } from '@/producers/jobs/v1/publishers';
-import { type GetProjectByIdInput } from '@/core/utils/libs/zod';
+import { type GetNamespaceByIdInput } from '@/core/utils/libs/zod';
 import type {
     BatchCreatePublishedEvent,
     BatchPublishedEventInput,
@@ -20,7 +20,7 @@ import { unprefixId } from '@kyrazo/shared';
 export class EventController {
     private static async checkTargetsExsisting(
         workspaceId: string,
-        projectId: string,
+        namespaceId: string,
         targets: string[]
     ): Promise<{
         foundTargets: { targetId: string; targetUrl: string }[];
@@ -28,7 +28,7 @@ export class EventController {
     }> {
         // 1. Try to get it from the cash
         let cachedTargets = await redisConfig.cache(
-            `workspace:${workspaceId}:project:${projectId}:targets`,
+            `workspace:${workspaceId}:namespace:${namespaceId}:targets`,
             async () => [],
             100
         );
@@ -45,11 +45,12 @@ export class EventController {
         // 3. Retrieve missing information from the database
         let fetchedTargets: any[] = [];
         if (missingFromCache.length > 0) {
-            fetchedTargets = await targetRepository.getTargetsByWorkspaceIdAndProjectIdAndTargetIds(
-                workspaceId,
-                projectId,
-                missingFromCache
-            );
+            fetchedTargets =
+                await targetRepository.getTargetsByWorkspaceIdAndNamespaceIdAndTargetIds(
+                    workspaceId,
+                    namespaceId,
+                    missingFromCache
+                );
         }
 
         // 4. Merge the cache with the retrieved data from the database and update the cache.
@@ -62,7 +63,7 @@ export class EventController {
         ];
         if (fetchedTargets.length > 0) {
             await redisConfig.cache(
-                `workspace:${workspaceId}:project:${projectId}:targets`,
+                `workspace:${workspaceId}:namespace:${namespaceId}:targets`,
                 async () => allTargets,
                 60 * 60 * 24
             );
@@ -85,10 +86,10 @@ export class EventController {
             const key = c.idempotencyKey;
             const workspaceId = c.workspace?.workspaceId;
             const param = c.req.valid('param');
-            const projectId = unprefixId(param.projectId)!;
+            const namespaceId = unprefixId(param.namespaceId)!;
             const valid: PublishedEventInput = c.req.valid('json');
 
-            if (!workspaceId || !projectId) {
+            if (!workspaceId || !namespaceId) {
                 await redisConfig.set(
                     `idem:${workspaceId}:${c.req.path}:${key}`,
                     JSON.stringify({
@@ -119,7 +120,7 @@ export class EventController {
                 ...valid,
                 eventId: uuidv4(),
                 workspaceId: workspaceId.toString(),
-                projectId,
+                namespaceId,
                 sourceType: 'publish',
                 timestamp: Date.now(),
                 shard,
@@ -127,7 +128,7 @@ export class EventController {
 
             const { foundTargets, unfoundTargets } = await EventController.checkTargetsExsisting(
                 workspaceId.toString(),
-                projectId,
+                namespaceId,
                 valid.targets.map((t: TargetInput) => t.targetId)
             );
             if (foundTargets.length === 0) {
@@ -294,10 +295,10 @@ export class EventController {
             const key = c.idempotencyKey;
             const workspaceId = c.workspace?.workspaceId;
             const param = c.req.valid('param');
-            const projectId = unprefixId(param.projectId)!;
+            const namespaceId = unprefixId(param.namespaceId)!;
             const valid: BatchPublishedEventInput = c.req.valid('json');
 
-            if (!workspaceId || !projectId) {
+            if (!workspaceId || !namespaceId) {
                 await redisConfig.set(
                     `idem:${workspaceId}:${c.req.path}:${key}`,
                     JSON.stringify({
@@ -385,7 +386,7 @@ export class EventController {
             }[] = [];
             const events: BatchCreatePublishedEvent = [];
 
-            // Optimized target lookup for the single projectId
+            // Optimized target lookup for the single namespaceId
             const allTargetIds = new Set<string>();
             valid.forEach((eventData: PublishedEventInput) => {
                 eventData.targets.forEach((t: TargetInput) => allTargetIds.add(t.targetId));
@@ -394,7 +395,7 @@ export class EventController {
             const { foundTargets, unfoundTargets: globalUnfoundTargets } =
                 await EventController.checkTargetsExsisting(
                     workspaceId.toString(),
-                    projectId,
+                    namespaceId,
                     Array.from(allTargetIds)
                 );
 
@@ -436,7 +437,7 @@ export class EventController {
                     ...eventData,
                     eventId,
                     workspaceId: workspaceId.toString(),
-                    projectId,
+                    namespaceId,
                     targets: eventFoundTargets,
                     sourceType: 'publish',
                     timestamp: Date.now(),

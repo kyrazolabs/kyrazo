@@ -1,44 +1,14 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
-import { AppContext, authenticate } from '@/core/middlewares/auth.middleware';
+import { authenticate } from '@/core/middlewares/auth.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
+import { requireRecentOTP } from '@/core/middlewares/otp.middleware';
 
-import { config } from '@/configs/app';
-import {
-    createSlidingWindowLimiter,
-    createRateLimitMiddleware,
-} from '@/core/middlewares/rate-limiter.middleware';
-
-import {
-    checkScopeSchema,
-    createAPIKeySchema,
-    getKeysSchema,
-    revokeKeyById,
-} from './key.schema';
+import { checkScopeSchema, createAPIKeySchema, getKeysSchema, revokeKeyById } from './key.schema';
 import { KeyController } from '@/modules/v1/key/key.controller';
+import { keyManagementRateLimiter } from './key.rate-limiter';
 
 const key = new Hono();
-
-// Lazy wrapper for API key management rate limiter (user-based, sensitive operations)
-const keyManagementRateLimiter = async (
-    c: AppContext,
-    next: () => Promise<void>
-) => {
-    const limiter = createRateLimitMiddleware(
-        createSlidingWindowLimiter({
-            points: config.security.rateLimiter.protected.sensitive.points,
-            duration: config.security.rateLimiter.protected.sensitive.duration,
-            blockDuration:
-                config.security.rateLimiter.protected.sensitive.blockDuration,
-        }),
-        c =>
-            config.security.rateLimiter.protected.sensitive.keyPrefix(
-                (c as any).user.userId
-            ),
-        'Too many API key management requests'
-    );
-    return limiter(c, next);
-};
 
 key.use(authenticate);
 key.use(requireWorkspaceMembership(['owner', 'admin', 'member']));
@@ -62,6 +32,7 @@ key.post(
             );
         }
     }),
+    requireRecentOTP('manage_keys'),
     KeyController.createKey
 );
 
@@ -125,6 +96,7 @@ key.delete(
             );
         }
     }),
+    requireRecentOTP('manage_keys'),
     KeyController.deleteKey
 );
 

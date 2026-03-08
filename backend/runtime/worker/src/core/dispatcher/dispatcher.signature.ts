@@ -1,13 +1,13 @@
-import crypto from "crypto";
-import { redisConfig } from "@/config";
-import { Target, Endpoint, logger, secretCrypto } from "@kyrazo/shared";
-import type { SignaturePayload, SignatureResult } from "./dispatcher.types";
+import crypto from 'crypto';
+import { redisConfig } from '@/config';
+import { Target, Endpoint, logger, secretCrypto } from '@kyrazo/shared';
+import type { SignaturePayload, SignatureResult } from './dispatcher.types';
 
 export class DispatcherSignature {
     private static instance: DispatcherSignature;
 
-    private readonly algorithm = "sha256";
-    private readonly version = "v1";
+    private readonly algorithm = 'sha256';
+    private readonly version = 'v1';
 
     private constructor() {}
 
@@ -24,24 +24,24 @@ export class DispatcherSignature {
     public async sign(
         body: unknown,
         workspaceId: string,
-        projectId: string,
+        namespaceId: string,
         targetId: string,
-        type: "target" | "endpoint" = "target",
+        type: 'target' | 'endpoint' = 'target'
     ): Promise<SignatureResult> {
         let entity: any;
         logger.info(`Sign Type: ${type}`);
 
-        if (type === "endpoint") {
+        if (type === 'endpoint') {
             entity = await redisConfig.cache(
                 `${type}:${targetId}`,
                 async () => {
                     return await Endpoint.findOne({
                         _id: targetId,
                         workspaceId,
-                        projectId,
-                    }).select("+secrets");
+                        namespaceId,
+                    }).select('+secrets');
                 },
-                60 * 60 * 24,
+                60 * 60 * 24
             );
         } else {
             entity = await redisConfig.cache(
@@ -50,25 +50,25 @@ export class DispatcherSignature {
                     return await Target.findOne({
                         _id: targetId,
                         workspaceId,
-                        projectId,
-                    }).select("+secrets");
+                        namespaceId,
+                    }).select('+secrets');
                 },
-                60 * 60 * 24,
+                60 * 60 * 24
             );
         }
 
         if (!entity) {
             throw new Error(
-                `${type.charAt(0).toUpperCase() + type.slice(1)} not found: ${targetId}`,
+                `${type.charAt(0).toUpperCase() + type.slice(1)} not found: ${targetId}`
             );
         }
 
-        const rawBody = typeof body === "string" ? body : JSON.stringify(body);
+        const rawBody = typeof body === 'string' ? body : JSON.stringify(body);
 
         const payload: SignaturePayload = {
             body: rawBody,
             timestamp: Date.now(),
-            nonce: crypto.randomBytes(16).toString("hex"),
+            nonce: crypto.randomBytes(16).toString('hex'),
             version: this.version,
         };
 
@@ -77,30 +77,23 @@ export class DispatcherSignature {
         let secret: string;
         try {
             const activeSecret = entity.secrets?.find(
-                (s: any) => s.active || s.active === undefined,
+                (s: any) => s.active || s.active === undefined
             );
             if (activeSecret?.value_enc && activeSecret?.iv) {
-                secret = secretCrypto.decrypt(
-                    activeSecret.value_enc,
-                    activeSecret.iv,
-                    projectId,
-                );
+                secret = secretCrypto.decrypt(activeSecret.value_enc, activeSecret.iv, namespaceId);
             } else {
-                // Fallback to project ID
-                secret = projectId;
+                // Fallback to namespace ID
+                secret = namespaceId;
             }
         } catch (error) {
-            logger.error(
-                "Decryption failed in signature, using fallback",
-                error as Error,
-            );
-            secret = projectId;
+            logger.error('Decryption failed in signature, using fallback', error as Error);
+            secret = namespaceId;
         }
 
         const signature = crypto
             .createHmac(this.algorithm, secret)
             .update(dataToSign)
-            .digest("hex");
+            .digest('hex');
 
         return {
             signature,
@@ -119,21 +112,15 @@ export class DispatcherSignature {
         timestamp: number,
         nonce: string,
         version: string,
-        secret: string,
+        secret: string
     ): boolean {
-        const rawBody = typeof body === "string" ? body : JSON.stringify(body);
+        const rawBody = typeof body === 'string' ? body : JSON.stringify(body);
 
         const data = `${version}.${timestamp}.${nonce}.${rawBody}`;
 
-        const expected = crypto
-            .createHmac(this.algorithm, secret)
-            .update(data)
-            .digest("hex");
+        const expected = crypto.createHmac(this.algorithm, secret).update(data).digest('hex');
 
-        return crypto.timingSafeEqual(
-            Buffer.from(signature),
-            Buffer.from(expected),
-        );
+        return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
     }
 
     /**
@@ -141,10 +128,10 @@ export class DispatcherSignature {
      */
     public async buildHeaders(result: SignatureResult) {
         return {
-            "X-Webhook-Signature": `v1=${result.signature}`,
-            "X-Webhook-Timestamp": result.timestamp.toString(),
-            "X-Webhook-Nonce": result.nonce,
-            "X-Webhook-Version": result.version,
+            'X-Webhook-Signature': `v1=${result.signature}`,
+            'X-Webhook-Timestamp': result.timestamp.toString(),
+            'X-Webhook-Nonce': result.nonce,
+            'X-Webhook-Version': result.version,
         };
     }
 }

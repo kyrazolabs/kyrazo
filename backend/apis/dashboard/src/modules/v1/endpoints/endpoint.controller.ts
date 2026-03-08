@@ -22,9 +22,9 @@ export class EndpointController {
         try {
             const userId = c.user?.userId;
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
+            const namespaceId = c.namespace?.namespaceId;
 
-            if (!userId || !workspaceId || !projectId) {
+            if (!userId || !workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -43,7 +43,7 @@ export class EndpointController {
                 valid,
                 userId,
                 workspaceId,
-                projectId
+                namespaceId
             );
 
             return c.json<CreateEndpointResponse>(
@@ -88,8 +88,8 @@ export class EndpointController {
     static async getEndpoint(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
-            if (!workspaceId || !projectId) {
+            const namespaceId = c.namespace?.namespaceId;
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -108,7 +108,7 @@ export class EndpointController {
             const endpoint = await endpointService.getEndpointById(
                 endpointId,
                 workspaceId.toString(),
-                projectId.toString()
+                namespaceId.toString()
             );
 
             return c.json<GetEndpointResponse>(
@@ -138,8 +138,8 @@ export class EndpointController {
     static async getEndpointSecret(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
-            if (!workspaceId || !projectId) {
+            const namespaceId = c.namespace?.namespaceId;
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -158,7 +158,7 @@ export class EndpointController {
             const secret = await endpointService.getEndpointSecret(
                 endpointId,
                 workspaceId.toString(),
-                projectId.toString()
+                namespaceId.toString()
             );
 
             return c.json<GetEndpointSecretResponse>(
@@ -191,8 +191,8 @@ export class EndpointController {
     static async getEndpoints(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
-            if (!workspaceId || !projectId) {
+            const namespaceId = c.namespace?.namespaceId;
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -208,7 +208,7 @@ export class EndpointController {
             // @ts-ignore
             const { q, status, limit = 10, page = 1 }: FilterEndpointInput = c.req.valid('query');
 
-            const query: Record<string, unknown> = { workspaceId, projectId };
+            const query: Record<string, unknown> = { workspaceId, namespaceId };
 
             if (q) query.$text = { $search: q };
             if (status) query.status = status;
@@ -247,8 +247,8 @@ export class EndpointController {
     static async updateEndpointStatus(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
-            if (!workspaceId || !projectId) {
+            const namespaceId = c.namespace?.namespaceId;
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -281,7 +281,7 @@ export class EndpointController {
             const updated = await endpointService.updateEndpoint(
                 endpointId,
                 workspaceId.toString(),
-                projectId.toString(),
+                namespaceId.toString(),
                 { status }
             );
 
@@ -315,8 +315,8 @@ export class EndpointController {
     static async updateEndpoint(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
-            if (!workspaceId || !projectId) {
+            const namespaceId = c.namespace?.namespaceId;
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -337,7 +337,7 @@ export class EndpointController {
             const updated = await endpointService.updateEndpoint(
                 endpointId,
                 workspaceId.toString(),
-                projectId.toString(),
+                namespaceId.toString(),
                 valid
             );
 
@@ -368,8 +368,8 @@ export class EndpointController {
     static async deleteEndpoint(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
-            if (!workspaceId || !projectId) {
+            const namespaceId = c.namespace?.namespaceId;
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -388,7 +388,7 @@ export class EndpointController {
             const deleted = await endpointService.deleteEndpoint(
                 endpointId,
                 workspaceId.toString(),
-                projectId.toString()
+                namespaceId.toString()
             );
 
             return c.json<DeleteEndpointResponse>(

@@ -50,7 +50,7 @@ export class WebflowPipeline {
                 body: dispatchedEvent.data,
                 source: 'webflow',
                 sourceId: event.sourceId,
-                projectId: event.projectId,
+                namespaceId: event.namespaceId,
                 workspaceId: event.workspaceId,
             });
 
@@ -69,7 +69,7 @@ export class WebflowPipeline {
                 sourceSecret = secretCrypto.decrypt(
                     credentials.secret,
                     credentials.iv,
-                    source.projectId.toString()
+                    source.namespaceId.toString()
                 );
             } catch (error) {
                 logger.warn(
@@ -121,7 +121,7 @@ export class WebflowPipeline {
                 verified,
             });
         await ingestAnalyticsProducer.record({
-            projectId: data.project_id,
+            namespaceId: data.namespace_id,
             sourceId: data.source_id,
             status: data.processing_status,
             timestamp: data.processed_at,

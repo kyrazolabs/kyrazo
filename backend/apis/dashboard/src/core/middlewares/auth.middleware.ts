@@ -2,11 +2,12 @@ import { Context, Next } from 'hono';
 
 import {
     IErrorResponse,
-    IProject,
+    INamespace,
     IUserWorkspace,
     logger,
-    Project,
+    Namespace,
     UserWorkspace,
+    unprefixId,
 } from '@kyrazo/shared';
 import { config } from '@/configs';
 import { getSignedCookie } from 'hono/cookie';
@@ -16,7 +17,7 @@ import { Types } from 'mongoose';
 export interface AppContext extends Context {
     user?: JWTPayload;
     workspace?: IUserWorkspace;
-    project?: IProject & { projectId: Types.ObjectId };
+    namespace?: INamespace & { namespaceId: Types.ObjectId };
 }
 
 /**
@@ -25,14 +26,9 @@ export interface AppContext extends Context {
 export const authenticate = async (c: AppContext, next: Next) => {
     try {
         const authHeader = c.req.header('Authorization');
-        const cookieToken = await getSignedCookie(
-            c,
-            config.jwt.secrets.access,
-            'access_token'
-        );
+        const cookieToken = await getSignedCookie(c, config.jwt.secrets.access, 'access_token');
         const hasHeader = authHeader && authHeader.startsWith('Bearer ');
-        const hasCookie =
-            typeof cookieToken === 'string' && cookieToken.length > 0;
+        const hasCookie = typeof cookieToken === 'string' && cookieToken.length > 0;
 
         // If neither header token nor cookie token exists
         if (!hasHeader && !hasCookie) {
@@ -50,15 +46,12 @@ export const authenticate = async (c: AppContext, next: Next) => {
         }
 
         // Pick whichever is available
-        const token = hasHeader
-            ? authHeader!.substring(7)
-            : (cookieToken as string);
+        const token = hasHeader ? authHeader!.substring(7) : (cookieToken as string);
 
         const result = authUtils.verifyAccessToken(token);
 
         if (!result.valid) {
-            const code =
-                result.reason === 'expired' ? 'TOKEN_EXPIRED' : 'INVALID_TOKEN';
+            const code = result.reason === 'expired' ? 'TOKEN_EXPIRED' : 'INVALID_TOKEN';
             const message =
                 result.reason === 'expired'
                     ? 'Access token expired, please refresh'
@@ -94,9 +87,9 @@ export const authenticate = async (c: AppContext, next: Next) => {
 
 /**
  * @title requireOwnership Middleware
- * @description Middleware to require ownership of a resource (ws, pr, etc.). Proceeds only if the user is the owner.
+ * @description Middleware to require ownership of a resource (ws, ns, etc.). Proceeds only if the user is the owner.
  */
-export const requireOwnership = (resourceType: 'workspace' | 'project') => {
+export const requireOwnership = (resourceType: 'workspace' | 'namespace') => {
     return async (c: AppContext, next: Next) => {
         try {
             const userId = c.user?.userId;
@@ -139,12 +132,15 @@ export const requireOwnership = (resourceType: 'workspace' | 'project') => {
             switch (resourceType) {
                 case 'workspace':
                     isOwner = await UserWorkspace.isUserOwner(
-                        userId,
-                        resourceId
+                        unprefixId(userId)!,
+                        unprefixId(resourceId)!
                     );
                     break;
-                case 'project':
-                    isOwner = await Project.isUserOwner(userId, resourceId);
+                case 'namespace':
+                    isOwner = await Namespace.isUserOwner(
+                        unprefixId(userId)!,
+                        unprefixId(resourceId)!
+                    );
                     break;
                 default:
                     break;

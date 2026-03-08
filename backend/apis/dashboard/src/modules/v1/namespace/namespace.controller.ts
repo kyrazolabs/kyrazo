@@ -1,15 +1,15 @@
 import { Types } from 'mongoose';
 import { AppContext } from '@/core/middlewares/auth.middleware';
 import {
-    Project,
-    CreateProjectResponse,
-    DeleteProjectResponse,
-    GetProjectResponse,
-    GetProjectsResponse,
+    Namespace,
+    CreateNamespaceResponse,
+    DeleteNamespaceResponse,
+    GetNamespaceResponse,
+    GetNamespacesResponse,
     IErrorResponse,
-    IProject,
-    RestoreProjectResponse,
-    UpdateProjectResponse,
+    INamespace,
+    RestoreNamespaceResponse,
+    UpdateNamespaceResponse,
     Subscription,
     logger,
     transformWithId,
@@ -20,15 +20,15 @@ import { subscriptionCacheService } from '@/shared/services/subscription-cache.s
 import { subscriptionService } from '@/modules/billing/subscriptions/subscription.service';
 import { redisConfig } from '@/configs';
 import {
-    CreateProjectInput,
-    FilterProjectInput,
-    GetProjectByIdInput,
-    UpdateProjectInput,
-} from './project.schema';
+    CreateNamespaceInput,
+    FilterNamespaceInput,
+    GetNamespaceByIdInput,
+    UpdateNamespaceInput,
+} from './namespace.schema';
 import { limitService } from '@/shared/services/limit.service';
 
-export class ProjectController {
-    static async createProject(c: AppContext): Promise<Response> {
+export class NamespaceController {
+    static async createNamespace(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
             const userId = c.user?.userId;
@@ -46,7 +46,7 @@ export class ProjectController {
                 );
             }
             // @ts-ignore
-            const valid: CreateProjectInput = c.req.valid('json');
+            const valid: CreateNamespaceInput = c.req.valid('json');
 
             // White-label header prefix subscription check
             if (valid.whiteLabelHeaders && valid.whiteLabelHeaders !== 'X-Webhook') {
@@ -78,15 +78,15 @@ export class ProjectController {
             };
 
             // Check plan limits
-            const currentProjects = await Project.countDocuments({
+            const currentNamespaces = await Namespace.countDocuments({
                 workspaceId,
                 isDeleted: false,
             });
 
             const canCreate = await limitService.checkLimit(
                 workspaceId.toString(),
-                'maxProjects',
-                currentProjects
+                'maxNamespaces',
+                currentNamespaces
             );
 
             if (!canCreate) {
@@ -95,7 +95,7 @@ export class ProjectController {
                         success: false,
                         error: {
                             code: 'PLAN_LIMIT_EXCEEDED',
-                            message: 'Project limit exceeded for your current plan',
+                            message: 'Namespace limit exceeded for your current plan',
                             requestId: c.get('requestId'),
                         },
                     },
@@ -103,27 +103,27 @@ export class ProjectController {
                 );
             }
 
-            const project = new Project(data);
-            const saved = await project.save();
+            const namespace = new Namespace(data);
+            const saved = await namespace.save();
 
-            return c.json<CreateProjectResponse>(
+            return c.json<CreateNamespaceResponse>(
                 {
                     success: true,
-                    message: 'Project created successfully.',
+                    message: 'Namespace created successfully.',
                     data: {
-                        project: saved as IProject,
+                        namespace: saved as INamespace,
                     },
                 },
                 201
             );
         } catch (error: unknown) {
-            logger.error('Unexpected error in ProjectController.createProject', error as Error);
+            logger.error('Unexpected error in NamespaceController.createNamespace', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
                     error: {
-                        code: 'CREATE_PROJECT_FAILED',
-                        message: 'Failed to create project',
+                        code: 'CREATE_NAMESPACE_FAILED',
+                        message: 'Failed to create namespace',
                         requestId: c.get('requestId'),
                     },
                 },
@@ -132,7 +132,7 @@ export class ProjectController {
         }
     }
 
-    static async getProjectById(c: AppContext): Promise<Response> {
+    static async getNamespaceById(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
             if (!workspaceId) {
@@ -149,23 +149,23 @@ export class ProjectController {
                 );
             }
             // @ts-ignore
-            const { projectId }: GetProjectByIdInput = c.req.valid('param');
+            const { namespaceId }: GetNamespaceByIdInput = c.req.valid('param');
 
-            const project = await Project.findOne({
-                _id: unprefixId(projectId),
+            const namespace = await Namespace.findOne({
+                _id: unprefixId(namespaceId),
                 workspaceId: unprefixId(workspaceId.toString()),
                 isDeleted: false,
             })
                 .lean()
                 .exec();
 
-            if (!project) {
+            if (!namespace) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
                         error: {
-                            code: 'PROJECT_NOT_FOUND',
-                            message: 'Project not found or you do not have permission',
+                            code: 'NAMESPACE_NOT_FOUND',
+                            message: 'Namespace not found or you do not have permission',
                             requestId: c.get('requestId'),
                         },
                     },
@@ -173,22 +173,25 @@ export class ProjectController {
                 );
             }
 
-            return c.json<GetProjectResponse>(
+            return c.json<GetNamespaceResponse>(
                 {
                     success: true,
-                    message: "Here's the project data that you asked",
-                    data: transformWithId(project, 'project') as any,
+                    message: "Here's the namespace data that you asked",
+                    data: transformWithId(namespace, 'namespace' as any) as any,
                 },
                 200
             );
         } catch (error: unknown) {
-            logger.error('Unexpected error in ProjectController.getProjectById', error as Error);
+            logger.error(
+                'Unexpected error in NamespaceController.getNamespaceById',
+                error as Error
+            );
             return c.json<IErrorResponse>(
                 {
                     success: false,
                     error: {
-                        code: 'GET_PROJECT_FAILED',
-                        message: 'Failed to get project',
+                        code: 'GET_NAMESPACE_FAILED',
+                        message: 'Failed to get namespace',
                         requestId: c.get('requestId'),
                     },
                 },
@@ -197,7 +200,7 @@ export class ProjectController {
         }
     }
 
-    static async updateProject(c: AppContext): Promise<Response> {
+    static async updateNamespace(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
             if (!workspaceId) {
@@ -214,9 +217,9 @@ export class ProjectController {
                 );
             }
             // @ts-ignore
-            const { projectId: id }: GetProjectByIdInput = c.req.valid('param');
+            const { namespaceId: id }: GetNamespaceByIdInput = c.req.valid('param');
             // @ts-ignore
-            const valid: UpdateProjectInput = c.req.valid('json');
+            const valid: UpdateNamespaceInput = c.req.valid('json');
 
             // White-label headers subscription check
             if (valid.whiteLabelHeaders && valid.whiteLabelHeaders !== 'X-Webhook') {
@@ -241,7 +244,7 @@ export class ProjectController {
                 }
             }
 
-            const updated = await Project.findOneAndUpdate(
+            const updated = await Namespace.findOneAndUpdate(
                 {
                     _id: unprefixId(id),
                     workspaceId: unprefixId(workspaceId.toString()),
@@ -256,8 +259,8 @@ export class ProjectController {
                     {
                         success: false,
                         error: {
-                            code: 'PROJECT_NOT_FOUND',
-                            message: 'Project not found or you do not have permission.',
+                            code: 'NAMESPACE_NOT_FOUND',
+                            message: 'Namespace not found or you do not have permission.',
                             requestId: c.get('requestId'),
                         },
                     },
@@ -265,23 +268,23 @@ export class ProjectController {
                 );
             }
 
-            const transformed = transformWithId(updated, 'project');
-            return c.json<UpdateProjectResponse>(
+            const transformed = transformWithId(updated, 'namespace');
+            return c.json<UpdateNamespaceResponse>(
                 {
                     success: true,
-                    message: 'Project updated successfully.',
+                    message: 'Namespace updated successfully.',
                     data: transformed as any,
                 },
                 200
             );
         } catch (error: unknown) {
-            logger.error('Unexpected error in ProjectController.updateProject', error as Error);
+            logger.error('Unexpected error in NamespaceController.updateNamespace', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
                     error: {
-                        code: 'UPDATE_PROJECT_FAILED',
-                        message: 'Failed to update project',
+                        code: 'UPDATE_NAMESPACE_FAILED',
+                        message: 'Failed to update namespace',
                         requestId: c.get('requestId'),
                     },
                 },
@@ -290,7 +293,7 @@ export class ProjectController {
         }
     }
 
-    static async deleteProject(c: AppContext): Promise<Response> {
+    static async deleteNamespace(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
             if (!workspaceId) {
@@ -307,11 +310,11 @@ export class ProjectController {
                 );
             }
             // @ts-ignore
-            const { projectId }: GetProjectByIdInput = c.req.valid('param');
+            const { namespaceId }: GetNamespaceByIdInput = c.req.valid('param');
 
-            const deleted = await Project.findOneAndUpdate(
+            const deleted = await Namespace.findOneAndUpdate(
                 {
-                    _id: unprefixId(projectId),
+                    _id: unprefixId(namespaceId),
                     workspaceId: unprefixId(workspaceId.toString()),
                     isDeleted: false,
                 },
@@ -324,8 +327,8 @@ export class ProjectController {
                     {
                         success: false,
                         error: {
-                            code: 'PROJECT_NOT_FOUND',
-                            message: 'Project not found or you do not have permission',
+                            code: 'NAMESPACE_NOT_FOUND',
+                            message: 'Namespace not found or you do not have permission',
                             requestId: c.get('requestId'),
                         },
                     },
@@ -333,21 +336,21 @@ export class ProjectController {
                 );
             }
 
-            return c.json<DeleteProjectResponse>(
+            return c.json<DeleteNamespaceResponse>(
                 {
                     success: true,
-                    message: 'Project deleted successfully.',
+                    message: 'Namespace deleted successfully.',
                 },
                 200
             );
         } catch (error: unknown) {
-            logger.error('Unexpected error in ProjectController.deleteProject', error as Error);
+            logger.error('Unexpected error in NamespaceController.deleteNamespace', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
                     error: {
-                        code: 'DELETE_PROJECT_FAILED',
-                        message: 'Failed to delete project',
+                        code: 'DELETE_NAMESPACE_FAILED',
+                        message: 'Failed to delete namespace',
                         requestId: c.get('requestId'),
                     },
                 },
@@ -356,7 +359,7 @@ export class ProjectController {
         }
     }
 
-    static async restoreProject(c: AppContext): Promise<Response> {
+    static async restoreNamespace(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
             if (!workspaceId) {
@@ -373,11 +376,11 @@ export class ProjectController {
                 );
             }
             // @ts-ignore
-            const { projectId }: GetProjectByIdInput = c.req.valid('param');
+            const { namespaceId }: GetNamespaceByIdInput = c.req.valid('param');
 
-            const restored = await Project.findOneAndUpdate(
+            const restored = await Namespace.findOneAndUpdate(
                 {
-                    _id: unprefixId(projectId),
+                    _id: unprefixId(namespaceId),
                     workspaceId: unprefixId(workspaceId.toString()),
                     isDeleted: true,
                 },
@@ -390,8 +393,8 @@ export class ProjectController {
                     {
                         success: false,
                         error: {
-                            code: 'PROJECT_NOT_FOUND',
-                            message: 'Project not found or you do not have permission',
+                            code: 'NAMESPACE_NOT_FOUND',
+                            message: 'Namespace not found or you do not have permission',
                             requestId: c.get('requestId'),
                         },
                     },
@@ -399,23 +402,26 @@ export class ProjectController {
                 );
             }
 
-            const transformed = transformWithId(restored, 'project');
-            return c.json<RestoreProjectResponse>(
+            const transformed = transformWithId(restored, 'namespace');
+            return c.json<RestoreNamespaceResponse>(
                 {
                     success: true,
-                    message: 'Project restored successfully.',
+                    message: 'Namespace restored successfully.',
                     data: transformed as any,
                 },
                 200
             );
         } catch (error: unknown) {
-            logger.error('Unexpected error in ProjectController.restoreProject', error as Error);
+            logger.error(
+                'Unexpected error in NamespaceController.restoreNamespace',
+                error as Error
+            );
             return c.json<IErrorResponse>(
                 {
                     success: false,
                     error: {
-                        code: 'RESTORE_PROJECT_FAILED',
-                        message: 'Failed to restore project',
+                        code: 'RESTORE_NAMESPACE_FAILED',
+                        message: 'Failed to restore namespace',
                         requestId: c.get('requestId'),
                     },
                 },
@@ -424,7 +430,7 @@ export class ProjectController {
         }
     }
 
-    static async listWorkspaceProjects(c: AppContext): Promise<Response> {
+    static async listWorkspaceNamespaces(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
             if (!workspaceId) {
@@ -441,7 +447,7 @@ export class ProjectController {
                 );
             }
             // @ts-ignore
-            const { q, limit = 10, page = 1 }: FilterProjectInput = c.req.valid('query');
+            const { q, limit = 10, page = 1 }: FilterNamespaceInput = c.req.valid('query');
 
             const query: any = {
                 workspaceId: unprefixId(workspaceId.toString()),
@@ -452,14 +458,14 @@ export class ProjectController {
 
             const perPage = Math.min(limit, 100);
             const skip = (page - 1) * perPage;
-            const [projects, total] = await Promise.all([
-                Project.find(query).sort({ createdAt: -1 }).skip(skip).limit(perPage).lean(),
-                Project.countDocuments(query),
+            const [namespaces, total] = await Promise.all([
+                Namespace.find(query).sort({ createdAt: -1 }).skip(skip).limit(perPage).lean(),
+                Namespace.countDocuments(query),
             ]);
 
-            const transformedProjects = transformWithId(projects, 'project');
+            const transformedNamespaces = transformWithId(namespaces, 'namespace');
 
-            return c.json<GetProjectsResponse>(
+            return c.json<GetNamespacesResponse>(
                 {
                     success: true,
                     pagination: {
@@ -468,21 +474,21 @@ export class ProjectController {
                         limit: perPage,
                         pages: Math.ceil(total / perPage),
                     },
-                    data: transformedProjects as any,
+                    data: transformedNamespaces as any,
                 },
                 200
             );
         } catch (error: unknown) {
             logger.error(
-                'Unexpected error in ProjectController.listWorkspaceProjects',
+                'Unexpected error in NamespaceController.listWorkspaceNamespaces',
                 error as Error
             );
             return c.json<IErrorResponse>(
                 {
                     success: false,
                     error: {
-                        code: 'GET_PROJECTS_FAILED',
-                        message: 'Failed to get projects',
+                        code: 'GET_NAMESPACES_FAILED',
+                        message: 'Failed to get namespaces',
                         requestId: c.get('requestId'),
                     },
                 },

@@ -14,6 +14,7 @@ export interface IUser extends BaseDocument {
     timeZone: string;
     language: string;
     emailVerified: boolean;
+    googleId?: string;
     emailVerificationToken?: string;
 
     // Instance Methods

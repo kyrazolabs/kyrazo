@@ -1,32 +1,32 @@
 export enum WebhookType {
-    RECEIVE = "receive",
-    PUBLISH = "publish",
+    RECEIVE = 'receive',
+    PUBLISH = 'publish',
 }
 export enum TargetStatus {
-    PENDING = "pending",
-    PROCESSING = "processing",
-    DELIVERED = "delivered",
-    FAILED = "failed",
-    TIMEOUT = "timeout",
-    NETWORK_ERROR = "network_error",
+    PENDING = 'pending',
+    PROCESSING = 'processing',
+    DELIVERED = 'delivered',
+    FAILED = 'failed',
+    TIMEOUT = 'timeout',
+    NETWORK_ERROR = 'network_error',
 }
 export enum EventStatus {
-    PENDING = "pending",
-    PROCESSING = "processing",
-    DELIVERED = "delivered",
-    FAILED = "failed",
-    RETRYING = "retrying",
+    PENDING = 'pending',
+    PROCESSING = 'processing',
+    DELIVERED = 'delivered',
+    FAILED = 'failed',
+    RETRYING = 'retrying',
 }
 export enum EventPriority {
-    LOW = "low",
-    NORMAL = "normal",
-    HIGH = "high",
-    URGENT = "urgent",
+    LOW = 'low',
+    NORMAL = 'normal',
+    HIGH = 'high',
+    URGENT = 'urgent',
 }
 export enum ProcessingStatus {
-    PENDING = "pending",
-    PROCESSED = "processed",
-    FAILED = "failed",
+    PENDING = 'pending',
+    PROCESSED = 'processed',
+    FAILED = 'failed',
 }
 
 export interface IPublishEvent extends Document {
@@ -59,7 +59,7 @@ export interface IPublishEvent extends Document {
 export interface IReceivedEvent<T = Record<string, string>> {
     eventId: string; // UUID Coming with the request
     workspaceId: string;
-    projectId: string;
+    namespaceId: string;
     userId?: string;
 
     source: string;

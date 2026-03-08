@@ -7,7 +7,7 @@ export * from './delivery.types';
 export * from './api.types';
 export * from './endpoint.types';
 export * from './event.types';
-export * from './project.types';
+export * from './namespace.types';
 export * from './user.types';
 export * from './billing.types';
 export * from './workspace.types';

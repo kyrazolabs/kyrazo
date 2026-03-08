@@ -1,10 +1,10 @@
-import { EventEmitter } from "events";
-import { dispatchConsumer } from "@/consumers/queues/dispatch.consumer";
-import type { IDispatchedEvent, IWebhookHeaders } from "./dispatcher.types";
-import { redisConfig } from "@/config";
-import { targetRepository } from "@/services/mongo/target.repo";
-import { logger } from "@kyrazo/shared";
-import { endpointRepository } from "@/services/mongo/endpoint.repo";
+import { EventEmitter } from 'events';
+import { dispatchConsumer } from '@/consumers/queues/dispatch.consumer';
+import type { IDispatchedEvent, IWebhookHeaders } from './dispatcher.types';
+import { redisConfig } from '@/config';
+import { targetRepository } from '@/services/mongo/target.repo';
+import { logger } from '@kyrazo/shared';
+import { endpointRepository } from '@/services/mongo/endpoint.repo';
 
 export enum JOB_PRIORITIES {
     LOW = 10,
@@ -37,33 +37,24 @@ export class DispatcherQueue extends EventEmitter {
         event: IDispatchedEvent,
         headers: IWebhookHeaders,
         targets: any[],
-        type: "target" | "endpoint" = "target",
+        type: 'target' | 'endpoint' = 'target'
     ): Promise<void> {
         try {
             logger.info(
-                `📦 Dispatching event ${event.id} to ${targets.length} targets (argument) and ${event.targets.length} targets (event prop) via queue`,
+                `📦 Dispatching event ${event.id} to ${targets.length} targets (argument) and ${event.targets.length} targets (event prop) via queue`
             );
 
             if (!targets || targets.length === 0) {
-                logger.info("No targets provided in event");
+                logger.info('No targets provided in event');
                 return;
             }
 
             const configuredTargets = await this.configureTargets(event, type);
-            const jobIds = await dispatchConsumer.enqueue(
-                event,
-                configuredTargets,
-                headers,
-            );
+            const jobIds = await dispatchConsumer.enqueue(event, configuredTargets, headers);
 
-            logger.info(
-                `✅ Queued ${jobIds.length} dispatch jobs for event ${event.id}`,
-            );
+            logger.info(`✅ Queued ${jobIds.length} dispatch jobs for event ${event.id}`);
         } catch (error: any) {
-            logger.error(
-                "Error dispatching to targets via queue:",
-                error as Error,
-            );
+            logger.error('Error dispatching to targets via queue:', error as Error);
             throw error;
         }
     }
@@ -73,10 +64,10 @@ export class DispatcherQueue extends EventEmitter {
      */
     private async configureTargets(
         event: IDispatchedEvent,
-        type: "target" | "endpoint" = "target",
+        type: 'target' | 'endpoint' = 'target'
     ): Promise<
         {
-            type: "target" | "endpoint";
+            type: 'target' | 'endpoint';
             targetId: string;
             url: string;
             priority: number;
@@ -88,7 +79,7 @@ export class DispatcherQueue extends EventEmitter {
         }[]
     > {
         const targets: {
-            type: "target" | "endpoint";
+            type: 'target' | 'endpoint';
             targetId: string;
             url: string;
             priority: number;
@@ -99,42 +90,40 @@ export class DispatcherQueue extends EventEmitter {
             method?: string;
         }[] = [];
         switch (type) {
-            case "target":
+            case 'target':
                 for await (const tar of event.targets) {
                     if (!tar) {
                         continue;
                     }
                     const target = await redisConfig.cache(
-                        `workspace:${event.workspaceId}:project:${event.projectId}:targets:${tar.targetId}`,
+                        `workspace:${event.workspaceId}:namespace:${event.namespaceId}:targets:${tar.targetId}`,
                         async () => {
                             const target = await targetRepository.getTargetById(
                                 tar.targetId,
                                 event.workspaceId,
-                                event.projectId,
+                                event.namespaceId
                             );
                             return target;
-                        },
+                        }
                     );
                     if (!target) {
                         logger.warn(
-                            `❌ Target not found in DB or Cache: ${tar.targetId} (Workspace: ${event.workspaceId}, Project: ${event.projectId})`,
+                            `❌ Target not found in DB or Cache: ${tar.targetId} (Workspace: ${event.workspaceId}, Namespace: ${event.namespaceId})`
                         );
                         continue;
                     }
-                    logger.info(
-                        `✅ Target found: ${target._id} (${target.url})`,
-                    );
+                    logger.info(`✅ Target found: ${target._id} (${target.url})`);
 
                     targets.push({
-                        type: "target",
+                        type: 'target',
                         targetId: target._id.toString(),
                         url: target.url,
                         priority:
-                            event.meta?.priority === "urgent"
+                            event.meta?.priority === 'urgent'
                                 ? JOB_PRIORITIES.CRITICAL
-                                : event.meta?.priority === "high"
+                                : event.meta?.priority === 'high'
                                   ? JOB_PRIORITIES.HIGH
-                                  : event.meta?.priority === "normal"
+                                  : event.meta?.priority === 'normal'
                                     ? JOB_PRIORITIES.NORMAL
                                     : JOB_PRIORITIES.LOW,
                         rateLimit: target.config.rateLimit,
@@ -145,43 +134,40 @@ export class DispatcherQueue extends EventEmitter {
                     });
                 }
                 break;
-            case "endpoint":
+            case 'endpoint':
                 for await (const tar of event.targets) {
                     if (!tar) {
                         continue;
                     }
                     const endpoint = await redisConfig.cache(
-                        `workspace:${event.workspaceId}:project:${event.projectId}:endpoint:${tar.targetId}`,
+                        `workspace:${event.workspaceId}:namespace:${event.namespaceId}:endpoint:${tar.targetId}`,
                         async () => {
-                            const target =
-                                await endpointRepository.getEndpointById(
-                                    tar.targetId,
-                                    event.workspaceId,
-                                    event.projectId,
-                                );
+                            const target = await endpointRepository.getEndpointById(
+                                tar.targetId,
+                                event.workspaceId,
+                                event.namespaceId
+                            );
                             return target;
-                        },
+                        }
                     );
                     if (!endpoint) {
                         logger.warn(
-                            `❌ Endpoint not found in DB or Cache: ${tar.targetId} (Workspace: ${event.workspaceId}, Project: ${event.projectId})`,
+                            `❌ Endpoint not found in DB or Cache: ${tar.targetId} (Workspace: ${event.workspaceId}, Namespace: ${event.namespaceId})`
                         );
                         continue;
                     }
-                    logger.info(
-                        `✅ Endpoint found: ${endpoint._id} (${endpoint.url})`,
-                    );
+                    logger.info(`✅ Endpoint found: ${endpoint._id} (${endpoint.url})`);
 
                     targets.push({
-                        type: "endpoint",
+                        type: 'endpoint',
                         targetId: endpoint._id.toString(),
                         url: endpoint.url,
                         priority:
-                            event.meta?.priority === "urgent"
+                            event.meta?.priority === 'urgent'
                                 ? JOB_PRIORITIES.CRITICAL
-                                : event.meta?.priority === "high"
+                                : event.meta?.priority === 'high'
                                   ? JOB_PRIORITIES.HIGH
-                                  : event.meta?.priority === "normal"
+                                  : event.meta?.priority === 'normal'
                                     ? JOB_PRIORITIES.NORMAL
                                     : JOB_PRIORITIES.LOW,
                         rateLimit: endpoint.config.rateLimit,

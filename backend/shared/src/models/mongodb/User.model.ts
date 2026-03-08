@@ -24,10 +24,7 @@ const userSchema = new Schema<IUser>(
             unique: true,
             lowercase: true,
             trim: true,
-            match: [
-                /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
-                'Please enter a valid email',
-            ],
+            match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email'],
         },
         jobTitle: {
             type: String,
@@ -73,14 +70,23 @@ const userSchema = new Schema<IUser>(
         timestamps: true,
         toJSON: {
             virtuals: true,
-            transform: function (doc, ret) {
-                delete (ret as any).passwordHash;
-                delete (ret as any).__v;
+            transform: function (doc, ret: any) {
+                ret.id = `usr_${ret._id.toString()}`;
+                delete ret.passwordHash;
+                delete ret._id;
+                delete ret.__v;
                 return ret;
             },
         },
         toObject: {
             virtuals: true,
+            transform: function (doc, ret: any) {
+                ret.id = `usr_${ret._id.toString()}`;
+                delete ret.passwordHash;
+                delete ret._id;
+                delete ret.__v;
+                return ret;
+            },
         },
     }
 );
@@ -126,9 +132,7 @@ userSchema.pre('save', async function () {
 });
 
 // Instance methods
-userSchema.methods.comparePassword = async function (
-    candidatePassword: string
-): Promise<boolean> {
+userSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
     return await Bun.password.verify(candidatePassword, this.passwordHash);
 };
 
@@ -147,9 +151,7 @@ userSchema.methods.activate = async function (): Promise<void> {
     await this.save();
 };
 
-userSchema.methods.updateProfile = async function (
-    updates: UpdateProfileInput
-): Promise<IUser> {
+userSchema.methods.updateProfile = async function (updates: UpdateProfileInput): Promise<IUser> {
     Object.assign(this, updates);
     return await this.save();
 };
@@ -185,7 +187,7 @@ userSchema.statics.getUserStats = async function () {
             },
         },
         {
-            $project: {
+            $namespace: {
                 _id: 0,
                 totalUsers: 1,
                 activeUsers: 1,

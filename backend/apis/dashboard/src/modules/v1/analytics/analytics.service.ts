@@ -2,11 +2,11 @@ import { unprefixId } from '@kyrazo/shared';
 import { AnalyticsRepo } from './analytics.repo';
 
 export class AnalyticsService {
-    static async getDispatchOverview(days: number, workspaceId: string, projectId: string) {
+    static async getDispatchOverview(days: number, workspaceId: string, namespaceId: string) {
         return await AnalyticsRepo.getDispatchOverview(
             days,
             unprefixId(workspaceId) ?? '',
-            unprefixId(projectId) ?? ''
+            unprefixId(namespaceId) ?? ''
         );
     }
 
@@ -14,21 +14,21 @@ export class AnalyticsService {
         days: number,
         workspaceId: string,
         targetId: string,
-        projectId: string
+        namespaceId: string
     ) {
         return await AnalyticsRepo.getTargetOverview(
             days,
             unprefixId(workspaceId) ?? '',
             unprefixId(targetId) ?? '',
-            unprefixId(projectId) ?? ''
+            unprefixId(namespaceId) ?? ''
         );
     }
 
-    static async getIngestOverview(days: number, workspaceId: string, projectId: string) {
+    static async getIngestOverview(days: number, workspaceId: string, namespaceId: string) {
         return await AnalyticsRepo.getIngestOverview(
             days,
             unprefixId(workspaceId) ?? '',
-            unprefixId(projectId) ?? ''
+            unprefixId(namespaceId) ?? ''
         );
     }
 }

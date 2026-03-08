@@ -8,7 +8,13 @@ import { redisConfig, config } from './configs';
 import cron from 'node-cron';
 import { billingJob } from './jobs/billing.job';
 
-import { databaseConfig, clickhouseConfig, Endpoint, postgresConfig, logger } from '@kyrazo/shared';
+import {
+    databaseConfig,
+    clickhouseConfig,
+    Namespace,
+    postgresConfig,
+    logger,
+} from '@kyrazo/shared';
 // import { arcjetMiddleware } from '@/core/middlewares/arcjet.middleware'
 import { errorHandler } from 'hono-error-handler';
 import { handleMongooseErrors, zodErrorHandler } from '@/core/middlewares/error.middleware';
@@ -36,7 +42,7 @@ app.use(
             'Content-Type',
             'Authorization',
             'x-workspace-id',
-            'x-project-id',
+            'x-namespace-id',
             'sentry-trace',
             'baggage',
         ],
@@ -53,14 +59,21 @@ app.route('/v1', v1Router);
 
 // Error handler
 const errorHandlers = [handleMongooseErrors];
-app.onError(errorHandler(errorHandlers));
+app.onError((err, c) => {
+    logger.error('Unhandled Application Error', err as Error, {
+        path: c.req.path,
+        method: c.req.method,
+        requestId: c.get('requestId'),
+    });
+    return errorHandler(errorHandlers)(err, c);
+});
 
 // Initialize database and Redis connections
 const initializeConnections = async () => {
     try {
         await databaseConfig.connect();
         logger.info('Database connected successfully');
-        await Endpoint.syncIndexes();
+        await Namespace.syncIndexes();
 
         await postgresConfig.connect();
         logger.info('Postgres connected successfully');

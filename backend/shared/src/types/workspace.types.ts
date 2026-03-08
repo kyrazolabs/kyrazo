@@ -21,7 +21,7 @@ export interface IWorkspace extends BaseDocument {
     // Virtual fields
     owner?: IUser;
     users?: IUserWorkspace[];
-    app?: any[]; // Will be defined in project types
+    app?: any[]; // Will be defined in namespace types
 
     // Instance methods
     archive: () => Promise<IWorkspace>;

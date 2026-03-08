@@ -1,14 +1,14 @@
 export interface IWebhookHeaders {
-    "X-Webhook-Id": string;
-    "X-Webhook-Event": string;
-    "X-Webhook-Timestamp": string; // unix ms
-    "X-Webhook-Workspace": string;
-    "X-Webhook-Project": string;
-    "X-Webhook-Attempt": string;
-    "X-Webhook-Signature": string;
-    "X-Webhook-Nonce": string;
-    "X-Webhook-Version": string;
-    "X-Webhook-Schema": string;
+    'X-Webhook-Id': string;
+    'X-Webhook-Event': string;
+    'X-Webhook-Timestamp': string; // unix ms
+    'X-Webhook-Workspace': string;
+    'X-Webhook-Namespace': string;
+    'X-Webhook-Attempt': string;
+    'X-Webhook-Signature': string;
+    'X-Webhook-Nonce': string;
+    'X-Webhook-Version': string;
+    'X-Webhook-Schema': string;
     [key: string]: string;
 }
 
@@ -32,7 +32,7 @@ export interface IDispatchedEvent {
     timestamp: number; // unix ms
 
     workspaceId: string;
-    projectId: string;
+    namespaceId: string;
 
     sourceId: string | null;
     sourceType: string | null;
@@ -51,7 +51,7 @@ export interface IDispatchedEvent {
     targets: IDispatchedTarget[];
 
     meta?: {
-        priority: "low" | "normal" | "high" | "urgent";
+        priority: 'low' | 'normal' | 'high' | 'urgent';
         maxRetries: number;
         insertedAt: Date;
         nonce: string;
@@ -77,7 +77,7 @@ export interface SignatureResult {
 }
 
 export interface IConfiguredTarget {
-    type: "target" | "endpoint";
+    type: 'target' | 'endpoint';
     targetId: string;
     url: string;
     priority: number;

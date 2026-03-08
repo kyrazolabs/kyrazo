@@ -10,9 +10,9 @@ export class AnalyticsController {
     static async getDispatchUsage(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
+            const namespaceId = c.namespace?.namespaceId;
 
-            if (!workspaceId || !projectId) {
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -35,13 +35,13 @@ export class AnalyticsController {
                 await AnalyticsService.getDispatchOverview(
                     parseInt(last),
                     workspaceId.toString(),
-                    projectId.toString()
+                    namespaceId.toString()
                 );
 
             // Fetch active targets count
             const activeTargets = await Target.countDocuments({
                 workspaceId: new Types.ObjectId(unprefixId(workspaceId.toString())),
-                projectId: new Types.ObjectId(unprefixId(projectId.toString())),
+                namespaceId: new Types.ObjectId(unprefixId(namespaceId.toString())),
                 enabled: true,
             });
 
@@ -91,9 +91,9 @@ export class AnalyticsController {
     static async getIngestUsage(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
+            const namespaceId = c.namespace?.namespaceId;
 
-            if (!workspaceId || !projectId) {
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -116,15 +116,15 @@ export class AnalyticsController {
                 await AnalyticsService.getIngestOverview(
                     parseInt(last),
                     workspaceId.toString(),
-                    projectId.toString()
+                    namespaceId.toString()
                 );
 
             const sources = await redisConfig.cache(
-                `workspace:${unprefixId(workspaceId.toString())}:project:${unprefixId(projectId.toString())}:sources`,
+                `workspace:${unprefixId(workspaceId.toString())}:namespace:${unprefixId(namespaceId.toString())}:sources`,
                 async () => {
                     return await Source.find({
                         workspaceId: new Types.ObjectId(unprefixId(workspaceId.toString())),
-                        projectId: new Types.ObjectId(unprefixId(projectId.toString())),
+                        namespaceId: new Types.ObjectId(unprefixId(namespaceId.toString())),
                         type: 'receive',
                     });
                 },
@@ -177,9 +177,9 @@ export class AnalyticsController {
     static async getTargetOverview(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
+            const namespaceId = c.namespace?.namespaceId;
 
-            if (!workspaceId || !projectId) {
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -205,7 +205,7 @@ export class AnalyticsController {
                     parseInt(last),
                     workspaceId.toString(),
                     target,
-                    projectId.toString()
+                    namespaceId.toString()
                 );
 
             // Calculate success rate

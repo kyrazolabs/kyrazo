@@ -2,8 +2,10 @@ import { Context, Next } from 'hono';
 import { Error } from 'hono-error-handler';
 import { ZodError } from 'zod';
 import { AppContext } from './auth.middleware';
+import { logger } from '@kyrazo/shared';
 
 const handleMongooseErrors = (error: Error) => {
+    logger.error('Mongoose Error', error);
     // Mongoose bad ObjectId
     if (error.name === 'CastError') {
         return {
@@ -62,6 +64,7 @@ const zodErrorHandler = async (c: AppContext, next: Next) => {
     try {
         await next();
     } catch (err) {
+        logger.error('Zod Validation Error', err as Error);
         if (err instanceof ZodError) {
             return c.json(
                 {

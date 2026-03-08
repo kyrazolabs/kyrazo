@@ -21,9 +21,9 @@ export class SourceController {
         try {
             const userId = c.user?.userId;
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
+            const namespaceId = c.namespace?.namespaceId;
 
-            if (!userId || !workspaceId || !projectId) {
+            if (!userId || !workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -44,7 +44,7 @@ export class SourceController {
                 valid,
                 userId,
                 workspaceId.toString(),
-                projectId.toString()
+                namespaceId.toString()
             );
 
             return c.json<CreateSourceResponse>(
@@ -78,9 +78,9 @@ export class SourceController {
     static async getSource(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
+            const namespaceId = c.namespace?.namespaceId;
 
-            if (!workspaceId || !projectId) {
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -100,7 +100,7 @@ export class SourceController {
             const source = await sourceService.getSourceById(
                 sourceId,
                 workspaceId.toString(),
-                projectId.toString()
+                namespaceId.toString()
             );
 
             return c.json<GetSourceResponse>(
@@ -138,8 +138,8 @@ export class SourceController {
     static async getSources(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
-            if (!workspaceId || !projectId) {
+            const namespaceId = c.namespace?.namespaceId;
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -157,7 +157,7 @@ export class SourceController {
 
             const query: Record<string, unknown> = {
                 workspaceId,
-                projectId,
+                namespaceId,
             };
 
             if (q) query.$text = { $search: q };
@@ -197,9 +197,9 @@ export class SourceController {
     static async updateSource(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
+            const namespaceId = c.namespace?.namespaceId;
 
-            if (!workspaceId || !projectId) {
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -223,7 +223,7 @@ export class SourceController {
             const updated = await sourceService.updateSource(
                 sourceId,
                 workspaceId.toString(),
-                projectId.toString(),
+                namespaceId.toString(),
                 data
             );
 
@@ -261,18 +261,18 @@ export class SourceController {
     static async deleteSource(c: AppContext): Promise<Response> {
         try {
             const userId = c.user?.userId;
-            const projectId = c.project?.projectId;
-            const workspaceId = c.workspace?.workspaceId; // Although deleted logic used userId in controller, repo usually uses workspaceId/projectId for higher level filtering, but simple delete might be okay.
-            // Wait, previous Delete logic used: `Source.findOneAndDelete({ _id: sourceId, userId: userId, projectId: projectId })`.
-            // My repo uses: `findOneAndDelete({ _id: id, workspaceId, projectId })`.
+            const namespaceId = c.namespace?.namespaceId;
+            const workspaceId = c.workspace?.workspaceId; // Although deleted logic used userId in controller, repo usually uses workspaceId/namespaceId for higher level filtering, but simple delete might be okay.
+            // Wait, previous Delete logic used: `Source.findOneAndDelete({ _id: sourceId, userId: userId, namespaceId: namespaceId })`.
+            // My repo uses: `findOneAndDelete({ _id: id, workspaceId, namespaceId })`.
             // There is a discrepancy. The original code used `userId`.
-            // I should stick to `sourceService` which uses `workspaceId` (and `projectId`).
+            // I should stick to `sourceService` which uses `workspaceId` (and `namespaceId`).
             // Assuming `workspaceId` is available in context (it is checked in other methods).
-            // `deleteSource` in original controller checked `userId` and `projectId`.
+            // `deleteSource` in original controller checked `userId` and `namespaceId`.
             // I will use `workspaceId` as it's more standard for resource ownership in this app context usually (Endpoints/Targets use it).
             // I need to ensure `workspaceId` is present.
 
-            if (!userId || !projectId || !workspaceId) {
+            if (!userId || !namespaceId || !workspaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -293,7 +293,7 @@ export class SourceController {
             await sourceService.deleteSource(
                 sourceId,
                 workspaceId.toString(),
-                projectId.toString()
+                namespaceId.toString()
             );
 
             return c.json<DeleteSourceResponse>(
@@ -326,9 +326,9 @@ export class SourceController {
     static async updateSourceAuth(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
+            const namespaceId = c.namespace?.namespaceId;
 
-            if (!workspaceId || !projectId) {
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -350,7 +350,7 @@ export class SourceController {
             await sourceService.updateSourceAuth(
                 sourceId,
                 workspaceId.toString(),
-                projectId.toString(),
+                namespaceId.toString(),
                 data
             );
 

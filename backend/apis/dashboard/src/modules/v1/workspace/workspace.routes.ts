@@ -4,6 +4,7 @@ import { WorkspaceController } from '@/modules/v1/workspace/workspace.controller
 import { authenticate } from '@/core/middlewares/auth.middleware';
 import { requireWorkspaceMembershipParam } from '@/core/middlewares/workspace.middleware';
 import { checkWorkspaceLimits } from '@/core/middlewares/limits.middleware';
+import { requireRecentOTP } from '@/core/middlewares/otp.middleware';
 import { workspaceReadRateLimiter, workspaceWriteRateLimiter } from './workspace.rate-limiter';
 import {
     CreateWorkspaceSchema,
@@ -109,6 +110,27 @@ workspace.post(
 // Routes requiring workspace membership
 workspace.use('/', requireWorkspaceMembershipParam());
 
+workspace.post(
+    '/:workspaceId/leave',
+    workspaceWriteRateLimiter,
+    zValidator('param', GetWorkspaceByIdSchema, (result, c) => {
+        if (!result.success) {
+            return c.json(
+                {
+                    success: false,
+                    statusCode: 400,
+                    errors: JSON.parse(result.error.message).map((e: any) => ({
+                        field: e.path.join('.') || 'unknown',
+                        message: e.message,
+                    })),
+                },
+                400
+            );
+        }
+    }),
+    WorkspaceController.leaveWorkspace
+);
+
 workspace.get(
     '/:workspaceId',
     workspaceReadRateLimiter,
@@ -164,6 +186,7 @@ workspace.patch(
         }
     }),
     requireWorkspaceMembershipParam(['admin', 'owner']),
+    requireRecentOTP('update_workspace'),
     WorkspaceController.updateWorkspace
 );
 
@@ -186,6 +209,7 @@ workspace.delete(
         }
     }),
     requireWorkspaceMembershipParam(['owner']),
+    requireRecentOTP('delete_workspace'),
     WorkspaceController.deleteWorkspace
 );
 

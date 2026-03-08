@@ -1,36 +1,30 @@
-import { Subscription } from '@kyrazo/shared';
+import { Subscription, unprefixId } from '@kyrazo/shared';
 import type { ISubscription } from '@kyrazo/shared';
 
 export class SubscriptionRepository {
-    async create(
-        subscriptionData: Partial<ISubscription>
-    ): Promise<ISubscription> {
+    async create(subscriptionData: Partial<ISubscription>): Promise<ISubscription> {
         const subscription = new (Subscription as any)(subscriptionData);
         return await subscription.save();
     }
 
     async findById(id: string): Promise<ISubscription | null> {
-        return await (Subscription as any).findById(id);
+        return await (Subscription as any).findById(unprefixId(id));
     }
 
     async findByWorkspace(workspaceId: string): Promise<ISubscription[]> {
         return await (Subscription as any)
-            .find({ workspaceId })
+            .find({ workspaceId: unprefixId(workspaceId) })
             .sort({ createdAt: -1 });
     }
 
-    async findActiveByWorkspace(
-        workspaceId: string
-    ): Promise<ISubscription | null> {
+    async findActiveByWorkspace(workspaceId: string): Promise<ISubscription | null> {
         return await (Subscription as any).findOne({
-            workspaceId,
+            workspaceId: unprefixId(workspaceId),
             status: 'active',
         });
     }
 
-    async findByStripeSubscriptionId(
-        stripeSubscriptionId: string
-    ): Promise<ISubscription | null> {
+    async findByStripeSubscriptionId(stripeSubscriptionId: string): Promise<ISubscription | null> {
         return await (Subscription as any).findOne({ stripeSubscriptionId });
     }
 
@@ -43,7 +37,7 @@ export class SubscriptionRepository {
         } = {}
     ): Promise<ISubscription[]> {
         const query: Record<string, unknown> = {};
-        if (options.workspaceId) query.workspaceId = options.workspaceId;
+        if (options.workspaceId) query.workspaceId = unprefixId(options.workspaceId);
         if (options.status) query.status = options.status;
 
         const subscriptions = await (Subscription as any)
@@ -55,11 +49,9 @@ export class SubscriptionRepository {
         return subscriptions;
     }
 
-    async count(
-        options: { workspaceId?: string; status?: string } = {}
-    ): Promise<number> {
+    async count(options: { workspaceId?: string; status?: string } = {}): Promise<number> {
         const query: Record<string, unknown> = {};
-        if (options.workspaceId) query.workspaceId = options.workspaceId;
+        if (options.workspaceId) query.workspaceId = unprefixId(options.workspaceId);
         if (options.status) query.status = options.status;
 
         return await (Subscription as any).countDocuments(query);
@@ -69,7 +61,7 @@ export class SubscriptionRepository {
         id: string,
         updateData: Partial<ISubscription>
     ): Promise<ISubscription | null> {
-        return await (Subscription as any).findByIdAndUpdate(id, updateData, {
+        return await (Subscription as any).findByIdAndUpdate(unprefixId(id), updateData, {
             new: true,
         });
     }
@@ -78,21 +70,17 @@ export class SubscriptionRepository {
         stripeSubscriptionId: string,
         updateData: Partial<ISubscription>
     ): Promise<ISubscription | null> {
-        return await (Subscription as any).findOneAndUpdate(
-            { stripeSubscriptionId },
-            updateData,
-            { new: true }
-        );
+        return await (Subscription as any).findOneAndUpdate({ stripeSubscriptionId }, updateData, {
+            new: true,
+        });
     }
 
     async deleteById(id: string): Promise<boolean> {
-        const result = await (Subscription as any).findByIdAndDelete(id);
+        const result = await (Subscription as any).findByIdAndDelete(unprefixId(id));
         return !!result;
     }
 
-    async findExpiringTrials(
-        hoursFromNow: number = 24
-    ): Promise<ISubscription[]> {
+    async findExpiringTrials(hoursFromNow: number = 24): Promise<ISubscription[]> {
         const futureDate = new Date();
         futureDate.setHours(futureDate.getHours() + hoursFromNow);
 
@@ -102,9 +90,7 @@ export class SubscriptionRepository {
         });
     }
 
-    async findEndingSubscriptions(
-        hoursFromNow: number = 24
-    ): Promise<ISubscription[]> {
+    async findEndingSubscriptions(hoursFromNow: number = 24): Promise<ISubscription[]> {
         const futureDate = new Date();
         futureDate.setHours(futureDate.getHours() + hoursFromNow);
 

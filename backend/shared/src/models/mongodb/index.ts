@@ -3,7 +3,7 @@ export * from './Endpoint.model';
 export * from './Invoice.model';
 export * from './Key.model';
 export * from './Plan.model';
-export * from './Project.model';
+export * from './Namespace.model';
 export * from './RefreshToken.model';
 export * from './Subscription.model';
 export * from './Target.model';

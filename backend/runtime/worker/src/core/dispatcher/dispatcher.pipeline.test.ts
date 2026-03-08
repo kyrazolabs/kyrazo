@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, mock } from "bun:test";
-import { DispatcherPipeline } from "./dispatcher.pipeline";
+import { describe, it, expect, beforeEach, mock } from 'bun:test';
+import { DispatcherPipeline } from './dispatcher.pipeline';
 
 // Mock dependencies
 const mockValidator = {
@@ -9,15 +9,15 @@ const mockValidator = {
 
 const mockTransformer = {
     transform: mock(() => ({
-        id: "evt_1",
-        workspaceId: "ws_1",
-        projectId: "proj_1",
-        targets: [{ targetId: "tar_1" }],
+        id: 'evt_1',
+        workspaceId: 'ws_1',
+        namespaceId: 'proj_1',
+        targets: [{ targetId: 'tar_1' }],
     })),
 };
 
 const mockHeaders = {
-    buildHeaders: mock(() => Promise.resolve({ "X-Webhook-Id": "evt_1" })),
+    buildHeaders: mock(() => Promise.resolve({ 'X-Webhook-Id': 'evt_1' })),
 };
 
 const mockQueue = {
@@ -31,16 +31,16 @@ const mockRedis = {
     getQueueClient: mock(() => mockRedisClient),
 };
 
-mock.module("./dispatcher.validator", () => ({
+mock.module('./dispatcher.validator', () => ({
     dispatcherValidator: mockValidator,
 }));
-mock.module("./dispatcher.transformer", () => ({
+mock.module('./dispatcher.transformer', () => ({
     dispatcherTransformer: mockTransformer,
 }));
-mock.module("./dispatcher.headers", () => ({ dispatcherHeaders: mockHeaders }));
-mock.module("./dispatcher.queue", () => ({ dispatcherQueue: mockQueue }));
-mock.module("@/config", () => ({ redisConfig: mockRedis }));
-mock.module("@kyrazo/shared", () => ({
+mock.module('./dispatcher.headers', () => ({ dispatcherHeaders: mockHeaders }));
+mock.module('./dispatcher.queue', () => ({ dispatcherQueue: mockQueue }));
+mock.module('@/config', () => ({ redisConfig: mockRedis }));
+mock.module('@kyrazo/shared', () => ({
     logger: {
         info: () => {},
         error: () => {},
@@ -49,7 +49,7 @@ mock.module("@kyrazo/shared", () => ({
     },
 }));
 
-describe("DispatcherPipeline", () => {
+describe('DispatcherPipeline', () => {
     let pipeline: DispatcherPipeline;
 
     beforeEach(() => {
@@ -62,10 +62,10 @@ describe("DispatcherPipeline", () => {
         mockRedisClient.set.mockClear();
     });
 
-    it("should process valid publish event", async () => {
+    it('should process valid publish event', async () => {
         const messageData = {
-            eventId: "evt_1",
-            sourceType: "internal",
+            eventId: 'evt_1',
+            sourceType: 'internal',
         };
 
         await pipeline.process(messageData);
@@ -76,20 +76,20 @@ describe("DispatcherPipeline", () => {
         expect(mockQueue.enqueue).toHaveBeenCalled();
     });
 
-    it("should skip invalid event", async () => {
+    it('should skip invalid event', async () => {
         mockValidator.validate.mockReturnValueOnce(false);
-        const messageData = { eventId: "evt_bad" };
+        const messageData = { eventId: 'evt_bad' };
 
         await pipeline.process(messageData);
 
         expect(mockTransformer.transform).not.toHaveBeenCalled();
     });
 
-    it("should skip duplicate events", async () => {
+    it('should skip duplicate events', async () => {
         const mockRedisClient = mockRedis.getQueueClient();
         (mockRedisClient.set as any).mockReturnValueOnce(false); // set returns null or false if NX fails
 
-        const messageData = { eventId: "evt_dup" };
+        const messageData = { eventId: 'evt_dup' };
 
         await pipeline.process(messageData);
 

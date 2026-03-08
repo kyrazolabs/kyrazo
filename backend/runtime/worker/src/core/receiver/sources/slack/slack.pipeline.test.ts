@@ -9,7 +9,7 @@ const mockSource = {
     findById: mock(() => ({
         populate: mock(() =>
             Promise.resolve({
-                projectId: 'proj_1',
+                namespaceId: 'proj_1',
                 authentication: { credentials: { secret: 'enc', iv: 'iv' } },
                 endpoints: [],
                 forwarding: true,
@@ -17,7 +17,7 @@ const mockSource = {
         ),
     })),
 };
-const mockTransformer = { transform: mock(() => ({ project_id: 'proj_1' })) };
+const mockTransformer = { transform: mock(() => ({ namespace_id: 'proj_1' })) };
 const mockIngestQueue = { add: mock(() => Promise.resolve()) };
 const mockIngestProducer = {
     getQueues: () => ({

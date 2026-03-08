@@ -16,8 +16,8 @@ describe('ID Utility', () => {
         });
 
         it('should return undefined for null/undefined', () => {
-            expect(prefixId(null as any, 'project')).toBeUndefined();
-            expect(prefixId(undefined, 'project')).toBeUndefined();
+            expect(prefixId(null as any, 'namespace')).toBeUndefined();
+            expect(prefixId(undefined, 'namespace')).toBeUndefined();
         });
 
         it('should NOT double-prefix', () => {
@@ -30,7 +30,7 @@ describe('ID Utility', () => {
         it('should remove prefix correctly', () => {
             expect(unprefixId(`src_${validObjectId}`)).toBe(validObjectId);
             expect(unprefixId(`trg_${validObjectId}`)).toBe(validObjectId);
-            expect(unprefixId(`pro_${validObjectId}`)).toBe(validObjectId);
+            expect(unprefixId(`ns_${validObjectId}`)).toBe(validObjectId);
             expect(unprefixId(`end_${validObjectId}`)).toBe(validObjectId);
         });
 
@@ -53,7 +53,7 @@ describe('ID Utility', () => {
 
         it('should validate with any valid prefix if type not provided', () => {
             expect(isValidPrefixedId(`src_${validObjectId}`)).toBe(true);
-            expect(isValidPrefixedId(`pro_${validObjectId}`)).toBe(true);
+            expect(isValidPrefixedId(`ns_${validObjectId}`)).toBe(true);
         });
 
         it('should fail for incorrect prefix or invalid hex', () => {

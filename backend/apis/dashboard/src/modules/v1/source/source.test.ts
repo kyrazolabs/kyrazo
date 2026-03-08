@@ -49,12 +49,12 @@ describe('SourceController', () => {
         query: any = {},
         userId: string = 'user1',
         workspaceId: string = 'workspace1',
-        projectId: string = 'project1'
+        namespaceId: string = 'namespace1'
     ) => {
         return {
             user: { userId },
             workspace: { workspaceId },
-            project: { projectId },
+            namespace: { namespaceId },
             req: {
                 valid: (type: string) => {
                     if (type === 'json') return body;

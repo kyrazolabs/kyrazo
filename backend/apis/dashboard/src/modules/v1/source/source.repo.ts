@@ -7,11 +7,11 @@ export class SourceRepository {
         return transformWithId(savedSource, 'source') as any;
     }
 
-    async findById(id: string, workspaceId: string, projectId: string): Promise<ISource | null> {
+    async findById(id: string, workspaceId: string, namespaceId: string): Promise<ISource | null> {
         const source = await Source.findOne({
             _id: unprefixId(id),
             workspaceId: unprefixId(workspaceId),
-            projectId: unprefixId(projectId),
+            namespaceId: unprefixId(namespaceId),
         })
             .populate('endpoints')
             .lean();
@@ -27,8 +27,8 @@ export class SourceRepository {
     ): Promise<{ sources: ISource[]; total: number }> {
         if (options.query?.workspaceId)
             options.query.workspaceId = unprefixId(options.query.workspaceId as string);
-        if (options.query?.projectId)
-            options.query.projectId = unprefixId(options.query.projectId as string);
+        if (options.query?.namespaceId)
+            options.query.namespaceId = unprefixId(options.query.namespaceId as string);
 
         const skip = options.page ? (options.page - 1) * (options.limit || 10) : 0;
         const [sources, total] = await Promise.all([
@@ -48,7 +48,7 @@ export class SourceRepository {
     async update(
         id: string,
         workspaceId: string,
-        projectId: string,
+        namespaceId: string,
         data: Partial<ISource> | Record<string, unknown>
     ): Promise<ISource | null> {
         // Handle $set operators if present
@@ -58,7 +58,7 @@ export class SourceRepository {
             {
                 _id: unprefixId(id),
                 workspaceId: unprefixId(workspaceId),
-                projectId: unprefixId(projectId),
+                namespaceId: unprefixId(namespaceId),
             },
             updateOp,
             { new: true }
@@ -66,11 +66,11 @@ export class SourceRepository {
         return updated ? (transformWithId(updated, 'source') as unknown as ISource) : null;
     }
 
-    async deleteById(id: string, workspaceId: string, projectId: string): Promise<boolean> {
+    async deleteById(id: string, workspaceId: string, namespaceId: string): Promise<boolean> {
         const deleted = await Source.findOneAndDelete({
             _id: unprefixId(id),
             workspaceId: unprefixId(workspaceId),
-            projectId: unprefixId(projectId),
+            namespaceId: unprefixId(namespaceId),
         }).exec();
         return deleted !== null;
     }

@@ -7,7 +7,7 @@ export type EndpointMethods = 'POST' | 'PUT' | 'PATCH';
 export interface IEndpoint<T = string> extends BaseDocument {
     id: string;
     workspaceId: Types.ObjectId;
-    projectId: Types.ObjectId;
+    namespaceId: Types.ObjectId;
     name: string;
     status: EndpointStatus;
     url: string;
@@ -37,16 +37,19 @@ export interface IEndpoint<T = string> extends BaseDocument {
 }
 
 export interface IEndpointModel extends Model<IEndpoint> {
-    findByWorkspaceAndProject(workspaceId: string, projectId: string): Promise<IEndpoint[]>;
-    findActiveByWorkspaceAndProject(workspaceId: string, projectId: string): Promise<IEndpoint[]>;
-    findActiveByWorkspaceAndProjectAndId(
+    findByWorkspaceAndNamespace(workspaceId: string, namespaceId: string): Promise<IEndpoint[]>;
+    findActiveByWorkspaceAndNamespace(
         workspaceId: string,
-        projectId: string,
+        namespaceId: string
+    ): Promise<IEndpoint[]>;
+    findActiveByWorkspaceAndNamespaceAndId(
+        workspaceId: string,
+        namespaceId: string,
         endpointId: string
     ): Promise<IEndpoint | null>;
-    findActiveByWorkspaceAndProjectAndIds(
+    findActiveByWorkspaceAndNamespaceAndIds(
         workspaceId: string,
-        projectId: string,
+        namespaceId: string,
         endpointIds: string[]
     ): Promise<IEndpoint[]>;
 }

@@ -25,9 +25,9 @@ export class DeliveryController {
     static async getDeliveriesBySource(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
+            const namespaceId = c.namespace?.namespaceId;
 
-            if (!workspaceId || !projectId) {
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -41,7 +41,7 @@ export class DeliveryController {
                 );
             }
 
-            if (!workspaceId || !projectId) {
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -61,7 +61,7 @@ export class DeliveryController {
             const { data: deliveries, total } = await DeliveryRepo.getDeliveriesBySource(
                 sourceId,
                 workspaceId.toString(),
-                projectId.toString(),
+                namespaceId.toString(),
                 limit,
                 page
             );
@@ -101,9 +101,9 @@ export class DeliveryController {
     static async getDeliveries(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
+            const namespaceId = c.namespace?.namespaceId;
 
-            if (!workspaceId || !projectId) {
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -121,7 +121,7 @@ export class DeliveryController {
 
             const { data: deliveries, total } = await DeliveryRepo.getDeliveries(
                 workspaceId.toString(),
-                projectId.toString(),
+                namespaceId.toString(),
                 status,
                 limit,
                 page
@@ -159,9 +159,9 @@ export class DeliveryController {
     static async getTargets(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
+            const namespaceId = c.namespace?.namespaceId;
 
-            if (!workspaceId || !projectId) {
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -179,7 +179,7 @@ export class DeliveryController {
 
             const { data: deliveries, total } = await DeliveryRepo.getTargets(
                 workspaceId.toString(),
-                projectId.toString(),
+                namespaceId.toString(),
                 limit,
                 page
             );
@@ -216,9 +216,9 @@ export class DeliveryController {
     static async getDeliveriesByTarget(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
+            const namespaceId = c.namespace?.namespaceId;
 
-            if (!workspaceId || !projectId) {
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -239,7 +239,7 @@ export class DeliveryController {
             const { data: deliveries, total } = await DeliveryRepo.getDeliveriesByTarget(
                 target,
                 workspaceId.toString(),
-                projectId.toString(),
+                namespaceId.toString(),
                 limit,
                 page
             );
@@ -276,9 +276,9 @@ export class DeliveryController {
     static async getDeliveryById(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
+            const namespaceId = c.namespace?.namespaceId;
 
-            if (!workspaceId || !projectId) {
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -296,7 +296,7 @@ export class DeliveryController {
             const result = await DeliveryRepo.getDeliveryById(
                 deliveryId,
                 workspaceId.toString(),
-                projectId.toString()
+                namespaceId.toString()
             );
             const delivery = result[0] || null;
 
@@ -326,9 +326,9 @@ export class DeliveryController {
     static async getDeliveryStatsByTarget(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
+            const namespaceId = c.namespace?.namespaceId;
 
-            if (!workspaceId || !projectId) {
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -352,7 +352,7 @@ export class DeliveryController {
                     parseInt(last),
                     target,
                     workspaceId.toString(),
-                    projectId.toString()
+                    namespaceId.toString()
                 );
 
             // Calculate success rate
@@ -405,9 +405,9 @@ export class DeliveryController {
     static async getIngestEvents(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
+            const namespaceId = c.namespace?.namespaceId;
 
-            if (!workspaceId || !projectId) {
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -425,7 +425,7 @@ export class DeliveryController {
 
             const { data: deliveries, total } = await IngestRepo.getIngestEvents(
                 workspaceId.toString(),
-                projectId.toString(),
+                namespaceId.toString(),
                 status,
                 limit,
                 page
@@ -463,9 +463,9 @@ export class DeliveryController {
     static async getReceivedEventsBySource(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
+            const namespaceId = c.namespace?.namespaceId;
 
-            if (!workspaceId || !projectId) {
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -479,7 +479,7 @@ export class DeliveryController {
                 );
             }
 
-            if (!workspaceId || !projectId) {
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -499,7 +499,7 @@ export class DeliveryController {
             const { data: deliveries, total } = await IngestRepo.getReceivedEventsBySource(
                 sourceId,
                 workspaceId.toString(),
-                projectId.toString(),
+                namespaceId.toString(),
                 limit,
                 page
             );
@@ -539,9 +539,9 @@ export class DeliveryController {
     static async getIngestEventById(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
+            const namespaceId = c.namespace?.namespaceId;
 
-            if (!workspaceId || !projectId) {
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -559,7 +559,7 @@ export class DeliveryController {
             const result = await IngestRepo.getIngestEventById(
                 eventId,
                 workspaceId.toString(),
-                projectId.toString()
+                namespaceId.toString()
             );
             const delivery = result[0] || null;
 
@@ -588,15 +588,15 @@ export class DeliveryController {
 
     private static decryptDelivery(delivery: any) {
         if (!delivery) return delivery;
-        const projectId = delivery.project_id;
-        if (!projectId) return delivery;
+        const namespaceId = delivery.namespace_id;
+        if (!namespaceId) return delivery;
 
         const tryDecrypt = (field: string) => {
             if (!field || typeof field !== 'string' || !field.includes(':')) return field;
             const [iv, encrypted] = field.split(':');
             if (!iv || !encrypted) return field;
             try {
-                return secretCrypto.decrypt(encrypted, iv, projectId);
+                return secretCrypto.decrypt(encrypted, iv, namespaceId);
             } catch (e) {
                 return field;
             }

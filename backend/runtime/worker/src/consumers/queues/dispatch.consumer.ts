@@ -1,26 +1,21 @@
-import { EventEmitter } from "events";
-import { Queue, Worker, Job, QueueEvents } from "bullmq";
-import { redisConfig } from "@/config";
-import { randomUUID } from "crypto";
+import { EventEmitter } from 'events';
+import { Queue, Worker, Job, QueueEvents } from 'bullmq';
+import { redisConfig } from '@/config';
+import { randomUUID } from 'crypto';
 import type {
     IConfiguredTarget,
     IDispatchedEvent,
     IDispatchedTarget,
     IDispatchJobData,
     IWebhookHeaders,
-} from "@/core/dispatcher/dispatcher.types";
-import {
-    DeliveryStatus,
-    EventStatus,
-    logger,
-    type SQLDeliveryAttempt,
-} from "@kyrazo/shared";
-import { httpRequester } from "@/services/http/http.requester";
-import { dispatchProducer } from "../batch/dispatch.producer";
-import { env } from "@/app/worker.env";
-import { config } from "@/config";
-import { dispatcherSignature } from "@/core/dispatcher/dispatcher.signature";
-import { dispatchAnalyticsProducer } from "@/services/analytics/dispatch.producer";
+} from '@/core/dispatcher/dispatcher.types';
+import { DeliveryStatus, EventStatus, logger, type SQLDeliveryAttempt } from '@kyrazo/shared';
+import { httpRequester } from '@/services/http/http.requester';
+import { dispatchProducer } from '../batch/dispatch.producer';
+import { env } from '@/app/worker.env';
+import { config } from '@/config';
+import { dispatcherSignature } from '@/core/dispatcher/dispatcher.signature';
+import { dispatchAnalyticsProducer } from '@/services/analytics/dispatch.producer';
 
 /**
  * Event Processor - Coordinates event processing and queue management
@@ -40,7 +35,7 @@ export class DispatchConsumer extends EventEmitter {
     public async initialize(): Promise<void> {
         if (this.dispatchQueue) return;
 
-        logger.info("Initializing Dispatch Consumer...");
+        logger.info('Initializing Dispatch Consumer...');
         const connection = redisConfig.getQueueClient();
 
         // Initialize queues
@@ -51,21 +46,17 @@ export class DispatchConsumer extends EventEmitter {
                 removeOnFail: 50, // Keep last 50 failed jobs
                 attempts: 3, // Default attempts (will be overridden per job based on event.meta.maxRetries)
                 backoff: {
-                    type: "exponential",
+                    type: 'exponential',
                     delay: 2000, // Start with 2 seconds
                 },
             },
         });
 
         // Initialize workers
-        this.dispatchWorker = new Worker(
-            `event-dispatch`,
-            this.process.bind(this),
-            {
-                connection,
-                concurrency: env.worker.CONCURRENCY,
-            },
-        );
+        this.dispatchWorker = new Worker(`event-dispatch`, this.process.bind(this), {
+            connection,
+            concurrency: env.worker.CONCURRENCY,
+        });
 
         // Initialize queue events for monitoring
         this.queueEvents = new QueueEvents(`event-dispatch`, {
@@ -73,7 +64,7 @@ export class DispatchConsumer extends EventEmitter {
         });
 
         this.setupEventListeners();
-        logger.info("🚀 Event Processor (event-dispatch) initialized");
+        logger.info('🚀 Event Processor (event-dispatch) initialized');
     }
 
     public static getInstance(): DispatchConsumer {
@@ -86,10 +77,10 @@ export class DispatchConsumer extends EventEmitter {
     public async enqueue(
         event: IDispatchedEvent,
         targets: IConfiguredTarget[],
-        headers: IWebhookHeaders,
+        headers: IWebhookHeaders
     ): Promise<(string | undefined)[]> {
         if (!this.dispatchQueue) {
-            throw new Error("DispatchConsumer not initialized");
+            throw new Error('DispatchConsumer not initialized');
         }
         try {
             const jobData = {
@@ -101,12 +92,12 @@ export class DispatchConsumer extends EventEmitter {
             const maxRetries = event.meta?.maxRetries || 3;
 
             const jobs = await this.dispatchQueue.addBulk(
-                targets.map((target) => {
+                targets.map(target => {
                     const deliveryId = `${randomUUID()}`;
                     // Retry count is the number of *retries*, so total attempts = retries + 1
                     const attempts = (target.retryCount || maxRetries) + 1;
                     return {
-                        name: "dispatch",
+                        name: 'dispatch',
                         data: { ...jobData, deliveryId, target },
                         opts: {
                             jobId: deliveryId,
@@ -114,26 +105,24 @@ export class DispatchConsumer extends EventEmitter {
                             delay: 0, // Process immediately
                             attempts: attempts, // Set total attempts
                             backoff: {
-                                type: "exponential",
+                                type: 'exponential',
                                 delay: 2000, // Start with 2 seconds
                             },
                         },
                     };
-                }),
+                })
             );
 
-            const jobIds = jobs.map((job) => job.id);
-            const deliveryIds = jobs.map((job) => job.opts.jobId);
+            const jobIds = jobs.map(job => job.id);
+            const deliveryIds = jobs.map(job => job.opts.jobId);
 
             logger.info(
-                `📦 Added dispatch job to queue: ${jobIds.join(
-                    ", ",
-                )} (maxRetries: ${maxRetries})`,
+                `📦 Added dispatch job to queue: ${jobIds.join(', ')} (maxRetries: ${maxRetries})`
             );
 
             return jobIds || deliveryIds;
         } catch (error) {
-            console.error("Error adding job to dispatch queue:", error);
+            console.error('Error adding job to dispatch queue:', error);
             throw error;
         }
     }
@@ -145,18 +134,16 @@ export class DispatchConsumer extends EventEmitter {
         const { event, target, headers, deliveryId } = job.data;
         // Format date for ClickHouse (YYYY-MM-DD HH:MM:SS.mmm)
         const toCHDate = (date: Date | string | number) =>
-            new Date(date).toISOString().slice(0, 23).replace("T", " ");
+            new Date(date).toISOString().slice(0, 23).replace('T', ' ');
 
         await job.log(
-            `🚀 Dispatch starting (Attempt ${job.attemptsMade + 1}/${
-                job.opts.attempts
-            })`,
+            `🚀 Dispatch starting (Attempt ${job.attemptsMade + 1}/${job.opts.attempts})`
         );
 
         const deliveryAttempt: SQLDeliveryAttempt = {
             delivery_id: deliveryId,
             workspace_id: event.workspaceId,
-            project_id: event.projectId,
+            namespace_id: event.namespaceId,
 
             // Links to other collections
             event_id: event.id,
@@ -173,14 +160,14 @@ export class DispatchConsumer extends EventEmitter {
             attempt_number: job.attemptsMade + 1,
 
             // Request details
-            request_method: target.method || "POST",
+            request_method: target.method || 'POST',
             request_header: JSON.stringify(headers),
             request_body: JSON.stringify(event),
 
             // Response details
             response_code: null,
-            response_header: "",
-            response_body: "",
+            response_header: '',
+            response_body: '',
             response_time_ms: null,
 
             // Timestamps
@@ -195,7 +182,7 @@ export class DispatchConsumer extends EventEmitter {
             logger.info(
                 `🚀 Processing delivery job: ${job.id} for target: ${target.url} (attempt: ${
                     job.attemptsMade + 1
-                }/${job.opts.attempts})`,
+                }/${job.opts.attempts})`
             );
 
             // Send HTTP request - only 1 attempt per job execution
@@ -204,7 +191,7 @@ export class DispatchConsumer extends EventEmitter {
                 type: event.type,
                 timestamp: event.timestamp,
                 workspaceId: event.workspaceId,
-                projectId: event.projectId,
+                namespaceId: event.namespaceId,
 
                 data: {
                     object: event.data.object,
@@ -219,13 +206,12 @@ export class DispatchConsumer extends EventEmitter {
             const signatureResult = await dispatcherSignature.sign(
                 event,
                 event.workspaceId,
-                event.projectId,
+                event.namespaceId,
                 target.targetId,
-                target.type,
+                target.type
             );
 
-            const signatureHeaders =
-                await dispatcherSignature.buildHeaders(signatureResult);
+            const signatureHeaders = await dispatcherSignature.buildHeaders(signatureResult);
 
             // Merge custom headers if they exist
             if (target.customHeaders) {
@@ -237,49 +223,37 @@ export class DispatchConsumer extends EventEmitter {
             // Update delivery attempt record with final headers
             deliveryAttempt.request_header = JSON.stringify(headers);
             await job.log(`✅ Message signed`);
-            const method = target.method || "POST";
+            const method = target.method || 'POST';
             await job.log(`📤 Sending ${method} request to ${target.url}`);
-            const response = await httpRequester.request(
-                method,
-                target.url,
-                body,
-                {
-                    headers: headers,
-                },
-            );
+            const response = await httpRequester.request(method, target.url, body, {
+                headers: headers,
+            });
             await job.log(`📥 Received response: ${response.status}`);
 
             // Update delivery attempt with response details
             deliveryAttempt.response_code = response.status;
             deliveryAttempt.response_header = JSON.stringify(response.headers);
             deliveryAttempt.response_body =
-                typeof response.data === "string"
-                    ? response.data
-                    : JSON.stringify(response.data);
+                typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
             deliveryAttempt.response_time_ms = response.duration;
 
             if (response.status < 200 || response.status >= 300) {
-                throw new Error(
-                    `Target responded with status: ${response.status}`,
-                );
+                throw new Error(`Target responded with status: ${response.status}`);
             }
 
             // DEBUG: Add to Delivery Attempt Collection
             await job.log(`📦 Sending success report to ClickHouse sink...`);
             await dispatchProducer
                 .getQueues()
-                .DispatchsQueue.add(
-                    dispatchProducer.getQueueNames().DispatchProducer,
-                    {
-                        ...deliveryAttempt,
-                        status: DeliveryStatus.DELIVERED,
-                        attempt_number: job.attemptsMade + 1,
-                        processed_at: toCHDate(new Date()),
-                    },
-                );
+                .DispatchsQueue.add(dispatchProducer.getQueueNames().DispatchProducer, {
+                    ...deliveryAttempt,
+                    status: DeliveryStatus.DELIVERED,
+                    attempt_number: job.attemptsMade + 1,
+                    processed_at: toCHDate(new Date()),
+                });
 
             await dispatchAnalyticsProducer.record({
-                projectId: deliveryAttempt.project_id,
+                namespaceId: deliveryAttempt.namespace_id,
                 targetId: deliveryAttempt.target_id,
                 eventType: deliveryAttempt.event_type,
                 responseCode: response.status,
@@ -289,7 +263,7 @@ export class DispatchConsumer extends EventEmitter {
                 deliveryId: deliveryAttempt.delivery_id,
             });
             logger.debug(
-                `✅ Delivery job completed and sent to sink: ${job.id} (${response.status})`,
+                `✅ Delivery job completed and sent to sink: ${job.id} (${response.status})`
             );
             await job.log(`✅ Job completed successfully`);
         } catch (error: any) {
@@ -297,7 +271,7 @@ export class DispatchConsumer extends EventEmitter {
                 `❌ Delivery job failed: ${job.id} (attempt ${
                     job.attemptsMade + 1
                 }/${job.opts.attempts})`,
-                error.message,
+                error.message
             );
             await job.log(`❌ POST failed: ${error.message}`);
 
@@ -305,28 +279,23 @@ export class DispatchConsumer extends EventEmitter {
             const maxAttempts = job.opts.attempts || 3;
             if (job.attemptsMade + 1 >= maxAttempts) {
                 logger.debug(
-                    `❌ Max attempts (${maxAttempts}) reached for delivery: ${deliveryId}`,
+                    `❌ Max attempts (${maxAttempts}) reached for delivery: ${deliveryId}`
                 );
-                await job.log(
-                    `❌ Max attempts reached. marking as final failure.`,
-                );
+                await job.log(`❌ Max attempts reached. marking as final failure.`);
 
                 // BUG: Add to Delivery Attempt Collection
                 await dispatchProducer
                     .getQueues()
-                    .DispatchsQueue.add(
-                        dispatchProducer.getQueueNames().DispatchProducer,
-                        {
-                            ...deliveryAttempt,
-                            status: DeliveryStatus.FAILED,
-                            attempt_number: job.attemptsMade + 1,
+                    .DispatchsQueue.add(dispatchProducer.getQueueNames().DispatchProducer, {
+                        ...deliveryAttempt,
+                        status: DeliveryStatus.FAILED,
+                        attempt_number: job.attemptsMade + 1,
 
-                            processed_at: toCHDate(new Date()),
-                            error: error.message,
-                        },
-                    );
+                        processed_at: toCHDate(new Date()),
+                        error: error.message,
+                    });
                 await dispatchAnalyticsProducer.record({
-                    projectId: deliveryAttempt.project_id,
+                    namespaceId: deliveryAttempt.namespace_id,
                     targetId: deliveryAttempt.target_id,
                     eventType: deliveryAttempt.event_type,
                     responseCode: deliveryAttempt.response_code ?? 500,
@@ -339,24 +308,21 @@ export class DispatchConsumer extends EventEmitter {
                 logger.debug(
                     `📅 BullMQ will retry job ${job.id} (attempt ${
                         job.attemptsMade + 2
-                    }/${maxAttempts})`,
+                    }/${maxAttempts})`
                 );
                 await job.log(`📅 Retrying...`);
                 // BUG: Add to Delivery Attempt Collection
                 await dispatchProducer
                     .getQueues()
-                    .DispatchsQueue.add(
-                        dispatchProducer.getQueueNames().DispatchProducer,
-                        {
-                            ...deliveryAttempt,
-                            status: DeliveryStatus.PROCESSING,
-                            attempt_number: job.attemptsMade + 1,
-                            processed_at: toCHDate(new Date()),
-                            error: error.message,
-                        },
-                    );
+                    .DispatchsQueue.add(dispatchProducer.getQueueNames().DispatchProducer, {
+                        ...deliveryAttempt,
+                        status: DeliveryStatus.PROCESSING,
+                        attempt_number: job.attemptsMade + 1,
+                        processed_at: toCHDate(new Date()),
+                        error: error.message,
+                    });
                 await dispatchAnalyticsProducer.record({
-                    projectId: deliveryAttempt.project_id,
+                    namespaceId: deliveryAttempt.namespace_id,
                     targetId: deliveryAttempt.target_id,
                     eventType: deliveryAttempt.event_type,
                     responseCode: deliveryAttempt.response_code ?? 0,
@@ -373,67 +339,56 @@ export class DispatchConsumer extends EventEmitter {
     }
 
     private setupEventListeners(): void {
-        this.dispatchWorker!.on("completed", (job: Job) => {
+        this.dispatchWorker!.on('completed', (job: Job) => {
             if (job) {
                 console.log(`✅ Dispatch job completed: ${job.id}`);
             }
         });
 
-        this.dispatchWorker!.on(
-            "failed",
-            (job: Job | undefined, err: Error) => {
-                if (job) {
-                    console.error(
-                        `❌ Dispatch job failed: ${job.id}`,
-                        err.message,
-                    );
-                }
-            },
-        );
+        this.dispatchWorker!.on('failed', (job: Job | undefined, err: Error) => {
+            if (job) {
+                console.error(`❌ Dispatch job failed: ${job.id}`, err.message);
+            }
+        });
 
-        this.queueEvents!.on("waiting", ({ jobId }: { jobId: string }) => {
+        this.queueEvents!.on('waiting', ({ jobId }: { jobId: string }) => {
             console.log(`⏳ Job waiting: ${jobId}`);
         });
 
-        this.queueEvents!.on(
-            "active",
-            ({ jobId, prev }: { jobId: string; prev?: string }) => {
-                console.log(`🔄 Job active: ${jobId} (prev: ${prev})`);
-            },
-        );
+        this.queueEvents!.on('active', ({ jobId, prev }: { jobId: string; prev?: string }) => {
+            console.log(`🔄 Job active: ${jobId} (prev: ${prev})`);
+        });
     }
 
     public async shutdown(): Promise<void> {
-        console.log("🔄 Shutting down event processor...");
+        console.log('🔄 Shutting down event processor...');
 
         try {
             await this.dispatchWorker?.close();
             await this.dispatchQueue?.close();
             await this.queueEvents?.close();
 
-            console.log("✅ Event processor shutdown complete");
+            console.log('✅ Event processor shutdown complete');
         } catch (error) {
-            console.error("❌ Error shutting down event processor:", error);
+            console.error('❌ Error shutting down event processor:', error);
             throw error;
         }
     }
 
     public async forceProcessAll(): Promise<void> {
         if (!this.dispatchQueue) {
-            throw new Error("DispatchConsumer not initialized");
+            throw new Error('DispatchConsumer not initialized');
         }
-        console.log("🚀 Force processing all waiting jobs...");
+        console.log('🚀 Force processing all waiting jobs...');
 
         try {
             const waitingJobs = await this.dispatchQueue.getWaiting();
             for (const job of waitingJobs) {
                 await job.promote();
             }
-            console.log(
-                `✅ Promoted ${waitingJobs.length} jobs for immediate processing`,
-            );
+            console.log(`✅ Promoted ${waitingJobs.length} jobs for immediate processing`);
         } catch (error) {
-            console.error("❌ Error force processing jobs:", error);
+            console.error('❌ Error force processing jobs:', error);
             throw error;
         }
     }

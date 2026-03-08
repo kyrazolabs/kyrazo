@@ -137,7 +137,7 @@ export class PublishEventPublisher {
             const event: IPublishedEvent = {
                 eventId: data.eventId,
                 workspaceId: data.workspaceId,
-                projectId: data.projectId,
+                namespaceId: data.namespaceId,
                 sourceType: data.sourceType,
                 eventType: data.eventType,
                 timestamp: data.timestamp,
@@ -220,7 +220,7 @@ export class PublishEventPublisher {
                         const event: Omit<IPublishedEvent, 'producerId' | 'userId'> = {
                             eventId: item.eventId,
                             workspaceId: item.workspaceId,
-                            projectId: item.projectId,
+                            namespaceId: item.namespaceId,
                             sourceType: item.sourceType,
                             eventType: item.eventType,
                             timestamp: item.timestamp,

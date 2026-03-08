@@ -33,7 +33,7 @@ const BasePlanSchema = z.object({
     limits: z.object({
         eventsPerSecond: z.number().int().min(0),
         eventsPerMonth: z.number().int().min(0),
-        maxProjects: z.number().int().min(0),
+        maxNamespaces: z.number().int().min(0),
         maxMembers: z.number().int().min(0),
         maxConnectors: z.number().int().min(0),
         maxIntegrations: z.number().int().min(0),

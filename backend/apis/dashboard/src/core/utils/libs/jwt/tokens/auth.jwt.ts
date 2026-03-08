@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { config } from '@/configs';
-import { logger } from '@kyrazo/shared';
+import { logger, RefreshToken } from '@kyrazo/shared';
 
 export interface JWTPayload {
     userId: string;
@@ -54,15 +54,37 @@ export class AuthJWT {
     }
 
     /**
+     * Alias for generateTokenPair
+     */
+    public async generateTokens(payload: JWTPayload): Promise<TokenPair> {
+        return this.generateTokenPair(payload);
+    }
+
+    /**
+     * Store refresh token in database
+     */
+    public async storeRefreshToken(userId: string, token: string): Promise<void> {
+        try {
+            await RefreshToken.create({
+                userId,
+                token,
+                expiresAt:
+                    this.getTokenExpiration(token) ||
+                    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            });
+        } catch (error: any) {
+            logger.error('Error storing refresh token', error as Error);
+            throw error;
+        }
+    }
+
+    /**
      * @title Generate Password Reset Token
      * @param {string} userId - The user ID.
      * @param {string} email - The user's email address.
      * @returns {string} The signed JWT reset token.
      */
-    public generateResetToken(payload: {
-        userId: string;
-        email: string;
-    }): string {
+    public generateResetToken(payload: { userId: string; email: string }): string {
         return jwt.sign(
             {
                 userId: payload.userId,
@@ -85,15 +107,11 @@ export class AuthJWT {
      * @returns {string} The signed JWT verification token.
      */
     public generateVerificationToken(email: string): string {
-        return jwt.sign(
-            { email, type: 'email_verification' },
-            config.jwt.secrets.key,
-            {
-                expiresIn: config.jwt.expires.verification,
-                issuer: config.app.name,
-                audience: config.app.url,
-            } as jwt.SignOptions
-        );
+        return jwt.sign({ email, type: 'email_verification' }, config.jwt.secrets.key, {
+            expiresIn: config.jwt.expires.verification,
+            issuer: config.app.name,
+            audience: config.app.url,
+        } as jwt.SignOptions);
     }
 
     /**
@@ -105,17 +123,15 @@ export class AuthJWT {
      */
     public verifyAccessToken(
         token: string
-    ):
-        | { valid: true; payload: JWTPayload }
-        | { valid: false; reason: 'expired' | 'invalid' } {
+    ): { valid: true; payload: JWTPayload } | { valid: false; reason: 'expired' | 'invalid' } {
         try {
             const decoded = jwt.verify(token, config.jwt.secrets.access, {
                 issuer: config.app.name,
                 audience: config.app.url,
             }) as JWTPayload;
             return { valid: true, payload: decoded };
-        } catch (error: unknown) {
-            if (error.name === 'TokenExpiredError') {
+        } catch (error: any) {
+            if (error?.name === 'TokenExpiredError') {
                 return { valid: false, reason: 'expired' };
             }
             logger.error('Invalid access token', error as Error);
@@ -133,7 +149,7 @@ export class AuthJWT {
     public verifyRefreshToken(token: string): JWTPayload {
         try {
             return jwt.verify(token, config.jwt.secrets.refresh) as JWTPayload;
-        } catch (error: unknown) {
+        } catch (error: any) {
             logger.error('Refresh token verify error', error as Error);
             throw new Error('Invalid refresh token');
         }
@@ -156,7 +172,7 @@ export class AuthJWT {
                 issuer: config.app.name,
                 audience: config.app.url,
             }) as { userId: string; email: string; type: string };
-        } catch (error: unknown) {
+        } catch (error: any) {
             logger.error('Reset token verify error', error as Error);
             throw new Error('Invalid or expired reset token');
         }
@@ -181,7 +197,7 @@ export class AuthJWT {
                 issuer: config.app.name,
                 audience: config.app.url,
             }) as { userId: string; email: string; type: string };
-        } catch (error: unknown) {
+        } catch (error: any) {
             logger.error('Verification token verify error', error as Error);
             throw new Error('Invalid or expired verification token');
         }
@@ -200,7 +216,7 @@ export class AuthJWT {
                 return new Date(decoded.exp * 1000);
             }
             return null;
-        } catch (error: unknown) {
+        } catch (error: any) {
             logger.error('Get Token Expiration Error', error as Error);
             return null;
         }
@@ -224,15 +240,11 @@ export class AuthJWT {
      * Generate 2FA token
      */
     public generate2FAToken(userId: string, secret: string): string {
-        return jwt.sign(
-            { userId, secret, type: '2fa' },
-            config.jwt.secrets.key,
-            {
-                expiresIn: '5m', // Short expiry for 2FA
-                issuer: config.app.name,
-                audience: config.app.url,
-            }
-        );
+        return jwt.sign({ userId, secret, type: '2fa' }, config.jwt.secrets.key, {
+            expiresIn: '5m', // Short expiry for 2FA
+            issuer: config.app.name,
+            audience: config.app.url,
+        });
     }
 
     /**
@@ -248,7 +260,7 @@ export class AuthJWT {
                 issuer: config.app.name,
                 audience: config.app.url,
             }) as { userId: string; secret: string; type: string };
-        } catch (error: unknown) {
+        } catch (error: any) {
             logger.error('2FA token verify error', error as Error);
             throw new Error('Invalid or expired 2FA token');
         }

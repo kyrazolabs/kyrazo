@@ -1,7 +1,7 @@
-import type { IDispatchedEvent } from "@/core/dispatcher/dispatcher.types";
-import type { StripeWebhookEvent } from "./stripe.types";
-import type { IReceivedEvent } from "@/types/events/event.types";
-import crypto from "crypto";
+import type { IDispatchedEvent } from '@/core/dispatcher/dispatcher.types';
+import type { StripeWebhookEvent } from './stripe.types';
+import type { IReceivedEvent } from '@/types/events/event.types';
+import crypto from 'crypto';
 
 export class StripeTransformer {
     static instance: StripeTransformer;
@@ -17,7 +17,7 @@ export class StripeTransformer {
 
     public transform(
         event: IReceivedEvent<StripeWebhookEvent>,
-        endpoints: any[],
+        endpoints: any[]
     ): IDispatchedEvent {
         return {
             id: event.eventId,
@@ -25,13 +25,13 @@ export class StripeTransformer {
             timestamp: event.body.created * 1000,
 
             workspaceId: event.workspaceId,
-            projectId: event.projectId,
+            namespaceId: event.namespaceId,
 
             sourceId: event.sourceId,
             sourceType: event.sourceType,
 
             provider: {
-                name: "stripe",
+                name: 'stripe',
                 eventId: event.body.id,
                 resourceId: event.body.data.object.id as string,
             },
@@ -56,11 +56,11 @@ export class StripeTransformer {
             })),
 
             meta: {
-                priority: "normal",
+                priority: 'normal',
                 maxRetries: 3,
                 insertedAt: new Date(),
                 nonce: crypto.randomUUID(),
-                version: "1.0.0",
+                version: '1.0.0',
                 source: event.source,
             },
         };

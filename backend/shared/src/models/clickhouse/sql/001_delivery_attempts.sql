@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS delivery_attempts (
     delivery_id UUID CODEC(ZSTD(3)),
     workspace_id LowCardinality(String),
-    project_id   LowCardinality(String),
+    namespace_id   LowCardinality(String),
 
     -- Links to other tables
     event_id   UUID,
@@ -44,7 +44,7 @@ ENGINE = MergeTree
 PARTITION BY toYYYYMM(scheduled_at)
 ORDER BY (
     workspace_id,
-    project_id,
+    namespace_id,
     scheduled_at,
     status,
     event_id,

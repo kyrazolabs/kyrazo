@@ -1,13 +1,10 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
-import { ProjectHeadersSchema } from '@kyrazo/shared';
+import { NamespaceHeadersSchema } from '@kyrazo/shared';
 import { authenticate } from '@/core/middlewares/auth.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
-import { requireProjectAccess } from '@/core/middlewares/project.middleware';
-import {
-    targetReadRateLimiter,
-    targetWriteRateLimiter,
-} from './target.rate-limiter';
+import { requireNamespaceAccess } from '@/core/middlewares/namespace.middleware';
+import { targetReadRateLimiter, targetWriteRateLimiter } from './target.rate-limiter';
 import {
     CreateTargetSchema,
     GetTargetByIdSchema,
@@ -20,30 +17,26 @@ import { TargetController } from './target.controller';
 const target = new Hono();
 
 // Header validation using zValidator
-const validateProjectHeaders = zValidator(
-    'header',
-    ProjectHeadersSchema,
-    (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
+const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema, (result, c) => {
+    if (!result.success) {
+        return c.json(
+            {
+                success: false,
+                statusCode: 400,
+                errors: JSON.parse(result.error.message).map((e: any) => ({
+                    field: e.path.join('.') || 'unknown',
+                    message: e.message,
+                })),
+            },
+            400
+        );
     }
-);
+});
 
 target.use('*', authenticate);
-target.use('*', validateProjectHeaders);
+target.use('*', validateNamespaceHeaders);
 target.use('*', requireWorkspaceMembership(['owner', 'admin', 'member']));
-target.use('*', requireProjectAccess());
+target.use('*', requireNamespaceAccess());
 
 target.post(
     '/',

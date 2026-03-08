@@ -10,10 +10,9 @@ import {
     IErrorResponse,
     IUser,
     ProfileActionsResponse,
-    RefreshToken,
-    User,
     PreferencesActionsResponse,
     logger,
+    unprefixId,
 } from '@kyrazo/shared';
 import {
     ChangePasswordInput,
@@ -26,16 +25,19 @@ import {
     UpdatePreferencesInput,
     UpdateProfileInput,
     VerifyEmailInput,
+    Setup2FAInput,
+    Verify2FASetupInput,
+    Login2FAInput,
+    RequestSensitiveOTPInput,
+    VerifySensitiveOTPInput,
 } from './auth.schema';
-import {
-    renderEmailVerificationEmail,
-    renderPasswordResetEmail,
-} from '@/templates/emails';
+import { OTPService } from '@/shared/services/otp.service';
+import { renderEmailVerificationEmail, renderPasswordResetEmail } from '@/templates/emails';
 import { mailQueues, mailQueuesName } from '@/producers/jobs/v1/publishers';
-import { UserPreference } from '@kyrazo/shared';
 import { authUtils } from '@/core/utils/libs/jwt';
 import { AppContext } from '@/core/middlewares/auth.middleware';
 import GoogleAuthConfig from '@/configs/google';
+import { authRepository } from './auth.repo';
 
 export class AuthController {
     /**
@@ -43,13 +45,12 @@ export class AuthController {
      */
     static async register(c: AppContext): Promise<Response> {
         try {
+            // @ts-ignore
             const valid: RegisterInput = c.req.valid('json');
             const info: ConnInfo = getConnInfo(c);
             const userAgent = c.req.header('User-Agent');
 
-            const existingUserByEmail = await User.findOne({
-                email: valid.email.toLowerCase(),
-            });
+            const existingUserByEmail = await authRepository.findUserByEmail(valid.email);
 
             if (existingUserByEmail) {
                 return c.json<IErrorResponse>(
@@ -72,12 +73,9 @@ export class AuthController {
                 passwordHash: valid.password,
                 emailVerificationToken: crypto.randomUUID(),
             };
-            // Create new user with hashed password
-            const user = new User(data);
+            // Create new user with hashed password via repository
+            const saved = await authRepository.createUser(data);
 
-            const saved = await user.save();
-            // Manually set the token back to the saved object because it's [select: false] in the schema
-            saved.emailVerificationToken = data.emailVerificationToken;
             if (!saved) {
                 return c.json<IErrorResponse>(
                     {
@@ -92,8 +90,8 @@ export class AuthController {
                 );
             }
 
-            const preference = new UserPreference({
-                userId: saved._id,
+            await authRepository.createUserPreference({
+                userId: unprefixId((saved as any).id),
                 notification: {
                     sourceFailures: true,
                     dailySummary: true,
@@ -105,8 +103,6 @@ export class AuthController {
                     },
                 },
             });
-
-            await preference.save();
 
             try {
                 const verificationUrl = `${config.app.frontendUrl}/verify-email?token=${saved.emailVerificationToken}`;
@@ -139,9 +135,7 @@ export class AuthController {
                         success: false,
                         error: {
                             code: 'SEND_VERIFICATION_FAILED',
-                            message:
-                                error.message ||
-                                'Failed to send verification mail',
+                            message: error.message || 'Failed to send verification mail',
                             details: {
                                 message: error.message,
                                 name: error.name,
@@ -155,73 +149,29 @@ export class AuthController {
                 );
             }
 
-            const payload = {
-                userId: saved._id.toString(),
-                email: saved.email.toString(),
-            };
-            const tokens = authUtils.generateTokenPair(payload);
+            const tempToken = await OTPService.generateTemp2FAToken((saved as any).id);
+            await OTPService.generateAndSendEmailOTP(
+                (saved as any).id,
+                saved.email as string,
+                '2fa_login'
+            );
 
-            try {
-                const refreshTokenDoc = new RefreshToken({
-                    userId: user._id,
-                    token: tokens.refresh,
-                    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-                    ipAddress: data.remote.address as string,
-                    userAgent: data.userAgent,
-                });
-                await refreshTokenDoc.save();
-            } catch (err: unknown) {
-                logger.error(
-                    'Failed to store refresh token in MongoDB',
-                    err as Error
-                );
-            }
-            await setSignedCookie(
-                c,
-                'access_token',
-                tokens.access,
-                config.jwt.secrets.key,
-                {
-                    domain: config.app.frontendUrl,
-                    httpOnly: true,
-                    path: '/',
-                    secure: true,
-                    sameSite: 'strict',
-                }
-            );
-            await setSignedCookie(
-                c,
-                'refresh_token',
-                tokens.refresh,
-                config.jwt.secrets.key,
-                {
-                    domain: config.app.frontendUrl,
-                    httpOnly: true,
-                    path: '/',
-                    secure: true,
-                    sameSite: 'strict',
-                }
-            );
             return c.json<AuthResponse>(
                 {
                     success: true,
                     message:
-                        'User registered successfully. Please check your email to verify your account.',
+                        'Registration successful. Please enter the verification code sent to your email.',
+                    pending_2fa: true,
+                    method: 'email',
+                    temp_token: tempToken,
                     data: {
                         user: saved as IUser,
-                        tokens: {
-                            access: tokens.access,
-                            refresh: tokens.refresh,
-                        },
                     },
                 },
                 201
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in AuthController.register',
-                error as Error
-            );
+            logger.error('Unexpected error in AuthController.register', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -241,6 +191,7 @@ export class AuthController {
      */
     static async login(c: AppContext): Promise<Response> {
         try {
+            // @ts-ignore
             const valid: LoginInput = c.req.valid('json');
 
             const info: ConnInfo = getConnInfo(c);
@@ -251,9 +202,7 @@ export class AuthController {
                 userAgent,
             };
 
-            const user = await User.findOne({
-                email: valid.email.toLowerCase(),
-            }).select('+passwordHash');
+            const user = await authRepository.findUserByEmail(valid.email.toLowerCase(), true);
 
             if (!user || !user.isActive) {
                 return c.json<IErrorResponse>({
@@ -267,7 +216,10 @@ export class AuthController {
             }
 
             // Verify password
-            const isPasswordValid = await user.comparePassword(data.password);
+            const isPasswordValid = await authRepository.comparePassword(
+                (user as any).id,
+                data.password
+            );
 
             if (!isPasswordValid) {
                 return c.json<IErrorResponse>(
@@ -282,74 +234,34 @@ export class AuthController {
                     401
                 );
             }
+            // Always require 2FA
+            const user2FA = await authRepository.findEnabledUser2FA((user as any).id);
+            const method = user2FA?.method || 'email';
+            const tempToken = await OTPService.generateTemp2FAToken((user as any).id);
 
-            const payload = {
-                userId: user._id.toString(),
-                email: user.email.toString(),
-            };
-
-            const tokens = authUtils.generateTokenPair(payload);
-
-            try {
-                const refreshTokenDoc = new RefreshToken({
-                    userId: user._id,
-                    token: tokens.refresh,
-                    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-                    ipAddress: data.remote.address as string,
-                    userAgent: data.userAgent,
-                });
-                await refreshTokenDoc.save();
-            } catch (err: unknown) {
-                logger.error(
-                    'Failed to store refresh token in MongoDB',
-                    err as Error
+            if (method === 'email') {
+                await OTPService.generateAndSendEmailOTP(
+                    (user as any).id,
+                    user.email as string,
+                    '2fa_login'
                 );
             }
-
-            await user.updateLastLogin();
-
-            await setSignedCookie(
-                c,
-                'access_token',
-                tokens.access,
-                config.jwt.secrets.key,
-                {
-                    path: '/',
-                    secure: true,
-                    domain: config.app.frontendUrl,
-                }
-            );
-            await setSignedCookie(
-                c,
-                'refresh_token',
-                tokens.refresh,
-                config.jwt.secrets.key,
-                {
-                    path: '/',
-                    secure: true,
-                    domain: config.app.frontendUrl,
-                }
-            );
 
             return c.json<AuthResponse>(
                 {
                     success: true,
-                    message: 'Login successful',
+                    message: '2-step verification required',
+                    pending_2fa: true,
+                    method: method as any,
+                    temp_token: tempToken,
                     data: {
                         user: user as IUser,
-                        tokens: {
-                            access: tokens.access,
-                            refresh: tokens.refresh,
-                        },
                     },
                 },
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in AuthController.login',
-                error as Error
-            );
+            logger.error('Unexpected error in AuthController.login', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -369,6 +281,8 @@ export class AuthController {
      */
     static async google(c: AppContext): Promise<Response> {
         try {
+            // @ts-ignore
+            // @ts-ignore
             const valid: GoogleLoginInput = c.req.valid('json');
 
             let payload: TokenPayload | undefined;
@@ -394,10 +308,7 @@ export class AuthController {
 
             return await AuthController._handleGoogleLogin(c, payload);
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in AuthController.google',
-                error as Error
-            );
+            logger.error('Unexpected error in AuthController.google', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -430,11 +341,11 @@ export class AuthController {
             });
         }
 
-        let user = await User.findOne({ email: payload.email.toLowerCase() });
+        let user = await authRepository.findUserByEmail(payload.email.toLowerCase());
 
         if (!user) {
             // Create new user if they don't exist
-            const newUser = new User({
+            user = await authRepository.createUser({
                 email: payload.email.toLowerCase(),
                 firstName: payload.given_name,
                 lastName: payload.family_name,
@@ -442,10 +353,9 @@ export class AuthController {
                 googleId: payload.sub,
                 emailVerified: true,
             });
-            user = await newUser.save();
 
-            const preference = new UserPreference({
-                userId: user._id,
+            await authRepository.createUserPreference({
+                userId: unprefixId((user as any).id),
                 notification: {
                     sourceFailures: true,
                     dailySummary: true,
@@ -457,73 +367,39 @@ export class AuthController {
                     },
                 },
             });
-            await preference.save();
         } else {
             // Link Google ID to existing user
             if (!user.googleId) {
-                user.googleId = payload.sub;
-                await user.save();
+                await authRepository.updateUser((user as any).id, { googleId: payload.sub });
             }
         }
-
         const appPayload = {
-            userId: user._id.toString(),
+            userId: (user as any).id.toString(),
             email: user.email.toString(),
         };
 
-        const tokens = authUtils.generateTokenPair(appPayload);
+        // Always require 2FA
+        const user2FA = await authRepository.findEnabledUser2FA((user as any).id);
+        const method = user2FA?.method || 'email';
+        const tempToken = await OTPService.generateTemp2FAToken((user as any).id);
 
-        try {
-            const refreshTokenDoc = new RefreshToken({
-                userId: user._id,
-                token: tokens.refresh,
-                expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-                ipAddress: info.remote.address as string,
-                userAgent: userAgent,
-            });
-            await refreshTokenDoc.save();
-        } catch (err: unknown) {
-            logger.error(
-                'Failed to store refresh token in MongoDB',
-                err as Error
+        if (method === 'email') {
+            await OTPService.generateAndSendEmailOTP(
+                (user as any).id,
+                user.email as string,
+                '2fa_login'
             );
         }
-
-        await user.updateLastLogin();
-
-        await setSignedCookie(
-            c,
-            'access_token',
-            tokens.access,
-            config.jwt.secrets.key,
-            {
-                path: '/',
-                secure: true,
-                domain: config.app.frontendUrl,
-            }
-        );
-        await setSignedCookie(
-            c,
-            'refresh_token',
-            tokens.refresh,
-            config.jwt.secrets.key,
-            {
-                path: '/',
-                secure: true,
-                domain: config.app.frontendUrl,
-            }
-        );
 
         return c.json<AuthResponse>(
             {
                 success: true,
-                message: 'Login successful',
+                message: '2-step verification required',
+                pending_2fa: true,
+                method: method as any,
+                temp_token: tempToken,
                 data: {
                     user: user as IUser,
-                    tokens: {
-                        access: tokens.access,
-                        refresh: tokens.refresh,
-                    },
                 },
             },
             200
@@ -535,22 +411,30 @@ export class AuthController {
      */
     static async refreshToken(c: AppContext): Promise<Response> {
         try {
-            const { refreshToken }: RefreshTokenInput = c.req.valid('json');
-            const payload = authUtils.verifyRefreshToken(refreshToken);
+            const refresh = await getSignedCookie(c, config.jwt.secrets.refresh, 'refresh_token');
 
-            const storedRefreshToken = await RefreshToken.findOne({
-                userId: payload.userId,
-                token: refreshToken,
-                isRevoked: false, // Add this field to your RefreshToken model
-                expiresAt: { $gt: new Date() },
-            });
-
-            if (!storedRefreshToken) {
+            if (typeof refresh !== 'string') {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
                         error: {
-                            code: 'INVALID_REFRESH_FAILED',
+                            code: 'INVALID_TOKEN',
+                            message: 'Refresh token cookie is missing',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    401
+                );
+            }
+
+            const payload = authUtils.verifyRefreshToken(refresh);
+            const session = await authRepository.findRefreshTokenByToken(refresh);
+            if (!session) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'INVALID_TOKEN',
                             message: 'Invalid or revoked refresh token',
                             requestId: c.get('requestId'),
                         },
@@ -559,33 +443,53 @@ export class AuthController {
                 );
             }
 
-            const user = await User.findById(payload.userId);
-            if (!user || !user.isActive) {
-                return c.json<IErrorResponse>({
-                    success: false,
-                    error: {
-                        code: 'USER_NOT_FOUND',
-                        message: 'User not found or inactive',
-                        requestId: c.get('requestId'),
+            const user = await authRepository.findUserById(payload.userId);
+            if (!user || !(user as any).isActive) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'USER_NOT_FOUND',
+                            message: 'User associated with this token not found',
+                            requestId: c.get('requestId'),
+                        },
                     },
-                });
+                    403
+                );
             }
 
+            // Revoke current token
+            await authRepository.revokeRefreshToken(refresh);
+
+            // Generate new token pair
             const tokens = authUtils.generateTokenPair({
-                userId: user._id.toString(),
+                userId: (user as any).id.toString(),
                 email: user.email.toString(),
             });
 
-            await storedRefreshToken.revokeToken();
+            // Store new refresh token
+            try {
+                await authRepository.createRefreshToken({
+                    userId: unprefixId((user as any).id),
+                    token: tokens.refresh,
+                    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+                    ipAddress: (session as any).ipAddress,
+                    userAgent: (session as any).userAgent,
+                });
+            } catch (err: unknown) {
+                logger.error('Failed to store refresh token in MongoDB', err as Error);
+            }
 
-            const newRefreshTokenDoc = new RefreshToken({
-                userId: user._id,
-                token: tokens.refresh,
-                expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-                ipAddress: storedRefreshToken.ipAddress,
-                userAgent: storedRefreshToken.userAgent,
+            await setSignedCookie(c, 'access_token', tokens.access, config.jwt.secrets.key, {
+                path: '/',
+                secure: true,
+                domain: config.app.frontendUrl,
             });
-            await newRefreshTokenDoc.save();
+            await setSignedCookie(c, 'refresh_token', tokens.refresh, config.jwt.secrets.key, {
+                path: '/',
+                secure: true,
+                domain: config.app.frontendUrl,
+            });
 
             return c.json<AuthRefreshResponse>(
                 {
@@ -601,10 +505,7 @@ export class AuthController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in AuthController.refreshToken',
-                error as Error
-            );
+            logger.error('Unexpected error in AuthController.refreshToken', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -624,13 +525,19 @@ export class AuthController {
      */
     static async logout(c: AppContext): Promise<Response> {
         try {
-            const refresh = await getSignedCookie(
-                c,
-                config.jwt.secrets.refresh,
-                'refresh_token'
-            );
+            const refresh = await getSignedCookie(c, config.jwt.secrets.refresh, 'refresh_token');
 
-            const session = await RefreshToken.findByToken(refresh);
+            if (typeof refresh !== 'string') {
+                return c.json<AuthActionsResponse>(
+                    {
+                        success: true,
+                        message: 'Logout successful',
+                    },
+                    200
+                );
+            }
+
+            const session = await authRepository.findRefreshTokenByToken(refresh);
             if (!session) {
                 return c.json<IErrorResponse>(
                     {
@@ -645,7 +552,7 @@ export class AuthController {
                 );
             }
 
-            await session.revokeToken();
+            await authRepository.revokeRefreshToken(refresh);
 
             deleteCookie(c, 'access_token');
             deleteCookie(c, 'refresh_token');
@@ -658,10 +565,7 @@ export class AuthController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in AuthController.logout',
-                error as Error
-            );
+            logger.error('Unexpected error in AuthController.logout', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -696,7 +600,8 @@ export class AuthController {
                 );
             }
 
-            const user = (await User.findById(userId)) as IUser;
+            const user = await authRepository.findUserById(userId);
+            const user2FA = await authRepository.findEnabledUser2FA(userId);
 
             if (!user) {
                 return c.json<IErrorResponse>(
@@ -712,19 +617,16 @@ export class AuthController {
                 );
             }
 
-            return c.json<ProfileActionsResponse>(
-                {
-                    success: true,
-                    message: 'Here is your profile',
-                    data: user,
+            return c.json({
+                success: true,
+                message: 'Here is your profile',
+                data: {
+                    ...user,
+                    is2FAEnabled: !!user2FA,
                 },
-                200
-            );
+            });
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in AuthController.getProfile',
-                error as Error
-            );
+            logger.error('Unexpected error in AuthController.getProfile', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -759,10 +661,11 @@ export class AuthController {
                 );
             }
 
+            // @ts-ignore
             const valid: UpdateProfileInput = c.req.valid('json');
 
-            const user = await User.findById(userId);
-            if (!user || !user.isActive) {
+            const user = await authRepository.findUserById(userId);
+            if (!user || !(user as any).isActive) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -776,7 +679,7 @@ export class AuthController {
                 );
             }
 
-            const update = await user.updateProfile(valid);
+            const update = await authRepository.updateUser(userId, valid);
 
             if (!update) {
                 return c.json<IErrorResponse>(
@@ -801,10 +704,7 @@ export class AuthController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in AuthController.updateProfile',
-                error as Error
-            );
+            logger.error('Unexpected error in AuthController.updateProfile', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -839,12 +739,12 @@ export class AuthController {
                 );
             }
 
-            let preferences = await UserPreference.findOne({ userId });
+            let preferences = await authRepository.getUserPreference(userId);
 
             if (!preferences) {
                 // Create default preferences
-                preferences = new UserPreference({
-                    userId,
+                preferences = await authRepository.createUserPreference({
+                    userId: unprefixId(userId),
                     notification: {
                         sourceFailures: true,
                         dailySummary: true,
@@ -856,7 +756,6 @@ export class AuthController {
                         },
                     },
                 });
-                await preferences.save();
             }
 
             return c.json<PreferencesActionsResponse>(
@@ -868,10 +767,7 @@ export class AuthController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in AuthController.getPreferences',
-                error as Error
-            );
+            logger.error('Unexpected error in AuthController.getPreferences', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -906,13 +802,14 @@ export class AuthController {
                 );
             }
 
+            // @ts-ignore
             const valid: UpdatePreferencesInput = c.req.valid('json');
 
-            let preferences = await UserPreference.findOne({ userId });
+            let preferences = await authRepository.getUserPreference(userId);
 
             if (!preferences) {
-                preferences = new UserPreference({
-                    userId,
+                preferences = await authRepository.createUserPreference({
+                    userId: unprefixId(userId),
                     notification: {
                         sourceFailures: true,
                         dailySummary: true,
@@ -927,10 +824,13 @@ export class AuthController {
             }
 
             if (valid.notification) {
-                Object.assign(preferences.notification, valid.notification);
+                preferences = await authRepository.updateUserPreference(userId, {
+                    notification: {
+                        ...preferences.notification,
+                        ...valid.notification,
+                    },
+                });
             }
-
-            await preferences.save();
 
             return c.json<PreferencesActionsResponse>(
                 {
@@ -941,10 +841,7 @@ export class AuthController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in AuthController.updatePreferences',
-                error as Error
-            );
+            logger.error('Unexpected error in AuthController.updatePreferences', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -979,10 +876,11 @@ export class AuthController {
                 );
             }
 
+            // @ts-ignore
             const valid: ChangePasswordInput = c.req.valid('json');
-            const user = await User.findById(userId).select('+passwordHash');
+            const user = await authRepository.findUserById(userId);
 
-            if (!user || !user.isActive) {
+            if (!user || !(user as any).isActive) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -996,7 +894,8 @@ export class AuthController {
                 );
             }
 
-            const isCurrentPasswordValid = await user.comparePassword(
+            const isCurrentPasswordValid = await authRepository.comparePassword(
+                userId,
                 valid.currentPassword
             );
 
@@ -1011,9 +910,7 @@ export class AuthController {
                 });
             }
 
-            user.passwordHash = valid.newPassword;
-
-            await user.save();
+            await authRepository.updatePassword(userId, valid.newPassword);
 
             return c.json<AuthActionsResponse>(
                 {
@@ -1023,10 +920,7 @@ export class AuthController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in AuthController.changePassword',
-                error as Error
-            );
+            logger.error('Unexpected error in AuthController.changePassword', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -1046,10 +940,11 @@ export class AuthController {
      */
     static async forgotPassword(c: AppContext): Promise<Response> {
         try {
+            // @ts-ignore
             const valid: ForgotPasswordInput = c.req.valid('json');
-            const user = await User.findOne(valid).select('+passwordHash');
+            const user = await authRepository.findUserByEmail(valid.email);
 
-            if (!user || !user.isActive) {
+            if (!user || !(user as any).isActive) {
                 return c.json<AuthActionsResponse>(
                     {
                         success: true,
@@ -1061,7 +956,7 @@ export class AuthController {
             }
 
             const payload = {
-                userId: user._id.toString(),
+                userId: (user as any).id.toString(),
                 email: user.email.toString(),
             };
             const token = authUtils.generateResetToken(payload);
@@ -1075,14 +970,11 @@ export class AuthController {
                     brandName: config.app.name,
                     supportEmail: config.contacts.support,
                 });
-                await mailQueues.sendMailHighPriorityQueue.add(
-                    'high-priority-mail',
-                    {
-                        to: user.email as string,
-                        subject: `Verify your ${config.app.name} email address`,
-                        html: body,
-                    }
-                );
+                await mailQueues.sendMailHighPriorityQueue.add('high-priority-mail', {
+                    to: user.email as string,
+                    subject: `Verify your ${config.app.name} email address`,
+                    html: body,
+                });
             } catch (mailError: unknown) {
                 logger.error(
                     'Unexpected error on sending reset password link in AuthController.forgotPassword',
@@ -1110,10 +1002,7 @@ export class AuthController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in AuthController.forgotPassword',
-                error as Error
-            );
+            logger.error('Unexpected error in AuthController.forgotPassword', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -1133,6 +1022,7 @@ export class AuthController {
      */
     static async resetPassword(c: AppContext): Promise<Response> {
         try {
+            // @ts-ignore
             const valid: ResetPasswordInput = c.req.valid('json');
 
             const decoded = authUtils.verifyResetToken(valid.token);
@@ -1148,9 +1038,9 @@ export class AuthController {
                 });
             }
 
-            const user = await User.findById(decoded.userId);
+            const user = await authRepository.findUserById(decoded.userId);
 
-            if (!user || !user.isActive) {
+            if (!user || !(user as any).isActive) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -1164,8 +1054,7 @@ export class AuthController {
                 );
             }
 
-            user.passwordHash = valid.password;
-            await user.save();
+            await authRepository.updatePassword((user as any).id, valid.password);
 
             return c.json<AuthActionsResponse>(
                 {
@@ -1175,10 +1064,7 @@ export class AuthController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in AuthController.forgotPassword',
-                error as Error
-            );
+            logger.error('Unexpected error in AuthController.forgotPassword', error as Error);
             return c.json(
                 {
                     success: false,
@@ -1198,13 +1084,12 @@ export class AuthController {
      */
     static async verifyEmail(c: AppContext): Promise<Response> {
         try {
+            // @ts-ignore
             const valid: VerifyEmailInput = c.req.valid('json');
 
-            const user = await User.findOne({
-                emailVerificationToken: valid.token,
-            });
+            const user = await authRepository.findUserByVerificationToken(valid.token);
 
-            if (!user || !user.isActive) {
+            if (!user || !(user as any).isActive) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -1229,13 +1114,7 @@ export class AuthController {
                 });
             }
 
-            await User.updateOne(
-                { _id: user._id },
-                {
-                    $set: { emailVerified: true },
-                    $unset: { emailVerificationToken: '' },
-                }
-            );
+            await authRepository.verifyUserEmail((user as any).id);
 
             return c.json<AuthActionsResponse>(
                 {
@@ -1245,10 +1124,7 @@ export class AuthController {
                 200
             );
         } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in AuthController.verifyEmail',
-                error as Error
-            );
+            logger.error('Unexpected error in AuthController.verifyEmail', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -1283,9 +1159,9 @@ export class AuthController {
                 );
             }
 
-            const user = await User.findById(userId);
+            const user = await authRepository.findUserById(userId);
 
-            if (!user || !user.isActive) {
+            if (!user || !(user as any).isActive) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -1347,9 +1223,9 @@ export class AuthController {
                 );
             }
 
-            const user = await User.findById(userId);
+            const user = await authRepository.findUserById(userId);
 
-            if (!user || !user.isActive) {
+            if (!user || !(user as any).isActive) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -1378,8 +1254,7 @@ export class AuthController {
             }
 
             const token = crypto.randomUUID();
-            user.emailVerificationToken = token;
-            await user.save();
+            await authRepository.updateVerificationToken((user as any).id, token);
 
             try {
                 const verificationUrl = `${config.app.frontendUrl}/auth/verify-email/${token}`;
@@ -1436,6 +1311,591 @@ export class AuthController {
                     error: {
                         code: 'RESEND_VERIFICATION_FAILED',
                         message: 'Failed to resend verification email',
+                        requestId: c.get('requestId'),
+                    },
+                },
+                500
+            );
+        }
+    }
+
+    /**
+     * Setup 2FA
+     */
+    static async setup2FA(c: AppContext): Promise<Response> {
+        try {
+            const userId = c.user?.userId;
+            // @ts-ignore
+            const data: Setup2FAInput = c.req.valid('json');
+
+            if (!userId) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'UNAUTHORIZED',
+                            message: 'Unauthorized',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    401
+                );
+            }
+
+            const user = await authRepository.findUserById(userId);
+            if (!user) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'USER_NOT_FOUND',
+                            message: 'User not found',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    404
+                );
+            }
+
+            if (data.method === 'app') {
+                const { secret, qrCode } = await OTPService.generateTOTPSetup(userId, user.email);
+
+                await authRepository.upsertUser2FA(userId, {
+                    method: 'app',
+                    secret,
+                    isEnabled: false,
+                });
+
+                return c.json({
+                    success: true,
+                    data: {
+                        secret,
+                        qrCode,
+                    },
+                });
+            } else {
+                await authRepository.upsertUser2FA(userId, {
+                    method: 'email',
+                    isEnabled: false,
+                });
+
+                await OTPService.generateAndSendEmailOTP(userId, user.email, '2fa_setup');
+
+                return c.json({
+                    success: true,
+                    message: 'OTP sent to your email',
+                });
+            }
+        } catch (error) {
+            logger.error('Error in setup2FA', error as Error);
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'SETUP_2FA_FAILED',
+                        message: 'Failed to setup 2FA',
+                        requestId: c.get('requestId'),
+                    },
+                },
+                500
+            );
+        }
+    }
+
+    /**
+     * Verify 2FA Setup
+     */
+    static async verify2FASetup(c: AppContext): Promise<Response> {
+        try {
+            const userId = c.user?.userId;
+            const data: Verify2FASetupInput = await c.req.json();
+
+            if (!userId) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'UNAUTHORIZED',
+                            message: 'Unauthorized',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    401
+                );
+            }
+
+            const user2FA = await authRepository.findUser2FA(userId, true);
+            if (!user2FA) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'NOT_FOUND',
+                            message: '2FA setup not found',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    404
+                );
+            }
+
+            let isValid = false;
+            if (user2FA.method === 'app') {
+                isValid = await OTPService.verifyTOTP(data.code, user2FA.secret);
+            } else {
+                isValid = await OTPService.verifyEmailOTP(userId, '2fa_setup', data.code);
+            }
+
+            if (!isValid) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'INVALID_CODE',
+                            message: 'Invalid verification code',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    400
+                );
+            }
+
+            await user2FA.enable();
+
+            // Generate backup codes if none exist or to ensure fresh ones during setup
+            const backupCodes = user2FA.generateBackupCodes();
+            await user2FA.save();
+
+            return c.json({
+                success: true,
+                message: '2FA enabled successfully',
+                data: {
+                    backupCodes,
+                },
+            });
+        } catch (error) {
+            logger.error('Error in verify2FASetup', error as Error);
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'VERIFY_2FA_SETUP_FAILED',
+                        message: 'Failed to verify 2FA setup',
+                        requestId: c.get('requestId'),
+                    },
+                },
+                500
+            );
+        }
+    }
+
+    /**
+     * Disable 2FA
+     */
+    static async disable2FA(c: AppContext): Promise<Response> {
+        try {
+            const userId = c.user?.userId;
+
+            if (!userId) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'UNAUTHORIZED',
+                            message: 'Unauthorized',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    401
+                );
+            }
+
+            const user2FA = await authRepository.findUser2FA(userId);
+            if (!user2FA) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'NOT_FOUND',
+                            message: '2FA settings not found',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    404
+                );
+            }
+
+            await user2FA.disable();
+
+            return c.json({
+                success: true,
+                message: '2FA disabled successfully',
+            });
+        } catch (error) {
+            logger.error('Error in disable2FA', error as Error);
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'DISABLE_2FA_FAILED',
+                        message: 'Failed to disable 2FA',
+                        requestId: c.get('requestId'),
+                    },
+                },
+                500
+            );
+        }
+    }
+
+    /**
+     * Login with 2FA
+     */
+    static async login2FA(c: AppContext): Promise<Response> {
+        try {
+            const data: Login2FAInput = await c.req.json();
+            const userId = await OTPService.getUserIdFromTempToken(data.tempToken);
+
+            if (!userId) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'INVALID_TEMP_TOKEN',
+                            message: 'Temporary token expired or invalid',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    401
+                );
+            }
+
+            const user = await authRepository.findUserById(userId);
+            const user2FA = await authRepository.findEnabledUser2FA(userId, true);
+
+            if (!user) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'USER_NOT_FOUND',
+                            message: 'User not found',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    404
+                );
+            }
+
+            let isValid = false;
+            if (user2FA && user2FA.method === 'app') {
+                isValid = await OTPService.verifyTOTP(data.code, user2FA.secret);
+            } else {
+                // Default to email verification if no explicit 2FA setup
+                isValid = await OTPService.verifyEmailOTP(userId, '2fa_login', data.code);
+            }
+
+            if (!isValid) {
+                // Check backup code only if user2FA exists
+                const isBackupCode = user2FA ? await user2FA.useBackupCode(data.code) : false;
+                if (!isBackupCode) {
+                    return c.json<IErrorResponse>(
+                        {
+                            success: false,
+                            error: {
+                                code: 'INVALID_CODE',
+                                message: 'Invalid verification code',
+                                requestId: c.get('requestId'),
+                            },
+                        },
+                        401
+                    );
+                }
+            }
+
+            const info: ConnInfo = getConnInfo(c);
+            const userAgent = c.req.header('User-Agent');
+
+            const payload = {
+                userId: (user as any).id.toString(),
+                email: user.email.toString(),
+            };
+            const tokens = authUtils.generateTokenPair(payload);
+
+            try {
+                await authRepository.createRefreshToken({
+                    userId: unprefixId((user as any).id),
+                    token: tokens.refresh,
+                    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+                    ipAddress: info.remote.address as string,
+                    userAgent: userAgent,
+                });
+            } catch (err: unknown) {
+                logger.error('Failed to store refresh token in MongoDB', err as Error);
+            }
+
+            await authRepository.updateLastLogin((user as any).id);
+            await OTPService.invalidateTempToken(data.tempToken);
+
+            await setSignedCookie(c, 'access_token', tokens.access, config.jwt.secrets.key, {
+                path: '/',
+                secure: true,
+                domain: config.app.frontendUrl,
+            });
+            await setSignedCookie(c, 'refresh_token', tokens.refresh, config.jwt.secrets.key, {
+                path: '/',
+                secure: true,
+                domain: config.app.frontendUrl,
+            });
+
+            return c.json<AuthResponse>(
+                {
+                    success: true,
+                    message: 'Login successful',
+                    data: {
+                        user: user as IUser,
+                        tokens: {
+                            access: tokens.access,
+                            refresh: tokens.refresh,
+                        },
+                    },
+                },
+                200
+            );
+        } catch (error) {
+            logger.error('Error in login2FA', error as Error);
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'LOGIN_2FA_FAILED',
+                        message: 'Failed to login with 2FA',
+                        requestId: c.get('requestId'),
+                    },
+                },
+                500
+            );
+        }
+    }
+
+    /**
+     * Resend 2FA OTP
+     */
+    static async resend2FAOTP(c: AppContext): Promise<Response> {
+        try {
+            const data: { tempToken: string } = await c.req.json();
+            const userId = await OTPService.getUserIdFromTempToken(data.tempToken);
+
+            if (!userId) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'INVALID_TEMP_TOKEN',
+                            message: 'Temporary token expired or invalid',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    401
+                );
+            }
+
+            const user = await authRepository.findUserById(userId);
+            const user2FA = await authRepository.findEnabledUser2FA(userId, true);
+
+            if (!user) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'USER_NOT_FOUND',
+                            message: 'User not found',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    404
+                );
+            }
+
+            const method = user2FA?.method || 'email';
+
+            if (method !== 'email') {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'INVALID_METHOD',
+                            message: 'OTP resend is only available for email verification',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    400
+                );
+            }
+
+            await OTPService.generateAndSendEmailOTP(userId, user.email as string, '2fa_login');
+
+            return c.json({
+                success: true,
+                message: 'Verification code resent to your email',
+            });
+        } catch (error) {
+            logger.error('Error in resend2FAOTP', error as Error);
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'RESEND_OTP_FAILED',
+                        message: 'Failed to resend verification code',
+                        requestId: c.get('requestId'),
+                    },
+                },
+                500
+            );
+        }
+    }
+
+    /**
+     * Request OTP for sensitive action
+     */
+    static async requestSensitiveOTP(c: AppContext): Promise<Response> {
+        try {
+            const userId = c.user?.userId;
+            const data: RequestSensitiveOTPInput = await c.req.json();
+
+            if (!userId) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'UNAUTHORIZED',
+                            message: 'Unauthorized',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    401
+                );
+            }
+
+            const user = await authRepository.findUserById(userId);
+            const user2FA = await authRepository.findEnabledUser2FA(userId, true);
+
+            if (!user) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'USER_NOT_FOUND',
+                            message: 'User not found',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    404
+                );
+            }
+
+            if (user2FA && user2FA.method === 'app') {
+                return c.json({
+                    success: true,
+                    message: 'Please use your authenticator app code',
+                    data: { method: 'app' },
+                });
+            } else {
+                await OTPService.generateAndSendEmailOTP(
+                    userId,
+                    user.email,
+                    `sensitive:${data.action}`
+                );
+                return c.json({
+                    success: true,
+                    message: 'OTP sent to your email',
+                    data: { method: 'email' },
+                });
+            }
+        } catch (error) {
+            logger.error('Error in requestSensitiveOTP', error as Error);
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'REQUEST_OTP_FAILED',
+                        message: 'Failed to request OTP',
+                        requestId: c.get('requestId'),
+                    },
+                },
+                500
+            );
+        }
+    }
+
+    /**
+     * Verify OTP for sensitive action
+     */
+    static async verifySensitiveOTP(c: AppContext): Promise<Response> {
+        try {
+            const userId = c.user?.userId;
+            const data: VerifySensitiveOTPInput = await c.req.json();
+
+            if (!userId) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'UNAUTHORIZED',
+                            message: 'Unauthorized',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    401
+                );
+            }
+
+            const user2FA = await authRepository.findEnabledUser2FA(userId, true);
+
+            let isValid = false;
+            if (user2FA && user2FA.method === 'app') {
+                isValid = await OTPService.verifyTOTP(data.code, user2FA.secret);
+            } else {
+                isValid = await OTPService.verifyEmailOTP(
+                    userId,
+                    `sensitive:${data.action}`,
+                    data.code
+                );
+            }
+
+            if (!isValid) {
+                if (user2FA && user2FA.method === 'app') {
+                    isValid = await user2FA.useBackupCode(data.code);
+                }
+            }
+
+            if (!isValid) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'INVALID_CODE',
+                            message: 'Invalid verification code',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    400
+                );
+            }
+
+            await OTPService.markActionAsVerified(userId, data.action);
+
+            return c.json({
+                success: true,
+                message: 'Action verified successfully',
+            });
+        } catch (error) {
+            logger.error('Error in verifySensitiveOTP', error as Error);
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'VERIFY_OTP_FAILED',
+                        message: 'Failed to verify OTP',
                         requestId: c.get('requestId'),
                     },
                 },

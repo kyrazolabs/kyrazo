@@ -1,5 +1,5 @@
 import type { IDispatchedEvent, IWebhookHeaders } from './dispatcher.types';
-import { Project, Subscription, unprefixId } from '@kyrazo/shared';
+import { Namespace, Subscription, unprefixId } from '@kyrazo/shared';
 import { redisConfig } from '../../config';
 
 export class DispatcherHeaders {
@@ -23,7 +23,7 @@ export class DispatcherHeaders {
             'X-Webhook-Event': event.type,
             'X-Webhook-Timestamp': event.timestamp.toString(), // Default or event timestamp
             'X-Webhook-Workspace': event.workspaceId,
-            'X-Webhook-Project': event.projectId,
+            'X-Webhook-Namespace': event.namespaceId,
             'X-Webhook-Attempt': attempt.toString(),
             'X-Webhook-Signature': '', // To be filled by dispatcher worker
             'X-Webhook-Nonce': '', // To be filled by dispatcher worker
@@ -32,16 +32,16 @@ export class DispatcherHeaders {
         };
 
         try {
-            // Fetch project config (cached in Redis)
-            const project = await redisConfig.cache(
-                `project:${unprefixId(event.projectId)}:config`,
+            // Fetch namespace config (cached in Redis)
+            const namespace = await redisConfig.cache(
+                `namespace:${unprefixId(event.namespaceId)}:config`,
                 async () => {
-                    return await Project.findById(unprefixId(event.projectId)).lean();
+                    return await Namespace.findById(unprefixId(event.namespaceId)).lean();
                 },
                 60 * 10 // 10 minutes cache
             );
 
-            const prefix = project?.whiteLabelHeaders || 'X-Webhook';
+            const prefix = namespace?.whiteLabelHeaders || 'X-Webhook';
 
             if (prefix !== 'X-Webhook') {
                 // Check if feature is enabled in subscription (cached in Redis)

@@ -33,7 +33,7 @@ export class WebflowTransformer {
             timestamp: timestamp,
 
             workspaceId: event.workspaceId,
-            projectId: event.projectId,
+            namespaceId: event.namespaceId,
 
             sourceId: event.sourceId,
             sourceType: event.sourceType,

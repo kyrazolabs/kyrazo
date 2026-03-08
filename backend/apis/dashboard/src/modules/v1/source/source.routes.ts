@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { AppContext } from '@/core/middlewares/auth.middleware';
 import { authenticate } from '@/core/middlewares/auth.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
-import { requireProjectAccess } from '@/core/middlewares/project.middleware';
+import { requireNamespaceAccess } from '@/core/middlewares/namespace.middleware';
 import { zValidator } from '@hono/zod-validator';
 import { config } from '@/configs/app';
 import {
@@ -16,13 +16,13 @@ import {
     UpdateSourceAuthSchema,
     GetSourceByIdSchema,
 } from './source.schema';
-import { ProjectHeadersSchema } from '@/core/utils/libs/zod';
+import { NamespaceHeadersSchema } from '@/core/utils/libs/zod';
 import { SourceController } from '@/modules/v1/source/source.controller';
 
 const source = new Hono();
 
 // Header validation using zValidator
-const validateProjectHeaders = zValidator('header', ProjectHeadersSchema, (result, c) => {
+const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema, (result, c) => {
     if (!result.success) {
         return c.json(
             {
@@ -66,9 +66,9 @@ const sourceWriteRateLimiter = async (c: AppContext, next: () => Promise<void>) 
 };
 
 source.use('*', authenticate);
-source.use('*', validateProjectHeaders);
+source.use('*', validateNamespaceHeaders);
 source.use('*', requireWorkspaceMembership(['owner', 'admin', 'member']));
-source.use('*', requireProjectAccess());
+source.use('*', requireNamespaceAccess());
 
 source.post(
     '/',

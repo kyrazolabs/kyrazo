@@ -22,9 +22,9 @@ export class TargetController {
         try {
             const userId = c.user?.userId;
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
+            const namespaceId = c.namespace?.namespaceId;
 
-            if (!userId || !workspaceId || !projectId) {
+            if (!userId || !workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -38,12 +38,7 @@ export class TargetController {
                 );
             }
             const valid: CreateTargetInput = c.req.valid('json');
-            const saved = await targetService.createTarget(
-                valid,
-                userId,
-                workspaceId,
-                projectId
-            );
+            const saved = await targetService.createTarget(valid, userId, workspaceId, namespaceId);
 
             return c.json<CreateTargetResponse>(
                 {
@@ -54,10 +49,7 @@ export class TargetController {
                 201
             );
         } catch (error) {
-            logger.error(
-                'Unexpected error in TargetController.createTarget',
-                error as Error
-            );
+            logger.error('Unexpected error in TargetController.createTarget', error as Error);
             if ((error as Error).message.includes('E11000')) {
                 return c.json<IErrorResponse>(
                     {
@@ -87,8 +79,8 @@ export class TargetController {
     static async getTargets(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
-            if (!workspaceId || !projectId) {
+            const namespaceId = c.namespace?.namespaceId;
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -101,23 +93,14 @@ export class TargetController {
                     401
                 );
             }
-            const {
-                q,
-                enabled,
-                limit = 10,
-                page = 1,
-            }: FilterTargetInput = c.req.valid('query');
+            const { q, enabled, limit = 10, page = 1 }: FilterTargetInput = c.req.valid('query');
 
-            const query: Record<string, unknown> = { workspaceId, projectId };
+            const query: Record<string, unknown> = { workspaceId, namespaceId };
             if (q) query.$text = { $search: q };
             if (enabled) query.enabled = enabled;
             const perPage = Math.min(limit, 100);
 
-            const { targets, total } = await targetService.getTargets(
-                query,
-                perPage,
-                page
-            );
+            const { targets, total } = await targetService.getTargets(query, perPage, page);
 
             return c.json<GetTargetsResponse>(
                 {
@@ -134,10 +117,7 @@ export class TargetController {
                 200
             );
         } catch (error) {
-            logger.error(
-                'Unexpected error in TargetController.getTargets',
-                error as Error
-            );
+            logger.error('Unexpected error in TargetController.getTargets', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -154,8 +134,8 @@ export class TargetController {
     static async getTarget(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
-            if (!workspaceId || !projectId) {
+            const namespaceId = c.namespace?.namespaceId;
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -173,7 +153,7 @@ export class TargetController {
             const target = await targetService.getTargetById(
                 targetId,
                 workspaceId.toString(),
-                projectId.toString()
+                namespaceId.toString()
             );
             return c.json<GetTargetByIdResponse>(
                 {
@@ -184,10 +164,7 @@ export class TargetController {
                 200
             );
         } catch (error) {
-            logger.error(
-                'Unexpected error in TargetController.getTarget',
-                error as Error
-            );
+            logger.error('Unexpected error in TargetController.getTarget', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -204,8 +181,8 @@ export class TargetController {
     static async getTargetSecret(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
-            if (!workspaceId || !projectId) {
+            const namespaceId = c.namespace?.namespaceId;
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -223,7 +200,7 @@ export class TargetController {
             const secret = await targetService.getTargetSecret(
                 targetId,
                 workspaceId.toString(),
-                projectId.toString()
+                namespaceId.toString()
             );
             return c.json<GetTargetSecretResponse>(
                 {
@@ -234,10 +211,7 @@ export class TargetController {
                 200
             );
         } catch (error) {
-            logger.error(
-                'Unexpected error in TargetController.getTargetSecret',
-                error as Error
-            );
+            logger.error('Unexpected error in TargetController.getTargetSecret', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -254,8 +228,8 @@ export class TargetController {
     static async updateTarget(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
-            if (!workspaceId || !projectId) {
+            const namespaceId = c.namespace?.namespaceId;
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -273,7 +247,7 @@ export class TargetController {
             const target = await targetService.updateTarget(
                 targetId,
                 workspaceId.toString(),
-                projectId.toString(),
+                namespaceId.toString(),
                 valid
             );
             return c.json<UpdateTargetResponse>(
@@ -285,10 +259,7 @@ export class TargetController {
                 200
             );
         } catch (error) {
-            logger.error(
-                'Unexpected error in TargetController.updateTarget',
-                error as Error
-            );
+            logger.error('Unexpected error in TargetController.updateTarget', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -305,8 +276,8 @@ export class TargetController {
     static async updateTargetStatus(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
-            if (!workspaceId || !projectId) {
+            const namespaceId = c.namespace?.namespaceId;
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -319,12 +290,11 @@ export class TargetController {
                     401
                 );
             }
-            const { targetId, enabled }: UpdateTargetStatusInput =
-                c.req.valid('json');
+            const { targetId, enabled }: UpdateTargetStatusInput = c.req.valid('json');
             const target = await targetService.updateTarget(
                 targetId,
                 workspaceId.toString(),
-                projectId.toString(),
+                namespaceId.toString(),
                 { enabled }
             );
             return c.json<UpdateTargetResponse>(
@@ -336,10 +306,7 @@ export class TargetController {
                 200
             );
         } catch (error) {
-            logger.error(
-                'Unexpected error in TargetController.updateTarget',
-                error as Error
-            );
+            logger.error('Unexpected error in TargetController.updateTarget', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -356,8 +323,8 @@ export class TargetController {
     static async deleteTarget(c: AppContext): Promise<Response> {
         try {
             const workspaceId = c.workspace?.workspaceId;
-            const projectId = c.project?.projectId;
-            if (!workspaceId || !projectId) {
+            const namespaceId = c.namespace?.namespaceId;
+            if (!workspaceId || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -374,7 +341,7 @@ export class TargetController {
             const deleted = await targetService.deleteTarget(
                 targetId,
                 workspaceId.toString(),
-                projectId.toString()
+                namespaceId.toString()
             );
             return c.json<DeleteTargetResponse>(
                 {
@@ -385,10 +352,7 @@ export class TargetController {
                 200
             );
         } catch (error) {
-            logger.error(
-                'Unexpected error in TargetController.deleteTarget',
-                error as Error
-            );
+            logger.error('Unexpected error in TargetController.deleteTarget', error as Error);
             return c.json<IErrorResponse>(
                 {
                     success: false,

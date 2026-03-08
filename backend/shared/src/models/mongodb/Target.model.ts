@@ -9,9 +9,9 @@ const TargetSchema = new Schema<ITarget>(
             ref: 'Workspace',
             required: true,
         },
-        projectId: {
+        namespaceId: {
             type: Schema.Types.ObjectId,
-            ref: 'Project',
+            ref: 'Namespace',
             required: true,
         },
 
@@ -85,7 +85,7 @@ TargetSchema.index({
 TargetSchema.index(
     {
         workspaceId: 1,
-        projectId: 1,
+        namespaceId: 1,
         url: 1,
         method: 1,
     },
@@ -94,20 +94,20 @@ TargetSchema.index(
 TargetSchema.index(
     {
         workspaceId: 1,
-        projectId: 1,
+        namespaceId: 1,
         enabled: 1,
     },
-    { name: 'idx_workspace_project_enabled' }
+    { name: 'idx_workspace_namespace_enabled' }
 );
 
 TargetSchema.index(
     {
         workspaceId: 1,
-        projectId: 1,
+        namespaceId: 1,
         'secrets.kid': 1,
         'secrets.active': 1,
     },
-    { name: 'idx_workspace_project_kid_active' }
+    { name: 'idx_workspace_namespace_kid_active' }
 );
 
 TargetSchema.pre('save', function () {
@@ -130,43 +130,49 @@ TargetSchema.virtual('isDisabled').get(function (this: ITarget) {
 /**
  * 🔹 Static Methods
  */
-TargetSchema.statics.findByWorkspaceAndProject = function (workspaceId: string, projectId: string) {
-    return this.find({ workspaceId: unprefixId(workspaceId), projectId: unprefixId(projectId) });
+TargetSchema.statics.findByWorkspaceAndNamespace = function (
+    workspaceId: string,
+    namespaceId: string
+) {
+    return this.find({
+        workspaceId: unprefixId(workspaceId),
+        namespaceId: unprefixId(namespaceId),
+    });
 };
 
-TargetSchema.statics.findActiveByWorkspaceAndProject = function (
+TargetSchema.statics.findActiveByWorkspaceAndNamespace = function (
     workspaceId: string,
-    projectId: string
+    namespaceId: string
 ) {
     return this.find({
         enabled: true,
-        projectId: unprefixId(projectId),
+        namespaceId: unprefixId(namespaceId),
         workspaceId: unprefixId(workspaceId),
     });
 };
 
-TargetSchema.statics.findActiveByWorkspaceAndProjectAndTargetId = function (
+TargetSchema.statics.findActiveByWorkspaceAndNamespaceAndTargetId = function (
     workspaceId: string,
-    projectId: string,
+    namespaceId: string,
     targetId: string
 ) {
     return this.findOne({
         enabled: true,
-        projectId: unprefixId(projectId),
+        namespaceId: unprefixId(namespaceId),
         workspaceId: unprefixId(workspaceId),
         _id: unprefixId(targetId),
     });
 };
 
-TargetSchema.statics.findActiveByWorkspaceAndProjectAndTargetIds = function (
+TargetSchema.statics.findActiveByWorkspaceAndNamespaceAndTargetIds = function (
     workspaceId: string,
-    projectId: string,
+    namespaceId: string,
     targetIds: string[]
 ): Promise<ITarget[]> {
     return this.find({
         enabled: true,
         workspaceId: unprefixId(workspaceId),
-        projectId: unprefixId(projectId),
+        namespaceId: unprefixId(namespaceId),
         _id: { $in: targetIds.map(id => unprefixId(id)).filter((id): id is string => !!id) },
     });
 };

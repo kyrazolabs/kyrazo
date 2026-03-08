@@ -8,8 +8,8 @@ import {
     User,
     transformWithId,
     unprefixId,
-    ClientSession,
 } from '@kyrazo/shared';
+import { ClientSession } from 'mongoose';
 
 export class WorkspaceRepository {
     async findById(id: string): Promise<IWorkspace | null> {
@@ -18,7 +18,10 @@ export class WorkspaceRepository {
     }
 
     async findOwnedWorkspace(ownerId: string): Promise<IWorkspace | null> {
-        const workspace = await Workspace.findOne({ ownerId, isDeleted: false }).lean();
+        const workspace = await Workspace.findOne({
+            ownerId: unprefixId(ownerId),
+            isDeleted: false,
+        }).lean();
         return workspace ? (transformWithId(workspace, 'workspace') as any) : null;
     }
 
@@ -93,7 +96,7 @@ export class WorkspaceRepository {
 
     async countPendingInvitations(workspaceId: string): Promise<number> {
         return WorkspaceInvitation.countDocuments({
-            workspaceId,
+            workspaceId: unprefixId(workspaceId),
             invitationAcceptedAt: null,
         });
     }

@@ -1,6 +1,6 @@
-import { redisConfig } from "@/config";
-import { type IDispatchedEvent } from "./dispatcher.types";
-import { targetRepository } from "@/services/mongo/target.repo";
+import { redisConfig } from '@/config';
+import { type IDispatchedEvent } from './dispatcher.types';
+import { targetRepository } from '@/services/mongo/target.repo';
 
 export class DispatcherTransformer {
     static instance: DispatcherTransformer;
@@ -21,7 +21,7 @@ export class DispatcherTransformer {
             timestamp: event.timestamp ?? Date.now(),
 
             workspaceId: event.workspaceId,
-            projectId: event.projectId,
+            namespaceId: event.namespaceId,
 
             sourceId: null,
             sourceType: null,
@@ -46,12 +46,12 @@ export class DispatcherTransformer {
             })),
 
             meta: {
-                priority: event.meta?.priority ?? "normal",
+                priority: event.meta?.priority ?? 'normal',
                 maxRetries: event.meta?.maxRetries ?? 3,
                 insertedAt: event.meta?.insertedAt ?? new Date(),
                 nonce: event.meta?.nonce ?? crypto.randomUUID(),
-                version: "1.0.0",
-                source: event.meta?.source ?? "internal",
+                version: '1.0.0',
+                source: event.meta?.source ?? 'internal',
             },
         };
     }

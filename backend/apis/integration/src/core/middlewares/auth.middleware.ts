@@ -2,8 +2,8 @@ import { Context, type Next } from 'hono';
 import { getConnInfo } from 'hono/bun';
 import { ipRestriction } from 'hono/ip-restriction';
 
-import type { IErrorResponse, IProject } from '@kyrazo/shared';
-import { Key, logger, Project, unprefixId } from '@kyrazo/shared';
+import type { IErrorResponse, INamespace } from '@kyrazo/shared';
+import { Key, logger, Namespace, unprefixId } from '@kyrazo/shared';
 import { redisConfig } from '@/configs';
 import { keyCrypto, secretCrypto, config } from '@kyrazo/shared';
 import { Types } from 'mongoose';
@@ -14,7 +14,7 @@ export type AppContext = Context & {
         permissions: string[];
     };
     workspace?: { workspaceId: Types.ObjectId };
-    project?: IProject & { projectId: Types.ObjectId };
+    namespace?: INamespace & { namespaceId: Types.ObjectId };
     userId?: string;
     idempotencyKey?: string;
 };
@@ -26,7 +26,7 @@ export type AppContext = Context & {
 export const authenticate = async (c: AppContext, next: Next) => {
     try {
         const apiKey = c.req.header('x-api-key') as string;
-        const projectId = c.req.param('projectId');
+        const namespaceId = c.req.param('namespaceId');
 
         if (!apiKey) {
             return c.json<IErrorResponse>(
@@ -42,13 +42,13 @@ export const authenticate = async (c: AppContext, next: Next) => {
             );
         }
 
-        if (!projectId) {
+        if (!namespaceId) {
             return c.json<IErrorResponse>(
                 {
                     success: false,
                     error: {
                         code: 'PROJECT_ID_MISSING',
-                        message: 'Project Id is required',
+                        message: 'Namespace Id is required',
                         requestId: c.get('requestId'),
                     },
                 },
@@ -196,15 +196,15 @@ export const authenticate = async (c: AppContext, next: Next) => {
             }
         }
 
-        const project = await Project.findById(unprefixId(projectId));
+        const namespace = await Namespace.findById(unprefixId(namespaceId));
 
-        if (!project) {
+        if (!namespace) {
             return c.json<IErrorResponse>(
                 {
                     success: false,
                     error: {
                         code: 'INVALID_PROJECT',
-                        message: 'Project not found',
+                        message: 'Namespace not found',
                         requestId: c.get('requestId'),
                     },
                 },
@@ -218,9 +218,9 @@ export const authenticate = async (c: AppContext, next: Next) => {
         };
 
         c.workspace = workspacePayload;
-        // @ts-ignore - project is IProject & { projectId: Types.ObjectId }
-        c.project = Object.assign(project, { projectId: project._id });
-        c.userId = workspace.createBy.toString();
+        // @ts-ignore - namespace is INamespace & { namespaceId: Types.ObjectId }
+        c.namespace = Object.assign(namespace, { namespaceId: namespace._id });
+        c.userId = unprefixId(workspace.createBy.toString());
         c.key = {
             name: workspace.name,
             permissions: workspace.scopes,

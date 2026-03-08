@@ -1,25 +1,25 @@
 import { redisConfig } from '@/configs';
-import { IErrorResponse, IProject, logger, Project, unprefixId } from '@kyrazo/shared';
+import { IErrorResponse, INamespace, logger, Namespace, unprefixId } from '@kyrazo/shared';
 import { Next } from 'hono';
 import { Types } from 'mongoose';
 import { AppContext } from './auth.middleware';
 
 /**
- * @title requireProjectAccess Middleware
- * @description Middleware to require project access and (optionally) a specific role. Attaches project access to request.
+ * @title requireNamespaceAccess Middleware
+ * @description Middleware to require namespace access and (optionally) a specific role. Attaches namespace access to request.
  */
-export const requireProjectAccess = (options?: { allowDeleted?: boolean }) => {
+export const requireNamespaceAccess = (options?: { allowDeleted?: boolean }) => {
     return async (c: AppContext, next: Next) => {
         try {
             const workspace = c.workspace;
-            const projectId = c.req.header('x-project-id');
-            if (!workspace || !projectId) {
+            const namespaceId = c.req.header('x-namespace-id');
+            if (!workspace || !namespaceId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
                         error: {
                             code: 'IDS_MISSING',
-                            message: 'Workspace and project ID is required',
+                            message: 'Workspace and namespace ID is required',
                             requestId: c.get('requestId'),
                         },
                     },
@@ -28,19 +28,19 @@ export const requireProjectAccess = (options?: { allowDeleted?: boolean }) => {
             }
 
             const access = await redisConfig.cache(
-                `workspace:${unprefixId(workspace.workspaceId.toString())}:project:${unprefixId(projectId)}`,
+                `workspace:${unprefixId(workspace.workspaceId.toString())}:namespace:${unprefixId(namespaceId)}`,
                 async () => {
                     if (options?.allowDeleted) {
-                        // Allow access to deleted projects for restore operations
-                        return await Project.findOne({
-                            _id: unprefixId(projectId),
+                        // Allow access to deleted namespaces for restore operations
+                        return await Namespace.findOne({
+                            _id: unprefixId(namespaceId),
                             workspaceId: unprefixId(workspace.workspaceId.toString()),
                         });
                     } else {
-                        // Normal access - only non-deleted projects
-                        return await Project.findByWorkspaceAndProject(
+                        // Normal access - only non-deleted namespaces
+                        return await Namespace.findByWorkspaceAndNamespace(
                             workspace.workspaceId.toString(),
-                            projectId
+                            namespaceId
                         );
                     }
                 },
@@ -52,8 +52,8 @@ export const requireProjectAccess = (options?: { allowDeleted?: boolean }) => {
                     {
                         success: false,
                         error: {
-                            code: 'PROJECT_ACCESS_DENIED',
-                            message: 'Insufficient permissions to access this project',
+                            code: 'NAMESPACE_ACCESS_DENIED',
+                            message: 'Insufficient permissions to access this namespace',
                             requestId: c.get('requestId'),
                         },
                     },
@@ -61,14 +61,13 @@ export const requireProjectAccess = (options?: { allowDeleted?: boolean }) => {
                 );
             }
 
-            const project = {
+            c.namespace = {
                 ...access,
-                projectId: new Types.ObjectId(unprefixId(access.id)),
-            };
-            c.project = project as IProject & { projectId: Types.ObjectId };
+                namespaceId: new Types.ObjectId(unprefixId(access.id)),
+            } as any;
             await next();
         } catch (error: unknown) {
-            logger.error('Unexpected error in requireProjectAccess middleware', error as Error);
+            logger.error('Unexpected error in requireNamespaceAccess middleware', error as Error);
 
             return c.json<IErrorResponse>(
                 {
@@ -86,10 +85,10 @@ export const requireProjectAccess = (options?: { allowDeleted?: boolean }) => {
 };
 
 /**
- * @title requireProjectAccessParam Middleware
- * @description Middleware to require project access and (optionally) a specific role. Attaches project access to request.
+ * @title requireNamespaceAccessParam Middleware
+ * @description Middleware to require namespace access and (optionally) a specific role. Attaches namespace access to request.
  */
-export const requireProjectAccessParam = (
+export const requireNamespaceAccessParam = (
     role?: string[],
     options?: { allowDeleted?: boolean }
 ) => {
@@ -97,9 +96,9 @@ export const requireProjectAccessParam = (
         try {
             const userId = c.user?.userId;
             const workspace = c.workspace;
-            const { projectId } = c.req.valid('param');
+            const namespaceId = c.req.param('namespaceId');
 
-            if (!workspace || !projectId || !userId) {
+            if (!workspace || !namespaceId || !userId) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -115,19 +114,19 @@ export const requireProjectAccessParam = (
 
             // parallel fetching
             const access = await redisConfig.cache(
-                `workspace:${unprefixId(workspace.workspaceId.toString())}:project:${unprefixId(projectId)}`,
+                `workspace:${unprefixId(workspace.workspaceId.toString())}:namespace:${unprefixId(namespaceId)}`,
                 async () => {
                     if (options?.allowDeleted) {
-                        // Allow access to deleted projects for restore operations
-                        return await Project.findOne({
-                            _id: unprefixId(projectId),
+                        // Allow access to deleted namespaces for restore operations
+                        return await Namespace.findOne({
+                            _id: unprefixId(namespaceId),
                             workspaceId: unprefixId(workspace.workspaceId.toString()),
                         });
                     } else {
-                        // Normal access - only non-deleted projects
-                        return await Project.findByWorkspaceAndProject(
+                        // Normal access - only non-deleted namespaces
+                        return await Namespace.findByWorkspaceAndNamespace(
                             workspace.workspaceId.toString(),
-                            projectId
+                            namespaceId
                         );
                     }
                 },
@@ -139,8 +138,8 @@ export const requireProjectAccessParam = (
                     {
                         success: false,
                         error: {
-                            code: 'PROJECT_ACCESS_DENIED',
-                            message: 'Insufficient permissions to access this project',
+                            code: 'NAMESPACE_ACCESS_DENIED',
+                            message: 'Insufficient permissions to access this namespace',
                             requestId: c.get('requestId'),
                         },
                     },
@@ -163,15 +162,14 @@ export const requireProjectAccessParam = (
                 );
             }
 
-            const project = {
+            c.namespace = {
                 ...access,
-                projectId: new Types.ObjectId(unprefixId(access.id)),
-            };
-            c.project = project as IProject & { projectId: Types.ObjectId };
+                namespaceId: new Types.ObjectId(unprefixId(access.id)),
+            } as any;
             await next();
         } catch (error: unknown) {
             logger.error(
-                'Unexpected error in requireProjectAccessParam middleware',
+                'Unexpected error in requireNamespaceAccessParam middleware',
                 error as Error
             );
             return c.json<IErrorResponse>(

@@ -6,7 +6,7 @@ import { logger } from '@kyrazo/shared';
 const FREE_PLAN_LIMITS = {
     eventsPerSecond: 25,
     eventsPerMonth: 100000,
-    maxProjects: 3,
+    maxNamespaces: 3,
     maxMembers: 3,
     maxConnectors: 3,
     maxIntegrations: 1,

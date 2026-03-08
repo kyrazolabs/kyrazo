@@ -7,7 +7,7 @@ import sourcesRouter from './v1/source/source.routes';
 import deliveryRouter from './v1/delivery/delivery.routes';
 import analyticsRouter from './v1/analytics/analytics.routes';
 import billingRouter from './billing';
-import projectRouter from './v1/project/project.routes';
+import namespaceRouter from './v1/namespace/namespace.routes';
 import targetRouter from './v1/target/target.routes';
 import ingestRouter from './v1/ingest/ingest.routes';
 import supportRouter from './v1/support/support.routes';
@@ -21,7 +21,7 @@ router.route('/auth', authRouter);
 
 router.route('/workspaces', workspaceRouter);
 
-router.route('/projects', projectRouter);
+router.route('/namespaces', namespaceRouter);
 
 // Mount api key routes
 router.route('/keys', keyRouter);

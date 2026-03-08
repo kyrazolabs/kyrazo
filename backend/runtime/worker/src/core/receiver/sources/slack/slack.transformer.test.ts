@@ -9,7 +9,7 @@ describe('SlackTransformer', () => {
         const event: IReceivedEvent<SlackEventPayload> = {
             eventId: 'evt_123',
             workspaceId: 'ws_123',
-            projectId: 'proj_123',
+            namespaceId: 'proj_123',
             userId: 'user_123',
             sourceId: 'src_123',
             sourceType: 'receive',
@@ -51,7 +51,7 @@ describe('SlackTransformer', () => {
         const event: IReceivedEvent<SlackEventPayload> = {
             eventId: 'evt_456',
             workspaceId: 'ws_123',
-            projectId: 'proj_123',
+            namespaceId: 'proj_123',
             userId: 'user_123',
             sourceId: 'src_123',
             sourceType: 'receive',
