@@ -1,9 +1,9 @@
 import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
 import { NamespaceHeadersSchema } from '@kyrazo/shared';
 import { authenticate } from '@/core/middlewares/auth.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
 import { requireNamespaceAccess } from '@/core/middlewares/namespace.middleware';
+import { zValidator } from '@/core/middlewares/validator.middleware';
 import { targetReadRateLimiter, targetWriteRateLimiter } from './target.rate-limiter';
 import {
     CreateTargetSchema,
@@ -17,21 +17,7 @@ import { TargetController } from './target.controller';
 const target = new Hono();
 
 // Header validation using zValidator
-const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema, (result, c) => {
-    if (!result.success) {
-        return c.json(
-            {
-                success: false,
-                statusCode: 400,
-                errors: JSON.parse(result.error.message).map((e: any) => ({
-                    field: e.path.join('.') || 'unknown',
-                    message: e.message,
-                })),
-            },
-            400
-        );
-    }
-});
+const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema);
 
 target.use('*', authenticate);
 target.use('*', validateNamespaceHeaders);
@@ -41,162 +27,50 @@ target.use('*', requireNamespaceAccess());
 target.post(
     '/',
     targetWriteRateLimiter,
-    zValidator('json', CreateTargetSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('json', CreateTargetSchema),
     TargetController.createTarget
 );
 
 target.get(
     '/',
     targetReadRateLimiter,
-    zValidator('query', SearchTargetSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('query', SearchTargetSchema),
     TargetController.getTargets
 );
 
 target.get(
     '/:targetId',
     targetReadRateLimiter,
-    zValidator('param', GetTargetByIdSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('param', GetTargetByIdSchema),
     TargetController.getTarget
 );
 
 target.get(
     '/:targetId/secret',
     targetReadRateLimiter,
-    zValidator('param', GetTargetByIdSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('param', GetTargetByIdSchema),
     TargetController.getTargetSecret
 );
 
 target.patch(
     '/:targetId',
     targetWriteRateLimiter,
-    zValidator('param', GetTargetByIdSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
-    zValidator('json', UpdateTargetSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('param', GetTargetByIdSchema),
+    zValidator('json', UpdateTargetSchema),
     TargetController.updateTarget
 );
 
 target.put(
     '/:targetId',
     targetWriteRateLimiter,
-    zValidator('json', UpdateTargetStatusSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('json', UpdateTargetStatusSchema),
     TargetController.updateTargetStatus
 );
 
 target.delete(
     '/:targetId',
     targetWriteRateLimiter,
-    zValidator('param', GetTargetByIdSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('param', GetTargetByIdSchema),
     TargetController.deleteTarget
 );
 

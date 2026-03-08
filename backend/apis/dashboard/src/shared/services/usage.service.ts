@@ -137,7 +137,7 @@ export class UsageService {
 
             // 3. Update real-time usage counter in Redis
             const currentMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-            const redisKey = `usage:events:${workspaceId}:${currentMonth}`;
+            const redisKey = `usage:events:${unprefixId(workspaceId)}:${currentMonth}`;
             const client = redisConfig.getClient();
             await client.incrby(redisKey, count);
             await client.expire(redisKey, 60 * 60 * 24 * 35);

@@ -347,7 +347,7 @@ workspaceSchema.statics.getWorkspaceStats = async function (): Promise<{
             },
         },
         {
-            $namespace: {
+            $project: {
                 _id: 0,
                 totalWorkspaces: 1,
                 activeWorkspaces: 1,

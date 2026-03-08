@@ -3,14 +3,11 @@ import { Types } from 'mongoose';
 import { stripe, stripeConfig } from '@/configs/stripe';
 import { paymentRepository } from './payment.repo';
 import { subscriptionService } from '@/modules/billing/subscriptions/subscription.service';
-import { planService } from '@/modules/billing/plans/plan.service';
-import { PaymentResponse } from './payment.dto';
 import { Invoice, logger, unprefixId } from '@kyrazo/shared';
 import { subscriptionRepository } from '@/modules/billing/subscriptions/subscription.repo';
 import { planRepository } from '@/modules/billing/plans/plan.repo';
 import { snapshot } from '@/core/utils/transformers';
 import { limitService } from '@/shared/services/limit.service';
-import { usageService } from '@/shared/services/usage.service';
 
 export class PaymentService {
     private async saveInvoiceFromStripe(
@@ -135,7 +132,6 @@ export class PaymentService {
                 logger.info(`Webhook event ${event.id} already processed`);
                 return;
             }
-            logger.debug(JSON.stringify(event));
 
             // Process the event
             await this.handleWebhookEvent(event);

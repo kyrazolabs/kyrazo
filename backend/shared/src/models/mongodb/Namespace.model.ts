@@ -194,7 +194,7 @@ NamespaceSchema.statics.getNamespaceStats = async function () {
             },
         },
         {
-            $namespace: {
+            $project: {
                 _id: 0,
                 totalNamespaces: 1,
                 activeNamespaces: 1,

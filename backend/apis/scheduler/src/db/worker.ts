@@ -1,7 +1,15 @@
-import { pgTable, uuid, text, timestamp } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, timestamp, pgEnum } from 'drizzle-orm/pg-core';
 import { clients } from './client';
 import { servers } from './server';
 
+export const workerStatusEnum = pgEnum('worker_status', [
+    'pending',
+    'starting',
+    'running',
+    'stopping',
+    'stopped',
+    'failed',
+]);
 export const workers = pgTable('workers', {
     worker_id: uuid('worker_id').defaultRandom().primaryKey(),
     client_id: text('client_id')
@@ -10,11 +18,8 @@ export const workers = pgTable('workers', {
     server_id: uuid('server_id')
         .references(() => servers.server_id)
         .notNull(),
-    status: text('status', {
-        enum: ['pending', 'starting', 'running', 'stopping', 'stopped', 'failed'],
-    })
-        .default('pending')
-        .notNull(),
+
+    status: workerStatusEnum().default('pending').notNull(),
     created_at: timestamp('created_at').defaultNow(),
     updated_at: timestamp('updated_at').defaultNow(),
 });

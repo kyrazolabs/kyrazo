@@ -187,7 +187,7 @@ userSchema.statics.getUserStats = async function () {
             },
         },
         {
-            $namespace: {
+            $project: {
                 _id: 0,
                 totalUsers: 1,
                 activeUsers: 1,

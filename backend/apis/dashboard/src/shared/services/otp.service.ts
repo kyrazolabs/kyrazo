@@ -1,4 +1,4 @@
-import { generateSecret, generateURI, verify } from 'otplib';
+import { OTP } from 'otplib';
 import * as QRCode from 'qrcode';
 import { redisConfig } from '@/configs/redis';
 import { config } from '@/configs/app';
@@ -6,6 +6,7 @@ import { logger, unprefixId } from '@kyrazo/shared';
 import { mailQueues, mailQueuesName } from '@/producers/jobs/v1/publishers';
 
 export class OTPService {
+    private static readonly totpInstance = new OTP();
     private static readonly REDIS_PREFIX = 'otp:';
     private static readonly TEMP_2FA_PREFIX = 'otp:temp_2fa:';
     private static readonly RECENT_VERIFIED_PREFIX = 'otp:verified:';
@@ -14,11 +15,12 @@ export class OTPService {
      * Generate a TOTP secret and QR code for a user
      */
     static async generateTOTPSetup(userId: string, email: string) {
-        const secret = generateSecret();
-        const otpauth = generateURI({
-            secret,
-            label: email,
+        // authenticator secrets are typically base32
+        const secret = this.totpInstance.generateSecret();
+        const otpauth = this.totpInstance.generateURI({
             issuer: config.app.name,
+            label: email,
+            secret,
         });
         const qrCode = await QRCode.toDataURL(otpauth);
 
@@ -30,8 +32,8 @@ export class OTPService {
      */
     static async verifyTOTP(token: string, secret: string): Promise<boolean> {
         try {
-            const result = await verify({ token, secret });
-            return !!result;
+            const result = await this.totpInstance.verify({ token, secret, epochTolerance: 30 });
+            return result.valid;
         } catch (error) {
             logger.error('TOTP verification error', error as Error);
             return false;

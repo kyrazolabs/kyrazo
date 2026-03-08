@@ -1,5 +1,5 @@
 {
-  "id": "52cec629-ffe7-4edc-ba6d-496aa40dba5d",
+  "id": "3c249144-9a5d-4c05-b146-15d565143766",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -75,13 +75,20 @@
         },
         "status": {
           "name": "status",
-          "type": "text",
+          "type": "server_status",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
           "default": "'active'"
         },
-        "ip": {
-          "name": "ip",
+        "ipv4": {
+          "name": "ipv4",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ipv6": {
+          "name": "ipv6",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -152,7 +159,8 @@
         },
         "status": {
           "name": "status",
-          "type": "text",
+          "type": "worker_status",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
           "default": "'pending'"
@@ -208,7 +216,29 @@
       "isRLSEnabled": false
     }
   },
-  "enums": {},
+  "enums": {
+    "public.server_status": {
+      "name": "server_status",
+      "schema": "public",
+      "values": [
+        "active",
+        "draining",
+        "down"
+      ]
+    },
+    "public.worker_status": {
+      "name": "worker_status",
+      "schema": "public",
+      "values": [
+        "pending",
+        "starting",
+        "running",
+        "stopping",
+        "stopped",
+        "failed"
+      ]
+    }
+  },
   "schemas": {},
   "sequences": {},
   "roles": {},

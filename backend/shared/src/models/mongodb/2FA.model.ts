@@ -48,6 +48,12 @@ const user2FASchema = new Schema<IUser2FA>(
         },
         toObject: {
             virtuals: true,
+            transform: function (doc, ret) {
+                delete (ret as any).secret;
+                delete (ret as any).backupCodes;
+                delete (ret as any).__v;
+                return ret;
+            },
         },
     }
 );
