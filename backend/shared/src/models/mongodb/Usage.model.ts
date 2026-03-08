@@ -105,7 +105,7 @@ usageSchema.statics.aggregateUsage = function (
                 periodEnd: 1,
             },
         },
-    ]);
+    ] as any[]);
 };
 
 usageSchema.statics.bulkInsert = function (usages: Partial<IUsage>[]) {

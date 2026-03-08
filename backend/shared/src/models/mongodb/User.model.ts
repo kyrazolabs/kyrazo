@@ -194,7 +194,7 @@ userSchema.statics.getUserStats = async function () {
                 inactiveUsers: 1,
             },
         },
-    ]);
+    ] as any[]);
 
     return stats[0] || { totalUsers: 0, activeUsers: 0, inactiveUsers: 0 };
 };

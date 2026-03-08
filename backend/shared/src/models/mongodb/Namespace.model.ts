@@ -203,7 +203,7 @@ NamespaceSchema.statics.getNamespaceStats = async function () {
                 deletedNamespaces: 1,
             },
         },
-    ]);
+    ] as any[]);
 
     return (
         stats[0] || {
