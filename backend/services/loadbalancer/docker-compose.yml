@@ -9,6 +9,7 @@ services:
     # so the container can reach backend servers on other hosts
     network_mode: host
     environment:
+      - PORT=${PORT}
       - INGEST_SERVER1_IP=${INGEST_SERVER1_IP}
       - INGEST_SERVER2_IP=${INGEST_SERVER2_IP}
       - DASHBOARD_SERVER1_IP=${DASHBOARD_SERVER1_IP}

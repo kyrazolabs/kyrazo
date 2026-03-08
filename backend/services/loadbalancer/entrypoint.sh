@@ -1,5 +1,6 @@
 #!/bin/sh
 # Replace placeholder IPs with environment variables at runtime
+sed -i "s|PORT|${PORT}|g" /etc/nginx/nginx.conf
 sed -i "s|INGEST_SERVER1_IP|${INGEST_SERVER1_IP}|g" /etc/nginx/nginx.conf
 sed -i "s|INGEST_SERVER2_IP|${INGEST_SERVER2_IP}|g" /etc/nginx/nginx.conf
 sed -i "s|DASHBOARD_SERVER1_IP|${DASHBOARD_SERVER1_IP}|g" /etc/nginx/nginx.conf
