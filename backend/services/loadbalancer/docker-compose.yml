@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  haproxy:
+    image: haproxy:3.0.0-alpine
+    container_name: kyrazo-loadbalancer
+    restart: unless-stopped
+    ports:
+      - "80:80/tcp" # HTTP
+      - "443:443/tcp" # HTTPS (HTTP/1.1 & HTTP/2)
+      - "443:443/udp" # HTTP/3 (QUIC)
+    environment:
+      - CERTIFICATE=${CERTIFICATE_NAME}
+      - INGEST_SERVER1_IP=${INGEST_SERVER1_IP}
+      - INGEST_SERVER2_IP=${INGEST_SERVER2_IP}
+      - DASHBOARD_SERVER1_IP=${DASHBOARD_SERVER1_IP}
+      - DASHBOARD_SERVER2_IP=${DASHBOARD_SERVER2_IP}
+      - API_SERVER1_IP=${API_SERVER1_IP}
+      - API_SERVER2_IP=${API_SERVER2_IP}
+    volumes:
+      # Map our configuration file into the container
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+      # Map the directory containing certificates
+      # NOTE: Place your valid TLS certificate (e.g. from Let's Encrypt)
+      # inside this directory named 'cloudflare.pem'
+      - /data/coolify/proxy/certs:/etc/haproxy/certs:ro
