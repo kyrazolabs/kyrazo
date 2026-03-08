@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   haproxy:
-    image: haproxy:3.0.0-alpine
+    image: haproxytech/haproxy-alpine:3.0
     container_name: kyrazo-loadbalancer
     restart: unless-stopped
     ports:
@@ -10,7 +10,7 @@ services:
       - "${HOST_HTTPS_PORT:-443}:443/tcp" # HTTPS (HTTP/1.1 & HTTP/2)
       - "${HOST_HTTPS_PORT:-443}:443/udp" # HTTP/3 (QUIC)
     environment:
-      - CERTIFICATE=${CERTIFICATE_NAME}
+      - CERTIFICATE=${CERTIFICATE_NAME:-cloudflare}
       - INGEST_SERVER1_IP=${INGEST_SERVER1_IP}
       - INGEST_SERVER2_IP=${INGEST_SERVER2_IP}
       - DASHBOARD_SERVER1_IP=${DASHBOARD_SERVER1_IP}
