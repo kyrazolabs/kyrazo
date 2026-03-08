@@ -8,6 +8,6 @@ COPY nginx.conf /etc/nginx/nginx.conf
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-EXPOSE 8080
+EXPOSE 7080
 
 ENTRYPOINT ["/entrypoint.sh"]
