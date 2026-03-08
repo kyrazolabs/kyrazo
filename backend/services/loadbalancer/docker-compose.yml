@@ -16,3 +16,7 @@ services:
       - DASHBOARD_SERVER2_IP=${DASHBOARD_SERVER2_IP}
       - API_SERVER1_IP=${API_SERVER1_IP}
       - API_SERVER2_IP=${API_SERVER2_IP}
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
