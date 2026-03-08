@@ -5,6 +5,7 @@ services:
     image: haproxytech/haproxy-alpine:3.0
     container_name: loadbalancer
     restart: unless-stopped
+    command: haproxy -W -f /usr/local/etc/haproxy/haproxy.cfg
     ports:
       - "${HOST_HTTP_PORT:-80}:80/tcp" # HTTP
       - "${HOST_HTTPS_PORT:-443}:443/tcp" # HTTPS (HTTP/1.1 & HTTP/2)
