@@ -14,4 +14,6 @@ pub struct Rule {
     pub backend_ids: Vec<String>,
     /// Higher priority = evaluated first.
     pub priority: u32,
+    /// Whether to strip the prefix before forwarding.
+    pub strip_prefix: bool,
 }

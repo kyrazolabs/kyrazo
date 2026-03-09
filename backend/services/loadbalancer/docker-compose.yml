@@ -1,6 +1,7 @@
 services:
   loadbalancer:
     build: .
+    network_mode: host
     environment:
       - RUST_LOG=${RUST_LOG:-info}
       - PORT=${PORT:-8080}
