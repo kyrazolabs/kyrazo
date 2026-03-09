@@ -1,11 +1,11 @@
-# rust-lb — Internal HTTP Load Balancer
+# loadbalancer — Internal HTTP Load Balancer
 
 High-performance, lock-free HTTP load balancer written in Rust. Designed to sit
 **behind** Coolify (Traefik/Caddy) which handles SSL termination, header rewriting,
 and public-facing concerns.
 
 ```
-Internet → Coolify (Traefik/Caddy) → [rust-lb] → Backend Pool
+Internet → Coolify (Traefik/Caddy) → [loadbalancer] → Backend Pool
 ```
 
 ## Features
@@ -26,7 +26,7 @@ Internet → Coolify (Traefik/Caddy) → [rust-lb] → Backend Pool
 cargo build --release
 
 # Run
-./target/release/rust-lb --config config/config.toml
+./target/release/loadbalancer --config config/config.toml
 
 # Or with Docker Compose (includes 3 echo backends + Prometheus)
 docker compose up --build
@@ -65,7 +65,7 @@ See [`config/config.toml`](config/config.toml) for a fully commented example.
 Send `SIGHUP` to reload configuration without dropping connections:
 
 ```bash
-kill -HUP $(pidof rust-lb)
+kill -HUP $(pidof loadbalancer)
 ```
 
 ## Coolify Deployment
@@ -94,7 +94,7 @@ Prometheus metrics are exposed at `http://<metrics_bind>/metrics`:
 
 ```
 ┌──────────────────────────────────────────────────────┐
-│                    rust-lb                            │
+│                    loadbalancer                            │
 │                                                      │
 │  ┌────────────┐  ┌──────────┐  ┌──────────────────┐ │
 │  │Rate Limiter│→ │Rules     │→ │Round Robin       │ │

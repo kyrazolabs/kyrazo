@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY --from=builder /app/target/release/rust-lb  /app/rust-lb
+COPY --from=builder /app/target/release/loadbalancer  /app/loadbalancer
 COPY config/config.toml  /app/config/config.toml.template
 COPY entrypoint.sh        /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh

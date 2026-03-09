@@ -12,12 +12,12 @@ HEALTH_CHECK_TIMEOUT="${HEALTH_CHECK_TIMEOUT:-2}"
 RATE_LIMIT_RPS="${RATE_LIMIT_RPS:-1000}"
 RATE_LIMIT_BURST="${RATE_LIMIT_BURST:-2000}"
 
-echo "rust-lb: substituting environment variables into config..."
+echo "loadbalancer: substituting environment variables into config..."
 
 # Use envsubst to replace ${VAR} placeholders in the template
 envsubst < "$CONFIG_TEMPLATE" > "$CONFIG_OUTPUT"
 
-echo "rust-lb: config generated at $CONFIG_OUTPUT"
-echo "rust-lb: starting load balancer on port $PORT..."
+echo "loadbalancer: config generated at $CONFIG_OUTPUT"
+echo "loadbalancer: starting load balancer on port $PORT..."
 
-exec /app/rust-lb --config "$CONFIG_OUTPUT"
+exec /app/loadbalancer --config "$CONFIG_OUTPUT"
