@@ -2,13 +2,11 @@
 FROM rust:1.78-bookworm AS builder
 WORKDIR /app
 
-ENV RUSTFLAGS="-C target-cpu=native"
-
 # Cache dependency layer separately from source
 COPY Cargo.toml Cargo.lock* ./
-RUN mkdir src && echo "fn main(){}" > src/main.rs
-RUN cargo build --release
-RUN rm src/main.rs
+RUN mkdir src && echo "fn main(){}" > src/main.rs && \
+    cargo build --release && \
+    rm src/main.rs
 
 # Copy source and rebuild (only changed code recompiles)
 COPY src ./src
