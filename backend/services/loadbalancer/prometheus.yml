@@ -1,7 +1,8 @@
 global:
-  scrape_interval: 5s
+  scrape_interval: 15s
+  evaluation_interval: 15s
 
 scrape_configs:
-  - job_name: "loadbalancer"
+  - job_name: 'loadbalancer'
     static_configs:
-      - targets: ["loadbalancer:9090"]
+      - targets: ['localhost:9090']

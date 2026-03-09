@@ -90,33 +90,45 @@ Prometheus metrics are exposed at `http://<metrics_bind>/metrics`:
 | `lb_rate_limited_total`       | Counter   | —                           |
 | `lb_all_backends_down_total`  | Counter   | —                           |
 
+### Monitoring (Prometheus & Grafana)
+
+The load balancer exports metrics on `:9090/metrics`. The monitoring stack is included in the `docker-compose.yml`:
+
+- **Prometheus**: Scrapes the load balancer and stores historical data.
+- **Grafana**: Provides a "Load Balancer Insights" dashboard out-of-the-box.
+- **Default password**: `admin` (Change on first login).
+
+To view metrics:
+
+1. Open Grafana at `http://your-server-ip:3000`.
+2. Navigate to Dashboards -> Load Balancer Insights.
+
 ## Architecture
 
 ```
 
-│                    loadbalancer
-│                                                      │
-│  ┌────────────┐  ┌──────────┐  ┌──────────────────┐ │
-│  │Rate Limiter│→ │Rules     │→ │Round Robin       │ │
-│  │(token      │  │Engine    │  │Strategy          │ │
-│  │ bucket)    │  │(prefix   │  │(lock-free,       │ │
-│  │            │  │ match)   │  │ weighted)        │ │
-│  └────────────┘  └──────────┘  └────────┬─────────┘ │
-│                                         │            │
-│                              ┌──────────▼─────────┐ │
-│                              │HTTP Forwarder      │ │
-│                              │(connection pooling,│ │
-│                              │ body streaming)    │ │
-│                              └──────────┬─────────┘ │
-│                                         │            │
-│  ┌─────────────────┐           ┌────────▼────────┐  │
-│  │Health Checker   │           │Backend Pool     │  │
-│  │(1 task/backend) │──────────▶│[b1] [b2]  [b3]  │  │
-│  └─────────────────┘           └─────────────────┘  │
-│                                                      │
-│  ┌─────────────────┐  ┌──────────────────────────┐  │
-│  │Metrics Server   │  │Config (ArcSwap)          │  │
-│  │(:9090)          │  │SIGHUP → atomic reload    │  │
-│  └─────────────────┘  └──────────────────────────┘  │
-└──────────────────────────────────────────────────────┘
+                    loadbalancer
+
+  ┌────────────┐             ┌──────────┐             ┌──────────────────┐
+  │Rate Limiter│             │Rules     │             │Round Robin       │
+  │(token      │ ──────────▶ │Engine    │ ──────────▶ │Strategy          │
+  │ bucket)    │             │(prefix   │             │(lock-free,       │
+  │            │             │ match)   │             │ weighted)        │
+  └────────────┘             └──────────┘             └────────┬─────────┘
+                                                               │
+                                                     ┌─────────▼──────────┐
+                                                     │HTTP Forwarder      │
+                                                     │(connection pooling,│
+                                                     │ body streaming)    │
+                                                     └─────────┬──────────┘
+                                                               │
+  ┌─────────────────┐                                  ┌───────▼────────┐
+  │Health Checker   │                                  │Backend Pool    │
+  │(1 task/backend) │ ──────────────────────────────▶  │[b1] [b2]  [b3] │
+  └─────────────────┘                                  └────────────────┘
+
+  ┌─────────────────┐                             ┌──────────────────────────┐
+  │Metrics Server   │                             │Config (ArcSwap)          │
+  │(:9090)          │                             │SIGHUP → atomic reload    │
+  └─────────────────┘                             └──────────────────────────┘
 ```
