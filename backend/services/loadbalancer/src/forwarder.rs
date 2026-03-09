@@ -11,17 +11,24 @@ use crate::health::Backend;
 use crate::metrics;
 
 /// Shared HTTP client for forwarding requests to backends.
-/// Uses connection pooling for maximum throughput.
+/// Supports both http:// and https:// via hyper-rustls.
 pub type HttpClient = Client<
-    hyper_util::client::legacy::connect::HttpConnector,
+    hyper_rustls::HttpsConnector<hyper_util::client::legacy::connect::HttpConnector>,
     Incoming,
 >;
 
-/// Build a reusable HTTP client with connection pooling.
+/// Build a reusable HTTP client with connection pooling and HTTPS support.
 pub fn build_client() -> HttpClient {
-    let mut connector = hyper_util::client::legacy::connect::HttpConnector::new();
-    connector.set_nodelay(true);
-    connector.enforce_http(true);
+    let mut http = hyper_util::client::legacy::connect::HttpConnector::new();
+    http.set_nodelay(true);
+    http.enforce_http(false);
+
+    let connector = hyper_rustls::HttpsConnectorBuilder::new()
+        .with_native_roots()
+        .expect("failed to load system CA roots")
+        .https_or_http()
+        .enable_http1()
+        .wrap_connector(http);
 
     Client::builder(TokioExecutor::new())
         .pool_idle_timeout(Duration::from_secs(90))

@@ -29,6 +29,8 @@ rand             = "0.8"
 clap             = { version = "4", features = ["derive"] }
 uuid             = { version = "1", features = ["v4"] }
 http             = "1"
+hyper-rustls     = "0.27"
+rustls-native-certs = "0.7"
 
 [profile.release]
 opt-level     = 3

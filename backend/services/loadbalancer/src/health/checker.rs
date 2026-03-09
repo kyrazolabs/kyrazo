@@ -52,11 +52,21 @@ async fn health_check_loop(
     healthy_threshold: u32,
     unhealthy_threshold: u32,
 ) {
-    // Build a lightweight HTTP client for health probes
+    // Build a lightweight HTTP/HTTPS client for health probes
+    let mut http = hyper_util::client::legacy::connect::HttpConnector::new();
+    http.enforce_http(false);
+
+    let connector = hyper_rustls::HttpsConnectorBuilder::new()
+        .with_native_roots()
+        .expect("failed to load system CA roots")
+        .https_or_http()
+        .enable_http1()
+        .wrap_connector(http);
+
     let client = Client::builder(TokioExecutor::new())
         .pool_idle_timeout(Duration::from_secs(30))
         .pool_max_idle_per_host(2)
-        .build_http::<Empty<Bytes>>();
+        .build::<_, Empty<Bytes>>(connector);
 
     let health_url = format!("{}{}", backend.address.trim_end_matches('/'), path);
 
