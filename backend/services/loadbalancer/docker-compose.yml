@@ -16,3 +16,12 @@ services:
       - HEALTH_CHECK_TIMEOUT=${HEALTH_CHECK_TIMEOUT:-2}
       - RATE_LIMIT_RPS=${RATE_LIMIT_RPS:-1000}
       - RATE_LIMIT_BURST=${RATE_LIMIT_BURST:-2000}
+    deploy:
+      resources:
+        limits:
+          cpus: '2'         # Hard limit of 2 CPU cores
+          memory: 4G        # Hard limit of 4GB RAM
+        reservations:
+          cpus: '0.50'      # Soft reservation of 0.25 CPU cores
+          memory: 1G        # Soft reservation of 1GB RAM
+
