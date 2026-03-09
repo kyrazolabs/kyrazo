@@ -10,13 +10,21 @@ RUN rm src/main.rs
 
 # Copy source and rebuild (only changed code recompiles)
 COPY src ./src
-COPY config ./config
 RUN touch src/main.rs && cargo build --release
 
-# ── Stage 2: Runtime (distroless = minimal attack surface) ──
-FROM gcr.io/distroless/cc-debian12
+# ── Stage 2: Runtime ─────────────────────────────────
+# Using slim instead of distroless so we have a shell for
+# environment variable substitution via entrypoint.sh
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gettext-base ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
-COPY --from=builder /app/target/release/rust-lb  /app/rust-lb
-COPY --from=builder /app/config/config.toml       /app/config/config.toml
+COPY --from=builder /app/target/release/loadbalancer  /app/loadbalancer
+COPY config/config.toml  /app/config/config.toml.template
+COPY entrypoint.sh        /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
 EXPOSE 8080 9090
-ENTRYPOINT ["/app/rust-lb", "--config", "/app/config/config.toml"]
+ENTRYPOINT ["/app/entrypoint.sh"]

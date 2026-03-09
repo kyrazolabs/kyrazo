@@ -29,7 +29,7 @@ use crate::health::checker;
 // ─── CLI ────────────────────────────────────────────────────────────
 
 #[derive(Parser)]
-#[command(name = "rust-lb", about = "High-performance internal HTTP load balancer")]
+#[command(name = "loadbalancer", about = "High-performance internal HTTP load balancer")]
 struct Cli {
     /// Path to the TOML configuration file.
     #[arg(short, long, default_value = "config/config.toml")]
@@ -67,7 +67,7 @@ async fn async_main(config_path: PathBuf, cfg: config::Config) {
 
     info!(
         worker_threads = num_cpus::get(),
-        "starting rust-lb"
+        "starting loadbalancer"
     );
 
     // ── Config in ArcSwap for hot-reload ──────────────────────────

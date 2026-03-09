@@ -1,5 +1,5 @@
 [package]
-name = "rust-lb"
+name = "loadbalancer"
 version = "0.1.0"
 edition = "2021"
 description = "High-performance internal HTTP load balancer"

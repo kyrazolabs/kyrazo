@@ -2,7 +2,19 @@ services:
   loadbalancer:
     build: .
     environment:
-      RUST_LOG: info
+      - RUST_LOG=${RUST_LOG:-info}
+      - PORT=${PORT:-8080}
+      - INGEST_SERVER1_IP=${INGEST_SERVER1_IP}
+      - INGEST_SERVER2_IP=${INGEST_SERVER2_IP}
+      - DASHBOARD_SERVER1_IP=${DASHBOARD_SERVER1_IP}
+      - DASHBOARD_SERVER2_IP=${DASHBOARD_SERVER2_IP}
+      - API_SERVER1_IP=${API_SERVER1_IP}
+      - API_SERVER2_IP=${API_SERVER2_IP}
+      - HEALTH_CHECK_PATH=${HEALTH_CHECK_PATH:-/v1/health}
+      - HEALTH_CHECK_INTERVAL=${HEALTH_CHECK_INTERVAL:-5}
+      - HEALTH_CHECK_TIMEOUT=${HEALTH_CHECK_TIMEOUT:-2}
+      - RATE_LIMIT_RPS=${RATE_LIMIT_RPS:-1000}
+      - RATE_LIMIT_BURST=${RATE_LIMIT_BURST:-2000}
     deploy:
       resources:
         limits:
