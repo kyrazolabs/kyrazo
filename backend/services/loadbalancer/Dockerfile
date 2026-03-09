@@ -5,7 +5,7 @@ WORKDIR /app
 ENV RUSTFLAGS="-C target-cpu=native"
 
 # Cache dependency layer separately from source
-COPY Cargo.toml Cargo.lock ./
+COPY Cargo.toml Cargo.lock* ./
 RUN mkdir src && echo "fn main(){}" > src/main.rs
 RUN cargo build --release
 RUN rm src/main.rs
