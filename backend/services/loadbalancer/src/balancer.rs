@@ -102,6 +102,7 @@ impl Balancer {
         let start = Instant::now();
         let request_id = Uuid::new_v4().to_string();
         let method = req.method().clone();
+        let path_and_query = req.uri().path_and_query().map(|pq| pq.to_string()).unwrap_or_else(|| "/".to_string());
         let path = req.uri().path().to_string();
 
         // ── Rate limiting ─────────────────────────────────────────
@@ -194,14 +195,21 @@ impl Balancer {
                     format!("/{}", new_path)
                 };
 
+                // Preserve query string if present
+                let final_uri = if let Some(query) = req.uri().query() {
+                    format!("{}?{}", final_path, query)
+                } else {
+                    final_path
+                };
+
                 let mut uri_parts = req.uri().clone().into_parts();
-                uri_parts.path_and_query = Some(final_path.parse().unwrap());
+                uri_parts.path_and_query = Some(final_uri.parse().unwrap());
                 *req.uri_mut() = http::Uri::from_parts(uri_parts).unwrap();
                 
                 info!(
                     request_id = %request_id,
-                    old_path = %path,
-                    new_path = %final_path,
+                    old_uri = %path_and_query,
+                    new_uri = %final_uri,
                     "stripped path prefix"
                 );
             }
