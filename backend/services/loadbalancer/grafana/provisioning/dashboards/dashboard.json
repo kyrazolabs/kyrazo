@@ -639,7 +639,7 @@
         }
     ],
     "preload": false,
-    "refresh": "",
+    "refresh": "auto",
     "schemaVersion": 42,
     "tags": [
         "loadbalancer",
@@ -654,7 +654,7 @@
     },
     "timepicker": {
         "refresh_intervals": [
-            "5s"
+            "1s"
         ]
     },
     "timezone": "browser",
