@@ -604,7 +604,11 @@
         "from": "now-30m",
         "to": "now"
     },
-    "timepicker": {},
+    "timepicker": {
+        "refresh_intervals": [
+            "5s"
+        ]
+    },
     "timezone": "",
     "title": "Load Balancer Insights",
     "uid": "lb_insights",
