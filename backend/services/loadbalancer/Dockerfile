@@ -17,7 +17,7 @@ RUN touch src/main.rs && cargo build --release
 # environment variable substitution via entrypoint.sh
 FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gettext-base ca-certificates \
+    gettext-base ca-certificates curl \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
