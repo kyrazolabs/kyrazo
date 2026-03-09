@@ -24,4 +24,10 @@ services:
         reservations:
           cpus: '0.50'      # Soft reservation of 0.25 CPU cores
           memory: 1G        # Soft reservation of 1GB RAM
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9090/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
 
