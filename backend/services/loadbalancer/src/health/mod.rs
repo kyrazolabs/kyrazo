@@ -46,8 +46,8 @@ pub struct BackendState {
 impl BackendState {
     pub fn new() -> Self {
         Self {
-            // Start healthy — health checker will flip if needed
-            healthy: AtomicBool::new(true),
+            // Start unhealthy — health checker will promote to healthy after verification
+            healthy: AtomicBool::new(false),
             consecutive_successes: AtomicU32::new(0),
             consecutive_failures: AtomicU32::new(0),
         }
@@ -79,9 +79,7 @@ impl BackendPool {
 
     /// Get a subset of backends by their IDs.
     pub fn subset(&self, ids: &[String]) -> Vec<Arc<Backend>> {
-        ids.iter()
-            .filter_map(|id| self.get(id))
-            .collect()
+        ids.iter().filter_map(|id| self.get(id)).collect()
     }
 
     /// Check if all backends are unhealthy.

@@ -64,3 +64,17 @@ services:
           cpus: '0.5'
     restart: unless-stopped
 
+  nginx:
+    image: nginx:alpine
+    container_name: lb-nginx
+    network_mode: host
+    volumes:
+      - ./nginx/grafana.conf:/etc/nginx/conf.d/grafana.conf:ro
+      - /data/coolify/proxy/certs/cloudflare.pem:/etc/nginx/certs/cloudflare.pem:ro
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.2'
+    restart: unless-stopped
+
