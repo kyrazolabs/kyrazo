@@ -16,8 +16,3 @@ services:
       - HEALTH_CHECK_TIMEOUT=${HEALTH_CHECK_TIMEOUT:-2}
       - RATE_LIMIT_RPS=${RATE_LIMIT_RPS:-1000}
       - RATE_LIMIT_BURST=${RATE_LIMIT_BURST:-2000}
-    deploy:
-      resources:
-        limits:
-          cpus: "0"
-          memory: 256m
