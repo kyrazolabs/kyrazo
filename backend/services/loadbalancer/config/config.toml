@@ -1,65 +1,101 @@
 # ═══════════════════════════════════════════════════════
 # Rust Load Balancer — Configuration
 # ═══════════════════════════════════════════════════════
+# Variables like ${VAR_NAME} are substituted by entrypoint.sh
+# from environment variables at container startup.
+# ═══════════════════════════════════════════════════════
 
 [server]
-bind             = "0.0.0.0:8080"    # Coolify forwards traffic here
-metrics_bind     = "0.0.0.0:9090"    # Prometheus scrape endpoint
-worker_threads   = 0                  # 0 = auto-detect via num_cpus
+bind             = "0.0.0.0:${PORT}"
+metrics_bind     = "0.0.0.0:9090"
+worker_threads   = 0
 max_connections  = 100000
 
-# ── Backend Pool ──────────────────────────────────────
+# ── Ingest API backends ───────────────────────────────
 
 [[backends]]
-id               = "backend-1"
-address          = "http://127.0.0.1:3001"
+id               = "ingest-1"
+address          = "${INGEST_SERVER1_IP}"
 weight           = 1
 max_connections  = 500
 
 [[backends]]
-id               = "backend-2"
-address          = "http://127.0.0.1:3002"
-weight           = 2
+id               = "ingest-2"
+address          = "${INGEST_SERVER2_IP}"
+weight           = 1
+max_connections  = 500
+
+# ── Dashboard API backends ────────────────────────────
+
+[[backends]]
+id               = "dashboard-1"
+address          = "${DASHBOARD_SERVER1_IP}"
+weight           = 1
 max_connections  = 500
 
 [[backends]]
-id               = "backend-3"
-address          = "http://127.0.0.1:3003"
+id               = "dashboard-2"
+address          = "${DASHBOARD_SERVER2_IP}"
 weight           = 1
+max_connections  = 500
+
+# ── Integration/Default API backends ──────────────────
+
+[[backends]]
+id               = "api-1"
+address          = "${API_SERVER1_IP}"
+weight           = 1
+max_connections  = 500
+
+[[backends]]
+id               = "api-2"
+address          = "${API_SERVER2_IP}"
+weight           = 1
+max_connections  = 500
 
 # ── Health Checks ─────────────────────────────────────
 
 [health_check]
-interval_secs        = 5
-timeout_secs         = 2
-path                 = "/health"
+interval_secs        = ${HEALTH_CHECK_INTERVAL}
+timeout_secs         = ${HEALTH_CHECK_TIMEOUT}
+path                 = "${HEALTH_CHECK_PATH}"
 healthy_threshold    = 2
 unhealthy_threshold  = 3
 
-# ── Routing Rules ─────────────────────────────────────
+# ── Routing Rules (matches old Nginx path-based routing) ──
 
 [[rules]]
-id              = "api-rule"
-match_path      = "/api/*"
-match_methods   = ["GET", "POST", "PUT", "DELETE"]
-backends        = ["backend-1", "backend-2"]
+id              = "ingest-rule"
+match_path      = "/ingest/*"
+match_methods   = ["GET", "POST", "PUT", "DELETE", "PATCH"]
+backends        = ["ingest-1", "ingest-2"]
 priority        = 10
 
 [[rules]]
-id              = "worker-rule"
-match_path      = "/jobs/*"
-match_methods   = ["POST"]
-backends        = ["backend-3"]
-priority        = 5
+id              = "dashboard-rule"
+match_path      = "/dashboard/*"
+match_methods   = ["GET", "POST", "PUT", "DELETE", "PATCH"]
+backends        = ["dashboard-1", "dashboard-2"]
+priority        = 10
+
+# Catch-all: everything else goes to the default API backends
+# (no rule needed — unmatched requests use the global pool,
+#  but we define one explicitly for clarity)
+[[rules]]
+id              = "api-rule"
+match_path      = "/"
+match_methods   = []
+backends        = ["api-1", "api-2"]
+priority        = 1
 
 # ── Rate Limiting ─────────────────────────────────────
 
 [rate_limit]
 enabled              = true
-requests_per_second  = 1000
-burst                = 2000
+requests_per_second  = ${RATE_LIMIT_RPS}
+burst                = ${RATE_LIMIT_BURST}
 
-# ── Retry Policy ─────────────────────────────────────
+# ── Retry Policy ──────────────────────────────────────
 
 [retry]
 enabled       = true

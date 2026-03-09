@@ -1,0 +1,23 @@
+#!/bin/sh
+set -e
+
+CONFIG_TEMPLATE="/app/config/config.toml.template"
+CONFIG_OUTPUT="/app/config/config.toml"
+
+# Defaults
+PORT="${PORT:-8080}"
+HEALTH_CHECK_PATH="${HEALTH_CHECK_PATH:-/v1/health}"
+HEALTH_CHECK_INTERVAL="${HEALTH_CHECK_INTERVAL:-5}"
+HEALTH_CHECK_TIMEOUT="${HEALTH_CHECK_TIMEOUT:-2}"
+RATE_LIMIT_RPS="${RATE_LIMIT_RPS:-1000}"
+RATE_LIMIT_BURST="${RATE_LIMIT_BURST:-2000}"
+
+echo "rust-lb: substituting environment variables into config..."
+
+# Use envsubst to replace ${VAR} placeholders in the template
+envsubst < "$CONFIG_TEMPLATE" > "$CONFIG_OUTPUT"
+
+echo "rust-lb: config generated at $CONFIG_OUTPUT"
+echo "rust-lb: starting load balancer on port $PORT..."
+
+exec /app/rust-lb --config "$CONFIG_OUTPUT"
