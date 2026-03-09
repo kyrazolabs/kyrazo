@@ -177,6 +177,36 @@ impl Balancer {
             "routing request"
         );
 
+        // ── Path prefix stripping ─────────────────────────────────
+        let mut req = req;
+        if let Some(rule) = matched_rule {
+            if rule.strip_prefix {
+                let new_path = if path.len() > rule.path_prefix.len() {
+                    &path[rule.path_prefix.len()..]
+                } else {
+                    "/"
+                };
+                
+                // Ensure new_path starts with /
+                let final_path = if new_path.starts_with('/') {
+                    new_path.to_string()
+                } else {
+                    format!("/{}", new_path)
+                };
+
+                let mut uri_parts = req.uri().clone().into_parts();
+                uri_parts.path_and_query = Some(final_path.parse().unwrap());
+                *req.uri_mut() = http::Uri::from_parts(uri_parts).unwrap();
+                
+                info!(
+                    request_id = %request_id,
+                    old_path = %path,
+                    new_path = %final_path,
+                    "stripped path prefix"
+                );
+            }
+        }
+
         // ── Forward with retry ────────────────────────────────────
         let result = forwarder::try_forward(&self.client, &backend, req, &request_id).await;
 

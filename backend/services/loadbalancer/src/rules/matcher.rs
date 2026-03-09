@@ -28,6 +28,7 @@ pub fn build_rules(configs: &[RuleConfig]) -> Vec<Rule> {
                 methods,
                 backend_ids: cfg.backends.clone(),
                 priority: cfg.priority,
+                strip_prefix: cfg.strip_prefix,
             }
         })
         .collect();

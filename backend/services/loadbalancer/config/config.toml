@@ -70,6 +70,7 @@ match_path      = "/ingest/*"
 match_methods   = ["GET", "POST", "PUT", "DELETE", "PATCH"]
 backends        = ["ingest-1", "ingest-2"]
 priority        = 10
+strip_prefix    = true
 
 [[rules]]
 id              = "dashboard-rule"
@@ -77,6 +78,7 @@ match_path      = "/dashboard/*"
 match_methods   = ["GET", "POST", "PUT", "DELETE", "PATCH"]
 backends        = ["dashboard-1", "dashboard-2"]
 priority        = 10
+strip_prefix    = true
 
 # Catch-all: everything else goes to the default API backends
 # (no rule needed — unmatched requests use the global pool,

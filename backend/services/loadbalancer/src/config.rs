@@ -91,6 +91,8 @@ pub struct RuleConfig {
     pub backends: Vec<String>,
     #[serde(default)]
     pub priority: u32,
+    #[serde(default)]
+    pub strip_prefix: bool,
 }
 
 #[derive(Debug, Clone, Deserialize)]
