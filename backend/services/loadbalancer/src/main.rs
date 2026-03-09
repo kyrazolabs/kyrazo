@@ -235,6 +235,11 @@ async fn run_metrics_server(addr: SocketAddr) {
                         .header("content-type", "text/plain; version=0.0.4; charset=utf-8")
                         .body(Full::new(Bytes::from(body)))
                         .unwrap()
+                } else if req.uri().path() == "/health" {
+                    Response::builder()
+                        .status(200)
+                        .body(Full::new(Bytes::from("OK")))
+                        .unwrap()
                 } else {
                     Response::builder()
                         .status(404)
