@@ -70,7 +70,7 @@ services:
     network_mode: host
     volumes:
       - ./nginx/grafana.conf:/etc/nginx/conf.d/grafana.conf:ro
-      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /data/coolify/proxy/certs/cloudflare.pem:/etc/nginx/certs/cloudflare.pem:ro
     deploy:
       resources:
         limits:
