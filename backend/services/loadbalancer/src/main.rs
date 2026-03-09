@@ -92,11 +92,11 @@ async fn async_main(config_path: PathBuf, cfg: config::Config) {
     let _ = &*metrics::ACTIVE_CONNECTIONS;
     let _ = &*metrics::BACKEND_HEALTHY;
 
-    // Set initial backend health gauges
+    // Set initial backend health gauges (unhealthy until first check)
     for backend in &balancer.pool.backends {
         metrics::BACKEND_HEALTHY
             .with_label_values(&[&backend.id])
-            .set(1.0);
+            .set(0.0);
     }
 
     // ── Start metrics server ──────────────────────────────────────

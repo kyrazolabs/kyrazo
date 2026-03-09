@@ -61,8 +61,6 @@ async fn health_check_loop(
     let health_url = format!("{}{}", backend.address.trim_end_matches('/'), path);
 
     loop {
-        tokio::time::sleep(interval).await;
-
         let result = tokio::time::timeout(timeout, async {
             let uri: hyper::Uri = match health_url.parse() {
                 Ok(u) => u,
@@ -100,7 +98,7 @@ async fn health_check_loop(
                     metrics::BACKEND_HEALTHY
                         .with_label_values(&[&backend.id])
                         .set(1.0);
-                    info!(backend_id = %backend.id, "backend marked healthy");
+                    info!(backend_id = %backend.id, address = %backend.address, "backend marked healthy");
                 }
             }
             _ => {
@@ -115,6 +113,12 @@ async fn health_check_loop(
                     .consecutive_successes
                     .store(0, Ordering::Relaxed);
 
+                let error_msg = match &result {
+                    Ok(Ok(status)) => format!("HTTP {}", status),
+                    Ok(Err(e)) => e.clone(),
+                    Err(_) => "timeout".to_string(),
+                };
+
                 if failures >= unhealthy_threshold
                     && backend.state.healthy.load(Ordering::Relaxed)
                 {
@@ -122,25 +126,27 @@ async fn health_check_loop(
                     metrics::BACKEND_HEALTHY
                         .with_label_values(&[&backend.id])
                         .set(0.0);
-                    warn!(backend_id = %backend.id, "backend marked UNHEALTHY");
+                    warn!(
+                        backend_id = %backend.id, 
+                        address = %backend.address,
+                        reason = %error_msg,
+                        "backend marked UNHEALTHY"
+                    );
                 }
 
-                if failures >= unhealthy_threshold {
-                    let msg = match &result {
-                        Ok(Ok(status)) => format!("status {}", status),
-                        Ok(Err(e)) => e.clone(),
-                        Err(_) => "timeout".to_string(),
-                    };
-                    metrics::UPSTREAM_ERRORS_TOTAL
-                        .with_label_values(&[&backend.id, "health_check"])
-                        .inc();
+                // Log every failure if it's currently unhealthy to help debugging
+                if !backend.state.healthy.load(Ordering::Relaxed) {
                     error!(
                         backend_id = %backend.id,
-                        reason = %msg,
+                        address = %backend.address,
+                        url = %health_url,
+                        reason = %error_msg,
                         "health check failed"
                     );
                 }
             }
         }
+
+        tokio::time::sleep(interval).await;
     }
 }
