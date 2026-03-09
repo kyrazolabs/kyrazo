@@ -1,9 +1,6 @@
 services:
   loadbalancer:
     build: .
-    ports:
-      - "8080:8080"
-      - "9090:9090"
     environment:
       RUST_LOG: info
     deploy:
@@ -11,32 +8,3 @@ services:
         limits:
           cpus: "0"
           memory: 256m
-    depends_on:
-      - backend-1
-      - backend-2
-      - backend-3
-
-  backend-1:
-    image: hashicorp/http-echo
-    command: ["-text=backend-1", "-listen=:3001"]
-    ports:
-      - "3001:3001"
-
-  backend-2:
-    image: hashicorp/http-echo
-    command: ["-text=backend-2", "-listen=:3002"]
-    ports:
-      - "3002:3002"
-
-  backend-3:
-    image: hashicorp/http-echo
-    command: ["-text=backend-3", "-listen=:3003"]
-    ports:
-      - "3003:3003"
-
-  prometheus:
-    image: prom/prometheus
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9091:9090"
