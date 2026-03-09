@@ -1,22 +1,42 @@
-version: "3.8"
-
 services:
   loadbalancer:
     build: .
-    container_name: loadbalancer
-    restart: unless-stopped
-    # Host network mode bypasses Docker network isolation
-    # so the container can reach backend servers on other hosts
-    network_mode: host
+    ports:
+      - "8080:8080"
+      - "9090:9090"
     environment:
-      - PORT=${PORT}
-      - INGEST_SERVER1_IP=${INGEST_SERVER1_IP}
-      - INGEST_SERVER2_IP=${INGEST_SERVER2_IP}
-      - DASHBOARD_SERVER1_IP=${DASHBOARD_SERVER1_IP}
-      - DASHBOARD_SERVER2_IP=${DASHBOARD_SERVER2_IP}
-      - API_SERVER1_IP=${API_SERVER1_IP}
-      - API_SERVER2_IP=${API_SERVER2_IP}
-    ulimits:
-      nofile:
-        soft: 65536
-        hard: 65536
+      RUST_LOG: info
+    deploy:
+      resources:
+        limits:
+          cpus: "0"
+          memory: 256m
+    depends_on:
+      - backend-1
+      - backend-2
+      - backend-3
+
+  backend-1:
+    image: hashicorp/http-echo
+    command: ["-text=backend-1", "-listen=:3001"]
+    ports:
+      - "3001:3001"
+
+  backend-2:
+    image: hashicorp/http-echo
+    command: ["-text=backend-2", "-listen=:3002"]
+    ports:
+      - "3002:3002"
+
+  backend-3:
+    image: hashicorp/http-echo
+    command: ["-text=backend-3", "-listen=:3003"]
+    ports:
+      - "3003:3003"
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9091:9090"
