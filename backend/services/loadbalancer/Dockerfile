@@ -26,7 +26,7 @@ COPY config/config.toml  /app/config/config.toml.template
 COPY entrypoint.sh        /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
-EXPOSE 8080 9090
+EXPOSE 8080 9091
 
 HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:9091/health || exit 1
