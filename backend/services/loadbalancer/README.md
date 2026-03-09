@@ -93,8 +93,8 @@ Prometheus metrics are exposed at `http://<metrics_bind>/metrics`:
 ## Architecture
 
 ```
-┌──────────────────────────────────────────────────────┐
-│                    loadbalancer                            │
+
+│                    loadbalancer
 │                                                      │
 │  ┌────────────┐  ┌──────────┐  ┌──────────────────┐ │
 │  │Rate Limiter│→ │Rules     │→ │Round Robin       │ │
@@ -105,13 +105,13 @@ Prometheus metrics are exposed at `http://<metrics_bind>/metrics`:
 │                                         │            │
 │                              ┌──────────▼─────────┐ │
 │                              │HTTP Forwarder      │ │
-│                              │(connection pooling, │ │
-│                              │ body streaming)     │ │
+│                              │(connection pooling,│ │
+│                              │ body streaming)    │ │
 │                              └──────────┬─────────┘ │
 │                                         │            │
 │  ┌─────────────────┐           ┌────────▼────────┐  │
-│  │Health Checker    │           │Backend Pool     │  │
-│  │(1 task/backend)  │──────────▶│[b1] [b2] [b3]  │  │
+│  │Health Checker   │           │Backend Pool     │  │
+│  │(1 task/backend) │──────────▶│[b1] [b2]  [b3]  │  │
 │  └─────────────────┘           └─────────────────┘  │
 │                                                      │
 │  ┌─────────────────┐  ┌──────────────────────────┐  │

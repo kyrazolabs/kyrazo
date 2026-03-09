@@ -10,6 +10,7 @@ bind             = "0.0.0.0:${PORT}"
 metrics_bind     = "0.0.0.0:9090"
 worker_threads   = 0
 max_connections  = 100000
+skip_ssl_verify  = false
 
 # ── Ingest API backends ───────────────────────────────
 

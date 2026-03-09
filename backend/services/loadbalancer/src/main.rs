@@ -80,6 +80,7 @@ async fn async_main(config_path: PathBuf, cfg: config::Config) {
     let health_handles = checker::spawn_health_checks(
         &balancer.pool.backends,
         &cfg.health_check,
+        cfg.server.skip_ssl_verify,
     );
     info!(count = health_handles.len(), "spawned health check tasks");
 

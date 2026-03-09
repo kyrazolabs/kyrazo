@@ -31,6 +31,8 @@ uuid             = { version = "1", features = ["v4"] }
 http             = "1"
 hyper-rustls     = "0.27"
 rustls-native-certs = "0.7"
+rustls           = { version = "0.23", features = ["aws-lc-rs"] }
+rustls-pki-types = "1"
 
 [profile.release]
 opt-level     = 3

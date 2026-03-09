@@ -18,14 +18,35 @@ pub type HttpClient = Client<
 >;
 
 /// Build a reusable HTTP client with connection pooling and HTTPS support.
-pub fn build_client() -> HttpClient {
+pub fn build_client(skip_verify: bool) -> HttpClient {
     let mut http = hyper_util::client::legacy::connect::HttpConnector::new();
     http.set_nodelay(true);
     http.enforce_http(false);
 
+    let provider = Arc::new(rustls::crypto::aws_lc_rs::default_provider());
+    
+    let rustls_config = if skip_verify {
+        rustls::ClientConfig::builder_with_provider(provider)
+            .with_safe_default_protocol_versions()
+            .expect("failed to build rustls config")
+            .dangerous()
+            .with_custom_certificate_verifier(Arc::new(NoVerifier))
+            .with_no_client_auth()
+    } else {
+        let mut root_store = rustls::RootCertStore::empty();
+        for cert in rustls_native_certs::load_native_certs().expect("failed to load native certs") {
+            root_store.add(cert).ok();
+        }
+
+        rustls::ClientConfig::builder_with_provider(provider)
+            .with_safe_default_protocol_versions()
+            .expect("failed to build rustls config")
+            .with_root_certificates(root_store)
+            .with_no_client_auth()
+    };
+
     let connector = hyper_rustls::HttpsConnectorBuilder::new()
-        .with_native_roots()
-        .expect("failed to load system CA roots")
+        .with_tls_config(rustls_config)
         .https_or_http()
         .enable_http1()
         .wrap_connector(http);
@@ -34,6 +55,59 @@ pub fn build_client() -> HttpClient {
         .pool_idle_timeout(Duration::from_secs(90))
         .pool_max_idle_per_host(32)
         .build(connector)
+}
+
+/// A verifier that accepts any certificate.
+#[derive(Debug)]
+pub struct NoVerifier;
+
+impl rustls::client::danger::ServerCertVerifier for NoVerifier {
+    fn verify_server_cert(
+        &self,
+        _end_entity: &rustls::pki_types::CertificateDer<'_>,
+        _intermediates: &[rustls::pki_types::CertificateDer<'_>],
+        _server_name: &rustls::pki_types::ServerName<'_>,
+        _ocsp_response: &[u8],
+        _now: rustls::pki_types::UnixTime,
+    ) -> Result<rustls::client::danger::ServerCertVerified, rustls::Error> {
+        Ok(rustls::client::danger::ServerCertVerified::assertion())
+    }
+
+    fn verify_tls12_signature(
+        &self,
+        _message: &[u8],
+        _cert: &rustls::pki_types::CertificateDer<'_>,
+        _dss: &rustls::DigitallySignedStruct,
+    ) -> Result<rustls::client::danger::HandshakeSignatureValid, rustls::Error> {
+        Ok(rustls::client::danger::HandshakeSignatureValid::assertion())
+    }
+
+    fn verify_tls13_signature(
+        &self,
+        _message: &[u8],
+        _cert: &rustls::pki_types::CertificateDer<'_>,
+        _dss: &rustls::DigitallySignedStruct,
+    ) -> Result<rustls::client::danger::HandshakeSignatureValid, rustls::Error> {
+        Ok(rustls::client::danger::HandshakeSignatureValid::assertion())
+    }
+
+    fn supported_verify_schemes(&self) -> Vec<rustls::SignatureScheme> {
+        vec![
+            rustls::SignatureScheme::RSA_PKCS1_SHA1,
+            rustls::SignatureScheme::ECDSA_SHA1_Legacy,
+            rustls::SignatureScheme::RSA_PKCS1_SHA256,
+            rustls::SignatureScheme::RSA_PKCS1_SHA384,
+            rustls::SignatureScheme::RSA_PKCS1_SHA512,
+            rustls::SignatureScheme::ECDSA_NISTP256_SHA256,
+            rustls::SignatureScheme::ECDSA_NISTP384_SHA384,
+            rustls::SignatureScheme::ECDSA_NISTP521_SHA512,
+            rustls::SignatureScheme::RSA_PSS_SHA256,
+            rustls::SignatureScheme::RSA_PSS_SHA384,
+            rustls::SignatureScheme::RSA_PSS_SHA512,
+            rustls::SignatureScheme::ED25519,
+            rustls::SignatureScheme::ED448,
+        ]
+    }
 }
 
 /// Result type for forwarding — the balancer maps errors to responses.
