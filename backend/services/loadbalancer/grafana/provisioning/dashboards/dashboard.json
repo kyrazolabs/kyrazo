@@ -591,6 +591,7 @@
             "type": "timeseries"
         }
     ],
+    "refresh": "auto",
     "schemaVersion": 36,
     "style": "dark",
     "tags": [
@@ -606,7 +607,7 @@
     },
     "timepicker": {
         "refresh_intervals": [
-            "5s"
+            "1s"
         ]
     },
     "timezone": "",
