@@ -29,6 +29,6 @@ RUN chmod +x /app/entrypoint.sh
 EXPOSE 8080 9090
 
 HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:9090/health || exit 1
+    CMD curl -f http://localhost:9091/health || exit 1
 
 ENTRYPOINT ["/app/entrypoint.sh"]
