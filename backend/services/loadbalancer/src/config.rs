@@ -28,6 +28,8 @@ pub struct ServerConfig {
     pub worker_threads: usize,
     #[serde(default = "default_max_connections")]
     pub max_connections: usize,
+    #[serde(default)]
+    pub skip_ssl_verify: bool,
 }
 
 fn default_max_connections() -> usize {

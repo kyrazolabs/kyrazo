@@ -70,7 +70,7 @@ impl Balancer {
         let global_strategy = RoundRobinStrategy::new(&pool.backends);
 
         // Build HTTP client
-        let client = forwarder::build_client();
+        let client = forwarder::build_client(config.server.skip_ssl_verify);
 
         // Build rate limiter
         let rate_limiter = Arc::new(RateLimiter::new(
