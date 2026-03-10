@@ -7,7 +7,11 @@ export const workspaceInterceptor: HttpInterceptorFn = (req, next) => {
     const workspace = ss.getItem<string>('workspace');
 
     // Add workspace header for namespace workspace endpoints
-    if (req.url.includes('/v1/namespaces') || req.url.includes('/v1/plans')) {
+    if (
+        req.url.includes('/v1/namespaces') ||
+        req.url.includes('/v1/workers') ||
+        req.url.includes('/v1/plans')
+    ) {
         const modified = req.clone({
             setHeaders: {
                 'x-workspace-id': workspace ?? '',

@@ -7,7 +7,7 @@
                 [outlined]="true"
                 [text]="true"
                 (click)="openSidebar()"
-                [icon]="isOpenSidebar()? 'pi pi-chevron-left' : 'pi pi-chevron-right'"
+                [icon]="isOpenSidebar()? 'icon-[hugeicons--arrow-left-01] text-lg!' : 'icon-[hugeicons--arrow-right-01] text-lg!'"
                 class="after:border after:border-surface-300 dark:after:border-surface-600" />
             <div class="flex items-center gap-1 lg:gap-2 overflow-hidden">
                 <!-- Namespace Selector (shown only when workspace is selected) -->
@@ -44,12 +44,16 @@
             </div>
         </p-popover>
 
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1 lg:gap-2">
+            <!-- Search Button -->
             <!-- <p-button
-            [outlined]="true"
-            [text]="true"
-            [icon]="'pi pi-search'"
-            (click)="showSearch()" /> -->
+                [outlined]="true"
+                [text]="true"
+                icon="icon-[hugeicons--search-01] text-lg!"
+                (click)="showSearch()"
+                class="hidden lg:inline-flex"
+                pTooltip="Search (Ctrl+K)" tooltipPosition="bottom" /> -->
+
             <p-dialog
                 maskStyleClass="backdrop-blur-sm"
                 [modal]="true"
@@ -60,9 +64,6 @@
                 [minY]="10"
                 [style]="{ width: '25rem' }"
             >
-            <ng-template #header>
-
-            </ng-template>
                 <div class="flex items-center gap-4 mb-4">
                     <input
                         pInputText
@@ -75,7 +76,7 @@
                 </div>
                 <div class="w-full h-48 flex justify-center">
                     <div class="justify-center items-center">
-                        <i class="size-20 pi pi-search"></i>
+                        <i class="size-20 icon-[hugeicons--search-01] text-surface-400"></i>
                         <p class="text-xl mt-10"> No Results</p>
                     </div>
                 </div>
@@ -88,13 +89,18 @@
                     <p-button label="Save" (click)="searchVisible = false" />
                 </div>
             </p-dialog>
+
+            <!-- Worker Status -->
             <p-button
                 [outlined]="true"
                 [text]="true"
-                (click)="toggleDarkMode()"
-                [icon]="isDarkMode()? 'pi pi-moon' : 'pi pi-sun'"
+                (click)="workerDrawerVisible.set(true)"
+                icon="icon-[hugeicons--cpu] text-lg!"
                 class="hidden lg:inline-flex"
-            />
+                pTooltip="Worker Status" tooltipPosition="bottom">
+            </p-button>
+
+            <!-- Palette / Config -->
             <div class="relative hidden lg:block z-50">
                 <p-button
                     #settingsButton
@@ -102,16 +108,20 @@
                     [outlined]="true"
                     [text]="true"
                     icon="pi pi-palette"
-                    aria-label="Settings"
+                    pTooltip="Theme Settings" tooltipPosition="bottom"
                 />
                 <app-config *ngIf="showConfig" @dropdownAnimation />
             </div>
-            <!-- <p-button
-                    [outlined]="true"
-                    [text]="true"
-                    icon="pi pi-bell"
-                    aria-label="Notifications"
-                /> -->
+
+            <!-- Dark Mode Toggle -->
+            <p-button
+                [outlined]="true"
+                [text]="true"
+                (click)="toggleDarkMode()"
+                [icon]="isDarkMode()? 'pi pi-moon' : 'pi pi-sun'"
+                class="hidden lg:inline-flex"
+                pTooltip="Toggle Dark Mode" tooltipPosition="bottom"
+            />
             <p-button pRipple
                 [outlined]="false"
                 variant="text"
@@ -157,9 +167,16 @@
                                 @if (layoutService.isMobile()) {
                                     <div class="my-1 border-t border-surface-200 dark:border-surface-800"></div>
                                     <li>
+                                        <a pRipple (click)="workerDrawerVisible.set(true)"
+                                            class="flex items-center cursor-pointer p-2 rounded-xl text-sm text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-150 transition-colors p-ripple click-effect">
+                                            <i class="icon-[hugeicons--cpu] text-lg! mr-2"></i>
+                                            <span class="font-medium">Worker Status</span>
+                                        </a>
+                                    </li>
+                                    <li>
                                         <a pRipple (click)="toggleDarkMode()"
                                             class="flex items-center cursor-pointer p-2 rounded-xl text-sm text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-150 transition-colors p-ripple click-effect">
-                                            <i [class]="isDarkMode() ? 'pi pi-moon' : 'pi pi-sun'" class="mr-2"></i>
+                                            <i [class]="isDarkMode() ? 'pi pi-moon' : 'pi pi-sun text-lg!'" class="mr-2"></i>
                                             <span class="font-medium">{{ isDarkMode() ? 'Dark Mode' : 'Light Mode' }}</span>
                                         </a>
                                     </li>
@@ -191,9 +208,6 @@
         </div>
     </div>
 </div>
-
-
-
 <p-dialog header="Create Namespace" [(visible)]="visible" [modal]="true" [style]="{ width: '50rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
     <div class="grid grid-cols-5">
 
@@ -203,3 +217,5 @@
         <p-button label="Save" [outlined]="true" severity="secondary" (click)="visible = false" />
     </ng-template>
 </p-dialog>
+
+<app-worker-status [(visible)]="workerDrawerVisible" />

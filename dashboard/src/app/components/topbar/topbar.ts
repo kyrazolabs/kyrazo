@@ -6,6 +6,7 @@ import {
     ViewChild,
     ElementRef,
     HostListener,
+    signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -38,9 +39,12 @@ import { StorageService } from '@core/services/storage.service';
 import { NamespaceService } from '@core/services/namespace.service';
 import { CreateFirstNamespaceComponent } from '../launchpad/namespaces/create-first-namespace/create-first-namespace';
 import { AuthService } from '@core/auth/auth.service';
+import { WorkerComponent } from '../worker/worker';
+import { WorkerService } from '@core/services/worker.service';
 
 @Component({
     selector: 'app-topbar',
+    standalone: true,
     imports: [
         CommonModule,
         FormsModule,
@@ -57,6 +61,7 @@ import { AuthService } from '@core/auth/auth.service';
         PopoverModule,
         AvatarModule,
         BadgeModule,
+        WorkerComponent,
     ],
     templateUrl: './topbar.html',
     styleUrl: './topbar.scss',
@@ -67,10 +72,12 @@ export class TopbarComponent implements OnInit {
     private ss = inject(StorageService);
     private ps = inject(NamespaceService);
     private dialogService = inject(DialogService);
+    protected workerService = inject(WorkerService);
 
     layoutService: LayoutService = inject(LayoutService);
 
     visible: boolean = false;
+    workerDrawerVisible = signal(false);
 
     value1: string = '';
     pageTitle = '';
@@ -150,6 +157,9 @@ export class TopbarComponent implements OnInit {
 
         // Initialize namespace selection on load
         this.initializeNamespaceSelection();
+
+        // Initialize worker loading
+        this.workerService.loadWorkers();
 
         // Listen for namespace updates
         this.ps.namespacesUpdated$.subscribe(() => {

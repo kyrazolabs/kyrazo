@@ -8,6 +8,7 @@ import {
     EventEmitter,
     OnChanges,
     SimpleChanges,
+    computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -20,6 +21,7 @@ import {
 import { Router } from '@angular/router';
 
 import { EndpointService } from '@core/services/endpoint.service';
+import { SubscriptionService } from '@core/services/subscription.service';
 import { DialogService } from '@shared/services/dialog.service';
 import { IEndpoint } from '@models/endpoint.types';
 import { SentryService } from '@core/3rd-party/sentry';
@@ -27,6 +29,7 @@ import { PostHogService } from '@core/3rd-party/posthog';
 
 // PrimeNG Imports
 import { CardModule } from 'primeng/card';
+import { TooltipModule } from 'primeng/tooltip';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
@@ -47,6 +50,7 @@ import { SkeletonModule } from 'primeng/skeleton';
         FormsModule,
         // PrimeNG Modules
         CardModule,
+        TooltipModule,
         InputTextModule,
         SelectModule,
         ButtonModule,
@@ -62,12 +66,23 @@ import { SkeletonModule } from 'primeng/skeleton';
     providers: [EndpointService],
 })
 export class EndpointFormComponent implements OnInit, OnChanges {
-    private fb = inject(FormBuilder);
-    private mes = inject(MessageService);
-    private endpointService = inject(EndpointService);
-    private dls = inject(DialogService);
-    private sentry = inject(SentryService);
-    private posthog = inject(PostHogService);
+    private readonly fb = inject(FormBuilder);
+    private readonly mes = inject(MessageService);
+    private readonly endpointService = inject(EndpointService);
+    private readonly dialogService = inject(DialogService);
+    public readonly subscriptionService = inject(SubscriptionService);
+    private readonly sentry = inject(SentryService);
+    private readonly posthog = inject(PostHogService);
+
+    public readonly hasCustomHeaders = computed(() =>
+        this.subscriptionService.hasFeature('customHeaders'),
+    );
+    public readonly hasCustomTimeout = computed(() =>
+        this.subscriptionService.hasFeature('customTimeout'),
+    );
+    public readonly hasCustomRetries = computed(() =>
+        this.subscriptionService.hasFeature('customRetries'),
+    );
 
     @Input() endpointId: string | null = null;
     @Output() onSuccess = new EventEmitter<any>();
@@ -191,7 +206,7 @@ export class EndpointFormComponent implements OnInit, OnChanges {
 
     cancel() {
         this.onCancel.emit();
-        this.dls.closeEndpointDialog();
+        this.dialogService.closeEndpointDialog();
     }
 
     trackByIndex(index: number): number {
@@ -255,7 +270,7 @@ export class EndpointFormComponent implements OnInit, OnChanges {
                         context: 'dialog',
                     });
                 }
-                this.dls.closeEndpointDialog();
+                this.dialogService.closeEndpointDialog();
             },
             error: (error) => {
                 this.loading.set(false);

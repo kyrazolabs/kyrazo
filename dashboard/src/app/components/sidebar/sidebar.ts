@@ -34,6 +34,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { SupportDialogComponent } from '@shared/components/support-dialog/support-dialog.component';
 import { ToastModule } from 'primeng/toast';
 import { LayoutService } from '../service/layout.service';
+import { SubscriptionService } from '@core/services/subscription.service';
 
 @Component({
     selector: 'app-sidebar',
@@ -69,6 +70,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     private messageService = inject(MessageService);
     private dialogService = inject(DialogService);
     public layoutService = inject(LayoutService);
+    public subscriptionService = inject(SubscriptionService);
 
     currentRoute = '';
     dispatchDropdownOpen = false;

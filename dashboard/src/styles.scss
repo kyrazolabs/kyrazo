@@ -71,9 +71,9 @@ body {
         --p-tabs-tab-border-width: 0 0 1px 0 !important;
         --p-tabs-tablist-border-width: 0 0 2px 0 !important;
 
-        --tooltip-bg: var(--p-surface-900);
-        --tooltip-text: var(--p-surface-0);
-        --tooltip-border: var(--p-surface-700);
+        --tooltip-bg: var(--p-surface-50);
+        --tooltip-text: var(--p-surface-950);
+        --tooltip-border: var(--p-surface-200);
 
         --p-autocomplete-chip-border-radius: var(--radius-xl) !important;
         --p-autocomplete-dropdown-border-radius: var(--radius-xl) !important;
@@ -118,14 +118,10 @@ body {
     }
 
     .p-button, .click-effect, .p-select-option, .p-multiselect-option, .p-autocomplete-chip-item, .p-toggleswitch, .p-checkbox {
-        @apply transition-all! duration-300! ease-in-out!;
-
-        &:hover {
-            transform: translateY(0px);
-        }
+        @apply transition-all! duration-200! ease-in-out!;
 
         &:active {
-            transform: translateY(2px);
+            transform: translateY(2px) scale(0.99);
         }
     }
 
@@ -166,7 +162,7 @@ body {
             color: var(--tooltip-text) !important;
             border: 1px solid var(--tooltip-border) !important;
 
-            @apply text-xs/3 px-3 py-1! rounded-lg! shadow-xl;
+            @apply text-xs px-3 py-1! rounded-lg! shadow-xl font-medium!;
         }
 
         .p-tooltip-arrow {

@@ -8,6 +8,7 @@ import {
     EventEmitter,
     OnChanges,
     SimpleChanges,
+    computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -24,6 +25,7 @@ import { Router } from '@angular/router';
 import { SourceService } from '@core/services/source.service';
 import { EndpointService } from '@core/services/endpoint.service';
 import { DialogService } from '@shared/services/dialog.service';
+import { SubscriptionService } from '@core/services/subscription.service';
 import {
     CreateSourceRequest,
     UpdateSourceRequest,
@@ -94,11 +96,16 @@ export class SourceFormComponent implements OnInit, OnChanges {
     private fb = inject(FormBuilder);
     private mes = inject(MessageService);
     // private router = inject(Router); // Router not needed for navigation back
-    private sourceService = inject(SourceService);
-    private dls = inject(DialogService);
-    private endpointService = inject(EndpointService);
-    private sentry = inject(SentryService);
-    private posthog = inject(PostHogService);
+    private readonly sourceService = inject(SourceService);
+    public readonly dialogService = inject(DialogService);
+    private readonly endpointService = inject(EndpointService);
+    public readonly subscriptionService = inject(SubscriptionService);
+    private readonly sentry = inject(SentryService);
+    private readonly posthog = inject(PostHogService);
+
+    public readonly hasForwarding = computed(() =>
+        this.subscriptionService.hasFeature('forwardConfiguration'),
+    );
 
     @Input() sourceId: string | null = null;
     @Input() sourceType: string | null = null; // For default type when creating

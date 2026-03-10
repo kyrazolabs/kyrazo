@@ -1,20 +1,61 @@
 // Subscription and Billing Types
 
+export interface IPlanFeatures {
+    workers: number | string;
+    ingest: boolean;
+    dispatch: boolean;
+    support: string;
+    sla: string;
+    analytics: string;
+    retentionDays: number;
+    customHeaders: boolean;
+    customTimeout: boolean;
+    customRetries: boolean;
+    forwardConfiguration: boolean;
+    apiAccess: boolean;
+    batchProcessing: boolean;
+    ipWhitelisting?: boolean;
+    whiteLabelHeaders?: boolean;
+    customSla?: boolean;
+    customDomain?: boolean;
+    dedicatedInfrastructure?: boolean;
+    sso?: boolean;
+}
+
+export interface IPlanLimits {
+    eventsPerSecond: number;
+    eventsPerMonth: number;
+    maxNamespaces: number;
+    maxMembers: number;
+    maxConnectors: number;
+    maxIntegrations: number;
+    maxWorkers: number;
+    webhooks?: number;
+    maxTokens?: number;
+}
+
 export interface IPlan {
     id: string;
     name: string;
     slug: string;
     description?: string;
     price?: number;
-    priceCents?: number; // Backend uses cents
+    priceCents?: number;
     currency: string;
     frequency?: 'daily' | 'weekly' | 'monthly' | 'yearly';
-    interval?: 'month' | 'year'; // Backend uses interval
-    features: any; // Mixed object
-    limits: any; // Mixed object
+    interval?: 'month' | 'year';
+    features: IPlanFeatures;
+    limits: IPlanLimits;
     trialDays?: number;
     isActive: boolean;
     isPopular?: boolean;
+}
+
+export interface IPlanSnapshot extends Omit<
+    IPlan,
+    'isActive' | 'isPopular' | 'trialDays'
+> {
+    planId: string;
 }
 
 export interface ISubscription {
@@ -40,7 +81,7 @@ export interface ISubscription {
     currentPeriodStart: string;
     currentPeriodEnd: string;
     plan?: IPlan;
-    planSnapshot?: any;
+    planSnapshot?: IPlanSnapshot;
     createdAt: string;
     updatedAt: string;
     isVirtual?: boolean;

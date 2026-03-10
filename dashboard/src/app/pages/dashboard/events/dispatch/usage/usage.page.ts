@@ -1,4 +1,10 @@
-import { Component, OnInit, AfterViewInit, inject } from '@angular/core';
+import {
+    Component,
+    OnInit,
+    AfterViewInit,
+    inject,
+    computed,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -15,6 +21,7 @@ import {
 } from '@core/services/analytics.service';
 import { SentryService } from '@core/3rd-party/sentry';
 import { PostHogService } from '@core/3rd-party/posthog';
+import { SubscriptionService } from '@core/services/subscription.service';
 
 @Component({
     selector: 'app-usage.page',
@@ -34,6 +41,21 @@ export class UsagePage implements OnInit, AfterViewInit {
     private readonly analyticsService = inject(AnalyticsService);
     private readonly sentry = inject(SentryService);
     private readonly posthog = inject(PostHogService);
+    public readonly subscriptionService = inject(SubscriptionService);
+
+    public readonly hasAnalytics = computed(() => {
+        const analytics =
+            this.subscriptionService.subscription()?.planSnapshot?.features
+                ?.analytics;
+        if (
+            !analytics ||
+            analytics.toLowerCase() === 'none' ||
+            analytics.toLowerCase() === 'disabled'
+        ) {
+            return false;
+        }
+        return true;
+    });
 
     selectedTimeRange: TimeRange = 'last7days';
     timeRangeOptions = [

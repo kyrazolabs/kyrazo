@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -60,7 +60,8 @@ export class NamespacesPage implements OnInit {
     public subscriptionService = inject(SubscriptionService);
     public dialogService = inject(DialogService);
 
-    namespaces: INamespace[] = [];
+    namespaces = signal<INamespace[]>([]);
+    totalNamespaces = signal<number>(0);
     loading = false;
 
     // Dialog
@@ -79,10 +80,13 @@ export class NamespacesPage implements OnInit {
     isEdit = false;
 
     // Subscription & Features
+    public isLimitReached = computed(() => {
+        const max = this.subscriptionService.getLimit('maxNamespaces')();
+        return this.totalNamespaces() >= max;
+    });
 
     get hasWhiteLabelFeature(): boolean {
-        return !!this.subscriptionService.subscription()?.planSnapshot?.features
-            ?.whiteLabelHeaders;
+        return this.subscriptionService.hasFeature('whiteLabelHeaders')();
     }
 
     // Search
@@ -98,7 +102,10 @@ export class NamespacesPage implements OnInit {
             .getWorkspaceNamespaces({ q: this.searchQuery })
             .subscribe({
                 next: (res) => {
-                    this.namespaces = res.data;
+                    this.namespaces.set(res.data);
+                    this.totalNamespaces.set(
+                        res.pagination?.total || res.data.length,
+                    );
                     this.loading = false;
                 },
                 error: (err) => {

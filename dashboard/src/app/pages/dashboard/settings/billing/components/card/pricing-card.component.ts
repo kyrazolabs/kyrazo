@@ -41,6 +41,11 @@ export class PricingCardComponent {
         },
         { label: 'API Access', key: 'features.apiAccess', format: 'check' },
         {
+            label: 'IP Whitelist',
+            key: 'features.ipWhitelisting',
+            format: 'check',
+        },
+        {
             label: 'Custom Domain',
             key: 'features.customDomain',
             format: 'check',

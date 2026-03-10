@@ -12,7 +12,7 @@
 
     <!-- Control Center Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        @for (card of navCards; track card.title) {
+        @for (card of navCards(); track card.title) {
             <div class="group relative bg-surface-0 dark:bg-surface-950! border-2 border-surface-100 dark:border-surface-900 rounded-2xl p-4 hover:shadow-sm hover:border-primary-500/50 transition-all duration-300 cursor-pointer flex flex-col h-full"
                  [routerLink]="card.route">
 
@@ -78,10 +78,21 @@
             <label for="pdesc" class="font-medium">Description</label>
             <textarea pInputTextarea id="pdesc" [(ngModel)]="namespaceForm.description" rows="3" placeholder="Brief description of this namespace environment..." class="resize-none"></textarea>
         </div>
+        @if (isLimitReached()) {
+        <div class="p-3 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl flex items-start gap-3 mt-2 animate-fade-in">
+            <i class="pi pi-exclamation-triangle text-amber-500 mt-0.5"></i>
+            <div class="flex flex-col gap-1">
+                <span class="text-amber-800 dark:text-amber-400 font-semibold text-sm">Namespace limit reached</span>
+                <span class="text-amber-700 dark:text-amber-500 text-xs">You have reached the maximum number of namespaces for your current plan. Please upgrade to create more.</span>
+            </div>
+        </div>
+        }
     </div>
     <ng-template pTemplate="footer">
         <p-button label="Cancel" [text]="true" severity="secondary" (click)="namespaceDialogVisible = false" styleClass="rounded-xl!" />
-        <p-button label="Create Namespace" [loading]="isCreating" (click)="createNamespace()" [disabled]="!namespaceForm.name" styleClass="rounded-xl!" />
+        <p-button label="Create Namespace" [loading]="isCreating" (click)="createNamespace()" [disabled]="!namespaceForm.name || isLimitReached()"
+            [pTooltip]="isLimitReached() ? 'Limit reached' : ''"
+            styleClass="rounded-xl!" />
     </ng-template>
 </p-dialog>
 

@@ -13,8 +13,13 @@
                     <div class="flex items-center justify-center w-10 h-10 aspect-square bg-surface-100 dark:bg-surface-800 rounded-lg shrink-0">
                         <span class="text-xl font-semibold">#</span>
                     </div>
-                    <div class="flex flex-col min-w-0">
-                        <h2 class="font-semibold text-md truncate w-full">{{ selectedWorkspace?.name || 'Select Workspace' }}</h2>
+                    <div class="flex flex-col min-w-0 flex-1">
+                        <div class="flex items-center gap-2">
+                            <h2 class="font-semibold text-md truncate">{{ selectedWorkspace?.name || 'Select Workspace' }}</h2>
+                            @if (subscriptionService.subscription(); as sub) {
+                                <p-badge [value]="sub.planSnapshot?.name || sub.plan?.name || 'Free'" styleClass="text-[10px]! h-4! min-w-8" />
+                            }
+                        </div>
                         <p class="font-medium text-xs truncate w-full text-surface-500 dark:text-surface-400">{{ selectedWorkspace?.description || ''}}</p>
                     </div>
                 </div>
@@ -56,7 +61,7 @@
                                         <a pRipple [routerLink]="'/namespaces'"
                                             class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect"
                                             [class]="isRouteActive('/namespaces') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
-                                            <i class="icon-[hugeicons--dashboard-square-01] size-5 mr-2"></i>
+                                            <i class="icon-[hugeicons--dashboard-square-setting] size-5 mr-2"></i>
                                             <span class="font-medium">Namespaces</span>
                                         </a>
                                     </li>
@@ -114,89 +119,93 @@
                                             <span class="font-medium">Event Types</span>
                                         </a>
                                     </li> -->
-                                    <li>
-                                        <a pRipple
-                                            class="flex items-center cursor-pointer py-2 px-4 rounded-xl text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-500 transition-colors p-ripple click-effect"
-                                            (click)="toggleDispatch()">
-                                            <i class="icon-[hugeicons--rocket-01] size-5 mr-2"></i>
-                                            <span class="font-medium">Dispatch</span>
-                                            <i class="pi pi-chevron-down ml-auto duration-200 transition-transform" [class.rotate-180]="dispatchDropdownOpen"></i>
-                                        </a>
-                                        <ul
-                                            class="list-none py-0 pl-4 pr-0 m-0 space-y-1 overflow-y-hidden transition-[max-height,opacity] duration-500 ease-in-out"
-                                            [class]="dispatchDropdownOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'">
-                                            <li>
-                                                <a pRipple [routerLink]="'/events/dispatch'"
-                                                    class="flex items-center cursor-pointer py-2 px-4 mt-2 rounded-xl duration-150 transition-colors click-effect"
-                                                    [class]="isRouteActive('/events/dispatch') && !isRouteActive('/endpoints') && !isRouteActive('/events/dispatch/targets') && !isRouteActive('/events/dispatch/logs') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
-                                                    <i class="icon-[hugeicons--activity-03] size-5 mr-2"></i>
-                                                    <span class="font-medium">Usage</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a pRipple [routerLink]="'/events/dispatch/targets'"
-                                                    class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect"
-                                                    [class]="isRouteActive('/events/dispatch/targets') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
-                                                    <i class="icon-[hugeicons--target-02] size-5 mr-2"></i>
-                                                    <span class="font-medium">Targets</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a pRipple [routerLink]="'/events/dispatch/logs'"
-                                                    class="flex items-center cursor-pointer py-2 px-4 mb-2 rounded-xl duration-150 transition-colors click-effect"
-                                                    [class]="isRouteActive('/events/dispatch/logs') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
-                                                    <i class="icon-[hugeicons--transaction-history] size-5 mr-2"></i>
-                                                    <span class="font-medium">Logs</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </li>
+                                    @if (subscriptionService.hasFeature('dispatch')()) {
+                                        <li>
+                                            <a pRipple
+                                                class="flex items-center cursor-pointer py-2 px-4 rounded-xl text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-500 transition-colors p-ripple click-effect"
+                                                (click)="toggleDispatch()">
+                                                <i class="icon-[hugeicons--rocket-01] size-5 mr-2"></i>
+                                                <span class="font-medium">Dispatch</span>
+                                                <i class="pi pi-chevron-down ml-auto duration-200 transition-transform" [class.rotate-180]="dispatchDropdownOpen"></i>
+                                            </a>
+                                            <ul
+                                                class="list-none py-0 pl-4 pr-0 m-0 space-y-1 overflow-y-hidden transition-[max-height,opacity] duration-500 ease-in-out"
+                                                [class]="dispatchDropdownOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'">
+                                                <li>
+                                                    <a pRipple [routerLink]="'/events/dispatch'"
+                                                        class="flex items-center cursor-pointer py-2 px-4 mt-2 rounded-xl duration-150 transition-colors click-effect"
+                                                        [class]="isRouteActive('/events/dispatch') && !isRouteActive('/endpoints') && !isRouteActive('/events/dispatch/targets') && !isRouteActive('/events/dispatch/logs') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                        <i class="icon-[hugeicons--activity-03] size-5 mr-2"></i>
+                                                        <span class="font-medium">Usage</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a pRipple [routerLink]="'/events/dispatch/targets'"
+                                                        class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect"
+                                                        [class]="isRouteActive('/events/dispatch/targets') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                        <i class="icon-[hugeicons--target-02] size-5 mr-2"></i>
+                                                        <span class="font-medium">Targets</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a pRipple [routerLink]="'/events/dispatch/logs'"
+                                                        class="flex items-center cursor-pointer py-2 px-4 mb-2 rounded-xl duration-150 transition-colors click-effect"
+                                                        [class]="isRouteActive('/events/dispatch/logs') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                        <i class="icon-[hugeicons--transaction-history] size-5 mr-2"></i>
+                                                        <span class="font-medium">Logs</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    }
 
-                                    <li>
-                                        <a pRipple
-                                            class="flex items-center cursor-pointer py-2 px-4 rounded-xl text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-500 transition-colors p-ripple click-effect"
-                                            (click)="toggleIngest()">
-                                            <i class="icon-[hugeicons--inbox-download] size-5 mr-2"></i>
-                                            <span class="font-medium">Ingest</span>
-                                            <i class="pi pi-chevron-down ml-auto duration-200 transition-transform" [class.rotate-180]="ingestDropdownOpen"></i>
-                                        </a>
-                                        <ul
-                                            class="list-none py-0 pl-4 pr-0 m-0 space-y-1 overflow-y-hidden transition-[max-height,opacity] duration-500 ease-in-out"
-                                            [class]="ingestDropdownOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'">
-                                            <li>
-                                                <a pRipple [routerLink]="'/events/ingest'"
-                                                    class="flex items-center cursor-pointer py-2 px-4 mt-2 rounded-xl duration-150 transition-colors click-effect"
-                                                    [class]="isRouteActive('/events/ingest') && !isRouteActive('/endpoints') && !isRouteActive('/events/ingest/sources') && !isRouteActive('/events/ingest/endpoints') && !isRouteActive('/events/ingest/logs') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
-                                                    <i class="icon-[hugeicons--activity-03] size-5 mr-2"></i>
-                                                    <span class="font-medium">Usage</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a pRipple [routerLink]="'/events/ingest/sources'"
-                                                    class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect"
-                                                    [class]="isRouteActive('/events/ingest/sources') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
-                                                    <i class="icon-[hugeicons--live-streaming-02] size-5 mr-2"></i>
-                                                    <span class="font-medium">Source</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a pRipple [routerLink]="'/events/ingest/endpoints'"
-                                                    class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect"
-                                                    [class]="isRouteActive('/events/ingest/endpoints') || isRouteActive('/endpoints') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
-                                                    <i class="pi pi-link mr-2"></i>
-                                                    <span class="font-medium">Endpoints</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a pRipple [routerLink]="'/events/ingest/logs'"
-                                                    class="flex items-center cursor-pointer py-2 px-4 mb-2 rounded-xl duration-150 transition-colors click-effect"
-                                                    [class]="isRouteActive('/events/ingest/logs') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
-                                                    <i class="icon-[hugeicons--transaction-history] size-5 mr-2"></i>
-                                                    <span class="font-medium">Logs</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </li>
+                                    @if (subscriptionService.hasFeature('ingest')()) {
+                                        <li>
+                                            <a pRipple
+                                                class="flex items-center cursor-pointer py-2 px-4 rounded-xl text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-500 transition-colors p-ripple click-effect"
+                                                (click)="toggleIngest()">
+                                                <i class="icon-[hugeicons--inbox-download] size-5 mr-2"></i>
+                                                <span class="font-medium">Ingest</span>
+                                                <i class="pi pi-chevron-down ml-auto duration-200 transition-transform" [class.rotate-180]="ingestDropdownOpen"></i>
+                                            </a>
+                                            <ul
+                                                class="list-none py-0 pl-4 pr-0 m-0 space-y-1 overflow-y-hidden transition-[max-height,opacity] duration-500 ease-in-out"
+                                                [class]="ingestDropdownOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'">
+                                                <li>
+                                                    <a pRipple [routerLink]="'/events/ingest'"
+                                                        class="flex items-center cursor-pointer py-2 px-4 mt-2 rounded-xl duration-150 transition-colors click-effect"
+                                                        [class]="isRouteActive('/events/ingest') && !isRouteActive('/endpoints') && !isRouteActive('/events/ingest/sources') && !isRouteActive('/events/ingest/endpoints') && !isRouteActive('/events/ingest/logs') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                        <i class="icon-[hugeicons--activity-03] size-5 mr-2"></i>
+                                                        <span class="font-medium">Usage</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a pRipple [routerLink]="'/events/ingest/sources'"
+                                                        class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect"
+                                                        [class]="isRouteActive('/events/ingest/sources') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                        <i class="icon-[hugeicons--live-streaming-02] size-5 mr-2"></i>
+                                                        <span class="font-medium">Source</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a pRipple [routerLink]="'/events/ingest/endpoints'"
+                                                        class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect"
+                                                        [class]="isRouteActive('/events/ingest/endpoints') || isRouteActive('/endpoints') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                        <i class="pi pi-link mr-2"></i>
+                                                        <span class="font-medium">Endpoints</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a pRipple [routerLink]="'/events/ingest/logs'"
+                                                        class="flex items-center cursor-pointer py-2 px-4 mb-2 rounded-xl duration-150 transition-colors click-effect"
+                                                        [class]="isRouteActive('/events/ingest/logs') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                        <i class="icon-[hugeicons--transaction-history] size-5 mr-2"></i>
+                                                        <span class="font-medium">Logs</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    }
                                 </ul>
                             </li>
                             <li>

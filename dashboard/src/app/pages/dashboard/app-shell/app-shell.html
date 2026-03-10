@@ -270,3 +270,22 @@
 </p-dialog>
 
 <app-twofa-setup-dialog></app-twofa-setup-dialog>
+
+<!-- Invite Member Dialog (Global) -->
+<p-dialog
+    header="Invite Team Member"
+    [(visible)]="inviteMemberDialogVisible"
+    [modal]="true"
+    [style]="{ width: '500px' }"
+    [breakpoints]="{ '960px': '75vw', '640px': '90vw' }"
+    styleClass="rounded-2xl!"
+    [draggable]="false"
+    [resizable]="false"
+    (onHide)="onInviteMemberDialogHide()"
+>
+    <app-invite-member-form
+        [workspaceId]="inviteMemberWorkspaceId"
+        (onSuccess)="onInviteMemberSuccess($event)"
+        (onCancel)="onInviteMemberDialogHide()"
+    ></app-invite-member-form>
+</p-dialog>

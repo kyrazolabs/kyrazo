@@ -171,4 +171,7 @@ export const environment = {
         ingress: (id: string) =>
             `https://api.kyrazo.com/dashboard/v1/ingest/${id}`,
     },
+    worker: {
+        status: `https://api.kyrazo.com/dashboard/v1/workers/status`,
+    },
 };

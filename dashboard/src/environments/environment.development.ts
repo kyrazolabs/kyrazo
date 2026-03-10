@@ -138,4 +138,7 @@ export const environment = {
         getBySource: (id: string) => `${baseUrl}/v1/ingest/source/${id}`,
         ingress: (id: string) => `${baseUrl}/v1/ingest/${id}`,
     },
+    worker: {
+        status: `${baseUrl}/v1/workers/status`,
+    },
 };
