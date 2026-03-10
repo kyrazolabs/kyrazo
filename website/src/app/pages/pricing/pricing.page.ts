@@ -10,6 +10,7 @@ import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directiv
 import { PostHogService } from '@core/3rd-party/posthog';
 import { SeoService } from '@core/services/seo.service';
 import { PricingService } from '@core/services/pricing.service';
+import { AvatarModule } from 'primeng/avatar';
 
 @Component({
     selector: 'app-pricing-page',
@@ -20,6 +21,7 @@ import { PricingService } from '@core/services/pricing.service';
         CtaComponent,
         PricingCardComponent,
         ScrollRevealDirective,
+        AvatarModule,
     ],
     templateUrl: './pricing.page.html',
     styleUrl: './pricing.page.scss',

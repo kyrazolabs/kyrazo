@@ -8,6 +8,9 @@ import { FaqComponent } from '@pages/landing/components/faq/faq.component';
 import { TrustComponent } from '@pages/landing/components/trust/trust.component';
 import { Motivation } from '@pages/landing/components/motivation/motivation';
 import { DedicatedWorkersComponent } from '@pages/landing/components/dedicated-workers/dedicated-workers.component';
+import { PricingComponent } from '@pages/landing/components/pricing/pricing.component';
+import { IntegrationsComponent } from '@pages/landing/components/integrations/integrations.component';
+import { ComparisonComponent } from '@pages/landing/components/comparison/comparison.component';
 
 import { PostHogService } from '@core/3rd-party/posthog';
 import { SeoService } from '@core/services/seo.service';
@@ -25,6 +28,9 @@ import { SeoService } from '@core/services/seo.service';
         FaqComponent,
         TrustComponent,
         Motivation,
+        PricingComponent,
+        IntegrationsComponent,
+        ComparisonComponent,
     ],
     templateUrl: './landing.page.html',
     styleUrl: './landing.page.scss',

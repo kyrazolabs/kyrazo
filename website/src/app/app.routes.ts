@@ -67,6 +67,34 @@ export const routes: Routes = [
                 },
             },
             {
+                path: 'legal/gdpr',
+                loadComponent: () =>
+                    import('@pages/legal/policies/gdpr/gdpr.page').then(
+                        (p) => p.GDPRPage,
+                    ),
+                data: {
+                    title: 'GDPR Compliance - Kyrazo',
+                    meta: {
+                        description:
+                            "Kyrazo's commitment to GDPR and data protection. Learn about your rights and how we handle your data.",
+                    },
+                },
+            },
+            {
+                path: 'legal/dpa',
+                loadComponent: () =>
+                    import('@pages/legal/policies/dpa/dpa.page').then(
+                        (p) => p.DPAPage,
+                    ),
+                data: {
+                    title: 'Data Processing Agreement - Kyrazo',
+                    meta: {
+                        description:
+                            "Kyrazo's Data Processing Agreement (DPA). Understand how we process personal data on your behalf.",
+                    },
+                },
+            },
+            {
                 path: 'blog',
                 loadChildren: () =>
                     import('./pages/blog/blog.routes').then(

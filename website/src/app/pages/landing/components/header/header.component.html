@@ -18,7 +18,7 @@
                     'bg-transparent border-transparent!': isScrolled
                 }">
                 @for (item of items; track $index) {
-                    <div class="relative flex items-center"
+                    <div class="relative flex items-center click-effect"
                         (mouseenter)="item.items ? onMouseEnter(item.label!) : null"
                         (mouseleave)="item.items ? onMouseLeave() : null">
 
@@ -45,7 +45,7 @@
                                     <a
                                         [routerLink]="subItem.routerLink"
                                         (click)="subItem.command?.({originalEvent: $event})"
-                                        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-surface-600 dark:text-surface-300 hover:text-primary-500 hover:bg-primary-500/5 dark:hover:bg-surface-800 transition-colors cursor-pointer no-underline">
+                                        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-surface-600 dark:text-surface-300 hover:text-primary-500 hover:bg-primary-500/5 dark:hover:bg-surface-800 transition-colors cursor-pointer no-underline click-effect">
                                         @if (subItem.icon) {
                                             <i [class]="subItem.icon + ' text-lg'"></i>
                                         }

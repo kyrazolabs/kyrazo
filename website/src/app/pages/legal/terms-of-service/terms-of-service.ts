@@ -1,20 +1,21 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject } from '@angular/core';
 
-import { CommonModule } from "@angular/common";
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
-import { PostHogService } from "@core/3rd-party/posthog";
+import { PostHogService } from '@core/3rd-party/posthog';
 
 @Component({
-  selector: "app-terms-of-service",
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: "./terms-of-service.html",
-  styleUrl: "./terms-of-service.scss",
+    selector: 'app-terms-of-service',
+    standalone: true,
+    imports: [CommonModule, RouterLink],
+    templateUrl: './terms-of-service.html',
+    styleUrl: './terms-of-service.scss',
 })
 export class TermsOfService {
-  private posthog = inject(PostHogService);
+    private posthog = inject(PostHogService);
 
-  ngOnInit() {
-    this.posthog.capture("terms_of_service_viewed");
-  }
+    ngOnInit() {
+        this.posthog.capture('terms_of_service_viewed');
+    }
 }
