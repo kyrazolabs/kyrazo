@@ -113,8 +113,12 @@ export class UsagePage implements OnInit, AfterViewInit {
     sourceLogs: any[];
 
     async ngOnInit() {
-        this.posthog.capture('usage_viewed', { type: 'ingest' });
-        await this.loadAnalytics();
+        if (this.hasAnalytics()) {
+            this.posthog.capture('usage_viewed', { type: 'ingest' });
+            await this.loadAnalytics();
+        } else {
+            this.loadingCharts = false;
+        }
     }
 
     ngAfterViewInit() {
@@ -134,6 +138,10 @@ export class UsagePage implements OnInit, AfterViewInit {
     }
 
     async loadAnalytics() {
+        if (!this.hasAnalytics()) {
+            this.loadingCharts = false;
+            return;
+        }
         return new Promise<void>((resolve) => {
             this.analyticsService
                 .getIngestUsage(this.selectedTimeRange)
@@ -185,6 +193,8 @@ export class UsagePage implements OnInit, AfterViewInit {
     }
 
     onTimeRangeChange() {
+        if (!this.hasAnalytics()) return;
+
         this.loadingCharts = true;
         this.posthog.capture('usage_timerange_changed', {
             type: 'ingest',
