@@ -182,6 +182,7 @@ export class TopbarComponent implements OnInit {
         this.ps.getWorkspaceNamespaces().subscribe({
             next: (response) => {
                 this.namespaces = response.data;
+
                 // Try to restore previously selected namespace
                 const namespaceId = this.ss.getItem<string>('namespace');
                 if (namespaceId) {
@@ -190,6 +191,10 @@ export class TopbarComponent implements OnInit {
                     );
                     if (savedNamespace) {
                         this.selectedNamespace = savedNamespace;
+                    } else {
+                        // Invalidate stale selection
+                        this.ss.removeItem('namespace');
+                        this.selectedNamespace = null;
                     }
                 }
 
@@ -198,6 +203,7 @@ export class TopbarComponent implements OnInit {
                     this.selectedNamespace = this.namespaces[0];
                     this.ss.setItem('namespace', this.selectedNamespace.id);
                 }
+
 
                 // Only redirect to Launchpad if no namespaces exist AND we are not in a settings page
                 if (
