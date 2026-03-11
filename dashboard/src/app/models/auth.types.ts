@@ -24,9 +24,9 @@ export interface UserProfileResponse {
     timeZone: string;
     language: string;
     isActive: boolean;
-    lastLogin: Date;
-    createdAt: Date;
-    updatedAt: Date;
+    lastLogin: string;
+    createdAt: string;
+    updatedAt: string;
     is2FAEnabled: boolean;
 }
 
