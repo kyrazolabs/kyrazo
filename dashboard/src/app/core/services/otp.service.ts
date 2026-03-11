@@ -22,6 +22,7 @@ export class OtpService {
         onCancel: () => {},
     };
 
+    private currentOtpPromise: Promise<boolean> | null = null;
     state = signal<OtpDialogState>(this.initialState);
 
     showOtpDialog(
@@ -29,7 +30,11 @@ export class OtpService {
         message: string = 'Verification Required',
         method?: 'app' | 'email',
     ): Promise<boolean> {
-        return new Promise((resolve) => {
+        if (this.currentOtpPromise) {
+            return this.currentOtpPromise;
+        }
+
+        this.currentOtpPromise = new Promise((resolve) => {
             this.state.set({
                 show: true,
                 action,
@@ -45,9 +50,13 @@ export class OtpService {
                 },
             });
         });
+
+        return this.currentOtpPromise;
     }
 
     close() {
+        this.currentOtpPromise = null;
         this.state.set(this.initialState);
     }
+
 }
