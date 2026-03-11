@@ -199,15 +199,16 @@ export class AuthService {
         });
     }
 
-    handleRefreshSuccess(response: LoginResponse): void {
+    handleRefreshSuccess(response: ApiResponse<RefreshTokenResponse>): void {
         if (!response.data) {
             return;
         }
-        const { access, refresh } = response.data.tokens;
+        const { accessToken, refreshToken } = response.data;
 
-        this.storage.setItem('access_token', access);
-        this.storage.setItem('refresh_token', refresh);
+        this.storage.setItem('access_token', accessToken);
+        this.storage.setItem('refresh_token', refreshToken);
     }
+
     private handleError(error: HttpErrorResponse): Observable<never> {
         console.error('AuthService Error:', error);
         return throwError(() => error);

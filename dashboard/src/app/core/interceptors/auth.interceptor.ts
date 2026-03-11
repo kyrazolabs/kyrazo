@@ -10,6 +10,9 @@ import { AuthService } from '../auth/auth.service';
 import { BehaviorSubject, Observable, throwError, from } from 'rxjs';
 import { catchError, filter, switchMap, take } from 'rxjs/operators';
 import { OtpService } from '../services/otp.service';
+import { ApiResponse } from '@models/index';
+import { RefreshTokenResponse } from '@models/auth.types';
+
 
 let isRefreshing = false;
 const refreshTokenSubject = new BehaviorSubject<string | null>(null);
@@ -90,14 +93,15 @@ function handle401Error(
         refreshTokenSubject.next(null);
 
         return authService.refreshToken(authService.getRToken()!).pipe(
-            switchMap((authResponse: any) => {
+            switchMap((authResponse: ApiResponse<RefreshTokenResponse>) => {
                 isRefreshing = false;
-                console.log('Auth Response ' + authResponse);
+                const newAccessToken = authResponse.data.accessToken;
 
                 authService.handleRefreshSuccess(authResponse);
-                refreshTokenSubject.next(authResponse);
-                return next(addToken(req, authResponse));
+                refreshTokenSubject.next(newAccessToken);
+                return next(addToken(req, newAccessToken));
             }),
+
             catchError((error) => {
                 isRefreshing = false;
                 return throwError(() => error);
