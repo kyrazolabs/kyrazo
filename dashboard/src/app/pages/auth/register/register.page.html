@@ -22,7 +22,7 @@
         </ng-template>
 
         <ng-template pTemplate="content">
-            <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+            <form *ngIf="!pending2FA()" [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
 
                 <!-- Name Fields -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -142,6 +142,46 @@
                         [disabled]="loading()" styleClass="w-full rounded-xl! font-medium"></p-button>
                 </div>
             </form>
+
+            <!-- 2FA Step -->
+            <div *ngIf="pending2FA()" class="space-y-6">
+                <div class="text-center">
+                    <div class="mb-4">
+                        <i class="pi pi-envelope text-4xl text-primary"></i>
+                    </div>
+                    <div class="text-xl font-semibold mb-2">Verify your Email</div>
+                    <p class="text-surface-600 dark:text-surface-300 text-sm mb-6">
+                        We've sent a 6-digit verification code to your email address. Please enter it below to complete your registration.
+                    </p>
+
+                    <div class="flex justify-center">
+                        <p-inputotp
+                            [(ngModel)]="otpCode"
+                            [length]="6"
+                            [integerOnly]="true"
+                            (onComplete)="verify2FA()"
+                        ></p-inputotp>
+                    </div>
+                </div>
+
+                <p-button
+                    label="Verify Account"
+                    icon="pi pi-check-circle"
+                    [loading]="loading()"
+                    (onClick)="verify2FA()"
+                    [disabled]="otpCode().length < 6"
+                    styleClass="w-full rounded-xl! font-medium"
+                />
+
+                <div class="text-center">
+                    <button type="button"
+                        class="text-surface-600 dark:text-surface-400 hover:text-primary transition-colors duration-200 bg-transparent border-0 cursor-pointer text-sm font-medium click-effect"
+                        (click)="pending2FA.set(false)">
+                        <i class="pi pi-arrow-left mr-1 text-xs"></i>
+                        Back to registration
+                    </button>
+                </div>
+            </div>
         </ng-template>
     </p-card>
     </div>

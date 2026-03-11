@@ -6,6 +6,7 @@ import {
     ViewChild,
     ElementRef,
     HostListener,
+    signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -33,14 +34,17 @@ import { MenuModule } from 'primeng/menu';
 import { Popover, PopoverModule } from 'primeng/popover';
 import { AvatarModule } from 'primeng/avatar';
 import { BadgeModule } from 'primeng/badge';
-import { IProject } from '@models/project.types';
+import { INamespace } from '@models/namespace.types';
 import { StorageService } from '@core/services/storage.service';
-import { ProjectService } from '@core/services/project.service';
-import { CreateFirstProjectComponent } from '../launchpad/projects/create-first-project/create-first-project';
+import { NamespaceService } from '@core/services/namespace.service';
+import { CreateFirstNamespaceComponent } from '../launchpad/namespaces/create-first-namespace/create-first-namespace';
 import { AuthService } from '@core/auth/auth.service';
+import { WorkerComponent } from '../worker/worker';
+import { WorkerService } from '@core/services/worker.service';
 
 @Component({
     selector: 'app-topbar',
+    standalone: true,
     imports: [
         CommonModule,
         FormsModule,
@@ -57,6 +61,7 @@ import { AuthService } from '@core/auth/auth.service';
         PopoverModule,
         AvatarModule,
         BadgeModule,
+        WorkerComponent,
     ],
     templateUrl: './topbar.html',
     styleUrl: './topbar.scss',
@@ -65,12 +70,14 @@ import { AuthService } from '@core/auth/auth.service';
 export class TopbarComponent implements OnInit {
     private as = inject(AuthService);
     private ss = inject(StorageService);
-    private ps = inject(ProjectService);
+    private ps = inject(NamespaceService);
     private dialogService = inject(DialogService);
+    protected workerService = inject(WorkerService);
 
     layoutService: LayoutService = inject(LayoutService);
 
     visible: boolean = false;
+    workerDrawerVisible = signal(false);
 
     value1: string = '';
     pageTitle = '';
@@ -80,11 +87,11 @@ export class TopbarComponent implements OnInit {
     isDarkMode = computed(() => this.layoutService.appState().darkMode);
     isOpenSidebar = computed(() => this.layoutService.appState().openSidebar);
 
-    selectedProject: IProject | null = null;
-    projects: IProject[] = [];
-    loadingProjects: boolean = false;
-    showFirstProjectDialog: boolean = false;
-    firstProjectDialogVisible: boolean = false;
+    selectedNamespace: INamespace | null = null;
+    namespaces: INamespace[] = [];
+    loadingNamespaces: boolean = false;
+    showFirstNamespaceDialog: boolean = false;
+    firstNamespaceDialogVisible: boolean = false;
     showConfig = false;
 
     @ViewChild(AppConfig, { read: ElementRef }) configPanel!: ElementRef;
@@ -118,22 +125,22 @@ export class TopbarComponent implements OnInit {
     ) {
         this.store.changes$.subscribe((change) => {
             if (change?.key === 'workspace') {
-                this.selectedProject = null;
-                this.ss.removeItem('project');
-                this.loadProjects();
+                this.selectedNamespace = null;
+                this.ss.removeItem('namespace');
+                this.loadNamespaces();
             }
             if (change?.key === 'avatar') {
                 this.avatar = this.ss.getItem('avatar');
-                this.loadProjects();
+                this.loadNamespaces();
             }
         });
     }
 
-    showCreateProject() {
+    showCreateNamespace() {
         this.visible = true;
     }
 
-    toggleProjectSelector(event: any) {
+    toggleNamespaceSelector(event: any) {
         this.pp.toggle(event);
     }
 
@@ -148,80 +155,86 @@ export class TopbarComponent implements OnInit {
         // Initialize avatar
         this.avatar = this.ss.getItem('avatar');
 
-        // Initialize project selection on load
-        this.initializeProjectSelection();
+        // Initialize namespace selection on load
+        this.initializeNamespaceSelection();
 
-        // Listen for project updates
-        this.ps.projectsUpdated$.subscribe(() => {
-            this.loadProjects();
+        // Initialize worker loading
+        this.workerService.loadWorkers();
+
+        // Listen for namespace updates
+        this.ps.namespacesUpdated$.subscribe(() => {
+            this.loadNamespaces();
         });
     }
-    selectProject(project: IProject) {
-        this.selectedProject = project;
-        this.ss.setItem('project', project.id);
+    selectNamespace(namespace: INamespace) {
+        this.selectedNamespace = namespace;
+        this.ss.setItem('namespace', namespace.id);
         // Close the popover after selection
         this.pp.hide();
     }
 
-    loadProjects() {
-        this.loadingProjects = true;
-        this.ps.getWorkspaceProjects().subscribe({
+    loadNamespaces() {
+        this.loadingNamespaces = true;
+        this.ps.getWorkspaceNamespaces().subscribe({
             next: (response) => {
-                this.projects = response.data;
-                // Try to restore previously selected project
-                const projectId = this.ss.getItem<string>('project');
-                if (projectId) {
-                    const savedProject = this.projects.find(
-                        (p) => p.id === projectId,
+                this.namespaces = response.data;
+                // Try to restore previously selected namespace
+                const namespaceId = this.ss.getItem<string>('namespace');
+                if (namespaceId) {
+                    const savedNamespace = this.namespaces.find(
+                        (p) => p.id === namespaceId,
                     );
-                    if (savedProject) {
-                        this.selectedProject = savedProject;
+                    if (savedNamespace) {
+                        this.selectedNamespace = savedNamespace;
                     }
                 }
 
-                // Select first project by default if available and none selected
-                if (this.projects.length > 0 && !this.selectedProject) {
-                    this.selectedProject = this.projects[0];
-                    this.ss.setItem('project', this.selectedProject.id);
+                // Select first namespace by default if available and none selected
+                if (this.namespaces.length > 0 && !this.selectedNamespace) {
+                    this.selectedNamespace = this.namespaces[0];
+                    this.ss.setItem('namespace', this.selectedNamespace.id);
                 }
 
-                // Redirect to Launchpad if no projects exist in this workspace
-                if (this.projects.length === 0) {
+                // Only redirect to Launchpad if no namespaces exist AND we are not in a settings page
+                if (
+                    this.namespaces.length === 0 &&
+                    !this.router.url.includes('/settings')
+                ) {
                     this.router.navigate(['/launchpad']);
                 }
 
-                this.loadingProjects = false;
+                this.loadingNamespaces = false;
             },
             error: (error) => {
-                console.error('Failed to load projects:', error);
-                this.loadingProjects = false;
+                console.error('Failed to load namespaces:', error);
+                this.loadingNamespaces = false;
             },
         });
     }
 
-    private initializeProjectSelection() {
-        // Check if workspace exists and load projects
+    private initializeNamespaceSelection() {
+        // Check if workspace exists and load namespaces
         const workspaceId = this.ss.getItem<string>('workspace');
         if (workspaceId) {
-            this.loadProjects();
+            this.loadNamespaces();
         }
     }
 
-    // First project dialog event handlers
-    onFirstProjectCreated(project: IProject) {
-        console.log('First project created:', project.name);
-        this.selectedProject = project;
-        this.projects.push(project);
-        this.firstProjectDialogVisible = false;
+    // First namespace dialog event handlers
+    onFirstNamespaceCreated(namespace: INamespace) {
+        console.log('First namespace created:', namespace.name);
+        this.selectedNamespace = namespace;
+        this.namespaces.push(namespace);
+        this.firstNamespaceDialogVisible = false;
     }
 
-    onFirstProjectDialogVisibleChange(visible: boolean) {
-        this.firstProjectDialogVisible = visible;
+    onFirstNamespaceDialogVisibleChange(visible: boolean) {
+        this.firstNamespaceDialogVisible = visible;
     }
 
-    onFirstProjectSkipped() {
-        console.log('First project dialog skipped');
-        this.firstProjectDialogVisible = false;
+    onFirstNamespaceSkipped() {
+        console.log('First namespace dialog skipped');
+        this.firstNamespaceDialogVisible = false;
     }
 
     private getRouteTitle(route: ActivatedRoute): string | undefined {

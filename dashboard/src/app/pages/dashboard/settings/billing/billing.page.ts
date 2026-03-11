@@ -205,6 +205,11 @@ export class BillingSettingsPage implements OnInit {
             return;
         }
 
+        if (plan.slug === 'free') {
+            this.cancelSubscription();
+            return;
+        }
+
         // Logic to find the specific backend plan (IPlan) based on interval
         const targetPlan = this.availablePlans.find((p) => {
             const matchesSlug = (p.slug || '')

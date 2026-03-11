@@ -897,7 +897,7 @@ export class TargetPage implements OnInit, AfterViewInit {
             } else {
                 filled.push({
                     workspace_id: deliveryTrends[0]?.workspace_id || '',
-                    project_id: deliveryTrends[0]?.project_id || '',
+                    namespace_id: deliveryTrends[0]?.namespace_id || '',
                     day: dayStr,
                     target: deliveryTrends[0]?.target || '',
                     successful: 0,
@@ -931,7 +931,7 @@ export class TargetPage implements OnInit, AfterViewInit {
         monthMap.forEach((data, monthKey) => {
             aggregated.push({
                 workspace_id: deliveryTrends[0]?.workspace_id || '',
-                project_id: deliveryTrends[0]?.project_id || '',
+                namespace_id: deliveryTrends[0]?.namespace_id || '',
                 day: monthKey,
                 target: deliveryTrends[0]?.target || '',
                 successful: data.successful,

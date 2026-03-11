@@ -27,8 +27,8 @@ export class PricingCardComponent {
             format: 'number',
         },
         {
-            label: 'Max Projects',
-            key: 'limits.maxProjects',
+            label: 'Max Namespaces',
+            key: 'limits.maxNamespaces',
             format: 'unlimited',
         },
         { label: 'Max Members', key: 'limits.maxMembers', format: 'unlimited' },
@@ -40,6 +40,11 @@ export class PricingCardComponent {
             format: 'check',
         },
         { label: 'API Access', key: 'features.apiAccess', format: 'check' },
+        {
+            label: 'IP Whitelist',
+            key: 'features.ipWhitelisting',
+            format: 'check',
+        },
         {
             label: 'Custom Domain',
             key: 'features.customDomain',

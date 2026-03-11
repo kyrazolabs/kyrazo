@@ -39,6 +39,20 @@ export class DialogService {
     }>({ visible: false });
     billingDialogState$ = this.billingDialogStateSubject.asObservable();
 
+    // 2FA Setup Dialog State
+    private twofaSetupDialogStateSubject = new BehaviorSubject<{
+        visible: boolean;
+    }>({ visible: false });
+    twofaSetupDialogState$ = this.twofaSetupDialogStateSubject.asObservable();
+
+    // Invite Member Dialog State
+    private inviteMemberDialogStateSubject = new BehaviorSubject<{
+        visible: boolean;
+        workspaceId: string | null;
+    }>({ visible: false, workspaceId: null });
+    inviteMemberDialogState$ =
+        this.inviteMemberDialogStateSubject.asObservable();
+
     // Event Sources
     private sourceSavedSource = new Subject<any>();
     sourceSaved$ = this.sourceSavedSource.asObservable();
@@ -48,6 +62,12 @@ export class DialogService {
 
     private targetSavedSource = new Subject<any>();
     targetSaved$ = this.targetSavedSource.asObservable();
+
+    private twofaEnabledSource = new Subject<void>();
+    twofaEnabled$ = this.twofaEnabledSource.asObservable();
+
+    private memberInvitedSource = new Subject<any>();
+    memberInvited$ = this.memberInvitedSource.asObservable();
 
     private router = inject(Router);
 
@@ -114,5 +134,37 @@ export class DialogService {
 
     closeBillingDialog() {
         this.billingDialogStateSubject.next({ visible: false });
+    }
+
+    // 2FA Setup Dialog Methods
+    openTwofaSetupDialog() {
+        this.twofaSetupDialogStateSubject.next({ visible: true });
+    }
+
+    closeTwofaSetupDialog() {
+        this.twofaSetupDialogStateSubject.next({ visible: false });
+    }
+
+    notifyTwofaEnabled() {
+        this.twofaEnabledSource.next();
+    }
+
+    // Invite Member Dialog Methods
+    openInviteMemberDialog(workspaceId: string | null = null) {
+        this.inviteMemberDialogStateSubject.next({
+            visible: true,
+            workspaceId,
+        });
+    }
+
+    closeInviteMemberDialog() {
+        this.inviteMemberDialogStateSubject.next({
+            visible: false,
+            workspaceId: null,
+        });
+    }
+
+    notifyMemberInvited(data?: any) {
+        this.memberInvitedSource.next(data);
     }
 }

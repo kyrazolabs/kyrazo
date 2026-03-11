@@ -72,25 +72,25 @@
     <!-- Tabs Content -->
     <p-tabs [value]="currentTab" (valueChange)="onTabChange($event)">
         <p-tablist styleClass="gap-2 border-none!">
-            <p-tab value="profile">
+            <p-tab value="profile" class="click-effect">
                 <div class="flex items-center gap-2">
                     <i class="icon-[hugeicons--user-03] text-lg!"></i>
                     <span>Profile</span>
                 </div>
             </p-tab>
-            <!-- <p-tab value="notifications">
+            <!-- <p-tab value="notifications" class="click-effect">
                 <div class="flex items-center gap-2">
                     <i class="icon-[hugeicons--notification-01] text-lg!"></i>
                     <span>Notifications</span>
                 </div>
             </p-tab> -->
-            <p-tab value="workspace">
+            <p-tab value="workspace" class="click-effect">
                 <div class="flex items-center gap-2">
                     <i class="icon-[hugeicons--briefcase-08] text-lg!"></i>
                     <span>Workspace</span>
                 </div>
             </p-tab>
-            <p-tab value="billing">
+            <p-tab value="billing" class="click-effect">
                 <div class="flex items-center gap-2">
                     <i class="icon-[hugeicons--credit-card] text-lg!"></i>
                     <span>Billing</span>
@@ -116,6 +116,6 @@
 </div>
 
 <p-toast />
-<p-confirmDialog [style]="{ width: '400px' }"
+<!-- <p-confirmDialog [style]="{ width: '400px' }"
     [breakpoints]="{ '960px': '90vw', '640px': '90vw' }"
-    styleClass="rounded-2xl!" />
+    styleClass="rounded-2xl!" /> -->

@@ -33,7 +33,7 @@ export interface PricingPlan {
     limits: {
         eventsPerSecond: number;
         eventsPerMonth: number;
-        maxProjects: number;
+        maxNamespaces: number;
         maxMembers: number;
         maxConnectors: number;
         maxIntegrations: number;
@@ -96,7 +96,7 @@ export const MANUAL_CUSTOM_PLAN: PricingPlan = {
     limits: {
         eventsPerSecond: -1,
         eventsPerMonth: -1,
-        maxProjects: -1,
+        maxNamespaces: -1,
         maxMembers: -1,
         maxConnectors: -1,
         maxIntegrations: -1,

@@ -23,6 +23,8 @@ import { LayoutService } from '@components/service/layout.service';
 import { SourceFormComponent } from '../events/ingest/sources/components/source-form/source-form.component';
 import { EndpointFormComponent } from '../events/ingest/endpoints/components/endpoint-form/endpoint-form.component';
 import { TargetFormComponent } from '../events/dispatch/targets/components/target-form/target-form.component';
+import { TwofaSetupDialogComponent } from '@shared/components/twofa-setup-dialog/twofa-setup-dialog.component';
+import { InviteMemberFormComponent } from '@shared/components/invite-member-form/invite-member-form.component';
 
 @Component({
     selector: 'app-shell',
@@ -37,6 +39,8 @@ import { TargetFormComponent } from '../events/dispatch/targets/components/targe
         SourceFormComponent,
         EndpointFormComponent,
         TargetFormComponent,
+        TwofaSetupDialogComponent,
+        InviteMemberFormComponent,
     ],
     templateUrl: './app-shell.html',
     styleUrl: './app-shell.scss',
@@ -83,8 +87,9 @@ export class AppShell implements OnInit, AfterViewInit {
     targetDialogId: string | null = null;
     targetDialogHeader = 'Create Target';
 
-    // Billing Dialog
-    billingDialogVisible = false;
+    // Invite Member Dialog
+    inviteMemberDialogVisible = false;
+    inviteMemberWorkspaceId: string | null = null;
 
     constructor(private dialogService: DialogService) {}
 
@@ -140,6 +145,12 @@ export class AppShell implements OnInit, AfterViewInit {
             this.targetDialogHeader = state.targetId
                 ? 'Edit Target'
                 : 'Create Target';
+        });
+
+        // Listen for Invite Member Dialog State
+        this.dialogService.inviteMemberDialogState$.subscribe((state) => {
+            this.inviteMemberDialogVisible = state.visible;
+            this.inviteMemberWorkspaceId = state.workspaceId;
         });
     }
 
@@ -208,5 +219,14 @@ export class AppShell implements OnInit, AfterViewInit {
 
     onTargetDialogHide() {
         this.dialogService.closeTargetDialog();
+    }
+
+    onInviteMemberSuccess(data?: any) {
+        this.dialogService.notifyMemberInvited(data);
+        this.dialogService.closeInviteMemberDialog();
+    }
+
+    onInviteMemberDialogHide() {
+        this.dialogService.closeInviteMemberDialog();
     }
 }

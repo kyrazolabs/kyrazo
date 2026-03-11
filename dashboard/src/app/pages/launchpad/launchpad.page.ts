@@ -2,10 +2,10 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CreateFirstWorkspace } from '@components/launchpad/workspaces/create-first-workspace/create-first-workspace';
-import { CreateFirstProjectComponent } from '@components/launchpad/projects/create-first-project/create-first-project';
+import { CreateFirstNamespaceComponent } from '@components/launchpad/namespaces/create-first-namespace/create-first-namespace';
 import { StorageService } from '@core/services/storage.service';
 import { WorkspaceService } from '@core/services/workspace.service';
-import { ProjectService } from '@core/services/project.service';
+import { NamespaceService } from '@core/services/namespace.service';
 import { ButtonModule } from 'primeng/button';
 import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directive';
 
@@ -15,7 +15,7 @@ import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directiv
     imports: [
         CommonModule,
         CreateFirstWorkspace,
-        CreateFirstProjectComponent,
+        CreateFirstNamespaceComponent,
         ButtonModule,
         ScrollRevealDirective,
     ],
@@ -26,9 +26,9 @@ export class LaunchpadPage implements OnInit {
     private router = inject(Router);
     private storage = inject(StorageService);
     private ws = inject(WorkspaceService);
-    private ps = inject(ProjectService);
+    private ps = inject(NamespaceService);
 
-    currentStep = signal(1); // 1: Workspace, 2: Project, 3: Success
+    currentStep = signal(1); // 1: Workspace, 2: Namespace, 3: Success
     createdWorkspaceId = signal<string | null>(null);
     confettiParticles = signal<any[]>([]);
 
@@ -41,15 +41,24 @@ export class LaunchpadPage implements OnInit {
             next: (response) => {
                 const memberships = response.data || [];
                 if (memberships.length > 0) {
-                    const workspace = memberships[0].workspace;
+                    const storedWorkspaceId =
+                        this.storage.getItem<string>('workspace');
+                    const matchingMembership = memberships.find(
+                        (m) => m.workspaceId === storedWorkspaceId,
+                    );
+
+                    const workspace = matchingMembership
+                        ? matchingMembership.workspace
+                        : memberships[0].workspace;
+
                     this.createdWorkspaceId.set(workspace.id);
                     this.storage.setItem('workspace', workspace.id);
 
-                    // Check for projects in this workspace
-                    this.ps.getWorkspaceProjects().subscribe({
+                    // Check for namespaces in this workspace
+                    this.ps.getWorkspaceNamespaces().subscribe({
                         next: (projResponse) => {
-                            const projects = projResponse.data || [];
-                            if (projects.length > 0) {
+                            const namespaces = projResponse.data || [];
+                            if (namespaces.length > 0) {
                                 this.currentStep.set(3);
                                 this.triggerConfetti();
                             } else {
@@ -73,8 +82,8 @@ export class LaunchpadPage implements OnInit {
         this.currentStep.set(2);
     }
 
-    onProjectCreated(project: any) {
-        this.storage.setItem('project', project.id);
+    onNamespaceCreated(namespace: any) {
+        this.storage.setItem('namespace', namespace.id);
         this.currentStep.set(3);
         this.triggerConfetti();
     }

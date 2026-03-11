@@ -5,7 +5,6 @@ import {
     FormGroup,
     Validators,
     ReactiveFormsModule,
-    FormArray,
     FormsModule,
 } from '@angular/forms';
 
@@ -31,6 +30,7 @@ import { finalize } from 'rxjs';
 import { DialogService } from '@shared/services/dialog.service';
 import { SentryService } from '@core/3rd-party/sentry';
 import { SubscriptionService } from '@core/services/subscription.service';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
     selector: 'app-secrets.page',
@@ -50,6 +50,7 @@ import { SubscriptionService } from '@core/services/subscription.service';
         ConfirmDialogModule,
         Dialog,
         DividerModule,
+        TooltipModule,
     ],
     templateUrl: './secrets.page.html',
     styleUrl: './secrets.page.scss',
@@ -119,8 +120,7 @@ export class SecretsPage implements OnInit {
     ];
 
     get hasIpWhitelistFeature(): boolean {
-        return !!this.subscriptionService.subscription()?.planSnapshot?.features
-            ?.ipWhitelisting;
+        return this.subscriptionService.hasFeature('ipWhitelisting')();
     }
 
     constructor(

@@ -1,7 +1,11 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { StorageService } from './storage.service';
 import { SettingService } from './settings.service';
-import { ISubscription } from '@models/billing.types';
+import {
+    ISubscription,
+    IPlanFeatures,
+    IPlanLimits,
+} from '@models/billing.types';
 import { filter, map } from 'rxjs';
 
 @Injectable({
@@ -14,10 +18,22 @@ export class SubscriptionService {
     private _subscription = signal<ISubscription | null>(null);
     public subscription = this._subscription.asReadonly();
 
-    public hasFeature = (featureKey: string) =>
+    public hasFeature = (featureKey: keyof IPlanFeatures) =>
         computed(() => {
             const sub = this._subscription();
             return !!sub?.planSnapshot?.features?.[featureKey];
+        });
+
+    public getLimit = (limitKey: keyof IPlanLimits) =>
+        computed(() => {
+            const sub = this._subscription();
+            return sub?.planSnapshot?.limits?.[limitKey] ?? 0;
+        });
+
+    public isPlan = (planSlug: string) =>
+        computed(() => {
+            const sub = this._subscription();
+            return sub?.planSnapshot?.slug === planSlug;
         });
 
     constructor() {

@@ -1,5 +1,5 @@
-// Project Interface
-export interface IProject {
+// Namespace Interface
+export interface INamespace {
     id: string;
     name: string;
     description?: string;
@@ -12,29 +12,29 @@ export interface IProject {
     whiteLabelHeaders?: string;
 }
 
-// Project Request Types
-export interface CreateProjectRequest {
+// Namespace Request Types
+export interface CreateNamespaceRequest {
     name: string;
     description?: string;
     whiteLabelHeaders?: string;
 }
 
-export interface UpdateProjectRequest {
+export interface UpdateNamespaceRequest {
     name?: string;
     description?: string;
     whiteLabelHeaders?: string;
 }
 
-// Project Response Types
-export interface CreateProjectResponse {
+// Namespace Response Types
+export interface CreateNamespaceResponse {
     success: true;
     message: string;
     data: {
-        project: IProject;
+        namespace: INamespace;
     };
 }
 
-export interface GetProjectsResponse {
+export interface GetNamespacesResponse {
     success: true;
     pagination: {
         total: number;
@@ -42,28 +42,28 @@ export interface GetProjectsResponse {
         limit: number;
         pages: number;
     };
-    data: IProject[];
+    data: INamespace[];
 }
 
-export interface GetProjectResponse {
+export interface GetNamespaceResponse {
     success: true;
     message: string;
-    data: IProject;
+    data: INamespace;
 }
 
-export interface UpdateProjectResponse {
+export interface UpdateNamespaceResponse {
     success: true;
     message: string;
-    data: IProject;
+    data: INamespace;
 }
 
-export interface DeleteProjectResponse {
+export interface DeleteNamespaceResponse {
     success: true;
     message: string;
 }
 
-export interface RestoreProjectResponse {
+export interface RestoreNamespaceResponse {
     success: true;
     message: string;
-    data: IProject;
+    data: INamespace;
 }

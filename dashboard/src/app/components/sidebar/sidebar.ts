@@ -34,6 +34,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { SupportDialogComponent } from '@shared/components/support-dialog/support-dialog.component';
 import { ToastModule } from 'primeng/toast';
 import { LayoutService } from '../service/layout.service';
+import { SubscriptionService } from '@core/services/subscription.service';
 
 @Component({
     selector: 'app-sidebar',
@@ -69,6 +70,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     private messageService = inject(MessageService);
     private dialogService = inject(DialogService);
     public layoutService = inject(LayoutService);
+    public subscriptionService = inject(SubscriptionService);
 
     currentRoute = '';
     dispatchDropdownOpen = false;
@@ -130,6 +132,10 @@ export class SidebarComponent implements OnInit, AfterViewInit {
         this.selectedWorkspace = workspace;
         this.ss.setItem('workspace', workspace.id);
         this.wp.hide();
+        // Clear namespace selection when switching workspace
+        this.ss.removeItem('namespace');
+        // Navigate to dashboard root to reload all data for the new workspace
+        this.router.navigate(['/']);
     }
 
     generateHashtag(name: string): string {
@@ -155,9 +161,20 @@ export class SidebarComponent implements OnInit, AfterViewInit {
                     return;
                 }
 
-                // Select first workspace by default if available
-                this.selectedWorkspace = this.workspaceMemberships[0].workspace;
-                this.ss.setItem('workspace', this.selectedWorkspace.id);
+                // Honor existing workspace in storage if it exists in the list
+                const storedWorkspaceId = this.ss.getItem<string>('workspace');
+                const matchingMembership = this.workspaceMemberships.find(
+                    (m) => m.workspaceId === storedWorkspaceId,
+                );
+
+                if (matchingMembership) {
+                    this.selectedWorkspace = matchingMembership.workspace;
+                } else {
+                    // Default to first workspace if none or invalid stored
+                    this.selectedWorkspace =
+                        this.workspaceMemberships[0].workspace;
+                    this.ss.setItem('workspace', this.selectedWorkspace.id);
+                }
 
                 this.loading = false;
             },
@@ -172,6 +189,11 @@ export class SidebarComponent implements OnInit, AfterViewInit {
         this.loadWorkspaces();
         this.currentRoute = this.router.url;
         this.updateDropdownStates();
+
+        // Subscribe to workspace updates
+        this.ws.workspacesUpdated$.subscribe(() => {
+            this.loadWorkspaces();
+        });
 
         // Subscribe to route changes
         this.router.events

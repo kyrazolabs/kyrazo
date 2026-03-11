@@ -1,5 +1,5 @@
 <div class="flex flex-col w-full mx-auto gap-8 flex-1 p-2 animate-fade-in">
-    
+
     <!-- Header Section -->
     <div class="flex flex-col gap-6">
         <app-welcome-widget />
@@ -12,10 +12,10 @@
 
     <!-- Control Center Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        @for (card of navCards; track card.title) {
+        @for (card of navCards(); track card.title) {
             <div class="group relative bg-surface-0 dark:bg-surface-950! border-2 border-surface-100 dark:border-surface-900 rounded-2xl p-4 hover:shadow-sm hover:border-primary-500/50 transition-all duration-300 cursor-pointer flex flex-col h-full"
                  [routerLink]="card.route">
-                
+
                 <!-- Icon & Header -->
                 <div class="flex items-start justify-between mb-4">
                     <div class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors" [ngClass]="card.bg">
@@ -54,7 +54,7 @@
             </div>
             <a href="https://docs.kyrazo.com" target="_blank" pButton icon="pi pi-book" label="Documentation"  pButton class="p-button-text rounded-xl!"></a>
         </div>
-        
+
         <div class="bg-linear-to-r from-surface-0 to-primary-50/10 dark:from-surface-950 dark:to-primary-500/10 border-2 border-surface-100 dark:border-surface-900 rounded-xl p-6 flex items-center justify-between">
              <div class="flex flex-col gap-1">
                 <span class="font-bold text-surface-900 dark:text-surface-0">Need Support?</span>
@@ -67,21 +67,32 @@
 </div>
 <p-toast />
 
-<!-- Create Project Dialog -->
-<p-dialog header="Create Project" styleClass="rounded-xl!" [(visible)]="projectDialogVisible" [modal]="true" [style]="{ width: '40rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [draggable]="false" [resizable]="false">
+<!-- Create Namespace Dialog -->
+<p-dialog header="Create Namespace" styleClass="rounded-xl!" [(visible)]="namespaceDialogVisible" [modal]="true" [style]="{ width: '40rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [draggable]="false" [resizable]="false">
     <div class="flex flex-col gap-4 pt-2">
          <div class="flex flex-col gap-2">
-            <label for="pname" class="font-medium">Project Name</label>
-            <input pInputText id="pname" [(ngModel)]="projectForm.name" placeholder="e.g. Acme Production" autofocus />
+            <label for="pname" class="font-medium">Namespace Name</label>
+            <input pInputText id="pname" [(ngModel)]="namespaceForm.name" placeholder="e.g. Acme Production" autofocus />
         </div>
         <div class="flex flex-col gap-2">
             <label for="pdesc" class="font-medium">Description</label>
-            <textarea pInputTextarea id="pdesc" [(ngModel)]="projectForm.description" rows="3" placeholder="Brief description of this project environment..." class="resize-none"></textarea>
+            <textarea pInputTextarea id="pdesc" [(ngModel)]="namespaceForm.description" rows="3" placeholder="Brief description of this namespace environment..." class="resize-none"></textarea>
         </div>
+        @if (isLimitReached()) {
+        <div class="p-3 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl flex items-start gap-3 mt-2 animate-fade-in">
+            <i class="pi pi-exclamation-triangle text-amber-500 mt-0.5"></i>
+            <div class="flex flex-col gap-1">
+                <span class="text-amber-800 dark:text-amber-400 font-semibold text-sm">Namespace limit reached</span>
+                <span class="text-amber-700 dark:text-amber-500 text-xs">You have reached the maximum number of namespaces for your current plan. Please upgrade to create more.</span>
+            </div>
+        </div>
+        }
     </div>
     <ng-template pTemplate="footer">
-        <p-button label="Cancel" [text]="true" severity="secondary" (click)="projectDialogVisible = false" styleClass="rounded-xl!" />
-        <p-button label="Create Project" [loading]="isCreating" (click)="createProject()" [disabled]="!projectForm.name" styleClass="rounded-xl!" />
+        <p-button label="Cancel" [text]="true" severity="secondary" (click)="namespaceDialogVisible = false" styleClass="rounded-xl!" />
+        <p-button label="Create Namespace" [loading]="isCreating" (click)="createNamespace()" [disabled]="!namespaceForm.name || isLimitReached()"
+            [pTooltip]="isLimitReached() ? 'Limit reached' : ''"
+            styleClass="rounded-xl!" />
     </ng-template>
 </p-dialog>
 

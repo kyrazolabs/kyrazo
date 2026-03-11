@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
     FormsModule,
@@ -28,6 +28,7 @@ import { ConfirmationService } from 'primeng/api';
 import { WorkspaceService } from '@core/services/workspace.service';
 import { StorageService } from '@core/services/storage.service';
 import { SettingService } from '@core/services/settings.service';
+import { SubscriptionService } from '@core/services/subscription.service';
 import {
     IWorkspace,
     IWorkspaceMember,
@@ -74,21 +75,25 @@ export class WorkspaceSettingsPage implements OnInit {
     private readonly sentry = inject(SentryService);
     private readonly posthog = inject(PostHogService);
     private readonly dialogService = inject(DialogService);
+    public readonly subscriptionService = inject(SubscriptionService);
 
     // Reactive forms
     workspaceForm!: FormGroup;
-    inviteForm!: FormGroup;
 
     // Data
     workspace: IWorkspace | null = null;
-    members: IWorkspaceMember[] = [];
+    members = signal<IWorkspaceMember[]>([]);
     currentUserId: string | null = null;
     currentUserRole: WorkspaceRole = 'member';
 
+    // Limits
+    public isMemberLimitReached = computed(() => {
+        const max = this.subscriptionService.getLimit('maxMembers')();
+        return this.members().length >= max;
+    });
+
     // UI state
     isSaving = false;
-    showInviteDialog = false;
-    isInviting = false;
 
     // Role options
     roleOptions = [
@@ -119,6 +124,11 @@ export class WorkspaceSettingsPage implements OnInit {
                 detail: 'Failed to load workspace data',
             });
         }
+
+        // Listen for global member invited notifications
+        this.dialogService.memberInvited$.subscribe(() => {
+            this.loadWorkspaceMembers();
+        });
     }
 
     private initializeForms() {
@@ -133,12 +143,6 @@ export class WorkspaceSettingsPage implements OnInit {
             ],
             description: ['', [Validators.maxLength(2000)]],
         });
-
-        this.inviteForm = this.fb.group({
-            email: ['', [Validators.required, Validators.email]],
-            role: ['member', [Validators.required]],
-            message: ['', [Validators.maxLength(2000)]],
-        });
     }
 
     private loadWorkspaceMembers() {
@@ -148,7 +152,7 @@ export class WorkspaceSettingsPage implements OnInit {
         this.workspaceService.getMembers(this.workspace.id).subscribe({
             next: (response) => {
                 if (response.success && response.data) {
-                    this.members = response.data;
+                    this.members.set(response.data);
                     // Get current user ID from profile endpoint
                     this.settingService.get().subscribe({
                         next: (profileResponse: {
@@ -160,7 +164,7 @@ export class WorkspaceSettingsPage implements OnInit {
                                 profileResponse.data
                             ) {
                                 this.currentUserId = profileResponse.data.id;
-                                const currentUserMember = this.members.find(
+                                const currentUserMember = this.members().find(
                                     (m) =>
                                         this.getMemberUserId(m) ===
                                         this.currentUserId,
@@ -239,74 +243,8 @@ export class WorkspaceSettingsPage implements OnInit {
     }
 
     openInviteDialog() {
-        this.inviteForm.reset({ role: 'member' });
-        this.showInviteDialog = true;
-    }
-
-    closeInviteDialog() {
-        this.showInviteDialog = false;
-        this.inviteForm.reset();
-    }
-
-    inviteMember() {
-        if (!this.inviteForm.valid || this.isInviting || !this.workspace) {
-            return;
-        }
-
-        this.isInviting = true;
-        const formData = this.inviteForm.value;
-
-        const inviteData: InviteWorkspaceMemberRequest = {
-            email: formData.email,
-            role: formData.role,
-            message: formData.message || undefined,
-        };
-
-        this.workspaceService
-            .inviteUser(this.workspace.id, inviteData)
-            .pipe(finalize(() => (this.isInviting = false)))
-            .subscribe({
-                next: (response) => {
-                    if (response.success) {
-                        this.messageService.add({
-                            summary: 'Success',
-                            detail: 'Invitation sent successfully!',
-                        });
-                        this.posthog.capture('workspace_invitation_sent', {
-                            role: formData.role,
-                        });
-                        this.closeInviteDialog();
-
-                        // Reload members to show pending invitation
-                        this.loadWorkspaceMembers();
-                    } else {
-                        this.messageService.add({
-                            severity: 'error',
-                            summary: 'Error',
-                            detail: 'Failed to send invitation',
-                        });
-                    }
-                },
-                error: (error) => {
-                    this.sentry.captureException(error);
-                    const errorMessage =
-                        error.error?.error?.code === 'LIMIT_EXCEEDED'
-                            ? 'Member limit exceeded for your current plan.'
-                            : error.error?.error?.message ||
-                              error.message ||
-                              'Failed to send invitation';
-
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail: errorMessage,
-                    });
-                    this.posthog.capture('workspace_invitation_error', {
-                        error: error.message,
-                    });
-                    console.error('Error inviting member:', error);
-                },
-            });
+        if (!this.workspace) return;
+        this.dialogService.openInviteMemberDialog(this.workspace.id);
     }
 
     updateMemberRole(member: IWorkspaceMember, newRole: WorkspaceRole) {
@@ -368,6 +306,8 @@ export class WorkspaceSettingsPage implements OnInit {
             message: `Are you sure you want to remove ${member.user?.firstName} ${member.user?.lastName} from this workspace?`,
             header: 'Remove Member',
             icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Remove',
+            acceptIcon: 'pi pi-trash',
             accept: () => {
                 this.workspaceService
                     .removeUser(this.workspace!.id, member.userId)
@@ -380,8 +320,8 @@ export class WorkspaceSettingsPage implements OnInit {
                                     detail: 'Member removed successfully!',
                                 });
                                 // Remove from local array
-                                this.members = this.members.filter(
-                                    (m) => m.id !== member.id,
+                                this.members.update((members) =>
+                                    members.filter((m) => m.id !== member.id),
                                 );
                             } else {
                                 this.messageService.add({
@@ -484,6 +424,57 @@ export class WorkspaceSettingsPage implements OnInit {
             });
     }
 
+    leaveWorkspace() {
+        if (!this.workspace || this.currentUserRole === 'owner') {
+            return;
+        }
+
+        this.confirmationService.confirm({
+            message: `Are you sure you want to leave the workspace "${this.workspace.name}"? You will lost access to all resources in this workspace.`,
+            header: 'Leave Workspace',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Leave',
+            acceptIcon: 'pi pi-sign-out',
+            acceptButtonStyleClass: 'p-button-danger rounded-xl!',
+            rejectButtonStyleClass: 'p-button-text rounded-xl!',
+            accept: () => {
+                this.workspaceService.leave(this.workspace!.id).subscribe({
+                    next: (response) => {
+                        if (response.success) {
+                            this.messageService.add({
+                                severity: 'success',
+                                detail: 'You have left the workspace successfully!',
+                            });
+                            this.posthog.capture('workspace_left', {
+                                workspace_id: this.workspace?.id,
+                            });
+
+                            this.storageService.removeItem('workspace');
+                            this.router.navigate(['/']);
+                        } else {
+                            this.messageService.add({
+                                severity: 'error',
+                                summary: 'Error',
+                                detail: 'Failed to leave workspace',
+                            });
+                        }
+                    },
+                    error: (error: any) => {
+                        this.sentry.captureException(error);
+                        this.messageService.add({
+                            severity: 'error',
+                            summary: 'Error',
+                            detail:
+                                error.error?.error?.message ||
+                                'Failed to leave workspace',
+                        });
+                        console.error('Error leaving workspace:', error);
+                    },
+                });
+            },
+        });
+    }
+
     deleteWorkspace() {
         if (!this.workspace || this.currentUserRole !== 'owner') {
             return;
@@ -493,6 +484,8 @@ export class WorkspaceSettingsPage implements OnInit {
             message: `Are you sure you want to delete the workspace "${this.workspace.name}"? This action is permanent and will delete all associated data.`,
             header: 'Delete Workspace',
             icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Delete',
+            acceptIcon: 'pi pi-trash',
             acceptButtonStyleClass: 'p-button-danger rounded-xl!',
             rejectButtonStyleClass: 'p-button-text rounded-xl!',
             accept: () => {
@@ -508,9 +501,7 @@ export class WorkspaceSettingsPage implements OnInit {
                             });
                             // Force storage update and navigate to dash
 
-                            this.storageService.removeItem(
-                                'currentWorkspaceId',
-                            );
+                            this.storageService.removeItem('workspace');
                             this.router.navigate(['/']);
                         } else {
                             this.messageService.add({

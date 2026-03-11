@@ -3,18 +3,23 @@ import {
     HttpErrorResponse,
     HttpRequest,
     HttpHandlerFn,
-    HttpEvent
+    HttpEvent,
 } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthService } from '../auth/auth.service';
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, throwError, from } from 'rxjs';
 import { catchError, filter, switchMap, take } from 'rxjs/operators';
+import { OtpService } from '../services/otp.service';
 
 let isRefreshing = false;
 const refreshTokenSubject = new BehaviorSubject<string | null>(null);
 
-export const authInterceptor: HttpInterceptorFn = ( req: HttpRequest<any>, next: HttpHandlerFn ): Observable<HttpEvent<any>> => {
+export const authInterceptor: HttpInterceptorFn = (
+    req: HttpRequest<any>,
+    next: HttpHandlerFn,
+): Observable<HttpEvent<any>> => {
     const authService = inject(AuthService);
+    const otpService = inject(OtpService);
 
     // استثناء طلبات auth
     if (isAuthRequest(req)) {
@@ -34,8 +39,27 @@ export const authInterceptor: HttpInterceptorFn = ( req: HttpRequest<any>, next:
                 return handle401Error(req, next, authService);
             }
 
+            if (error.status === 403 && code === 'OTP_REQUIRED') {
+                const action = error.error?.error?.details?.action;
+                const method = error.error?.error?.details?.method;
+                return from(
+                    otpService.showOtpDialog(
+                        action,
+                        'Verification Required',
+                        method,
+                    ),
+                ).pipe(
+                    switchMap((verified) => {
+                        if (verified) {
+                            return next(req);
+                        }
+                        return throwError(() => error);
+                    }),
+                );
+            }
+
             return throwError(() => error);
-        })
+        }),
     );
 };
 
@@ -50,13 +74,17 @@ function isAuthRequest(req: HttpRequest<any>): boolean {
     );
 }
 
-function addToken( request: HttpRequest<any>, token: string ): HttpRequest<any> {
+function addToken(request: HttpRequest<any>, token: string): HttpRequest<any> {
     return request.clone({
-        setHeaders: { Authorization: `Bearer ${token}` }
+        setHeaders: { Authorization: `Bearer ${token}` },
     });
 }
 
-function handle401Error( req: HttpRequest<any>, next: HttpHandlerFn, authService: AuthService ): Observable<HttpEvent<any>> {
+function handle401Error(
+    req: HttpRequest<any>,
+    next: HttpHandlerFn,
+    authService: AuthService,
+): Observable<HttpEvent<any>> {
     if (!isRefreshing) {
         isRefreshing = true;
         refreshTokenSubject.next(null);
@@ -64,8 +92,8 @@ function handle401Error( req: HttpRequest<any>, next: HttpHandlerFn, authService
         return authService.refreshToken(authService.getRToken()!).pipe(
             switchMap((authResponse: any) => {
                 isRefreshing = false;
-                console.log("Auth Response " + authResponse);
-                
+                console.log('Auth Response ' + authResponse);
+
                 authService.handleRefreshSuccess(authResponse);
                 refreshTokenSubject.next(authResponse);
                 return next(addToken(req, authResponse));
@@ -73,14 +101,13 @@ function handle401Error( req: HttpRequest<any>, next: HttpHandlerFn, authService
             catchError((error) => {
                 isRefreshing = false;
                 return throwError(() => error);
-            })
+            }),
         );
     } else {
         return refreshTokenSubject.pipe(
             filter((token) => token !== null),
             take(1),
-            switchMap((token) => next(addToken(req, token!)))
+            switchMap((token) => next(addToken(req, token!))),
         );
     }
 }
-  
