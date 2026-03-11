@@ -30,8 +30,8 @@
             <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">3. Technical & Organizational Measures</h2>
             <p>Processor implements industry-standard measures to protect Personal Data, including:</p>
             <ul class="list-disc list-inside space-y-2 mt-4">
-                <li><strong>Encryption:</strong> Payload encryption using <strong>AES-256-GCM</strong> (at rest) and <strong>TLS 1.2+</strong> (in transit).</li>
-                <li><strong>Data Residency:</strong> All primary processing and storage occur on <strong>Netcup</strong> infrastructure in <strong>Germany/Austria (EEA)</strong>.</li>
+                <li><strong>Encryption:</strong> Payload encryption using <strong>AES-256-GCM</strong> (at rest) and <strong>TLS 1.3</strong> (in transit).</li>
+                <li><strong>Data Residency:</strong> Primary processing and storage occur within the EEA (Netcup Germany/Austria).</li>
                 <li><strong>Backups:</strong> Securely encrypted snapshots stored within the <strong>EEA</strong>.</li>
                 <li><strong>Isolation:</strong> Logical separation of data between different Controller workspaces.</li>
                 <li><strong>Retention:</strong> Data is automatically deleted in accordance with the Controller's <strong>active subscription plan</strong> for all ingest and dispatch events.</li>
@@ -40,7 +40,9 @@
 
         <section>
             <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">4. Sub-processing</h2>
-            <p>Controller authorizes Processor to engage sub-processors (such as Google Cloud, Stripe, and Cloudflare) to perform processing activities. Processor shall ensure that all sub-processors are bound by data protection obligations that are at least as restrictive as those in this DPA.</p>
+                <p class="text-surface-600 dark:text-surface-400 leading-relaxed">
+                    We use a limited number of third-party sub-processors to providing our services. A current list and their processing locations can be found on our <a routerLink="/legal/gdpr" class="text-primary-500 hover:underline">GDPR Page</a>.
+                </p>
         </section>
 
         <section>

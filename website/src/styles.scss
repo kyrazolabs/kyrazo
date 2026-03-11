@@ -16,12 +16,20 @@ body {
   .p-button, .click-effect, .p-select-option, .p-multiselect-option, .p-autocomplete-chip-item, .p-toggleswitch, .p-checkbox {
         @apply transition-all! duration-300! ease-in-out!;
 
-        &:hover {
-            transform: translateY(0px);
+        @media (prefers-reduced-motion: no-preference) {
+            &:hover {
+                transform: translateY(0px);
+            }
+
+            &:active {
+                transform: translateY(2px) scale(0.98);
+            }
         }
 
-        &:active {
-            transform: translateY(2px) scale(0.98);
+        @media (prefers-reduced-motion: reduce) {
+            &:active {
+                transform: none;
+            }
         }
     }
 

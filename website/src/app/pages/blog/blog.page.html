@@ -22,7 +22,7 @@
     @if (articles$(); as articles) {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             @for (article of articles; track article.slug) {
-                <div class="group bg-surface-0 dark:bg-surface-900 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-surface-200 dark:border-surface-800 flex flex-col h-full ring-1 ring-black/5 click-effect">
+                <a [routerLink]="['/blog', article.slug]" class="group bg-surface-0 dark:bg-surface-900 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-surface-200 dark:border-surface-800 flex flex-col h-full ring-1 ring-black/5 click-effect no-underline">
                     <!-- Image -->
                     <div class="h-56 overflow-hidden bg-surface-100 dark:bg-surface-800 relative">
                          @if (article.cover) {
@@ -53,7 +53,7 @@
                         </div>
 
                         <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-3 line-clamp-2 group-hover:text-primary transition-colors">
-                            <a [routerLink]="['/blog', article.slug]">{{ article.title }}</a>
+                            {{ article.title }}
                         </h2>
 
                         <p class="text-surface-600 dark:text-surface-300 mb-6 line-clamp-3 text-base leading-relaxed flex-1">
@@ -71,10 +71,10 @@
                                     <span class="text-sm font-medium text-surface-700 dark:text-surface-200">{{ article.author!.name }}</span>
                                 </div>
                             }
-                            <a [routerLink]="['/blog', article.slug]" class="text-primary hover:text-primary-emphasis font-bold text-sm tracking-wide group-hover:underline decoration-2 underline-offset-4">Read more</a>
+                            <span class="text-primary hover:text-primary-emphasis font-bold text-sm tracking-wide group-hover:underline decoration-2 underline-offset-4">Read more</span>
                         </div>
                     </div>
-                </div>
+                </a>
             }
         </div>
     }

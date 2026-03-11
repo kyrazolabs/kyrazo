@@ -157,6 +157,34 @@ export const routes: Routes = [
                 },
             },
             {
+                path: 'features/privacy-by-design',
+                loadComponent: () =>
+                    import(
+                        '@pages/features/privacy-by-design/privacy-by-design.page'
+                    ).then((p) => p.PrivacyByDesignPage),
+                data: {
+                    title: 'Privacy by Design - Kyrazo',
+                    meta: {
+                        description:
+                            'Learn how Kyrazo implements privacy-first engineering in its webhook relay infrastructure.',
+                    },
+                },
+            },
+            {
+                path: 'features/early-adopter',
+                loadComponent: () =>
+                    import(
+                        '@pages/features/early-adopter/early-adopter.page'
+                    ).then((p) => p.EarlyAdopterPage),
+                data: {
+                    title: 'Early Adopter Program - Kyrazo',
+                    meta: {
+                        description:
+                            'Join the Kyrazo Early Adopter program and get direct access to our founding engineering team.',
+                    },
+                },
+            },
+            {
                 path: 'pricing',
                 loadComponent: () =>
                     import('@pages/pricing/pricing.page').then(
