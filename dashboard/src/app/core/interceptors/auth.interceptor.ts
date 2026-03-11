@@ -13,7 +13,6 @@ import { OtpService } from '../services/otp.service';
 import { ApiResponse } from '@models/index';
 import { RefreshTokenResponse } from '@models/auth.types';
 
-
 let isRefreshing = false;
 const refreshTokenSubject = new BehaviorSubject<string | null>(null);
 
@@ -95,7 +94,7 @@ function handle401Error(
         return authService.refreshToken(authService.getRToken()!).pipe(
             switchMap((authResponse: ApiResponse<RefreshTokenResponse>) => {
                 isRefreshing = false;
-                const newAccessToken = authResponse.data.accessToken;
+                const newAccessToken = authResponse.data.tokens.access;
 
                 authService.handleRefreshSuccess(authResponse);
                 refreshTokenSubject.next(newAccessToken);

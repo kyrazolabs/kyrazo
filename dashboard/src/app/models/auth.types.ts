@@ -68,8 +68,10 @@ export interface LoginResponse {
 }
 
 export interface RefreshTokenResponse {
-    accessToken: string;
-    refreshToken: string;
+    tokens: {
+        access: string;
+        refresh: string;
+    };
 }
 
 export type RegisterResponse = LoginResponse;

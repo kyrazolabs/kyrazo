@@ -203,10 +203,10 @@ export class AuthService {
         if (!response.data) {
             return;
         }
-        const { accessToken, refreshToken } = response.data;
+        const { access, refresh } = response.data.tokens;
 
-        this.storage.setItem('access_token', accessToken);
-        this.storage.setItem('refresh_token', refreshToken);
+        this.storage.setItem('access_token', access);
+        this.storage.setItem('refresh_token', refresh);
     }
 
     private handleError(error: HttpErrorResponse): Observable<never> {
