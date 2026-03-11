@@ -547,4 +547,7 @@ export class UsagePage implements OnInit, AfterViewInit {
             });
         }
     }
+    onUpgradePlan() {
+        this.subscriptionService.createBillingPortalSession(window.location.href);
+    }
 }
