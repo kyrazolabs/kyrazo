@@ -20,8 +20,37 @@ export class WorkerService {
     }
 
     private pollingSubscription?: any;
+    private pollingRefCount = 0;
 
+    /**
+     * Start worker polling with reference counting.
+     * Call this when a component needs worker data.
+     */
+    acquireWorkerPolling() {
+        this.pollingRefCount++;
+        if (this.pollingRefCount === 1) {
+            this.startPoll();
+        }
+    }
+
+    /**
+     * Stop worker polling with reference counting.
+     * Call this when a component is destroyed or no longer needs worker data.
+     */
+    releaseWorkerPolling() {
+        this.pollingRefCount--;
+        if (this.pollingRefCount <= 0) {
+            this.pollingRefCount = 0;
+            this.stopPoll();
+        }
+    }
+
+    /** @deprecated Use acquireWorkerPolling() instead */
     loadWorkers() {
+        this.acquireWorkerPolling();
+    }
+
+    private startPoll() {
         this.loading.set(true);
         this.fetchWorkers();
 
@@ -46,12 +75,18 @@ export class WorkerService {
         });
     }
 
+    /** @deprecated Use releaseWorkerPolling() instead */
     stopPolling() {
+        this.releaseWorkerPolling();
+    }
+
+    private stopPoll() {
         if (this.pollingSubscription) {
             clearInterval(this.pollingSubscription);
             this.pollingSubscription = undefined;
         }
     }
+
 
     getBadgeSeverity(
         status: string,

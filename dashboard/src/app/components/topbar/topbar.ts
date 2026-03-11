@@ -3,6 +3,7 @@ import {
     computed,
     inject,
     OnInit,
+    OnDestroy,
     ViewChild,
     ElementRef,
     HostListener,
@@ -67,7 +68,7 @@ import { WorkerService } from '@core/services/worker.service';
     styleUrl: './topbar.scss',
     animations: [dropdownAnimation],
 })
-export class TopbarComponent implements OnInit {
+export class TopbarComponent implements OnInit, OnDestroy {
     private as = inject(AuthService);
     private ss = inject(StorageService);
     private ps = inject(NamespaceService);
@@ -158,17 +159,20 @@ export class TopbarComponent implements OnInit {
         this.initializeNamespaceSelection();
 
         // Initialize worker loading
-        this.workerService.loadWorkers();
+        this.workerService.acquireWorkerPolling();
 
         // Listen for namespace updates
         this.ps.namespacesUpdated$.subscribe(() => {
             this.loadNamespaces();
         });
 
-        // Listen for namespace saved via global dialog
         this.dialogService.namespaceSaved$.subscribe(() => {
             this.loadNamespaces();
         });
+    }
+
+    ngOnDestroy() {
+        this.workerService.releaseWorkerPolling();
     }
     selectNamespace(namespace: INamespace) {
         this.selectedNamespace = namespace;

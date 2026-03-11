@@ -1,6 +1,7 @@
 import {
     Component,
     OnInit,
+    OnDestroy,
     inject,
     signal,
     model,
@@ -44,7 +45,7 @@ import { SelectButton } from 'primeng/selectbutton';
     templateUrl: './worker.html',
     styleUrl: './worker.scss',
 })
-export class WorkerComponent implements OnInit {
+export class WorkerComponent implements OnInit, OnDestroy {
     protected workerService = inject(WorkerService);
     readonly drawerRef = viewChild<Drawer>('drawerRef');
 
@@ -124,9 +125,11 @@ export class WorkerComponent implements OnInit {
     }
 
     ngOnInit() {
-        if (this.workerService.workers().length === 0) {
-            this.workerService.loadWorkers();
-        }
+        this.workerService.acquireWorkerPolling();
+    }
+
+    ngOnDestroy() {
+        this.workerService.releaseWorkerPolling();
     }
 
     copyToClipboard(val: string, uniqueId: string) {
