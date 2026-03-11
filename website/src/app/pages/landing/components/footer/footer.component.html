@@ -13,7 +13,7 @@
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-[minmax(180px,auto)] mb-20">
 
             <!-- Brand Highlight Card -->
-            <div class="md:col-span-6 md:row-span-2 p-6 md:p-10 flex flex-col justify-between relative overflow-hidden rounded-2xl border border-surface-100 bg-surface-50/30 backdrop-blur-3xl transition-all duration-300 dark:border-surface-800/50 dark:bg-surface-900/20 scale-[0.99] hover:scale-[1.00] hover:border-primary-500/50 hover:shadow-2xl hover:shadow-primary-500/10" appScrollReveal>
+            <div class="md:col-span-6 md:row-span-2 p-6 md:p-10 flex flex-col justify-between relative overflow-hidden rounded-2xl border border-surface-100 bg-surface-50/30 backdrop-blur-3xl transition-all duration-300 dark:border-surface-800/50 dark:bg-surface-900/20" appScrollReveal>
 
                 <!-- Massive Background Watermark -->
                 <div class="absolute -bottom-5 -right-12 select-none pointer-events-none opacity-[0.03] dark:opacity-[0.05] translate-y-1/4 hidden md:block" aria-hidden="true">
@@ -62,7 +62,7 @@
             </div>
 
             <!-- Product Bento -->
-            <div class="md:col-span-3 p-6 md:p-8 group/card relative overflow-hidden rounded-2xl border border-surface-100 bg-surface-50/30 backdrop-blur-3xl transition-all duration-300 dark:border-surface-800/50 dark:bg-surface-900/20 scale-[0.99] hover:scale-[1.00] hover:border-primary-500/50 hover:shadow-2xl hover:shadow-primary-500/10" appScrollReveal delay="delay-100">
+            <div class="md:col-span-3 p-6 md:p-8 group/card relative overflow-hidden rounded-2xl border border-surface-100 bg-surface-50/30 backdrop-blur-3xl transition-all duration-300 dark:border-surface-800/50 dark:bg-surface-900/20" appScrollReveal delay="delay-100">
                 <div class="relative z-10 h-full flex flex-col">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary-500">
@@ -71,15 +71,15 @@
                         <span class="font-black uppercase tracking-widest text-[10px] text-surface-400">Platform</span>
                     </div>
                     <ul class="space-y-1">
-                        <li><a href="https://docs.kyrazo.com" class="block py-2 px-3 rounded-xl transition-all duration-100 text-surface-500 dark:text-surface-400 font-medium hover:text-primary-500 hover:bg-primary-500/5 hover:translate-x-1">Documentation</a></li>
-                        <li><a href="https://docs.kyrazo.com/api-reference/introduction" class="block py-2 px-3 rounded-xl transition-all duration-100 text-surface-500 dark:text-surface-400 font-medium hover:text-primary-500 hover:bg-primary-500/5 hover:translate-x-1">API Reference</a></li>
-                        <li><a href="/changelogs" class="block py-2 px-3 rounded-xl transition-all duration-100 text-surface-500 dark:text-surface-400 font-medium hover:text-primary-500 hover:bg-primary-500/5 hover:translate-x-1">Changelog</a></li>
+                        <li><a href="https://docs.kyrazo.com" target="_blank" rel="noopener noreferrer" class="p-button p-button-text p-button-secondary">Documentation</a></li>
+                        <li><a href="https://docs.kyrazo.com/api-reference/introduction" target="_blank" rel="noopener noreferrer" class="p-button p-button-text p-button-secondary">API Reference</a></li>
+                        <li><p-button variant="text" severity="secondary" routerLink="/changelogs">Changelog</p-button></li>
                     </ul>
                 </div>
             </div>
 
             <!-- Ecosystem Bento -->
-            <div class="md:col-span-3 p-6 md:p-8 group/card relative overflow-hidden rounded-2xl border border-surface-100 bg-surface-50/30 backdrop-blur-3xl transition-all duration-300 dark:border-surface-800/50 dark:bg-surface-900/20 scale-[0.99] hover:scale-[1.00] hover:border-primary-500/50 hover:shadow-2xl hover:shadow-primary-500/10" appScrollReveal delay="delay-150">
+            <div class="md:col-span-3 p-6 md:p-8 group/card relative overflow-hidden rounded-2xl border border-surface-100 bg-surface-50/30 backdrop-blur-3xl transition-all duration-300 dark:border-surface-800/50 dark:bg-surface-900/20" appScrollReveal delay="delay-150">
                 <div class="relative z-10 h-full flex flex-col">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-9 h-9 rounded-xl bg-primary-500/10 flex items-center justify-center text-primary-500 dark:text-primary-400">
@@ -88,15 +88,15 @@
                         <span class="font-black uppercase tracking-widest text-[10px] text-surface-400">Resources</span>
                     </div>
                     <ul class="space-y-1">
-                        <li><a href="/blog" class="block py-2 px-3 rounded-xl transition-all duration-100 text-surface-500 dark:text-surface-400 font-medium hover:text-primary-500 hover:bg-primary-500/5 hover:translate-x-1">Blog</a></li>
-                        <li><a href="https://status.kyrazo.com" class="block py-2 px-3 rounded-xl transition-all duration-100 text-surface-500 dark:text-surface-400 font-medium hover:text-primary-500 hover:bg-primary-500/5 hover:translate-x-1">Network Status</a></li>
-                        <li><a href="mailto:support@kyrazo.com" class="block py-2 px-3 rounded-xl transition-all duration-100 text-surface-500 dark:text-surface-400 font-medium hover:text-primary-500 hover:bg-primary-500/5 hover:translate-x-1">Support</a></li>
+                        <li><p-button variant="text" severity="secondary" routerLink="/blog">Blog</p-button></li>
+                        <li><a href="https://status.kyrazo.com" target="_blank" rel="noopener noreferrer" class="p-button p-button-text p-button-secondary">Network Status</a></li>
+                        <li><a href="mailto:support@kyrazo.com" class="p-button p-button-text p-button-secondary">Support</a></li>
                     </ul>
                 </div>
             </div>
 
             <!-- Legal Bento -->
-            <div class="md:col-span-6 p-6 md:p-8 group/card relative overflow-hidden rounded-2xl border border-surface-100 bg-surface-50/30 backdrop-blur-3xl transition-all duration-300 dark:border-surface-800/50 dark:bg-surface-900/20 scale-[0.99] hover:scale-[1.00] hover:border-primary-500/50 hover:shadow-2xl hover:shadow-primary-500/10" appScrollReveal delay="delay-200">
+            <div class="md:col-span-6 p-6 md:p-8 group/card relative overflow-hidden rounded-2xl border border-surface-100 bg-surface-50/30 backdrop-blur-3xl transition-all duration-300 dark:border-surface-800/50 dark:bg-surface-900/20" appScrollReveal delay="delay-200">
                 <div class="relative z-10 h-full flex flex-col">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-9 h-9 rounded-xl bg-primary-500/10 flex items-center justify-center text-primary-500 dark:text-primary-400">
@@ -105,15 +105,17 @@
                         <span class="font-black uppercase tracking-widest text-[10px] text-surface-400">Privacy & Terms</span>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
-                        <a [routerLink]="'/legal/privacy-policy'" class="block py-2 px-3 rounded-xl transition-all duration-100 text-surface-500 dark:text-surface-400 font-medium hover:text-primary-500 hover:bg-primary-500/5 hover:translate-x-1">Privacy Policy</a>
-                        <a [routerLink]="'/legal/terms-of-service'" class="block py-2 px-3 rounded-xl transition-all duration-100 text-surface-500 dark:text-surface-400 font-medium hover:text-primary-500 hover:bg-primary-500/5 hover:translate-x-1">Terms of Service</a>
-                        <a [routerLink]="'/legal/refund-policy'" class="block py-2 px-3 rounded-xl transition-all duration-100 text-surface-500 dark:text-surface-400 font-medium hover:text-primary-500 hover:bg-primary-500/5 hover:translate-x-1">Refund Policy</a>
+                        <p-button variant="text" severity="secondary" routerLink="/legal/privacy-policy">Privacy Policy</p-button>
+                        <p-button variant="text" severity="secondary" routerLink="/legal/terms-of-service">Terms of Service</p-button>
+                        <p-button variant="text" severity="secondary" routerLink="/legal/refund-policy">Refund Policy</p-button>
+                        <p-button variant="text" severity="secondary" routerLink="/legal/gdpr">GDPR Compliance</p-button>
+                        <p-button variant="text" severity="secondary" routerLink="/legal/dpa">Data Processing Agreement</p-button>
                     </div>
                 </div>
             </div>
 
             <!-- Stats/Trust Bento -->
-            <!-- <div class="md:col-span-2 flex flex-col justify-center items-center text-center group/card relative overflow-hidden rounded-2xl border border-surface-100 bg-surface-50/30 backdrop-blur-3xl transition-all duration-300 dark:border-surface-800/50 dark:bg-surface-900/20 scale-[0.99] hover:scale-[1.00] hover:border-primary-500/50 hover:shadow-2xl hover:shadow-primary-500/10 before:content-[''] before:absolute before:inset-0 before:opacity-0 before:transition-opacity before:duration-300 before:bg-linear-to-br before:from-white/10 before:to-transparent dark:before:from-white/5 hover:before:opacity-100 after:content-[''] after:absolute after:inset-0 after:opacity-0 after:transition-opacity after:duration-300 after:bg-[radial-gradient(circle_at_top_left,color-mix(in_srgb,var(--primary-500),transparent_98%),transparent)] hover:after:opacity-100" appScrollReveal delay="delay-400">
+            <!-- <div class="md:col-span-2 flex flex-col justify-center items-center text-center group/card relative overflow-hidden rounded-2xl border border-surface-100 bg-surface-50/30 backdrop-blur-3xl transition-all duration-300 dark:border-surface-800/50 dark:bg-surface-900/20 before:content-[''] before:absolute before:inset-0 before:opacity-0 before:transition-opacity before:duration-300 before:bg-linear-to-br before:from-white/10 before:to-transparent dark:before:from-white/5 hover:before:opacity-100 after:content-[''] after:absolute after:inset-0 after:opacity-0 after:transition-opacity after:duration-300 after:bg-[radial-gradient(circle_at_top_left,color-mix(in_srgb,var(--primary-500),transparent_98%),transparent)] hover:after:opacity-100" appScrollReveal delay="delay-400">
                 <div class="relative z-10 flex flex-col items-center">
                     <span class="text-4xl font-black text-primary-500 mb-1">99.9%</span>
                     <span class="text-[10px] font-black uppercase tracking-widest text-surface-500">Uptime SLA</span>
@@ -133,8 +135,9 @@
 
             <div class="flex items-center gap-6 text-surface-400 text-xs font-semibold uppercase tracking-widest">
                 <a href="https://status.kyrazo.com" target="_blank" class="hover:text-primary-500 transition-colors">Status</a>
+                <a [routerLink]="'/legal/gdpr'" class="hover:text-primary-500 transition-colors">GDPR</a>
                 <!-- <a href="/legal/privacy-policy" class="hover:text-primary-500 transition-colors">Security</a> -->
-                <a href="/legal/privacy-policy" class="hover:text-primary-500 transition-colors">Privacy</a>
+                <a [routerLink]="'/legal/privacy-policy'" class="hover:text-primary-500 transition-colors">Privacy</a>
             </div>
         </div>
     </div>

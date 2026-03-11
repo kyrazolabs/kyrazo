@@ -89,6 +89,18 @@ export class HeaderComponent {
                         routerLink: '/features/architecture',
                         command: () => this.activeDropdown.set(null),
                     },
+                    {
+                        label: 'Privacy by Design',
+                        icon: 'icon-[hugeicons--shield-check] size-5',
+                        routerLink: '/features/privacy-by-design',
+                        command: () => this.activeDropdown.set(null),
+                    },
+                    {
+                        label: 'Early Adopter',
+                        icon: 'icon-[hugeicons--star-01] size-5',
+                        routerLink: '/features/early-adopter',
+                        command: () => this.activeDropdown.set(null),
+                    },
                 ],
             },
             {
@@ -156,7 +168,7 @@ export class HeaderComponent {
                     {
                         label: 'Refund Policy',
                         icon: 'icon-[hugeicons--file-euro] size-5',
-                        routerLink: '/legal/policies/refund',
+                        routerLink: '/legal/refund-policy',
                         command: () => this.activeDropdown.set(null),
                     },
                     {

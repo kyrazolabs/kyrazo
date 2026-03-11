@@ -1,0 +1,92 @@
+<section class="py-16 md:py-24 px-4 md:px-6 bg-surface-50/50 dark:bg-surface-900/20" id="integrations">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-12" appScrollReveal>
+            <span class="text-primary-500 font-bold uppercase tracking-widest text-[10px] mb-4 block">Ecosystem</span>
+            <h2 class="text-3xl md:text-5xl font-black text-surface-900 dark:text-surface-0 tracking-tighter mb-6">
+                Works with <span class="text-primary-500 font-sansation!">everything.</span>
+            </h2>
+            <p class="text-lg text-surface-600 dark:text-surface-400 max-w-2xl mx-auto">
+                Kyrazo effortlessly integrates with your existing tech stack and the tools you already use every day.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center relative" appScrollReveal delay="delay-200">
+            <!-- Sources -->
+            <div class="space-y-4">
+                <div class="text-center md:text-left mb-6">
+                    <h3 class="text-xl font-bold text-surface-900 dark:text-surface-0">Webhook Sources</h3>
+                    <p class="text-base text-surface-500">Events coming from your favorite tools.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    @for (item of sources; track item.name) {
+                        <div class="flex flex-col items-center justify-center p-6 rounded-2xl bg-white dark:bg-surface-950 border border-surface-200 dark:border-surface-800 hover:border-primary-500/30 transition-all group">
+                            <span [class]="item.icon + ' text-3xl mb-3 grayscale group-hover:grayscale-0 transition-all'"></span>
+                            <span class="text-xs font-bold text-surface-700 dark:text-surface-300">{{ item.name }}</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Kyrazo Core -->
+            <div class="flex flex-col items-center justify-center py-12 relative">
+                <div class="hidden lg:flex absolute inset-0 items-center justify-center -z-10">
+                   <div class="w-full h-px bg-linear-to-r from-transparent via-primary-500/20 to-transparent"></div>
+                </div>
+                <div class="w-24 h-24 rounded-3xl bg-primary-500 flex items-center justify-center shadow-2xl shadow-primary-500/40 relative z-10">
+                    <img src="/logo-light.png" alt="Kyrazo Logo" class="w-20 h-20 brightness-0 invert">
+                </div>
+                <div class="mt-8 text-center px-4">
+                    <h4 class="text-lg font-bold text-primary-500 mb-2">The Bridge</h4>
+                    <p class="text-base text-surface-600 dark:text-surface-400">Reliable ingestion, transformation, and physical isolation for every event.</p>
+                </div>
+            </div>
+
+            <!-- Targets -->
+            <div class="space-y-4">
+                <div class="text-center md:text-left mb-6">
+                    <h3 class="text-xl font-bold text-surface-900 dark:text-surface-0">Destinations</h3>
+                    <p class="text-base text-surface-500">Dispatch to internal APIs or 3rd parties.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    @for (item of targets; track item.name) {
+                        <div class="flex flex-col items-center justify-center p-6 rounded-2xl bg-white dark:bg-surface-950 border border-surface-200 dark:border-surface-800 hover:border-primary-500/30 transition-all group">
+                            <span [class]="item.icon + ' text-3xl mb-3 grayscale group-hover:grayscale-0 transition-all'"></span>
+                            <span class="text-xs font-bold text-surface-700 dark:text-surface-300">{{ item.name }}</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 text-center" appScrollReveal delay="delay-400">
+            <div>
+                <div class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 mx-auto mb-4">
+                    <i class="icon-[hugeicons--api] text-2xl"></i>
+                </div>
+                <h4 class="font-bold mb-2 text-surface-900 dark:text-surface-0">Unified API</h4>
+                <p class="text-sm text-surface-500 leading-relaxed">Engineers use one API to handle all external webhooks, reducing code bloat and complexity.</p>
+            </div>
+            <div>
+                <div class="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center text-green-500 mx-auto mb-4">
+                    <i class="icon-[hugeicons--ai-security-03] text-2xl"></i>
+                </div>
+                <h4 class="font-bold mb-2 text-surface-900 dark:text-surface-0">Reliable Retry</h4>
+                <p class="text-sm text-surface-500 leading-relaxed">No more "silent failures". If a target is down, we back off and retry automatically.</p>
+            </div>
+            <div>
+                <div class="w-10 h-10 rounded-xl bg-primary-500/10 flex items-center justify-center text-primary-500 mx-auto mb-4">
+                    <i class="icon-[hugeicons--eye] text-2xl"></i>
+                </div>
+                <h4 class="font-bold mb-2 text-surface-900 dark:text-surface-0">Observability</h4>
+                <p class="text-sm text-surface-500 leading-relaxed">Trace every byte from Stripe to your backend. Debug in seconds, not hours.</p>
+            </div>
+        </div>
+
+        <div class="mt-16 text-center" appScrollReveal delay="delay-500">
+             <a href="https://docs.kyrazo.com/integrations" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm font-bold text-primary-500 hover:text-primary-600 transition-colors">
+                Explore the Protocol
+                <i class="icon-[hugeicons--arrow-right-01]"></i>
+             </a>
+        </div>
+    </div>
+</section>

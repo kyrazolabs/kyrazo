@@ -25,7 +25,7 @@
                         @if (item.items) {
                             <button
                                 (click)="toggleDropdown($event, item.label!)"
-                                class="dropdown-trigger bg-transparent border-none text-surface-600 dark:text-surface-300 hover:text-primary-500 hover:bg-surface-100 dark:hover:bg-surface-800 px-3 py-2 rounded-3xl font-medium transition-colors cursor-pointer text-sm flex items-center gap-1 group">
+                                class="dropdown-trigger bg-transparent border-none text-surface-600 dark:text-surface-300 hover:text-primary-500 hover:bg-surface-100 dark:hover:bg-surface-800 px-3 py-2 rounded-3xl font-medium transition-colors cursor-pointer text-sm flex items-center gap-1 group click-effect">
                                 {{ item.label }}
                                 <i class="pi pi-chevron-down text-[11px]! transition-transform duration-300" [class.rotate-180]="activeDropdown() === item.label"></i>
                             </button>
@@ -33,7 +33,7 @@
                             <a
                                 [routerLink]="item.routerLink"
                                 (click)="item.command?.({originalEvent: $event})"
-                                class="bg-transparent border-none text-surface-600 dark:text-surface-300 hover:text-primary-500 hover:bg-surface-100 dark:hover:bg-surface-800 px-3 py-2 rounded-3xl font-medium transition-colors cursor-pointer text-sm flex items-center gap-1 group no-underline">
+                                class="bg-transparent border-none text-surface-600 dark:text-surface-300 hover:text-primary-500 hover:bg-surface-100 dark:hover:bg-surface-800 px-3 py-2 rounded-3xl font-medium transition-colors cursor-pointer text-sm flex items-center gap-1 group no-underline click-effect">
                                 {{ item.label }}
                             </a>
                         }
@@ -45,7 +45,7 @@
                                     <a
                                         [routerLink]="subItem.routerLink"
                                         (click)="subItem.command?.({originalEvent: $event})"
-                                        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-surface-600 dark:text-surface-300 hover:text-primary-500 hover:bg-primary-500/5 dark:hover:bg-surface-800 transition-colors cursor-pointer no-underline">
+                                        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-surface-600 dark:text-surface-300 hover:text-primary-500 hover:bg-primary-500/5 dark:hover:bg-surface-800 transition-colors cursor-pointer no-underline click-effect">
                                         @if (subItem.icon) {
                                             <i [class]="subItem.icon + ' text-lg'"></i>
                                         }

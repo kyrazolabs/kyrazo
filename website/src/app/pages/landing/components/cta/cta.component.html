@@ -10,13 +10,16 @@
             Join thousands of developers who trust Kyrazo handling their critical events.
         </p>
 
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <button [routerLink]="['/auth/register']" (click)="trackCta()" class="px-8 py-1.5 bg-white text-black font-black rounded-xl hover:bg-primary-800 hover:text-white transition-all duration-300 shadow-xl shadow-white/5 cursor-pointer" aria-label="Get early access for Kyrazo">
-                Get Early Access
-            </button>
-            <!-- <button class="px-8 py-2 bg-transparent border-2 border-surface-800 text-white font-black rounded-2xl hover:bg-surface-800 transition-all duration-300">
-                Compare Plans
-            </button> -->
+        <div class="flex flex-col items-center gap-4 justify-center">
+            <div class="flex flex-col sm:flex-row gap-4 justify-center w-full">
+                <a href="https://dash.kyrazo.com/auth/register" (click)="trackCta()" class="px-8 py-3 bg-white text-black font-black rounded-xl hover:bg-primary-800 hover:text-white transition-all duration-300 shadow-xl shadow-white/5 cursor-pointer no-underline flex items-center justify-center" aria-label="Get early access for Kyrazo">
+                    Get Early Access
+                </a>
+            </div>
+            <div class="flex items-center gap-2 text-surface-400 text-sm mt-2">
+                <i class="icon-[hugeicons--shield-tick] text-primary-500"></i>
+                <span>30-Day Money-Back Guarantee</span>
+            </div>
         </div>
     </div>
 </div>

@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
+import { RouterModule } from '@angular/router';
 
 @Component({
     selector: 'app-dedicated-workers',
     standalone: true,
-    imports: [CommonModule, ButtonModule],
+    imports: [CommonModule, ButtonModule, RouterModule],
     templateUrl: './dedicated-workers.component.html',
 })
 export class DedicatedWorkersComponent {

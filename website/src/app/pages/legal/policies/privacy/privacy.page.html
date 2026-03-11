@@ -11,82 +11,103 @@
     <div class="prose prose-lg dark:prose-invert max-w-none text-surface-600 dark:text-surface-300 space-y-12">
         <section>
             <p class="leading-relaxed">
-                This Privacy Policy explains how <strong>Kyrazo</strong> (“we”, “our”, “us”) collects, uses, and protects personal data when you use our website and services.
+                This Privacy Policy explains how <strong>Kyrazo LLC</strong> (“we”, “our”, “us”) collects, uses, and protects personal data when you use our website and services. We are committed to processing your data securely and transparently.
             </p>
         </section>
 
         <section>
             <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">1. Information We Collect</h2>
-            <p class="mb-4">We collect only the minimum personal data required to provide account access and operate the service.</p>
+            <p class="mb-4">We collect the minimum personal data required to provide account access and operate our high-scale webhook infrastructure.</p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
                 <div class="p-6 rounded-2xl bg-surface-50 dark:bg-surface-900/50 border border-surface-200 dark:border-surface-900">
                     <h3 class="font-bold text-surface-900 dark:text-surface-0 mb-3">1.1 Account Information</h3>
-                    <ul class="list-disc list-inside space-y-1 text-sm">
-                        <li>First name & Last name</li>
-                        <li>Email address</li>
-                        <li>Job title (optional)</li>
-                        <li>Profile avatar</li>
+                    <ul class="list-disc list-inside space-y-1 text-sm font-medium">
+                        <li>Name & Email address</li>
+                        <li>Workspace configurations</li>
+                        <li>Authentication metadata</li>
                     </ul>
                 </div>
                 <div class="p-6 rounded-2xl bg-surface-50 dark:bg-surface-900/50 border border-surface-200 dark:border-surface-900">
-                    <h3 class="font-bold text-surface-900 dark:text-surface-0 mb-3">1.2 Authentication Data</h3>
-                    <ul class="list-disc list-inside space-y-1 text-sm">
-                        <li>Securely hashed passwords</li>
-                        <li>Last login timestamp</li>
-                        <li>Email verification status</li>
+                    <h3 class="font-bold text-surface-900 dark:text-surface-0 mb-3">1.2 Event Data</h3>
+                    <ul class="list-disc list-inside space-y-1 text-sm font-medium">
+                        <li>Webhook payloads (Headers & Bodies)</li>
+                        <li>Delivery status & attempts</li>
+                        <li>Endpoint URLs</li>
                     </ul>
                 </div>
             </div>
+        </section>
 
-            <div class="mt-8">
-                <h3 class="font-bold text-surface-900 dark:text-surface-0 mb-3">1.3 Third-Party Authentication (Google)</h3>
-                <p>If you sign in using Google, we receive basic profile information provided by Google (Name, Email, Image). We do <strong>not</strong> receive access to your Google password or private data.</p>
+        <section>
+            <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">2. Data Security & Encryption</h2>
+            <p>We implement application-level encryption for all sensitive data. Payloads moving through our system are protected using <strong>AES-256-GCM</strong> encryption.</p>
+            <ul class="list-disc list-inside space-y-2 mt-4">
+                <li><strong>In Transit:</strong> All data is encrypted using TLS 1.2+ (HTTPS).</li>
+                <li><strong>At Rest:</strong> Sensitive fields and high-volume event payloads are encrypted before being stored in our databases.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">3. Data Residency & Hosting</h2>
+            <p>Our infrastructure is designed for performance and compliance:</p>
+            <ul class="list-disc list-inside space-y-2 mt-4">
+                <li><strong>Primary Storage & Hosting:</strong> All application and event data is processed and stored on <strong>Netcup</strong> infrastructure in <strong>Germany/Austria (EU)</strong>.</li>
+                <li><strong>Backups:</strong> Encrypted snapshots are replicated to <strong>EEA (EU)</strong> regions for disaster recovery via Cloudflare R2.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">4. Data Retention</h2>
+            <p>We adhere to the principle of storage limitation. Data is purged based on your service agreement and subscription tier:</p>
+            <ul class="list-disc list-inside space-y-2 mt-4">
+                <li><strong>Ingest & Dispatch Events:</strong> Deleted automatically based on the <strong>customer subscription</strong> terms.</li>
+                <li><strong>Processed Webhooks:</strong> Retained according to subscription-level retention settings.</li>
+                <li><strong>Account Data:</strong> Retained for the duration of your active subscription.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">5. Third-Party Processors</h2>
+            <p>We share data with the following trusted service providers to operate Kyrazo:</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+                <div class="p-4 rounded-xl border border-surface-200 dark:border-surface-800">
+                    <span class="font-bold text-surface-900 dark:text-surface-0">Stripe</span>
+                    <p class="text-xs">Payment & Billing (USA/Global)</p>
+                </div>
+                <div class="p-4 rounded-xl border border-surface-200 dark:border-surface-800">
+                    <span class="font-bold text-surface-900 dark:text-surface-0">Netcup</span>
+                    <p class="text-xs">Primary Hosting (Germany/Austria)</p>
+                </div>
+                <div class="p-4 rounded-xl border border-surface-200 dark:border-surface-800">
+                    <span class="font-bold text-surface-900 dark:text-surface-0">Cloudflare</span>
+                    <p class="text-xs">DNS & Object Storage (Global/EEA)</p>
+                </div>
+                <div class="p-4 rounded-xl border border-surface-200 dark:border-surface-800">
+                    <span class="font-bold text-surface-900 dark:text-surface-0">PostHog EU</span>
+                    <p class="text-xs">Product Analytics (Europe)</p>
+                </div>
+                <div class="p-4 rounded-xl border border-surface-200 dark:border-surface-800">
+                    <span class="font-bold text-surface-900 dark:text-surface-0">Sentry</span>
+                    <p class="text-xs">Error Monitoring (USA/Global)</p>
+                </div>
             </div>
         </section>
 
         <section>
-            <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">2. Payment Information</h2>
-            <p>All payments and subscription transactions are processed securely by <strong>Stripe</strong>. We do <strong>not</strong> store or process credit card or payment details on our servers.</p>
-        </section>
-
-        <section>
-            <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">3. How We Use Personal Data</h2>
-            <ul class="list-disc list-inside space-y-2">
-                <li>Create and manage user accounts.</li>
-                <li>Authenticate users and secure access.</li>
-                <li>Process subscriptions and payments.</li>
-                <li>Communicate essential service-related messages.</li>
-                <li>Maintain security and prevent unauthorized access.</li>
-            </ul>
-            <p class="mt-4 font-bold text-primary-500">We do NOT sell personal data or use it for advertising purposes.</p>
-        </section>
-
-        <section>
-            <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">4. Legal Basis (GDPR)</h2>
-            <p>If you are in the EEA, we process data based on contractual necessity, legitimate interests (security), user consent, and legal obligations.</p>
-        </section>
-
-        <section>
-            <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">5. Data Sharing</h2>
-            <p>We share personal data only with trusted service providers: <strong>Stripe</strong> (payments), <strong>Google</strong> (auth), and our infrastructure providers.</p>
-        </section>
-
-        <section>
-            <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">8. Your Rights (GDPR)</h2>
-            <p class="mb-4">You have the right to access, correct, delete, or port your data. You may also withdraw consent or object to processing.</p>
+            <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">6. Your Rights</h2>
+            <p class="mb-4">You have the right to access, rectify, or delete your personal data. You also have the right to object to processing and data portability. To exercise these rights or request a Data Subject Access Request (DSAR), please contact us. Detailed information on your rights can be found on our <a routerLink="/legal/gdpr" class="text-primary-500 hover:underline">GDPR Compliance Page</a>.</p>
             <div class="p-6 rounded-2xl bg-primary-500/5 border border-primary-500/20 text-center">
-                <p class="mb-2">To exercise these rights, contact us at:</p>
                 <a href="mailto:support@kyrazo.com" class="text-primary-600 dark:text-primary-400 font-bold hover:underline">support@kyrazo.com</a>
             </div>
         </section>
 
         <section>
-            <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">13. Contact Information</h2>
+            <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">7. Contact Information</h2>
             <div class="flex flex-col gap-1 text-sm font-medium">
-                <p><span class="text-surface-400">Product:</span> Kyrazo</p>
-                <p><span class="text-surface-400">Email:</span> support@kyrazo.com</p>
-                <p><span class="text-surface-400">Country:</span> United States</p>
+                <p><span class="text-surface-400">Entity:</span> Kyrazo LLC</p>
+                <p><span class="text-surface-400">Email:</span> legal@kyrazo.com</p>
+                <p><span class="text-surface-400">Jurisdiction:</span> United States</p>
             </div>
         </section>
     </div>

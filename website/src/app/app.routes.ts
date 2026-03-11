@@ -67,6 +67,34 @@ export const routes: Routes = [
                 },
             },
             {
+                path: 'legal/gdpr',
+                loadComponent: () =>
+                    import('@pages/legal/policies/gdpr/gdpr.page').then(
+                        (p) => p.GDPRPage,
+                    ),
+                data: {
+                    title: 'GDPR Compliance - Kyrazo',
+                    meta: {
+                        description:
+                            "Kyrazo's commitment to GDPR and data protection. Learn about your rights and how we handle your data.",
+                    },
+                },
+            },
+            {
+                path: 'legal/dpa',
+                loadComponent: () =>
+                    import('@pages/legal/policies/dpa/dpa.page').then(
+                        (p) => p.DPAPage,
+                    ),
+                data: {
+                    title: 'Data Processing Agreement - Kyrazo',
+                    meta: {
+                        description:
+                            "Kyrazo's Data Processing Agreement (DPA). Understand how we process personal data on your behalf.",
+                    },
+                },
+            },
+            {
                 path: 'blog',
                 loadChildren: () =>
                     import('./pages/blog/blog.routes').then(
@@ -125,6 +153,34 @@ export const routes: Routes = [
                             'Eliminate noisy neighbor issues with Kyrazo’s dedicated workers. Isolated infrastructure ensures consistent latency and high throughput for your webhooks.',
                         keywords:
                             'Dedicated Workers, Webhook Isolation, Noisy Neighbor Problem, High Throughput Webhooks, Predictable Latency, Enterprise Webhooks',
+                    },
+                },
+            },
+            {
+                path: 'features/privacy-by-design',
+                loadComponent: () =>
+                    import(
+                        '@pages/features/privacy-by-design/privacy-by-design.page'
+                    ).then((p) => p.PrivacyByDesignPage),
+                data: {
+                    title: 'Privacy by Design - Kyrazo',
+                    meta: {
+                        description:
+                            'Learn how Kyrazo implements privacy-first engineering in its webhook relay infrastructure.',
+                    },
+                },
+            },
+            {
+                path: 'features/early-adopter',
+                loadComponent: () =>
+                    import(
+                        '@pages/features/early-adopter/early-adopter.page'
+                    ).then((p) => p.EarlyAdopterPage),
+                data: {
+                    title: 'Early Adopter Program - Kyrazo',
+                    meta: {
+                        description:
+                            'Join the Kyrazo Early Adopter program and get direct access to our founding engineering team.',
                     },
                 },
             },
