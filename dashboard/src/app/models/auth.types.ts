@@ -2,7 +2,8 @@ export interface IUser {
     _id: string;
     id: string;
     workspaceId?: string;
-    name: string;
+    firstName: string;
+    lastName: string;
     email: string;
     avatar: string | null;
     isActive: boolean;
