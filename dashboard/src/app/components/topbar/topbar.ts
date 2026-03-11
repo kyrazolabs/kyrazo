@@ -8,6 +8,7 @@ import {
     ElementRef,
     HostListener,
     signal,
+    DestroyRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -17,7 +18,8 @@ import {
     Router,
     RouterLink,
 } from '@angular/router';
-import { filter, map } from 'rxjs/operators';
+import { filter, map, take } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { AppConfig } from '@components/app.config';
 import { LayoutService } from '../service/layout.service';
@@ -38,7 +40,6 @@ import { BadgeModule } from 'primeng/badge';
 import { INamespace } from '@models/namespace.types';
 import { StorageService } from '@core/services/storage.service';
 import { NamespaceService } from '@core/services/namespace.service';
-import { CreateFirstNamespaceComponent } from '../launchpad/namespaces/create-first-namespace/create-first-namespace';
 import { AuthService } from '@core/auth/auth.service';
 import { WorkerComponent } from '../worker/worker';
 import { WorkerService } from '@core/services/worker.service';
@@ -74,6 +75,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
     private ps = inject(NamespaceService);
     private dialogService = inject(DialogService);
     protected workerService = inject(WorkerService);
+    private destroyRef = inject(DestroyRef);
 
     layoutService: LayoutService = inject(LayoutService);
 
@@ -123,17 +125,19 @@ export class TopbarComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private store: StorageService,
     ) {
-        this.store.changes$.subscribe((change) => {
-            if (change?.key === 'workspace') {
-                this.selectedNamespace = null;
-                this.ss.removeItem('namespace');
-                this.loadNamespaces();
-            }
-            if (change?.key === 'avatar') {
-                this.avatar = this.ss.getItem('avatar');
-                this.loadNamespaces();
-            }
-        });
+        this.store.changes$
+            .pipe(takeUntilDestroyed())
+            .subscribe((change) => {
+                if (change?.key === 'workspace') {
+                    this.selectedNamespace = null;
+                    this.ss.removeItem('namespace');
+                    this.loadNamespaces();
+                }
+                if (change?.key === 'avatar') {
+                    this.avatar = this.ss.getItem('avatar');
+                    this.loadNamespaces();
+                }
+            });
     }
 
     showCreateNamespace() {
@@ -149,6 +153,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
             .pipe(
                 filter((event) => event instanceof NavigationEnd),
                 map(() => this.getRouteTitle(this.route)),
+                takeUntilDestroyed(this.destroyRef)
             )
             .subscribe((title) => (this.pageTitle = title || 'Dashboard'));
 
@@ -162,13 +167,17 @@ export class TopbarComponent implements OnInit, OnDestroy {
         this.workerService.acquireWorkerPolling();
 
         // Listen for namespace updates
-        this.ps.namespacesUpdated$.subscribe(() => {
-            this.loadNamespaces();
-        });
+        this.ps.namespacesUpdated$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(() => {
+                this.loadNamespaces();
+            });
 
-        this.dialogService.namespaceSaved$.subscribe(() => {
-            this.loadNamespaces();
-        });
+        this.dialogService.namespaceSaved$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(() => {
+                this.loadNamespaces();
+            });
     }
 
     ngOnDestroy() {

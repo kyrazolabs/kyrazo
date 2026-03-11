@@ -45,9 +45,12 @@ export class WorkerService {
         }
     }
 
-    /** @deprecated Use acquireWorkerPolling() instead */
+    /** @deprecated Use acquireWorkerPolling() instead. This now performs a one-off load. */
     loadWorkers() {
-        this.acquireWorkerPolling();
+        this.getWorkerStatus().subscribe({
+            next: (res) => this.workers.set(res.data),
+            error: (err) => console.error('One-off worker load failed', err)
+        });
     }
 
     private startPoll() {
@@ -60,6 +63,10 @@ export class WorkerService {
 
         this.getWorkerStatus()
             .pipe(
+                catchError((err) => {
+                    console.error('Worker polling failed:', err);
+                    return throwError(() => err);
+                }),
                 finalize(() => {
                     this.loading.set(false);
                     this.scheduleNextPoll();
@@ -67,8 +74,14 @@ export class WorkerService {
             )
             .subscribe({
                 next: (res) => {
-                    this.workers.set(res.data);
+                    if (res?.success) {
+                        this.workers.set(res.data);
+                    }
                 },
+                error: () => {
+                    // Error is already handled/logged in catchError, 
+                    // and finalize ensures the next poll is scheduled.
+                }
             });
     }
 

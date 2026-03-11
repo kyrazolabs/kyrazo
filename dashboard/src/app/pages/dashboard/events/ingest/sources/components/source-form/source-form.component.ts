@@ -115,6 +115,7 @@ export class SourceFormComponent implements OnInit, OnChanges {
     loading = signal(false);
     initialLoading = signal(false);
     isEditing = signal(false);
+    loadedSource = signal<ISource | null>(null);
     filteredEventTypes = signal<string[]>([]);
 
     availableEndpoints = signal<any[]>([]); // Store fetched endpoints
@@ -280,6 +281,7 @@ export class SourceFormComponent implements OnInit, OnChanges {
         this.initialLoading.set(true); // Set initial loading
         this.sourceService.get(this.sourceId).subscribe({
             next: (response) => {
+                this.loadedSource.set(response.data);
                 this.populateForm(response.data);
                 this.initialLoading.set(false);
             },
@@ -346,11 +348,12 @@ export class SourceFormComponent implements OnInit, OnChanges {
                           (et: string) => et && et.trim(),
                       )
                     : [],
-                forwarding:
-                    this.hasForwarding() &&
-                    Array.isArray(formValue.endpoints) &&
-                    formValue.endpoints.length > 0,
-                endpoints: this.hasForwarding() ? formValue.endpoints : [],
+                forwarding: this.hasForwarding() 
+                    ? (Array.isArray(formValue.endpoints) && formValue.endpoints.length > 0)
+                    : (this.loadedSource()?.forwarding ?? false),
+                endpoints: this.hasForwarding() 
+                    ? formValue.endpoints 
+                    : (this.loadedSource()?.endpoints?.map(e => e.id) ?? []),
             };
 
             this.sourceService.update(this.sourceId!, updateData).subscribe({
