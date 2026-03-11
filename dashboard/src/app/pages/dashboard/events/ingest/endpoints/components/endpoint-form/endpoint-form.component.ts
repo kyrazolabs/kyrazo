@@ -69,7 +69,7 @@ export class EndpointFormComponent implements OnInit, OnChanges {
     private readonly fb = inject(FormBuilder);
     private readonly mes = inject(MessageService);
     private readonly endpointService = inject(EndpointService);
-    private readonly dialogService = inject(DialogService);
+    public readonly dialogService = inject(DialogService);
     public readonly subscriptionService = inject(SubscriptionService);
     private readonly sentry = inject(SentryService);
     private readonly posthog = inject(PostHogService);
