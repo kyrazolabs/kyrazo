@@ -156,7 +156,8 @@
 
                     <div class="flex justify-center">
                         <p-inputotp
-                            [(ngModel)]="otpCode"
+                            [ngModel]="otpCode()"
+                            (ngModelChange)="otpCode.set($event)"
                             [length]="6"
                             [integerOnly]="true"
                             (onComplete)="verify2FA()"
