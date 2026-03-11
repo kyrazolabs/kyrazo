@@ -291,7 +291,7 @@ export class RegisterPage {
             const returnUrl =
                 this.route.snapshot.queryParamMap.get('returnUrl');
             if (returnUrl) {
-                this.router.navigate([returnUrl], { replaceUrl: true });
+                this.router.navigateByUrl(returnUrl, { replaceUrl: true });
             } else {
                 this.router.navigate(['/launchpad'], { replaceUrl: true });
             }
