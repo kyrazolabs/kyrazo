@@ -44,7 +44,9 @@ export class OtpDialogComponent {
 
     onVisibleChange(visible: boolean) {
         if (!visible) {
-            this.otpService.state().onCancel();
+            this.code = '';
+            this.error = '';
+            this.isBackupCode = false;
         }
     }
 
@@ -82,9 +84,9 @@ export class OtpDialogComponent {
     }
 
     cancel() {
-        this.otpService.state().onCancel();
-        this.code = '';
-        this.isBackupCode = false;
+        if (this.otpService.state().show) {
+            this.otpService.state().onCancel();
+        }
     }
 
     toggleBackupCode() {

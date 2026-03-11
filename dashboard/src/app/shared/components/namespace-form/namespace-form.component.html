@@ -1,0 +1,83 @@
+<div class="flex flex-col gap-4 mt-2">
+    <div class="flex flex-col gap-2">
+        <label for="name" class="font-bold">Name</label>
+        <input
+            type="text"
+            pInputText
+            id="name"
+            [(ngModel)]="namespaceForm.name"
+            required
+            autofocus
+            placeholder="e.g., My Web App, E-commerce API"
+            class="rounded-xl!"
+        />
+        @if (!namespaceForm.name && attemptedSave) {
+        <small class="text-red-500">Name is required.</small>
+        }
+    </div>
+    <div class="flex flex-col gap-2">
+        <label for="description" class="font-bold">Description</label>
+        <textarea
+            id="description"
+            pInputTextarea
+            [(ngModel)]="namespaceForm.description"
+            rows="3"
+            cols="20"
+            placeholder="Brief description of your namespace..."
+            class="rounded-xl!"
+        ></textarea>
+    </div>
+    <div class="flex flex-col gap-2">
+        <div class="flex items-center justify-between">
+            <label for="prefix" class="font-bold flex items-center gap-2">
+                Header Prefix
+                <i
+                    class="pi pi-info-circle text-sm opacity-60"
+                    pTooltip="Customize the HTTP header prefix for outbound webhooks (e.g., X-Webhook-Id becomes X-Stripe-Id)"
+                ></i>
+            </label>
+            @if (!hasWhiteLabelFeature) {
+            <span
+                (click)="dialogService.openBillingDialog()"
+                pTooltip="Upgrade to Pro to customize header prefixes"
+                class="px-2.5 py-0.5 rounded-full bg-primary-500/10 border border-primary-500/30 text-primary-600 shadow-primary-500/20 text-[10px] font-bold uppercase tracking-wider cursor-pointer"
+            >
+                Pro</span
+            >
+            }
+        </div>
+        <input
+            type="text"
+            pInputText
+            id="prefix"
+            [(ngModel)]="namespaceForm.whiteLabelHeaders"
+            [placeholder]="hasWhiteLabelFeature ? 'e.g. X-Kyrazo' : 'X-Webhook (Default)'"
+            [disabled]="!hasWhiteLabelFeature"
+            class="rounded-xl!"
+        />
+        @if (hasWhiteLabelFeature) {
+        <small class="opacity-60 text-xs"
+            >This will replace the default "X-Webhook" prefix.</small
+        >
+        }
+    </div>
+
+    <div class="flex justify-end gap-2 mt-4">
+        <p-button
+            label="Cancel"
+            icon="pi pi-times"
+            [text]="true"
+            severity="secondary"
+            (onClick)="onCancel.emit()"
+            styleClass="rounded-xl!"
+        />
+        <p-button
+            label="Save"
+            icon="pi pi-check"
+            (onClick)="saveNamespace()"
+            [loading]="isSaving"
+            [disabled]="isSaving"
+            styleClass="rounded-xl!"
+        />
+    </div>
+</div>

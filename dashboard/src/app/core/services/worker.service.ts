@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, throwError, tap } from 'rxjs';
+import { Observable, catchError, throwError, tap, finalize } from 'rxjs';
 import { ApiResponse, WorkerStatus } from '@models/index';
 import { environment } from 'environments/environment';
 
@@ -20,38 +20,78 @@ export class WorkerService {
     }
 
     private pollingSubscription?: any;
+    private pollingRefCount = 0;
 
+    /**
+     * Start worker polling with reference counting.
+     * Call this when a component needs worker data.
+     */
+    acquireWorkerPolling() {
+        this.pollingRefCount++;
+        if (this.pollingRefCount === 1) {
+            this.startPoll();
+        }
+    }
+
+    /**
+     * Stop worker polling with reference counting.
+     * Call this when a component is destroyed or no longer needs worker data.
+     */
+    releaseWorkerPolling() {
+        this.pollingRefCount--;
+        if (this.pollingRefCount <= 0) {
+            this.pollingRefCount = 0;
+            this.stopPoll();
+        }
+    }
+
+    /** @deprecated Use acquireWorkerPolling() instead */
     loadWorkers() {
+        this.acquireWorkerPolling();
+    }
+
+    private startPoll() {
         this.loading.set(true);
         this.fetchWorkers();
-
-        // Setup polling if not already running
-        if (!this.pollingSubscription) {
-            this.pollingSubscription = setInterval(
-                () => this.fetchWorkers(),
-                30000,
-            );
-        }
     }
 
     private fetchWorkers() {
-        this.getWorkerStatus().subscribe({
-            next: (res) => {
-                this.workers.set(res.data);
-                this.loading.set(false);
-            },
-            error: () => {
-                this.loading.set(false);
-            },
-        });
+        this.stopPoll();
+
+        this.getWorkerStatus()
+            .pipe(
+                finalize(() => {
+                    this.loading.set(false);
+                    this.scheduleNextPoll();
+                }),
+            )
+            .subscribe({
+                next: (res) => {
+                    this.workers.set(res.data);
+                },
+            });
     }
 
+    private scheduleNextPoll() {
+        if (this.pollingRefCount > 0) {
+            this.pollingSubscription = setTimeout(() => {
+                this.fetchWorkers();
+            }, 30000);
+        }
+    }
+
+    /** @deprecated Use releaseWorkerPolling() instead */
     stopPolling() {
+        this.releaseWorkerPolling();
+    }
+
+    private stopPoll() {
         if (this.pollingSubscription) {
-            clearInterval(this.pollingSubscription);
+            clearTimeout(this.pollingSubscription);
             this.pollingSubscription = undefined;
         }
     }
+
 
     getBadgeSeverity(
         status: string,

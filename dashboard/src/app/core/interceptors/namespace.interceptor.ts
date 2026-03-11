@@ -19,11 +19,12 @@ export const namespaceInterceptor: HttpInterceptorFn = (req, next) => {
         req.url.includes('/v1/payment') ||
         req.url.includes('/v1/support')
     ) {
+        const headers: { [name: string]: string } = {};
+        if (workspace) headers['x-workspace-id'] = workspace;
+        if (namespace) headers['x-namespace-id'] = namespace;
+
         const modified = req.clone({
-            setHeaders: {
-                'x-workspace-id': workspace ?? '',
-                'x-namespace-id': namespace ?? '',
-            },
+            setHeaders: headers,
         });
         return next(modified);
     }

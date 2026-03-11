@@ -3,6 +3,7 @@ import {
     computed,
     inject,
     OnInit,
+    OnDestroy,
     ViewChild,
     ElementRef,
     HostListener,
@@ -67,7 +68,7 @@ import { WorkerService } from '@core/services/worker.service';
     styleUrl: './topbar.scss',
     animations: [dropdownAnimation],
 })
-export class TopbarComponent implements OnInit {
+export class TopbarComponent implements OnInit, OnDestroy {
     private as = inject(AuthService);
     private ss = inject(StorageService);
     private ps = inject(NamespaceService);
@@ -76,7 +77,6 @@ export class TopbarComponent implements OnInit {
 
     layoutService: LayoutService = inject(LayoutService);
 
-    visible: boolean = false;
     workerDrawerVisible = signal(false);
 
     value1: string = '';
@@ -137,7 +137,7 @@ export class TopbarComponent implements OnInit {
     }
 
     showCreateNamespace() {
-        this.visible = true;
+        this.dialogService.openNamespaceDialog();
     }
 
     toggleNamespaceSelector(event: any) {
@@ -159,12 +159,20 @@ export class TopbarComponent implements OnInit {
         this.initializeNamespaceSelection();
 
         // Initialize worker loading
-        this.workerService.loadWorkers();
+        this.workerService.acquireWorkerPolling();
 
         // Listen for namespace updates
         this.ps.namespacesUpdated$.subscribe(() => {
             this.loadNamespaces();
         });
+
+        this.dialogService.namespaceSaved$.subscribe(() => {
+            this.loadNamespaces();
+        });
+    }
+
+    ngOnDestroy() {
+        this.workerService.releaseWorkerPolling();
     }
     selectNamespace(namespace: INamespace) {
         this.selectedNamespace = namespace;
@@ -178,6 +186,7 @@ export class TopbarComponent implements OnInit {
         this.ps.getWorkspaceNamespaces().subscribe({
             next: (response) => {
                 this.namespaces = response.data;
+
                 // Try to restore previously selected namespace
                 const namespaceId = this.ss.getItem<string>('namespace');
                 if (namespaceId) {
@@ -186,6 +195,10 @@ export class TopbarComponent implements OnInit {
                     );
                     if (savedNamespace) {
                         this.selectedNamespace = savedNamespace;
+                    } else {
+                        // Invalidate stale selection
+                        this.ss.removeItem('namespace');
+                        this.selectedNamespace = null;
                     }
                 }
 
@@ -194,6 +207,7 @@ export class TopbarComponent implements OnInit {
                     this.selectedNamespace = this.namespaces[0];
                     this.ss.setItem('namespace', this.selectedNamespace.id);
                 }
+
 
                 // Only redirect to Launchpad if no namespaces exist AND we are not in a settings page
                 if (

@@ -103,9 +103,8 @@ export class SourceFormComponent implements OnInit, OnChanges {
     private readonly sentry = inject(SentryService);
     private readonly posthog = inject(PostHogService);
 
-    public readonly hasForwarding = computed(() =>
-        this.subscriptionService.hasFeature('forwardConfiguration'),
-    );
+    public readonly hasForwarding =
+        this.subscriptionService.hasFeature('forwardConfiguration');
 
     @Input() sourceId: string | null = null;
     @Input() sourceType: string | null = null; // For default type when creating
@@ -348,11 +347,10 @@ export class SourceFormComponent implements OnInit, OnChanges {
                       )
                     : [],
                 forwarding:
+                    this.hasForwarding() &&
                     Array.isArray(formValue.endpoints) &&
-                    formValue.endpoints.length > 0
-                        ? true
-                        : false,
-                endpoints: formValue.endpoints,
+                    formValue.endpoints.length > 0,
+                endpoints: this.hasForwarding() ? formValue.endpoints : [],
             };
 
             this.sourceService.update(this.sourceId!, updateData).subscribe({
@@ -393,16 +391,10 @@ export class SourceFormComponent implements OnInit, OnChanges {
                 type: SourceType.RECEIVE,
                 service: formValue.service,
                 forwarding:
+                    this.hasForwarding() &&
                     Array.isArray(formValue.endpoints) &&
-                    formValue.endpoints.length > 0
-                        ? true
-                        : false,
-                eventTypes: formValue.eventTypes
-                    ? formValue.eventTypes.filter(
-                          (et: string) => et && et.trim(),
-                      )
-                    : [],
-                endpoints: formValue.endpoints || [], // Map endpoints
+                    formValue.endpoints.length > 0,
+                endpoints: this.hasForwarding() ? formValue.endpoints || [] : [], // Map endpoints
                 retryPolicy: {
                     maxAttempts: 3,
                     backoffStrategy: backoffStrategy.EXPONENTIAL,

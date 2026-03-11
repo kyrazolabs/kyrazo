@@ -11,7 +11,14 @@
                 class="after:border after:border-surface-300 dark:after:border-surface-600" />
             <div class="flex items-center gap-1 lg:gap-2 overflow-hidden">
                 <!-- Namespace Selector (shown only when workspace is selected) -->
-                <div class="flex items-center justify-between cursor-pointer duration-300 hover:bg-surface-50 dark:hover:bg-surface-800/50 transition-all shrink-0 click-effect" (click)="toggleNamespaceSelector($event)">
+                <div 
+                    class="flex items-center justify-between cursor-pointer duration-300 hover:bg-surface-50 dark:hover:bg-surface-800/50 transition-all shrink-0 click-effect outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded-lg" 
+                    role="button"
+                    tabindex="0"
+                    aria-label="Select Namespace"
+                    (click)="toggleNamespaceSelector($event)"
+                    (keydown.enter)="toggleNamespaceSelector($event)"
+                    (keydown.space)="toggleNamespaceSelector($event)">
                     <div class="flex justify-between items-center gap-1 lg:gap-2">
                         <h3 class="text-sm lg:text-lg font-medium truncate max-w-[100px] lg:max-w-none">{{ selectedNamespace?.name || 'Select Namespace' }}</h3>
                         <i class="icon-[lucide--chevrons-up-down] size-4 lg:size-5 aspect-square text-surface-400 dark:text-surface-500"></i>
@@ -208,14 +215,7 @@
         </div>
     </div>
 </div>
-<p-dialog header="Create Namespace" [(visible)]="visible" [modal]="true" [style]="{ width: '50rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
-    <div class="grid grid-cols-5">
-
-    </div>
-    <ng-template #footer>
-        <p-button label="Cancel" [text]="true" severity="secondary" (click)="visible = false" />
-        <p-button label="Save" [outlined]="true" severity="secondary" (click)="visible = false" />
-    </ng-template>
-</p-dialog>
 
 <app-worker-status [(visible)]="workerDrawerVisible" />
+
+

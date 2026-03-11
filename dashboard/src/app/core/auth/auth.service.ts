@@ -184,22 +184,23 @@ export class AuthService {
 
         const { tokens, user } = response.data;
         const { access, refresh } = tokens;
-        const { workspaceId, avatar, id, email, name } = user;
+        const { workspaceId, avatar, id, email, firstName, lastName } = user;
+        const fullName = `${firstName} ${lastName}`.trim();
 
         this.storage.setItem('access_token', access);
         this.storage.setItem('refresh_token', refresh);
         this.storage.setItem('workspace', workspaceId);
         this.storage.setItem('avatar', avatar);
         this.storage.setItem('user_id', id);
-        this.storage.setItem('user_name', name);
+        this.storage.setItem('user_name', fullName);
 
         this.posthog.identify(id, {
             email,
-            name,
+            name: fullName,
         });
     }
 
-    handleRefreshSuccess(response: LoginResponse): void {
+    handleRefreshSuccess(response: ApiResponse<RefreshTokenResponse>): void {
         if (!response.data) {
             return;
         }
@@ -208,6 +209,7 @@ export class AuthService {
         this.storage.setItem('access_token', access);
         this.storage.setItem('refresh_token', refresh);
     }
+
     private handleError(error: HttpErrorResponse): Observable<never> {
         console.error('AuthService Error:', error);
         return throwError(() => error);

@@ -191,7 +191,7 @@
             } @else {
                 <div class="flex flex-col items-center justify-center py-8 text-center border border-dashed border-surface-200 dark:border-surface-800 rounded-xl bg-surface-50 dark:bg-surface-950">
                     <p class="text-surface-500 dark:text-surface-400 text-sm mb-4">Custom headers are not included in your current plan.</p>
-                    <p-button label="Upgrade to Unlock" icon="pi pi-lock" size="small" [outlined]="true" (onClick)="subscriptionService.refreshSubscription()" styleClass="rounded-xl!" />
+                    <p-button label="Upgrade to Unlock" icon="pi pi-lock" size="small" [outlined]="true" (onClick)="dialogService.openBillingDialog()" styleClass="rounded-xl!" />
                 </div>
             }
         </div>

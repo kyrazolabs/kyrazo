@@ -64,18 +64,6 @@ export class NamespacesPage implements OnInit {
     totalNamespaces = signal<number>(0);
     loading = false;
 
-    // Dialog
-    namespaceDialog = false;
-    namespaceForm: {
-        name: string;
-        description: string;
-        whiteLabelHeaders: string;
-        _id?: string;
-    } = {
-        name: '',
-        description: '',
-        whiteLabelHeaders: '',
-    };
     isSaving = false;
     isEdit = false;
 
@@ -94,6 +82,11 @@ export class NamespacesPage implements OnInit {
 
     ngOnInit() {
         this.loadNamespaces();
+
+        // Listen for namespace saved via global dialog
+        this.dialogService.namespaceSaved$.subscribe(() => {
+            this.loadNamespaces();
+        });
     }
 
     loadNamespaces() {
@@ -125,105 +118,18 @@ export class NamespacesPage implements OnInit {
     }
 
     openNew() {
-        this.namespaceForm = {
-            name: '',
-            description: '',
-            whiteLabelHeaders: '',
-        };
-        this.isEdit = false;
-        this.namespaceDialog = true;
+        this.dialogService.openNamespaceDialog();
     }
 
     editNamespace(namespace: INamespace) {
-        this.namespaceForm = {
-            name: namespace.name,
-            description: namespace.description || '',
-            whiteLabelHeaders: namespace.whiteLabelHeaders || '',
-            _id: namespace.id,
-        };
-        this.isEdit = true;
-        this.namespaceDialog = true;
+        this.dialogService.openNamespaceDialog(namespace.id);
     }
 
     hideDialog() {
-        this.namespaceDialog = false;
-        this.isSaving = false;
+        this.dialogService.closeNamespaceDialog();
     }
 
-    saveNamespace() {
-        if (!this.namespaceForm.name.trim()) return;
-
-        this.isSaving = true;
-
-        if (this.isEdit && this.namespaceForm._id) {
-            // Update
-            this.namespaceService
-                .update(this.namespaceForm._id, {
-                    name: this.namespaceForm.name,
-                    description: this.namespaceForm.description,
-                    whiteLabelHeaders: this.namespaceForm.whiteLabelHeaders,
-                })
-                .subscribe({
-                    next: (res) => {
-                        this.messageService.add({
-                            severity: 'success',
-                            summary: 'Success',
-                            detail: 'Namespace updated',
-                        });
-                        this.loadNamespaces();
-                        this.hideDialog();
-                    },
-                    error: (err) => {
-                        this.sentry.captureException(err);
-                        this.messageService.add({
-                            severity: 'error',
-                            summary: 'Error',
-                            detail: 'Failed to update namespace',
-                        });
-                        this.isSaving = false;
-                    },
-                });
-        } else {
-            // Create
-            this.namespaceService
-                .create({
-                    name: this.namespaceForm.name,
-                    description: this.namespaceForm.description,
-                    whiteLabelHeaders: this.namespaceForm.whiteLabelHeaders,
-                })
-                .subscribe({
-                    next: (res) => {
-                        this.messageService.add({
-                            severity: 'success',
-                            summary: 'Success',
-                            detail: 'Namespace created',
-                        });
-                        this.loadNamespaces();
-                        this.hideDialog();
-                        // Optionally reload window if we want to update topbar list immediately,
-                        // but for this page managing its own list, loadNamespaces is enough for the table view.
-                        // If topbar sync is critical, we might need a signal or subject in a shared service.
-                        // For now, let's just refresh the table.
-                    },
-                    error: (err) => {
-                        this.sentry.captureException(err);
-                        const errorMessage =
-                            err.error?.error?.code === 'LIMIT_EXCEEDED'
-                                ? 'Namespace limit exceeded for your current plan.'
-                                : err.error?.error?.message ||
-                                  err.message ||
-                                  'Failed to create namespace';
-
-                        this.messageService.add({
-                            severity: 'error',
-                            summary: 'Error',
-                            detail: errorMessage,
-                        });
-                        this.isSaving = false;
-                    },
-                });
-        }
-    }
+    // saveNamespace() removed as it is now handled by NamespaceFormComponent
 
     deleteNamespace(namespace: INamespace) {
         this.confirmationService.confirm({

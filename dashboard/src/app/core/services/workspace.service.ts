@@ -72,7 +72,10 @@ export class WorkspaceService {
                 environment.workspace.update(workspaceId),
                 payload,
             )
-            .pipe(catchError(this.handleError));
+            .pipe(
+                tap(() => this.workspacesUpdated.next()),
+                catchError(this.handleError),
+            );
     }
 
     // Delete Workspace
@@ -94,7 +97,10 @@ export class WorkspaceService {
                 environment.workspace.restore(workspaceId),
                 {},
             )
-            .pipe(catchError(this.handleError));
+            .pipe(
+                tap(() => this.workspacesUpdated.next()),
+                catchError(this.handleError),
+            );
     }
 
     // Archive Workspace
@@ -104,7 +110,10 @@ export class WorkspaceService {
                 environment.workspace.archive(workspaceId),
                 {},
             )
-            .pipe(catchError(this.handleError));
+            .pipe(
+                tap(() => this.workspacesUpdated.next()),
+                catchError(this.handleError),
+            );
     }
 
     // Unarchive Workspace
@@ -114,7 +123,10 @@ export class WorkspaceService {
                 environment.workspace.unarchive(workspaceId),
                 {},
             )
-            .pipe(catchError(this.handleError));
+            .pipe(
+                tap(() => this.workspacesUpdated.next()),
+                catchError(this.handleError),
+            );
     }
 
     // Invite User to Workspace

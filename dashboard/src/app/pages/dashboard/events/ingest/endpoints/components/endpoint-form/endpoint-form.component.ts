@@ -69,20 +69,17 @@ export class EndpointFormComponent implements OnInit, OnChanges {
     private readonly fb = inject(FormBuilder);
     private readonly mes = inject(MessageService);
     private readonly endpointService = inject(EndpointService);
-    private readonly dialogService = inject(DialogService);
+    public readonly dialogService = inject(DialogService);
     public readonly subscriptionService = inject(SubscriptionService);
     private readonly sentry = inject(SentryService);
     private readonly posthog = inject(PostHogService);
 
-    public readonly hasCustomHeaders = computed(() =>
-        this.subscriptionService.hasFeature('customHeaders'),
-    );
-    public readonly hasCustomTimeout = computed(() =>
-        this.subscriptionService.hasFeature('customTimeout'),
-    );
-    public readonly hasCustomRetries = computed(() =>
-        this.subscriptionService.hasFeature('customRetries'),
-    );
+    public readonly hasCustomHeaders =
+        this.subscriptionService.hasFeature('customHeaders');
+    public readonly hasCustomTimeout =
+        this.subscriptionService.hasFeature('customTimeout');
+    public readonly hasCustomRetries =
+        this.subscriptionService.hasFeature('customRetries');
 
     @Input() endpointId: string | null = null;
     @Output() onSuccess = new EventEmitter<any>();

@@ -2,7 +2,8 @@ export interface IUser {
     _id: string;
     id: string;
     workspaceId?: string;
-    name: string;
+    firstName: string;
+    lastName: string;
     email: string;
     avatar: string | null;
     isActive: boolean;
@@ -24,9 +25,9 @@ export interface UserProfileResponse {
     timeZone: string;
     language: string;
     isActive: boolean;
-    lastLogin: Date;
-    createdAt: Date;
-    updatedAt: Date;
+    lastLogin: string;
+    createdAt: string;
+    updatedAt: string;
     is2FAEnabled: boolean;
 }
 
@@ -68,8 +69,10 @@ export interface LoginResponse {
 }
 
 export interface RefreshTokenResponse {
-    accessToken: string;
-    refreshToken: string;
+    tokens: {
+        access: string;
+        refresh: string;
+    };
 }
 
 export type RegisterResponse = LoginResponse;

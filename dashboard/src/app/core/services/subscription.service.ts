@@ -76,4 +76,17 @@ export class SubscriptionService {
             },
         });
     }
+
+    public createBillingPortalSession(returnUrl: string) {
+        this.settings.createBillingPortalSession(returnUrl).subscribe({
+            next: (res) => {
+                if (res.success && res.data?.url) {
+                    window.location.href = res.data.url;
+                }
+            },
+            error: (err) => {
+                console.error('Failed to create billing portal session:', err);
+            },
+        });
+    }
 }
