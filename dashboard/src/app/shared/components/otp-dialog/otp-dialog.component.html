@@ -2,6 +2,7 @@
     [header]="otpService.state().message"
     [visible]="otpService.state().show"
     (visibleChange)="onVisibleChange($event)"
+    (onHide)="cancel()"
     [modal]="true"
     [closable]="true"
     [draggable]="false"
