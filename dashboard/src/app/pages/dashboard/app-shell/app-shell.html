@@ -289,3 +289,23 @@
         (onCancel)="onInviteMemberDialogHide()"
     ></app-invite-member-form>
 </p-dialog>
+
+<!-- Namespace Form Dialog (Global) -->
+<p-dialog
+    [header]="namespaceDialogHeader"
+    [(visible)]="namespaceDialogVisible"
+    [modal]="true"
+    [style]="{ width: '500px' }"
+    [breakpoints]="{ '960px': '75vw', '640px': '90vw' }"
+    styleClass="rounded-2xl!"
+    [draggable]="false"
+    [resizable]="false"
+    (onHide)="onNamespaceDialogHide()"
+>
+    <app-namespace-form
+        [namespaceId]="namespaceDialogId"
+        (onSuccess)="onNamespaceFormSuccess($event)"
+        (onCancel)="onNamespaceDialogHide()"
+    ></app-namespace-form>
+</p-dialog>
+

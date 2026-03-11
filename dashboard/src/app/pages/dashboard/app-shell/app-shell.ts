@@ -25,6 +25,7 @@ import { EndpointFormComponent } from '../events/ingest/endpoints/components/end
 import { TargetFormComponent } from '../events/dispatch/targets/components/target-form/target-form.component';
 import { TwofaSetupDialogComponent } from '@shared/components/twofa-setup-dialog/twofa-setup-dialog.component';
 import { InviteMemberFormComponent } from '@shared/components/invite-member-form/invite-member-form.component';
+import { NamespaceFormComponent } from '@shared/components/namespace-form/namespace-form.component';
 
 @Component({
     selector: 'app-shell',
@@ -41,6 +42,7 @@ import { InviteMemberFormComponent } from '@shared/components/invite-member-form
         TargetFormComponent,
         TwofaSetupDialogComponent,
         InviteMemberFormComponent,
+        NamespaceFormComponent,
     ],
     templateUrl: './app-shell.html',
     styleUrl: './app-shell.scss',
@@ -90,6 +92,11 @@ export class AppShell implements OnInit, AfterViewInit {
     // Invite Member Dialog
     inviteMemberDialogVisible = false;
     inviteMemberWorkspaceId: string | null = null;
+
+    // Namespace Dialog
+    namespaceDialogVisible = false;
+    namespaceDialogId: string | null = null;
+    namespaceDialogHeader = 'Create Namespace';
 
     constructor(private dialogService: DialogService) {}
 
@@ -151,6 +158,15 @@ export class AppShell implements OnInit, AfterViewInit {
         this.dialogService.inviteMemberDialogState$.subscribe((state) => {
             this.inviteMemberDialogVisible = state.visible;
             this.inviteMemberWorkspaceId = state.workspaceId;
+        });
+
+        // Listen for Namespace Dialog State
+        this.dialogService.namespaceDialogState$.subscribe((state) => {
+            this.namespaceDialogVisible = state.visible;
+            this.namespaceDialogId = state.namespaceId;
+            this.namespaceDialogHeader = state.namespaceId
+                ? 'Edit Namespace'
+                : 'Create Namespace';
         });
     }
 
@@ -228,5 +244,14 @@ export class AppShell implements OnInit, AfterViewInit {
 
     onInviteMemberDialogHide() {
         this.dialogService.closeInviteMemberDialog();
+    }
+
+    onNamespaceFormSuccess(data?: any) {
+        this.dialogService.notifyNamespaceSaved(data);
+        this.dialogService.closeNamespaceDialog();
+    }
+
+    onNamespaceDialogHide() {
+        this.dialogService.closeNamespaceDialog();
     }
 }

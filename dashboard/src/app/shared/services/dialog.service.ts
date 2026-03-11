@@ -53,6 +53,13 @@ export class DialogService {
     inviteMemberDialogState$ =
         this.inviteMemberDialogStateSubject.asObservable();
 
+    // Namespace Dialog State
+    private namespaceDialogStateSubject = new BehaviorSubject<{
+        visible: boolean;
+        namespaceId: string | null;
+    }>({ visible: false, namespaceId: null });
+    namespaceDialogState$ = this.namespaceDialogStateSubject.asObservable();
+
     // Event Sources
     private sourceSavedSource = new Subject<any>();
     sourceSaved$ = this.sourceSavedSource.asObservable();
@@ -68,6 +75,9 @@ export class DialogService {
 
     private memberInvitedSource = new Subject<any>();
     memberInvited$ = this.memberInvitedSource.asObservable();
+
+    private namespaceSavedSource = new Subject<any>();
+    namespaceSaved$ = this.namespaceSavedSource.asObservable();
 
     private router = inject(Router);
 
@@ -166,5 +176,21 @@ export class DialogService {
 
     notifyMemberInvited(data?: any) {
         this.memberInvitedSource.next(data);
+    }
+
+    // Namespace Dialog Methods
+    openNamespaceDialog(namespaceId: string | null = null) {
+        this.namespaceDialogStateSubject.next({ visible: true, namespaceId });
+    }
+
+    closeNamespaceDialog() {
+        this.namespaceDialogStateSubject.next({
+            visible: false,
+            namespaceId: null,
+        });
+    }
+
+    notifyNamespaceSaved(data?: any) {
+        this.namespaceSavedSource.next(data);
     }
 }

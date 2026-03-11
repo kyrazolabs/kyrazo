@@ -76,7 +76,6 @@ export class TopbarComponent implements OnInit {
 
     layoutService: LayoutService = inject(LayoutService);
 
-    visible: boolean = false;
     workerDrawerVisible = signal(false);
 
     value1: string = '';
@@ -137,7 +136,7 @@ export class TopbarComponent implements OnInit {
     }
 
     showCreateNamespace() {
-        this.visible = true;
+        this.dialogService.openNamespaceDialog();
     }
 
     toggleNamespaceSelector(event: any) {
@@ -163,6 +162,11 @@ export class TopbarComponent implements OnInit {
 
         // Listen for namespace updates
         this.ps.namespacesUpdated$.subscribe(() => {
+            this.loadNamespaces();
+        });
+
+        // Listen for namespace saved via global dialog
+        this.dialogService.namespaceSaved$.subscribe(() => {
             this.loadNamespaces();
         });
     }
