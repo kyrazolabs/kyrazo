@@ -28,7 +28,7 @@ export function createPublishEvents(httpClient: HttpClient) {
    * Sends up to 100 events in a single API call for efficient bulk operations.
    * Each event is queued independently for delivery.
    *
-   * @param projectId - The project ID to publish events to (MongoDB ObjectId format)
+   * @param namespaceId - The namespace ID to publish events to (MongoDB ObjectId format)
    * @param events - Array of event payloads (max 100 per batch)
    * @param options - Optional configuration including idempotency key
    * @returns Promise resolving to an array of queued event details
@@ -41,7 +41,7 @@ export function createPublishEvents(httpClient: HttpClient) {
    *
    * @example Batch publishing multiple events
    * ```typescript
-   * const response = await kyrazo.events.batch("project-123", [
+   * const response = await kyrazo.events.batch("namespace-123", [
    *   {
    *     eventType: "user.created",
    *     payload: { userId: "u_1" },
@@ -58,18 +58,18 @@ export function createPublishEvents(httpClient: HttpClient) {
    * ```
    */
   return async function publishEvents(
-    projectId: string,
+    namespaceId: string,
     events: PublishEventPayload[],
     options?: PublishEventOptions,
   ): Promise<BatchPublishEventResponse> {
-    // Validate projectId
+    // Validate namespaceId
     if (
-      !projectId ||
-      typeof projectId !== "string" ||
-      projectId.trim() === ""
+      !namespaceId ||
+      typeof namespaceId !== "string" ||
+      namespaceId.trim() === ""
     ) {
       throw new ValidationError(
-        "projectId is required and must be a non-empty string",
+        "namespaceId is required and must be a non-empty string",
       );
     }
 
@@ -127,7 +127,7 @@ export function createPublishEvents(httpClient: HttpClient) {
       : undefined;
 
     const response = await httpClient.post<BatchPublishEventResponse>(
-      `/v1/events/${projectId}/publish/batch`,
+      `/v1/events/${namespaceId}/publish/batch`,
       events,
       requestOptions,
     );

@@ -16,20 +16,20 @@ import type { PaginatedResponse, APIResponse } from "../../types/common";
  */
 export interface SourcesModule {
   list: (
-    projectId: string,
+    namespaceId: string,
     params?: FilterSourcesInput,
   ) => Promise<PaginatedResponse<Source>>;
-  get: (projectId: string, sourceId: string) => Promise<APIResponse<Source>>;
+  get: (namespaceId: string, sourceId: string) => Promise<APIResponse<Source>>;
   create: (
-    projectId: string,
+    namespaceId: string,
     data: CreateSourceInput,
   ) => Promise<APIResponse<Source>>;
   update: (
-    projectId: string,
+    namespaceId: string,
     sourceId: string,
     data: UpdateSourceInput,
   ) => Promise<APIResponse<Source>>;
-  delete: (projectId: string, sourceId: string) => Promise<APIResponse<void>>;
+  delete: (namespaceId: string, sourceId: string) => Promise<APIResponse<void>>;
 }
 
 /**
@@ -39,55 +39,55 @@ export interface SourcesModule {
 export function createSourcesModule(client: HttpClient): SourcesModule {
   return {
     async list(
-      projectId: string,
+      namespaceId: string,
       params?: FilterSourcesInput,
     ): Promise<PaginatedResponse<Source>> {
       const response = await client.get<PaginatedResponse<Source>>(
-        `/v1/sources/${projectId}`,
+        `/v1/sources/${namespaceId}`,
         params,
       );
       return response.data;
     },
 
     async get(
-      projectId: string,
+      namespaceId: string,
       sourceId: string,
     ): Promise<APIResponse<Source>> {
       const response = await client.get<APIResponse<Source>>(
-        `/v1/sources/${projectId}/${sourceId}`,
+        `/v1/sources/${namespaceId}/${sourceId}`,
       );
       return response.data;
     },
 
     async create(
-      projectId: string,
+      namespaceId: string,
       data: CreateSourceInput,
     ): Promise<APIResponse<Source>> {
       const response = await client.post<APIResponse<Source>>(
-        `/v1/sources/${projectId}`,
+        `/v1/sources/${namespaceId}`,
         data,
       );
       return response.data;
     },
 
     async update(
-      projectId: string,
+      namespaceId: string,
       sourceId: string,
       data: UpdateSourceInput,
     ): Promise<APIResponse<Source>> {
       const response = await client.patch<APIResponse<Source>>(
-        `/v1/sources/${projectId}/${sourceId}`,
+        `/v1/sources/${namespaceId}/${sourceId}`,
         data,
       );
       return response.data;
     },
 
     async delete(
-      projectId: string,
+      namespaceId: string,
       sourceId: string,
     ): Promise<APIResponse<void>> {
       const response = await client.delete<APIResponse<void>>(
-        `/v1/sources/${projectId}/${sourceId}`,
+        `/v1/sources/${namespaceId}/${sourceId}`,
       );
       return response.data;
     },

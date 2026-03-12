@@ -29,7 +29,7 @@ describe("Events.single()", () => {
     });
   });
 
-  it("should validate projectId is required", async () => {
+  it("should validate namespaceId is required", async () => {
     await expect(
       client.events.single("", {
         eventType: "test.event",
@@ -41,7 +41,7 @@ describe("Events.single()", () => {
 
   it("should validate eventType is required", async () => {
     await expect(
-      client.events.single("project-123", {
+      client.events.single("namespace-123", {
         eventType: "",
         payload: {},
         targets: [{ targetId: "target-123" }],
@@ -51,7 +51,7 @@ describe("Events.single()", () => {
 
   it("should validate targets is required", async () => {
     await expect(
-      client.events.single("project-123", {
+      client.events.single("namespace-123", {
         eventType: "test.event",
         payload: {},
         targets: [],
@@ -61,7 +61,7 @@ describe("Events.single()", () => {
 
   it("should validate targetId is required", async () => {
     await expect(
-      client.events.single("project-123", {
+      client.events.single("namespace-123", {
         eventType: "test.event",
         payload: {},
         targets: [{ targetId: "" }],
@@ -81,7 +81,7 @@ describe("Events.batch()", () => {
   });
 
   it("should validate events array is not empty", async () => {
-    await expect(client.events.batch("project-123", [])).rejects.toThrow(
+    await expect(client.events.batch("namespace-123", [])).rejects.toThrow(
       ValidationError,
     );
   });
@@ -92,7 +92,7 @@ describe("Events.batch()", () => {
       payload: {},
       targets: [{ targetId: "target-123" }],
     });
-    await expect(client.events.batch("project-123", events)).rejects.toThrow(
+    await expect(client.events.batch("namespace-123", events)).rejects.toThrow(
       ValidationError,
     );
   });

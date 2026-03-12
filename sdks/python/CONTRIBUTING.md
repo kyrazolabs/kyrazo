@@ -4,7 +4,7 @@
 
 ```
 sdk/python/
-├── pyproject.toml        # Dependencies (Poetry)
+├── pyproject.toml          # Dependencies (Poetry)
 ├── README.md
 ├── kyrazo/               # Source code
 │   ├── client.py         # Main Client

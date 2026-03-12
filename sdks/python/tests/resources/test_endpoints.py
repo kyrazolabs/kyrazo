@@ -3,7 +3,7 @@ from kyrazo.resources.endpoints import CreateEndpointInput
 
 
 def test_create_endpoint_success(client, mock_api):
-    project_id = "proj_123"
+    namespace_id = "proj_123"
     payload = {
         "name": "My Endpoint",
         "url": "https://example.com/webhook",
@@ -35,12 +35,12 @@ def test_create_endpoint_success(client, mock_api):
         }
     }
 
-    mock_api.post(f"/v1/endpoints/{project_id}").mock(
+    mock_api.post(f"/v1/endpoints/{namespace_id}").mock(
         return_value=Response(201, json=response_data)
     )
 
     endpoint_input = CreateEndpointInput(**payload)
-    endpoint = client.endpoints.create(project_id, endpoint_input)
+    endpoint = client.endpoints.create(namespace_id, endpoint_input)
 
     assert endpoint.id == "end_123"
     assert endpoint.name == "My Endpoint"
@@ -48,24 +48,24 @@ def test_create_endpoint_success(client, mock_api):
 
 
 def test_get_endpoint_secret(client, mock_api):
-    project_id = "proj_123"
+    namespace_id = "proj_123"
     endpoint_id = "ep_123"
     secret = "whsec_12345"
 
-    mock_api.get(f"/v1/endpoints/{project_id}/{endpoint_id}/secret").mock(
+    mock_api.get(f"/v1/endpoints/{namespace_id}/{endpoint_id}/secret").mock(
         return_value=Response(
             200, json={"success": True, "data": secret}
         )
     )
 
-    result = client.endpoints.get_secret(project_id, endpoint_id)
+    result = client.endpoints.get_secret(namespace_id, endpoint_id)
     assert result == secret
 
 
 def test_list_endpoints(client, mock_api):
-    project_id = "proj_123"
+    namespace_id = "proj_123"
 
-    mock_api.get(f"/v1/endpoints/{project_id}").mock(
+    mock_api.get(f"/v1/endpoints/{namespace_id}").mock(
         return_value=Response(
             200,
             json={
@@ -90,6 +90,6 @@ def test_list_endpoints(client, mock_api):
         )
     )
 
-    response = client.endpoints.list(project_id)
+    response = client.endpoints.list(namespace_id)
     assert len(response["data"]) == 1
     assert response["data"][0]["name"] == "E1"

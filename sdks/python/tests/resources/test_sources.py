@@ -3,7 +3,7 @@ from kyrazo.resources.sources import CreateSourceInput
 
 
 def test_create_source_success(client, mock_api):
-    project_id = "proj_123"
+    namespace_id = "proj_123"
     payload = {
         "name": "My Source",
         "service": "stripe",
@@ -27,12 +27,12 @@ def test_create_source_success(client, mock_api):
         }
     }
 
-    mock_api.post(f"/v1/sources/{project_id}").mock(
+    mock_api.post(f"/v1/sources/{namespace_id}").mock(
         return_value=Response(201, json=response_data)
     )
 
     source_input = CreateSourceInput(**payload)
-    source = client.sources.create(project_id, source_input)
+    source = client.sources.create(namespace_id, source_input)
 
     assert source.id == "src_123"
     assert source.name == "My Source"
@@ -40,9 +40,9 @@ def test_create_source_success(client, mock_api):
 
 
 def test_list_sources(client, mock_api):
-    project_id = "proj_123"
+    namespace_id = "proj_123"
 
-    mock_api.get(f"/v1/sources/{project_id}").mock(
+    mock_api.get(f"/v1/sources/{namespace_id}").mock(
         return_value=Response(
             200,
             json={
@@ -73,13 +73,13 @@ def test_list_sources(client, mock_api):
     )
 
     # Returns PaginatedResponse[Source]
-    response = client.sources.list(project_id)
+    response = client.sources.list(namespace_id)
     assert len(response.data) == 2
     assert response.data[0].id == "src_1"
 
 
 def test_create_source_with_auth(client, mock_api):
-    project_id = "proj_123"
+    namespace_id = "proj_123"
     payload = {
         "name": "Auth Source",
         "service": "stripe",
@@ -109,12 +109,12 @@ def test_create_source_with_auth(client, mock_api):
         }
     }
 
-    mock_api.post(f"/v1/sources/{project_id}").mock(
+    mock_api.post(f"/v1/sources/{namespace_id}").mock(
         return_value=Response(201, json=response_data)
     )
 
     source_input = CreateSourceInput(**payload)
-    source = client.sources.create(project_id, source_input)
+    source = client.sources.create(namespace_id, source_input)
 
     assert source.id == "src_auth"
     assert source.name == "Auth Source"

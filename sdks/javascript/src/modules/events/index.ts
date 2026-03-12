@@ -13,10 +13,10 @@
  * const kyrazo = new Kyrazo({ apiKey: "your-key" });
  *
  * // Publish a single event
- * await kyrazo.events.single(projectId, payload);
+ * await kyrazo.events.single(namespaceId, payload);
  *
  * // Publish multiple events in batch
- * await kyrazo.events.batch(projectId, [payload1, payload2]);
+ * await kyrazo.events.batch(namespaceId, [payload1, payload2]);
  * ```
  */
 
@@ -43,7 +43,7 @@ export type { EventTarget, EventData } from "../../types/common";
  */
 export interface EventsModule {
   /**
-   * Publish a single event to the specified project
+   * Publish a single event to the specified namespace
    *
    * @see {@link createPublishEvent} for full documentation
    */

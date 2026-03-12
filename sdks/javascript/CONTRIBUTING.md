@@ -73,8 +73,8 @@ Kyrazo (client.ts)
     │       └── Handles all HTTP requests with retry logic
     │
     ├── events (EventsModule)
-    │       ├── single(projectId, payload) → PublishEventResponse
-    │       └── batch(projectId, events[]) → BatchPublishEventResponse[]
+    │       ├── single(namespaceId, payload) → PublishEventResponse
+    │       └── batch(namespaceId, events[]) → BatchPublishEventResponse[]
     │
     ├── sources (SourcesModule)
     │       └── list, get, create, update, delete
@@ -88,9 +88,9 @@ Kyrazo (client.ts)
 
 ### Request Flow
 
-1. User calls `kyrazo.events.single(projectId, payload)`
+1. User calls `kyrazo.events.single(namespaceId, payload)`
 2. Factory function creates the request context
-3. Validation runs on `projectId` and `payload`
+3. Validation runs on `namespaceId` and `payload`
 4. `HttpClient.post()` sends request with:
    - `x-api-key` header
    - JSON body
@@ -137,7 +137,7 @@ const client = new Kyrazo({
 });
 
 // Test single event
-const response = await client.events.single("project-id", {
+const response = await client.events.single("namespace-id", {
   webhookId: "68c674dd3b96f77d9426a93b",
   eventType: "user.created",
   payload: { userId: "u_123" },

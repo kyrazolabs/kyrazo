@@ -9,78 +9,78 @@ class EndpointsClient:
     def __init__(self, http_client: HttpClient):
         self._http_client = http_client
 
-    def list(self, project_id: str, params: Optional[dict] = None) -> Any:
+    def list(self, namespace_id: str, params: Optional[dict] = None) -> Any:
         """
-        List all endpoints for a project.
+        List all endpoints for a namespace.
 
         Args:
-            project_id: The ID of the project.
+            namespace_id: The ID of the namespace.
             params: Optional filter and pagination parameters.
         """
-        return self._http_client.get(f"/v1/endpoints/{project_id}", params=params)
+        return self._http_client.get(f"/v1/endpoints/{namespace_id}", params=params)
 
-    def get(self, project_id: str, endpoint_id: str) -> Endpoint:
+    def get(self, namespace_id: str, endpoint_id: str) -> Endpoint:
         """
         Get a single endpoint by ID.
 
         Args:
-            project_id: The ID of the project.
+            namespace_id: The ID of the namespace.
             endpoint_id: The ID of the endpoint.
         """
-        response = self._http_client.get(f"/v1/endpoints/{project_id}/{endpoint_id}")
+        response = self._http_client.get(f"/v1/endpoints/{namespace_id}/{endpoint_id}")
         return Endpoint(**response.get("data"))
 
-    def create(self, project_id: str, data: CreateEndpointInput) -> Endpoint:
+    def create(self, namespace_id: str, data: CreateEndpointInput) -> Endpoint:
         """
         Create a new webhook endpoint.
 
         Args:
-            project_id: The ID of the project.
+            namespace_id: The ID of the namespace.
             data: Endpoint configuration data.
         """
         payload = data.model_dump(by_alias=True, exclude_none=True)
-        response = self._http_client.post(f"/v1/endpoints/{project_id}", data=payload)
+        response = self._http_client.post(f"/v1/endpoints/{namespace_id}", data=payload)
         # Backend returns { "data": { "endpoint": { ... } } }
         endpoint_data = response.get("data", {}).get("endpoint")
         return Endpoint(**endpoint_data)
 
     def update(
-        self, project_id: str, endpoint_id: str, data: UpdateEndpointInput
+        self, namespace_id: str, endpoint_id: str, data: UpdateEndpointInput
     ) -> Endpoint:
         """
         Update an existing webhook endpoint.
 
         Args:
-            project_id: The ID of the project.
+            namespace_id: The ID of the namespace.
             endpoint_id: The ID of the endpoint.
             data: Updated endpoint configuration.
         """
         payload = data.model_dump(by_alias=True, exclude_none=True)
         response = self._http_client.patch(
-            f"/v1/endpoints/{project_id}/{endpoint_id}", data=payload
+            f"/v1/endpoints/{namespace_id}/{endpoint_id}", data=payload
         )
         return Endpoint(**response.get("data"))
 
-    def delete(self, project_id: str, endpoint_id: str) -> bool:
+    def delete(self, namespace_id: str, endpoint_id: str) -> bool:
         """
         Delete a webhook endpoint.
 
         Args:
-            project_id: The ID of the project.
+            namespace_id: The ID of the namespace.
             endpoint_id: The ID of the endpoint.
         """
-        response = self._http_client.delete(f"/v1/endpoints/{project_id}/{endpoint_id}")
+        response = self._http_client.delete(f"/v1/endpoints/{namespace_id}/{endpoint_id}")
         return response.get("success", False)
 
-    def get_secret(self, project_id: str, endpoint_id: str) -> str:
+    def get_secret(self, namespace_id: str, endpoint_id: str) -> str:
         """
         Get the signing secret for an endpoint.
 
         Args:
-            project_id: The ID of the project.
+            namespace_id: The ID of the namespace.
             endpoint_id: The ID of the endpoint.
         """
         response = self._http_client.get(
-            f"/v1/endpoints/{project_id}/{endpoint_id}/secret"
+            f"/v1/endpoints/{namespace_id}/{endpoint_id}/secret"
         )
         return response.get("data")

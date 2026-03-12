@@ -29,7 +29,7 @@ import {
  *   baseURL: "http://localhost:4000"
  * });
  *
- * const response = await kyrazo.events.single("project-123", {
+ * const response = await kyrazo.events.single("namespace-123", {
  *   eventType: "user.created",
  *   webhookId: "webhook-456",
  *   workspaceId: "workspace-789",

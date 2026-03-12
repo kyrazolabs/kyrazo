@@ -77,7 +77,7 @@ export interface PublishEventPayload {
  *
  * @example
  * ```typescript
- * const response = await kyrazo.dispatch.publishEvent(projectId, payload);
+ * const response = await kyrazo.dispatch.publishEvent(namespaceId, payload);
  * console.log(`Event ${response.eventId} queued at ${response.queued_at}`);
  * console.log(`Processing took ${response.processing_time_ms}ms`);
  * ```

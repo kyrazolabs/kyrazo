@@ -9,7 +9,7 @@ class EventsClient:
 
     def publish(
         self,
-        project_id: str,
+        namespace_id: str,
         body: PublishEventBody,
         idempotency_key: Optional[str] = None,
     ) -> PublishEventResponse:
@@ -17,7 +17,7 @@ class EventsClient:
         Publish a single event.
 
         Args:
-            project_id: The project ID.
+            namespace_id: The namespace ID.
             body: The event data (validated by Pydantic model).
             idempotency_key: Optional key for idempotency.
         """
@@ -29,13 +29,13 @@ class EventsClient:
         data = body.model_dump(by_alias=True, exclude_none=True)
 
         response_data = self._http_client.post(
-            f"/v1/events/{project_id}/publish", data=data, headers=headers
+            f"/v1/events/{namespace_id}/publish", data=data, headers=headers
         )
         return PublishEventResponse(**response_data)
 
     def batch(
         self,
-        project_id: str,
+        namespace_id: str,
         events: List[PublishEventBody],
         idempotency_key: Optional[str] = None,
     ) -> BatchPublishEventResponse:
@@ -49,6 +49,6 @@ class EventsClient:
         data = [evt.model_dump(by_alias=True, exclude_none=True) for evt in events]
 
         response_data = self._http_client.post(
-            f"/v1/events/{project_id}/publish/batch", data=data, headers=headers
+            f"/v1/events/{namespace_id}/publish/batch", data=data, headers=headers
         )
         return BatchPublishEventResponse(**response_data)
