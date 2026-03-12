@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, Input, Output, EventEmitter, computed, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, inject, Input, Output, EventEmitter, computed, OnChanges, SimpleChanges, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
@@ -10,6 +10,7 @@ import { NamespaceService } from '@core/services/namespace.service';
 import { SubscriptionService } from '@core/services/subscription.service';
 import { DialogService } from '@shared/services/dialog.service';
 import { SentryService } from '@core/3rd-party/sentry';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { INamespace, GetNamespaceResponse } from '@models/namespace.types';
 
 @Component({
@@ -31,6 +32,7 @@ export class NamespaceFormComponent implements OnInit, OnChanges {
     private subscriptionService = inject(SubscriptionService);
     protected dialogService = inject(DialogService);
     private sentry = inject(SentryService);
+    private destroyRef = inject(DestroyRef);
 
     @Input() namespaceId: string | null = null;
     @Output() onSuccess = new EventEmitter<any>();
@@ -55,7 +57,7 @@ export class NamespaceFormComponent implements OnInit, OnChanges {
     }
 
     ngOnInit() {
-        this.initializeForm();
+        // rely on ngOnChanges for initial setup and subsequent changes
     }
 
     ngOnChanges(changes: SimpleChanges) {
@@ -82,25 +84,27 @@ export class NamespaceFormComponent implements OnInit, OnChanges {
     loadNamespace() {
         if (!this.namespaceId) return;
         
-        this.namespaceService.get(this.namespaceId).subscribe({
-            next: (res: GetNamespaceResponse) => {
-                const ns = res.data;
-                this.namespaceForm = {
-                    name: ns.name,
-                    description: ns.description || '',
-                    whiteLabelHeaders: ns.whiteLabelHeaders || '',
-                };
-            },
-            error: (err: any) => {
-                this.sentry.captureException(err);
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: 'Failed to load namespace details',
-                });
-                this.onCancel.emit();
-            }
-        });
+        this.namespaceService.get(this.namespaceId)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+                next: (res: GetNamespaceResponse) => {
+                    const ns = res.data;
+                    this.namespaceForm = {
+                        name: ns.name,
+                        description: ns.description || '',
+                        whiteLabelHeaders: ns.whiteLabelHeaders || '',
+                    };
+                },
+                error: (err: any) => {
+                    this.sentry.captureException(err);
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Failed to load namespace details',
+                    });
+                    this.onCancel.emit();
+                }
+            });
     }
 
     saveNamespace() {

@@ -11,10 +11,11 @@
                     <input pInputText type="text" formControlName="firstName" placeholder="Enter your first name"
                         class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
                         [class.border-red-500]="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched" />
-                    <small *ngIf="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched"
-                        class="text-red-500 text-sm">
+                    @if (profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched) {
+                    <small class="text-red-500 text-sm">
                         First name is required and must be at least 2 characters
                     </small>
+                    }
                 </div>
 
                 <!-- Last Name -->
@@ -23,10 +24,11 @@
                     <input pInputText type="text" formControlName="lastName" placeholder="Enter your last name"
                         class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
                         [class.border-red-500]="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched" />
-                    <small *ngIf="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched"
-                        class="text-red-500 text-sm">
+                    @if (profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched) {
+                    <small class="text-red-500 text-sm">
                         Last name is required and at least 2 characters
                     </small>
+                    }
                 </div>
 
                 <!-- Email Address -->
@@ -35,10 +37,11 @@
                     <input pInputText type="email" formControlName="email" placeholder="Enter your email address"
                         class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
                         [class.border-red-500]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched" />
-                    <small *ngIf="profileForm.get('email')?.invalid && profileForm.get('email')?.touched"
-                        class="text-red-500 text-sm">
+                    @if (profileForm.get('email')?.invalid && profileForm.get('email')?.touched) {
+                    <small class="text-red-500 text-sm">
                         Please enter a valid email address
                     </small>
+                    }
                 </div>
 
 
@@ -122,10 +125,13 @@
                         <label class="font-semibold text-surface-900 dark:text-surface-0 text-sm">Update Password</label>
                         <div class="space-y-4">
                             <input pInputText type="password" formControlName="currentPassword" placeholder="Current Password"
+                                (keydown.enter)="$event.preventDefault(); changePassword()"
                                 class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800 text-sm" />
                             <input pInputText type="password" formControlName="newPassword" placeholder="New Password"
+                                (keydown.enter)="$event.preventDefault(); changePassword()"
                                 class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800 text-sm" />
                             <input pInputText type="password" formControlName="confirmPassword" placeholder="Confirm New Password"
+                                (keydown.enter)="$event.preventDefault(); changePassword()"
                                 class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800 text-sm" />
                             <p-button label="Change Password" icon="pi pi-lock" styleClass="rounded-xl! w-full"
                                 [disabled]="passwordForm.invalid || isChangingPassword" [loading]="isChangingPassword"
@@ -148,10 +154,14 @@
                         Add an extra layer of security to your account by requiring more than just a password to log in.
                     </p>
                     <div class="mt-auto">
-                        <p-button *ngIf="!originalProfile?.is2FAEnabled" label="Enable 2FA" icon="pi pi-plus"
+                        @if (!originalProfile?.is2FAEnabled) {
+                        <p-button label="Enable 2FA" icon="pi pi-plus"
                             styleClass="rounded-xl! w-full" size="small" (onClick)="start2FASetup()" />
-                        <p-button *ngIf="originalProfile?.is2FAEnabled" label="Disable 2FA" icon="pi pi-trash"
+                        }
+                        @if (originalProfile?.is2FAEnabled) {
+                        <p-button label="Disable 2FA" icon="pi pi-trash"
                             severity="danger" [outlined]="true" styleClass="rounded-xl! w-full" size="small" (onClick)="disable2FA()" />
+                        }
                     </div>
                 </div>
             </div>

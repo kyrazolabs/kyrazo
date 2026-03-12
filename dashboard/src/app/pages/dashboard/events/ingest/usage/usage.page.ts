@@ -4,6 +4,7 @@ import {
     AfterViewInit,
     inject,
     computed,
+    effect,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -112,13 +113,19 @@ export class UsagePage implements OnInit, AfterViewInit {
 
     sourceLogs: any[];
 
+    constructor() {
+        effect(() => {
+            if (this.hasAnalytics()) {
+                this.posthog.capture('usage_viewed', { type: 'ingest' });
+                this.loadAnalytics();
+            } else {
+                this.loadingCharts = false;
+            }
+        });
+    }
+
     async ngOnInit() {
-        if (this.hasAnalytics()) {
-            this.posthog.capture('usage_viewed', { type: 'ingest' });
-            await this.loadAnalytics();
-        } else {
-            this.loadingCharts = false;
-        }
+        // Initialization handled by effect
     }
 
     ngAfterViewInit() {

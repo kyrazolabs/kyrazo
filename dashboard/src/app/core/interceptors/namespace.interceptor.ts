@@ -19,6 +19,8 @@ export const namespaceInterceptor: HttpInterceptorFn = (req, next) => {
         req.url.includes('/v1/payment') ||
         req.url.includes('/v1/support')
     ) {
+        if (!workspace && !namespace) return next(req);
+
         const headers: { [name: string]: string } = {};
         if (workspace) headers['x-workspace-id'] = workspace;
         if (namespace) headers['x-namespace-id'] = namespace;

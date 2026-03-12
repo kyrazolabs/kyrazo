@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, computed, signal } from '@angular/core';
+import { Component, OnInit, inject, computed, signal, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -17,6 +17,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { TooltipModule } from 'primeng/tooltip';
 import { MenuModule } from 'primeng/menu';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ISubscription } from '@models/billing.types';
 import { SubscriptionService } from '@core/services/subscription.service';
 
@@ -59,6 +60,7 @@ export class NamespacesPage implements OnInit {
     private sentry = inject(SentryService);
     public subscriptionService = inject(SubscriptionService);
     public dialogService = inject(DialogService);
+    private destroyRef = inject(DestroyRef);
 
     namespaces = signal<INamespace[]>([]);
     totalNamespaces = signal<number>(0);
@@ -84,9 +86,11 @@ export class NamespacesPage implements OnInit {
         this.loadNamespaces();
 
         // Listen for namespace saved via global dialog
-        this.dialogService.namespaceSaved$.subscribe(() => {
-            this.loadNamespaces();
-        });
+        this.dialogService.namespaceSaved$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(() => {
+                this.loadNamespaces();
+            });
     }
 
     loadNamespaces() {

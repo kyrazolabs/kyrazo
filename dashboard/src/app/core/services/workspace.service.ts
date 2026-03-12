@@ -139,7 +139,10 @@ export class WorkspaceService {
                 environment.workspace.invite(workspaceId),
                 payload,
             )
-            .pipe(catchError(this.handleError));
+            .pipe(
+                tap(() => this.workspacesUpdated.next()),
+                catchError(this.handleError)
+            );
     }
 
     // Accept Workspace Invitation
@@ -149,7 +152,10 @@ export class WorkspaceService {
                 environment.workspace.acceptInvitation(token),
                 {},
             )
-            .pipe(catchError(this.handleError));
+            .pipe(
+                tap(() => this.workspacesUpdated.next()),
+                catchError(this.handleError)
+            );
     }
 
     // Get Invitation Details
@@ -180,7 +186,10 @@ export class WorkspaceService {
             .delete<WorkspaceActionResponse>(
                 environment.workspace.removeMember(workspaceId, userId),
             )
-            .pipe(catchError(this.handleError));
+            .pipe(
+                tap(() => this.workspacesUpdated.next()),
+                catchError(this.handleError)
+            );
     }
 
     // Update User Role in Workspace
@@ -193,7 +202,10 @@ export class WorkspaceService {
                 environment.workspace.updateMemberRole(workspaceId),
                 payload,
             )
-            .pipe(catchError(this.handleError));
+            .pipe(
+                tap(() => this.workspacesUpdated.next()),
+                catchError(this.handleError)
+            );
     }
 
     // Get Workspace Members

@@ -5,10 +5,12 @@ import {
     ChangeDetectorRef,
     ViewChild,
     AfterViewInit,
+    DestroyRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -58,6 +60,7 @@ export class AppShell implements OnInit, AfterViewInit {
     private cdr = inject(ChangeDetectorRef);
     private router = inject(Router);
     public layoutService = inject(LayoutService);
+    private destroyRef = inject(DestroyRef);
 
     secretV = false;
     ingressV = false;
@@ -105,69 +108,84 @@ export class AppShell implements OnInit, AfterViewInit {
     }
     ngOnInit() {
         this.router.events
-            .pipe(filter((event) => event instanceof NavigationEnd))
+            .pipe(
+                filter((event) => event instanceof NavigationEnd),
+                takeUntilDestroyed(this.destroyRef)
+            )
             .subscribe(() => {
                 this.footerAnimationKey = this.router.url;
             });
 
-        this.dialogService.message$.subscribe((msg: DialogMessage | null) => {
-            if (!msg) return;
+        this.dialogService.message$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe((msg: DialogMessage | null) => {
+                if (!msg) return;
 
-            switch (msg.type) {
-                case 'secret':
-                    this.secret.key = msg.data.key;
-                    this.secret.masked = false;
-                    this.secretV = true;
-                    break;
+                switch (msg.type) {
+                    case 'secret':
+                        this.secret.key = msg.data.key;
+                        this.secret.masked = false;
+                        this.secretV = true;
+                        break;
 
-                case 'ingress':
-                    this.ingress.url = msg.data.ingress;
-                    this.ingressV = true;
-                    break;
-            }
-        });
+                    case 'ingress':
+                        this.ingress.url = msg.data.ingress;
+                        this.ingressV = true;
+                        break;
+                }
+            });
 
         // Listen for Source Dialog State
-        this.dialogService.sourceDialogState$.subscribe((state) => {
-            this.sourceDialogVisible = state.visible;
-            this.sourceDialogId = state.sourceId;
-            this.sourceDialogHeader = state.sourceId
-                ? 'Edit Source'
-                : 'Create Source';
-        });
+        this.dialogService.sourceDialogState$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe((state) => {
+                this.sourceDialogVisible = state.visible;
+                this.sourceDialogId = state.sourceId;
+                this.sourceDialogHeader = state.sourceId
+                    ? 'Edit Source'
+                    : 'Create Source';
+            });
 
         // Listen for Endpoint Dialog State
-        this.dialogService.endpointDialogState$.subscribe((state) => {
-            this.endpointDialogVisible = state.visible;
-            this.endpointDialogId = state.endpointId;
-            this.endpointDialogHeader = state.endpointId
-                ? 'Edit Endpoint'
-                : 'Create Endpoint';
-        });
+        this.dialogService.endpointDialogState$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe((state) => {
+                this.endpointDialogVisible = state.visible;
+                this.endpointDialogId = state.endpointId;
+                this.endpointDialogHeader = state.endpointId
+                    ? 'Edit Endpoint'
+                    : 'Create Endpoint';
+            });
 
         // Listen for Target Dialog State
-        this.dialogService.targetDialogState$.subscribe((state) => {
-            this.targetDialogVisible = state.visible;
-            this.targetDialogId = state.targetId;
-            this.targetDialogHeader = state.targetId
-                ? 'Edit Target'
-                : 'Create Target';
-        });
+        this.dialogService.targetDialogState$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe((state) => {
+                this.targetDialogVisible = state.visible;
+                this.targetDialogId = state.targetId;
+                this.targetDialogHeader = state.targetId
+                    ? 'Edit Target'
+                    : 'Create Target';
+            });
 
         // Listen for Invite Member Dialog State
-        this.dialogService.inviteMemberDialogState$.subscribe((state) => {
-            this.inviteMemberDialogVisible = state.visible;
-            this.inviteMemberWorkspaceId = state.workspaceId;
-        });
+        this.dialogService.inviteMemberDialogState$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe((state) => {
+                this.inviteMemberDialogVisible = state.visible;
+                this.inviteMemberWorkspaceId = state.workspaceId;
+            });
 
         // Listen for Namespace Dialog State
-        this.dialogService.namespaceDialogState$.subscribe((state) => {
-            this.namespaceDialogVisible = state.visible;
-            this.namespaceDialogId = state.namespaceId;
-            this.namespaceDialogHeader = state.namespaceId
-                ? 'Edit Namespace'
-                : 'Create Namespace';
-        });
+        this.dialogService.namespaceDialogState$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe((state) => {
+                this.namespaceDialogVisible = state.visible;
+                this.namespaceDialogId = state.namespaceId;
+                this.namespaceDialogHeader = state.namespaceId
+                    ? 'Edit Namespace'
+                    : 'Create Namespace';
+            });
     }
 
     ngAfterViewInit() {

@@ -18,7 +18,7 @@
                     aria-label="Select Namespace"
                     (click)="toggleNamespaceSelector($event)"
                     (keydown.enter)="toggleNamespaceSelector($event)"
-                    (keydown.space)="toggleNamespaceSelector($event)">
+                    (keydown.space)="$event.preventDefault(); toggleNamespaceSelector($event)">
                     <div class="flex justify-between items-center gap-1 lg:gap-2">
                         <h3 class="text-sm lg:text-lg font-medium truncate max-w-[100px] lg:max-w-none">{{ selectedNamespace?.name || 'Select Namespace' }}</h3>
                         <i class="icon-[lucide--chevrons-up-down] size-4 lg:size-5 aspect-square text-surface-400 dark:text-surface-500"></i>
