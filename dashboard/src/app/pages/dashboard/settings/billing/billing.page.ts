@@ -89,10 +89,9 @@ export class BillingSettingsPage implements OnInit {
     lightningOffset = signal(0);
     plans = signal<PricingPlan[]>([]);
 
-
     get isFirstMonth(): boolean {
-        if (!this.currentSubscription?.startDate) return false;
-        const startDate = new Date(this.currentSubscription.startDate);
+        if (!this.currentSubscription?.createdAt) return false;
+        const startDate = new Date(this.currentSubscription.createdAt);
         const now = new Date();
         if (startDate > now) return false;
 
