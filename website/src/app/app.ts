@@ -1,4 +1,12 @@
-import { Component, signal, afterNextRender, OnInit, inject, DestroyRef, PLATFORM_ID } from '@angular/core';
+import {
+    Component,
+    signal,
+    afterNextRender,
+    OnInit,
+    inject,
+    DestroyRef,
+    PLATFORM_ID,
+} from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { SeoService } from './core/services/seo.service';
@@ -37,7 +45,9 @@ export class App implements OnInit {
             )
             .subscribe(() => {
                 if (isPlatformBrowser(this.platformId)) {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    setTimeout(() => {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    });
                 }
             });
     }

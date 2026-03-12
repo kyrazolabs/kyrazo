@@ -40,7 +40,7 @@ export const appConfig: ApplicationConfig = {
         provideZonelessChangeDetection(),
         provideRouter(
             routes,
-            withInMemoryScrolling({ scrollPositionRestoration: 'enabled' }),
+            withInMemoryScrolling({ scrollPositionRestoration: 'disabled' }),
         ),
         provideAnimations(),
         provideHttpClient(withFetch()),
