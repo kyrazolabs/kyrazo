@@ -1,8 +1,19 @@
-import { Component, signal, afterNextRender } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import {
+    Component,
+    signal,
+    afterNextRender,
+    OnInit,
+    inject,
+    DestroyRef,
+    PLATFORM_ID,
+} from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { SeoService } from './core/services/seo.service';
 import { AppConfig } from '@components/app.config';
 import { environment } from 'environments/environment';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter } from 'rxjs/operators';
 import * as Sentry from '@sentry/angular';
 import posthog from 'posthog-js';
 
@@ -12,8 +23,11 @@ import posthog from 'posthog-js';
     templateUrl: './app.html',
     styleUrl: './app.scss',
 })
-export class App {
+export class App implements OnInit {
     protected readonly title = signal('website');
+    private readonly router = inject(Router);
+    private readonly destroyRef = inject(DestroyRef);
+    private readonly platformId = inject(PLATFORM_ID);
 
     constructor(private seoService: SeoService) {
         this.seoService.init();
@@ -21,6 +35,21 @@ export class App {
         afterNextRender(() => {
             this.initAnalytics();
         });
+    }
+
+    ngOnInit() {
+        this.router.events
+            .pipe(
+                filter((event) => event instanceof NavigationEnd),
+                takeUntilDestroyed(this.destroyRef),
+            )
+            .subscribe(() => {
+                if (isPlatformBrowser(this.platformId)) {
+                    setTimeout(() => {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    });
+                }
+            });
     }
 
     private initAnalytics() {
