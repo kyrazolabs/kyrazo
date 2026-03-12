@@ -1,14 +1,12 @@
 <div class="space-y-6">
     @if (isFirstMonth) {
-        <p-message severity="info" styleClass="w-full justify-start rounded-xl!">
-            <ng-template pTemplate="content">
+        <p-message severity="info" styleClass="w-full justify-start rounded-xl! mb-6!">
                 <div class="flex items-center gap-2 ml-2">
                     <i class="pi pi-info-circle mr-1"></i>
-                    <span>Using Kyrazo for the first month? If you're considering cancelling, please </span>
+                    <span>Using Kyrazo for the first month? You're eligible for a refund! just </span>
                     <button type="button" class="font-bold underline cursor-pointer bg-transparent border-none p-0 text-inherit hover:opacity-80 transition-opacity" (click)="openSupportDialog()">contact our support team</button>
-                    <span> first!</span>
+                    <span> for first-month refund!</span>
                 </div>
-            </ng-template>
         </p-message>
     }
 
