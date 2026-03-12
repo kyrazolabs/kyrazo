@@ -68,7 +68,7 @@ unhealthy_threshold  = 3
 [[rules]]
 id              = "ingest-rule"
 match_path      = "/ingest/*"
-match_methods   = ["GET", "POST", "PUT", "DELETE", "PATCH"]
+match_methods   = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
 backends        = ["ingest-1", "ingest-2"]
 priority        = 10
 strip_prefix    = true
@@ -76,7 +76,7 @@ strip_prefix    = true
 [[rules]]
 id              = "dashboard-rule"
 match_path      = "/dashboard/*"
-match_methods   = ["GET", "POST", "PUT", "DELETE", "PATCH"]
+match_methods   = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
 backends        = ["dashboard-1", "dashboard-2"]
 priority        = 10
 strip_prefix    = true
