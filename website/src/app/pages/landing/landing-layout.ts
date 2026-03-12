@@ -35,13 +35,5 @@ import { filter } from 'rxjs/operators';
     ],
 })
 export class LandingLayoutComponent implements OnInit {
-    constructor(private router: Router) {}
-
-    ngOnInit() {
-        this.router.events
-            .pipe(filter((event) => event instanceof NavigationEnd))
-            .subscribe(() => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-    }
+    ngOnInit() {}
 }
