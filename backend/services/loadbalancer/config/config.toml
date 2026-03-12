@@ -18,13 +18,13 @@ skip_ssl_verify  = false
 id               = "ingest-1"
 address          = "${INGEST_SERVER1_IP}"
 weight           = 1
-max_connections  = 500
+max_connections  = 1500
 
 [[backends]]
 id               = "ingest-2"
 address          = "${INGEST_SERVER2_IP}"
 weight           = 1
-max_connections  = 500
+max_connections  = 1500
 
 # ── Dashboard API backends ────────────────────────────
 
@@ -46,13 +46,13 @@ max_connections  = 500
 id               = "api-1"
 address          = "${API_SERVER1_IP}"
 weight           = 1
-max_connections  = 500
+max_connections  = 3000
 
 [[backends]]
 id               = "api-2"
 address          = "${API_SERVER2_IP}"
 weight           = 1
-max_connections  = 500
+max_connections  = 3000
 
 # ── Health Checks ─────────────────────────────────────
 
