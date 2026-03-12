@@ -18,7 +18,8 @@ import {
     Router,
     RouterLink,
 } from '@angular/router';
-import { filter, map, take } from 'rxjs/operators';
+import { filter, map, take, switchMap, tap, startWith, catchError } from 'rxjs/operators';
+import { merge, Subject, of } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { AppConfig } from '@components/app.config';
@@ -37,7 +38,8 @@ import { MenuModule } from 'primeng/menu';
 import { Popover, PopoverModule } from 'primeng/popover';
 import { AvatarModule } from 'primeng/avatar';
 import { BadgeModule } from 'primeng/badge';
-import { INamespace } from '@models/namespace.types';
+import { INamespace, GetNamespacesResponse } from '@models/namespace.types';
+import { ApiResponse } from '@models/index';
 import { StorageService } from '@core/services/storage.service';
 import { NamespaceService } from '@core/services/namespace.service';
 import { AuthService } from '@core/auth/auth.service';
@@ -120,25 +122,13 @@ export class TopbarComponent implements OnInit, OnDestroy {
 
     @ViewChild('pp') pp!: Popover;
 
+    private refreshNamespaces$ = new Subject<void>();
+
     constructor(
         private router: Router,
         private route: ActivatedRoute,
         private store: StorageService,
-    ) {
-        this.store.changes$
-            .pipe(takeUntilDestroyed())
-            .subscribe((change) => {
-                if (change?.key === 'workspace') {
-                    this.selectedNamespace = null;
-                    this.ss.removeItem('namespace');
-                    this.loadNamespaces();
-                }
-                if (change?.key === 'avatar') {
-                    this.avatar = this.ss.getItem('avatar');
-                    this.loadNamespaces();
-                }
-            });
-    }
+    ) { }
 
     showCreateNamespace() {
         this.dialogService.openNamespaceDialog();
@@ -153,30 +143,52 @@ export class TopbarComponent implements OnInit, OnDestroy {
             .pipe(
                 filter((event) => event instanceof NavigationEnd),
                 map(() => this.getRouteTitle(this.route)),
-                takeUntilDestroyed(this.destroyRef)
+                takeUntilDestroyed(this.destroyRef),
             )
             .subscribe((title) => (this.pageTitle = title || 'Dashboard'));
 
         // Initialize avatar
         this.avatar = this.ss.getItem('avatar');
 
-        // Initialize namespace selection on load
-        this.initializeNamespaceSelection();
-
         // Initialize worker loading
         this.workerService.acquireWorkerPolling();
 
-        // Listen for namespace updates
-        this.ps.namespacesUpdated$
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(() => {
-                this.loadNamespaces();
-            });
-
-        this.dialogService.namespaceSaved$
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(() => {
-                this.loadNamespaces();
+        // Unified trigger for namespace loading
+        merge(
+            this.store.changes$.pipe(
+                filter((c) => c?.key === 'workspace' || c?.key === 'avatar'),
+                tap((c) => {
+                    if (c?.key === 'workspace') {
+                        this.selectedNamespace = null;
+                        this.ss.removeItem('namespace');
+                    } else {
+                        this.avatar = this.ss.getItem('avatar');
+                    }
+                }),
+            ),
+            this.ps.namespacesUpdated$,
+            this.dialogService.namespaceSaved$,
+            this.refreshNamespaces$,
+        )
+            .pipe(
+                startWith(null),
+                filter(() => !!this.ss.getItem('workspace')),
+                tap(() => (this.loadingNamespaces = true)),
+                switchMap(() =>
+                    this.ps.getWorkspaceNamespaces().pipe(
+                        catchError((error) => {
+                            console.error('Failed to load namespaces:', error);
+                            return of({ success: false, data: [] } as any);
+                        }),
+                    ),
+                ),
+                takeUntilDestroyed(this.destroyRef),
+            )
+            .subscribe((response: any) => {
+                if (response && response.success && response.data) {
+                    this.handleNamespaceResponse(response.data);
+                }
+                this.loadingNamespaces = false;
             });
     }
 
@@ -191,56 +203,44 @@ export class TopbarComponent implements OnInit, OnDestroy {
     }
 
     loadNamespaces() {
-        this.loadingNamespaces = true;
-        this.ps.getWorkspaceNamespaces().subscribe({
-            next: (response) => {
-                this.namespaces = response.data;
+        this.refreshNamespaces$.next();
+    }
 
-                // Try to restore previously selected namespace
-                const namespaceId = this.ss.getItem<string>('namespace');
-                if (namespaceId) {
-                    const savedNamespace = this.namespaces.find(
-                        (p) => p.id === namespaceId,
-                    );
-                    if (savedNamespace) {
-                        this.selectedNamespace = savedNamespace;
-                    } else {
-                        // Invalidate stale selection
-                        this.ss.removeItem('namespace');
-                        this.selectedNamespace = null;
-                    }
-                }
+    private handleNamespaceResponse(namespaces: INamespace[]) {
+        this.namespaces = namespaces;
 
-                // Select first namespace by default if available and none selected
-                if (this.namespaces.length > 0 && !this.selectedNamespace) {
-                    this.selectedNamespace = this.namespaces[0];
-                    this.ss.setItem('namespace', this.selectedNamespace.id);
-                }
+        // Try to restore previously selected namespace
+        const namespaceId = this.ss.getItem<string>('namespace');
+        if (namespaceId) {
+            const savedNamespace = this.namespaces.find(
+                (p) => p.id === namespaceId,
+            );
+            if (savedNamespace) {
+                this.selectedNamespace = savedNamespace;
+            } else {
+                // Invalidate stale selection
+                this.ss.removeItem('namespace');
+                this.selectedNamespace = null;
+            }
+        }
 
+        // Select first namespace by default if available and none selected
+        if (this.namespaces.length > 0 && !this.selectedNamespace) {
+            this.selectedNamespace = this.namespaces[0];
+            this.ss.setItem('namespace', this.selectedNamespace.id);
+        }
 
-                // Only redirect to Launchpad if no namespaces exist AND we are not in a settings page
-                if (
-                    this.namespaces.length === 0 &&
-                    !this.router.url.includes('/settings')
-                ) {
-                    this.router.navigate(['/launchpad']);
-                }
-
-                this.loadingNamespaces = false;
-            },
-            error: (error) => {
-                console.error('Failed to load namespaces:', error);
-                this.loadingNamespaces = false;
-            },
-        });
+        // Only redirect to Launchpad if no namespaces exist AND we are not in a settings page
+        if (
+            this.namespaces.length === 0 &&
+            !this.router.url.includes('/settings')
+        ) {
+            this.router.navigate(['/launchpad']);
+        }
     }
 
     private initializeNamespaceSelection() {
-        // Check if workspace exists and load namespaces
-        const workspaceId = this.ss.getItem<string>('workspace');
-        if (workspaceId) {
-            this.loadNamespaces();
-        }
+        // Handled by reactive stream in ngOnInit
     }
 
     // First namespace dialog event handlers
