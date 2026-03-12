@@ -9,6 +9,8 @@ import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { DividerModule } from 'primeng/divider';
+import { MessageModule } from 'primeng/message';
+import { DialogService } from '@shared/services/dialog.service';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { DialogModule } from 'primeng/dialog';
 import { TableModule } from 'primeng/table';
@@ -54,6 +56,7 @@ import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directiv
         ConfirmDialogModule,
         TextareaModule,
         RadioButtonModule,
+        MessageModule,
         PricingCardComponent,
         PricingComparisonComponent,
     ],
@@ -67,6 +70,7 @@ export class BillingSettingsPage implements OnInit {
     private confirmationService = inject(ConfirmationService);
     private sentry = inject(SentryService);
     private supportService = inject(SupportService);
+    private dialogService = inject(DialogService);
     public loader = inject(LoaderService);
     public subscriptionService = inject(SubscriptionService);
 
@@ -84,6 +88,18 @@ export class BillingSettingsPage implements OnInit {
     shakeToggle = signal(false);
     lightningOffset = signal(0);
     plans = signal<PricingPlan[]>([]);
+
+
+    get isFirstMonth(): boolean {
+        if (!this.currentSubscription?.startDate) return false;
+        const startDate = new Date(this.currentSubscription.startDate);
+        const now = new Date();
+        if (startDate > now) return false;
+
+        const diffTime = now.getTime() - startDate.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays <= 30;
+    }
 
     upgradeForm!: FormGroup;
     showUpgradeDialog = false;
@@ -619,5 +635,9 @@ export class BillingSettingsPage implements OnInit {
                     });
                 },
             });
+    }
+
+    openSupportDialog() {
+        this.dialogService.openSupportDialog();
     }
 }

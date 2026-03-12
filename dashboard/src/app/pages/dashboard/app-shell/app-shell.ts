@@ -28,6 +28,7 @@ import { TargetFormComponent } from '../events/dispatch/targets/components/targe
 import { TwofaSetupDialogComponent } from '@shared/components/twofa-setup-dialog/twofa-setup-dialog.component';
 import { InviteMemberFormComponent } from '@shared/components/invite-member-form/invite-member-form.component';
 import { NamespaceFormComponent } from '@shared/components/namespace-form/namespace-form.component';
+import { SupportDialogComponent } from '@shared/components/support-dialog/support-dialog.component';
 
 @Component({
     selector: 'app-shell',
@@ -45,6 +46,7 @@ import { NamespaceFormComponent } from '@shared/components/namespace-form/namesp
         TwofaSetupDialogComponent,
         InviteMemberFormComponent,
         NamespaceFormComponent,
+        SupportDialogComponent,
     ],
     templateUrl: './app-shell.html',
     styleUrl: './app-shell.scss',
@@ -100,6 +102,9 @@ export class AppShell implements OnInit, AfterViewInit {
     namespaceDialogVisible = false;
     namespaceDialogId: string | null = null;
     namespaceDialogHeader = 'Create Namespace';
+
+    // Support Dialog
+    supportDialogVisible = false;
 
     constructor(private dialogService: DialogService) {}
 
@@ -186,6 +191,13 @@ export class AppShell implements OnInit, AfterViewInit {
                     ? 'Edit Namespace'
                     : 'Create Namespace';
             });
+
+        // Listen for Support Dialog State
+        this.dialogService.supportDialogState$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe((state) => {
+                this.supportDialogVisible = state.visible;
+            });
     }
 
     ngAfterViewInit() {
@@ -271,5 +283,9 @@ export class AppShell implements OnInit, AfterViewInit {
 
     onNamespaceDialogHide() {
         this.dialogService.closeNamespaceDialog();
+    }
+
+    onSupportDialogHide() {
+        this.dialogService.closeSupportDialog();
     }
 }

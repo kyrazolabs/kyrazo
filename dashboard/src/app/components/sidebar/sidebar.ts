@@ -56,7 +56,6 @@ import { SubscriptionService } from '@core/services/subscription.service';
         TextareaModule,
         CardModule,
         ToastModule,
-        SupportDialogComponent,
     ],
     providers: [MessageService],
     templateUrl: './sidebar.html',
@@ -257,11 +256,8 @@ export class SidebarComponent implements OnInit, AfterViewInit {
         return (this.helpVisible = true);
     }
 
-    // Support dialog state
-    supportDialogVisible = false;
-
     openSupportDialog() {
-        this.supportDialogVisible = true;
+        this.dialogService.openSupportDialog();
     }
 
     openBilling() {

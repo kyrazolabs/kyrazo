@@ -309,3 +309,5 @@
     ></app-namespace-form>
 </p-dialog>
 
+<app-support-dialog [(visible)]="supportDialogVisible" (visibleChange)="!$event && onSupportDialogHide()"></app-support-dialog>
+

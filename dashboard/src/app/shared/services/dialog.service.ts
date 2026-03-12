@@ -60,6 +60,12 @@ export class DialogService {
     }>({ visible: false, namespaceId: null });
     namespaceDialogState$ = this.namespaceDialogStateSubject.asObservable();
 
+    // Support Dialog State
+    private supportDialogStateSubject = new BehaviorSubject<{
+        visible: boolean;
+    }>({ visible: false });
+    supportDialogState$ = this.supportDialogStateSubject.asObservable();
+
     // Event Sources
     private sourceSavedSource = new Subject<any>();
     sourceSaved$ = this.sourceSavedSource.asObservable();
@@ -192,5 +198,14 @@ export class DialogService {
 
     notifyNamespaceSaved(data?: any) {
         this.namespaceSavedSource.next(data);
+    }
+
+    // Support Dialog Methods
+    openSupportDialog() {
+        this.supportDialogStateSubject.next({ visible: true });
+    }
+
+    closeSupportDialog() {
+        this.supportDialogStateSubject.next({ visible: false });
     }
 }

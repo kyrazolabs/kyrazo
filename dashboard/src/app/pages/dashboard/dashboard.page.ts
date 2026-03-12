@@ -18,7 +18,7 @@ import { MessageService } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
 
 // Shared Components
-import { SupportDialogComponent } from '@shared/components/support-dialog/support-dialog.component';
+import { DialogService } from '@shared/services/dialog.service';
 
 // Services
 import { NamespaceService } from '@core/services/namespace.service';
@@ -40,7 +40,6 @@ import { SubscriptionService } from '@core/services/subscription.service';
         InputTextModule,
         TextareaModule,
         ToastModule,
-        SupportDialogComponent,
         TooltipModule,
     ],
     templateUrl: './dashboard.page.html',
@@ -51,6 +50,7 @@ export class DashboardPage implements OnInit {
     private namespaceService = inject(NamespaceService);
     private messageService = inject(MessageService);
     private sentry = inject(SentryService);
+    private dialogService = inject(DialogService);
     public readonly subscriptionService = inject(SubscriptionService);
 
     // Data
@@ -84,9 +84,6 @@ export class DashboardPage implements OnInit {
             },
         });
     }
-
-    // Support Dialog State
-    supportDialogVisible = false;
 
     // Navigation Cards Configuration
     public navCards = computed(() => {
@@ -199,6 +196,6 @@ export class DashboardPage implements OnInit {
 
     // Support dialog
     openSupportDialog() {
-        this.supportDialogVisible = true;
+        this.dialogService.openSupportDialog();
     }
 }
