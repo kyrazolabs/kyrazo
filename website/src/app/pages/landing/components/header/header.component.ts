@@ -89,18 +89,18 @@ export class HeaderComponent {
                         routerLink: '/features/architecture',
                         command: () => this.activeDropdown.set(null),
                     },
-                    {
-                        label: 'Privacy by Design',
-                        icon: 'icon-[hugeicons--shield-check] size-5',
-                        routerLink: '/features/privacy-by-design',
-                        command: () => this.activeDropdown.set(null),
-                    },
-                    {
-                        label: 'Early Adopter',
-                        icon: 'icon-[hugeicons--star-01] size-5',
-                        routerLink: '/features/early-adopter',
-                        command: () => this.activeDropdown.set(null),
-                    },
+                    // {
+                    //     label: 'Privacy by Design',
+                    //     icon: 'icon-[hugeicons--shield-check] size-5',
+                    //     routerLink: '/features/privacy-by-design',
+                    //     command: () => this.activeDropdown.set(null),
+                    // },
+                    // {
+                    //     label: 'Early Adopter',
+                    //     icon: 'icon-[hugeicons--star-01] size-5',
+                    //     routerLink: '/features/early-adopter',
+                    //     command: () => this.activeDropdown.set(null),
+                    // },
                 ],
             },
             {
