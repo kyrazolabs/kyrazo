@@ -33,7 +33,7 @@ A Target is where Kyrazo will deliver your events.
 Now you're ready to send data. Use the following `curl` command (replace the placeholders with your actual values):
 
 ```bash
-curl -X POST "https://api.kyrazo.com/v1/projects/{PROJECT_ID}/publish" \
+curl -X POST "https://api.kyrazo.com/v1/namespaces/{PROJECT_ID}/publish" \
      -H "x-api-key: {YOUR_API_KEY}" \
      -H "Content-Type: application/json" \
      -d '{
@@ -53,7 +53,7 @@ curl -X POST "https://api.kyrazo.com/v1/projects/{PROJECT_ID}/publish" \
 Once you send the request, you can verify the result:
 
 1.  Check your destination URL (or Webhook.site) to see the incoming payload.
-2.  In the Kyrazo Dashboard, navigate to the **Dispatch/Ingest Logs** for your project.
+2.  In the Kyrazo Dashboard, navigate to the **Dispatch/Ingest Logs** for your namespace.
 3.  You should see your event listed with a status of `Queued` or `Delivered`, along with detailed logs for the delivery attempt.
 
 ---

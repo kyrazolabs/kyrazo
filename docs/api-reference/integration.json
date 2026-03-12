@@ -20,19 +20,19 @@
         }
     ],
     "paths": {
-        "/v1/events/{projectId}/publish": {
+        "/v1/events/{namespaceId}/publish": {
             "post": {
                 "summary": "Publish Event",
-                "description": "Publishes a single event to the specified project and its associated targets.",
+                "description": "Publishes a single event to the specified namespace and its associated targets.",
                 "operationId": "publishEvent",
                 "x-codeSamples": [
                     {
                         "lang": "JavaScript",
-                        "source": "await client.events.single('project_id', {\n  eventType: 'user.created',\n  payload: { id: 1 },\n  targets: [{ targetId: '65a1b2c3d4e5f67890123456' }]\n});"
+                        "source": "await client.events.single('namespace_id', {\n  eventType: 'user.created',\n  payload: { id: 1 },\n  targets: [{ targetId: '65a1b2c3d4e5f67890123456' }]\n});"
                     },
                     {
                         "lang": "Python",
-                        "source": "client.events.publish(\n    project_id='project_id',\n    body=PublishEventBody(\n        eventType='user.created',\n        payload={'id': 1},\n        targets=[{'targetId': '65a1b2c3d4e5f67890123456'}]\n    )\n)"
+                        "source": "client.events.publish(\n    namespace_id='namespace_id',\n    body=PublishEventBody(\n        eventType='user.created',\n        payload={'id': 1},\n        targets=[{'targetId': '65a1b2c3d4e5f67890123456'}]\n    )\n)"
                     }
                 ],
                 "tags": [
@@ -40,10 +40,10 @@
                 ],
                 "parameters": [
                     {
-                        "name": "projectId",
+                        "name": "namespaceId",
                         "in": "path",
                         "required": true,
-                        "description": "The unique identifier of the project.",
+                        "description": "The unique identifier of the namespace.",
                         "schema": {
                             "type": "string",
                             "pattern": "^[0-9a-fA-F]{24}$"
@@ -159,7 +159,7 @@
                 }
             }
         },
-        "/v1/events/{projectId}/publish/batch": {
+        "/v1/events/{namespaceId}/publish/batch": {
             "post": {
                 "summary": "Batch Publish Events",
                 "description": "Publishes multiple events in a single request.",
@@ -167,11 +167,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "JavaScript",
-                        "source": "await client.events.batch('project_id', [\n  {\n    eventType: 'user.created',\n    payload: { id: 1 },\n    targets: [{ targetId: '65a1b2c3d4e5f67890123456' }]\n  },\n  {\n    eventType: 'order.created',\n    payload: { id: 99 },\n    targets: [{ targetId: '65a1b2c3d4e5f67890123457' }]\n  }\n]);"
+                        "source": "await client.events.batch('namespace_id', [\n  {\n    eventType: 'user.created',\n    payload: { id: 1 },\n    targets: [{ targetId: '65a1b2c3d4e5f67890123456' }]\n  },\n  {\n    eventType: 'order.created',\n    payload: { id: 99 },\n    targets: [{ targetId: '65a1b2c3d4e5f67890123457' }]\n  }\n]);"
                     },
                     {
                         "lang": "Python",
-                        "source": "client.events.batch(\n    project_id='project_id',\n    body=[\n        PublishEventBody(\n            eventType='user.created',\n            payload={'id': 1},\n            targets=[{'targetId': '65a1b2c3d4e5f67890123456'}]\n        ),\n        PublishEventBody(\n            eventType='order.created',\n            payload={'id': 99},\n            targets=[{'targetId': '65a1b2c3d4e5f67890123457'}]\n        )\n    ]\n)"
+                        "source": "client.events.batch(\n    namespace_id='namespace_id',\n    body=[\n        PublishEventBody(\n            eventType='user.created',\n            payload={'id': 1},\n            targets=[{'targetId': '65a1b2c3d4e5f67890123456'}]\n        ),\n        PublishEventBody(\n            eventType='order.created',\n            payload={'id': 99},\n            targets=[{'targetId': '65a1b2c3d4e5f67890123457'}]\n        )\n    ]\n)"
                     }
                 ],
                 "tags": [
@@ -179,10 +179,10 @@
                 ],
                 "parameters": [
                     {
-                        "name": "projectId",
+                        "name": "namespaceId",
                         "in": "path",
                         "required": true,
-                        "description": "The unique identifier of the project.",
+                        "description": "The unique identifier of the namespace.",
                         "schema": {
                             "type": "string",
                             "pattern": "^[0-9a-fA-F]{24}$"
@@ -314,19 +314,19 @@
                 }
             }
         },
-        "/v1/targets/{projectId}": {
+        "/v1/targets/{namespaceId}": {
             "get": {
                 "summary": "List Targets",
-                "description": "Retrieves a paginated list of targets for the specified project.",
+                "description": "Retrieves a paginated list of targets for the specified namespace.",
                 "operationId": "listTargets",
                 "x-codeSamples": [
                     {
                         "lang": "JavaScript",
-                        "source": "const targets = await client.targets.list('project_id', { limit: 10, page: 1 });"
+                        "source": "const targets = await client.targets.list('namespace_id', { limit: 10, page: 1 });"
                     },
                     {
                         "lang": "Python",
-                        "source": "targets = client.targets.list(project_id='project_id', limit=10, page=1)"
+                        "source": "targets = client.targets.list(namespace_id='namespace_id', limit=10, page=1)"
                     }
                 ],
                 "tags": [
@@ -334,7 +334,7 @@
                 ],
                 "parameters": [
                     {
-                        "name": "projectId",
+                        "name": "namespaceId",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -485,16 +485,16 @@
             },
             "post": {
                 "summary": "Create Target",
-                "description": "Creates a new webhook target for the specified project.",
+                "description": "Creates a new webhook target for the specified namespace.",
                 "operationId": "createTarget",
                 "x-codeSamples": [
                     {
                         "lang": "JavaScript",
-                        "source": "const target = await client.targets.create('project_id', {\n  name: 'Production Webhook',\n  url: 'https://api.example.com/webhooks',\n  method: 'POST',\n  config: { timeout: 5000, retryCount: 3, rateLimitDuration: 60 }\n});"
+                        "source": "const target = await client.targets.create('namespace_id', {\n  name: 'Production Webhook',\n  url: 'https://api.example.com/webhooks',\n  method: 'POST',\n  config: { timeout: 5000, retryCount: 3, rateLimitDuration: 60 }\n});"
                     },
                     {
                         "lang": "Python",
-                        "source": "target = client.targets.create(\n    project_id='project_id',\n    data=CreateTargetInput(\n        name='Production Webhook',\n        url='https://api.example.com/webhooks',\n        method='POST',\n        config=TargetConfig(timeout=5000, retryCount=3, rateLimitDuration=60)\n    )\n)"
+                        "source": "target = client.targets.create(\n    namespace_id='namespace_id',\n    data=CreateTargetInput(\n        name='Production Webhook',\n        url='https://api.example.com/webhooks',\n        method='POST',\n        config=TargetConfig(timeout=5000, retryCount=3, rateLimitDuration=60)\n    )\n)"
                     }
                 ],
                 "tags": [
@@ -502,7 +502,7 @@
                 ],
                 "parameters": [
                     {
-                        "name": "projectId",
+                        "name": "namespaceId",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -630,7 +630,7 @@
                 }
             }
         },
-        "/v1/targets/{projectId}/{targetId}": {
+        "/v1/targets/{namespaceId}/{targetId}": {
             "get": {
                 "summary": "Get Target",
                 "description": "Retrieves details of a specific target.",
@@ -638,11 +638,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "JavaScript",
-                        "source": "const target = await client.targets.get('project_id', 'target_id');"
+                        "source": "const target = await client.targets.get('namespace_id', 'target_id');"
                     },
                     {
                         "lang": "Python",
-                        "source": "target = client.targets.get(project_id='project_id', target_id='target_id')"
+                        "source": "target = client.targets.get(namespace_id='namespace_id', target_id='target_id')"
                     }
                 ],
                 "tags": [
@@ -650,7 +650,7 @@
                 ],
                 "parameters": [
                     {
-                        "name": "projectId",
+                        "name": "namespaceId",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -782,11 +782,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "JavaScript",
-                        "source": "const target = await client.targets.update('project_id', 'target_id', { name: 'Updated Name', url: 'https://new-url.com' });"
+                        "source": "const target = await client.targets.update('namespace_id', 'target_id', { name: 'Updated Name', url: 'https://new-url.com' });"
                     },
                     {
                         "lang": "Python",
-                        "source": "target = client.targets.update(\n    project_id='project_id',\n    target_id='target_id',\n    data=UpdateTargetInput(name='Updated Name', url='https://new-url.com')\n)"
+                        "source": "target = client.targets.update(\n    namespace_id='namespace_id',\n    target_id='target_id',\n    data=UpdateTargetInput(name='Updated Name', url='https://new-url.com')\n)"
                     }
                 ],
                 "tags": [
@@ -794,7 +794,7 @@
                 ],
                 "parameters": [
                     {
-                        "name": "projectId",
+                        "name": "namespaceId",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -929,11 +929,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "JavaScript",
-                        "source": "const target = await client.targets.updateStatus('project_id', 'target_id', false);"
+                        "source": "const target = await client.targets.updateStatus('namespace_id', 'target_id', false);"
                     },
                     {
                         "lang": "Python",
-                        "source": "target = client.targets.update_status(project_id='project_id', target_id='target_id', enabled=False)"
+                        "source": "target = client.targets.update_status(namespace_id='namespace_id', target_id='target_id', enabled=False)"
                     }
                 ],
                 "tags": [
@@ -941,7 +941,7 @@
                 ],
                 "parameters": [
                     {
-                        "name": "projectId",
+                        "name": "namespaceId",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -1084,11 +1084,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "JavaScript",
-                        "source": "await client.targets.delete('project_id', 'target_id');"
+                        "source": "await client.targets.delete('namespace_id', 'target_id');"
                     },
                     {
                         "lang": "Python",
-                        "source": "client.targets.delete(project_id='project_id', target_id='target_id')"
+                        "source": "client.targets.delete(namespace_id='namespace_id', target_id='target_id')"
                     }
                 ],
                 "tags": [
@@ -1096,7 +1096,7 @@
                 ],
                 "parameters": [
                     {
-                        "name": "projectId",
+                        "name": "namespaceId",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -1205,7 +1205,7 @@
                 }
             }
         },
-        "/v1/targets/{projectId}/{targetId}/secret": {
+        "/v1/targets/{namespaceId}/{targetId}/secret": {
             "get": {
                 "summary": "Get Target Secret",
                 "description": "Retrieves the signing secret for the target.",
@@ -1213,11 +1213,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "JavaScript",
-                        "source": "const secret = await client.targets.getSecret('project_id', 'target_id');"
+                        "source": "const secret = await client.targets.getSecret('namespace_id', 'target_id');"
                     },
                     {
                         "lang": "Python",
-                        "source": "secret = client.targets.get_secret(project_id='project_id', target_id='target_id')"
+                        "source": "secret = client.targets.get_secret(namespace_id='namespace_id', target_id='target_id')"
                     }
                 ],
                 "tags": [
@@ -1225,7 +1225,7 @@
                 ],
                 "parameters": [
                     {
-                        "name": "projectId",
+                        "name": "namespaceId",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -1334,18 +1334,18 @@
                 }
             }
         },
-        "/v1/endpoints/{projectId}": {
+        "/v1/endpoints/{namespaceId}": {
             "get": {
                 "summary": "List Endpoints",
                 "operationId": "listEndpoints",
                 "x-codeSamples": [
                     {
                         "lang": "JavaScript",
-                        "source": "const endpoints = await client.endpoints.list('project_id', { limit: 10, page: 1 });"
+                        "source": "const endpoints = await client.endpoints.list('namespace_id', { limit: 10, page: 1 });"
                     },
                     {
                         "lang": "Python",
-                        "source": "endpoints = client.endpoints.list(project_id='project_id', limit=10, page=1)"
+                        "source": "endpoints = client.endpoints.list(namespace_id='namespace_id', limit=10, page=1)"
                     }
                 ],
                 "tags": [
@@ -1353,7 +1353,7 @@
                 ],
                 "parameters": [
                     {
-                        "name": "projectId",
+                        "name": "namespaceId",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -1476,11 +1476,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "JavaScript",
-                        "source": "const endpoint = await client.endpoints.create('project_id', {\n  name: 'Backend Service',\n  url: 'https://api.internal/webhook',\n  method: 'POST',\n  config: { timeout: 5000, retryCount: 3, rateLimitDuration: 60 }\n});"
+                        "source": "const endpoint = await client.endpoints.create('namespace_id', {\n  name: 'Backend Service',\n  url: 'https://api.internal/webhook',\n  method: 'POST',\n  config: { timeout: 5000, retryCount: 3, rateLimitDuration: 60 }\n});"
                     },
                     {
                         "lang": "Python",
-                        "source": "endpoint = client.endpoints.create(\n    project_id='project_id',\n    data=CreateEndpointInput(\n        name='Backend Service',\n        url='https://api.internal/webhook',\n        method='POST',\n        config=EndpointConfig(timeout=5000, retryCount=3, rateLimitDuration=60)\n    )\n)"
+                        "source": "endpoint = client.endpoints.create(\n    namespace_id='namespace_id',\n    data=CreateEndpointInput(\n        name='Backend Service',\n        url='https://api.internal/webhook',\n        method='POST',\n        config=EndpointConfig(timeout=5000, retryCount=3, rateLimitDuration=60)\n    )\n)"
                     }
                 ],
                 "tags": [
@@ -1488,7 +1488,7 @@
                 ],
                 "parameters": [
                     {
-                        "name": "projectId",
+                        "name": "namespaceId",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -1601,18 +1601,18 @@
                 }
             }
         },
-        "/v1/endpoints/{projectId}/{endpointId}": {
+        "/v1/endpoints/{namespaceId}/{endpointId}": {
             "get": {
                 "summary": "Get Endpoint",
                 "operationId": "getEndpoint",
                 "x-codeSamples": [
                     {
                         "lang": "JavaScript",
-                        "source": "const endpoint = await client.endpoints.get('project_id', 'endpoint_id');"
+                        "source": "const endpoint = await client.endpoints.get('namespace_id', 'endpoint_id');"
                     },
                     {
                         "lang": "Python",
-                        "source": "endpoint = client.endpoints.get(project_id='project_id', endpoint_id='endpoint_id')"
+                        "source": "endpoint = client.endpoints.get(namespace_id='namespace_id', endpoint_id='endpoint_id')"
                     }
                 ],
                 "tags": [
@@ -1620,7 +1620,7 @@
                 ],
                 "parameters": [
                     {
-                        "name": "projectId",
+                        "name": "namespaceId",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -1728,11 +1728,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "JavaScript",
-                        "source": "const endpoint = await client.endpoints.update('project_id', 'endpoint_id', { name: 'Updated Name', status: 'inactive' });"
+                        "source": "const endpoint = await client.endpoints.update('namespace_id', 'endpoint_id', { name: 'Updated Name', status: 'inactive' });"
                     },
                     {
                         "lang": "Python",
-                        "source": "endpoint = client.endpoints.update(\n    project_id='project_id',\n    endpoint_id='endpoint_id',\n    data=UpdateEndpointInput(name='Updated Name', status='inactive')\n)"
+                        "source": "endpoint = client.endpoints.update(\n    namespace_id='namespace_id',\n    endpoint_id='endpoint_id',\n    data=UpdateEndpointInput(name='Updated Name', status='inactive')\n)"
                     }
                 ],
                 "tags": [
@@ -1740,7 +1740,7 @@
                 ],
                 "parameters": [
                     {
-                        "name": "projectId",
+                        "name": "namespaceId",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -1849,11 +1849,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "JavaScript",
-                        "source": "await client.endpoints.delete('project_id', 'endpoint_id');"
+                        "source": "await client.endpoints.delete('namespace_id', 'endpoint_id');"
                     },
                     {
                         "lang": "Python",
-                        "source": "client.endpoints.delete(project_id='project_id', endpoint_id='endpoint_id')"
+                        "source": "client.endpoints.delete(namespace_id='namespace_id', endpoint_id='endpoint_id')"
                     }
                 ],
                 "tags": [
@@ -1861,7 +1861,7 @@
                 ],
                 "parameters": [
                     {
-                        "name": "projectId",
+                        "name": "namespaceId",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -1952,18 +1952,18 @@
                 }
             }
         },
-        "/v1/endpoints/{projectId}/{endpointId}/secret": {
+        "/v1/endpoints/{namespaceId}/{endpointId}/secret": {
             "get": {
                 "summary": "Get Endpoint Secret",
                 "operationId": "getEndpointSecret",
                 "x-codeSamples": [
                     {
                         "lang": "JavaScript",
-                        "source": "const secret = await client.endpoints.getSecret('project_id', 'endpoint_id');"
+                        "source": "const secret = await client.endpoints.getSecret('namespace_id', 'endpoint_id');"
                     },
                     {
                         "lang": "Python",
-                        "source": "secret = client.endpoints.get_secret(project_id='project_id', endpoint_id='endpoint_id')"
+                        "source": "secret = client.endpoints.get_secret(namespace_id='namespace_id', endpoint_id='endpoint_id')"
                     }
                 ],
                 "tags": [
@@ -1971,7 +1971,7 @@
                 ],
                 "parameters": [
                     {
-                        "name": "projectId",
+                        "name": "namespaceId",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -2062,18 +2062,18 @@
                 }
             }
         },
-        "/v1/sources/{projectId}": {
+        "/v1/sources/{namespaceId}": {
             "get": {
                 "summary": "List Sources",
                 "operationId": "listSources",
                 "x-codeSamples": [
                     {
                         "lang": "JavaScript",
-                        "source": "const sources = await client.sources.list('project_id', { limit: 10, page: 1 });"
+                        "source": "const sources = await client.sources.list('namespace_id', { limit: 10, page: 1 });"
                     },
                     {
                         "lang": "Python",
-                        "source": "sources = client.sources.list(project_id='project_id', limit=10, page=1)"
+                        "source": "sources = client.sources.list(namespace_id='namespace_id', limit=10, page=1)"
                     }
                 ],
                 "tags": [
@@ -2081,7 +2081,7 @@
                 ],
                 "parameters": [
                     {
-                        "name": "projectId",
+                        "name": "namespaceId",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -2119,7 +2119,7 @@
                                     "sources": [
                                         {
                                             "id": "69734d32990b0591070786c8",
-                                            "projectId": "69674fad7590d01406e98126",
+                                            "namespaceId": "69674fad7590d01406e98126",
                                             "name": "Paypal Source",
                                             "description": "Webhook for receiving general events",
                                             "service": "paypal",
@@ -2209,11 +2209,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "JavaScript",
-                        "source": "const source = await client.sources.create('project_id', {\n  name: 'Stripe Ingest',\n  service: 'stripe',\n  type: 'receive',\n  eventTypes: ['charge.succeeded'],\n  authentication: { enabled: true, type: 'service', service: { secret: 'whsec_...' } }\n});"
+                        "source": "const source = await client.sources.create('namespace_id', {\n  name: 'Stripe Ingest',\n  service: 'stripe',\n  type: 'receive',\n  eventTypes: ['charge.succeeded'],\n  authentication: { enabled: true, type: 'service', service: { secret: 'whsec_...' } }\n});"
                     },
                     {
                         "lang": "Python",
-                        "source": "source = client.sources.create(\n    project_id='project_id',\n    data=CreateSourceInput(\n        name='Stripe Ingest',\n        service='stripe',\n        type='receive',\n        eventTypes=['charge.succeeded'],\n        authentication=SourceAuth(enabled=True, type='service', service=ServiceAuth(secret='whsec_...'))\n    )\n)"
+                        "source": "source = client.sources.create(\n    namespace_id='namespace_id',\n    data=CreateSourceInput(\n        name='Stripe Ingest',\n        service='stripe',\n        type='receive',\n        eventTypes=['charge.succeeded'],\n        authentication=SourceAuth(enabled=True, type='service', service=ServiceAuth(secret='whsec_...'))\n    )\n)"
                     }
                 ],
                 "tags": [
@@ -2221,7 +2221,7 @@
                 ],
                 "parameters": [
                     {
-                        "name": "projectId",
+                        "name": "namespaceId",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -2254,7 +2254,7 @@
                                         "sourceId": "69734d32990b0591070786c8",
                                         "source": {
                                             "id": "69734d32990b0591070786c8",
-                                            "projectId": "69674fad7590d01406e98126",
+                                            "namespaceId": "69674fad7590d01406e98126",
                                             "name": "Paypal Source",
                                             "description": "Webhook for receiving general events",
                                             "service": "paypal",
@@ -2339,18 +2339,18 @@
                 }
             }
         },
-        "/v1/sources/{projectId}/{sourceId}": {
+        "/v1/sources/{namespaceId}/{sourceId}": {
             "get": {
                 "summary": "Get Source",
                 "operationId": "getSource",
                 "x-codeSamples": [
                     {
                         "lang": "JavaScript",
-                        "source": "const source = await client.sources.get('project_id', 'source_id');"
+                        "source": "const source = await client.sources.get('namespace_id', 'source_id');"
                     },
                     {
                         "lang": "Python",
-                        "source": "source = client.sources.get(project_id='project_id', source_id='source_id')"
+                        "source": "source = client.sources.get(namespace_id='namespace_id', source_id='source_id')"
                     }
                 ],
                 "tags": [
@@ -2358,7 +2358,7 @@
                 ],
                 "parameters": [
                     {
-                        "name": "projectId",
+                        "name": "namespaceId",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -2387,7 +2387,7 @@
                                     "message": "Source fetched successfully",
                                     "data": {
                                         "id": "69734d32990b0591070786c8",
-                                        "projectId": "69674fad7590d01406e98126",
+                                        "namespaceId": "69674fad7590d01406e98126",
                                         "name": "Paypal Source",
                                         "description": "Webhook for receiving general events",
                                         "service": "paypal",
@@ -2476,11 +2476,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "JavaScript",
-                        "source": "const source = await client.sources.update('project_id', 'source_id', { name: 'New Name' });"
+                        "source": "const source = await client.sources.update('namespace_id', 'source_id', { name: 'New Name' });"
                     },
                     {
                         "lang": "Python",
-                        "source": "source = client.sources.update(\n    project_id='project_id',\n    source_id='source_id',\n    data=UpdateSourceInput(name='New Name')\n)"
+                        "source": "source = client.sources.update(\n    namespace_id='namespace_id',\n    source_id='source_id',\n    data=UpdateSourceInput(name='New Name')\n)"
                     }
                 ],
                 "tags": [
@@ -2488,7 +2488,7 @@
                 ],
                 "parameters": [
                     {
-                        "name": "projectId",
+                        "name": "namespaceId",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -2526,7 +2526,7 @@
                                     "message": "Source updated successfully",
                                     "data": {
                                         "id": "69734d32990b0591070786c8",
-                                        "projectId": "69674fad7590d01406e98126",
+                                        "namespaceId": "69674fad7590d01406e98126",
                                         "name": "Updated Paypal Source",
                                         "description": "Updated Webhook for receiving general events",
                                         "service": "paypal",
@@ -2615,11 +2615,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "JavaScript",
-                        "source": "const result = await client.sources.delete('project_id', 'source_id');"
+                        "source": "const result = await client.sources.delete('namespace_id', 'source_id');"
                     },
                     {
                         "lang": "Python",
-                        "source": "result = client.sources.delete(project_id='project_id', source_id='source_id')"
+                        "source": "result = client.sources.delete(namespace_id='namespace_id', source_id='source_id')"
                     }
                 ],
                 "tags": [
@@ -2627,7 +2627,7 @@
                 ],
                 "parameters": [
                     {
-                        "name": "projectId",
+                        "name": "namespaceId",
                         "in": "path",
                         "required": true,
                         "schema": {

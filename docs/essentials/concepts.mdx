@@ -28,7 +28,7 @@ An **Event** is the core unit of data in Kyrazo. It represents something that ha
 
 A **Target** is a destination where Kyrazo delivers your events. In most cases, this is a webhook URL provided by your users or secondary systems.
 
-- **Project-Based**: Targets are grouped within **Projects**, allowing you to isolate integrations for different environments or product lines.
+- **Namespace-Based**: Targets are grouped within **Namespaces**, allowing you to isolate integrations for different environments or product lines.
 - **Delivery Protocol**: Standard HTTP(S) requests (POST, PUT, PATCH, etc.).
 - **Security**: kyrazo provides professional-grade security for targets:
   - **Signing Secrets**: Every target can have a unique secret used to generate HMAC signatures, allowing the receiver to verify the payload's integrity.
@@ -41,5 +41,5 @@ A **Target** is a destination where Kyrazo delivers your events. In most cases, 
 
 1. Your system **publishes** an **Event** to Kyrazo.
 2. The **Dispatch** layer validates the event and queues it for high-performance delivery.
-3. Kyrazo identifies all active **Targets** associated with the project.
+3. Kyrazo identifies all active **Targets** associated with the namespace.
 4. The Dispatcher delivers the event to each **Target**, handling retries and security signatures automatically.

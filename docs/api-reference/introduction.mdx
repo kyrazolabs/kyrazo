@@ -5,7 +5,7 @@ description: "Documentation for the Kyrazo Integration API"
 
 ## Overview
 
-The Integration API allows you to programmatically publish events and manage webhook targets within your projects. It is designed for high-performance and reliable event delivery.
+The Integration API allows you to programmatically publish events and manage webhook targets within your namespaces. It is designed for high-performance and reliable event delivery.
 
 <CardGroup cols={2}>
   <Card
@@ -49,7 +49,7 @@ https://api.kyrazo.com
 ```
 
 <Note>
-  Ensure you are using the correct Project ID from your dashboard when constructing the publish URL: `https://api.kyrazo.com/v1/events/{projectId}/publish`
+  Ensure you are using the correct Namespace ID from your dashboard when constructing the publish URL: `https://api.kyrazo.com/v1/events/{namespaceId}/publish`
 </Note>
 
 ## SDK Support
@@ -121,7 +121,7 @@ client = Kyrazo(api_key="your_api_key")
 
 # Publish an event
 response = client.events.publish(
-    project_id="proj_123",
+    namespace_id="proj_123",
     body={
         "eventType": "user.created",
         "payload": {"id": 1, "name": "Alice"},
