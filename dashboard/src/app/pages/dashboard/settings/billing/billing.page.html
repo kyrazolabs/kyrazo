@@ -5,7 +5,7 @@
                 <div class="flex items-center gap-2 ml-2">
                     <i class="pi pi-info-circle mr-1"></i>
                     <span>Using Kyrazo for the first month? If you're considering cancelling, please </span>
-                    <button type="button" class="font-bold underline cursor-pointer bg-transparent border-none p-0 text-inherit hover:opacity-80 transition-opacity" (click)="supportVisible = true">contact our support team</button>
+                    <button type="button" class="font-bold underline cursor-pointer bg-transparent border-none p-0 text-inherit hover:opacity-80 transition-opacity" (click)="openSupportDialog()">contact our support team</button>
                     <span> first!</span>
                 </div>
             </ng-template>
@@ -200,5 +200,4 @@
     </div>
 </p-dialog>
 
-<!-- Support Dialog -->
-<app-support-dialog [(visible)]="supportVisible"></app-support-dialog>
+

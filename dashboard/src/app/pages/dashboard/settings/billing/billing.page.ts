@@ -10,7 +10,7 @@ import { TagModule } from 'primeng/tag';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { DividerModule } from 'primeng/divider';
 import { MessageModule } from 'primeng/message';
-import { SupportDialogComponent } from '@shared/components/support-dialog/support-dialog.component';
+import { DialogService } from '@shared/services/dialog.service';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { DialogModule } from 'primeng/dialog';
 import { TableModule } from 'primeng/table';
@@ -59,7 +59,6 @@ import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directiv
         MessageModule,
         PricingCardComponent,
         PricingComparisonComponent,
-        SupportDialogComponent,
     ],
     templateUrl: './billing.page.html',
     styleUrl: './billing.page.scss',
@@ -71,6 +70,7 @@ export class BillingSettingsPage implements OnInit {
     private confirmationService = inject(ConfirmationService);
     private sentry = inject(SentryService);
     private supportService = inject(SupportService);
+    private dialogService = inject(DialogService);
     public loader = inject(LoaderService);
     public subscriptionService = inject(SubscriptionService);
 
@@ -88,7 +88,7 @@ export class BillingSettingsPage implements OnInit {
     shakeToggle = signal(false);
     lightningOffset = signal(0);
     plans = signal<PricingPlan[]>([]);
-    supportVisible = false;
+
 
     get isFirstMonth(): boolean {
         if (!this.currentSubscription?.startDate) return false;
@@ -633,5 +633,9 @@ export class BillingSettingsPage implements OnInit {
                     });
                 },
             });
+    }
+
+    openSupportDialog() {
+        this.dialogService.openSupportDialog();
     }
 }
