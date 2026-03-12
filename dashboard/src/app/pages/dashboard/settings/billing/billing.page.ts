@@ -94,7 +94,9 @@ export class BillingSettingsPage implements OnInit {
         if (!this.currentSubscription?.startDate) return false;
         const startDate = new Date(this.currentSubscription.startDate);
         const now = new Date();
-        const diffTime = Math.abs(now.getTime() - startDate.getTime());
+        if (startDate > now) return false;
+
+        const diffTime = now.getTime() - startDate.getTime();
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         return diffDays <= 30;
     }
