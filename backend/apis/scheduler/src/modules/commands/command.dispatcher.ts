@@ -39,10 +39,8 @@ export class CommandDispatcher {
                 project_uuid: server.coolify_project_uuid,
                 environment_uuid: server.coolify_environment_uuid,
                 github_app_uuid: config.COOLIFY_GITHUB_APP_UUID,
-                repository: config.COOLIFY_REPOSITORY,
-                branch: config.COOLIFY_BRANCH,
                 name: appName,
-                descriptions: `This worker ${workerId} is dedicated for client ${clientId}`,
+                description: `This worker ${workerId} is dedicated for client ${clientId}`,
                 build_pack: 'dockerfile',
             };
 
@@ -134,6 +132,8 @@ export class CommandDispatcher {
                 `[CommandDispatcher] Failed to dispatch Coolify Worker ${workerId}:`,
                 err
             );
+            // Rethrow so WorkerService can rollback DB if needed
+            throw err;
         }
     }
 
