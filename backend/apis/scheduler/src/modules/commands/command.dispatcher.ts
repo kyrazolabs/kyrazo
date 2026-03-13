@@ -41,7 +41,7 @@ export class CommandDispatcher {
                 github_app_uuid: config.COOLIFY_GITHUB_APP_UUID,
                 name: appName,
                 description: `This worker ${workerId} is dedicated for client ${clientId}`,
-                build_pack: 'dockerfile',
+                build_pack: 'dockercompose',
             };
 
             const appRes = await createGitHubApp(createPayload);
