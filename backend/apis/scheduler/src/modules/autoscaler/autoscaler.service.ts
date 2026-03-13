@@ -167,6 +167,7 @@ export class AutoScalerService {
         try {
             await WorkerService.provisionWorker(clientId);
         } catch (err: any) {
+            console.error(`[AutoScaler] Provisioning failed for client ${clientId}:`, err);
             console.warn(`[AutoScaler] Provisioning info: ${err.message}`);
         }
     }
