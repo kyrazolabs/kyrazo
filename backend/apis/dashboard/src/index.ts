@@ -71,21 +71,32 @@ app.onError((err, c) => {
 // Initialize database and Redis connections
 const initializeConnections = async () => {
     try {
+        logger.info('Initializing connections...');
+
+        logger.info('Stage 1: Connecting to MongoDB...');
         await databaseConfig.connect();
         logger.info('Database connected successfully');
-        await Namespace.syncIndexes();
 
+        logger.info('Stage 2: Syncing MongoDB indexes...');
+        await Namespace.syncIndexes();
+        logger.info('MongoDB indexes synced successfully');
+
+        logger.info('Stage 3: Connecting to Postgres...');
         await postgresConfig.connect();
         logger.info('Postgres connected successfully');
 
+        logger.info('Stage 4: Connecting to Redis...');
         await redisConfig.connect();
         logger.info('Redis connected successfully');
 
+        logger.info('Stage 5: Initializing Usage Service...');
         usageService.init();
 
+        logger.info('Stage 6: Connecting to ClickHouse...');
         await clickhouseConfig.connect();
         logger.info('ClickHouse connected successfully');
 
+        logger.info('Stage 7: Setting up Bull Board...');
         const serverAdapter = new HonoAdapter(serveStatic);
 
         createBullBoard({
@@ -97,6 +108,7 @@ const initializeConnections = async () => {
         serverAdapter.setBasePath(basePath);
         app.route(basePath, serverAdapter.registerPlugin());
 
+        logger.info('All connections initialized successfully');
         return true;
     } catch (error) {
         logger.error('Failed to initialize connections:', error as Error);

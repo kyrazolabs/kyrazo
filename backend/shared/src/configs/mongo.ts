@@ -54,6 +54,11 @@ export class DatabaseConfig {
                 throw new Error('MONGODB_URI environment variable is not defined');
             }
 
+            logger.info('Connecting to MongoDB...', {
+                uri: mongoUri.replace(/:([^@]+)@/, ':****@'), // Mask password
+                dbName: config.database.dbName,
+            });
+
             await mongoose.connect(mongoUri, {
                 dbName: config.database.dbName!,
                 maxPoolSize: 10,
@@ -64,7 +69,7 @@ export class DatabaseConfig {
             });
 
             this.isConnected = true;
-            logger.info('Connected to MongoDB successfully');
+            logger.info('Mongoose connected to MongoDB successfully');
 
             // Handle connection events
             mongoose.connection.on('error', error => {
