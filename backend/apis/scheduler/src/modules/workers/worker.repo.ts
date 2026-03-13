@@ -25,6 +25,21 @@ export class WorkerRepo {
         return result[0] as typeof clients.$inferSelect;
     }
 
+    static async upsertClient(tx: any, clientId: string, maxWorkers: number) {
+        await tx
+            .insert(clients)
+            .values({
+                client_id: clientId,
+                plan_max_workers: maxWorkers,
+            })
+            .onConflictDoUpdate({
+                target: clients.client_id,
+                set: {
+                    plan_max_workers: maxWorkers,
+                },
+            });
+    }
+
     static async lockCapacity(
         tx: any,
         clientId: string,
