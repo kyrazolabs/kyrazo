@@ -1,6 +1,8 @@
 import {
     connect,
     StringCodec,
+    RetentionPolicy,
+    StorageType,
     type NatsConnection,
     type JetStreamManager,
     type JetStreamClient,
@@ -92,6 +94,9 @@ export class NatsConfig {
             this.isConnected = true;
             logger.info('Connected to NATS successfully');
 
+            // Ensure EVENTS stream exists (idempotent)
+            await this.ensureEventsStream();
+
             // Test JetStream with a ping
             try {
                 await this.nc.request('$JS.API.INFO', '', { timeout: 5000 });
@@ -115,6 +120,41 @@ export class NatsConfig {
             logger.error('Failed to connect to NATS:', error as Error);
             this.isConnected = false;
             throw error;
+        }
+    }
+
+    /**
+     * Ensure the EVENTS JetStream stream exists.
+     * Safe to call multiple times — does nothing if already created.
+     */
+    private async ensureEventsStream(): Promise<void> {
+        if (!this.jsm) return;
+        const STREAM_NAME = 'EVENTS';
+        const STREAM_SUBJECTS = ['workspace.*.plan.*.events.>'];
+        try {
+            await this.jsm.streams.info(STREAM_NAME);
+            logger.info(`NATS stream '${STREAM_NAME}' already exists`);
+        } catch (err: any) {
+            // err_code 10059 = stream not found
+            if (err?.api_error?.err_code === 10059 || err?.code === 404) {
+                logger.info(`Creating NATS stream '${STREAM_NAME}'...`);
+                await this.jsm.streams.add({
+                    name: STREAM_NAME,
+                    subjects: STREAM_SUBJECTS,
+                    retention: RetentionPolicy.Limits,
+                    storage: StorageType.File,
+                    num_replicas: 1,
+                    max_age: 7 * 24 * 60 * 60 * 1e9, // 7 days in nanoseconds
+                    max_bytes: -1,
+                    max_msg_size: -1,
+                    discard: 'old' as any,
+                    duplicate_window: 2 * 60 * 1e9, // 2 minute dedup window
+                });
+                logger.info(`NATS stream '${STREAM_NAME}' created successfully`);
+            } else {
+                logger.error(`Failed to ensure stream '${STREAM_NAME}':`, err);
+                throw err;
+            }
         }
     }
 
