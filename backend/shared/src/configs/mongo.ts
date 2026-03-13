@@ -62,7 +62,7 @@ export class DatabaseConfig {
             await mongoose.connect(mongoUri, {
                 dbName: config.database.dbName!,
                 maxPoolSize: 10,
-                serverSelectionTimeoutMS: 5000,
+                serverSelectionTimeoutMS: 10000,
                 socketTimeoutMS: 45000,
                 bufferCommands: false,
                 // bufferMaxEntries: 0,
@@ -87,7 +87,15 @@ export class DatabaseConfig {
                 this.isConnected = true;
             });
         } catch (error) {
-            logger.error('Failed to connect to MongoDB:', error as Error);
+            let errorMessage = 'Failed to connect to MongoDB';
+            if (
+                (error as any).message?.includes('ESERVFAIL') ||
+                (error as any).message?.includes('EAI_AGAIN')
+            ) {
+                errorMessage +=
+                    ' (Tip: If using a replica set in a restricted network, try adding ?directConnection=true to your MONGODB_URI)';
+            }
+            logger.error(errorMessage, error as Error);
             this.isConnected = false;
             throw error;
         }
