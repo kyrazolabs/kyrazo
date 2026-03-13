@@ -141,12 +141,13 @@ export class CommandDispatcher {
         serverId: string,
         workerId: string,
         clientId: string,
-        force = false
+        force = false,
+        apps?: any[]
     ) {
         // 1. Fetch all applications and delete the corresponding worker (Auto-Scale Down)
         try {
-            const apps = await getApplications();
-            const targetApp = apps?.find((app: any) => app.name === `Worker - ${workerId}`);
+            const allApps = apps || (await getApplications());
+            const targetApp = allApps?.find((app: any) => app.name === `Worker - ${workerId}`);
 
             if (targetApp && targetApp.uuid) {
                 // DELETE /applications/{uuid} destroys the Coolify App entirely.

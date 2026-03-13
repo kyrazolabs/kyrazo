@@ -101,7 +101,7 @@ export class WorkerRepo {
                 SELECT COUNT(*)
                 FROM ${workers} w
                 WHERE w.server_id = s.server_id
-                AND w.status IN ('pending', 'starting', 'running')
+                AND w.status IN ('pending', 'starting', 'running', 'stopping')
             )
         `);
     }
@@ -113,7 +113,7 @@ export class WorkerRepo {
                 SELECT COUNT(*)
                 FROM ${workers} w
                 WHERE w.client_id = c.client_id
-                AND w.status IN ('pending', 'starting', 'running')
+                AND w.status IN ('pending', 'starting', 'running', 'stopping')
             )
         `);
     }

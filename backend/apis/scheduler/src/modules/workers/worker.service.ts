@@ -53,7 +53,7 @@ export class WorkerService {
     /**
      * Decommission a worker.
      */
-    static async decommissionWorker(workerId: string) {
+    static async decommissionWorker(workerId: string, apps?: any[]) {
         return await db.transaction(async tx => {
             const worker = await WorkerRepo.getWorker(tx, workerId);
 
@@ -67,7 +67,9 @@ export class WorkerService {
             await CommandDispatcher.dispatchStopWorker(
                 worker.server_id,
                 workerId,
-                worker.client_id
+                worker.client_id,
+                false,
+                apps
             );
         });
     }
