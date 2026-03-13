@@ -17,11 +17,11 @@ export async function createGitHubApp(payload: any) {
             is_spa: false,
             base_directory: '/',
             docker_compose_location: 'runtime/worker/docker-compose.yaml',
-            docker_compose_raw: '', // Optional: if provided, it overrides the file in the repo
             watch_paths: 'runtime/worker/**',
             use_build_server: false,
             is_http_basic_auth_enabled: true,
             autogenerate_domain: false,
+            limits_cpus: '1',
             ...payload,
         }),
     });
