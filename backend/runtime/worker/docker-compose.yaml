@@ -1,7 +1,7 @@
 services:
   worker:
     build:
-      context: ../../
+      context: .
       dockerfile: runtime/worker/Dockerfile
     restart: always
     environment:
