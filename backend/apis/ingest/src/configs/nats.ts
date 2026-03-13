@@ -149,7 +149,7 @@ export class NatsConfig {
                     max_bytes: -1,
                     max_msg_size: -1,
                     discard: DiscardPolicy.Old,
-                    duplicate_window: 5 * 60 * 1e9, // 2 minute dedup window
+                    duplicate_window: 5 * 60 * 1e9, // 5 minute dedup window
                 });
                 logger.info(`NATS stream '${STREAM_NAME}' created successfully`);
             } else {
