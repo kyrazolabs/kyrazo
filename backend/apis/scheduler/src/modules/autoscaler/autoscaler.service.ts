@@ -119,25 +119,19 @@ export class AutoScalerService {
 
         const desiredWorkers = maxWorkers;
 
-        // 2. Identify Actual Running Workers for this specific client
-        // Find which worker IDs are actually registered as running in Coolify for this client
-        const runningWorkerIds = kyrazoApps
-            .map(app => app.name.replace('Worker - ', ''))
-            .filter(id => id.length > 0);
+        // 2. Sync & Health Check (Verify health and sync pending -> running)
+        await this.syncState(clientIdStr, kyrazoApps);
 
-        // Fetch DB records for workers that belong to this client and are ACTUALLY running according to Coolify
-        let runningWorkerRecords: (typeof workers.$inferSelect)[] = [];
-        if (runningWorkerIds.length > 0) {
-            runningWorkerRecords = await db
-                .select()
-                .from(workers)
-                .where(
-                    and(
-                        eq(workers.client_id, clientIdStr),
-                        inArray(workers.worker_id, runningWorkerIds)
-                    )
-                );
-        }
+        // 3. Identify Actual ACTIVE Workers for this specific client AFTER sync
+        const runningWorkerRecords = await db
+            .select()
+            .from(workers)
+            .where(
+                and(
+                    eq(workers.client_id, clientIdStr),
+                    inArray(workers.status, ['pending', 'starting', 'running'])
+                )
+            );
 
         const actualWorkers = runningWorkerRecords.length;
 
@@ -146,9 +140,6 @@ export class AutoScalerService {
                 `[AutoScaler] Client ${clientIdStr}: Desired=${desiredWorkers}, Actual=${actualWorkers}`
             );
         }
-
-        // 3. Sync & Cleanup State (Identify zombies or finished stops)
-        await this.syncState(clientIdStr, runningWorkerIds, kyrazoApps);
 
         // 4. Scale UP
         if (actualWorkers < desiredWorkers) {
@@ -184,10 +175,9 @@ export class AutoScalerService {
      */
     private static async syncState(
         clientId: string,
-        runningWorkerIdsFromCoolify: string[],
         kyrazoApps: any[]
     ) {
-        const GRACE_PERIOD_MS = 60 * 1000; // 1 minute grace for "pending" starts
+        const GRACE_PERIOD_MS = 2 * 60 * 1000; // 2 minutes grace for "pending" starts
         const staleThreshold = new Date(Date.now() - GRACE_PERIOD_MS);
 
         const activeWorkers = await db
@@ -201,27 +191,49 @@ export class AutoScalerService {
             );
 
         for (const w of activeWorkers) {
-            const isRunningInCoolify = runningWorkerIdsFromCoolify.includes(w.worker_id);
+            const app = kyrazoApps.find(a => a.name === `Worker - ${w.worker_id}`);
             const isStale = (w.created_at?.getTime() || 0) < staleThreshold.getTime();
 
-            // Case 1: Worker should be running but is missing from Coolify
-            if (!isRunningInCoolify && isStale && ['pending', 'starting', 'running'].includes(w.status)) {
-                console.log(
-                    `[AutoScaler] Confirming zombie: ${w.worker_id} is apparently not running in Coolify. Marking as failed.`
-                );
-                await db
-                    .update(workers)
-                    .set({ status: 'failed' })
-                    .where(eq(workers.worker_id, w.worker_id));
-            }
+            if (app) {
+                // Coolify returns status in lowercase usually (running, exited, starting, etc.)
+                const coolifyStatus = app.status?.toLowerCase() || '';
 
-            // Case 2: Worker was supposed to stop and is now gone from Coolify
-            if (!isRunningInCoolify && w.status === 'stopping') {
-                console.log(`[AutoScaler] Worker ${w.worker_id} successfully stopped in Coolify. Marking as stopped.`);
-                await db
-                    .update(workers)
-                    .set({ status: 'stopped' })
-                    .where(eq(workers.worker_id, w.worker_id));
+                // Case 1: Transition Pending/Starting -> Running
+                if (
+                    ['pending', 'starting'].includes(w.status) &&
+                    coolifyStatus.includes('running')
+                ) {
+                    console.log(`[AutoScaler] Worker ${w.worker_id} confirmed RUNNING in Coolify.`);
+                    await WorkerService.updateWorkerStatus(w.worker_id, 'running');
+                }
+
+                // Case 2: Transition to Failed if Exited or Unhealthy
+                const isUnhealthy =
+                    ['exited', 'unhealthy', 'degraded', 'error'].some(s =>
+                        coolifyStatus.includes(s)
+                    ) ||
+                    (coolifyStatus.includes('running') && coolifyStatus.includes('unhealthy'));
+
+                if (isUnhealthy) {
+                    console.warn(
+                        `[AutoScaler] Worker ${w.worker_id} is ${coolifyStatus} in Coolify. Marking as failed.`
+                    );
+                    await WorkerService.updateWorkerStatus(w.worker_id, 'failed');
+                }
+            } else {
+                // Case 3: Worker should be running but is missing entirely from Coolify
+                if (isStale && ['pending', 'starting', 'running'].includes(w.status)) {
+                    console.log(
+                        `[AutoScaler] Confirming zombie: ${w.worker_id} missing from Coolify after grace period. Marking as failed.`
+                    );
+                    await WorkerService.updateWorkerStatus(w.worker_id, 'failed');
+                }
+
+                // Case 4: Worker was supposed to stop and is now gone from Coolify
+                if (w.status === 'stopping') {
+                    console.log(`[AutoScaler] Worker ${w.worker_id} successfully stopped in Coolify. Marking as stopped.`);
+                    await WorkerService.updateWorkerStatus(w.worker_id, 'stopped');
+                }
             }
         }
     }
