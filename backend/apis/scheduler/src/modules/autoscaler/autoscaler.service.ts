@@ -1,6 +1,7 @@
 import { db } from '@/db';
 import { clients, workers } from '@/db/schema';
 import { WorkerService } from '@/modules/workers/worker.service';
+import { WorkerRepo } from '@/modules/workers/worker.repo';
 import { CommandDispatcher } from '@/modules/commands/command.dispatcher';
 import { Plan, Subscription, Workspace } from '@kyrazo/shared';
 import { and, eq, inArray } from 'drizzle-orm';
@@ -21,7 +22,9 @@ export class AutoScalerService {
             console.warn(`[AutoScaler] Server sync error: ${err.message}`);
         }
 
-        const subscriptions = await Subscription.find({ status: 'active' });
+        const subscriptions = await Subscription.find({
+            status: { $in: ['active', 'trialing'] },
+        });
 
         // Fetch global state from Coolify ONCE per reconciliation loop
         let allApps = [];
@@ -49,7 +52,12 @@ export class AutoScalerService {
         if (!plan) return;
 
         // 2. Identify State
-        const desiredWorkers = plan.limits.maxWorkers;
+        // Ensure the client exists and limits are synced to Postgres
+        const maxWorkers =
+            subscription.planSnapshot?.limits?.maxWorkers ?? plan.limits.maxWorkers;
+        await WorkerRepo.upsertClient(db, subscription.workspaceId.toString(), maxWorkers);
+
+        const desiredWorkers = maxWorkers;
         const clientIdStr = subscription.workspaceId.toString();
 
         // Find which worker IDs are actually registered as running in Coolify
