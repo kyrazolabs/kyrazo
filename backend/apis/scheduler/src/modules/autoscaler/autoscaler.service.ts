@@ -83,7 +83,7 @@ export class AutoScalerService {
         const actualWorkers = runningWorkerRecords.length;
 
         console.log(
-            `[AuthScaler] Client ${clientIdStr}: Desired=${desiredWorkers}, Actual=${actualWorkers}`
+            `[AutoScaler] Client ${clientIdStr}: Desired=${desiredWorkers}, Actual=${actualWorkers}`
         );
 
         // 3. Sync & Cleanup State
