@@ -3,10 +3,10 @@ import {
     StringCodec,
     RetentionPolicy,
     StorageType,
+    DiscardPolicy,
     type NatsConnection,
     type JetStreamManager,
     type JetStreamClient,
-    DiscardPolicy,
 } from 'nats';
 import * as dotenv from 'dotenv';
 

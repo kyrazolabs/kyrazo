@@ -3,6 +3,7 @@ import {
     StringCodec,
     RetentionPolicy,
     StorageType,
+    DiscardPolicy,
     type NatsConnection,
     type JetStreamManager,
     type JetStreamClient,
@@ -147,8 +148,8 @@ export class NatsConfig {
                     max_age: 7 * 24 * 60 * 60 * 1e9, // 7 days in nanoseconds
                     max_bytes: -1,
                     max_msg_size: -1,
-                    discard: 'old' as any,
-                    duplicate_window: 2 * 60 * 1e9, // 2 minute dedup window
+                    discard: DiscardPolicy.Old,
+                    duplicate_window: 5 * 60 * 1e9, // 5 minute dedup window
                 });
                 logger.info(`NATS stream '${STREAM_NAME}' created successfully`);
             } else {
