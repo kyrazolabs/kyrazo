@@ -50,8 +50,14 @@ const devFormat = winston.format.combine(
     winston.format.colorize({ all: true }),
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
     winston.format.printf(info => {
-        const meta = info.metadata ? JSON.stringify(info.metadata, null, 2) : '';
-        return `${info.timestamp} ${info.level}: ${info.message}${meta ? `\n${meta}` : ''}`;
+        const { timestamp, level, message, error, metadata, ...rest } = info;
+        const meta = metadata ? JSON.stringify(metadata, null, 2) : '';
+        const errorDetails = error ? ((error as any).stack || (error as any).message || JSON.stringify(error, null, 2)) : '';
+        
+        // Include any other properties from rest if they exist
+        const extra = Object.keys(rest).length > 0 ? JSON.stringify(rest, null, 2) : '';
+
+        return `${timestamp} ${level}: ${message}${errorDetails ? `\n${errorDetails}` : ''}${meta ? `\nMeta: ${meta}` : ''}${extra ? `\nExtra: ${extra}` : ''}`;
     })
 );
 
@@ -130,13 +136,7 @@ export const logger = {
     // === Structured helper functions ===
     error: (message: string, error?: Error, metadata?: any) => {
         log.error(message, {
-            error: error
-                ? {
-                      name: error.name,
-                      message: error.message,
-                      stack: error.stack,
-                  }
-                : undefined,
+            error,
             metadata: sanitize(metadata),
         });
     },
