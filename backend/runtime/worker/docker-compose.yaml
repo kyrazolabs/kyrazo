@@ -2,7 +2,7 @@ services:
   worker:
     build:
       context: ../../
-      dockerfile: ./runtime/worker/Dockerfile
+      dockerfile: runtime/worker/Dockerfile
     restart: always
     environment:
       - WORKSPACE_ID=${WORKSPACE_ID}
