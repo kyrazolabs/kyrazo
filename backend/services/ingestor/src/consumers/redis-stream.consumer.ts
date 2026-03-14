@@ -40,13 +40,33 @@ export class RedisStreamConsumer {
 
         // Start processing loops
         this.processStream(this.dispatchStream, async (messages) => {
-            const dataBatch: SQLDeliveryAttempt[] = messages.map(msg => JSON.parse(msg.payload));
-            await batchWriter.saveBatchedDeliveryAttempts(dataBatch);
+            const dataBatch: SQLDeliveryAttempt[] = [];
+            for (const msg of messages) {
+                try {
+                    dataBatch.push(JSON.parse(msg.payload));
+                } catch (err) {
+                    logger.error(`Failed to parse payload for dispatch message ${msg.id}:`, err as Error);
+                    await this.redis.xack(this.dispatchStream, this.consumerGroup, msg.id);
+                }
+            }
+            if (dataBatch.length > 0) {
+                await batchWriter.saveBatchedDeliveryAttempts(dataBatch);
+            }
         });
 
         this.processStream(this.ingestStream, async (messages) => {
-            const dataBatch: SQLIngestEvent[] = messages.map(msg => JSON.parse(msg.payload));
-            await batchWriter.saveBatchedIngestEvents(dataBatch);
+            const dataBatch: SQLIngestEvent[] = [];
+            for (const msg of messages) {
+                try {
+                    dataBatch.push(JSON.parse(msg.payload));
+                } catch (err) {
+                    logger.error(`Failed to parse payload for ingest message ${msg.id}:`, err as Error);
+                    await this.redis.xack(this.ingestStream, this.consumerGroup, msg.id);
+                }
+            }
+            if (dataBatch.length > 0) {
+                await batchWriter.saveBatchedIngestEvents(dataBatch);
+            }
         });
     }
 
