@@ -6,8 +6,8 @@ import {
     type ISource,
     secretCrypto,
     generateIngressId,
-    decryptSourceSecrets,
     unprefixId,
+    prefixId,
 } from '@kyrazo/shared';
 import { config } from '@/configs';
 
@@ -27,7 +27,7 @@ export class SourceService {
 
         if (valid.authentication.type === 'service' && valid.authentication.service) {
             const encrypted = secretCrypto.encrypt(
-                namespaceId,
+                this.deriveNamespaceKey(namespaceId),
                 valid.authentication.service.secret
             );
             processedAuth = {
@@ -184,6 +184,10 @@ export class SourceService {
             logger.error('Failed to delete source:', error as Error);
             throw error;
         }
+    }
+
+    private deriveNamespaceKey(namespaceId: string | Types.ObjectId): string {
+        return prefixId(namespaceId, 'namespace') || namespaceId.toString();
     }
 }
 

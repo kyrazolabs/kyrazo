@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import { logger } from '../configs';
 import { secretCrypto } from './libs';
+import { prefixId } from './id';
 import type { ISource } from '../types';
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
@@ -82,12 +83,15 @@ export function safeDecode(input: string): string {
  * @title Decrypts source authentication secrets if they exist
  * @description Utility function to decrypt encrypted secrets in source authentication data
  * @param source - The source document to process
+ * @param key - Optional custom key for decryption (default: prefixed namespaceId)
  * @returns A new source object with decrypted secrets and IVs removed for security
  */
-export function decryptSourceSecrets(source: ISource): ISource {
+export function decryptSourceSecrets(source: ISource, key?: string): ISource {
     if (!source || !source.authentication) return source;
 
     const decryptedSource = JSON.parse(JSON.stringify(source)); // Deep clone
+    const namespaceKey =
+        key || prefixId(source.namespaceId, 'namespace') || source.namespaceId.toString();
 
     // Decrypt service authentication secret and remove IV
     if (
@@ -98,7 +102,7 @@ export function decryptSourceSecrets(source: ISource): ISource {
             decryptedSource.authentication.credentials.secret = secretCrypto.decrypt(
                 decryptedSource.authentication.credentials.secret,
                 decryptedSource.authentication.credentials.iv,
-                decryptedSource.namespaceId
+                namespaceKey
             );
             // Remove IV from response for security
             delete decryptedSource.authentication.credentials.iv;
@@ -117,7 +121,7 @@ export function decryptSourceSecrets(source: ISource): ISource {
             decryptedSource.authentication.credentials.signingSecret = secretCrypto.decrypt(
                 decryptedSource.authentication.credentials.signingSecret,
                 decryptedSource.authentication.credentials.iv,
-                decryptedSource.namespaceId
+                namespaceKey
             );
             // Remove IV from response for security
             delete decryptedSource.authentication.credentials.iv;
@@ -136,7 +140,7 @@ export function decryptSourceSecrets(source: ISource): ISource {
             decryptedSource.authentication.credentials.apiKey = secretCrypto.decrypt(
                 decryptedSource.authentication.credentials.apiKey,
                 decryptedSource.authentication.credentials.iv,
-                decryptedSource.namespaceId
+                namespaceKey
             );
             // Remove IV from response for security
             delete decryptedSource.authentication.credentials.iv;
@@ -155,7 +159,7 @@ export function decryptSourceSecrets(source: ISource): ISource {
             decryptedSource.authentication.credentials.password = secretCrypto.decrypt(
                 decryptedSource.authentication.credentials.password,
                 decryptedSource.authentication.credentials.iv,
-                decryptedSource.namespaceId
+                namespaceKey
             );
             // Remove IV from response for security
             delete decryptedSource.authentication.credentials.iv;

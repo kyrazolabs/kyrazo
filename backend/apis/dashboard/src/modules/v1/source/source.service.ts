@@ -34,7 +34,7 @@ export class SourceService {
 
         if (valid.authentication.type === 'service' && valid.authentication.service) {
             const encrypted = secretCrypto.encrypt(
-                prefixId(namespaceId, 'namespace')!,
+                this.deriveNamespaceKey(namespaceId),
                 valid.authentication.service.secret
             );
             processedAuth = {
@@ -167,7 +167,7 @@ export class SourceService {
             if (!updated) {
                 throw new Error('Failed to update source');
             }
-            return decryptSourceSecrets(updated);
+            return decryptSourceSecrets(updated, this.deriveNamespaceKey(updated.namespaceId));
         } catch (error) {
             logger.error('Failed to update source:', error as Error);
             throw error;
@@ -206,7 +206,7 @@ export class SourceService {
 
             if (valid.authentication.type === 'service' && valid.authentication.service) {
                 const encrypted = secretCrypto.encrypt(
-                    prefixId(namespaceId, 'namespace')!,
+                    this.deriveNamespaceKey(namespaceId),
                     valid.authentication.service.secret
                 );
                 processedAuth = {
@@ -234,6 +234,10 @@ export class SourceService {
             logger.error('Failed to update source auth:', error as Error);
             throw error;
         }
+    }
+
+    private deriveNamespaceKey(namespaceId: string | Types.ObjectId): string {
+        return prefixId(namespaceId, 'namespace') || namespaceId.toString();
     }
 }
 
