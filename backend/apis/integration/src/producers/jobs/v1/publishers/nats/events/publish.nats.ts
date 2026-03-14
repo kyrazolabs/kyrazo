@@ -5,7 +5,7 @@ import { natsConfig } from '@/configs/nats';
 import { redisConfig, REDIS_KEYS } from '@/configs/redis';
 import { config } from '@/configs';
 import type { IPublishedEvent } from '@kyrazo/shared';
-import { signatureCrypto, logger } from '@kyrazo/shared';
+import { signatureCrypto, logger, prefixId, snowflake } from '@kyrazo/shared';
 import type {
     BatchCreatePublishedEvent,
     CreatePublishedEvent,
@@ -303,16 +303,16 @@ export class PublishEventPublisher {
 
             for (const target of data.targets) {
                 const targetKey = REDIS_KEYS.targetHash(
-                    event.event_id.toString(),
+                    prefixId(event.event_id.toString(), 'event')!,
                     data.sourceType,
-                    target.targetId || ''
+                    prefixId(target.targetId || '', 'target')!
                 );
 
                 await redisClient.hset(targetKey, {
-                    deliveryId: `del_${uuidv4()}`,
-                    workspaceId: event.workspace_id?.toString() || '',
+                    deliveryId: `del_${snowflake.generate()}`,
+                    workspaceId: prefixId(event.workspace_id?.toString() || '', 'workspace') || '',
                     sourceType: 'publish',
-                    eventId: event.event_id?.toString() || '',
+                    eventId: prefixId(event.event_id?.toString() || '', 'event') || '',
                     eventModel: 'PublishedEvent',
                     // sourceId: data.sourceId,
                     target: JSON.stringify({

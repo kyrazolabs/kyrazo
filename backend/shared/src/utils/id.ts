@@ -10,6 +10,8 @@ export const ID_PREFIXES = {
     workspaceInvitation: 'winv',
     user: 'usr',
     subscription: 'sub',
+    event: 'evt',
+    delivery: 'del',
 } as const;
 
 export type IdType = keyof typeof ID_PREFIXES;
@@ -56,6 +58,15 @@ export function unprefixId(prefixedId: string | undefined | null): string | unde
 export function isValidPrefixedId(id: string | undefined | null, type?: IdType): boolean {
     if (!id) return false;
     const prefix = type ? ID_PREFIXES[type] : undefined;
+    
+    // For event and delivery, we now use Snowflake IDs (UInt64 numeric strings)
+    if (type === 'event' || type === 'delivery' || (!type && (id.startsWith('evt_') || id.startsWith('del_')))) {
+        const regex = prefix
+            ? new RegExp(`^${prefix}_[0-9]+$`)
+            : new RegExp(`^(evt|del)_[0-9]+$`);
+        return regex.test(id);
+    }
+
     const regex = prefix
         ? new RegExp(`^${prefix}_[0-9a-fA-F]{24}$`)
         : new RegExp(`^([a-z]{3})_[0-9a-fA-F]{24}$`);
@@ -104,6 +115,11 @@ export function transformWithId<T>(data: T, type: IdType): TransformedWithId<T> 
             endpointId: 'endpoint',
             userId: 'user',
             subscriptionId: 'subscription',
+            eventId: 'event',
+            deliveryId: 'delivery',
+            event_id: 'event',
+            delivery_id: 'delivery',
+            associated_event_id: 'event',
         };
 
         for (const [field, idType] of Object.entries(idFields)) {
@@ -111,7 +127,8 @@ export function transformWithId<T>(data: T, type: IdType): TransformedWithId<T> 
                 const value = obj[field];
                 if (
                     value instanceof Types.ObjectId ||
-                    (typeof value === 'string' && /^[0-9a-fA-F]{24}$/.test(value))
+                    (typeof value === 'string' && /^[0-9a-fA-F]{24}$/.test(value)) ||
+                    ((field === 'eventId' || field === 'deliveryId' || field === 'event_id' || field === 'delivery_id' || field === 'associated_event_id') && typeof value === 'string' && /^[0-9]+$/.test(value))
                 ) {
                     obj[field] = prefixId(value, idType as IdType);
                 }

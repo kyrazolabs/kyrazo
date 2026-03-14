@@ -13,6 +13,8 @@ import {
     generateIngressId,
     decryptSourceSecrets,
     unprefixId,
+    prefixId,
+    ID_PREFIXES,
 } from '@kyrazo/shared';
 import { config } from '@/configs';
 
@@ -32,7 +34,7 @@ export class SourceService {
 
         if (valid.authentication.type === 'service' && valid.authentication.service) {
             const encrypted = secretCrypto.encrypt(
-                namespaceId,
+                prefixId(namespaceId, 'namespace')!,
                 valid.authentication.service.secret
             );
             processedAuth = {
@@ -204,7 +206,7 @@ export class SourceService {
 
             if (valid.authentication.type === 'service' && valid.authentication.service) {
                 const encrypted = secretCrypto.encrypt(
-                    namespaceId,
+                    prefixId(namespaceId, 'namespace')!,
                     valid.authentication.service.secret
                 );
                 processedAuth = {

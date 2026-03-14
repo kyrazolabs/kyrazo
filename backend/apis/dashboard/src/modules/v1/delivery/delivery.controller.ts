@@ -14,11 +14,12 @@ import {
     IGetDeliveriesResponse,
     IGetDeliveryResponse,
     IGetIngestEventResponse,
-    IGetReceivedEventsResponse,
+    IGetIngestEventsResponse,
     IGetTargetsResponse,
     IngestRepo,
     logger,
     secretCrypto,
+    transformWithId,
 } from '@kyrazo/shared';
 
 export class DeliveryController {
@@ -55,7 +56,9 @@ export class DeliveryController {
                 );
             }
 
+            // @ts-ignore
             const { sourceId }: GetDeliveriesBySourceIdInput = c.req.valid('param');
+            // @ts-ignore
             const { limit = 10, page = 1 }: IFilterDeliveryBySource = c.req.valid('query');
 
             const { data: deliveries, total } = await DeliveryRepo.getDeliveriesBySource(
@@ -117,6 +120,7 @@ export class DeliveryController {
                 );
             }
 
+            // @ts-ignore
             const { status, limit = 10, page = 1 }: IFilterDelivery = c.req.valid('query');
 
             const { data: deliveries, total } = await DeliveryRepo.getDeliveries(
@@ -291,6 +295,7 @@ export class DeliveryController {
                     401
                 );
             }
+            // @ts-ignore
             const { deliveryId }: GetDeliveryByIdInput = c.req.valid('param');
 
             const result = await DeliveryRepo.getDeliveryById(
@@ -342,7 +347,9 @@ export class DeliveryController {
                 );
             }
 
+            // @ts-ignore
             const { target }: GetDeliveriesByTargetInput = c.req.valid('param');
+            // @ts-ignore
             const { days }: OverviewFilterInput = c.req.valid('query');
 
             const last = days.replace(/\D/g, '');
@@ -421,6 +428,7 @@ export class DeliveryController {
                 );
             }
 
+            // @ts-ignore
             const { status, limit = 10, page = 1 }: IFilterIngest = c.req.valid('query');
 
             const { data: deliveries, total } = await IngestRepo.getIngestEvents(
@@ -431,7 +439,7 @@ export class DeliveryController {
                 page
             );
 
-            return c.json<IGetReceivedEventsResponse>(
+            return c.json<IGetIngestEventsResponse>(
                 {
                     success: true,
                     pagination: {
@@ -493,7 +501,9 @@ export class DeliveryController {
                 );
             }
 
+            // @ts-ignore
             const { sourceId }: GetDeliveriesBySourceIdInput = c.req.valid('param');
+            // @ts-ignore
             const { limit = 10, page = 1 }: IFilterDeliveryBySource = c.req.valid('query');
 
             const { data: deliveries, total } = await IngestRepo.getReceivedEventsBySource(
@@ -504,7 +514,7 @@ export class DeliveryController {
                 page
             );
 
-            return c.json<IGetReceivedEventsResponse>(
+            return c.json<IGetIngestEventsResponse>(
                 {
                     success: true,
                     pagination: {
@@ -554,6 +564,7 @@ export class DeliveryController {
                     401
                 );
             }
+            // @ts-ignore
             const { eventId } = c.req.valid('param');
 
             const result = await IngestRepo.getIngestEventById(
@@ -602,12 +613,15 @@ export class DeliveryController {
             }
         };
 
-        return {
-            ...delivery,
-            request_body: tryDecrypt(delivery.request_body),
-            request_header: tryDecrypt(delivery.request_header),
-            response_body: tryDecrypt(delivery.response_body),
-            response_header: tryDecrypt(delivery.response_header),
-        };
+        return transformWithId(
+            {
+                ...delivery,
+                request_body: tryDecrypt(delivery.request_body),
+                request_header: tryDecrypt(delivery.request_header),
+                response_body: tryDecrypt(delivery.response_body),
+                response_header: tryDecrypt(delivery.response_header),
+            },
+            'delivery'
+        );
     }
 }

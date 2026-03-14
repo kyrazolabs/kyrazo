@@ -1,5 +1,5 @@
 import { redisConfig } from '@/config';
-import { logger, Source } from '@kyrazo/shared';
+import { logger, Source, unprefixId } from '@kyrazo/shared';
 
 import { paypalTransformer } from './sources/paypal/paypal.transformer';
 import { stripeTransformer } from './sources/stripe/stripe.transformer';
@@ -40,7 +40,7 @@ export class ReceiverDetector {
                 await payPalPipeline.process(event);
                 logger.debug(JSON.stringify(event));
                 const source = await redisConfig.cache(
-                    `source:${event.sourceId}`,
+                    `source:${unprefixId(event.sourceId)}`,
                     async () => {
                         return await Source.findById(event.sourceId).populate('endpoints');
                     },
@@ -72,7 +72,7 @@ export class ReceiverDetector {
                 await stripePipeline.process(event);
                 logger.debug(JSON.stringify(event));
                 const stripeSource = await redisConfig.cache(
-                    `source:${event.sourceId}`,
+                    `source:${unprefixId(event.sourceId)}`,
                     async () => {
                         return await Source.findById(event.sourceId).populate('endpoints');
                     },
@@ -108,7 +108,7 @@ export class ReceiverDetector {
                 await githubPipeline.process(event);
                 logger.debug(JSON.stringify(event));
                 const githubSource = await redisConfig.cache(
-                    `source:${event.sourceId}`,
+                    `source:${unprefixId(event.sourceId)}`,
                     async () => {
                         return await Source.findById(event.sourceId).populate('endpoints');
                     },
@@ -144,7 +144,7 @@ export class ReceiverDetector {
                 await shopifyPipeline.process(event);
                 logger.debug(JSON.stringify(event));
                 const shopifySource = await redisConfig.cache(
-                    `source:${event.sourceId}`,
+                    `source:${unprefixId(event.sourceId)}`,
                     async () => {
                         return await Source.findById(event.sourceId).populate('endpoints');
                     },
@@ -180,7 +180,7 @@ export class ReceiverDetector {
                 await slackPipeline.process(event);
                 logger.debug(JSON.stringify(event));
                 const slackSource = await redisConfig.cache(
-                    `source:${event.sourceId}`,
+                    `source:${unprefixId(event.sourceId)}`,
                     async () => {
                         return await Source.findById(event.sourceId).populate('endpoints');
                     },
@@ -216,7 +216,7 @@ export class ReceiverDetector {
                 await webflowPipeline.process(event);
                 logger.debug(JSON.stringify(event));
                 const webflowSource = await redisConfig.cache(
-                    `source:${event.sourceId}`,
+                    `source:${unprefixId(event.sourceId)}`,
                     async () => {
                         return await Source.findById(event.sourceId).populate('endpoints');
                     },

@@ -120,7 +120,7 @@ ingest.get(
 ingest.get(
     '/events/:eventId',
     ingestRateLimiter,
-    zValidator('param', z.object({ eventId: z.string().uuidv4() }), (result, c) => {
+    zValidator('param', z.object({ eventId: z.string().regex(/^evt_[0-9]+$/) }), (result, c) => {
         if (!result.success) {
             return c.json(
                 {

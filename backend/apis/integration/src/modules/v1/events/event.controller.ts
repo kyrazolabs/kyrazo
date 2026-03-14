@@ -2,7 +2,7 @@ import type { AppContext } from '@/core/middlewares/auth.middleware';
 import { v4 as uuidv4 } from 'uuid';
 import { redisConfig } from '@/configs';
 import { PerformanceTimer } from '@/core/utils';
-import { logger, type IErrorResponse } from '@kyrazo/shared';
+import { logger, type IErrorResponse, snowflake } from '@kyrazo/shared';
 import { publishEventPublisher } from '@/producers/jobs/v1/publishers';
 import { type GetNamespaceByIdInput } from '@/core/utils/libs/zod';
 import type {
@@ -28,7 +28,7 @@ export class EventController {
     }> {
         // 1. Try to get it from the cash
         let cachedTargets = await redisConfig.cache(
-            `workspace:${workspaceId}:namespace:${namespaceId}:targets`,
+            `workspace:${unprefixId(workspaceId)}:namespace:${unprefixId(namespaceId)}:targets`,
             async () => [],
             100
         );
@@ -63,7 +63,7 @@ export class EventController {
         ];
         if (fetchedTargets.length > 0) {
             await redisConfig.cache(
-                `workspace:${workspaceId}:namespace:${namespaceId}:targets`,
+                `workspace:${unprefixId(workspaceId)}:namespace:${unprefixId(namespaceId)}:targets`,
                 async () => allTargets,
                 60 * 60 * 24
             );
@@ -91,7 +91,7 @@ export class EventController {
 
             if (!workspaceId || !namespaceId) {
                 await redisConfig.set(
-                    `idem:${workspaceId}:${c.req.path}:${key}`,
+                    `idem:${unprefixId(workspaceId)}:${c.req.path}:${key}`,
                     JSON.stringify({
                         status: 'failed',
                         error: {
@@ -118,7 +118,7 @@ export class EventController {
             const shard = parseInt(workspaceId.toString().slice(-6), 16) % 10;
             const data: CreatePublishedEvent = {
                 ...valid,
-                eventId: uuidv4(),
+                eventId: snowflake.generate(),
                 workspaceId: workspaceId.toString(),
                 namespaceId,
                 sourceType: 'publish',
@@ -133,7 +133,7 @@ export class EventController {
             );
             if (foundTargets.length === 0) {
                 await redisConfig.set(
-                    `idem:${workspaceId}:${c.req.path}:${key}`,
+                    `idem:${unprefixId(workspaceId)}:${c.req.path}:${key}`,
                     JSON.stringify({
                         status: 'failed',
                         error: {
@@ -170,7 +170,7 @@ export class EventController {
 
             if (!canProceed) {
                 await redisConfig.set(
-                    `idem:${workspaceId}:${c.req.path}:${key}`,
+                    `idem:${unprefixId(workspaceId)}:${c.req.path}:${key}`,
                     JSON.stringify({
                         status: 'failed',
                         error: {
@@ -194,7 +194,7 @@ export class EventController {
                 );
             }
 
-            const planSlug = await redisConfig.get(`workspace:${workspaceId}`);
+            const planSlug = await redisConfig.get(`workspace:${unprefixId(workspaceId)}`);
             const publishResult = await publishEventPublisher.publish({
                 ...data,
                 planSlug: planSlug ? JSON.parse(planSlug).planSlug : 'free',
@@ -202,7 +202,7 @@ export class EventController {
 
             if (!publishResult) {
                 await redisConfig.set(
-                    `idem:${workspaceId}:${c.req.path}:${key}`,
+                    `idem:${unprefixId(workspaceId)}:${c.req.path}:${key}`,
                     JSON.stringify({
                         status: 'failed',
                         error: {
@@ -239,7 +239,7 @@ export class EventController {
             });
 
             await redisConfig.set(
-                `idem:${workspaceId}:${c.req.path}:${key}`,
+                `idem:${unprefixId(workspaceId)}:${c.req.path}:${key}`,
                 JSON.stringify({
                     status: 'completed',
                     response: {
@@ -268,7 +268,7 @@ export class EventController {
             timer.end();
             logger.error('Unexpected error in EventController.publishEvent', error as Error);
             await redisConfig.set(
-                `idem:${c.req.workspace.workspaceId}:${c.req.path}:${c.idempotencyKey}`,
+                `idem:${unprefixId(c.req.workspace.workspaceId)}:${c.req.path}:${c.idempotencyKey}`,
                 JSON.stringify({
                     status: 'failed',
                     response: 'Unexpected error',
@@ -300,7 +300,7 @@ export class EventController {
 
             if (!workspaceId || !namespaceId) {
                 await redisConfig.set(
-                    `idem:${workspaceId}:${c.req.path}:${key}`,
+                    `idem:${unprefixId(workspaceId)}:${c.req.path}:${key}`,
                     JSON.stringify({
                         status: 'failed',
                         error: {
@@ -326,7 +326,7 @@ export class EventController {
 
             if (!valid || valid.length === 0) {
                 await redisConfig.set(
-                    `idem:${workspaceId}:${c.req.path}:${key}`,
+                    `idem:${unprefixId(workspaceId)}:${c.req.path}:${key}`,
                     JSON.stringify({
                         status: 'failed',
                         error: {
@@ -353,7 +353,7 @@ export class EventController {
 
             if (valid.length > 1000) {
                 await redisConfig.set(
-                    `idem:${workspaceId}:${c.req.path}:${key}`,
+                    `idem:${unprefixId(workspaceId)}:${c.req.path}:${key}`,
                     JSON.stringify({
                         status: 'failed',
                         error: {
@@ -404,7 +404,7 @@ export class EventController {
 
             // Process events
             for (let index = 0; index < valid.length; index++) {
-                const eventId = uuidv4();
+                const eventId = snowflake.generate();
                 const eventData = valid[index];
 
                 const eventFoundTargets: {
@@ -449,7 +449,7 @@ export class EventController {
             const canProceed = await LimitChecker.checkEventLimit(workspaceId.toString());
             if (!canProceed) {
                 await redisConfig.set(
-                    `idem:${workspaceId}:${c.req.path}:${key}`,
+                    `idem:${unprefixId(workspaceId)}:${c.req.path}:${key}`,
                     JSON.stringify({
                         status: 'failed',
                         error: {
@@ -474,7 +474,7 @@ export class EventController {
             }
 
             // Actual publishing
-            const planSlug = await redisConfig.get(`workspace:${workspaceId}`);
+            const planSlug = await redisConfig.get(`workspace:${unprefixId(workspaceId)}`);
             let queuedCount = 0;
             if (events.length > 0) {
                 const natsResults = await publishEventPublisher.batch(
@@ -520,7 +520,7 @@ export class EventController {
             );
 
             await redisConfig.set(
-                `idem:${workspaceId}:${c.req.path}:${key}`,
+                `idem:${unprefixId(workspaceId)}:${c.req.path}:${key}`,
                 JSON.stringify({
                     status: 'completed',
                     response: {
@@ -563,7 +563,7 @@ export class EventController {
             timer.end();
             logger.error('Unexpected error in EventController.publishEvents', error as Error);
             await redisConfig.set(
-                `idem:${c.req.workspace.workspaceId}:${c.req.path}:${c.idempotencyKey}`,
+                `idem:${unprefixId(c.req.workspace.workspaceId)}:${c.req.path}:${c.idempotencyKey}`,
                 JSON.stringify({
                     status: 'failed',
                     response: 'Unexpected error',

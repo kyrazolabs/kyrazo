@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 import type { CreateEndpointInput } from './endpoint.schema';
-import { secretCrypto } from '@kyrazo/shared';
+import { secretCrypto, prefixId } from '@kyrazo/shared';
 import { endpointRepository } from './endpoint.repo';
 import { logger } from '@kyrazo/shared';
 
@@ -12,7 +12,10 @@ export class EndpointService {
         namespaceId: Types.ObjectId
     ) {
         const secret = secretCrypto.generateSourceSecret();
-        const encryptedSecret = secretCrypto.encrypt(namespaceId.toString(), secret);
+        const encryptedSecret = secretCrypto.encrypt(
+            prefixId(namespaceId.toString(), 'namespace')!,
+            secret
+        );
         const data = {
             ...valid,
             userId: new Types.ObjectId(userId),
@@ -88,7 +91,7 @@ export class EndpointService {
             const secret = secretCrypto.decrypt(
                 activeSecret.value_enc,
                 activeSecret.iv,
-                namespaceId
+                prefixId(namespaceId, 'namespace')!
             );
             return secret;
         } catch (error) {

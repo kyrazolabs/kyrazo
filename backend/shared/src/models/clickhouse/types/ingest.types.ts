@@ -1,7 +1,7 @@
 import { ProcessingStatus } from '../../../types';
 
 export interface SQLIngestEvent {
-    event_id: string; // UUID
+    event_id: string; // UInt64
 
     workspace_id: string;
     namespace_id: string;
@@ -27,5 +27,5 @@ export interface SQLIngestEvent {
     processing_status: ProcessingStatus;
     processing_error: string | null;
 
-    associated_event_id: string | null; // UUID
+    associated_event_id: string | null; // UInt64
 }

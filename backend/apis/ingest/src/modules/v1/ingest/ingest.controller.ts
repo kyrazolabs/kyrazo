@@ -2,8 +2,8 @@ import { Context } from 'hono';
 import { v4 as uuidv4 } from 'uuid';
 
 import { redisConfig } from '@/configs';
-import { logger, mapToObject, PerformanceTimer } from '@kyrazo/shared';
-import { type IErrorResponse, type IReceivedEvent, Source } from '@kyrazo/shared';
+import { logger, mapToObject, PerformanceTimer, snowflake } from '@kyrazo/shared';
+import { type IErrorResponse, type IReceivedEvent, Source, unprefixId } from '@kyrazo/shared';
 import { receiveEventPublisher } from '@/producers/jobs/v1/publishers';
 import { usageProducer } from '@/core/services/usage.producer';
 import { LimitChecker } from '@/core/services/limit.checker';
@@ -127,7 +127,7 @@ export class ingestController {
 
             const shard = parseInt(source.workspaceId.toString().slice(-6), 16) % 10;
 
-            const planSlug = await redisConfig.get(`workspace:${source.workspaceId}`);
+            const planSlug = await redisConfig.get(`workspace:${unprefixId(source.workspaceId.toString())}`);
 
             // Create the received event data
             const receivedEventData: IReceivedEvent & {
@@ -135,7 +135,7 @@ export class ingestController {
                 planSlug: string;
             } = {
                 planSlug: planSlug ? JSON.parse(planSlug).planSlug : 'free',
-                eventId: uuidv4(),
+                eventId: snowflake.generate(),
                 source: service ? service : source.service,
                 sourceType: 'receive',
                 sourceId: source._id.toString(),
