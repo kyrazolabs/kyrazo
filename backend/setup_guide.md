@@ -17,7 +17,7 @@ The Scheduler manages the cluster, exposes the API, and handles WebSocket connec
 1. **Source:** Select the Kyrazo Git Repository.
 2. **Build Pack:** Dockerfile.
 3. **Base Directory:** `/backend`
-4. **Dockerfile Location:** `apis/scheduler/Dockerfile`
+4. **Dockerfile Location:** `services/orchestrator/Dockerfile`
 
 ### Environment Variables
 
