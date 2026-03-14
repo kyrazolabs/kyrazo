@@ -8,33 +8,43 @@ export class RedisStreamConsumer {
     private timer?: Timer;
     private running = false;
 
-    public readonly dispatchStream = "stream:dispatch-events";
-    public readonly ingestStream = "stream:ingest-events";
-    public readonly consumerGroup = "group:clickhouse-ingestor";
+    public readonly dispatchStream = 'stream:dispatch-events';
+    public readonly ingestStream = 'stream:ingest-events';
+    public readonly consumerGroup = 'group:clickhouse-ingestor';
     public readonly consumerName = `consumer:${Math.random().toString(36).substring(7)}`;
 
-    constructor(
-        redisClient?: Redis
-    ) {
+    constructor(redisClient?: Redis) {
         this.redis = redisClient || new Redis(Config.get().redisUrl);
     }
 
     async start() {
         if (this.running) return;
         this.running = true;
-        console.log('🚀 Redis Stream Consumer started...');
-        
+        console.info('🚀 Redis Stream Consumer started...');
+
         // Ensure consumer groups exist
         try {
-            await this.redis.xgroup('CREATE', this.dispatchStream, this.consumerGroup, '0', 'MKSTREAM');
+            await this.redis.xgroup(
+                'CREATE',
+                this.dispatchStream,
+                this.consumerGroup,
+                '0',
+                'MKSTREAM'
+            );
         } catch (e: any) {
             if (!e.message.includes('BUSYGROUP')) {
                 logger.error(`Error creating consumer group for ${this.dispatchStream}:`, e);
             }
         }
-        
+
         try {
-            await this.redis.xgroup('CREATE', this.ingestStream, this.consumerGroup, '0', 'MKSTREAM');
+            await this.redis.xgroup(
+                'CREATE',
+                this.ingestStream,
+                this.consumerGroup,
+                '0',
+                'MKSTREAM'
+            );
         } catch (e: any) {
             if (!e.message.includes('BUSYGROUP')) {
                 logger.error(`Error creating consumer group for ${this.ingestStream}:`, e);
@@ -42,13 +52,16 @@ export class RedisStreamConsumer {
         }
 
         // Start processing loops
-        this.processStream(this.dispatchStream, async (messages) => {
+        this.processStream(this.dispatchStream, async messages => {
             const dataBatch: SQLDeliveryAttempt[] = [];
             for (const msg of messages) {
                 try {
                     dataBatch.push(JSON.parse(msg.payload));
                 } catch (err) {
-                    logger.error(`Failed to parse payload for dispatch message ${msg.id}:`, err as Error);
+                    logger.error(
+                        `Failed to parse payload for dispatch message ${msg.id}:`,
+                        err as Error
+                    );
                     await this.redis.xack(this.dispatchStream, this.consumerGroup, msg.id);
                 }
             }
@@ -57,13 +70,16 @@ export class RedisStreamConsumer {
             }
         });
 
-        this.processStream(this.ingestStream, async (messages) => {
+        this.processStream(this.ingestStream, async messages => {
             const dataBatch: SQLIngestEvent[] = [];
             for (const msg of messages) {
                 try {
                     dataBatch.push(JSON.parse(msg.payload));
                 } catch (err) {
-                    logger.error(`Failed to parse payload for ingest message ${msg.id}:`, err as Error);
+                    logger.error(
+                        `Failed to parse payload for ingest message ${msg.id}:`,
+                        err as Error
+                    );
                     await this.redis.xack(this.ingestStream, this.consumerGroup, msg.id);
                 }
             }
@@ -74,7 +90,7 @@ export class RedisStreamConsumer {
     }
 
     public async stop() {
-        console.log('🛑 Stopping Redis Stream Consumer...');
+        console.error('🛑 Stopping Redis Stream Consumer...');
         this.running = false;
         // Optionally disconnect to immediately abort blocking calls
         this.redis.disconnect();
@@ -82,16 +98,22 @@ export class RedisStreamConsumer {
 
     private async processStream(streamName: string, processFn: (messages: any[]) => Promise<void>) {
         const loop = async () => {
-             if (!this.running) return;
-             
-             try {
+            if (!this.running) return;
+
+            try {
                 // Read up to 1000 messages with a block time of 1000ms
                 // The > ID means we want new messages that have not been delivered to other consumers in this group
                 const results = await this.redis.xreadgroup(
-                    'GROUP', this.consumerGroup, this.consumerName,
-                    'COUNT', Config.get().streamBatchCount,
-                    'BLOCK', Config.get().streamBlockMs,
-                    'STREAMS', streamName, '>'
+                    'GROUP',
+                    this.consumerGroup,
+                    this.consumerName,
+                    'COUNT',
+                    Config.get().streamBatchCount,
+                    'BLOCK',
+                    Config.get().streamBlockMs,
+                    'STREAMS',
+                    streamName,
+                    '>'
                 );
 
                 if (results && results.length > 0) {
@@ -119,23 +141,26 @@ export class RedisStreamConsumer {
                             const idsToAck = parsedMessages.map((msg: any) => msg.id);
                             await this.redis.xack(streamName, this.consumerGroup, ...idsToAck);
                         } catch (error) {
-                            logger.error(`Failed to process batch for ${streamName}:`, error as Error);
+                            logger.error(
+                                `Failed to process batch for ${streamName}:`,
+                                error as Error
+                            );
                         }
                     }
                 }
-             } catch (error: any) {
-                 if (!this.running || error.message.includes('Connection is closed')) {
-                     // Expected error during shutdown
-                     return;
-                 }
-                 logger.error(`Error in stream processing loop for ${streamName}:`, error as Error);
-                 await new Promise(resolve => setTimeout(resolve, 5000)); // Backoff on error
-             }
-             
-             // Continue loop
-             if (this.running) {
-                 setImmediate(loop);
-             }
+            } catch (error: any) {
+                if (!this.running || error.message.includes('Connection is closed')) {
+                    // Expected error during shutdown
+                    return;
+                }
+                logger.error(`Error in stream processing loop for ${streamName}:`, error as Error);
+                await new Promise(resolve => setTimeout(resolve, 5000)); // Backoff on error
+            }
+
+            // Continue loop
+            if (this.running) {
+                setImmediate(loop);
+            }
         };
 
         // Start the loop

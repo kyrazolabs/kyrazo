@@ -33,7 +33,7 @@ export class RedisSnapshotConsumer {
     }
 
     start() {
-        console.log('🚀 Redis Snapshot Consumer started...');
+        console.info('🚀 Redis Snapshot Consumer started...');
         this.timer = setInterval(
             () => this.consume(),
             Config.get().snapshotIntervalMs
@@ -108,13 +108,13 @@ export class RedisSnapshotConsumer {
             stream.on('end', async () => {
                 try {
                     if (dispatchBatch.length > 0) {
-                        console.log(
+                        console.info(
                             `Processing ${dispatchBatch.length} dispatch events`
                         );
                         await this.dispatchAgg.aggregateMany(dispatchBatch);
                     }
                     if (ingestBatch.length > 0) {
-                        console.log(
+                        console.info(
                             `Processing ${ingestBatch.length} ingest events`
                         );
                         await this.ingestAgg.aggregateMany(ingestBatch);
