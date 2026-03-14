@@ -140,13 +140,14 @@ async function main() {
         isShuttingDown = true;
         console.info(`\n🛑 Received ${signal}, shutting down...`);
 
+        // Force exit after 5 seconds if cleanup hangs
+        setTimeout(() => {
+            console.warn('Force closing after timeout');
+            process.exit(1);
+        }, 5000).unref();
+
         try {
             await streamConsumer.stop();
-            // Allow some time for existing connections to close gracefully
-            setTimeout(() => {
-                console.warn('Force closing after timeout');
-                process.exit(0);
-            }, 5000).unref();
             
             console.info('Cleanup complete. Exiting.');
             process.exit(0);
