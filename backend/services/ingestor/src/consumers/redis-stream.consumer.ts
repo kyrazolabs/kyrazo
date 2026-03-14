@@ -89,11 +89,20 @@ export class RedisStreamConsumer {
         });
     }
 
+    private processingPromises = new Set<Promise<void>>();
+
     public async stop() {
         console.error('🛑 Stopping Redis Stream Consumer...');
         this.running = false;
+        
+        if (this.processingPromises.size > 0) {
+            console.info(`⏳ Waiting for ${this.processingPromises.size} active batches to finish processing...`);
+            await Promise.allSettled(Array.from(this.processingPromises));
+        }
+
         // Optionally disconnect to immediately abort blocking calls
         this.redis.disconnect();
+        console.info('✅ Redis Stream Consumer stopped.');
     }
 
     private async processStream(streamName: string, processFn: (messages: any[]) => Promise<void>) {
@@ -163,32 +172,38 @@ export class RedisStreamConsumer {
                 const allMessages = [...reclaimedMessages, ...newMessages];
 
                 if (allMessages.length > 0) {
-                    try {
-                        const parsedMessages = allMessages.map((result: any) => {
-                            const id = result[0] as string;
-                            const rawData = result[1] as string[];
-                            const data: Record<string, string> = {};
-                            for (let i = 0; i < rawData.length; i += 2) {
-                                const key = rawData[i];
-                                if (key !== undefined) {
-                                    data[key] = rawData[i + 1] as string;
+                    const activeWork = (async () => {
+                        try {
+                            const parsedMessages = allMessages.map((result: any) => {
+                                const id = result[0] as string;
+                                const rawData = result[1] as string[];
+                                const data: Record<string, string> = {};
+                                for (let i = 0; i < rawData.length; i += 2) {
+                                    const key = rawData[i];
+                                    if (key !== undefined) {
+                                        data[key] = rawData[i + 1] as string;
+                                    }
                                 }
-                            }
-                            return { id, ...data };
-                        });
+                                return { id, ...data };
+                            });
 
-                        // Process the batch
-                        await processFn(parsedMessages);
+                            // Process the batch
+                            await processFn(parsedMessages);
 
-                        // Acknowledge processed messages
-                        const idsToAck = parsedMessages.map((msg: any) => msg.id);
-                        await this.redis.xack(streamName, this.consumerGroup, ...idsToAck);
-                    } catch (error) {
-                        logger.error(
-                            `Failed to process batch for ${streamName}:`,
-                            error as Error
-                        );
-                    }
+                            // Acknowledge processed messages
+                            const idsToAck = parsedMessages.map((msg: any) => msg.id);
+                            await this.redis.xack(streamName, this.consumerGroup, ...idsToAck);
+                        } catch (error) {
+                            logger.error(
+                                `Failed to process batch for ${streamName}:`,
+                                error as Error
+                            );
+                        }
+                    })();
+                    
+                    this.processingPromises.add(activeWork);
+                    await activeWork;
+                    this.processingPromises.delete(activeWork);
                 }
             } catch (error: any) {
                 if (!this.running || error.message.includes('Connection is closed')) {
