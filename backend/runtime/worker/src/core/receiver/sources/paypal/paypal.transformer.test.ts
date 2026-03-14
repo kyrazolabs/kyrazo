@@ -31,7 +31,7 @@ describe('PayPalTransformer', () => {
         expect(result.type).toBe('PAYMENT.SALE.COMPLETED');
         expect(result.workspaceId).toBe(event.workspaceId);
         expect(result.targets.length).toBe(1);
-        expect(result.targets[0].targetId).toBe('end_1');
+        expect(result.targets![0]!.targetId).toBe('end_1');
         expect(result.provider?.name).toBe('paypal');
         expect(result.provider?.eventId).toBe('pp_1');
     });

@@ -35,7 +35,7 @@ export class IngestAggregator {
             const compositeKey = `${projectId}|${bucketDayStr}|${sourceId}|${processingStatus}`;
 
             const existing = aggMap.get(compositeKey) || {
-                project_id: projectId,
+                namespace_id: projectId,
                 bucket_day: bucketDayStr,
                 source_id: sourceId,
                 processing_status: processingStatus,

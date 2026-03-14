@@ -32,7 +32,7 @@ export class DispatchAggregator {
             const compositeKey = `${projectId}|${bucketDayStr}|${targetId}|${eventType}|${responseCode}`;
 
             const existing = aggMap.get(compositeKey) || {
-                project_id: projectId,
+                namespace_id: projectId,
                 bucket_day: bucketDayStr,
                 target_id: targetId,
                 event_type: eventType,

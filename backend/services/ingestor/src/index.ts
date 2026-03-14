@@ -1,4 +1,5 @@
 import { RedisSnapshotConsumer } from './consumers/redis-snapshot.consumer';
+import { RedisStreamConsumer } from './consumers/redis-stream.consumer';
 import { DispatchAggregator } from './aggregators/dispatch.aggregator';
 import { IngestAggregator } from './aggregators/ingest.aggregator';
 import { Config } from './config';
@@ -12,9 +13,11 @@ async function main() {
 
     const ingestAgg = new IngestAggregator();
 
-    const consumer = new RedisSnapshotConsumer(dispatchAgg, ingestAgg);
+    const snapshotConsumer = new RedisSnapshotConsumer(dispatchAgg, ingestAgg);
+    snapshotConsumer.start();
 
-    consumer.start();
+    const streamConsumer = new RedisStreamConsumer();
+    await streamConsumer.start();
 
     // Initialize Redis client for health checks
     const redisClient = new Redis(Config.get().redisUrl);
@@ -128,7 +131,34 @@ async function main() {
         },
     });
 
-    console.log(`📡 Health check server running on port ${Config.get().port}`);
+    console.info(`📡 Health check server running on port ${Config.get().port}`);
+
+    // Graceful shutdown
+    let isShuttingDown = false;
+    const shutdown = async (signal: string) => {
+        if (isShuttingDown) return;
+        isShuttingDown = true;
+        console.info(`\n🛑 Received ${signal}, shutting down...`);
+
+        // Force exit after 5 seconds if cleanup hangs
+        setTimeout(() => {
+            console.warn('Force closing after timeout');
+            process.exit(1);
+        }, 5000).unref();
+
+        try {
+            await streamConsumer.stop();
+            
+            console.info('Cleanup complete. Exiting.');
+            process.exit(0);
+        } catch (error) {
+            console.error('Error during shutdown:', error);
+            process.exit(1);
+        }
+    };
+
+    process.on('SIGTERM', () => shutdown('SIGTERM'));
+    process.on('SIGINT', () => shutdown('SIGINT'));
 }
 
 main().catch(err => {

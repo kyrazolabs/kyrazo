@@ -24,7 +24,7 @@ WORKDIR /app
 # Copy all installed dependencies
 COPY --from=builder /app/node_modules /app/node_modules
 
-# Copy analytics package binaries and config
+# Copy ingestor package binaries and config
 COPY --from=builder /app/package.json /app/package.json
 COPY --from=builder /app/tsconfig.json /app/tsconfig.json
 COPY --from=builder /app/dist /app/dist

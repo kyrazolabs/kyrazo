@@ -8,7 +8,7 @@ const numCPUs = Number(process.env.WORKERS) || os.cpus().length;
 const workers: Record<number, any> = {};
 
 if (cluster.isPrimary) {
-  console.log(`🚀 Master process PID ${process.pid} starting ${numCPUs} workers...`);
+  console.info(`🚀 Master process PID ${process.pid} starting ${numCPUs} workers...`);
 
   for (let i = 0; i < numCPUs; i++) {
     const worker = cluster.fork();
@@ -22,7 +22,7 @@ if (cluster.isPrimary) {
   }
 
   process.on("SIGINT", () => {
-    console.log("\n🛑 SIGINT received, shutting down all workers...");
+    console.info("\n🛑 SIGINT received, shutting down all workers...");
     for (const id in workers) {
       workers[id].kill("SIGTERM");
     }
@@ -30,7 +30,7 @@ if (cluster.isPrimary) {
   });
 
   process.on("SIGTERM", () => {
-    console.log("\n🛑 SIGTERM received, shutting down all workers...");
+    console.info("\n🛑 SIGTERM received, shutting down all workers...");
     for (const id in workers) {
       workers[id].kill("SIGTERM");
     }
@@ -38,7 +38,7 @@ if (cluster.isPrimary) {
   });
 
 } else {
-  console.log(`👷 Worker ${process.pid} started`);
+  console.info(`👷 Worker ${process.pid} started`);
   const workerProcess = spawn("bun", ["run", "src/index.ts"], {
     stdio: "inherit",
     env: process.env,
