@@ -132,6 +132,32 @@ async function main() {
     });
 
     console.log(`📡 Health check server running on port ${Config.get().port}`);
+
+    // Graceful shutdown
+    let isShuttingDown = false;
+    const shutdown = async (signal: string) => {
+        if (isShuttingDown) return;
+        isShuttingDown = true;
+        console.log(`\n🛑 Received ${signal}, shutting down...`);
+
+        try {
+            await streamConsumer.stop();
+            // Allow some time for existing connections to close gracefully
+            setTimeout(() => {
+                console.log('Force closing after timeout');
+                process.exit(0);
+            }, 5000).unref();
+            
+            console.log('Cleanup complete. Exiting.');
+            process.exit(0);
+        } catch (error) {
+            console.error('Error during shutdown:', error);
+            process.exit(1);
+        }
+    };
+
+    process.on('SIGTERM', () => shutdown('SIGTERM'));
+    process.on('SIGINT', () => shutdown('SIGINT'));
 }
 
 main().catch(err => {

@@ -6,6 +6,7 @@ import { logger, type SQLDeliveryAttempt, type SQLIngestEvent } from '@kyrazo/sh
 export class RedisStreamConsumer {
     private redis: Redis;
     private timer?: Timer;
+    private running = false;
 
     public readonly dispatchStream = "stream:dispatch-events";
     public readonly ingestStream = "stream:ingest-events";
@@ -19,6 +20,8 @@ export class RedisStreamConsumer {
     }
 
     async start() {
+        if (this.running) return;
+        this.running = true;
         console.log('🚀 Redis Stream Consumer started...');
         
         // Ensure consumer groups exist
@@ -70,8 +73,17 @@ export class RedisStreamConsumer {
         });
     }
 
+    public async stop() {
+        console.log('🛑 Stopping Redis Stream Consumer...');
+        this.running = false;
+        // Optionally disconnect to immediately abort blocking calls
+        this.redis.disconnect();
+    }
+
     private async processStream(streamName: string, processFn: (messages: any[]) => Promise<void>) {
         const loop = async () => {
+             if (!this.running) return;
+             
              try {
                 // Read up to 1000 messages with a block time of 1000ms
                 // The > ID means we want new messages that have not been delivered to other consumers in this group
@@ -108,19 +120,22 @@ export class RedisStreamConsumer {
                             await this.redis.xack(streamName, this.consumerGroup, ...idsToAck);
                         } catch (error) {
                             logger.error(`Failed to process batch for ${streamName}:`, error as Error);
-                            // Important: Since we didn't XACK, the messages remain in the PEL (Pending Entries List).
-                            // A real implementation might need a sweeper to grab old un-acked messages (XPENDING/XCLAIM),
-                            // but standard retry will just leave them there for now until we claim them.
                         }
                     }
                 }
-             } catch (error) {
+             } catch (error: any) {
+                 if (!this.running || error.message.includes('Connection is closed')) {
+                     // Expected error during shutdown
+                     return;
+                 }
                  logger.error(`Error in stream processing loop for ${streamName}:`, error as Error);
                  await new Promise(resolve => setTimeout(resolve, 5000)); // Backoff on error
              }
              
              // Continue loop
-             setImmediate(loop);
+             if (this.running) {
+                 setImmediate(loop);
+             }
         };
 
         // Start the loop
