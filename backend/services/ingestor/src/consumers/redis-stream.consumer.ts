@@ -34,6 +34,7 @@ export class RedisStreamConsumer {
         } catch (e: any) {
             if (!e.message.includes('BUSYGROUP')) {
                 logger.error(`Error creating consumer group for ${this.dispatchStream}:`, e);
+                throw e;
             }
         }
 
@@ -48,6 +49,7 @@ export class RedisStreamConsumer {
         } catch (e: any) {
             if (!e.message.includes('BUSYGROUP')) {
                 logger.error(`Error creating consumer group for ${this.ingestStream}:`, e);
+                throw e;
             }
         }
 

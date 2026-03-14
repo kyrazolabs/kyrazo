@@ -3,32 +3,52 @@ ARG BUN_VERSION=1.3.5
 FROM oven/bun:${BUN_VERSION}-alpine AS base
 WORKDIR /app
 
-# Stage 1: Builder
+# Stage 1: Builder (Install & Build everything in strict order)
 FROM base AS builder
 
-# 1. Install dependencies
-COPY package.json bun.lock ./
+# 1. Install Shared Dependencies
+COPY shared/package.json shared/bun.lock ./shared/
+WORKDIR /app/shared
+RUN bun install
+
+# 2. Build Shared (Requires source)
+COPY shared ./
+RUN bun run build
+
+# 3. Install Ingestor Dependencies
+WORKDIR /app
+COPY services/ingestor/package.json services/ingestor/bun.lock ./services/ingestor/
+WORKDIR /app/services/ingestor
 RUN bun install --frozen-lockfile
 
-# 2. Copy source code
-COPY . .
-
-# 3. Build the application and run migrations
-# NOTE: This requires DATABASE_URL to be set if migrations are run during build
-RUN bun run prod
+# 4. Build Ingestor
+COPY services/ingestor ./
+RUN bun run build
 
 # Stage 2: Production runner
 FROM oven/bun:${BUN_VERSION}-alpine AS runner
 WORKDIR /app
 
 # Copy all installed dependencies
-COPY --from=builder /app/node_modules /app/node_modules
+COPY --from=builder /app/services/ingestor/node_modules /app/services/ingestor/node_modules
+
+# FORCE COPY Shared into node_modules (replaces symlink with actual code)
+# This prevents "Cannot find module" errors due to broken/missing symlinks in production
+# We copy /app/shared (which is built) to /app/services/ingestor/node_modules/@kyrazo/shared
+RUN rm -rf /app/services/ingestor/node_modules/@kyrazo/shared && mkdir -p /app/services/ingestor/node_modules/@kyrazo/shared
+COPY --from=builder /app/shared /app/services/ingestor/node_modules/@kyrazo/shared
+
+# ALSO Copy shared to /app/shared because tsconfig paths point to "../../shared"
+COPY --from=builder /app/shared /app/shared
 
 # Copy ingestor package binaries and config
-COPY --from=builder /app/package.json /app/package.json
-COPY --from=builder /app/tsconfig.json /app/tsconfig.json
-COPY --from=builder /app/dist /app/dist
-COPY --from=builder /app/drizzle /app/drizzle
+COPY --from=builder /app/services/ingestor/package.json /app/services/ingestor/package.json
+COPY --from=builder /app/services/ingestor/tsconfig.json /app/services/ingestor/tsconfig.json
+COPY --from=builder /app/services/ingestor/dist /app/services/ingestor/dist
+COPY --from=builder /app/services/ingestor/drizzle /app/services/ingestor/drizzle
+
+# Set working directory to ingestor package
+WORKDIR /app/services/ingestor
 
 # Ensure everything is owned by the bun user before switching
 RUN chown -R bun:bun /app
