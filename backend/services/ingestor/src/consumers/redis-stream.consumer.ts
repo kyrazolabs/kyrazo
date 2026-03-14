@@ -57,8 +57,8 @@ export class RedisStreamConsumer {
                 // The > ID means we want new messages that have not been delivered to other consumers in this group
                 const results = await this.redis.xreadgroup(
                     'GROUP', this.consumerGroup, this.consumerName,
-                    'COUNT', '1000',
-                    'BLOCK', '1000',
+                    'COUNT', Config.get().streamBatchCount,
+                    'BLOCK', Config.get().streamBlockMs,
                     'STREAMS', streamName, '>'
                 );
 
