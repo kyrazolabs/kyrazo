@@ -63,7 +63,7 @@ describe('DispatcherQueue', () => {
         await queue.enqueue(event, headers, targets);
 
         expect(mockDispatchConsumer.enqueue).toHaveBeenCalled();
-        const callArgs = mockDispatchConsumer.enqueue.mock.calls[0];
+        const callArgs = mockDispatchConsumer.enqueue.mock.calls[0] as any[];
         expect(callArgs[0]).toBe(event);
         expect(callArgs[1][0].url).toBe('http://target.com');
         expect(callArgs[1][0].method).toBe('POST');

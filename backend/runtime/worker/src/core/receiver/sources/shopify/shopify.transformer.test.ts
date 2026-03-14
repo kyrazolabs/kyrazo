@@ -41,7 +41,7 @@ describe('ShopifyTransformer', () => {
         expect(result.provider!.eventId).toBe('delivery_123');
         expect(result.provider!.resourceId).toBe('123456789');
         expect(result.targets).toHaveLength(1);
-        expect(result.targets[0].targetUrl).toBe('https://example.com/webhook');
+        expect(result.targets![0]!.targetUrl).toBe('https://example.com/webhook');
     });
 
     it('should fallback to shop domain if id is missing', () => {

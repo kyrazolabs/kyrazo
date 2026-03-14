@@ -33,7 +33,7 @@ describe('StripeTransformer', () => {
         expect(result.id).toBe(event.eventId);
         expect(result.type).toBe('payment_intent.succeeded');
         expect(result.timestamp).toBe(1234567890000);
-        expect(result.targets[0].targetId).toBe('end_1');
+        expect(result.targets![0]!.targetId).toBe('end_1');
         expect(result.provider?.name).toBe('stripe');
         expect(result.data.previous).toEqual({ status: 'processing' });
     });

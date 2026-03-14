@@ -1,0 +1,218 @@
+{
+  "id": "d29f5c65-2516-49b4-9dd6-d922fc145462",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.analytics_dispatch_day": {
+      "name": "analytics_dispatch_day",
+      "schema": "",
+      "columns": {
+        "project_id": {
+          "name": "project_id",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "target_id": {
+          "name": "target_id",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "event_type": {
+          "name": "event_type",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "response_code": {
+          "name": "response_code",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bucket_day": {
+          "name": "bucket_day",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "total_deliveries": {
+          "name": "total_deliveries",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "successful_deliveries": {
+          "name": "successful_deliveries",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "failed_deliveries": {
+          "name": "failed_deliveries",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pending_deliveries": {
+          "name": "pending_deliveries",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "avg_delivery_time_ms": {
+          "name": "avg_delivery_time_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "dispatch_day_project_idx": {
+          "name": "dispatch_day_project_idx",
+          "columns": [
+            {
+              "expression": "project_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "bucket_day",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "analytics_dispatch_day_project_id_bucket_day_target_id_event_type_response_code_pk": {
+          "name": "analytics_dispatch_day_project_id_bucket_day_target_id_event_type_response_code_pk",
+          "columns": [
+            "project_id",
+            "bucket_day",
+            "target_id",
+            "event_type",
+            "response_code"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.analytics_ingest_day": {
+      "name": "analytics_ingest_day",
+      "schema": "",
+      "columns": {
+        "project_id": {
+          "name": "project_id",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source_id": {
+          "name": "source_id",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "processing_status": {
+          "name": "processing_status",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bucket_day": {
+          "name": "bucket_day",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "total_events": {
+          "name": "total_events",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "successful_events": {
+          "name": "successful_events",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "failed_events": {
+          "name": "failed_events",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pending_events": {
+          "name": "pending_events",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "ingest_day_project_idx": {
+          "name": "ingest_day_project_idx",
+          "columns": [
+            {
+              "expression": "project_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "bucket_day",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "analytics_ingest_day_project_id_bucket_day_source_id_processing_status_pk": {
+          "name": "analytics_ingest_day_project_id_bucket_day_source_id_processing_status_pk",
+          "columns": [
+            "project_id",
+            "bucket_day",
+            "source_id",
+            "processing_status"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

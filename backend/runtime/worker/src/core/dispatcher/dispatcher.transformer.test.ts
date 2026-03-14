@@ -36,8 +36,8 @@ describe('DispatcherTransformer', () => {
         expect(result.namespaceId).toBe(rawEvent.namespaceId);
         expect(result.data.object).toEqual(rawEvent.data);
         expect(result.targets.length).toBe(1);
-        expect(result.targets[0].targetId).toBe('tar_1');
-        expect(result.targets[0].method).toBe('PUT');
+        expect(result.targets![0]!.targetId).toBe('tar_1');
+        expect(result.targets![0]!.method).toBe('PUT');
         expect(result.meta!.priority).toBe('high');
         expect(result.meta!.maxRetries).toBe(5);
     });

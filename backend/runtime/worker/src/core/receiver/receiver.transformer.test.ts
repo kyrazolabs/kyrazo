@@ -39,6 +39,6 @@ describe('ReceiverTransformer', () => {
         expect(result.headers).toBe(JSON.stringify(receivedEvent.headers));
         expect(result.body).toBe(JSON.stringify(receivedEvent.body));
         expect(result.verified).toBe(true);
-        expect(result.processing_status).toBe('processed');
+        expect(result.processing_status).toBe('processed' as any);
     });
 });

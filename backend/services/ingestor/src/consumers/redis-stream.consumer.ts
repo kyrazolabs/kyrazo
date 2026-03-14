@@ -1,0 +1,109 @@
+import { Redis } from 'ioredis';
+import { Config } from '../config';
+import { batchWriter } from '../db/clickhouse/batch.writer';
+import { logger, type SQLDeliveryAttempt, type SQLIngestEvent } from '@kyrazo/shared';
+
+export class RedisStreamConsumer {
+    private redis: Redis;
+    private timer?: Timer;
+
+    public readonly dispatchStream = "stream:dispatch-events";
+    public readonly ingestStream = "stream:ingest-events";
+    public readonly consumerGroup = "group:clickhouse-ingestor";
+    public readonly consumerName = `consumer:${Math.random().toString(36).substring(7)}`;
+
+    constructor(
+        redisClient?: Redis
+    ) {
+        this.redis = redisClient || new Redis(Config.get().redisUrl);
+    }
+
+    async start() {
+        console.log('🚀 Redis Stream Consumer started...');
+        
+        // Ensure consumer groups exist
+        try {
+            await this.redis.xgroup('CREATE', this.dispatchStream, this.consumerGroup, '0', 'MKSTREAM');
+        } catch (e: any) {
+            if (!e.message.includes('BUSYGROUP')) {
+                logger.error(`Error creating consumer group for ${this.dispatchStream}:`, e);
+            }
+        }
+        
+        try {
+            await this.redis.xgroup('CREATE', this.ingestStream, this.consumerGroup, '0', 'MKSTREAM');
+        } catch (e: any) {
+            if (!e.message.includes('BUSYGROUP')) {
+                logger.error(`Error creating consumer group for ${this.ingestStream}:`, e);
+            }
+        }
+
+        // Start processing loops
+        this.processStream(this.dispatchStream, async (messages) => {
+            const dataBatch: SQLDeliveryAttempt[] = messages.map(msg => JSON.parse(msg.payload));
+            await batchWriter.saveBatchedDeliveryAttempts(dataBatch);
+        });
+
+        this.processStream(this.ingestStream, async (messages) => {
+            const dataBatch: SQLIngestEvent[] = messages.map(msg => JSON.parse(msg.payload));
+            await batchWriter.saveBatchedIngestEvents(dataBatch);
+        });
+    }
+
+    private async processStream(streamName: string, processFn: (messages: any[]) => Promise<void>) {
+        const loop = async () => {
+             try {
+                // Read up to 1000 messages with a block time of 1000ms
+                // The > ID means we want new messages that have not been delivered to other consumers in this group
+                const results = await this.redis.xreadgroup(
+                    'GROUP', this.consumerGroup, this.consumerName,
+                    'COUNT', '1000',
+                    'BLOCK', '1000',
+                    'STREAMS', streamName, '>'
+                );
+
+                if (results && results.length > 0) {
+                    const resultData = results[0] as [string, any[]];
+                    const [_stream, messages] = resultData;
+                    if (messages && messages.length > 0) {
+                        try {
+                            const parsedMessages = messages.map((result: any) => {
+                                const id = result[0] as string;
+                                const rawData = result[1] as string[];
+                                const data: Record<string, string> = {};
+                                for (let i = 0; i < rawData.length; i += 2) {
+                                    const key = rawData[i];
+                                    if (key !== undefined) {
+                                        data[key] = rawData[i + 1] as string;
+                                    }
+                                }
+                                return { id, ...data };
+                            });
+
+                            // Process the batch
+                            await processFn(parsedMessages);
+
+                            // Acknowledge processed messages
+                            const idsToAck = parsedMessages.map((msg: any) => msg.id);
+                            await this.redis.xack(streamName, this.consumerGroup, ...idsToAck);
+                        } catch (error) {
+                            logger.error(`Failed to process batch for ${streamName}:`, error as Error);
+                            // Important: Since we didn't XACK, the messages remain in the PEL (Pending Entries List).
+                            // A real implementation might need a sweeper to grab old un-acked messages (XPENDING/XCLAIM),
+                            // but standard retry will just leave them there for now until we claim them.
+                        }
+                    }
+                }
+             } catch (error) {
+                 logger.error(`Error in stream processing loop for ${streamName}:`, error as Error);
+                 await new Promise(resolve => setTimeout(resolve, 5000)); // Backoff on error
+             }
+             
+             // Continue loop
+             setImmediate(loop);
+        };
+
+        // Start the loop
+        loop();
+    }
+}

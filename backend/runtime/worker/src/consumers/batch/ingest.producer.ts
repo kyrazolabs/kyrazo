@@ -1,40 +1,24 @@
-import { Redis } from "ioredis";
-import { Queue, Worker, Job } from "bullmq";
-import { config, redisConfig } from "@/config";
+import { redisConfig } from "@/config";
 import { logger, type SQLIngestEvent } from "@kyrazo/shared";
-import { batchWriter } from "@/services/clickhouse/batch.writer";
+import { Redis } from "ioredis";
 
 export class IngestProducer {
     private static instance: IngestProducer;
-    private redisUrl: string | undefined;
-    private redisOptions: any;
+    private redis: Redis;
 
-    // Singleton instances
-    private ingestQueue: Queue<SQLIngestEvent> | undefined;
-    private ingestWorker: Worker<SQLIngestEvent> | undefined;
+    public readonly streamName = "stream:ingest-events";
 
-    // Buffering
-    private buffer: {
-        data: SQLIngestEvent;
-        resolve: () => void;
-        reject: (err: any) => void;
-        jobId?: string;
-    }[] = [];
-    private readonly maxBatchSize = 1000;
-    private readonly flushIntervalMs = 1000;
-    private flushTimer: NodeJS.Timeout | null = null;
-
-    private constructor() {}
+    private constructor() {
+        this.redis = redisConfig.getQueueClient(); 
+    }
 
     public async initialize(): Promise<void> {
-        if (this.ingestQueue) return;
-
-        logger.info("[IngestProducer] Initializing...");
-        this.initializeQueue();
-        this.initializeWorker();
-
-        // Start periodic flush timer
-        this.startFlushTimer();
+        logger.info("[IngestProducer] Initializing Redis Stream Producer...");
+        // Ensure connection is ready
+        if (this.redis.status === 'wait') {
+            await this.redis.connect().catch(() => {});
+        }
+        logger.info(`[IngestProducer] Redis Stream Producer aligned with ${this.streamName}`);
     }
 
     public static getInstance(): IngestProducer {
@@ -44,129 +28,42 @@ export class IngestProducer {
         return IngestProducer.instance;
     }
 
+    // Public API to access the queue for producers
+    public getQueues() {
+        return {
+            // Provide a shim that matches the BullMQ add method signature for easy refactoring
+            IngestQueue: {
+                add: async (name: string, data: SQLIngestEvent) => {
+                    await this.publish(data);
+                }
+            }
+        };
+    }
+
     public getQueueNames() {
         return {
-            IngestQueue: "batch-ingest-events",
+            IngestQueue: this.streamName,
         };
     }
 
-    private initializeQueue() {
-        const queueName = this.getQueueNames().IngestQueue;
-        const connection = redisConfig.getQueueClient();
-
-        this.ingestQueue = new Queue<SQLIngestEvent>(queueName, {
-            connection,
-            defaultJobOptions: {
-                attempts: 10,
-                backoff: {
-                    type: "exponential",
-                    delay: 5000,
-                },
-                removeOnComplete: true,
-                removeOnFail: false,
-            },
-        });
-
-        logger.info(`[IngestProducer] Queue ${queueName} initialized`);
-    }
-
-    private initializeWorker() {
-        const queueName = this.getQueueNames().IngestQueue;
-        const connection = redisConfig.getQueueClient();
-
-        this.ingestWorker = new Worker<SQLIngestEvent>(
-            queueName,
-            async (job: Job<SQLIngestEvent>) => {
-                await this.processJob(job);
-            },
-            {
-                connection,
-                concurrency: 50, // High concurrency for high throughput
-                maxStalledCount: 0,
-            },
-        );
-
-        this.ingestWorker.on("failed", (job, err) => {
-            logger.error(
-                `[IngestProducer] Worker failed for job ${job?.id}:`,
-                err,
-            );
-        });
-
-        logger.info(`[IngestProducer] Worker ${queueName} initialized`);
-    }
-
-    private startFlushTimer() {
-        if (this.flushTimer) clearInterval(this.flushTimer);
-        this.flushTimer = setInterval(() => {
-            this.flush();
-        }, this.flushIntervalMs);
-    }
-
-    private async processJob(job: Job<SQLIngestEvent>) {
-        return new Promise<void>(async (resolve, reject) => {
-            logger.info(
-                `[IngestProducer] Buffering ingest event for ClickHouse batch (${this.buffer.length + 1}/${this.maxBatchSize})`,
-            );
-            await job.log(`Adding to ClickHouse buffer...`);
-
-            this.buffer.push({
-                data: job.data,
-                resolve,
-                reject,
-                jobId: job.id,
-            });
-
-            if (this.buffer.length >= this.maxBatchSize) {
-                this.flush();
-            }
-        });
-    }
-
-    private async flush() {
-        if (this.buffer.length === 0) return;
-
-        const batch = [...this.buffer];
-        this.buffer = []; // Clear buffer immediately
-
-        const dataBatch = batch.map((b) => b.data);
-
+    private async publish(data: SQLIngestEvent): Promise<void> {
         try {
-            logger.info(
-                `[IngestProducer] Flushing ${batch.length} ingest events to ClickHouse`,
-            );
-            await batchWriter.saveBatchedIngestEvents(dataBatch);
-
-            // Resolve all jobs in the batch
-            batch.forEach((b) => b.resolve());
-            logger.info(
-                `[IngestProducer] Successfully resolved ${batch.length} jobs`,
-            );
+            const payload = {
+                payload: JSON.stringify(data)
+            };
+            
+            await this.redis.xadd(this.streamName, "*", "payload", payload.payload);
+            logger.debug(`[IngestProducer] Successfully added ingest event ${data.event_id} to stream`);
         } catch (error: any) {
-            logger.error(
-                "[IngestProducer] Failed to flush batch to ClickHouse:",
+             logger.error(
+                "[IngestProducer] Failed to add event to Redis stream:",
                 error,
             );
-            // Reject all jobs in the batch to trigger BullMQ retries
-            batch.forEach((b) => b.reject(error));
+            throw error;
         }
-    }
-
-    // Public API to access the queue for producers (like DispatchConsumer)
-    public getQueues() {
-        if (!this.ingestQueue) {
-            throw new Error("IngestProducer Queue not initialized");
-        }
-        return {
-            IngestQueue: this.ingestQueue,
-        };
     }
 
     public async close() {
-        if (this.flushTimer) clearInterval(this.flushTimer);
-        await this.flush(); // Flush remaining
-        await this.ingestQueue?.close();
-        await this.ingestWorker?.close();
     }
 }
 
