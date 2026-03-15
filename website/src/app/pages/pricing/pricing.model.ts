@@ -12,7 +12,7 @@ export interface PricingPlan {
         support: string;
         sla: string;
         analytics: string;
-        retentionDays: number;
+        retentionDays: number | string;
         customHeaders: boolean;
         customTimeout: boolean;
         customRetries: boolean;
@@ -29,8 +29,8 @@ export interface PricingPlan {
         sso?: boolean;
     };
     limits: {
-        eventsPerSecond: number;
-        eventsPerMonth: number;
+        eventsPerSecond: number | string;
+        eventsPerMonth: number | string;
         maxProjects: number;
         maxMembers: number;
         maxConnectors: number;
@@ -77,7 +77,7 @@ export const MANUAL_CUSTOM_PLAN: PricingPlan = {
         support: '24/7 Dedicated Account Manager',
         sla: 'Custom Uptime SLA',
         analytics: 'Custom Dashboards & Raw Data Export',
-        retentionDays: 365,
+        retentionDays: 'Custom',
         customHeaders: true,
         customTimeout: true,
         customRetries: true,
@@ -92,8 +92,8 @@ export const MANUAL_CUSTOM_PLAN: PricingPlan = {
         sso: true,
     },
     limits: {
-        eventsPerSecond: 1000,
-        eventsPerMonth: -1,
+        eventsPerSecond: 'Custom',
+        eventsPerMonth: 'Custom',
         maxProjects: -1,
         maxMembers: -1,
         maxConnectors: -1,
