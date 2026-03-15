@@ -244,6 +244,7 @@
                             @if (hasForwarding()) {
                                 <div class="flex gap-2">
                                     <p-select [options]="availableEndpoints()" placeholder="Link Existing Endpoint" optionLabel="url" optionValue="id"
+                                        aria-label="Link existing endpoint"
                                         (onChange)="linkExistingEndpoint($event.value)" [filter]="true" class="w-64" styleClass="rounded-xl!" panelStyleClass="rounded-xl!" size="small">
                                         <ng-template let-endpoint pTemplate="item">
                                             <div class="flex flex-col">
@@ -252,7 +253,7 @@
                                             </div>
                                         </ng-template>
                                     </p-select>
-                                    <p-button label="New Endpoint" icon="pi pi-plus" size="small" (onClick)="openAddEndpointDialog()" styleClass="rounded-xl!" />
+                                    <p-button label="New Endpoint" icon="pi pi-plus" size="small" (onClick)="openAddEndpointDialog()" styleClass="rounded-xl!" aria-label="Create new endpoint" />
                                 </div>
                             }
                         </div>
