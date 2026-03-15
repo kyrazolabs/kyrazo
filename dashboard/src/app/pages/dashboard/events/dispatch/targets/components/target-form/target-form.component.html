@@ -184,7 +184,7 @@
             </div>
 
             @if (hasCustomHeaders()) {
-                @if (customHeaders && customHeaders.length > 0) {
+                @if (customHeaders.length) {
                      <div class="space-y-4 mb-4">
                         @for (header of customHeaders; track $index; let i = $index) {
                              <div class="flex gap-3 items-center rounded-xl">
