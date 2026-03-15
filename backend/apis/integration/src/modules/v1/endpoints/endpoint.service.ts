@@ -13,7 +13,7 @@ export class EndpointService {
     ) {
         const secret = secretCrypto.generateSourceSecret();
         const encryptedSecret = secretCrypto.encrypt(
-            prefixId(namespaceId.toString(), 'namespace')!,
+            this.deriveNamespaceKey(namespaceId.toString()),
             secret
         );
         const data = {
@@ -88,11 +88,39 @@ export class EndpointService {
             if (!activeSecret) {
                 throw new Error('Active secret not found');
             }
-            const secret = secretCrypto.decrypt(
-                activeSecret.value_enc,
-                activeSecret.iv,
-                prefixId(namespaceId, 'namespace')!
-            );
+
+            let secret: string;
+            const prefixedKey = this.deriveNamespaceKey(namespaceId);
+
+            try {
+                // Try with prefixed key first
+                secret = secretCrypto.decrypt(activeSecret.value_enc, activeSecret.iv, prefixedKey);
+            } catch (error) {
+                try {
+                    // Fallback to raw namespaceId
+                    secret = secretCrypto.decrypt(
+                        activeSecret.value_enc,
+                        activeSecret.iv,
+                        namespaceId
+                    );
+
+                    // Migration: Re-encrypt and persist with prefixed key
+                    const migrated = secretCrypto.encrypt(prefixedKey, secret);
+                    await endpointRepository.updateSecret(endpointId, activeSecret.kid, {
+                        value_enc: migrated.encrypted,
+                        iv: migrated.iv,
+                    });
+
+                    logger.info(`Migrated endpoint secret for ${endpointId} to prefixed key`);
+                } catch (innerError) {
+                    logger.error(
+                        'Failed to decrypt endpoint secret with both prefixed and raw keys',
+                        innerError as Error
+                    );
+                    throw new Error('Failed to get endpoint secret');
+                }
+            }
+
             return secret;
         } catch (error) {
             logger.error('Failed to get endpoint secret:', error as Error);
@@ -150,6 +178,10 @@ export class EndpointService {
             logger.error('Failed to delete endpoint:', error as Error);
             throw new Error('Failed to delete endpoint');
         }
+    }
+
+    private deriveNamespaceKey(namespaceId: string | Types.ObjectId): string {
+        return prefixId(namespaceId, 'namespace') || namespaceId.toString();
     }
 }
 

@@ -1,7 +1,7 @@
 import { Types } from 'mongoose';
 import type { CreateTargetInput, UpdateTargetInput } from './target.schema';
 import { targetRepository } from './target.repo';
-import { secretCrypto, logger, unprefixId } from '@kyrazo/shared';
+import { secretCrypto, logger, unprefixId, prefixId } from '@kyrazo/shared';
 import type { ITarget } from '@kyrazo/shared';
 import { redisConfig } from '@/configs';
 
@@ -13,7 +13,10 @@ export class TargetService {
         namespaceId: Types.ObjectId
     ) {
         const secret = secretCrypto.generateSourceSecret();
-        const encryptedSecret = secretCrypto.encrypt(namespaceId.toString(), secret);
+        const encryptedSecret = secretCrypto.encrypt(
+            this.deriveNamespaceKey(namespaceId.toString()),
+            secret
+        );
         const data = {
             ...valid,
             userId: new Types.ObjectId(userId),
@@ -81,11 +84,39 @@ export class TargetService {
             if (!activeSecret) {
                 throw new Error('Active secret not found');
             }
-            const secret = secretCrypto.decrypt(
-                activeSecret.value_enc,
-                activeSecret.iv,
-                namespaceId
-            );
+
+            let secret: string;
+            const prefixedKey = this.deriveNamespaceKey(namespaceId);
+
+            try {
+                // Try with prefixed key first
+                secret = secretCrypto.decrypt(activeSecret.value_enc, activeSecret.iv, prefixedKey);
+            } catch (error) {
+                try {
+                    // Fallback to raw namespaceId
+                    secret = secretCrypto.decrypt(
+                        activeSecret.value_enc,
+                        activeSecret.iv,
+                        namespaceId
+                    );
+
+                    // Migration: Re-encrypt and persist with prefixed key
+                    const migrated = secretCrypto.encrypt(prefixedKey, secret);
+                    await targetRepository.updateSecret(targetId, activeSecret.kid, {
+                        value_enc: migrated.encrypted,
+                        iv: migrated.iv,
+                    });
+
+                    logger.info(`Migrated target secret for ${targetId} to prefixed key`);
+                } catch (innerError) {
+                    logger.error(
+                        'Failed to decrypt target secret with both prefixed and raw keys',
+                        innerError as Error
+                    );
+                    throw new Error('Failed to get target secret');
+                }
+            }
+
             return secret;
         } catch (error) {
             logger.error('Failed to get target secret:', error as Error);
@@ -141,6 +172,10 @@ export class TargetService {
             logger.error('Failed to delete target:', error as Error);
             throw new Error('Failed to delete target');
         }
+    }
+
+    private deriveNamespaceKey(namespaceId: string | Types.ObjectId): string {
+        return prefixId(namespaceId, 'namespace') || namespaceId.toString();
     }
 }
 
