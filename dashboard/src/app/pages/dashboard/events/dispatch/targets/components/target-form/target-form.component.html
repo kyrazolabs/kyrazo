@@ -126,7 +126,8 @@
                         Timeout (ms)
                     </label>
                     <p-inputNumber id="timeout" formControlName="timeout" [min]="100" [max]="60000"
-                        [showButtons]="false" suffix=" ms" inputStyleClass="rounded-xl!" styleClass="w-full" />
+                        [showButtons]="false" suffix=" ms" inputStyleClass="rounded-xl!" styleClass="w-full"
+                        [disabled]="!hasCustomTimeout()" [pTooltip]="!hasCustomTimeout() ? 'Custom timeout is not included in your plan' : ''" tooltipPosition="top" />
                     <small class="text-surface-600 dark:text-surface-400">
                         Max wait time for response
                     </small>
@@ -138,7 +139,8 @@
                         Retry Count
                     </label>
                     <p-inputNumber id="retryCount" formControlName="retryCount" [min]="0" [max]="10"
-                        [showButtons]="false" inputStyleClass="rounded-xl!" styleClass="w-full" />
+                        [showButtons]="false" inputStyleClass="rounded-xl!" styleClass="w-full"
+                        [disabled]="!hasCustomRetries()" [pTooltip]="!hasCustomRetries() ? 'Custom retries are not included in your plan' : ''" tooltipPosition="top" />
                     <small class="text-surface-600 dark:text-surface-400">
                         Attempts on failure
                     </small>
@@ -162,26 +164,39 @@
 
         <!-- Custom Headers -->
         <div class="flex flex-col gap-4">
-            <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0">Custom Headers</h3>
-            @if (customHeaders && customHeaders.length > 0) {
-                 <div class="space-y-4 mb-4">
-                    @for (header of customHeaders; track $index; let i = $index) {
-                         <div class="flex gap-3 items-center rounded-xl">
-                            <input type="text" pInputText [(ngModel)]="header.key" [ngModelOptions]="{standalone: true}"
-                                placeholder="Header Key (e.g. X-API-Key)" class="flex-1 rounded-xl!" />
-                            <input type="text" pInputText [(ngModel)]="header.value" [ngModelOptions]="{standalone: true}"
-                                placeholder="Value" class="flex-1 rounded-xl!" />
-                            <p-button icon="pi pi-trash" severity="danger" [outlined]="true" size="small"
-                                (onClick)="removeHeader(i)" styleClass="rounded-xl!" />
-                        </div>
-                    }
-                </div>
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0">Custom Headers</h3>
+                @if (!hasCustomHeaders()) {
+                    <span class="text-xs bg-primary/10 text-primary px-2 py-1 rounded-md font-medium">Pro Feature</span>
+                }
+            </div>
+
+            @if (hasCustomHeaders()) {
+                @if (customHeaders && customHeaders.length > 0) {
+                     <div class="space-y-4 mb-4">
+                        @for (header of customHeaders; track $index; let i = $index) {
+                             <div class="flex gap-3 items-center rounded-xl">
+                                <input type="text" pInputText [(ngModel)]="header.key" [ngModelOptions]="{standalone: true}"
+                                    placeholder="Header Key (e.g. X-API-Key)" class="flex-1 rounded-xl!" />
+                                <input type="text" pInputText [(ngModel)]="header.value" [ngModelOptions]="{standalone: true}"
+                                    placeholder="Value" class="flex-1 rounded-xl!" />
+                                <p-button icon="pi pi-trash" severity="danger" [outlined]="true" size="small"
+                                    (onClick)="removeHeader(i)" styleClass="rounded-xl!" />
+                            </div>
+                        }
+                    </div>
+                } @else {
+                    <div class="text-center py-4 mb-4">
+                         <p class="text-surface-600 dark:text-surface-400 text-sm">No custom headers configured</p>
+                    </div>
+                }
+                 <p-button label="Add Header" icon="pi pi-plus" [outlined]="true" size="small" styleClass="rounded-xl!" (onClick)="addHeader()" />
             } @else {
-                <div class="text-center py-4 mb-4">
-                     <p class="text-surface-600 dark:text-surface-400 text-sm">No custom headers configured</p>
+                <div class="flex flex-col items-center justify-center py-8 text-center border border-dashed border-surface-200 dark:border-surface-800 rounded-xl bg-surface-50 dark:bg-surface-950">
+                    <p class="text-surface-500 dark:text-surface-400 text-sm mb-4">Custom headers are not included in your current plan.</p>
+                    <p-button label="Upgrade to Unlock" icon="pi pi-lock" size="small" [outlined]="true" (onClick)="dls.openBillingDialog()" styleClass="rounded-xl!" />
                 </div>
             }
-             <p-button label="Add Header" icon="pi pi-plus" [outlined]="true" size="small" styleClass="rounded-xl!" (onClick)="addHeader()" />
         </div>
 
         <div class="flex justify-end gap-2 pt-4">
