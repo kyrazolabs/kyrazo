@@ -347,13 +347,18 @@ export class DeliveryRepo {
 
             const query = `
                 SELECT * FROM delivery_attempts
-                WHERE delivery_id = '${unprefixId(deliveryId)}' AND workspace_id = '${prefixId(workspaceId, 'workspace')}' AND namespace_id = '${prefixId(namespaceId, 'namespace')}'
+                WHERE delivery_id = {deliveryId:UInt64} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
                 LIMIT 1
             `;
 
             const rows = await client.query({
                 query,
                 format: 'JSONEachRow',
+                query_params: {
+                    deliveryId: unprefixId(deliveryId),
+                    workspaceId: prefixId(workspaceId, 'workspace'),
+                    namespaceId: prefixId(namespaceId, 'namespace'),
+                },
             });
 
             const data = await rows.json<SQLDeliveryAttempt>();
@@ -373,13 +378,18 @@ export class DeliveryRepo {
             }
             const query = `
                 SELECT * FROM delivery_attempts
-                WHERE status = 'pending' AND workspace_id = '${prefixId(workspaceId, 'workspace')}'
+                WHERE status = {status:String} AND workspace_id = {workspaceId:String}
                 ORDER BY scheduled_at ASC
-                LIMIT ${limit}
+                LIMIT {limit:Int32}
             `;
             const rows = await client.query({
                 query,
                 format: 'JSONEachRow',
+                query_params: {
+                    status: 'pending',
+                    workspaceId: prefixId(workspaceId, 'workspace'),
+                    limit,
+                },
             });
 
             const data = await rows.json<SQLDeliveryAttempt>();
