@@ -5,6 +5,7 @@ services:
       dockerfile: runtime/worker/Dockerfile
     restart: always
     environment:
+      - WORKERS=1
       - WORKSPACE_ID=${WORKSPACE_ID}
       - WORKER_ID=${WORKER_ID}
       - WORKER_CONCURRENCY=${WORKER_CONCURRENCY}
