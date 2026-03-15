@@ -237,53 +237,75 @@
                         <div class="flex items-center justify-between">
                             <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0">
                                 Configured Endpoints
+                                @if (!hasForwarding()) {
+                                    <span class="text-xs bg-primary/10 text-primary px-2 py-1 rounded-md font-medium ml-2">Pro Feature</span>
+                                }
                             </h3>
-                            <p-button label="Add Endpoint" icon="pi pi-plus" size="small" />
-                        </div>
-
-                        <div *ngIf="endpoints().length === 0">
-                            <div class="text-center py-12">
-                                <i class="pi pi-link text-6xl text-surface-400 mb-4"></i>
-                                <h3 class="text-lg font-medium text-surface-900 dark:text-surface-0 mb-2">
-                                    No endpoints configured
-                                </h3>
-                                <p class="text-surface-600 dark:text-surface-400 mb-4">
-                                    Add endpoints to start receiving source events.
-                                </p>
-                                <p-button label="Add First Endpoint" icon="pi pi-plus" size="small" />
-                            </div>
-                        </div>
-
-                        <div *ngIf="endpoints().length > 0" class="space-y-3">
-                            <p-card *ngFor="let endpoint of endpoints(); trackBy: trackByEndpoint"
-                                class="card-panel">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex-1">
-                                        <div class="flex items-center gap-3 mb-2">
-                                            <p-tag [rounded]="true" [value]="endpoint.method" severity="success" class="text-xs!" />
-                                            <code
-                                                class="text-sm/6 text-surface-900 dark:text-surface-0 bg-surface-100 dark:bg-surface-900 px-3 py-1 rounded-xl">
-                                                {{ endpoint.url }}
-                                            </code>
-                                            <p-tag [rounded]="true" [value]="endpoint.enabled ? 'Enabled' : 'Disabled'"
-                                                [severity]="endpoint.enabled ? 'success' : 'danger'" [rounded]="true" />
-                                        </div>
-                                        <p class="text-sm text-surface-600 dark:text-surface-400">
-                                            Timeout: {{ endpoint.config.timeout }}ms
-                                            @if (endpoint.config.rateLimit) {
-                                                <span>
-                                                    • Rate limit: {{ endpoint.config.rateLimit }}/min
-                                                </span>
-                                            }
-                                        </p>
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <p-button icon="icon-[hugeicons--edit-03]" [outlined]="true" size="small" severity="secondary" />
-                                        <p-button icon="pi pi-trash" [outlined]="true" size="small" severity="danger" />
-                                    </div>
+                            @if (hasForwarding()) {
+                                <div class="flex gap-2">
+                                    <p-select [options]="availableEndpoints()" placeholder="Link Existing Endpoint" optionLabel="url" optionValue="id"
+                                        (onChange)="linkExistingEndpoint($event.value)" [filter]="true" class="w-64" styleClass="rounded-xl!" panelStyleClass="rounded-xl!" size="small">
+                                        <ng-template let-endpoint pTemplate="item">
+                                            <div class="flex flex-col">
+                                                <span class="font-medium">{{ endpoint.url }}</span>
+                                                <span class="text-xs text-surface-500">{{ endpoint.description }}</span>
+                                            </div>
+                                        </ng-template>
+                                    </p-select>
+                                    <p-button label="New Endpoint" icon="pi pi-plus" size="small" (onClick)="openAddEndpointDialog()" styleClass="rounded-xl!" />
                                 </div>
-                            </p-card>
+                            }
                         </div>
+
+                        @if (hasForwarding()) {
+                            <div *ngIf="endpoints().length === 0">
+                                <div class="text-center py-12">
+                                    <i class="pi pi-link text-6xl text-surface-400 mb-4"></i>
+                                    <h3 class="text-lg font-medium text-surface-900 dark:text-surface-0 mb-2">
+                                        No endpoints configured
+                                    </h3>
+                                    <p class="text-surface-600 dark:text-surface-400 mb-4">
+                                        Add or link endpoints to start receiving source events.
+                                    </p>
+                                    <p-button label="Add First Endpoint" icon="pi pi-plus" size="small" (onClick)="openAddEndpointDialog()" styleClass="rounded-xl!" />
+                                </div>
+                            </div>
+
+                            <div *ngIf="endpoints().length > 0" class="space-y-3">
+                                <p-card *ngFor="let endpoint of endpoints(); trackBy: trackByEndpoint"
+                                    class="card-panel">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex-1">
+                                            <div class="flex items-center gap-3 mb-2">
+                                                <p-tag [rounded]="true" [value]="endpoint.method" severity="success" class="text-xs!" />
+                                                <code
+                                                    class="text-sm/6 text-surface-900 dark:text-surface-0 bg-surface-100 dark:bg-surface-900 px-3 py-1 rounded-xl">
+                                                    {{ endpoint.url }}
+                                                </code>
+                                                <p-tag [rounded]="true" [value]="endpoint.enabled ? 'Enabled' : 'Disabled'"
+                                                    [severity]="endpoint.enabled ? 'success' : 'danger'" [rounded]="true" />
+                                            </div>
+                                            <p class="text-sm text-surface-600 dark:text-surface-400">
+                                                Timeout: {{ endpoint.config.timeout }}ms
+                                                @if (endpoint.config.rateLimit) {
+                                                    <span>
+                                                        • Rate limit: {{ endpoint.config.rateLimit }}/min
+                                                    </span>
+                                                }
+                                            </p>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <p-button icon="pi pi-unlink" [outlined]="true" size="small" severity="danger" (onClick)="unlinkEndpoint(endpoint.id)" pTooltip="Unlink from Source" tooltipPosition="top" styleClass="rounded-xl!" />
+                                        </div>
+                                    </div>
+                                </p-card>
+                            </div>
+                        } @else {
+                            <div class="flex flex-col items-center justify-center py-12 text-center border border-dashed border-surface-200 dark:border-surface-800 rounded-xl bg-surface-50 dark:bg-surface-950">
+                                <p class="text-surface-500 dark:text-surface-400 text-sm mb-4">Forwarding configuration is not included in your current plan.</p>
+                                <p-button label="Upgrade to Unlock" icon="pi pi-lock" size="small" [outlined]="true" (onClick)="dialogService.openBillingDialog()" styleClass="rounded-xl!" />
+                            </div>
+                        }
                     </div>
                 </p-tabpanel>
 
