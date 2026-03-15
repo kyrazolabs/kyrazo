@@ -238,20 +238,32 @@ export class TargetFormComponent implements OnInit, OnChanges {
 
         const payload: Partial<ITarget> = {
             ...formValue,
-            customHeaders: headersObject,
         };
 
-        // Ensure rateLimit is not sent as null if empty (it's optional)
-        if (
-            payload.config &&
-            (payload.config.rateLimit === null ||
-                payload.config.rateLimit === undefined)
-        ) {
-            // Create a copy of config to avoid mutating the form value reference directly if needed,
-            // though payload is already a new object shallowly.
-            // However, config is nested so it references the same object.
-            payload.config = { ...payload.config };
-            delete payload.config.rateLimit;
+        // Gate custom headers
+        if (this.hasCustomHeaders()) {
+            payload.customHeaders = headersObject;
+        } else {
+            delete payload.customHeaders;
+        }
+
+        // Gate config features
+        if (payload.config) {
+            const config: any = { ...payload.config };
+
+            if (!this.hasCustomTimeout()) {
+                delete config.timeout;
+            }
+
+            if (!this.hasCustomRetries()) {
+                delete config.retryCount;
+            }
+
+            // Ensure rateLimit is not sent as null if empty (it's optional)
+            if (config.rateLimit === null || config.rateLimit === undefined) {
+                delete config.rateLimit;
+            }
+            payload.config = config;
         }
 
         const request$ =
