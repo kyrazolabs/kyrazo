@@ -33,7 +33,7 @@ import { serveStatic } from 'hono/bun';
 import v1Router from './modules';
 import { AppContext } from './core/middlewares/auth.middleware';
 
-const app = new Hono().route('/v1', v1Router);
+const app = new Hono();
 
 // Global middleware
 app.use('*', RequestId());
@@ -55,6 +55,9 @@ app.use(
     })
 );
 app.use('*', zodErrorHandler); // قبل errorHandler
+
+// Mount V1 Router
+app.route('/v1', v1Router);
 
 // Security middleware
 // app.use('*', arcjetMiddleware)
