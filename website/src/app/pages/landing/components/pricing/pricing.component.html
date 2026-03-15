@@ -35,9 +35,13 @@
                     }
 
                     <div class="flex items-baseline gap-1 mb-6">
-                        <span class="text-base font-medium opacity-70 self-start mt-1">@if (plan.slug === 'enterprise') { from }</span>
-                        <span class="text-4xl font-bold font-sansation!">{{ formatPrice(plan.priceCentsMonthly) }}</span>
-                        <span class="opacity-70 text-sm">/month</span>
+                        @if (plan.slug === 'custom') {
+                            <span class="text-4xl font-bold font-sansation!">Custom</span>
+                        } @else {
+                            <span class="text-base font-medium opacity-70 self-start mt-1">@if (plan.slug === 'enterprise') { from }</span>
+                            <span class="text-4xl font-bold font-sansation!">{{ formatPrice(plan.priceCentsMonthly) }}</span>
+                            <span class="opacity-70 text-sm">/month</span>
+                        }
                     </div>
 
                     <p-button
@@ -53,19 +57,45 @@
                     <ul class="space-y-4">
                         <li class="flex items-center gap-3 text-sm opacity-80">
                             <i class="pi pi-check text-green-500" aria-hidden="true"></i>
-                            <span>{{ plan.limits.eventsPerMonth | number }} events / mo</span>
+                            <span>
+                                @if (plan.limits.eventsPerMonth === 'Custom') {
+                                    Custom events / mo
+                                } @else {
+                                    {{ plan.limits.eventsPerMonth | number }} events / mo
+                                }
+                            </span>
                         </li>
                         <li class="flex items-center gap-3 text-sm opacity-80">
                             <i class="pi pi-check text-green-500" aria-hidden="true"></i>
-                            <span>{{ plan.limits.eventsPerSecond }} events / sec</span>
+                            <span>
+                                @if (plan.limits.eventsPerSecond === 'Custom') {
+                                    Custom events / sec
+                                } @else {
+                                    {{ plan.limits.eventsPerSecond }} events / sec
+                                }
+                            </span>
                         </li>
                         <li class="flex items-center gap-3 text-sm opacity-80">
                             <i class="pi pi-check text-green-500" aria-hidden="true"></i>
-                            <span>{{ plan.features.workers === 'shared' ? 'Shared' : plan.features.workers }} Dedicated Workers</span>
+                            <span>
+                                @if (plan.features.workers === 0 || plan.features.workers === 'shared') {
+                                    Shared Workers
+                                } @else if (plan.features.workers === 'Custom') {
+                                    Custom Workers
+                                } @else {
+                                    {{ plan.features.workers }} Dedicated Workers
+                                }
+                            </span>
                         </li>
                         <li class="flex items-center gap-3 text-sm opacity-80">
                             <i class="pi pi-check text-green-500" aria-hidden="true"></i>
-                            <span>{{ plan.features.retentionDays }} Days retention</span>
+                            <span>
+                                @if (plan.features.retentionDays === 'Custom') {
+                                    Custom retention
+                                } @else {
+                                    {{ plan.features.retentionDays }} Days retention
+                                }
+                            </span>
                         </li>
                         <li class="flex items-center gap-3 text-sm opacity-80">
                             <i class="pi pi-check text-green-500" aria-hidden="true"></i>
