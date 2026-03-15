@@ -21,6 +21,7 @@ import { TargetService, ITarget } from '@core/services/target.service';
 import { DialogService } from '@shared/services/dialog.service';
 import { SentryService } from '@core/3rd-party/sentry';
 import { PostHogService } from '@core/3rd-party/posthog';
+import { SubscriptionService } from '@core/services/subscription.service';
 
 // PrimeNG Imports
 import { CardModule } from 'primeng/card';
@@ -36,6 +37,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { SelectModule } from 'primeng/select';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
     selector: 'app-target-form',
@@ -57,6 +59,7 @@ import { SelectModule } from 'primeng/select';
         IconFieldModule,
         InputIconModule,
         SelectModule,
+        TooltipModule,
     ],
     templateUrl: './target-form.component.html',
     styleUrls: ['./target-form.component.scss'],
@@ -66,9 +69,17 @@ export class TargetFormComponent implements OnInit, OnChanges {
     private fb = inject(FormBuilder);
     private mes = inject(MessageService);
     private targetService = inject(TargetService);
-    private dls = inject(DialogService);
+    public dls = inject(DialogService);
     private sentry = inject(SentryService);
     private posthog = inject(PostHogService);
+    public subscriptionService = inject(SubscriptionService);
+
+    public readonly hasCustomHeaders =
+        this.subscriptionService.hasFeature('customHeaders');
+    public readonly hasCustomTimeout =
+        this.subscriptionService.hasFeature('customTimeout');
+    public readonly hasCustomRetries =
+        this.subscriptionService.hasFeature('customRetries');
 
     @Input() targetId: string | null = null;
     @Output() onSuccess = new EventEmitter<any>();
@@ -227,20 +238,32 @@ export class TargetFormComponent implements OnInit, OnChanges {
 
         const payload: Partial<ITarget> = {
             ...formValue,
-            customHeaders: headersObject,
         };
 
-        // Ensure rateLimit is not sent as null if empty (it's optional)
-        if (
-            payload.config &&
-            (payload.config.rateLimit === null ||
-                payload.config.rateLimit === undefined)
-        ) {
-            // Create a copy of config to avoid mutating the form value reference directly if needed,
-            // though payload is already a new object shallowly.
-            // However, config is nested so it references the same object.
-            payload.config = { ...payload.config };
-            delete payload.config.rateLimit;
+        // Gate custom headers
+        if (this.hasCustomHeaders()) {
+            payload.customHeaders = headersObject;
+        } else {
+            delete payload.customHeaders;
+        }
+
+        // Gate config features
+        if (payload.config) {
+            const config: any = { ...payload.config };
+
+            if (!this.hasCustomTimeout()) {
+                delete config.timeout;
+            }
+
+            if (!this.hasCustomRetries()) {
+                delete config.retryCount;
+            }
+
+            // Ensure rateLimit is not sent as null if empty (it's optional)
+            if (config.rateLimit === null || config.rateLimit === undefined) {
+                delete config.rateLimit;
+            }
+            payload.config = config;
         }
 
         const request$ =

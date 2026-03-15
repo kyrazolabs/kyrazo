@@ -41,6 +41,8 @@ import {
     UpdateSourceAuthRequest,
 } from '@models/source.types';
 import { IEndpoint } from '@models/endpoint.types';
+import { EndpointService } from '@core/services/endpoint.service';
+import { SubscriptionService } from '@core/services/subscription.service';
 import {
     GetDAWResponse,
     IDeliveryAttempt,
@@ -98,7 +100,12 @@ export class SourcePage implements OnInit, AfterViewInit {
 
     public mes = inject(MessageService);
     private sentry = inject(SentryService);
-    private dialogService = inject(DialogService);
+    public dialogService = inject(DialogService);
+    private endpointService = inject(EndpointService);
+    public subscriptionService = inject(SubscriptionService);
+
+    public readonly hasForwarding =
+        this.subscriptionService.hasFeature('forwardConfiguration');
 
     // Signals for reactive data
     source = signal<ISource | null>(null);
@@ -110,6 +117,8 @@ export class SourcePage implements OnInit, AfterViewInit {
         failed: 0,
         pending: 0,
     });
+    availableEndpoints = signal<IEndpoint[]>([]);
+    loadingEndpoints = signal(false);
     loading = signal(false);
     ingressUrl = signal<string>('');
     // secret = signal<string>(""); // Removed as it's not returned by backend anymore
@@ -158,6 +167,10 @@ export class SourcePage implements OnInit, AfterViewInit {
 
                 if (response.data.ingressUrl) {
                     this.ingressUrl.set(response.data.ingressUrl);
+                }
+
+                if (this.hasForwarding()) {
+                    this.loadAvailableEndpoints();
                 }
 
                 // Safely access nested secret if available
@@ -474,5 +487,72 @@ export class SourcePage implements OnInit, AfterViewInit {
         if (this.source()) {
             this.dialogService.openSourceDialog(this.source()!.id);
         }
+    }
+
+    loadAvailableEndpoints() {
+        this.loadingEndpoints.set(true);
+        this.endpointService.gets().subscribe({
+            next: (response) => {
+                const allEndpoints = response.data || [];
+                const linkedIds = new Set(this.endpoints().map((e) => e.id));
+                this.availableEndpoints.set(
+                    allEndpoints.filter((e: IEndpoint) => !linkedIds.has(e.id)),
+                );
+                this.loadingEndpoints.set(false);
+            },
+            error: (err) => {
+                this.sentry.captureException(err);
+                this.loadingEndpoints.set(false);
+            },
+        });
+    }
+
+    linkExistingEndpoint(endpointId: string) {
+        const source = this.source();
+        if (!source) return;
+
+        const currentEndpoints = this.endpoints().map((e) => e.id);
+        if (currentEndpoints.includes(endpointId)) return;
+
+        const newEndpoints = [...currentEndpoints, endpointId];
+        this.updateSourceEndpoints(source.id, newEndpoints);
+    }
+
+    unlinkEndpoint(endpointId: string) {
+        const source = this.source();
+        if (!source) return;
+
+        const newEndpoints = this.endpoints()
+            .map((e) => e.id)
+            .filter((id) => id !== endpointId);
+        this.updateSourceEndpoints(source.id, newEndpoints);
+    }
+
+    private updateSourceEndpoints(sourceId: string, endpointIds: string[]) {
+        this.loader.show();
+        this.sourceService.update(sourceId, { endpoints: endpointIds }).subscribe({
+            next: () => {
+                this.mes.add({
+                    severity: 'success',
+                    summary: 'Success',
+                    detail: 'Source endpoints updated',
+                });
+                this.loadSourceData(sourceId);
+                this.loader.hide();
+            },
+            error: (err) => {
+                this.sentry.captureException(err);
+                this.mes.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Failed to update endpoints',
+                });
+                this.loader.hide();
+            },
+        });
+    }
+
+    openAddEndpointDialog() {
+        this.dialogService.openEndpointDialog();
     }
 }

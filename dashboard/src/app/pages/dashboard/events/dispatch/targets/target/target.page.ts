@@ -230,6 +230,7 @@ export class TargetPage implements OnInit, AfterViewInit {
                 this.targetId = this.targetEntity!.id;
                 this.targetUrl = this.targetEntity!.url;
                 this.loadStats();
+                this.loadDeliveries();
             }
         });
 
@@ -547,7 +548,7 @@ export class TargetPage implements OnInit, AfterViewInit {
         search?: string,
         status?: TargetStatus,
     ) {
-        if (!this.targetUrl) return;
+        if (!this.targetId) return;
 
         this.loader.show();
 
@@ -562,7 +563,7 @@ export class TargetPage implements OnInit, AfterViewInit {
 
         // Assuming deliveryService has a gets method similar to webhooks
         this.deliveryService
-            .getByTarget(this.encodeTarget(this.targetUrl), queryParams)
+            .getByTarget(this.targetId, queryParams)
             .pipe(finalize(() => this.loader.hide()))
             .subscribe({
                 next: (response) => {
@@ -941,10 +942,6 @@ export class TargetPage implements OnInit, AfterViewInit {
         return aggregated.sort((a, b) => a.day.localeCompare(b.day));
     }
 
-    encodeTarget(decoded: string): string {
-        const b64 = btoa(decoded);
-        return encodeURIComponent(b64);
-    }
 
     // Secret Management
     signingSecret = signal<string | null>(null);
