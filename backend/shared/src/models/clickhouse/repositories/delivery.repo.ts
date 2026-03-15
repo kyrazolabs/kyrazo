@@ -19,6 +19,11 @@ export class DeliveryRepo {
                 return;
             }
 
+            // Asymmetric ID transformation:
+            // - delivery_id and event_id use unprefixId because they represent raw identifiers
+            //   (often numeric/Snowflake) used for deduplication and internal lookups within the data layer.
+            // - workspace_id, namespace_id, source_id, and target_id use prefixId to maintain
+            //   consistent namespacing/entity identification across external systems and APIs.
             const transformedData = data.map(attempt => ({
                 ...attempt,
                 delivery_id: unprefixId(attempt.delivery_id) as string,

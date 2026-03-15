@@ -17,6 +17,11 @@ export class IngestRepo {
                 return;
             }
 
+            // Asymmetric ID transformation:
+            // - event_id and associated_event_id use unprefixId because they represent raw identifiers
+            //   (often numeric/Snowflake) used for deduplication and internal lookups within the data layer.
+            // - workspace_id, namespace_id, and source_id use prefixId to maintain consistent
+            //   namespacing/entity identification across external systems and APIs.
             const transformedData = data.map(event => ({
                 ...event,
                 event_id: unprefixId(event.event_id) as string,
