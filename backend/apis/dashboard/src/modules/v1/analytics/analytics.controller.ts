@@ -194,7 +194,7 @@ export class AnalyticsController {
             }
 
             // @ts-ignore
-            const { target }: TargetQueryInput = c.req.valid('param');
+            const { targetId }: TargetQueryInput = c.req.valid('param');
             // @ts-ignore
             const { days }: OverviewFilterInput = c.req.valid('query');
 
@@ -204,7 +204,7 @@ export class AnalyticsController {
                 await AnalyticsService.getTargetOverview(
                     parseInt(last),
                     workspaceId.toString(),
-                    target,
+                    targetId,
                     namespaceId.toString()
                 );
 

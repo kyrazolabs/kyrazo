@@ -159,12 +159,13 @@ export class DeliveryRepo {
             const query = `
                 SELECT
                     target,
+                    target_id,
                     count() AS attempts,
                     countIf(status = 'delivered') AS success,
                     countIf(status IN ('failed', 'timeout', 'network_error')) AS failed
                 FROM delivery_attempts
                 ${whereClause}
-                GROUP BY target
+                GROUP BY target, target_id
                 ORDER BY attempts DESC
                 LIMIT {limit:Int32} OFFSET {offset:Int32}
             `;
@@ -172,10 +173,10 @@ export class DeliveryRepo {
             const countQuery = `
                 SELECT count() AS total
                 FROM (
-                    SELECT target
+                    SELECT target, target_id
                     FROM delivery_attempts
                     ${whereClause}
-                    GROUP BY target
+                    GROUP BY target, target_id
                 )
                 `;
 
@@ -194,6 +195,7 @@ export class DeliveryRepo {
 
             const data = await rows.json<{
                 target: string;
+                target_id: string;
                 attempts: number;
                 success: number;
                 failed: number;
@@ -215,7 +217,7 @@ export class DeliveryRepo {
     }
 
     static async getDeliveriesByTarget(
-        target: string,
+        targetId: string,
         workspaceId: string,
         namespaceId: string,
         limit: number,
@@ -231,9 +233,8 @@ export class DeliveryRepo {
             const perPage = Math.min(limit, 100);
             const skip = (page - 1) * perPage;
 
-            const decodedTarget = this.decodeTarget(target);
             const params: Record<string, string | number> = {
-                decodedTarget,
+                targetId: prefixId(targetId, 'target') as string,
                 workspaceId: prefixId(workspaceId, 'workspace') as string,
                 namespaceId: prefixId(namespaceId, 'namespace') as string,
                 limit: perPage,
@@ -242,14 +243,14 @@ export class DeliveryRepo {
 
             const query = `
                 SELECT * FROM delivery_attempts
-                WHERE target = {decodedTarget:String} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
+                WHERE target_id = {targetId:String} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
                 ORDER BY processed_at DESC
                 LIMIT {limit:Int32} OFFSET {offset:Int32}
             `;
 
             const countQuery = `
                 SELECT count() AS total FROM delivery_attempts
-                WHERE target = {decodedTarget:String} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
+                WHERE target_id = {targetId:String} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
             `;
 
             const [rows, countRows] = await Promise.all([
@@ -471,7 +472,7 @@ export class DeliveryRepo {
     }
     static async getDeliveriesOverviewByTarget(
         days: number = 7,
-        target: string,
+        targetId: string,
         workspaceId: string,
         namespaceId: string
     ): Promise<{
@@ -536,13 +537,11 @@ export class DeliveryRepo {
                 };
             }
 
-            const decodedTarget = this.decodeTarget(target);
-
             const params: Record<string, string | number> = {
                 days,
                 workspaceId: prefixId(workspaceId, 'workspace') as string,
                 namespaceId: prefixId(namespaceId, 'namespace') as string,
-                decodedTarget,
+                targetId: prefixId(targetId, 'target') as string,
             };
 
             const statsQuery = `
@@ -556,7 +555,7 @@ export class DeliveryRepo {
                 WHERE toDate(scheduled_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
                     AND namespace_id = {namespaceId:String}
-                    AND target = {decodedTarget:String};
+                    AND target_id = {targetId:String};
             `;
             const deliveryTrendsQuery = `
                 SELECT
@@ -567,7 +566,7 @@ export class DeliveryRepo {
                 WHERE toDate(scheduled_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
                     AND namespace_id = {namespaceId:String}
-                    AND target = {decodedTarget:String}
+                    AND target_id = {targetId:String}
                 GROUP BY day
                 ORDER BY day DESC;
             `;
@@ -580,7 +579,7 @@ export class DeliveryRepo {
                 WHERE toDate(scheduled_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
                     AND namespace_id = {namespaceId:String}
-                    AND target = {decodedTarget:String}
+                    AND target_id = {targetId:String}
                 GROUP BY event_type
                 ORDER BY total DESC
                 LIMIT 10;
@@ -594,7 +593,7 @@ export class DeliveryRepo {
                 WHERE toDate(scheduled_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
                     AND namespace_id = {namespaceId:String}
-                    AND target = {decodedTarget:String}
+                    AND target_id = {targetId:String}
                     AND response_code != 0
                 GROUP BY response_code
                 ORDER BY total DESC;

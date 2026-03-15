@@ -120,6 +120,7 @@ export function transformWithId<T>(data: T, type: IdType): TransformedWithId<T> 
             event_id: 'event',
             delivery_id: 'delivery',
             associated_event_id: 'event',
+            target_id: 'target',
         };
 
         for (const [field, idType] of Object.entries(idFields)) {
