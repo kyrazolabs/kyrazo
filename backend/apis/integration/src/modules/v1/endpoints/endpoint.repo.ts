@@ -103,6 +103,19 @@ export class EndpointRepository {
             .exec();
         return deleted !== null;
     }
+
+    async updateSecret(endpointId: string, kid: string, data: { value_enc: string; iv: string }): Promise<boolean> {
+        const result = await Endpoint.updateOne(
+            { _id: unprefixId(endpointId), 'secrets.kid': kid },
+            {
+                $set: {
+                    'secrets.$.value_enc': data.value_enc,
+                    'secrets.$.iv': data.iv,
+                }
+            }
+        );
+        return result.modifiedCount > 0;
+    }
 }
 
 export const endpointRepository = new EndpointRepository();

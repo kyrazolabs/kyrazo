@@ -1,7 +1,7 @@
 import { EventPriority } from '../../../types';
 
 export interface SQLDispatchedEvent {
-    event_id: string; // UUID
+    event_id: string; // UInt64
 
     workspace_id: string;
     namespace_id: string;

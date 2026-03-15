@@ -8,12 +8,12 @@ export enum DeliveryStatus {
 }
 
 export interface SQLDeliveryAttempt {
-    delivery_id: string; // UUID
+    delivery_id: string; // UInt64
 
     workspace_id: string;
     namespace_id: string;
 
-    event_id: string; // UUID
+    event_id: string; // UInt64
     event_type: string;
 
     source_id: string | null;

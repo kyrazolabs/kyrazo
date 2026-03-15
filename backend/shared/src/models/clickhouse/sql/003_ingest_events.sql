@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS ingest_events (
-    event_id UUID CODEC(ZSTD(3)),
+    event_id UInt64 CODEC(ZSTD(3)),
     workspace_id LowCardinality(String),
     namespace_id   LowCardinality(String),
     user_id      LowCardinality(String),
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS ingest_events (
     processing_status Enum8('pending' = 1, 'processed' = 2, 'failed' = 3),
     processing_error Nullable(String) CODEC(ZSTD(5)),
 
-    associated_event_id Nullable(UUID)
+    associated_event_id Nullable(UInt64)
 )
 ENGINE = MergeTree
 PARTITION BY toYYYYMM(created_at)

@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import { logger } from '../configs';
 import { secretCrypto } from './libs';
+import { prefixId } from './id';
 import type { ISource } from '../types';
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
@@ -82,29 +83,46 @@ export function safeDecode(input: string): string {
  * @title Decrypts source authentication secrets if they exist
  * @description Utility function to decrypt encrypted secrets in source authentication data
  * @param source - The source document to process
+ * @param key - Optional custom key for decryption (default: prefixed namespaceId)
  * @returns A new source object with decrypted secrets and IVs removed for security
  */
-export function decryptSourceSecrets(source: ISource): ISource {
+export function decryptSourceSecrets(source: ISource, key?: string): ISource {
     if (!source || !source.authentication) return source;
 
     const decryptedSource = JSON.parse(JSON.stringify(source)); // Deep clone
+    const prefixedKey =
+        key || prefixId(source.namespaceId, 'namespace') || source.namespaceId.toString();
+    const rawKey = source.namespaceId.toString();
+
+    const decrypt = (encrypted: string, iv: string): string | undefined => {
+        try {
+            // Try with prefixed key (or custom key) first
+            return secretCrypto.decrypt(encrypted, iv, prefixedKey);
+        } catch (error) {
+            try {
+                // If it fails and we used the prefixed key, try fallback to raw key
+                if (prefixedKey !== rawKey) {
+                    return secretCrypto.decrypt(encrypted, iv, rawKey);
+                }
+            } catch (innerError) {
+                // Ignore and proceed to fail
+            }
+            return undefined;
+        }
+    };
 
     // Decrypt service authentication secret and remove IV
     if (
         decryptedSource.authentication?.credentials?.secret &&
         decryptedSource.authentication?.credentials?.iv
     ) {
-        try {
-            decryptedSource.authentication.credentials.secret = secretCrypto.decrypt(
-                decryptedSource.authentication.credentials.secret,
-                decryptedSource.authentication.credentials.iv,
-                decryptedSource.namespaceId
-            );
-            // Remove IV from response for security
+        const secret = decrypt(
+            decryptedSource.authentication.credentials.secret,
+            decryptedSource.authentication.credentials.iv
+        );
+        if (secret) {
+            decryptedSource.authentication.credentials.secret = secret;
             delete decryptedSource.authentication.credentials.iv;
-        } catch (error) {
-            logger.error('Failed to decrypt service secret:', error as Error);
-            // Keep the encrypted version if decryption fails
         }
     }
 
@@ -113,17 +131,13 @@ export function decryptSourceSecrets(source: ISource): ISource {
         decryptedSource.authentication?.credentials?.signingSecret &&
         decryptedSource.authentication?.credentials?.iv
     ) {
-        try {
-            decryptedSource.authentication.credentials.signingSecret = secretCrypto.decrypt(
-                decryptedSource.authentication.credentials.signingSecret,
-                decryptedSource.authentication.credentials.iv,
-                decryptedSource.namespaceId
-            );
-            // Remove IV from response for security
+        const secret = decrypt(
+            decryptedSource.authentication.credentials.signingSecret,
+            decryptedSource.authentication.credentials.iv
+        );
+        if (secret) {
+            decryptedSource.authentication.credentials.signingSecret = secret;
             delete decryptedSource.authentication.credentials.iv;
-        } catch (error) {
-            logger.error('Failed to decrypt HMAC secret:', error as Error);
-            // Keep the encrypted version if decryption fails
         }
     }
 
@@ -132,17 +146,13 @@ export function decryptSourceSecrets(source: ISource): ISource {
         decryptedSource.authentication?.credentials?.apiKey &&
         decryptedSource.authentication?.credentials?.iv
     ) {
-        try {
-            decryptedSource.authentication.credentials.apiKey = secretCrypto.decrypt(
-                decryptedSource.authentication.credentials.apiKey,
-                decryptedSource.authentication.credentials.iv,
-                decryptedSource.namespaceId
-            );
-            // Remove IV from response for security
+        const secret = decrypt(
+            decryptedSource.authentication.credentials.apiKey,
+            decryptedSource.authentication.credentials.iv
+        );
+        if (secret) {
+            decryptedSource.authentication.credentials.apiKey = secret;
             delete decryptedSource.authentication.credentials.iv;
-        } catch (error) {
-            logger.error('Failed to decrypt API key:', error as Error);
-            // Keep the encrypted version if decryption fails
         }
     }
 
@@ -151,17 +161,13 @@ export function decryptSourceSecrets(source: ISource): ISource {
         decryptedSource.authentication?.credentials?.password &&
         decryptedSource.authentication?.credentials?.iv
     ) {
-        try {
-            decryptedSource.authentication.credentials.password = secretCrypto.decrypt(
-                decryptedSource.authentication.credentials.password,
-                decryptedSource.authentication.credentials.iv,
-                decryptedSource.namespaceId
-            );
-            // Remove IV from response for security
+        const secret = decrypt(
+            decryptedSource.authentication.credentials.password,
+            decryptedSource.authentication.credentials.iv
+        );
+        if (secret) {
+            decryptedSource.authentication.credentials.password = secret;
             delete decryptedSource.authentication.credentials.iv;
-        } catch (error) {
-            logger.error('Failed to decrypt basic auth password:', error as Error);
-            // Keep the encrypted version if decryption fails
         }
     }
 

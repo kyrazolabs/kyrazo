@@ -1,6 +1,6 @@
 import { clickhouseConfig, logger } from '../../../configs';
+import { prefixId, unprefixId, transformWithId } from '../../../utils/id';
 import { SQLIngestEvent } from '../types';
-import { unprefixId } from '../../../utils/id';
 
 export class IngestRepo {
     private static getClient() {
@@ -17,9 +17,23 @@ export class IngestRepo {
                 return;
             }
 
+            // Asymmetric ID transformation:
+            // - event_id and associated_event_id use unprefixId because they represent raw identifiers
+            //   (often numeric/Snowflake) used for deduplication and internal lookups within the data layer.
+            // - workspace_id, namespace_id, and source_id use prefixId to maintain consistent
+            //   namespacing/entity identification across external systems and APIs.
+            const transformedData = data.map(event => ({
+                ...event,
+                event_id: unprefixId(event.event_id) as string,
+                workspace_id: prefixId(event.workspace_id, 'workspace') as string,
+                namespace_id: prefixId(event.namespace_id, 'namespace') as string,
+                source_id: prefixId(event.source_id, 'source') as string,
+                associated_event_id: event.associated_event_id ? (unprefixId(event.associated_event_id) as string) : null,
+            }));
+
             await client.insert({
                 table: 'ingest_events',
-                values: data,
+                values: transformedData,
                 format: 'JSONEachRow',
             });
 
@@ -49,9 +63,9 @@ export class IngestRepo {
                     LIMIT 1
                 `;
             const params: Record<string, string | number> = {
-                eventId: unprefixId(eventId)!,
-                workspaceId: unprefixId(workspaceId)!,
-                namespaceId: unprefixId(namespaceId)!,
+                eventId: unprefixId(eventId) || eventId,
+                workspaceId: prefixId(workspaceId, 'workspace') as string,
+                namespaceId: prefixId(namespaceId, 'namespace') as string,
             };
 
             const rows = await client.query({
@@ -61,7 +75,7 @@ export class IngestRepo {
             });
 
             const data = await rows.json<SQLIngestEvent>();
-            return data;
+            return transformWithId(data, 'event') as SQLIngestEvent[];
         } catch (error) {
             logger.error('Failed to get delivered event', error as Error);
             throw error;
@@ -89,8 +103,8 @@ export class IngestRepo {
                 'namespace_id = {namespaceId:String}',
             ];
             const params: Record<string, string | number> = {
-                workspaceId: unprefixId(workspaceId)!,
-                namespaceId: unprefixId(namespaceId)!,
+                workspaceId: prefixId(workspaceId, 'workspace') as string,
+                namespaceId: prefixId(namespaceId, 'namespace') as string,
                 limit: perPage,
                 offset: skip,
             };
@@ -128,9 +142,10 @@ export class IngestRepo {
             ]);
 
             const data = await rows.json<SQLIngestEvent>();
-            const total = (await countRows.json<{ total: number }>())[0]?.total ?? 0;
+            const total = (await countRows.json<{ total: number }>())?.[0]?.total ?? 0;
+            const transformedData = transformWithId(data, 'event') as SQLIngestEvent[];
 
-            return { data, total };
+            return { data: transformedData, total };
         } catch (error) {
             logger.error('Unexpected error in DeliveryRepo.getDeliveries', error as Error);
             throw error;
@@ -169,9 +184,9 @@ export class IngestRepo {
                     query,
                     format: 'JSONEachRow',
                     query_params: {
-                        sourceId: unprefixId(sourceId)!,
-                        workspaceId: unprefixId(workspaceId)!,
-                        namespaceId: unprefixId(namespaceId)!,
+                        sourceId: prefixId(sourceId, 'source') as string,
+                        workspaceId: prefixId(workspaceId, 'workspace') as string,
+                        namespaceId: prefixId(namespaceId, 'namespace') as string,
                         limit: perPage,
                         offset: skip,
                     },
@@ -180,16 +195,18 @@ export class IngestRepo {
                     query: countQuery,
                     format: 'JSONEachRow',
                     query_params: {
-                        sourceId: unprefixId(sourceId)!,
-                        workspaceId: unprefixId(workspaceId)!,
-                        namespaceId: unprefixId(namespaceId)!,
+                        sourceId: prefixId(sourceId, 'source') as string,
+                        workspaceId: prefixId(workspaceId, 'workspace') as string,
+                        namespaceId: prefixId(namespaceId, 'namespace') as string,
                     },
                 }),
             ]);
 
             const data = await rows.json<SQLIngestEvent>();
-            const total = (await countRows.json<{ total: number }>())[0].total;
-            return { data, total };
+            const total = (await countRows.json<{ total: number }>())?.[0]?.total ?? 0;
+            const transformedData = transformWithId(data, 'event') as SQLIngestEvent[];
+
+            return { data: transformedData, total };
         } catch (error) {
             logger.error('Unexpected error in DeliveryRepo.getDeliveriesBySource', error as Error);
             throw error;
@@ -264,8 +281,8 @@ export class IngestRepo {
 
             const params: Record<string, string | number> = {
                 days,
-                workspaceId: unprefixId(workspaceId)!,
-                namespaceId: unprefixId(namespaceId)!,
+                workspaceId: prefixId(workspaceId, 'workspace') as string,
+                namespaceId: prefixId(namespaceId, 'namespace') as string,
             };
 
             const statsQuery = `

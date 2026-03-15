@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS delivery_attempts (
-    delivery_id UUID CODEC(ZSTD(3)),
+    delivery_id UInt64 CODEC(ZSTD(3)),
     workspace_id LowCardinality(String),
     namespace_id   LowCardinality(String),
 
     -- Links to other tables
-    event_id   UUID,
+    event_id   UInt64,
     event_type LowCardinality(String),
 
     -- Source (if forwarded)

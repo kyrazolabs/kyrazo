@@ -1,5 +1,5 @@
 import { AppContext } from '@/core/middlewares/auth.middleware';
-import { IErrorResponse, IngestRepo, logger, secretCrypto } from '@kyrazo/shared';
+import { IErrorResponse, IngestRepo, logger, secretCrypto, transformWithId } from '@kyrazo/shared';
 import { GetIngestsBySourceIdInput, IFilterIngest } from './ingest.schema';
 import { IGetIngestEventResponse, IGetIngestEventsResponse } from './ingest.type';
 
@@ -23,6 +23,7 @@ export class IngestController {
                 );
             }
 
+            // @ts-ignore
             const { status, limit = 10, page = 1 }: IFilterIngest = c.req.valid('query');
 
             const { data: deliveries, total } = await IngestRepo.getIngestEvents(
@@ -95,7 +96,9 @@ export class IngestController {
                 );
             }
 
+            // @ts-ignore
             const { sourceId }: GetIngestsBySourceIdInput = c.req.valid('param');
+            // @ts-ignore
             const { limit = 10, page = 1 }: IFilterIngest = c.req.valid('query');
 
             const { data: deliveries, total } = await IngestRepo.getReceivedEventsBySource(
@@ -156,6 +159,7 @@ export class IngestController {
                     401
                 );
             }
+            // @ts-ignore
             const { eventId } = c.req.valid('param');
 
             const result = await IngestRepo.getIngestEventById(
@@ -204,10 +208,13 @@ export class IngestController {
             }
         };
 
-        return {
-            ...event,
-            headers: tryDecrypt(event.headers),
-            body: tryDecrypt(event.body),
-        };
+        return transformWithId(
+            {
+                ...event,
+                headers: tryDecrypt(event.headers),
+                body: tryDecrypt(event.body),
+            },
+            'event'
+        );
     }
 }

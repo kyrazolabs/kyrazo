@@ -1,7 +1,7 @@
 import { clickhouseConfig } from '../../../configs/clickhouse';
 import logger from '../../../configs/logger';
+import { prefixId, unprefixId, transformWithId } from '../../../utils/id';
 import { SQLAnalyticsDispatchDay, SQLAnalyticsIngestDay } from '../types';
-import { unprefixId } from '../../../utils/id';
 
 export class AnalyticsRepo {
     private static getClient() {
@@ -25,9 +25,14 @@ export class AnalyticsRepo {
 
             while (retries > 0) {
                 try {
+                    const transformedBatch = batch.map(row => ({
+                        ...row,
+                        namespace_id: prefixId(row.namespace_id, 'namespace') as string,
+                        target_id: row.target_id ? (prefixId(row.target_id, 'target') as string) : null,
+                    }));
                     await client.insert({
                         table: 'analytics_dispatch_day',
-                        values: batch,
+                        values: transformedBatch,
                         format: 'JSONEachRow',
                     });
                     logger.info(
@@ -73,9 +78,14 @@ export class AnalyticsRepo {
 
             while (retries > 0) {
                 try {
+                    const transformedBatch = batch.map(row => ({
+                        ...row,
+                        namespace_id: prefixId(row.namespace_id, 'namespace') as string,
+                        source_id: row.source_id ? (prefixId(row.source_id, 'source') as string) : null,
+                    }));
                     await client.insert({
                         table: 'analytics_ingest_day',
-                        values: batch,
+                        values: transformedBatch,
                         format: 'JSONEachRow',
                     });
                     logger.info(
@@ -109,7 +119,7 @@ export class AnalyticsRepo {
             const client = this.getClient();
             if (!client) return null;
 
-            const params = { days, namespaceId: unprefixId(namespaceId) };
+            const params = { days, namespaceId: prefixId(namespaceId, 'namespace') as string };
 
             // 1. Overall Stats
             const statsQuery = `
@@ -197,17 +207,20 @@ export class AnalyticsRepo {
                     average_delivery_time: avgTime,
                 },
                 deliveryTrends: (await trendsRes.json<any>()).map((t: any) => ({
+                    ...transformWithId(t, 'delivery'),
                     day: t.day,
                     target: '',
                     successful: Number(t.successful),
                     failed: Number(t.failed),
                 })),
                 topEventTypes: (await topEventsRes.json<any>()).map((e: any) => ({
+                    ...transformWithId(e, 'event'),
                     target: '',
                     event_type: e.event_type || 'unknown',
                     total: Number(e.total),
                 })),
                 statusCodeDistribution: (await statusCodeRes.json<any>()).map((s: any) => ({
+                    ...transformWithId(s, 'target'),
                     target: '',
                     response_code: Number(s.response_code),
                     total: Number(s.total),
@@ -231,8 +244,8 @@ export class AnalyticsRepo {
 
             const params = {
                 days,
-                namespaceId: unprefixId(namespaceId),
-                targetId: unprefixId(targetId),
+                namespaceId: prefixId(namespaceId, 'namespace') as string,
+                targetId: prefixId(targetId, 'target') as string,
             };
 
             const statsQuery = `
@@ -321,17 +334,20 @@ export class AnalyticsRepo {
                     average_delivery_time: avgTime,
                 },
                 deliveryTrends: (await trendsRes.json<any>()).map((t: any) => ({
+                    ...transformWithId(t, 'delivery'),
                     day: t.day,
                     target: '',
                     successful: Number(t.successful),
                     failed: Number(t.failed),
                 })),
                 topEventTypes: (await topEventsRes.json<any>()).map((e: any) => ({
+                    ...transformWithId(e, 'event'),
                     target: '',
                     event_type: e.event_type || 'unknown',
                     total: Number(e.total),
                 })),
                 statusCodeDistribution: (await statusCodeRes.json<any>()).map((s: any) => ({
+                    ...transformWithId(s, 'target'),
                     target: '',
                     response_code: Number(s.response_code),
                     total: Number(s.total),
@@ -348,7 +364,7 @@ export class AnalyticsRepo {
             const client = this.getClient();
             if (!client) return null;
 
-            const params = { days, namespaceId: unprefixId(namespaceId) };
+            const params = { days, namespaceId: prefixId(namespaceId, 'namespace') as string };
 
             const statsQuery = `
                 SELECT
@@ -448,10 +464,12 @@ export class AnalyticsRepo {
                     pending_events: Number(stats.pending_events || 0),
                 },
                 receiveTrends: (await trendsRes.json<any>()).map((t: any) => ({
+                    ...transformWithId(t, 'event'),
                     day: t.day,
                     events: Number(t.events),
                 })),
                 topSources: (await topSourcesRes.json<any>()).map((s: any) => ({
+                    ...transformWithId(s, 'source'),
                     source: s.source || 'unknown',
                     total: Number(s.total),
                 })),

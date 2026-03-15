@@ -1,7 +1,7 @@
 import { clickhouseConfig } from '../../../configs/clickhouse';
 import logger from '../../../configs/logger';
+import { prefixId, unprefixId, transformWithId } from '../../../utils/id';
 import { SQLDeliveryAttempt } from '../types';
-import { unprefixId } from '../../../utils/id';
 
 export class DeliveryRepo {
     private static getClient() {
@@ -19,9 +19,24 @@ export class DeliveryRepo {
                 return;
             }
 
+            // Asymmetric ID transformation:
+            // - delivery_id and event_id use unprefixId because they represent raw identifiers
+            //   (often numeric/Snowflake) used for deduplication and internal lookups within the data layer.
+            // - workspace_id, namespace_id, source_id, and target_id use prefixId to maintain
+            //   consistent namespacing/entity identification across external systems and APIs.
+            const transformedData = data.map(attempt => ({
+                ...attempt,
+                delivery_id: unprefixId(attempt.delivery_id) as string,
+                event_id: unprefixId(attempt.event_id) as string,
+                workspace_id: prefixId(attempt.workspace_id, 'workspace') as string,
+                namespace_id: prefixId(attempt.namespace_id, 'namespace') as string,
+                source_id: attempt.source_id ? (prefixId(attempt.source_id, 'source') as string) : null,
+                target_id: prefixId(attempt.target_id, 'target') as string,
+            }));
+
             await client.insert({
                 table: 'delivery_attempts',
-                values: data,
+                values: transformedData,
                 format: 'JSONEachRow',
             });
 
@@ -55,8 +70,8 @@ export class DeliveryRepo {
                 'namespace_id = {namespaceId:String}',
             ];
             const params: Record<string, string | number> = {
-                workspaceId: unprefixId(workspaceId)!,
-                namespaceId: unprefixId(namespaceId)!,
+                workspaceId: prefixId(workspaceId, 'workspace') as string,
+                namespaceId: prefixId(namespaceId, 'namespace') as string,
                 limit: perPage,
                 offset: skip,
             };
@@ -94,9 +109,10 @@ export class DeliveryRepo {
             ]);
 
             const data = await rows.json<SQLDeliveryAttempt>();
-            const total = (await countRows.json<{ total: number }>())[0]?.total ?? 0;
+            const total = (await countRows.json<{ total: number }>())?.[0]?.total ?? 0;
+            const transformedData = transformWithId(data, 'delivery') as SQLDeliveryAttempt[];
 
-            return { data, total };
+            return { data: transformedData, total };
         } catch (error) {
             logger.error('Unexpected error in DeliveryRepo.getDeliveries', error as Error);
             throw error;
@@ -132,8 +148,8 @@ export class DeliveryRepo {
                 'namespace_id = {namespaceId:String}',
             ];
             const params: Record<string, string | number> = {
-                workspaceId: unprefixId(workspaceId)!,
-                namespaceId: unprefixId(namespaceId)!,
+                workspaceId: prefixId(workspaceId, 'workspace') as string,
+                namespaceId: prefixId(namespaceId, 'namespace') as string,
                 limit: perPage,
                 offset: skip,
             };
@@ -182,9 +198,11 @@ export class DeliveryRepo {
                 success: number;
                 failed: number;
             }>();
-            const total = (await countRows.json<{ total: number }>())[0]?.total ?? 0;
+            const total = (await countRows.json<{ total: number }>())?.[0]?.total ?? 0;
 
-            return { data, total };
+            const transformedData = transformWithId(data, 'target') as any[];
+
+            return { data: transformedData, total };
         } catch (error) {
             logger.error('Unexpected error in DeliveryRepo.getTargets', error as Error);
             throw error;
@@ -213,25 +231,25 @@ export class DeliveryRepo {
             const perPage = Math.min(limit, 100);
             const skip = (page - 1) * perPage;
 
-            const targeet = this.decodeTarget(target);
+            const decodedTarget = this.decodeTarget(target);
             const params: Record<string, string | number> = {
-                targeet,
-                workspaceId: unprefixId(workspaceId)!,
-                namespaceId: unprefixId(namespaceId)!,
+                decodedTarget,
+                workspaceId: prefixId(workspaceId, 'workspace') as string,
+                namespaceId: prefixId(namespaceId, 'namespace') as string,
                 limit: perPage,
                 offset: skip,
             };
 
             const query = `
                 SELECT * FROM delivery_attempts
-                WHERE target = {targeet:String} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
+                WHERE target = {decodedTarget:String} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
                 ORDER BY processed_at DESC
                 LIMIT {limit:Int32} OFFSET {offset:Int32}
             `;
 
             const countQuery = `
                 SELECT count() AS total FROM delivery_attempts
-                WHERE target = {targeet:String} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
+                WHERE target = {decodedTarget:String} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
             `;
 
             const [rows, countRows] = await Promise.all([
@@ -248,9 +266,10 @@ export class DeliveryRepo {
             ]);
 
             const data = await rows.json<SQLDeliveryAttempt>();
-            const total = (await countRows.json<{ total: number }>())[0]?.total ?? 0;
+            const total = (await countRows.json<{ total: number }>())?.[0]?.total ?? 0;
+            const transformedData = transformWithId(data, 'delivery') as SQLDeliveryAttempt[];
 
-            return { data, total };
+            return { data: transformedData, total };
         } catch (error) {
             logger.error('Failed to get delivered event', error as Error);
             throw error;
@@ -289,9 +308,9 @@ export class DeliveryRepo {
                     query,
                     format: 'JSONEachRow',
                     query_params: {
-                        sourceId: unprefixId(sourceId)!,
-                        workspaceId: unprefixId(workspaceId)!,
-                        namespaceId: unprefixId(namespaceId)!,
+                        sourceId: prefixId(sourceId, 'source') as string,
+                        workspaceId: prefixId(workspaceId, 'workspace') as string,
+                        namespaceId: prefixId(namespaceId, 'namespace') as string,
                         limit: perPage,
                         offset: skip,
                     },
@@ -300,16 +319,19 @@ export class DeliveryRepo {
                     query: countQuery,
                     format: 'JSONEachRow',
                     query_params: {
-                        sourceId: unprefixId(sourceId)!,
-                        workspaceId: unprefixId(workspaceId)!,
-                        namespaceId: unprefixId(namespaceId)!,
+                        sourceId: prefixId(sourceId, 'source') as string,
+                        workspaceId: prefixId(workspaceId, 'workspace') as string,
+                        namespaceId: prefixId(namespaceId, 'namespace') as string,
                     },
                 }),
             ]);
 
             const data = await rows.json<SQLDeliveryAttempt>();
-            const total = (await countRows.json<{ total: number }>())[0].total;
-            return { data, total };
+            const total = (await countRows.json<{ total: number }>())?.[0]?.total ?? 0;
+
+            const transformedData = transformWithId(data, 'delivery') as SQLDeliveryAttempt[];
+
+            return { data: transformedData, total };
         } catch (error) {
             logger.error('Unexpected error in DeliveryRepo.getDeliveriesBySource', error as Error);
             throw error;
@@ -330,17 +352,22 @@ export class DeliveryRepo {
 
             const query = `
                 SELECT * FROM delivery_attempts
-                WHERE delivery_id = '${unprefixId(deliveryId)}' AND workspace_id = '${unprefixId(workspaceId)}' AND namespace_id = '${unprefixId(namespaceId)}'
+                WHERE delivery_id = {deliveryId:UInt64} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
                 LIMIT 1
             `;
 
             const rows = await client.query({
                 query,
                 format: 'JSONEachRow',
+                query_params: {
+                    deliveryId: unprefixId(deliveryId),
+                    workspaceId: prefixId(workspaceId, 'workspace'),
+                    namespaceId: prefixId(namespaceId, 'namespace'),
+                },
             });
 
             const data = await rows.json<SQLDeliveryAttempt>();
-            return data;
+            return transformWithId(data, 'delivery') as SQLDeliveryAttempt[];
         } catch (error) {
             logger.error('Failed to get delivered event', error as Error);
             throw error;
@@ -356,17 +383,22 @@ export class DeliveryRepo {
             }
             const query = `
                 SELECT * FROM delivery_attempts
-                WHERE status = 'pending' AND ${workspaceId}
+                WHERE status = {status:String} AND workspace_id = {workspaceId:String}
                 ORDER BY scheduled_at ASC
-                LIMIT ${limit}
+                LIMIT {limit:Int32}
             `;
             const rows = await client.query({
                 query,
                 format: 'JSONEachRow',
+                query_params: {
+                    status: 'pending',
+                    workspaceId: prefixId(workspaceId, 'workspace'),
+                    limit,
+                },
             });
 
             const data = await rows.json<SQLDeliveryAttempt>();
-            return data;
+            return transformWithId(data, 'delivery') as SQLDeliveryAttempt[];
         } catch (error) {
             logger.error('Failed to get pending events ', error as Error);
             throw error;
@@ -406,9 +438,9 @@ export class DeliveryRepo {
             `;
 
             if (workspace_id && namespace_id) {
-                query += ` WHERE workspace_id = '${unprefixId(workspace_id)}' AND namespace_id = '${unprefixId(namespace_id)}'`;
+                query += ` WHERE workspace_id = '${prefixId(workspace_id, 'workspace')}' AND namespace_id = '${prefixId(namespace_id, 'namespace')}'`;
             } else if (workspace_id) {
-                query += ` WHERE workspace_id = '${unprefixId(workspace_id)}'`;
+                query += ` WHERE workspace_id = '${prefixId(workspace_id, 'workspace')}'`;
             }
 
             const rows = await client.query({
@@ -504,13 +536,13 @@ export class DeliveryRepo {
                 };
             }
 
-            const targeet = this.decodeTarget(target);
+            const decodedTarget = this.decodeTarget(target);
 
             const params: Record<string, string | number> = {
                 days,
-                workspaceId: unprefixId(workspaceId)!,
-                namespaceId: unprefixId(namespaceId)!,
-                targeet,
+                workspaceId: prefixId(workspaceId, 'workspace') as string,
+                namespaceId: prefixId(namespaceId, 'namespace') as string,
+                decodedTarget,
             };
 
             const statsQuery = `
@@ -524,7 +556,7 @@ export class DeliveryRepo {
                 WHERE toDate(scheduled_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
                     AND namespace_id = {namespaceId:String}
-                    AND target = {targeet:String};
+                    AND target = {decodedTarget:String};
             `;
             const deliveryTrendsQuery = `
                 SELECT
@@ -535,7 +567,7 @@ export class DeliveryRepo {
                 WHERE toDate(scheduled_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
                     AND namespace_id = {namespaceId:String}
-                    AND target = {targeet:String}
+                    AND target = {decodedTarget:String}
                 GROUP BY day
                 ORDER BY day DESC;
             `;
@@ -548,7 +580,7 @@ export class DeliveryRepo {
                 WHERE toDate(scheduled_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
                     AND namespace_id = {namespaceId:String}
-                    AND target = {targeet:String}
+                    AND target = {decodedTarget:String}
                 GROUP BY event_type
                 ORDER BY total DESC
                 LIMIT 10;
@@ -562,7 +594,7 @@ export class DeliveryRepo {
                 WHERE toDate(scheduled_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
                     AND namespace_id = {namespaceId:String}
-                    AND target = {targeet:String}
+                    AND target = {decodedTarget:String}
                     AND response_code != 0
                 GROUP BY response_code
                 ORDER BY total DESC;
@@ -630,15 +662,21 @@ export class DeliveryRepo {
                     pending_deliveries: 0,
                     average_delivery_time: null,
                 },
-                deliveryTrends: resultDeliveryTrends.length ? resultDeliveryTrends : [],
-                topEventTypes: resultTopEventTypes || [
+                deliveryTrends: resultDeliveryTrends.length 
+                    ? (transformWithId(resultDeliveryTrends, 'delivery') as any[]) 
+                    : [],
+                topEventTypes: resultTopEventTypes 
+                    ? (transformWithId(resultTopEventTypes, 'event') as any[]) 
+                    : [
                     {
                         target: '',
                         event_type: '',
                         total: 0,
                     },
                 ],
-                statusCodeDistribution: resultStatusCodeDistribution || [
+                statusCodeDistribution: resultStatusCodeDistribution 
+                    ? (transformWithId(resultStatusCodeDistribution, 'target') as any[]) 
+                    : [
                     {
                         target: '',
                         response_code: 0,
@@ -721,8 +759,8 @@ export class DeliveryRepo {
 
             const params: Record<string, string | number> = {
                 days,
-                workspaceId: unprefixId(workspaceId)!,
-                namespaceId: unprefixId(namespaceId)!,
+                workspaceId: prefixId(workspaceId, 'workspace') as string,
+                namespaceId: prefixId(namespaceId, 'namespace') as string,
             };
 
             const statsQuery = `
@@ -842,21 +880,9 @@ export class DeliveryRepo {
                     pending_deliveries: 0,
                     average_delivery_time: null,
                 },
-                deliveryTrends: resultDeliveryTrends.length ? resultDeliveryTrends : [],
-                topEventTypes: resultTopEventTypes || [
-                    {
-                        target: '',
-                        event_type: '',
-                        total: 0,
-                    },
-                ],
-                statusCodeDistribution: resultStatusCodeDistribution || [
-                    {
-                        target: '',
-                        response_code: 0,
-                        total: 0,
-                    },
-                ],
+                deliveryTrends: (transformWithId(resultDeliveryTrends, 'delivery') as any[]),
+                topEventTypes: (transformWithId(resultTopEventTypes, 'event') as any[]),
+                statusCodeDistribution: (transformWithId(resultStatusCodeDistribution, 'target') as any[]),
             };
         } catch (error) {
             logger.error('Failed to get stats ', error as Error);

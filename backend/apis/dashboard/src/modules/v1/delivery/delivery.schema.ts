@@ -88,7 +88,7 @@ export const OverviewFilterSchema = z.object({
     ]),
 });
 export const GetDeliveryByIdSchema = z.object({
-    deliveryId: z.string().uuidv4(),
+    deliveryId: z.string().regex(/^del_[0-9]+$/),
 });
 export const GetDeliveriesBySourceIdSchema = z.object({
     sourceId: objectIdSchema,

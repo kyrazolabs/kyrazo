@@ -13,6 +13,8 @@ import {
     generateIngressId,
     decryptSourceSecrets,
     unprefixId,
+    prefixId,
+    ID_PREFIXES,
 } from '@kyrazo/shared';
 import { config } from '@/configs';
 
@@ -32,7 +34,7 @@ export class SourceService {
 
         if (valid.authentication.type === 'service' && valid.authentication.service) {
             const encrypted = secretCrypto.encrypt(
-                namespaceId,
+                this.deriveNamespaceKey(namespaceId),
                 valid.authentication.service.secret
             );
             processedAuth = {
@@ -108,16 +110,7 @@ export class SourceService {
                 limit,
                 page,
             });
-            // Decrypt secrets for all sources before returning
-            // const decryptedSources = sources.map(source =>
-            //     decryptSourceSecrets(source)
-            // );
-            // return { sources: decryptedSources, total };
-            const sanitizedSources = sources.map(source => {
-                const s = { ...source };
-                delete s.authentication;
-                return s;
-            });
+            const sanitizedSources = sources.map(source => this.sanitizeSource(source));
             return { sources: sanitizedSources, total };
         } catch (error) {
             logger.error('Failed to get sources:', error as Error);
@@ -131,11 +124,7 @@ export class SourceService {
             if (!source) {
                 throw new Error('Source not found');
             }
-            // Decrypt secrets before returning
-            // return decryptSourceSecrets(source);
-            const s = { ...source };
-            delete s.authentication;
-            return s;
+            return this.sanitizeSource(source);
         } catch (error) {
             logger.error('Failed to get source by id:', error as Error);
             throw error;
@@ -165,7 +154,7 @@ export class SourceService {
             if (!updated) {
                 throw new Error('Failed to update source');
             }
-            return decryptSourceSecrets(updated);
+            return this.sanitizeSource(updated);
         } catch (error) {
             logger.error('Failed to update source:', error as Error);
             throw error;
@@ -204,7 +193,7 @@ export class SourceService {
 
             if (valid.authentication.type === 'service' && valid.authentication.service) {
                 const encrypted = secretCrypto.encrypt(
-                    namespaceId,
+                    this.deriveNamespaceKey(namespaceId),
                     valid.authentication.service.secret
                 );
                 processedAuth = {
@@ -232,6 +221,18 @@ export class SourceService {
             logger.error('Failed to update source auth:', error as Error);
             throw error;
         }
+    }
+
+    private sanitizeSource(source: ISource): any {
+        const s = (source as any).toObject ? (source as any).toObject() : { ...source };
+        if (s.authentication) {
+            delete s.authentication;
+        }
+        return s;
+    }
+
+    private deriveNamespaceKey(namespaceId: string | Types.ObjectId): string {
+        return prefixId(namespaceId, 'namespace') || namespaceId.toString();
     }
 }
 

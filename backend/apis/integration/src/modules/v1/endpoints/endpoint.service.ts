@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 import type { CreateEndpointInput } from './endpoint.schema';
-import { secretCrypto } from '@kyrazo/shared';
+import { secretCrypto, prefixId } from '@kyrazo/shared';
 import { endpointRepository } from './endpoint.repo';
 import { logger } from '@kyrazo/shared';
 
@@ -12,7 +12,10 @@ export class EndpointService {
         namespaceId: Types.ObjectId
     ) {
         const secret = secretCrypto.generateSourceSecret();
-        const encryptedSecret = secretCrypto.encrypt(namespaceId.toString(), secret);
+        const encryptedSecret = secretCrypto.encrypt(
+            this.deriveNamespaceKey(namespaceId.toString()),
+            secret
+        );
         const data = {
             ...valid,
             userId: new Types.ObjectId(userId),
@@ -85,11 +88,39 @@ export class EndpointService {
             if (!activeSecret) {
                 throw new Error('Active secret not found');
             }
-            const secret = secretCrypto.decrypt(
-                activeSecret.value_enc,
-                activeSecret.iv,
-                namespaceId
-            );
+
+            let secret: string;
+            const prefixedKey = this.deriveNamespaceKey(namespaceId);
+
+            try {
+                // Try with prefixed key first
+                secret = secretCrypto.decrypt(activeSecret.value_enc, activeSecret.iv, prefixedKey);
+            } catch (error) {
+                try {
+                    // Fallback to raw namespaceId
+                    secret = secretCrypto.decrypt(
+                        activeSecret.value_enc,
+                        activeSecret.iv,
+                        namespaceId
+                    );
+
+                    // Migration: Re-encrypt and persist with prefixed key
+                    const migrated = secretCrypto.encrypt(prefixedKey, secret);
+                    await endpointRepository.updateSecret(endpointId, activeSecret.kid, {
+                        value_enc: migrated.encrypted,
+                        iv: migrated.iv,
+                    });
+
+                    logger.info(`Migrated endpoint secret for ${endpointId} to prefixed key`);
+                } catch (innerError) {
+                    logger.error(
+                        'Failed to decrypt endpoint secret with both prefixed and raw keys',
+                        innerError as Error
+                    );
+                    throw new Error('Failed to get endpoint secret');
+                }
+            }
+
             return secret;
         } catch (error) {
             logger.error('Failed to get endpoint secret:', error as Error);
@@ -147,6 +178,10 @@ export class EndpointService {
             logger.error('Failed to delete endpoint:', error as Error);
             throw new Error('Failed to delete endpoint');
         }
+    }
+
+    private deriveNamespaceKey(namespaceId: string | Types.ObjectId): string {
+        return prefixId(namespaceId, 'namespace') || namespaceId.toString();
     }
 }
 

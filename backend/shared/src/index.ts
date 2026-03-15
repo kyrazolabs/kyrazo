@@ -1,5 +1,6 @@
 export * from './configs';
 export * from './utils';
+export * from './utils/snowflake';
 export * from './models/mongodb';
 export * from './models/postgres';
 export * from './schemas';
