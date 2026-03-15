@@ -105,7 +105,7 @@ analytics.get(
  * @title Get by Target stats
  */
 analytics.get(
-    '/targets/:target/overview',
+    '/targets/:targetId/overview',
     analyticsRateLimiter,
     zValidator('param', TargetQuerySchema, (result, c) => {
         if (!result.success) {
