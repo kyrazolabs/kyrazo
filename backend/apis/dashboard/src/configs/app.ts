@@ -1,5 +1,4 @@
 import * as dotenv from 'dotenv';
-import { AckPolicy, DeliverPolicy } from 'nats';
 
 // Load environment variables
 dotenv.config({ path: './backend/api/.env' });
@@ -18,6 +17,7 @@ const requiredEnvVars = [
     'STRIPE_MAIN_PRODUCT_ID',
     'BILLING_BASE_URL',
     'BILLING_ADMIN_EMAIL',
+    'SENTRY_DSN',
 ];
 
 console.log('Checking required env vars:');
@@ -237,16 +237,8 @@ export const config = {
 
     // Logging Configuration
     logging: {
-        level: process.env.LOG_LEVEL || 'info',
-        file: process.env.LOG_FILE,
-        errorFile: process.env.ERROR_LOG_FILE,
-        meta: {
-            service: process.env.APP_NAME,
-            env: process.env.NODE_ENV,
-            pid: process.pid,
-        },
-        error: {
-            exitOnError: false,
+        sentry: {
+            dsn: process.env.SENTRY_DSN!,
         },
     },
 

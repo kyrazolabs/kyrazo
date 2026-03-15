@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { NamespaceHeadersSchema } from '@/core/utils/libs/zod';
 import { AppContext, authenticate } from '@/core/middlewares/auth.middleware';
+import { sentryMiddleware } from '@/core/middlewares/sentry.middleware';
 import {
     createRateLimitMiddleware,
     createSlidingWindowLimiter,
@@ -47,6 +48,7 @@ const ingestRateLimiter = async (c: AppContext, next: () => Promise<void>) => {
 };
 
 ingest.use('*', authenticate);
+ingest.use('*', sentryMiddleware);
 ingest.use('*', validateNamespaceHeaders);
 ingest.use('*', requireWorkspaceMembership(['owner', 'admin', 'member']));
 ingest.use('*', requireNamespaceAccess());

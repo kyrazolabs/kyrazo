@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { NamespaceHeadersSchema } from '@kyrazo/shared';
 import { authenticate } from '@/core/middlewares/auth.middleware';
+import { sentryMiddleware } from '@/core/middlewares/sentry.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
 import { requireNamespaceAccess } from '@/core/middlewares/namespace.middleware';
 import { zValidator } from '@/core/middlewares/validator.middleware';
@@ -20,6 +21,7 @@ const target = new Hono();
 const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema);
 
 target.use('*', authenticate);
+target.use('*', sentryMiddleware);
 target.use('*', validateNamespaceHeaders);
 target.use('*', requireWorkspaceMembership(['owner', 'admin', 'member']));
 target.use('*', requireNamespaceAccess());
