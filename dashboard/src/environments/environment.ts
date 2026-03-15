@@ -66,13 +66,13 @@ export const environment = {
             `https://api.kyrazo.com/dashboard/v1/deliveries/${id}`,
         gets: `https://api.kyrazo.com/dashboard/v1/deliveries`,
         getTargets: `https://api.kyrazo.com/dashboard/v1/deliveries/targets`,
-        getByTarget: (target: string) =>
-            `https://api.kyrazo.com/dashboard/v1/deliveries/targets/${target}`,
+        getByTarget: (targetId: string) =>
+            `https://api.kyrazo.com/dashboard/v1/deliveries/targets/${targetId}`,
         getBySource: (id: string) =>
             `https://api.kyrazo.com/dashboard/v1/deliveries/webhook/${id}`,
         getStats: `https://api.kyrazo.com/dashboard/v1/deliveries/stats`,
-        getStatsByTarget: (target: string) =>
-            `https://api.kyrazo.com/dashboard/v1/deliveries/targets/${target}/overview`,
+        getStatsByTarget: (targetId: string) =>
+            `https://api.kyrazo.com/dashboard/v1/deliveries/targets/${targetId}/overview`,
     },
     key: {
         create: `https://api.kyrazo.com/dashboard/v1/keys`,
@@ -151,8 +151,8 @@ export const environment = {
     analytics: {
         dispatchUsage: `https://api.kyrazo.com/dashboard/v1/analytics/dispatch/usage`,
         ingestUsage: `https://api.kyrazo.com/dashboard/v1/analytics/ingest/usage`,
-        targetOverview: (target: string) =>
-            `https://api.kyrazo.com/dashboard/v1/analytics/targets/${target}/overview`,
+        targetOverview: (targetId: string) =>
+            `https://api.kyrazo.com/dashboard/v1/analytics/targets/${targetId}/overview`,
     },
     sentry: {
         dsn: 'https://c3803071d2f195c52eb7a5e915b895fc@o4510640976625664.ingest.de.sentry.io/4510640978657360',

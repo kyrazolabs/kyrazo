@@ -53,12 +53,12 @@ export const environment = {
         get: (id: string) => `${baseUrl}/v1/deliveries/${id}`,
         gets: `${baseUrl}/v1/deliveries`,
         getTargets: `${baseUrl}/v1/deliveries/targets`,
-        getByTarget: (target: string) =>
-            `${baseUrl}/v1/deliveries/targets/${target}`,
+        getByTarget: (targetId: string) =>
+            `${baseUrl}/v1/deliveries/targets/${targetId}`,
         getBySource: (id: string) => `${baseUrl}/v1/deliveries/webhook/${id}`,
         getStats: `${baseUrl}/v1/deliveries/stats`,
-        getStatsByTarget: (target: string) =>
-            `${baseUrl}/v1/deliveries/targets/${target}/overview`,
+        getStatsByTarget: (targetId: string) =>
+            `${baseUrl}/v1/deliveries/targets/${targetId}/overview`,
     },
     key: {
         create: `${baseUrl}/v1/keys`,
@@ -121,8 +121,8 @@ export const environment = {
     analytics: {
         dispatchUsage: `${baseUrl}/v1/analytics/dispatch/usage`,
         ingestUsage: `${baseUrl}/v1/analytics/ingest/usage`,
-        targetOverview: (target: string) =>
-            `${baseUrl}/v1/analytics/targets/${target}/overview`,
+        targetOverview: (targetId: string) =>
+            `${baseUrl}/v1/analytics/targets/${targetId}/overview`,
     },
     sentry: {
         dsn: 'https://c3803071d2f195c52eb7a5e915b895fc@o4510640976625664.ingest.de.sentry.io/4510640978657360',

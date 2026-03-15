@@ -127,7 +127,7 @@ export class DeliveryService {
             .pipe(catchError(this.handleError));
     }
     getByTarget(
-        target: string,
+        targetId: string,
         queryParams?: {
             q?: string;
             status?:
@@ -160,7 +160,7 @@ export class DeliveryService {
         return this.http
             .get<
                 ApiResponse<IDeliveryAttempt[]>
-            >(environment.delivery.getByTarget(target), { params })
+            >(environment.delivery.getByTarget(targetId), { params })
             .pipe(catchError(this.handleError));
     }
     getBySource(id: string): Observable<ApiResponse<IDeliveryAttempt[]>> {
@@ -192,7 +192,7 @@ export class DeliveryService {
     }
 
     getTargetOverview(
-        target: string,
+        targetId: string,
         queryParams?: { days?: string },
     ): Observable<
         ApiResponse<{
@@ -252,7 +252,7 @@ export class DeliveryService {
                         total: number;
                     }[];
                 }>
-            >(environment.analytics.targetOverview(target), { params })
+            >(environment.analytics.targetOverview(targetId), { params })
             .pipe(catchError(this.handleError));
     }
 
