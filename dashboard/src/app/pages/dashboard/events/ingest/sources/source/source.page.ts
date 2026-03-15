@@ -530,7 +530,7 @@ export class SourcePage implements OnInit, AfterViewInit {
 
     private updateSourceEndpoints(sourceId: string, endpointIds: string[]) {
         this.loader.show();
-        this.sourceService.update(sourceId, { endpoints: endpointIds as any }).subscribe({
+        this.sourceService.update(sourceId, { endpoints: endpointIds }).subscribe({
             next: () => {
                 this.mes.add({
                     severity: 'success',
