@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { AppContext, authenticate } from '@/core/middlewares/auth.middleware';
+import { sentryMiddleware } from '@/core/middlewares/sentry.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
 import { requireNamespaceAccess } from '@/core/middlewares/namespace.middleware';
 import { config } from '@/configs/app';
@@ -53,6 +54,7 @@ const deliveryRateLimiter = async (c: AppContext, next: () => Promise<void>) => 
 };
 
 delivery.use('*', authenticate);
+delivery.use('*', sentryMiddleware);
 delivery.use('*', validateNamespaceHeaders);
 delivery.use('*', requireWorkspaceMembership(['owner', 'admin', 'member']));
 delivery.use('*', requireNamespaceAccess());

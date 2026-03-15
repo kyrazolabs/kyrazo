@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { AppContext, authenticate } from '@/core/middlewares/auth.middleware';
+import { sentryMiddleware } from '@/core/middlewares/sentry.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
 import { requireNamespaceAccess } from '@/core/middlewares/namespace.middleware';
 import { config } from '@/configs/app';
@@ -49,6 +50,7 @@ const analyticsRateLimiter = async (c: AppContext, next: () => Promise<void>) =>
 };
 
 analytics.use('*', authenticate);
+analytics.use('*', sentryMiddleware);
 analytics.use('*', validateNamespaceHeaders);
 analytics.use('*', requireWorkspaceMembership(['owner', 'admin', 'member']));
 analytics.use('*', requireNamespaceAccess());

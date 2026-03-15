@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { AppContext } from '@/core/middlewares/auth.middleware';
 import { authenticate } from '@/core/middlewares/auth.middleware';
+import { sentryMiddleware } from '@/core/middlewares/sentry.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
 import { requireNamespaceAccess } from '@/core/middlewares/namespace.middleware';
 import { zValidator } from '@hono/zod-validator';
@@ -66,6 +67,7 @@ const sourceWriteRateLimiter = async (c: AppContext, next: () => Promise<void>) 
 };
 
 source.use('*', authenticate);
+source.use('*', sentryMiddleware);
 source.use('*', validateNamespaceHeaders);
 source.use('*', requireWorkspaceMembership(['owner', 'admin', 'member']));
 source.use('*', requireNamespaceAccess());

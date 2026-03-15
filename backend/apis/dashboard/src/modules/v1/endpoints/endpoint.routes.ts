@@ -3,6 +3,7 @@ import { zValidator } from '@hono/zod-validator';
 import { AppContext } from '@/core/middlewares/auth.middleware';
 
 import { authenticate } from '@/core/middlewares/auth.middleware';
+import { sentryMiddleware } from '@/core/middlewares/sentry.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
 import { requireNamespaceAccess } from '@/core/middlewares/namespace.middleware';
 import { config } from '@/configs/app';
@@ -67,6 +68,7 @@ const endpointWriteRateLimiter = async (c: AppContext, next: () => Promise<void>
 };
 
 endpoint.use('*', authenticate);
+endpoint.use('*', sentryMiddleware);
 endpoint.use('*', validateNamespaceHeaders);
 endpoint.use('*', requireWorkspaceMembership(['owner', 'admin', 'member']));
 endpoint.use('*', requireNamespaceAccess());

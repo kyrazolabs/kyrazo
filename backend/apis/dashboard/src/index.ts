@@ -1,5 +1,8 @@
-import { Hono } from 'hono';
+import './instrument';
+import { Context, Hono, Next } from 'hono';
+import * as Sentry from '@sentry/bun';
 import { logger as honoLogger } from 'hono/logger';
+import { HTTPException } from 'hono/http-exception';
 import { requestId as RequestId } from 'hono/request-id';
 import { cors } from 'hono/cors';
 
@@ -14,6 +17,7 @@ import {
     Namespace,
     postgresConfig,
     logger,
+    IErrorResponse,
 } from '@kyrazo/shared';
 // import { arcjetMiddleware } from '@/core/middlewares/arcjet.middleware'
 import { errorHandler } from 'hono-error-handler';
@@ -27,8 +31,9 @@ import { usageService } from '@/shared/services/usage.service';
 import { serveStatic } from 'hono/bun';
 
 import v1Router from './modules';
+import { AppContext } from './core/middlewares/auth.middleware';
 
-const app = new Hono();
+const app = new Hono().route('/v1', v1Router);
 
 // Global middleware
 app.use('*', RequestId());
@@ -54,12 +59,12 @@ app.use('*', zodErrorHandler); // قبل errorHandler
 // Security middleware
 // app.use('*', arcjetMiddleware)
 
-// Mount API routes
-app.route('/v1', v1Router);
-
 // Error handler
 const errorHandlers = [handleMongooseErrors];
 app.onError((err, c) => {
+    // Report unhandled errors to Sentry
+    Sentry.captureException(err);
+
     logger.error('Unhandled Application Error', err as Error, {
         path: c.req.path,
         method: c.req.method,
