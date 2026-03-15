@@ -127,10 +127,16 @@
                     </label>
                     <p-inputNumber id="timeout" formControlName="timeout" [min]="100" [max]="60000"
                         [showButtons]="false" suffix=" ms" inputStyleClass="rounded-xl!" styleClass="w-full"
-                        [disabled]="!hasCustomTimeout()" [pTooltip]="!hasCustomTimeout() ? 'Custom timeout is not included in your plan' : ''" tooltipPosition="top" />
-                    <small class="text-surface-600 dark:text-surface-400">
+                        [disabled]="!hasCustomTimeout()" [pTooltip]="!hasCustomTimeout() ? 'Custom timeout is not included in your plan' : ''" tooltipPosition="top"
+                        [attr.aria-describedby]="!hasCustomTimeout() ? 'timeout-pro-note' : 'timeout-help'" />
+                    <small id="timeout-help" class="text-surface-600 dark:text-surface-400">
                         Max wait time for response
                     </small>
+                    @if (!hasCustomTimeout()) {
+                        <small id="timeout-pro-note" role="note" class="text-primary font-medium">
+                            Included in Pro plan
+                        </small>
+                    }
                 </div>
 
                 <!-- Retry Count -->
@@ -140,10 +146,16 @@
                     </label>
                     <p-inputNumber id="retryCount" formControlName="retryCount" [min]="0" [max]="10"
                         [showButtons]="false" inputStyleClass="rounded-xl!" styleClass="w-full"
-                        [disabled]="!hasCustomRetries()" [pTooltip]="!hasCustomRetries() ? 'Custom retries are not included in your plan' : ''" tooltipPosition="top" />
-                    <small class="text-surface-600 dark:text-surface-400">
+                        [disabled]="!hasCustomRetries()" [pTooltip]="!hasCustomRetries() ? 'Custom retries are not included in your plan' : ''" tooltipPosition="top"
+                        [attr.aria-describedby]="!hasCustomRetries() ? 'retries-pro-note' : 'retries-help'" />
+                    <small id="retries-help" class="text-surface-600 dark:text-surface-400">
                         Attempts on failure
                     </small>
+                    @if (!hasCustomRetries()) {
+                        <small id="retries-pro-note" role="note" class="text-primary font-medium">
+                            Included in Pro plan
+                        </small>
+                    }
                 </div>
 
                 <!-- Rate Limit -->
