@@ -142,7 +142,7 @@ export class IngestRepo {
             ]);
 
             const data = await rows.json<SQLIngestEvent>();
-            const total = (await countRows.json<{ total: number }>())[0]?.total ?? 0;
+            const total = (await countRows.json<{ total: number }>())?.[0]?.total ?? 0;
             const transformedData = transformWithId(data, 'event') as SQLIngestEvent[];
 
             return { data: transformedData, total };
@@ -203,7 +203,7 @@ export class IngestRepo {
             ]);
 
             const data = await rows.json<SQLIngestEvent>();
-            const total = (await countRows.json<{ total: number }>())[0].total;
+            const total = (await countRows.json<{ total: number }>())?.[0]?.total ?? 0;
             const transformedData = transformWithId(data, 'event') as SQLIngestEvent[];
 
             return { data: transformedData, total };

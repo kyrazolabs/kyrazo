@@ -109,7 +109,7 @@ export class DeliveryRepo {
             ]);
 
             const data = await rows.json<SQLDeliveryAttempt>();
-            const total = (await countRows.json<{ total: number }>())[0]?.total ?? 0;
+            const total = (await countRows.json<{ total: number }>())?.[0]?.total ?? 0;
             const transformedData = transformWithId(data, 'delivery') as SQLDeliveryAttempt[];
 
             return { data: transformedData, total };
@@ -198,7 +198,7 @@ export class DeliveryRepo {
                 success: number;
                 failed: number;
             }>();
-            const total = (await countRows.json<{ total: number }>())[0]?.total ?? 0;
+            const total = (await countRows.json<{ total: number }>())?.[0]?.total ?? 0;
 
             const transformedData = transformWithId(data, 'target') as any[];
 
@@ -266,7 +266,7 @@ export class DeliveryRepo {
             ]);
 
             const data = await rows.json<SQLDeliveryAttempt>();
-            const total = (await countRows.json<{ total: number }>())[0]?.total ?? 0;
+            const total = (await countRows.json<{ total: number }>())?.[0]?.total ?? 0;
             const transformedData = transformWithId(data, 'delivery') as SQLDeliveryAttempt[];
 
             return { data: transformedData, total };
@@ -327,7 +327,7 @@ export class DeliveryRepo {
             ]);
 
             const data = await rows.json<SQLDeliveryAttempt>();
-            const total = (await countRows.json<{ total: number }>())[0].total;
+            const total = (await countRows.json<{ total: number }>())?.[0]?.total ?? 0;
 
             const transformedData = transformWithId(data, 'delivery') as SQLDeliveryAttempt[];
 
