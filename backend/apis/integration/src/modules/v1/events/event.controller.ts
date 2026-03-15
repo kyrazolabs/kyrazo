@@ -268,7 +268,7 @@ export class EventController {
             timer.end();
             logger.error('Unexpected error in EventController.publishEvent', error as Error);
             await redisConfig.set(
-                `idem:${unprefixId(c.req.workspace.workspaceId)}:${c.req.path}:${c.idempotencyKey}`,
+                `idem:${unprefixId(c.workspace?.workspaceId?.toString() || '')}:${c.req.path}:${c.idempotencyKey}`,
                 JSON.stringify({
                     status: 'failed',
                     response: 'Unexpected error',
@@ -563,7 +563,7 @@ export class EventController {
             timer.end();
             logger.error('Unexpected error in EventController.publishEvents', error as Error);
             await redisConfig.set(
-                `idem:${unprefixId(c.req.workspace.workspaceId)}:${c.req.path}:${c.idempotencyKey}`,
+                `idem:${unprefixId(c.workspace?.workspaceId?.toString() || '')}:${c.req.path}:${c.idempotencyKey}`,
                 JSON.stringify({
                     status: 'failed',
                     response: 'Unexpected error',
