@@ -13,18 +13,7 @@ const objectIdSchema = z
     .regex(/^[0-9a-fA-F]{24}$/, 'Invalid ID format');
 
 export const TargetQuerySchema = z.object({
-    target: z
-        .string()
-        .min(1)
-        .refine(encoded => {
-            try {
-                const base64 = decodeURIComponent(encoded);
-                // Check Base64 structure only (لا تفك الداتا هنا)
-                return /^[A-Za-z0-9+/=]+$/.test(base64);
-            } catch {
-                return false;
-            }
-        }, 'Invalid encoded target'),
+    targetId: objectIdSchema,
 });
 
 export const GetDeliveriesBySourceSchema = z.object({

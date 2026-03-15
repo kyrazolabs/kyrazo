@@ -109,7 +109,7 @@ delivery.get(
  * @title Get by Target
  */
 delivery.get(
-    '/targets/:target',
+    '/targets/:targetId',
     deliveryRateLimiter,
     zValidator('param', TargetQuerySchema, (result, c) => {
         if (!result.success) {
@@ -148,7 +148,7 @@ delivery.get(
  * @title Get by Target stats
  */
 delivery.get(
-    '/targets/:target/overview',
+    '/targets/:targetId/overview',
     deliveryRateLimiter,
     zValidator('param', TargetQuerySchema, (result, c) => {
         if (!result.success) {

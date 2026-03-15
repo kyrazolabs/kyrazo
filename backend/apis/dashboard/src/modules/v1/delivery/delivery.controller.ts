@@ -238,10 +238,10 @@ export class DeliveryController {
             // @ts-ignore
             const { limit = 10, page = 1 }: IFilterDelivery = c.req.valid('query');
             // @ts-ignore
-            const { target }: GetDeliveriesByTargetInput = c.req.valid('param');
+            const { targetId }: GetDeliveriesByTargetInput = c.req.valid('param');
 
             const { data: deliveries, total } = await DeliveryRepo.getDeliveriesByTarget(
-                target,
+                targetId,
                 workspaceId.toString(),
                 namespaceId.toString(),
                 limit,
@@ -348,7 +348,7 @@ export class DeliveryController {
             }
 
             // @ts-ignore
-            const { target }: GetDeliveriesByTargetInput = c.req.valid('param');
+            const { targetId }: GetDeliveriesByTargetInput = c.req.valid('param');
             // @ts-ignore
             const { days }: OverviewFilterInput = c.req.valid('query');
 
@@ -357,7 +357,7 @@ export class DeliveryController {
             const { stats, deliveryTrends, topEventTypes, statusCodeDistribution } =
                 await DeliveryRepo.getDeliveriesOverviewByTarget(
                     parseInt(last),
-                    target,
+                    targetId,
                     workspaceId.toString(),
                     namespaceId.toString()
                 );

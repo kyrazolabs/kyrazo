@@ -14,7 +14,7 @@ const objectIdSchema = z
     .regex(/^[0-9a-fA-F]{24}$/, 'Invalid ID format');
 
 export const TargetQuerySchema = z.object({
-    target: objectIdSchema,
+    targetId: objectIdSchema,
 });
 
 export const GetDeliveriesBySourceSchema = z.object({
