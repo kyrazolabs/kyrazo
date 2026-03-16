@@ -1,7 +1,7 @@
 services:
   dashboard-api:
     build:
-      context: ../../
+      context: .
       dockerfile: apis/dashboard/Dockerfile
     container_name: kyrazo-dashboard-api
     ports:
