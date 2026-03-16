@@ -106,14 +106,8 @@
                         </div>
                     </td>
                     <td class="text-center!">
-                        <div class="flex justify-center  gap-2">
-                             <p-button [icon]="target.enabled ? 'pi pi-pause' : 'pi pi-play'"
-                                [outlined]="true" size="small"
-                                [severity]="target.enabled ? 'warn' : 'success'"
-                                (onClick)="toggleStatus(target)"
-                                [pTooltip]="target.enabled ? 'Pause' : 'Activate'" tooltipPosition="top"
-                                styleClass="rounded-xl!" tooltipStyleClass="text-xs! rounded-xl!" />
-                            <p-button icon="pi pi-pencil" [outlined]="true" size="small" severity="secondary"
+                        <div class="flex justify-center gap-2">
+                            <p-button icon="pi pi-pencil" [outlined]="true" size="small" severity="primary"
                                 (onClick)="openEditDialog(target.id)" pTooltip="Edit" tooltipPosition="top"
                                 styleClass="rounded-xl!" tooltipStyleClass="text-xs! rounded-xl!" />
                             <p-button icon="pi pi-trash" [outlined]="true" size="small" severity="danger"
