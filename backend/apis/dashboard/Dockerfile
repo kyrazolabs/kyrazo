@@ -30,11 +30,13 @@ COPY apis/dashboard ./
 FROM oven/bun:${BUN_VERSION}-alpine AS runner
 WORKDIR /app
 
+# Install su-exec for dropping privileges from root
+RUN apk add --no-cache su-exec
+
 # Copy all installed dependencies
 COPY --from=builder /app/apis/dashboard/node_modules /app/apis/dashboard/node_modules
 
 # FORCE COPY Shared into node_modules (replaces symlink with actual code)
-# We copy /app/shared (which is built) to /app/apis/dashboard/node_modules/@kyrazo/shared
 RUN rm -rf /app/apis/dashboard/node_modules/@kyrazo/shared && mkdir -p /app/apis/dashboard/node_modules/@kyrazo/shared
 COPY --from=builder /app/shared /app/apis/dashboard/node_modules/@kyrazo/shared
 
@@ -49,14 +51,15 @@ COPY --from=builder /app/apis/dashboard/src /app/apis/dashboard/src
 # Set working directory to dashboard package
 WORKDIR /app/apis/dashboard
 
-# Pre-create logs directory with correct permissions
+# Pre-create logs directory
 RUN mkdir -p /app/apis/dashboard/logs && chown -R bun:bun /app/apis/dashboard/logs
 
-# Ensure everything is owned by the bun user before switching
-RUN chown -R bun:bun /app
+# Copy and setup entrypoint script
+COPY apis/dashboard/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Run as non-root user for security
-USER bun
+# Ensure everything is owned by the bun user (for non-volume cases)
+RUN chown -R bun:bun /app
 
 # Expose the application port
 EXPOSE ${PORT}
@@ -65,5 +68,5 @@ EXPOSE ${PORT}
 HEALTHCHECK  --start-period=20s --interval=30s --timeout=3s --retries=3 \
     CMD wget -qO- http://127.0.0.1:${PORT}/v1/health || exit 1
 
-# Start the application
-CMD ["bun", "run", "src/index.ts"]
+# Entrypoint runs as root to fix log dir permissions, then drops to bun
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
