@@ -15,7 +15,7 @@ export const config = {
     // Database Configuration
     database: {
         uri: process.env.MONGODB_URI!,
-        dbName: process.env.DB_NAME!,
+        dbName: process.env.MONGODB_DB_NAME! || process.env.DB_NAME!,
         maxPoolSize: parseInt(process.env.MONGODB_MAX_POOL_SIZE || '10'),
         minPoolSize: parseInt(process.env.MONGODB_MIN_POOL_SIZE || '2'),
         serverSelectionTimeoutMS: parseInt(
