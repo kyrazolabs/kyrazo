@@ -16,6 +16,16 @@ export const config = {
     database: {
         uri: process.env.MONGODB_URI!,
         dbName: process.env.DB_NAME!,
+        maxPoolSize: parseInt(process.env.MONGODB_MAX_POOL_SIZE || '10'),
+        minPoolSize: parseInt(process.env.MONGODB_MIN_POOL_SIZE || '2'),
+        serverSelectionTimeoutMS: parseInt(
+            process.env.MONGODB_SERVER_SELECTION_TIMEOUT_MS || '10000'
+        ),
+        socketTimeoutMS: parseInt(process.env.MONGODB_SOCKET_TIMEOUT_MS || '45000'),
+        connectTimeoutMS: parseInt(process.env.MONGODB_CONNECT_TIMEOUT_MS || '10000'),
+        heartbeatFrequencyMS: parseInt(process.env.MONGODB_HEARTBEAT_FREQUENCY_MS || '10000'),
+        retryWrites: process.env.MONGODB_RETRY_WRITES !== 'false',
+        retryReads: process.env.MONGODB_RETRY_READS !== 'false',
     },
 
     clickhouse: {
@@ -27,16 +37,10 @@ export const config = {
 
     // Postgres Configuration
     postgres: {
-        url:
-            process.env.POSTGRES_URL ||
-            'postgresql://postgres:postgres@localhost:5432/postgres',
+        url: process.env.POSTGRES_URL || 'postgresql://postgres:postgres@localhost:5432/postgres',
         max: parseInt(process.env.POSTGRES_MAX_POOL || '20'),
-        idleTimeoutMillis: parseInt(
-            process.env.POSTGRES_IDLE_TIMEOUT || '30000'
-        ),
-        connectionTimeoutMillis: parseInt(
-            process.env.POSTGRES_CONNECTION_TIMEOUT || '2000'
-        ),
+        idleTimeoutMillis: parseInt(process.env.POSTGRES_IDLE_TIMEOUT || '30000'),
+        connectionTimeoutMillis: parseInt(process.env.POSTGRES_CONNECTION_TIMEOUT || '2000'),
     },
 
     // Redis Configuration
@@ -49,13 +53,8 @@ export const config = {
         queue: {
             url: process.env.QUEUE_REDIS_URL!,
             host: process.env.QUEUE_REDIS_HOST || process.env.REDIS_HOST!,
-            port: parseInt(
-                process.env.QUEUE_REDIS_PORT || process.env.REDIS_PORT!
-            ),
-            password:
-                process.env.QUEUE_REDIS_PASSWORD ||
-                process.env.REDIS_PASSWORD ||
-                '',
+            port: parseInt(process.env.QUEUE_REDIS_PORT || process.env.REDIS_PORT!),
+            password: process.env.QUEUE_REDIS_PASSWORD || process.env.REDIS_PASSWORD || '',
             db: parseInt(process.env.QUEUE_REDIS_DB || '1'),
         },
     },
@@ -68,17 +67,11 @@ export const config = {
 
     // Logging Configuration
     logging: {
-        level: process.env.LOG_LEVEL || 'info',
-        file: process.env.LOG_FILE,
-        errorFile: process.env.ERROR_LOG_FILE,
         meta: {
             service: process.env.APP_NAME,
             version: process.env.APP_VERSION || '1.0.0',
             env: process.env.NODE_ENV,
             pid: process.pid,
-        },
-        error: {
-            exitOnError: false,
         },
     },
 

@@ -61,9 +61,14 @@ export class DatabaseConfig {
 
             await mongoose.connect(mongoUri, {
                 dbName: config.database.dbName!,
-                maxPoolSize: 10,
-                serverSelectionTimeoutMS: 10000,
-                socketTimeoutMS: 45000,
+                maxPoolSize: config.database.maxPoolSize,
+                minPoolSize: config.database.minPoolSize,
+                serverSelectionTimeoutMS: config.database.serverSelectionTimeoutMS,
+                socketTimeoutMS: config.database.socketTimeoutMS,
+                connectTimeoutMS: config.database.connectTimeoutMS,
+                heartbeatFrequencyMS: config.database.heartbeatFrequencyMS,
+                retryWrites: config.database.retryWrites,
+                retryReads: config.database.retryReads,
                 bufferCommands: false,
                 // bufferMaxEntries: 0,
             });
