@@ -65,10 +65,11 @@ services:
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - SENTRY_DSN=${SENTRY_DSN}
-
+    volumes:
+      - /data/coolify/applications/${COOLIFY_RESOURCE_UUID}/logs:/app/apis/dashboard/logs
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:${PORT:-3003}/v1/health"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:${PORT}/v1/health"]
       interval: 30s
       timeout: 3s
       retries: 3
