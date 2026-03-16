@@ -383,12 +383,6 @@ export class LoginPage implements OnInit {
 
     onForgotPassword(): void {
         // You can implement forgot password functionality here
-        this.messageService.add({
-            severity: 'info',
-            summary: 'Forgot Password',
-            detail: 'Forgot password functionality will be implemented soon',
-            life: 3000,
-        });
         this.router.navigate(['/auth/forget-password']);
     }
 
