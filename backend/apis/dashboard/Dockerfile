@@ -56,7 +56,7 @@ RUN chown -R bun:bun /app
 USER bun
 
 # Expose the application port
-EXPOSE 3000
+EXPOSE ${PORT}
 
 # Healthcheck
 HEALTHCHECK  --start-period=20s --interval=30s --timeout=3s --retries=3 \

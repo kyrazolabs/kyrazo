@@ -16,36 +16,8 @@ export class AutoScalerService {
     static async reconcile() {
         console.log('⚖️ Reconciling Worker State...');
 
-        try {
-            await WorkerService.reconcileServerCounts();
-        } catch (err: any) {
-            console.warn(`[AutoScaler] Server sync error: ${err.message}`);
-        }
-
-        // 1. Fetch ALL known clients that have workers in NOT STOPPED state
-        const activeClientsRes = await db
-            .select({ clientId: workers.client_id })
-            .from(workers)
-            .where(inArray(workers.status, ['pending', 'starting', 'running', 'stopping']))
-            .groupBy(workers.client_id);
-
-        const clientsWithWorkers = new Set(activeClientsRes.map(c => c.clientId));
-
-        // 2. Fetch all ACTIVE/TRIALING subscriptions from Mongo
-        const subscriptions = await Subscription.find({
-            status: { $in: ['active', 'trialing'] },
-        });
-
-        // 3. Merge both lists to ensure we process everyone:
-        // - Those who have a subscription (Scale UP/DOWN)
-        // - Those who have NO subscription but have workers (Scale DOWN to 0)
-        const subscriptionClientMap = new Map(subscriptions.map(s => [s.workspaceId.toString(), s]));
-
-        // Final set of client IDs to process
-        const allClientIds = new Set([...clientsWithWorkers, ...subscriptionClientMap.keys()]);
-
-        // 4. Fetch global state from Coolify ONCE per reconciliation loop
-        let allApps = [];
+        // 0. Fetch global Coolify state ONCE per reconciliation loop
+        let allApps: any[] = [];
         try {
             allApps = (await getApplications()) || [];
         } catch (err) {
@@ -55,16 +27,52 @@ export class AutoScalerService {
             (app: any) => app.name && app.name.startsWith('Worker - ')
         );
 
-        // 5. Cleanup Orphans: Coolify apps that don't have a record in PG workers
+        // 1. Reap stale terminated workers (stopped/failed for > 1 hour)
+        try {
+            await WorkerService.reapStaleWorkers(kyrazoApps);
+        } catch (err: any) {
+            console.warn(`[AutoScaler] Stale worker reaping error: ${err.message}`);
+        }
+
+        // 2. Reconcile server active_workers counts from actual worker records
+        try {
+            await WorkerService.reconcileServerCounts();
+        } catch (err: any) {
+            console.warn(`[AutoScaler] Server sync error: ${err.message}`);
+        }
+
+        // 3. Fetch ALL known clients that have workers in active state
+        const activeClientsRes = await db
+            .select({ clientId: workers.client_id })
+            .from(workers)
+            .where(inArray(workers.status, ['pending', 'starting', 'running', 'stopping']))
+            .groupBy(workers.client_id);
+
+        const clientsWithWorkers = new Set(activeClientsRes.map(c => c.clientId));
+
+        // 4. Fetch all ACTIVE/TRIALING subscriptions from Mongo
+        const subscriptions = await Subscription.find({
+            status: { $in: ['active', 'trialing'] },
+        });
+
+        // 5. Merge both lists to ensure we process everyone:
+        // - Those who have a subscription (Scale UP/DOWN)
+        // - Those who have NO subscription but have workers (Scale DOWN to 0)
+        const subscriptionClientMap = new Map(subscriptions.map(s => [s.workspaceId.toString(), s]));
+
+        // Final set of client IDs to process
+        const allClientIds = new Set([...clientsWithWorkers, ...subscriptionClientMap.keys()]);
+
+        // 6. Cleanup Orphans: Coolify apps that don't have a record in PG workers
         await this.cleanupOrphans(kyrazoApps);
 
-        // 6. Process each client
+        // 7. Process each client
         for (const clientId of allClientIds) {
             const subscription = subscriptionClientMap.get(clientId);
             await this.reconcileSubscription(clientId, subscription, kyrazoApps);
         }
 
-        // 7. Final sync of counts
+        // 8. Final sync of counts
         await WorkerService.reconcileClientCounts();
     }
 
@@ -72,9 +80,6 @@ export class AutoScalerService {
      * Delete Coolify applications that don't exist in our DB records (Orphans)
      */
     private static async cleanupOrphans(kyrazoApps: any[]) {
-        const GRACE_PERIOD_MS = 5 * 60 * 1000; // 5 mins grace for new creations
-        const staleThreshold = new Date(Date.now() - GRACE_PERIOD_MS);
-
         for (const app of kyrazoApps) {
             const workerId = app.name.replace('Worker - ', '');
             if (!workerId) continue;
@@ -84,9 +89,7 @@ export class AutoScalerService {
                 .from(workers)
                 .where(eq(workers.worker_id, workerId));
 
-            // If no DB record and app is not newly created (grace period check if metadata allows)
-            // Note: Coolify API might not return createdAt in a simple list, so we check if record exists at all.
-            // If it's not in our DB, it's a leak.
+            // If no DB record, it's a leak — delete the Coolify app
             if (!workerRecord) {
                 console.warn(`[AutoScaler] Found orphaned Coolify app: ${app.name}. Deleting.`);
                 try {
@@ -170,8 +173,14 @@ export class AutoScalerService {
     }
 
     /**
-     * Sync DB State with Actual State.
-     * Marks "Zombie" workers as failed and corrects used_workers count.
+     * Sync DB State with Actual (Coolify) State.
+     *
+     * Strategy: Reap-and-Replace
+     * - Transition pending/starting -> running when confirmed by Coolify
+     * - Mark unhealthy workers as failed AND delete their Coolify apps immediately
+     * - Mark zombie workers (missing from Coolify after grace period) as failed
+     *
+     * The next reconcile loop will see fewer actual workers and provision fresh ones.
      */
     private static async syncState(
         clientId: string,
@@ -216,9 +225,15 @@ export class AutoScalerService {
 
                 if (isUnhealthy) {
                     console.warn(
-                        `[AutoScaler] Worker ${w.worker_id} is ${coolifyStatus} in Coolify. Marking as failed.`
+                        `[AutoScaler] Worker ${w.worker_id} is ${coolifyStatus} in Coolify. Reaping (mark failed + delete app).`
                     );
+                    // Reap-and-replace: mark failed (releases resources) then delete Coolify app
                     await WorkerService.updateWorkerStatus(w.worker_id, 'failed');
+                    try {
+                        await CommandDispatcher.dispatchStopWorker('', w.worker_id, '', true, kyrazoApps);
+                    } catch (err) {
+                        console.error(`[AutoScaler] Failed to delete unhealthy worker app ${w.worker_id}:`, err);
+                    }
                 }
             } else {
                 // Case 3: Worker should be running but is missing entirely from Coolify

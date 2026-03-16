@@ -1,8 +1,12 @@
 import { db } from '@/db';
 import { clients, servers, workers } from '@/db/schema';
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, inArray, sql, lt } from 'drizzle-orm';
 
 export class WorkerRepo {
+    /**
+     * Find the best available server (least loaded) that has capacity.
+     * Non-locking read — suitable for informational queries.
+     */
     static async findAvailableServer(tx = db) {
         const [bestServer] = await tx
             .select()
@@ -16,6 +20,22 @@ export class WorkerRepo {
             .orderBy(servers.active_workers)
             .limit(1);
         return bestServer;
+    }
+
+    /**
+     * Find the best available server WITH a row-level lock (FOR UPDATE).
+     * Prevents two concurrent transactions from claiming the same last slot.
+     */
+    static async findAvailableServerForUpdate(tx: any) {
+        const result = await tx.execute(
+            sql`SELECT * FROM ${servers}
+                WHERE ${servers.status} = 'active'
+                  AND ${servers.active_workers} < ${servers.max_workers}
+                ORDER BY ${servers.active_workers} ASC
+                LIMIT 1
+                FOR UPDATE`
+        );
+        return result[0] as typeof servers.$inferSelect | undefined;
     }
 
     static async getClientForUpdate(tx: any, clientId: string) {
@@ -40,12 +60,11 @@ export class WorkerRepo {
             });
     }
 
-    static async lockCapacity(
-        tx: any,
-        clientId: string,
-        serverId: string,
-        currentServerActiveWorkers: number
-    ) {
+    /**
+     * Atomically increment capacity counters for a client and server.
+     * Uses SQL expressions so the UPDATE is safe under concurrency.
+     */
+    static async lockCapacity(tx: any, clientId: string, serverId: string) {
         await tx
             .update(clients)
             .set({ used_workers: sql`${clients.used_workers} + 1` })
@@ -53,7 +72,7 @@ export class WorkerRepo {
 
         await tx
             .update(servers)
-            .set({ active_workers: currentServerActiveWorkers + 1 })
+            .set({ active_workers: sql`${servers.active_workers} + 1` })
             .where(eq(servers.server_id, serverId));
     }
 
@@ -85,15 +104,51 @@ export class WorkerRepo {
             .where(eq(workers.worker_id, workerId));
     }
 
+    /**
+     * Release resources with a floor of 0 to prevent negative counter drift.
+     */
     static async releaseResources(tx: any, clientId: string, serverId: string) {
         await tx.execute(
-            sql`UPDATE ${clients} SET used_workers = used_workers - 1 WHERE ${clients.client_id} = ${clientId}`
+            sql`UPDATE ${clients} SET used_workers = GREATEST(0, used_workers - 1) WHERE ${clients.client_id} = ${clientId}`
         );
         await tx.execute(
-            sql`UPDATE ${servers} SET active_workers = active_workers - 1 WHERE ${servers.server_id} = ${serverId}`
+            sql`UPDATE ${servers} SET active_workers = GREATEST(0, active_workers - 1) WHERE ${servers.server_id} = ${serverId}`
         );
     }
 
+    /**
+     * Find stale terminated workers (stopped/failed for longer than the given TTL).
+     * Returns their IDs, server IDs, and client IDs for Coolify cleanup.
+     */
+    static async findStaleTerminatedWorkers(ttlMs: number = 60 * 60 * 1000) {
+        const cutoff = new Date(Date.now() - ttlMs);
+        return await db
+            .select({
+                worker_id: workers.worker_id,
+                server_id: workers.server_id,
+                client_id: workers.client_id,
+                status: workers.status,
+            })
+            .from(workers)
+            .where(
+                and(
+                    inArray(workers.status, ['stopped', 'failed']),
+                    lt(workers.updated_at, cutoff)
+                )
+            );
+    }
+
+    /**
+     * Delete a worker record from the DB. Should be called AFTER Coolify cleanup.
+     */
+    static async deleteWorker(tx: any, workerId: string) {
+        await tx.delete(workers).where(eq(workers.worker_id, workerId));
+    }
+
+    /**
+     * Reconcile server active_workers count from actual worker records.
+     * Counts only non-terminal workers (pending, starting, running, stopping).
+     */
     static async reconcileServerCounts() {
         await db.execute(sql`
             UPDATE ${servers} s
@@ -106,6 +161,10 @@ export class WorkerRepo {
         `);
     }
 
+    /**
+     * Reconcile client used_workers count from actual worker records.
+     * Counts only non-terminal workers (pending, starting, running, stopping).
+     */
     static async reconcileClientCounts() {
         await db.execute(sql`
             UPDATE ${clients} c

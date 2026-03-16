@@ -203,7 +203,7 @@ export const authenticate = async (c: AppContext, next: Next) => {
                 {
                     success: false,
                     error: {
-                        code: 'INVALID_PROJECT',
+                        code: 'INVALID_NAMESPACE',
                         message: 'Namespace not found',
                         requestId: c.get('requestId'),
                     },
