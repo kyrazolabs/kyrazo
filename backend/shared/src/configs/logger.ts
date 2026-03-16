@@ -69,7 +69,24 @@ const prodFormat = winston.format.combine(
 
 // === Transport setup ===
 const logDir = path.resolve('logs');
-if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
+let isLogDirWritable = false;
+
+if (process.env.DISABLE_FILE_LOGGING === 'true') {
+    console.warn('Logging: File logging is explicitly disabled via DISABLE_FILE_LOGGING env var.');
+} else {
+    try {
+        if (!fs.existsSync(logDir)) {
+            fs.mkdirSync(logDir, { recursive: true });
+        }
+        // Test if writable
+        const testFile = path.join(logDir, '.write-test');
+        fs.writeFileSync(testFile, '');
+        fs.unlinkSync(testFile);
+        isLogDirWritable = true;
+    } catch (err) {
+        console.error(`Logging: Failed to initialize log directory at ${logDir}. Falling back to Console-only logging. Error:`, (err as Error).message);
+    }
+}
 
 // Daily rotate for app logs
 const rotateFile = (filename: string, level?: string) =>
@@ -92,25 +109,29 @@ const transports: TransportStream[] = [
     }),
 ];
 
-if (config.isDevelopment) {
-    transports.push(
-        new winston.transports.File({
-            filename: path.join(logDir, 'development.json'),
-            level: 'error',
-            format: prodFormat,
-            maxsize: 5 * 1024 * 1024, // 5MB
-            maxFiles: 5,
-        })
-    );
-}
+if (isLogDirWritable) {
+    if (config.isDevelopment) {
+        transports.push(
+            new winston.transports.File({
+                filename: path.join(logDir, 'development.json'),
+                level: 'error',
+                format: prodFormat,
+                maxsize: 5 * 1024 * 1024, // 5MB
+                maxFiles: 5,
+            })
+        );
+    }
 
-if (config.isProduction) {
-    transports.push(
-        rotateFile('app'),
-        rotateFile('error', 'error'),
-        rotateFile('activity', 'info'),
-        rotateFile('http', 'http')
-    );
+    if (config.isProduction) {
+        transports.push(
+            rotateFile('app'),
+            rotateFile('error', 'error'),
+            rotateFile('activity', 'info'),
+            rotateFile('http', 'http')
+        );
+    }
+} else if (config.isProduction) {
+    console.warn('Logging: Skipping file transports because log directory is not writable or file logging is disabled.');
 }
 
 // === Logger ===

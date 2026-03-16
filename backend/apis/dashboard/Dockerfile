@@ -49,6 +49,9 @@ COPY --from=builder /app/apis/dashboard/src /app/apis/dashboard/src
 # Set working directory to dashboard package
 WORKDIR /app/apis/dashboard
 
+# Pre-create logs directory with correct permissions
+RUN mkdir -p /app/apis/dashboard/logs && chown -R bun:bun /app/apis/dashboard/logs
+
 # Ensure everything is owned by the bun user before switching
 RUN chown -R bun:bun /app
 
