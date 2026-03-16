@@ -14,7 +14,6 @@ const requiredEnvVars = [
     'STRIPE_WEBHOOK_SECRET',
     'STRIPE_MAIN_PRODUCT_ID',
     'BILLING_BASE_URL',
-    'BILLING_ADMIN_EMAIL',
     'SENTRY_DSN',
 ];
 
