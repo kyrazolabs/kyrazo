@@ -50,7 +50,6 @@ export const config = {
     // Application Configuration
     app: {
         name: process.env.APP_NAME || 'Kyrazo',
-        version: process.env.APP_VERSION || '1.0.0',
         url: process.env.APP_URL || 'http://localhost:3003',
         frontendUrl: process.env.FRONTEND_URL || 'http://localhost:4200',
         ingest: {
@@ -212,27 +211,11 @@ export const config = {
         },
     },
 
-    // Email Configuration
-    email: {
-        resend: {
-            apiKey: process.env.RESEND_KEY!,
-            rateLimit: {
-                maxRequestsPerSecond: parseInt(process.env.RESEND_RATE_LIMIT || '10'),
-                maxRequestsPerMinute: parseInt(process.env.RESEND_RATE_LIMIT_MINUTE || '100'),
-            },
-        },
-        from: {
-            email: process.env.FROM_EMAIL || 'delivered@resend.dev',
-            name: process.env.FROM_NAME || 'Kyrazo',
-        },
-    },
-
     stripe: {
         secretKey: process.env.STRIPE_SECRET_KEY!,
         sourceSecret: process.env.STRIPE_WEBHOOK_SECRET!,
         mainProduct: process.env.STRIPE_MAIN_PRODUCT_ID!,
         baseUrl: process.env.BILLING_BASE_URL || 'http://localhost:3003',
-        adminEmail: process.env.BILLING_ADMIN_EMAIL || 'admin@hookify.com',
     },
 
     // Logging Configuration
@@ -244,8 +227,6 @@ export const config = {
 
     contacts: {
         support: process.env.SUPPORT_EMAIL || 'support@yourdomain.com',
-        abuse: process.env.ABUSE_EMAIL || 'abuse@yourdomain.com',
-        partnerships: process.env.PARTNERSHIPS_EMAIL || 'partners@yourdomain.com',
     },
 
     // Development Configuration

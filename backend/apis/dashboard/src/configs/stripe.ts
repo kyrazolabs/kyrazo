@@ -10,7 +10,6 @@ export const stripeConfig = {
     secretKey: config.stripe.secretKey,
     sourceSecret: config.stripe.sourceSecret,
     baseUrl: config.stripe.baseUrl,
-    adminEmail: config.stripe.adminEmail,
 };
 
 export default stripe;
