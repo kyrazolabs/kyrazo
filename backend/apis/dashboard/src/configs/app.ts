@@ -9,8 +9,6 @@ const requiredEnvVars = [
     'JWT_SECRET',
     'JWT_ACCESS_SECRET',
     'JWT_REFRESH_SECRET',
-    'REDIS_HOST',
-    'REDIS_PORT',
     'ENCRYPTION_KEY',
     'STRIPE_SECRET_KEY',
     'STRIPE_WEBHOOK_SECRET',
