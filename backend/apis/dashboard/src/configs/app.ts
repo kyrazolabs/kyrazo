@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 
 // Load environment variables
-dotenv.config({ path: './backend/api/.env' });
+dotenv.config();
 
 // Validate required environment variables
 const requiredEnvVars = [
