@@ -9,6 +9,7 @@ import { MessageService } from 'primeng/api';
 import { NamespaceService } from '@core/services/namespace.service';
 import { SubscriptionService } from '@core/services/subscription.service';
 import { DialogService } from '@shared/services/dialog.service';
+import { CopyIdComponent } from '@shared/components/copy-id/copy-id.component';
 import { SentryService } from '@core/3rd-party/sentry';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { INamespace, GetNamespaceResponse } from '@models/namespace.types';
@@ -23,6 +24,7 @@ import { INamespace, GetNamespaceResponse } from '@models/namespace.types';
         TextareaModule,
         ButtonModule,
         TooltipModule,
+        CopyIdComponent,
     ],
     templateUrl: './namespace-form.component.html',
 })

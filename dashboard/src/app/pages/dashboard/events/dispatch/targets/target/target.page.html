@@ -33,6 +33,12 @@
                 <div class="flex flex-col gap-6">
                     <!-- Name -->
                     <div class="flex flex-col gap-2">
+                        <label class="font-semibold text-surface-900 dark:text-surface-0">Target ID</label>
+                        <app-copy-id [id]="targetEntity.id" [fullWidth]="true" />
+                    </div>
+
+                    <!-- Name -->
+                    <div class="flex flex-col gap-2">
                         <label class="font-semibold text-surface-900 dark:text-surface-0">Target Name</label>
                         <input pInputText [value]="targetEntity.name" [disabled]="true" class="w-full rounded-xl!" />
                     </div>
@@ -467,9 +473,7 @@
                         <tr class="hover:bg-surface-50 dark:hover:bg-surface-800">
                             <!-- ID -->
                             <td>
-                                <div class="font-mono text-xs text-surface-700 dark:text-surface-300">
-                                    {{ delivery.delivery_id }}
-                                </div>
+                                <app-copy-id [id]="delivery.delivery_id" />
                             </td>
 
                             <!-- Event Type -->

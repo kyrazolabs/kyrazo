@@ -2,7 +2,7 @@
 
 <div class="flex flex-col gap-6">
     <!-- Header -->
-    <div class="card-panel">
+
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
                 <h1 class="text-2xl font-bold">Events Logs</h1>
@@ -29,7 +29,6 @@
                     [loading]="loader.loading$ | async" />
             </div>
         </div>
-    </div>
 
     <!-- Deliveries Table -->
     <p-card class="card-panel">
@@ -38,10 +37,11 @@
             (onLazyLoad)="loadIngestEventsLazy($event)" dataKey="event_id" [sortField]="'processed_at'" [sortOrder]="-1"
             styleClass="p-datatable-sm" [tableStyle]="{'min-width': '60rem'}" [loading]="loader.loading$ | async">
 
-            <ng-template #header>
+            <ng-template pTemplate="header">
                 <tr>
-                    <th class="text-left rounded-xl! border-none!">
-                        Event ID
+                    <!-- Event ID -->
+                    <th class="rounded-xl! border-none!" style="width: 130px !important">
+                        ID
                     </th>
                     <th class="text-left rounded-xl! border-none!">
                         Source
@@ -62,13 +62,11 @@
                 </tr>
             </ng-template>
 
-            <ng-template #body let-event>
+            <ng-template pTemplate="body" let-event>
                 <tr class="hover:bg-surface-50 dark:hover:bg-surface-800">
                     <!-- Event ID -->
                     <td>
-                        <div class="font-mono text-xs text-surface-700 dark:text-surface-300">
-                            {{ event.event_id }}
-                        </div>
+                        <app-copy-id [id]="event.event_id" />
                     </td>
 
                     <!-- Source -->

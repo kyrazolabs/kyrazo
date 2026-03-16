@@ -22,6 +22,7 @@ import { DialogService } from '@shared/services/dialog.service';
 import { SentryService } from '@core/3rd-party/sentry';
 import { PostHogService } from '@core/3rd-party/posthog';
 import { SubscriptionService } from '@core/services/subscription.service';
+import { CopyIdComponent } from '@shared/components/copy-id/copy-id.component';
 
 // PrimeNG Imports
 import { CardModule } from 'primeng/card';
@@ -60,6 +61,7 @@ import { TooltipModule } from 'primeng/tooltip';
         InputIconModule,
         SelectModule,
         TooltipModule,
+        CopyIdComponent,
     ],
     templateUrl: './target-form.component.html',
     styleUrls: ['./target-form.component.scss'],

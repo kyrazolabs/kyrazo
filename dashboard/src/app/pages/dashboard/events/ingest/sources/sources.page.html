@@ -106,13 +106,16 @@
       dataKey="id"
       responsiveLayout="scroll"
     >
-      <ng-template #header>
+      <ng-template pTemplate="header">
         <tr>
-          <th pSortableColumn="name" class="rounded-xl! border-none!" style="min-width: 180px">
+          <th pSortableColumn="name" class="rounded-xl! border-none!" style="min-width: 200px">
             <div class="flex items-center gap-2">
               Name
               <p-sortIcon field="name" />
             </div>
+          </th>
+          <th class="rounded-xl! border-none!" style="width: 130px !important">
+              ID
           </th>
           <th class="rounded-xl! border-none!" style="min-width: 120px">Source</th>
           <th pSortableColumn="status" class="rounded-xl! border-none!" style="min-width: 100px">
@@ -136,23 +139,22 @@
         </tr>
       </ng-template>
 
-      <ng-template #body let-source>
+      <ng-template pTemplate="body" let-source>
         <tr>
           <td>
             <div class="flex flex-col max-w-56">
               <span class="font-semibold text-surface-900 dark:text-surface-0">
                 {{ source.name }}
               </span>
-              <span
-                class="text-sm truncate text-surface-600 dark:text-surface-400"
-                *ngIf="source.description"
-              >
-                {{ source.description }}
-              </span>
-              <span class="text-xs text-surface-500 dark:text-surface-500">
-                ID: {{ source.id }}
-              </span>
+              @if (source.description) {
+                <span class="text-sm truncate text-surface-600 dark:text-surface-400">
+                  {{ source.description }}
+                </span>
+              }
             </div>
+          </td>
+          <td>
+              <app-copy-id [id]="source.id" />
           </td>
           <td>
             <p-tag
@@ -223,7 +225,7 @@
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="6" class="text-center py-12">
+          <td colspan="7" class="text-center py-12">
             <div class="flex flex-col items-center gap-4 my-10">
               <i class="pi pi-link text-6xl! text-surface-400"></i>
               <div class="text-center flex flex-col justify-center">
@@ -237,16 +239,17 @@
                   {{ searchQuery ? 'Try adjusting your search terms' : activeFilter === 'all' ? 'Get started by creating your first source' : 'Try adjusting your filters or create a new source' }}
                 </p>
                 <div class="flex justify-center gap-2">
-                  <p-button
-                    label="Clear Filters"
-                    icon="pi pi-filter-slash"
-                    severity="secondary"
-                    size="small"
-                    styleClass="rounded-xl!"
-                    [outlined]="true"
-                    (onClick)="refreshSources()"
-                    *ngIf="searchQuery || activeFilter !== 'all'"
-                  />
+                  @if (searchQuery || activeFilter !== 'all') {
+                    <p-button
+                      label="Clear Filters"
+                      icon="pi pi-filter-slash"
+                      severity="secondary"
+                      size="small"
+                      styleClass="rounded-xl!"
+                      [outlined]="true"
+                      (onClick)="refreshSources()"
+                    />
+                  }
                   <p-button
                     label="Add Source"
                     icon="pi pi-plus"

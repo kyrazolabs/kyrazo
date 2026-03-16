@@ -18,6 +18,7 @@ import { SkeletonModule } from "primeng/skeleton";
 import { ProgressBarModule } from "primeng/progressbar";
 import { SentryService } from "@core/3rd-party/sentry";
 import { PostHogService } from "@core/3rd-party/posthog";
+import { CopyIdComponent } from "@shared/components/copy-id/copy-id.component";
 
 import { DeliveryService } from "@core/services/delivery.service";
 import { LoaderService } from "@core/services/loader.service";
@@ -65,11 +66,12 @@ interface Delivery {
     InputIconModule,
     SkeletonModule,
     ProgressBarModule,
+    CopyIdComponent,
   ],
   templateUrl: "./logs.page.html",
   styleUrl: "./logs.page.scss",
 })
-export class LogsPage implements OnInit {
+export class IngestLogsPage implements OnInit {
   @ViewChild("dt") dt!: Table;
 
   public loader = inject(LoaderService);

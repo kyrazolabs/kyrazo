@@ -36,6 +36,7 @@ import {
 } from '@models/source.types';
 import { SentryService } from '@core/3rd-party/sentry';
 import { PostHogService } from '@core/3rd-party/posthog';
+import { CopyIdComponent } from '@shared/components/copy-id/copy-id.component';
 
 // PrimeNG Imports
 import { CardModule } from 'primeng/card';
@@ -87,6 +88,7 @@ import { COMMON_EVENT_TYPES } from './events';
         MultiSelectModule,
         SkeletonModule,
         AutoCompleteModule,
+        CopyIdComponent,
     ],
     providers: [SourceService],
     templateUrl: './source-form.component.html',

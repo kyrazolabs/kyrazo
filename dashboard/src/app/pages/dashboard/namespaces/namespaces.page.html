@@ -59,7 +59,7 @@
             [rowHover]="true"
             [paginator]="true"
             [rows]="10"
-            dataKey="_id"
+            dataKey="id"
             responsiveLayout="scroll"
             [showGridlines]="false"
             styleClass="p-datatable-sm lg:p-datatable-md"
@@ -70,7 +70,7 @@
                         pSortableColumn="name"
                         class="rounded-xl! border-none!"
                         style="min-width: 150px"
-                    >
+                        >
                         <div class="flex items-center gap-2">
                             Name <p-sortIcon field="name" />
                         </div>
@@ -82,6 +82,12 @@
                         Description
                     </th>
                     <th
+                        class="rounded-xl! border-none!"
+                        style="width: 130px !important"
+                    >
+                        ID
+                    </th>
+                    <th
                         pSortableColumn="createdAt"
                         class="rounded-xl! border-none!"
                         style="min-width: 120px"
@@ -91,7 +97,7 @@
                         </div>
                     </th>
                     <th
-                        class="rounded-xl! border-none! text-center"
+                        class="rounded-xl! border-none! flex justify-center gap-2"
                         style="min-width: 120px"
                     >
                         Actions
@@ -99,7 +105,7 @@
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-namespace>
-                <tr>
+                <tr class="rounded-xl!">
                     <td
                         class="font-bold text-surface-900 dark:text-surface-0 truncate max-w-[200px]"
                         [pTooltip]="namespace.name"
@@ -115,6 +121,9 @@
                         >
                             {{ namespace.description || '-' }}
                         </div>
+                    </td>
+                    <td>
+                        <app-copy-id [id]="namespace.id" />
                     </td>
                     <td>
                         <span class="text-sm text-surface-500"
@@ -147,7 +156,7 @@
             </ng-template>
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td colspan="4" class="text-center py-12!">
+                    <td colspan="5" class="text-center py-12!">
                         <div class="flex flex-col items-center gap-4">
                             <i
                                 class="icon-[hugeicons--dashboard-square-01] text-6xl! text-surface-400"

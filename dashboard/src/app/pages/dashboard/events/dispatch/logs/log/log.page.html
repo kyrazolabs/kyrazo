@@ -37,13 +37,7 @@
                         class="block text-sm font-semibold text-surface-900 dark:text-surface-0 mb-1"
                         >Delivery ID</label
                     >
-                    <input
-                        type="text"
-                        pInputText
-                        [value]="delivery.delivery_id"
-                        [readonly]="true"
-                        class="w-full font-mono rounded-xl!"
-                    />
+                    <app-copy-id [id]="delivery.delivery_id" [fullWidth]="true" />
                 </div>
 
                 <div>

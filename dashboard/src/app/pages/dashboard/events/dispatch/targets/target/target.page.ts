@@ -41,6 +41,7 @@ import {
 import { TargetService, ITarget } from '@core/services/target.service';
 import { DialogService } from '@shared/services/dialog.service';
 import { SentryService } from '@core/3rd-party/sentry';
+import { CopyIdComponent } from '@shared/components/copy-id/copy-id.component';
 
 interface Delivery {
     id: string;
@@ -87,6 +88,7 @@ interface Delivery {
         ChartModule,
         TableModule,
         ToastModule,
+        CopyIdComponent,
     ],
     providers: [MessageService],
     templateUrl: './target.page.html',

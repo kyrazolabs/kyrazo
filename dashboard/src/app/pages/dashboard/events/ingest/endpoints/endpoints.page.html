@@ -50,10 +50,13 @@
                 (onLazyLoad)="loadEndpointsLazy($event)"
                 dataKey="_id"
                 responsiveLayout="scroll">
-            <ng-template #header>
+            <ng-template pTemplate="header">
                 <tr>
                     <th class="rounded-xl! border-none!" style="min-width: 200px">
                         Name
+                    </th>
+                    <th class="rounded-xl! border-none!" style="width: 130px !important">
+                        ID
                     </th>
                     <th class="rounded-xl! border-none!" style="min-width: 200px">
                         URL
@@ -70,7 +73,7 @@
                 </tr>
             </ng-template>
 
-            <ng-template #body let-endpoint>
+            <ng-template pTemplate="body" let-endpoint>
                 <tr>
                     <td>
                         <div class="flex flex-col max-w-56">
@@ -80,10 +83,10 @@
                             <span class="text-sm truncate text-surface-600 dark:text-surface-400" *ngIf="endpoint.description">
                                 {{ endpoint.description }}
                             </span>
-                            <span class="text-xs text-surface-500 dark:text-surface-500">
-                                ID: {{ endpoint.id }}
-                            </span>
                         </div>
+                    </td>
+                    <td>
+                        <app-copy-id [id]="endpoint.id" />
                     </td>
                     <td>
                         <div
@@ -131,7 +134,7 @@
 
             <ng-template  pTemplate="emptymessage">
                 <tr>
-                    <td colspan="7" class="text-center py-12">
+                    <td colspan="8" class="text-center py-12">
                         <div class="flex flex-col items-center gap-4 my-10">
                             <i class="pi pi-link text-6xl! text-surface-400"></i>
                             <div class="text-center flex flex-col justify-center">

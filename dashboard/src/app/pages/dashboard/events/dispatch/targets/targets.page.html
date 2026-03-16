@@ -47,10 +47,13 @@
                 dataKey="id"
                 responsiveLayout="scroll"
                 styleClass="p-datatable-sm lg:p-datatable-md">
-            <ng-template #header>
+            <ng-template pTemplate="header">
                 <tr>
                     <th class="rounded-xl! border-none!" style="min-width:180px">
                         Name
+                    </th>
+                    <th class="rounded-xl! border-none!" style="width: 130px !important">
+                        ID
                     </th>
                     <th class="rounded-xl! border-none!" style="min-width:250px">
                         URL
@@ -62,13 +65,16 @@
                 </tr>
             </ng-template>
 
-            <ng-template #body let-target>
+            <ng-template pTemplate="body" let-target>
                 <tr class="hover:bg-surface-50! dark:hover:bg-surface-900/50!">
                     <td [routerLink]="[target.id]" class="cursor-pointer">
                         <div class="flex flex-col min-w-0">
                             <span class="font-semibold text-surface-900 dark:text-surface-0 truncate" [pTooltip]="target.name">{{ target.name }}</span>
                             <span class="text-xs text-surface-500 dark:text-surface-400 truncate max-w-[150px]" *ngIf="target.description" [pTooltip]="target.description">{{ target.description }}</span>
                         </div>
+                    </td>
+                    <td>
+                        <app-copy-id [id]="target.id" />
                     </td>
                     <td>
                         <div class="font-mono text-sm text-surface-700 dark:text-surface-300 truncate max-w-[200px]" [pTooltip]="target.url">
@@ -120,7 +126,7 @@
 
             <ng-template  pTemplate="emptymessage">
                 <tr>
-                    <td colspan="6" class="text-center py-12">
+                    <td colspan="7" class="text-center py-12">
                         <div class="flex flex-col items-center gap-4 my-10">
                             <i class="icon-[hugeicons--target-02] text-6xl text-surface-400"></i>
                             <div class="text-center">

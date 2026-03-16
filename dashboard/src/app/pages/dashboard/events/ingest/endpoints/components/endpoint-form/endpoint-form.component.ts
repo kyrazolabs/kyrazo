@@ -26,6 +26,7 @@ import { DialogService } from '@shared/services/dialog.service';
 import { IEndpoint } from '@models/endpoint.types';
 import { SentryService } from '@core/3rd-party/sentry';
 import { PostHogService } from '@core/3rd-party/posthog';
+import { CopyIdComponent } from '@shared/components/copy-id/copy-id.component';
 
 // PrimeNG Imports
 import { CardModule } from 'primeng/card';
@@ -60,6 +61,7 @@ import { SkeletonModule } from 'primeng/skeleton';
         DividerModule,
         MessageModule,
         SkeletonModule,
+        CopyIdComponent,
     ],
     templateUrl: './endpoint-form.component.html',
     styleUrls: ['./endpoint-form.component.scss'],

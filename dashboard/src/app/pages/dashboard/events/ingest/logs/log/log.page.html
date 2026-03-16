@@ -37,13 +37,7 @@
                         class="block text-sm font-semibold text-surface-900 dark:text-surface-0 mb-1"
                         >Event ID</label
                     >
-                    <input
-                        type="text"
-                        pInputText
-                        [value]="ingestEvent.event_id"
-                        [readonly]="true"
-                        class="w-full font-mono rounded-xl!"
-                    />
+                    <app-copy-id [id]="ingestEvent.event_id" [fullWidth]="true" />
                 </div>
 
                 <div>

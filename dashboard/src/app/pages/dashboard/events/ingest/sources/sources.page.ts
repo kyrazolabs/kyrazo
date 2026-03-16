@@ -29,6 +29,7 @@ import { LoaderService } from '@core/services/loader.service';
 import { SentryService } from '@core/3rd-party/sentry';
 import { PostHogService } from '@core/3rd-party/posthog';
 import { DialogService } from '@shared/services/dialog.service';
+import { CopyIdComponent } from '@shared/components/copy-id/copy-id.component';
 
 @Component({
     selector: 'app-sources.page',
@@ -52,6 +53,7 @@ import { DialogService } from '@shared/services/dialog.service';
         ProgressSpinnerModule,
         PaginatorModule,
         ProgressBarModule,
+        CopyIdComponent,
     ],
     providers: [SourceService],
     templateUrl: './sources.page.html',

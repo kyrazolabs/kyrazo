@@ -9,6 +9,7 @@ import { TagModule } from "primeng/tag";
 import { DividerModule } from "primeng/divider";
 import { ScrollPanelModule } from "primeng/scrollpanel";
 import { InputTextModule } from "primeng/inputtext";
+import { CopyIdComponent } from "@shared/components/copy-id/copy-id.component";
 import { ProgressSpinnerModule } from "primeng/progressspinner";
 
 import { LoaderService } from "@core/services/loader.service";
@@ -27,7 +28,8 @@ import { NgxJsonViewerModule } from 'ngx-json-viewer';
     ScrollPanelModule,
     InputTextModule,
     ProgressSpinnerModule,
-    NgxJsonViewerModule
+    NgxJsonViewerModule,
+    CopyIdComponent
   ],
   templateUrl: './log.page.html',
   styleUrl: './log.page.scss',
