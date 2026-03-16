@@ -121,6 +121,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
     }
 
     @ViewChild('pp') pp!: Popover;
+    @ViewChild('op') op!: Popover;
 
     private refreshNamespaces$ = new Subject<void>();
 
@@ -142,6 +143,13 @@ export class TopbarComponent implements OnInit, OnDestroy {
         this.router.events
             .pipe(
                 filter((event) => event instanceof NavigationEnd),
+                tap(() => {
+                    // Close all popovers and UI state on navigation
+                    if (this.pp) this.pp.hide();
+                    if (this.op) this.op.hide();
+                    this.showConfig = false;
+                    this.workerDrawerVisible.set(false);
+                }),
                 map(() => this.getRouteTitle(this.route)),
                 takeUntilDestroyed(this.destroyRef),
             )
