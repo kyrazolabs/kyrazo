@@ -200,6 +200,11 @@ export class SidebarComponent implements OnInit, AfterViewInit {
             .subscribe((event: NavigationEnd) => {
                 this.currentRoute = event.url;
                 this.updateDropdownStates();
+
+                // Automatically close the sidebar on mobile after navigation
+                if (this.layoutService.isMobile()) {
+                    this.layoutService.closeSidebar();
+                }
             });
     }
 
