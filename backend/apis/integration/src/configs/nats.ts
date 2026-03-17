@@ -131,7 +131,7 @@ export class NatsConfig {
     private async ensureEventsStream(): Promise<void> {
         if (!this.jsm) return;
         const STREAM_NAME = 'EVENTS';
-        const STREAM_SUBJECTS = ['workspace.*.plan.*.events.>'];
+        const STREAM_SUBJECTS = ['workspace.>'];
         try {
             await this.jsm.streams.info(STREAM_NAME);
             logger.info(`NATS stream '${STREAM_NAME}' already exists`);
@@ -142,14 +142,17 @@ export class NatsConfig {
                 await this.jsm.streams.add({
                     name: STREAM_NAME,
                     subjects: STREAM_SUBJECTS,
-                    retention: RetentionPolicy.Limits,
+                    retention: RetentionPolicy.Workqueue,
                     storage: StorageType.File,
-                    num_replicas: 1,
-                    max_age: 7 * 24 * 60 * 60 * 1e9, // 7 days in nanoseconds
-                    max_bytes: -1,
-                    max_msg_size: -1,
+                    num_replicas: config.isDevelopment ? 1 : 2,
+                    max_age: 72 * 60 * 60 * 1e9, // 72H
+                    max_bytes: 1024 * 1024 * 1024 * 2, // 2GB
+                    max_msg_size: 1024 * 512, // 512KB
                     discard: DiscardPolicy.Old,
                     duplicate_window: 5 * 60 * 1e9, // 5 minute dedup window
+                    allow_rollup_hdrs: false,
+                    deny_delete: false,
+                    deny_purge: false,
                 });
                 logger.info(`NATS stream '${STREAM_NAME}' created successfully`);
             } else {
