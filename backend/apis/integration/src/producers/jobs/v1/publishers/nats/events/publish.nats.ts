@@ -58,7 +58,6 @@ export class PublishEventPublisher {
                 await natsConfig.connect();
             }
 
-            await this.ensureJetStreamSetup();
 
             this.isInitialized = true;
             logger.info('NATS Event Publisher initialized successfully');
@@ -71,49 +70,6 @@ export class PublishEventPublisher {
         }
     }
 
-    /**
-     * @title Ensure JetStream Setup
-     * @description Creates JetStream stream and consumer if they don't exist.
-     * @returns {Promise<void>} Resolves when setup is complete.
-     */
-    private async ensureJetStreamSetup(): Promise<void> {
-        try {
-            const jsm = natsConfig.getJetStreamManager();
-
-            try {
-                await jsm.streams.add({
-                    name: 'EVENTS',
-                    subjects: ['workspace.>'],
-                    storage: StorageType.File,
-                    num_replicas: config.isDevelopment ? 1 : 2,
-                    retention: RetentionPolicy.Workqueue,
-                    discard: DiscardPolicy.Old,
-                    max_msgs: -1,
-                    max_msgs_per_subject: -1,
-                    max_bytes: 1024 * 1024 * 1024 * 2, //2GB depend on the server resources
-                    max_age: 72 * 60 * 60 * 1000000000, // 72H
-                    max_msg_size: 1024 * 512,
-                    duplicate_window: 5 * 60 * 1000000000, // 5m
-                    allow_rollup_hdrs: false,
-                    deny_delete: false,
-                    deny_purge: false,
-                });
-                logger.info('Created EVENTS JetStream stream');
-            } catch (error: unknown) {
-                const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-                if (
-                    !errorMessage.includes('already exists') &&
-                    !errorMessage.includes('subjects overlap')
-                ) {
-                    throw error;
-                }
-                logger.debug(`Stream setup handled: ${errorMessage}`);
-            }
-        } catch (error: unknown) {
-            logger.error('Failed to setup JetStream in publish.nats.ts', error as Error);
-            throw error;
-        }
-    }
 
     /**
      * @title Publish Event

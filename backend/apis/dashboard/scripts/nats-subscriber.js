@@ -26,7 +26,7 @@ async function subscribeWithJetStream() {
         try {
             await jsm.streams.add({
                 name: 'EVENTS',
-                subjects: ['events.>'],
+                subjects: ['workspace.>'],
             });
             console.log('📚 Created EVENTS stream');
         } catch (error) {
