@@ -32,6 +32,9 @@ COPY runtime/worker ./
 FROM oven/bun:${BUN_VERSION}-alpine AS runner
 WORKDIR /app
 
+# Install su-exec for dropping privileges from root
+RUN apk add --no-cache su-exec
+
 # Copy all installed dependencies
 COPY --from=builder /app/runtime/worker/node_modules /app/runtime/worker/node_modules
 
@@ -54,9 +57,20 @@ COPY --from=builder /app/runtime/worker/src /app/runtime/worker/src
 # Set working directory to worker package so "bun run start" works
 WORKDIR /app/runtime/worker
 
+# Pre-create logs directory
+RUN mkdir -p /data/nats/certs && chown -R bun:bun /data/nats/certs
+
+# Copy and setup entrypoint script
+COPY runtime/worker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Ensure everything is owned by the bun user (for non-volume cases)
+RUN chown -R bun:bun /app
+
 ENV NODE_ENV=production
 ENV PORT=3000
 HEALTHCHECK  --start-period=20s --interval=30s --timeout=3s --retries=3 \
     CMD wget -qO- http://127.0.0.1:${PORT}/v1/health || exit 1
 
-CMD ["bun", "run", "prod"]
+# Entrypoint runs as root to fix log dir permissions, then drops to bun
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
