@@ -47,7 +47,7 @@ export class GitHubTransformer {
             },
 
             targets: (endpoints ?? []).map((t: any) => ({
-                targetId: t._id,
+                targetId: t.id || t.id,
                 targetUrl: t.url,
                 method: t.method || 'POST',
                 customHeaders: t.customHeaders,
