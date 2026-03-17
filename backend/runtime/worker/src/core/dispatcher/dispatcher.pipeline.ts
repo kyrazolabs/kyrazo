@@ -62,8 +62,12 @@ export class DispatcherPipeline {
             await dispatcherQueue.enqueue(envelope, headers, targets);
 
             logger.debug(`✅ Publish event processed: ${messageData.eventId}`);
-        } catch (error) {
-            logger.error('❌ Error processing publish event:', error as Error);
+        } catch (error: any) {
+            logger.error('❌ Error processing publish event:', {
+                message: error.message,
+                stack: error.stack,
+                ...error
+            });
             throw error;
         }
     }

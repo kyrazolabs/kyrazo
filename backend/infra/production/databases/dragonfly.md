@@ -54,10 +54,14 @@ BullMQ manages the `event-dispatch` queue used by the Worker service. It relies 
 
 **Required flags:**
 
-```
+```bash
+# Recommended production flags
 --default_lua_flags=allow-undeclared-keys
 --lua_allow_undeclared_auto_correct=true
---cluster_mode=emulated
+--cluster_mode=emulated # Required for BullMQ compatibility with dynamic key access
+--cache_mode=true
+--maxmemory=2G
+--dbnum=4
 ```
 
 **Key prefix structure (set via `Worker.connection`):**

@@ -265,10 +265,14 @@ export class WorkerConsumer {
 
             // Acknowledge message
             msg.ack();
-        } catch (error) {
+        } catch (error: any) {
             logger.error(
                 `Error processing message for subscription ${workspaceId}`,
-                error as Error,
+                {
+                    message: error.message,
+                    stack: error.stack,
+                    ...error
+                }
             );
             msg.nak();
         }
