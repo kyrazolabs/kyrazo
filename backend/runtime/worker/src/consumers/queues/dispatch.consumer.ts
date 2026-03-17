@@ -39,7 +39,7 @@ export class DispatchConsumer extends EventEmitter {
         const connection = redisConfig.getQueueClient();
 
         // Initialize queues
-        this.dispatchQueue = new Queue(`event-dispatch`, {
+        this.dispatchQueue = new Queue(`{event-dispatch}`, {
             connection,
             defaultJobOptions: {
                 removeOnComplete: 100, // Keep last 100 completed jobs
@@ -53,18 +53,18 @@ export class DispatchConsumer extends EventEmitter {
         });
 
         // Initialize workers
-        this.dispatchWorker = new Worker(`event-dispatch`, this.process.bind(this), {
+        this.dispatchWorker = new Worker(`{event-dispatch}`, this.process.bind(this), {
             connection,
             concurrency: env.worker.CONCURRENCY,
         });
 
         // Initialize queue events for monitoring
-        this.queueEvents = new QueueEvents(`event-dispatch`, {
+        this.queueEvents = new QueueEvents(`{event-dispatch}`, {
             connection,
         });
 
         this.setupEventListeners();
-        logger.info('🚀 Event Processor (event-dispatch) initialized');
+        logger.info('🚀 Event Processor ({event-dispatch}) initialized');
     }
 
     public static getInstance(): DispatchConsumer {
