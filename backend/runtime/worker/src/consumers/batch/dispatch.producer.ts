@@ -4,7 +4,7 @@ import { Redis } from 'ioredis';
 
 export class DispatchProducer {
     private static instance: DispatchProducer;
-    private redis: Redis;
+    private redis!: Redis;
 
     public readonly streamName = 'stream:dispatch-events';
 
@@ -12,10 +12,10 @@ export class DispatchProducer {
         // Use a standard Redis client for stream operations, not the BullMQ queue client
         // to avoid conflicts if they share state differently. redisConfig provides caching
         // clients usually, but we can reuse the queue client or better, a dedicated standard client.
-        this.redis = redisConfig.getQueueClient();
     }
 
     public async initialize(): Promise<void> {
+        this.redis = redisConfig.getQueueClient();
         logger.info('[DispatchProducer] Initializing Redis Stream Producer...');
         // Ensure connection is ready
         if (this.redis.status === 'wait') {

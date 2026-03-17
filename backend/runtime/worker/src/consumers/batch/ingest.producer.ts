@@ -4,15 +4,14 @@ import { Redis } from 'ioredis';
 
 export class IngestProducer {
     private static instance: IngestProducer;
-    private redis: Redis;
+    private redis!: Redis;
 
     public readonly streamName = 'stream:ingest-events';
 
-    private constructor() {
-        this.redis = redisConfig.getQueueClient();
-    }
+    private constructor() {}
 
     public async initialize(): Promise<void> {
+        this.redis = redisConfig.getQueueClient();
         logger.info('[IngestProducer] Initializing Redis Stream Producer...');
         // Ensure connection is ready
         if (this.redis.status === 'wait') {
