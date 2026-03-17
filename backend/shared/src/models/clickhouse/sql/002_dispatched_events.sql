@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS dispatched_events (
-    event_id UUID CODEC(ZSTD(3)),
+    event_id UInt64 CODEC(ZSTD(3)),
 
     workspace_id LowCardinality(String),
     namespace_id   LowCardinality(String),
