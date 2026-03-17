@@ -8,8 +8,8 @@ export const NamespaceHeadersSchema = z.object({
 export const GetNamespaceByIdSchema = z.object({
     namespaceId: z
         .string()
-        .regex(/^(pro_)?[0-9a-fA-F]{24}$/, 'Invalid ID format')
-        .transform((val: string) => (val.startsWith('pro_') ? val.split('_')[1] : val)),
+        .regex(/^(ns_)?[0-9a-fA-F]{24}$/, 'Invalid ID format')
+        .transform((val: string) => (val.startsWith('ns_') ? val.split('_')[1] : val)),
 });
 
 // Type exports
