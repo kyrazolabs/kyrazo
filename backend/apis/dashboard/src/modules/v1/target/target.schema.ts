@@ -23,11 +23,13 @@ export const CreateTargetSchema = z.object({
         timeout: z
             .number()
             .min(100, 'Timeout must be at least 100ms')
-            .max(60000, 'Timeout must be at most 60000ms'),
+            .max(60000, 'Timeout must be at most 60000ms')
+            .default(5000),
         retryCount: z
             .number()
             .min(0, 'Retry count cannot be negative')
-            .max(10, 'Retry count must not exceed 10'),
+            .max(10, 'Retry count must not exceed 10')
+            .default(3),
         rateLimit: z
             .number()
             .min(1, 'Rate limit must be at least 1 request')
