@@ -112,11 +112,11 @@ export class DispatcherQueue extends EventEmitter {
                         );
                         continue;
                     }
-                    logger.info(`✅ Target found: ${target._id} (${target.url})`);
+                    logger.info(`✅ Target found: ${target.id || target._id} (${target.url})`);
 
                     targets.push({
                         type: 'target',
-                        targetId: target._id.toString(),
+                        targetId: (target.id || target._id).toString(),
                         url: target.url,
                         priority:
                             event.meta?.priority === 'urgent'
@@ -156,11 +156,11 @@ export class DispatcherQueue extends EventEmitter {
                         );
                         continue;
                     }
-                    logger.info(`✅ Endpoint found: ${endpoint._id} (${endpoint.url})`);
+                    logger.info(`✅ Endpoint found: ${endpoint.id || endpoint._id} (${endpoint.url})`);
 
                     targets.push({
                         type: 'endpoint',
-                        targetId: endpoint._id.toString(),
+                        targetId: (endpoint.id || endpoint._id).toString(),
                         url: endpoint.url,
                         priority:
                             event.meta?.priority === 'urgent'
