@@ -27,6 +27,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { GetNamespacesResponse, INamespace } from '@models/namespace.types';
 import { SentryService } from '@core/3rd-party/sentry';
 import { DialogService } from '@shared/services/dialog.service';
+import { CopyIdComponent } from '@shared/components/copy-id/copy-id.component';
 
 @Component({
     selector: 'app-namespaces.page',
@@ -48,6 +49,7 @@ import { DialogService } from '@shared/services/dialog.service';
         InputIconModule,
         TooltipModule,
         MenuModule,
+        CopyIdComponent,
     ],
     templateUrl: './namespaces.page.html',
     styleUrl: './namespaces.page.scss',

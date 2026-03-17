@@ -27,6 +27,15 @@
     <div class="flex flex-col gap-6" [formGroup]="sourceForm">
         <!-- General Information -->
         <div class="flex flex-col gap-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-medium text-surface-900 dark:text-surface-0">General Information</h3>
+                @if (isEditing() && sourceId) {
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-semibold text-surface-500">ID:</span>
+                        <app-copy-id [id]="sourceId" [fullWidth]="true" />
+                    </div>
+                }
+            </div>
             <div class="flex flex-col gap-2">
                 <label for="name" class="font-medium text-surface-900 dark:text-surface-0">
                     Source Name <span class="text-red-500">*</span>

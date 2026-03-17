@@ -29,6 +29,7 @@ import { TargetService, ITarget } from '@core/services/target.service';
 import { DialogService } from '@shared/services/dialog.service';
 import { SentryService } from '@core/3rd-party/sentry';
 import { PostHogService } from '@core/3rd-party/posthog';
+import { CopyIdComponent } from '@shared/components/copy-id/copy-id.component';
 
 @Component({
     selector: 'app-targets.page',
@@ -54,6 +55,7 @@ import { PostHogService } from '@core/3rd-party/posthog';
         PaginatorModule,
         ProgressBarModule,
         BadgeModule,
+        CopyIdComponent,
     ],
     providers: [TargetService, ConfirmationService, MessageService], // Added providers explicitly if needed, though usually providedIn: root
     templateUrl: './targets.page.html',

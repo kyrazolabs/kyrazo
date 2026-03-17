@@ -56,7 +56,7 @@ export const eventsRoutes: Routes = [
     {
         path: 'dispatch/logs',
         loadComponent: () =>
-            import('./dispatch/logs/logs.page').then((p) => p.LogsPage),
+            import('./dispatch/logs/logs.page').then((p) => p.DispatchLogsPage),
         resolve: { data: deliveriesResolver },
         data: { title: 'Dispatch Logs', animation: 'dispatch-logs' },
     },
@@ -141,7 +141,7 @@ export const eventsRoutes: Routes = [
     {
         path: 'ingest/logs',
         loadComponent: () =>
-            import('./ingest/logs/logs.page').then((p) => p.LogsPage),
+            import('./ingest/logs/logs.page').then((p) => p.IngestLogsPage),
         data: { title: 'Ingest Logs', animation: 'ingest-logs' },
     },
     {

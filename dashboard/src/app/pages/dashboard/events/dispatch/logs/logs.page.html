@@ -1,6 +1,5 @@
 <div class="flex flex-col gap-6">
     <!-- Header -->
-    <div class="card-panel">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
                 <h1 class="text-2xl font-bold">Deliveries Logs</h1>
@@ -27,7 +26,6 @@
                     [loading]="loader.loading$ | async" />
             </div>
         </div>
-    </div>
 
     <!-- Deliveries Table -->
     <p-card class="card-panel">
@@ -36,9 +34,10 @@
             (onLazyLoad)="loadDeliveriesLazy($event)" dataKey="id" [sortField]="'timestamp'" [sortOrder]="-1"
             responsiveLayout="scroll" [loading]="loader.loading$ | async" styleClass="p-datatable-sm lg:p-datatable-md">
 
-            <ng-template #header>
+            <ng-template pTemplate="header">
                 <tr>
-                    <th class="text-left rounded-xl! border-none!" style="min-width: 120px">
+                    <!-- ID -->
+                    <th class="rounded-xl! border-none!" style="width: 130px !important">
                         ID
                     </th>
                     <th class="text-left rounded-xl! border-none!" style="min-width: 120px">
@@ -63,13 +62,11 @@
                 </tr>
             </ng-template>
 
-            <ng-template #body let-delivery>
+            <ng-template pTemplate="body" let-delivery>
                 <tr class="hover:bg-surface-50 dark:hover:bg-surface-800">
                     <!-- ID -->
                     <td>
-                        <div class="font-mono text-xs text-surface-700 dark:text-surface-300">
-                            {{ delivery.delivery_id }}
-                        </div>
+                        <app-copy-id [id]="delivery.delivery_id" />
                     </td>
 
                     <!-- Event Type -->

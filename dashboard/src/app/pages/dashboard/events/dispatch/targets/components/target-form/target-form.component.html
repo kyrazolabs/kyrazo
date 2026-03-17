@@ -32,7 +32,15 @@
     <div class="space-y-6" [formGroup]="targetForm">
         <!-- Basic Information -->
         <div class="flex flex-col gap-4">
-            <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0">Basic Information</h3>
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0">Basic Information</h3>
+                @if (isEditing() && targetId) {
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-semibold text-surface-500">ID:</span>
+                        <app-copy-id [id]="targetId" [fullWidth]="true" />
+                    </div>
+                }
+            </div>
             <div class="grid grid-cols-1 gap-6">
                 <div class="grid grid-cols-1 gap-6">
                      <!-- Name Field -->

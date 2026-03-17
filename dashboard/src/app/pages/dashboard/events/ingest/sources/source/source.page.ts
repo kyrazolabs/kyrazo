@@ -53,6 +53,7 @@ import { SourceService } from '@core/services/source.service';
 import { DeliveryService } from '@core/services/delivery.service';
 import { environment } from 'environments/environment';
 import { SentryService } from '@core/3rd-party/sentry';
+import { CopyIdComponent } from '@shared/components/copy-id/copy-id.component';
 
 interface DeliveryStats {
     total: number;
@@ -82,9 +83,9 @@ interface DeliveryStats {
         InputIconModule,
         TooltipModule,
         SelectModule,
-        SelectModule,
         ToastModule,
         DialogModule,
+        CopyIdComponent,
     ],
     providers: [MessageService],
     templateUrl: './source.page.html',

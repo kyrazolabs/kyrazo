@@ -27,6 +27,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { LoaderService } from '@core/services/loader.service';
 import { DialogService } from '@shared/services/dialog.service';
+import { CopyIdComponent } from '@shared/components/copy-id/copy-id.component';
 import { SentryService } from '@core/3rd-party/sentry';
 import { PostHogService } from '@core/3rd-party/posthog';
 
@@ -52,6 +53,7 @@ import { PostHogService } from '@core/3rd-party/posthog';
         ProgressSpinnerModule,
         PaginatorModule,
         ProgressBarModule,
+        CopyIdComponent,
     ],
     providers: [EndpointService],
     templateUrl: './endpoints.page.html',

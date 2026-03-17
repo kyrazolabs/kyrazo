@@ -18,6 +18,7 @@ import { FormsModule } from '@angular/forms';
 import { EndpointService } from '@core/services/endpoint.service';
 import { SentryService } from '@core/3rd-party/sentry';
 import { DialogService } from '@shared/services/dialog.service';
+import { CopyIdComponent } from '@shared/components/copy-id/copy-id.component';
 import { Endpoint } from '@models/endpoint.types';
 
 @Component({
@@ -38,6 +39,7 @@ import { Endpoint } from '@models/endpoint.types';
         IconFieldModule,
         InputIconModule,
         FormsModule,
+        CopyIdComponent,
     ],
     templateUrl: './detail.page.html',
     styleUrl: './detail.page.scss',
