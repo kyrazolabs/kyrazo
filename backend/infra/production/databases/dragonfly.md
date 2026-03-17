@@ -57,6 +57,7 @@ BullMQ manages the `event-dispatch` queue used by the Worker service. It relies 
 ```
 --default_lua_flags=allow-undeclared-keys
 --lua_allow_undeclared_auto_correct=true
+--cluster_mode=emulated
 ```
 
 **Key prefix structure (set via `Worker.connection`):**
@@ -300,4 +301,7 @@ For this use case (queues + short-lived analytics), **disable persistence** to m
 
 # Persistence (disabled for ephemeral workload)
 --save_schedule=
+
+# Cluster emulation (required for some multi-key BullMQ scripts)
+--cluster_mode=emulated
 ```
