@@ -24,8 +24,8 @@ export class CopyIdComponent {
 
     private readonly clipboard = inject(ClipboardService);
 
-    copy(event: MouseEvent | string): void {
-        // event.stopPropagation();
+    copy(event: MouseEvent): void {
+        event.stopPropagation();
         this.clipboard.copy(this.id, 'ID Copied');
     }
 }
