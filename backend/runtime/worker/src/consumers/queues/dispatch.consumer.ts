@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import { Queue, Worker, Job, QueueEvents } from 'bullmq';
 import { redisConfig } from '@/config';
-import { randomUUID } from 'crypto';
+import { DeliveryStatus, EventStatus, logger, type SQLDeliveryAttempt, snowflake } from '@kyrazo/shared';
 import type {
     IConfiguredTarget,
     IDispatchedEvent,
@@ -9,7 +9,6 @@ import type {
     IDispatchJobData,
     IWebhookHeaders,
 } from '@/core/dispatcher/dispatcher.types';
-import { DeliveryStatus, EventStatus, logger, type SQLDeliveryAttempt } from '@kyrazo/shared';
 import { httpRequester } from '@/services/http/http.requester';
 import { dispatchProducer } from '../batch/dispatch.producer';
 import { env } from '@/app/worker.env';
@@ -93,7 +92,7 @@ export class DispatchConsumer extends EventEmitter {
 
             const jobs = await this.dispatchQueue.addBulk(
                 targets.map(target => {
-                    const deliveryId = `${randomUUID()}`;
+                    const deliveryId = snowflake.generate();
                     // Retry count is the number of *retries*, so total attempts = retries + 1
                     const attempts = (target.retryCount || maxRetries) + 1;
                     return {
