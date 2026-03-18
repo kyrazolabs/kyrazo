@@ -21,7 +21,7 @@ export class RedisSnapshotConsumer {
         private ingestAgg: IngestAggregator,
         redisClient?: Redis
     ) {
-        this.redis = redisClient || new Redis(Config.get().redisUrl);
+        this.redis = redisClient || new Redis(Config.get().snapshotRedisUrl);
         // Define the custom command to make it easier to call
         // Check if defineCommand exists (mock might not have it or needs it)
         if (typeof this.redis.defineCommand === 'function') {

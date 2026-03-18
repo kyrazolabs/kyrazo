@@ -18,7 +18,7 @@ export class DispatchProducer {
         // Use the MAIN Redis client (DB 0) for stream operations.
         // The ingestor reads from REDIS_URL which is DB 0.
         // The queue client (DB 1) is for BullMQ only.
-        this.redis = redisConfig.getClient();
+        this.redis = redisConfig.getStreamClient();
         logger.info('[DispatchProducer] Initializing Redis Stream Producer...');
         logger.info(`[DispatchProducer] Redis Stream Producer aligned with ${this.streamName}`);
     }

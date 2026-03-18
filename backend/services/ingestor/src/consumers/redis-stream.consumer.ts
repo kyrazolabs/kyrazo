@@ -14,7 +14,7 @@ export class RedisStreamConsumer {
     public readonly consumerName = `consumer:${Math.random().toString(36).substring(7)}`;
 
     constructor(redisClient?: Redis) {
-        this.redis = redisClient || new Redis(Config.get().redisUrl);
+        this.redis = redisClient || new Redis(Config.get().streamRedisUrl);
     }
 
     async start() {

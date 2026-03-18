@@ -13,7 +13,7 @@ export class IngestProducer {
     public async initialize(): Promise<void> {
         // Use the MAIN Redis client (DB 0) for stream operations.
         // The ingestor reads from REDIS_URL which is DB 0.
-        this.redis = redisConfig.getClient();
+        this.redis = redisConfig.getStreamClient();
         logger.info('[IngestProducer] Initializing Redis Stream Producer...');
         logger.info(`[IngestProducer] Redis Stream Producer aligned with ${this.streamName}`);
     }

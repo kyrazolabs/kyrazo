@@ -1,8 +1,8 @@
-import Redis from "ioredis";
-import * as dotenv from "dotenv";
+import Redis from 'ioredis';
+import * as dotenv from 'dotenv';
 
-import { config } from "@/config";
-import { logger } from "@kyrazo/shared";
+import { config } from '@/config';
+import { logger } from '@kyrazo/shared';
 
 dotenv.config();
 
@@ -20,6 +20,7 @@ export class RedisConfig {
     private static instance: RedisConfig;
     public client: Redis | null = null;
     private queueClient: Redis | null = null;
+    private streamClient: Redis | null = null;
     private isConnected = false;
 
     /**
@@ -52,10 +53,11 @@ export class RedisConfig {
     public async connect(): Promise<void> {
         if (
             this.isConnected &&
-            this.client?.status === "ready" &&
-            this.queueClient?.status === "ready"
+            this.client?.status === 'ready' &&
+            this.queueClient?.status === 'ready' &&
+            this.streamClient?.status === 'ready'
         ) {
-            logger.info("Redis already connected");
+            logger.info('Redis already connected');
             return;
         }
 
@@ -86,82 +88,117 @@ export class RedisConfig {
                 this.queueClient = new Redis({
                     host: config.redis.queue.host || config.redis.host,
                     port: config.redis.queue.port || config.redis.port,
-                    password:
-                        config.redis.queue.password || config.redis.password,
+                    password: config.redis.queue.password || config.redis.password,
                     db: config.redis.queue.db || config.redis.db,
                     maxRetriesPerRequest: null, // Essential for BullMQ
                 });
             }
 
+            // Stream Redis client for Redis Streams
+            if (config.redis.stream.url) {
+                this.streamClient = new Redis(config.redis.stream.url, {
+                    maxRetriesPerRequest: null,
+                });
+            } else {
+                this.streamClient = new Redis({
+                    host: config.redis.stream.host || config.redis.host,
+                    port: config.redis.stream.port || config.redis.port,
+                    password: config.redis.stream.password || config.redis.password,
+                    db: config.redis.stream.db || config.redis.db,
+                    maxRetriesPerRequest: null,
+                });
+            }
+
             // Set up error handlers
-            this.client.on("error", (error: Error) => {
-                logger.error("Redis client error:", error);
+            this.client.on('error', (error: Error) => {
+                logger.error('Redis client error:', error);
                 this.isConnected = false;
             });
 
-            this.queueClient.on("error", (error: Error) => {
-                logger.error("Redis queue client error:", error);
+            this.queueClient.on('error', (error: Error) => {
+                logger.error('Redis queue client error:', error);
             });
 
-            this.client.on("connect", () => {
-                logger.info("Redis client connected");
+            this.client.on('connect', () => {
+                logger.info('Redis client connected');
             });
 
-            this.queueClient.on("connect", () => {
-                logger.info("Redis queue client connected");
+            this.queueClient.on('connect', () => {
+                logger.info('Redis queue client connected');
             });
 
-            this.client.on("disconnect", () => {
-                logger.warn("Redis client disconnected");
+            this.streamClient.on('connect', () => {
+                logger.info('Redis stream client connected');
+            });
+
+            this.client.on('disconnect', () => {
+                logger.warn('Redis client disconnected');
                 this.isConnected = false;
             });
 
-            this.client.on("reconnecting", () => {
-                logger.info("Redis client reconnecting");
+            this.client.on('reconnecting', () => {
+                logger.info('Redis client reconnecting');
             });
 
             // Wait for both clients to be ready
             await Promise.all([
                 new Promise<void>((resolve, reject) => {
                     const onReady = () => {
-                        this.client?.off("error", onError);
+                        this.client?.off('error', onError);
                         resolve();
                     };
                     const onError = (err: Error) => {
-                        this.client?.off("ready", onReady);
+                        this.client?.off('ready', onReady);
                         reject(err);
                     };
 
-                    if (this.client?.status === "ready") {
+                    if (this.client?.status === 'ready') {
                         resolve();
                     } else {
-                        this.client?.once("ready", onReady);
-                        this.client?.once("error", onError);
+                        this.client?.once('ready', onReady);
+                        this.client?.once('error', onError);
                     }
                 }),
                 new Promise<void>((resolve, reject) => {
                     const onReady = () => {
-                        this.queueClient?.off("error", onError);
+                        this.queueClient?.off('error', onError);
                         resolve();
                     };
                     const onError = (err: Error) => {
-                        this.queueClient?.off("ready", onReady);
+                        this.queueClient?.off('ready', onReady);
                         reject(err);
                     };
 
-                    if (this.queueClient?.status === "ready") {
+                    if (this.queueClient?.status === 'ready') {
                         resolve();
                     } else {
-                        this.queueClient?.once("ready", onReady);
-                        this.queueClient?.once("error", onError);
+                        this.queueClient?.once('ready', onReady);
+                        this.queueClient?.once('error', onError);
+                    }
+                }),
+                new Promise<void>((resolve, reject) => {
+                    const onReady = () => {
+                        this.streamClient?.off('error', onError);
+                        resolve();
+                    };
+                    const onError = (err: Error) => {
+                        this.streamClient?.off('ready', onReady);
+                        reject(err);
+                    };
+
+                    if (this.streamClient?.status === 'ready') {
+                        resolve();
+                    } else {
+                        this.streamClient?.once('ready', onReady);
+                        this.streamClient?.once('error', onError);
                     }
                 }),
             ]);
 
             this.isConnected = true;
-            logger.info("Connected to Redis successfully");
+            logger.info('Connected to Redis successfully');
         } catch (error) {
-            logger.error("Failed to connect to Redis:", error as Error);
+            logger.error('Failed to connect to Redis:', error as Error);
             this.isConnected = false;
             throw error;
         }
@@ -178,11 +215,11 @@ export class RedisConfig {
         try {
             const promises = [];
 
-            if (this.client && this.client.status === "ready") {
+            if (this.client && this.client.status === 'ready') {
                 promises.push(this.client.quit());
             }
 
-            if (this.queueClient && this.queueClient.status === "ready") {
+            if (this.queueClient && this.queueClient.status === 'ready') {
                 promises.push(this.queueClient.quit());
             }
 
@@ -192,9 +229,9 @@ export class RedisConfig {
             this.queueClient = null;
             this.isConnected = false;
 
-            logger.info("Disconnected from Redis");
+            logger.info('Disconnected from Redis');
         } catch (error) {
-            logger.error("Error disconnecting from Redis:", error as Error);
+            logger.error('Error disconnecting from Redis:', error as Error);
             throw error;
         }
     }
@@ -208,8 +245,8 @@ export class RedisConfig {
      * const client = redis.getClient();
      */
     public getClient(): Redis {
-        if (!this.client || this.client.status !== "ready") {
-            throw new Error("Redis client is not connected");
+        if (!this.client || this.client.status !== 'ready') {
+            throw new Error('Redis client is not connected');
         }
         return this.client;
     }
@@ -223,10 +260,25 @@ export class RedisConfig {
      * const queueClient = redis.getQueueClient();
      */
     public getQueueClient(): Redis {
-        if (!this.queueClient || this.queueClient.status !== "ready") {
-            throw new Error("Redis queue client is not connected");
+        if (!this.queueClient || this.queueClient.status !== 'ready') {
+            throw new Error('Redis queue client is not connected');
         }
         return this.queueClient;
+    }
+
+    /**
+     * @title Get Stream Redis Client
+     * @description Returns the stream Redis client instance. Throws if not connected.
+     * @returns {Redis} The stream Redis client.
+     * @throws {Error} If the stream client is not connected.
+     * @example
+     * const streamClient = redis.getStreamClient();
+     */
+    public getStreamClient(): Redis {
+        if (!this.streamClient || this.streamClient.status !== 'ready') {
+            throw new Error('Redis stream client is not connected');
+        }
+        return this.streamClient;
     }
 
     /**
@@ -237,9 +289,7 @@ export class RedisConfig {
      * const isConnected = redis.getConnectionStatus();
      */
     public getConnectionStatus(): boolean {
-        return (
-            this.isConnected && !!this.client && this.client.status === "ready"
-        );
+        return this.isConnected && !!this.client && this.client.status === 'ready';
     }
 
     /**
@@ -251,36 +301,33 @@ export class RedisConfig {
      */
     public async healthCheck(): Promise<{ status: string; details: any }> {
         try {
-            if (!this.client || this.client.status !== "ready") {
+            if (!this.client || this.client.status !== 'ready') {
                 return {
-                    status: "unhealthy",
+                    status: 'unhealthy',
                     details: {
                         connected: false,
-                        error: "Client not connected",
+                        error: 'Client not connected',
                     },
                 };
             }
 
             const ping = await this.client.ping();
-            const info = await this.client.info("server");
+            const info = await this.client.info('server');
 
             return {
-                status: "healthy",
+                status: 'healthy',
                 details: {
                     connected: this.isConnected,
                     ping,
-                    serverInfo: info.split("\r\n").slice(0, 5).join("\n"),
+                    serverInfo: info.split('\r\n').slice(0, 5).join('\n'),
                 },
             };
         } catch (error) {
             return {
-                status: "unhealthy",
+                status: 'unhealthy',
                 details: {
                     connected: this.isConnected,
-                    error:
-                        error instanceof Error
-                            ? error.message
-                            : "Unknown error",
+                    error: error instanceof Error ? error.message : 'Unknown error',
                 },
             };
         }
@@ -329,11 +376,7 @@ export class RedisConfig {
      * @example
      * const data = await redis.cache('user:1', async () => fetchUser(), 60);
      */
-    public async cache<T>(
-        key: string,
-        cb: () => Promise<T>,
-        ttl?: number,
-    ): Promise<T> {
+    public async cache<T>(key: string, cb: () => Promise<T>, ttl?: number): Promise<T> {
         const client = this.getClient();
         const value = await client.get(key);
         if (value != null) {
@@ -390,7 +433,7 @@ export const REDIS_KEYS = {
         `wh:evt:${eventId}:et:${eventType}:tg:${targetId}`,
     eventDeliveredCount: (eventId: string) => `wh:evt:${eventId}:deliv_count`,
     eventTotal: (eventId: string) => `wh:evt:${eventId}:total`,
-    dirtyZset: "wh:dirty", // لتتبع التحديثات
+    dirtyZset: 'wh:dirty', // لتتبع التحديثات
 };
 
 /**
