@@ -23,11 +23,13 @@ export type IdType = keyof typeof ID_PREFIXES;
  * @returns Prefixed ID string
  */
 export function prefixId(
-    id: string | Types.ObjectId | undefined | null,
+    id: any,
     type: IdType
 ): string | undefined {
-    if (!id) return undefined;
-    const stringId = id instanceof Types.ObjectId ? id.toHexString() : id;
+    if (id === undefined || id === null) return undefined;
+    const stringId = id instanceof Types.ObjectId 
+        ? id.toHexString() 
+        : String(id);
     const prefix = ID_PREFIXES[type];
     if (stringId.startsWith(`${prefix}_`)) return stringId;
     return `${prefix}_${stringId}`;
@@ -127,11 +129,13 @@ export function transformWithId<T>(data: T, type: IdType): TransformedWithId<T> 
             endpoint_id: 'endpoint',
             user_id: 'user',
             subscription_id: 'subscription',
+            ingress_id: 'source', // Using 'source' prefix for ingress IDs
             // Aliases used in some queries
             target: 'target',
             source: 'source',
             namespace: 'namespace',
             workspace: 'workspace',
+            id: type, // Fallback for 'id' field
         };
 
         for (const [field, idType] of Object.entries(idFields)) {
@@ -139,10 +143,18 @@ export function transformWithId<T>(data: T, type: IdType): TransformedWithId<T> 
                 const value = obj[field];
                 if (
                     value instanceof Types.ObjectId ||
-                    (typeof value === 'string' && /^[0-9a-fA-F]{24}$/.test(value)) ||
-                    ((field === 'eventId' || field === 'deliveryId' || field === 'event_id' || field === 'delivery_id' || field === 'associated_event_id') && typeof value === 'string' && /^[0-9]+$/.test(value))
+                    typeof value === 'string' ||
+                    typeof value === 'number' ||
+                    typeof value === 'bigint'
                 ) {
-                    obj[field] = prefixId(value, idType as IdType);
+                    const stringValue = String(value);
+                    if (
+                        /^[0-9a-fA-F]{24}$/.test(stringValue) || // Mongo OID
+                        /^[0-9]+$/.test(stringValue) || // Numeric ID
+                        stringValue.includes('_') // Already looks prefixed
+                    ) {
+                        obj[field] = prefixId(value, idType as IdType);
+                    }
                 }
             }
         }

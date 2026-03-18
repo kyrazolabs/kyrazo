@@ -413,12 +413,18 @@ export class IngestRepo {
                               events: 0,
                           },
                       ],
-                topSources: resultTopSources || [
-                    {
-                        source: '',
-                        total: 0,
-                    },
-                ],
+                topSources: resultTopSources.length 
+                    ? resultTopSources.map((s: any) => ({
+                        ...transformWithId(s, 'source'),
+                        source: s.source || 'unknown',
+                        total: Number(s.total),
+                    }))
+                    : [
+                        {
+                            source: '',
+                            total: 0,
+                        },
+                    ],
                 processStatusDistribution: resultProcessStatusDistribution || [
                     {
                         processing_status: 0,
