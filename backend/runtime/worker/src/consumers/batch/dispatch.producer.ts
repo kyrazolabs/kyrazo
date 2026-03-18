@@ -15,17 +15,11 @@ export class DispatchProducer {
     }
 
     public async initialize(): Promise<void> {
-        this.redis = redisConfig.getQueueClient();
+        // Use the MAIN Redis client (DB 0) for stream operations.
+        // The ingestor reads from REDIS_URL which is DB 0.
+        // The queue client (DB 1) is for BullMQ only.
+        this.redis = redisConfig.getClient();
         logger.info('[DispatchProducer] Initializing Redis Stream Producer...');
-        // Ensure connection is ready
-        if (this.redis.status === 'wait') {
-            await this.redis.connect().catch(err => {
-                logger.warn(
-                    '[DispatchProducer] Redis connection attempt failed, may already be connected:',
-                    err
-                );
-            });
-        }
         logger.info(`[DispatchProducer] Redis Stream Producer aligned with ${this.streamName}`);
     }
 
