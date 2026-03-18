@@ -269,10 +269,11 @@ export class WorkerConsumer {
             logger.error(
                 `Error processing message for subscription ${workspaceId}`,
                 {
-                    message: error.message,
-                    stack: error.stack,
-                    ...error
-                } as any
+                    errStr: String(error),
+                    message: error?.message,
+                    name: error?.name,
+                    stack: error?.stack,
+                }
             );
             msg.nak();
         }

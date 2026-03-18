@@ -17,15 +17,14 @@ export class DispatcherPipeline {
      */
     public async process(messageData: any): Promise<void> {
         try {
-            logger.debug('DEBUG: Starting dispatcherValidator.validate');
             if (!dispatcherValidator.validate(messageData)) {
                 logger.debug('Invalid event structure, skipping');
                 return;
             }
 
             // Deduplicate Original Event ID (handles NATS duplicates)
+            logger.debug(`[Pipeline] Step 1: Dedup check for ${messageData.eventId}`);
             const dedupKey = `processed:event:${messageData.eventId}`;
-            logger.info(`DEBUG: Checking deduplication for key: ${dedupKey}`);
             const isNew = await redisConfig.getQueueClient().set(dedupKey, '1', 'EX', 3600, 'NX');
             if (!isNew) {
                 logger.warn(
@@ -39,16 +38,23 @@ export class DispatcherPipeline {
                 return;
             }
 
+            logger.debug(`📨 Processing publish event: ${messageData.eventId}`);
+
+            if (!dispatcherValidator.shouldProcess(messageData.sourceType, WebhookType.PUBLISH)) {
+                logger.debug(`Skipping non-publish event: ${messageData.sourceType}`);
+                return;
+            }
+
             logger.info(`📨 Processing publish event: ${messageData.eventId}`);
             logger.info(`DEBUG: Raw messageData: ${JSON.stringify(messageData, null, 2)}`);
 
-            logger.debug('DEBUG: Starting dispatcherTransformer.transform');
+            logger.debug(`[Pipeline] Step 2: Transform`);
             const envelope = dispatcherTransformer.transform(messageData);
             logger.info(
                 `📦 Event transformed. NamespaceId: ${envelope.namespaceId}, WorkspaceId: ${envelope.workspaceId}, Targets: ${envelope.targets.length}`
             );
 
-            logger.debug('DEBUG: Starting dispatcherHeaders.buildHeaders');
+            logger.debug(`[Pipeline] Step 3: Build headers`);
             const headers = await dispatcherHeaders.buildHeaders(envelope, 1);
             const targets = envelope.targets;
 
@@ -57,16 +63,17 @@ export class DispatcherPipeline {
                 return;
             }
 
-            logger.debug('DEBUG: Starting dispatcherQueue.enqueue');
+            logger.debug(`[Pipeline] Step 4: Enqueue`);
             await dispatcherQueue.enqueue(envelope, headers, targets);
 
             logger.debug(`✅ Publish event processed: ${messageData.eventId}`);
         } catch (error: any) {
             logger.error('❌ Error processing publish event:', {
-                errorMessage: error?.message || String(error),
-                errorStack: error?.stack,
-                errorJson: JSON.stringify(error, Object.getOwnPropertyNames(error)),
-            } as any);
+                errStr: String(error),
+                message: error?.message,
+                name: error?.name,
+                stack: error?.stack,
+            });
             throw error;
         }
     }
