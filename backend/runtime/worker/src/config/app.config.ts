@@ -50,6 +50,13 @@ export const config = {
             password: process.env.QUEUE_REDIS_PASSWORD || process.env.REDIS_PASSWORD,
             db: parseInt(process.env.QUEUE_REDIS_DB || '1'),
         },
+        stream: {
+            url: process.env.STREAM_REDIS_URL || process.env.REDIS_URL!,
+            host: process.env.STREAM_REDIS_HOST || process.env.REDIS_HOST!,
+            port: parseInt(process.env.STREAM_REDIS_PORT || process.env.REDIS_PORT!),
+            password: process.env.STREAM_REDIS_PASSWORD || process.env.REDIS_PASSWORD,
+            db: parseInt(process.env.STREAM_REDIS_DB || '2'),
+        },
     },
 
     encryptions: {

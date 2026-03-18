@@ -19,8 +19,9 @@ async function main() {
     const streamConsumer = new RedisStreamConsumer();
     await streamConsumer.start();
 
-    // Initialize Redis client for health checks
-    const redisClient = new Redis(Config.get().redisUrl);
+    // Initialize Redis clients for health checks
+    const snapshotRedis = new Redis(Config.get().snapshotRedisUrl);
+    const streamRedis = new Redis(Config.get().streamRedisUrl);
 
     // Start health check server using Bun.serve
     Bun.serve({
@@ -60,24 +61,24 @@ async function main() {
                                 };
                             }
                         })(),
-                        // Redis health check
+                        // Redis health checks
                         (async () => {
                             try {
-                                const ping = await redisClient.ping();
-                                const info = await redisClient.info('server');
+                                const [snapshotPing, streamPing] = await Promise.all([
+                                    snapshotRedis.ping(),
+                                    streamRedis.ping(),
+                                ]);
                                 return {
                                     status: 'healthy',
                                     details: {
-                                        connected: true,
-                                        ping,
-                                        serverInfo: info.split('\r\n').slice(0, 5).join('\n'),
+                                        snapshot: { connected: true, ping: snapshotPing },
+                                        stream: { connected: true, ping: streamPing },
                                     },
                                 };
                             } catch (error) {
                                 return {
                                     status: 'unhealthy',
                                     details: {
-                                        connected: false,
                                         error:
                                             error instanceof Error
                                                 ? error.message
