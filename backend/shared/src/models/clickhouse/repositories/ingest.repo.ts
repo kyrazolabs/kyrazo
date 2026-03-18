@@ -62,8 +62,9 @@ export class IngestRepo {
                     WHERE event_id = {eventId:UInt64} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
                     LIMIT 1
                 `;
+            const unprefixedId = unprefixId(eventId) || '0';
             const params: Record<string, string | number | bigint> = {
-                eventId: BigInt(unprefixId(eventId) || '0'),
+                eventId: /^\d+$/.test(unprefixedId) ? BigInt(unprefixedId) : unprefixedId,
                 workspaceId: prefixId(workspaceId, 'workspace') as string,
                 namespaceId: prefixId(namespaceId, 'namespace') as string,
             };
@@ -77,7 +78,12 @@ export class IngestRepo {
             const data = await rows.json<SQLIngestEvent>();
             return transformWithId(data, 'event') as SQLIngestEvent[];
         } catch (error) {
-            logger.error('Failed to get delivered event', error as Error);
+            (logger as any).error('Failed to get delivered event from ClickHouse', {
+                error: error instanceof Error ? { message: error.message, stack: error.stack } : error,
+                eventId,
+                workspaceId,
+                namespaceId
+            });
             throw error;
         }
     }

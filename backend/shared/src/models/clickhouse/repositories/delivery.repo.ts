@@ -357,8 +357,9 @@ export class DeliveryRepo {
                 LIMIT 1
             `;
 
+            const unprefixedId = unprefixId(deliveryId) || '0';
             const queryParams = {
-                deliveryId: BigInt(unprefixId(deliveryId) || '0'),
+                deliveryId: /^\d+$/.test(unprefixedId) ? BigInt(unprefixedId) : unprefixedId,
                 workspaceId: prefixId(workspaceId, 'workspace'),
                 namespaceId: prefixId(namespaceId, 'namespace'),
             };
@@ -374,7 +375,12 @@ export class DeliveryRepo {
             const data = await rows.json<SQLDeliveryAttempt>();
             return transformWithId(data, 'delivery') as SQLDeliveryAttempt[];
         } catch (error) {
-            logger.error('Failed to get delivered event', error as Error);
+            (logger as any).error('Failed to get delivered event from ClickHouse', {
+                error: error instanceof Error ? { message: error.message, stack: error.stack } : error,
+                deliveryId,
+                workspaceId,
+                namespaceId
+            });
             throw error;
         }
     }
