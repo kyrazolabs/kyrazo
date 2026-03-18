@@ -272,7 +272,7 @@ export class WorkerConsumer {
                     message: error.message,
                     stack: error.stack,
                     ...error
-                }
+                } as any
             );
             msg.nak();
         }
