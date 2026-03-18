@@ -59,12 +59,11 @@ export class IngestRepo {
 
             const query = `
                     SELECT * FROM ingest_events
-                    WHERE event_id = {eventId:UInt64} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
+                    WHERE event_id = {eventId:String} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
                     LIMIT 1
                 `;
-            const unprefixedId = unprefixId(eventId) || '0';
-            const params: Record<string, string | number | bigint> = {
-                eventId: /^\d+$/.test(unprefixedId) ? BigInt(unprefixedId) : unprefixedId,
+            const params: Record<string, string | number> = {
+                eventId: unprefixId(eventId) || '0',
                 workspaceId: prefixId(workspaceId, 'workspace') as string,
                 namespaceId: prefixId(namespaceId, 'namespace') as string,
             };
@@ -122,8 +121,8 @@ export class IngestRepo {
             }
 
             if (eventId) {
-                conditions.push('event_id = {eventId:UInt64}');
-                params.eventId = BigInt(unprefixId(eventId) || '0');
+                conditions.push('event_id = {eventId:String}');
+                params.eventId = unprefixId(eventId) || '0';
             }
 
             const whereClause = `WHERE ${conditions.join(' AND ')}`;
