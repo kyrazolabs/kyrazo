@@ -59,13 +59,13 @@ export class IngestRepo {
 
             const query = `
                     SELECT * FROM ingest_events
-                    WHERE event_id = {eventId:String} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
+                    WHERE toString(event_id) = {eventId:String} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
                     LIMIT 1
                 `;
             const params: Record<string, string | number> = {
-                eventId: unprefixId(eventId) || '0',
-                workspaceId: prefixId(workspaceId, 'workspace') as string,
-                namespaceId: prefixId(namespaceId, 'namespace') as string,
+                eventId: String(unprefixId(eventId) || '0'),
+                workspaceId: String(prefixId(workspaceId, 'workspace')),
+                namespaceId: String(prefixId(namespaceId, 'namespace')),
             };
 
             const rows = await client.query({
@@ -73,6 +73,17 @@ export class IngestRepo {
                 format: 'JSONEachRow',
                 query_params: params,
             });
+
+            // Diagnostic: check if record exists by event_id alone
+            if (process.env.NODE_ENV === 'development' || true) {
+                const diagRows = await client.query({
+                    query: 'SELECT count() as count FROM ingest_events WHERE toString(event_id) = {eventId:String}',
+                    format: 'JSONEachRow',
+                    query_params: { eventId: params.eventId }
+                });
+                const diagData = await diagRows.json<{ count: string }>();
+                logger.debug(`[DIAGNOSTIC] Records with event_id ${params.eventId}:`, diagData[0]?.count);
+            }
 
             const data = await rows.json<SQLIngestEvent>();
             return transformWithId(data, 'event') as SQLIngestEvent[];
@@ -121,7 +132,7 @@ export class IngestRepo {
             }
 
             if (eventId) {
-                conditions.push('event_id = {eventId:String}');
+                conditions.push('toString(event_id) = {eventId:String}');
                 params.eventId = unprefixId(eventId) || '0';
             }
 
