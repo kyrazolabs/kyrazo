@@ -68,12 +68,13 @@ export class DispatcherPipeline {
 
             logger.debug(`✅ Publish event processed: ${messageData.eventId}`);
         } catch (error: any) {
-            logger.error('❌ Error processing publish event:', {
+            const errDetails = {
                 errStr: String(error),
                 message: error?.message,
                 name: error?.name,
                 stack: error?.stack,
-            });
+            };
+            logger.error('❌ Error processing publish event:', errDetails as any);
             throw error;
         }
     }
