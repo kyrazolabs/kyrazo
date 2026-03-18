@@ -121,6 +121,17 @@ export function transformWithId<T>(data: T, type: IdType): TransformedWithId<T> 
             delivery_id: 'delivery',
             associated_event_id: 'event',
             target_id: 'target',
+            workspace_id: 'workspace',
+            namespace_id: 'namespace',
+            source_id: 'source',
+            endpoint_id: 'endpoint',
+            user_id: 'user',
+            subscription_id: 'subscription',
+            // Aliases used in some queries
+            target: 'target',
+            source: 'source',
+            namespace: 'namespace',
+            workspace: 'workspace',
         };
 
         for (const [field, idType] of Object.entries(idFields)) {
