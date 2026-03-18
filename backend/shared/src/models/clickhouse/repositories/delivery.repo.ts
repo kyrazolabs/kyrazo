@@ -353,14 +353,14 @@ export class DeliveryRepo {
 
             const query = `
                 SELECT * FROM delivery_attempts
-                WHERE delivery_id = {deliveryId:String} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
+                WHERE toString(delivery_id) = {deliveryId:String} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
                 LIMIT 1
             `;
 
             const queryParams = {
-                deliveryId: unprefixId(deliveryId) || '0',
-                workspaceId: prefixId(workspaceId, 'workspace'),
-                namespaceId: prefixId(namespaceId, 'namespace'),
+                deliveryId: String(unprefixId(deliveryId) || '0'),
+                workspaceId: String(prefixId(workspaceId, 'workspace')),
+                namespaceId: String(prefixId(namespaceId, 'namespace')),
             };
 
             logger.debug('Fetching delivery from ClickHouse:', queryParams);
@@ -370,6 +370,17 @@ export class DeliveryRepo {
                 format: 'JSONEachRow',
                 query_params: queryParams,
             });
+
+            // Diagnostic: check if record exists by delivery_id alone
+            if (process.env.NODE_ENV === 'development' || true) {
+                 const diagRows = await client.query({
+                     query: 'SELECT count() as count FROM delivery_attempts WHERE toString(delivery_id) = {deliveryId:String}',
+                     format: 'JSONEachRow',
+                     query_params: { deliveryId: queryParams.deliveryId }
+                 });
+                 const diagData = await diagRows.json<{ count: string }>();
+                 logger.debug(`[DIAGNOSTIC] Records with delivery_id ${queryParams.deliveryId}:`, diagData[0]?.count);
+            }
 
             const data = await rows.json<SQLDeliveryAttempt>();
             return transformWithId(data, 'delivery') as SQLDeliveryAttempt[];
