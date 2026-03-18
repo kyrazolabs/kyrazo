@@ -11,17 +11,10 @@ export class IngestProducer {
     private constructor() {}
 
     public async initialize(): Promise<void> {
-        this.redis = redisConfig.getQueueClient();
+        // Use the MAIN Redis client (DB 0) for stream operations.
+        // The ingestor reads from REDIS_URL which is DB 0.
+        this.redis = redisConfig.getClient();
         logger.info('[IngestProducer] Initializing Redis Stream Producer...');
-        // Ensure connection is ready
-        if (this.redis.status === 'wait') {
-            await this.redis.connect().catch(err => {
-                logger.warn(
-                    '[IngestProducer] Redis connection attempt failed, may already be connected:',
-                    err
-                );
-            });
-        }
         logger.info(`[IngestProducer] Redis Stream Producer aligned with ${this.streamName}`);
     }
 
@@ -57,7 +50,7 @@ export class IngestProducer {
             };
 
             await this.redis.xadd(this.streamName, '*', 'payload', payload.payload);
-            logger.debug(
+            logger.info(
                 `[IngestProducer] Successfully added ingest event ${data.event_id} to stream`
             );
         } catch (error: any) {
