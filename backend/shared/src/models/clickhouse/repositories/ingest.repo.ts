@@ -59,11 +59,11 @@ export class IngestRepo {
 
             const query = `
                     SELECT * FROM ingest_events
-                    WHERE event_id = {eventId:String} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
+                    WHERE event_id = {eventId:UInt64} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
                     LIMIT 1
                 `;
-            const params: Record<string, string | number> = {
-                eventId: unprefixId(eventId) || eventId,
+            const params: Record<string, string | number | bigint> = {
+                eventId: BigInt(unprefixId(eventId) || '0'),
                 workspaceId: prefixId(workspaceId, 'workspace') as string,
                 namespaceId: prefixId(namespaceId, 'namespace') as string,
             };
@@ -86,7 +86,8 @@ export class IngestRepo {
         namespaceId: string,
         status: string | undefined,
         limit: number,
-        page: number
+        page: number,
+        eventId?: string
     ): Promise<{ data: SQLIngestEvent[]; total: number }> {
         try {
             const client = this.getClient();
@@ -102,7 +103,7 @@ export class IngestRepo {
                 'workspace_id = {workspaceId:String}',
                 'namespace_id = {namespaceId:String}',
             ];
-            const params: Record<string, string | number> = {
+            const params: Record<string, string | number | bigint> = {
                 workspaceId: prefixId(workspaceId, 'workspace') as string,
                 namespaceId: prefixId(namespaceId, 'namespace') as string,
                 limit: perPage,
@@ -112,6 +113,11 @@ export class IngestRepo {
             if (status) {
                 conditions.push('status = {status:String}');
                 params.status = status;
+            }
+
+            if (eventId) {
+                conditions.push('event_id = {eventId:UInt64}');
+                params.eventId = BigInt(unprefixId(eventId) || '0');
             }
 
             const whereClause = `WHERE ${conditions.join(' AND ')}`;
@@ -147,7 +153,7 @@ export class IngestRepo {
 
             return { data: transformedData, total };
         } catch (error) {
-            logger.error('Unexpected error in DeliveryRepo.getDeliveries', error as Error);
+            logger.error('Unexpected error in IngestRepo.getIngestEvents', error as Error);
             throw error;
         }
     }
