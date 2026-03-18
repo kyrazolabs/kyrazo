@@ -56,7 +56,7 @@ export class DispatchProducer {
             };
 
             await this.redis.xadd(this.streamName, '*', 'payload', payload.payload);
-            logger.debug(
+            logger.info(
                 `[DispatchProducer] Successfully added delivery attempt ${data.delivery_id} to stream`
             );
         } catch (error: any) {

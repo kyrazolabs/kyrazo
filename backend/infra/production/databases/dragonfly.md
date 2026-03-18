@@ -11,8 +11,8 @@ This document describes the Dragonfly configuration for all Kyrazo services. Dra
 | Dashboard API | Cache (auth, plans, subscriptions) | `0` | `cache:*`                                        |
 | Worker        | BullMQ job queue (event dispatch)  | `1` | `bull:event-dispatch:*`                          |
 | Worker        | Real-time analytics (hashes)       | `0` | `analytics:rt:*`                                 |
-| Worker        | Stream producer                    | `0` | `stream:dispatch-events`, `stream:ingest-events` |
-| Ingestor      | Stream consumer                    | `0` | `stream:dispatch-events`, `stream:ingest-events` |
+| Worker        | Stream producer                    | `2` | `stream:dispatch-events`, `stream:ingest-events` |
+| Ingestor      | Stream consumer                    | `2` | `stream:dispatch-events`, `stream:ingest-events` |
 | Worker        | Event deduplication (hashes)       | `0` | `wh:evt:*`                                       |
 
 ---
