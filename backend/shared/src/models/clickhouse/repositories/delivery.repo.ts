@@ -353,13 +353,12 @@ export class DeliveryRepo {
 
             const query = `
                 SELECT * FROM delivery_attempts
-                WHERE delivery_id = {deliveryId:UInt64} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
+                WHERE delivery_id = {deliveryId:String} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
                 LIMIT 1
             `;
 
-            const unprefixedId = unprefixId(deliveryId) || '0';
             const queryParams = {
-                deliveryId: /^\d+$/.test(unprefixedId) ? BigInt(unprefixedId) : unprefixedId,
+                deliveryId: unprefixId(deliveryId) || '0',
                 workspaceId: prefixId(workspaceId, 'workspace'),
                 namespaceId: prefixId(namespaceId, 'namespace'),
             };
