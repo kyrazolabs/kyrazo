@@ -357,14 +357,18 @@ export class DeliveryRepo {
                 LIMIT 1
             `;
 
+            const queryParams = {
+                deliveryId: BigInt(unprefixId(deliveryId) || '0'),
+                workspaceId: prefixId(workspaceId, 'workspace'),
+                namespaceId: prefixId(namespaceId, 'namespace'),
+            };
+
+            logger.debug('Fetching delivery from ClickHouse:', queryParams);
+
             const rows = await client.query({
                 query,
                 format: 'JSONEachRow',
-                query_params: {
-                    deliveryId: unprefixId(deliveryId),
-                    workspaceId: prefixId(workspaceId, 'workspace'),
-                    namespaceId: prefixId(namespaceId, 'namespace'),
-                },
+                query_params: queryParams,
             });
 
             const data = await rows.json<SQLDeliveryAttempt>();
