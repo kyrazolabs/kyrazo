@@ -1,4 +1,4 @@
-import { logger, type SQLIngestEvent, Source, secretCrypto, unprefixId } from '@kyrazo/shared';
+import { logger, type SQLIngestEvent, Source, secretCrypto, unprefixId, prefixId } from '@kyrazo/shared';
 import { webflowValidator } from './webflow.validator';
 import { webflowSignature } from './webflow.signature';
 import { webflowTransformer } from './webflow.transformer';
@@ -69,7 +69,7 @@ export class WebflowPipeline {
                 sourceSecret = secretCrypto.decrypt(
                     credentials.secret,
                     credentials.iv,
-                    source.namespaceId.toString()
+                    prefixId(source.namespaceId, 'namespace') as string
                 );
             } catch (error: any) {
                 logger.warn(

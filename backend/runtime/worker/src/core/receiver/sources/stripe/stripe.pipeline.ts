@@ -1,4 +1,4 @@
-import { logger, type SQLIngestEvent, Source, secretCrypto, unprefixId } from '@kyrazo/shared';
+import { logger, type SQLIngestEvent, Source, secretCrypto, unprefixId, prefixId } from '@kyrazo/shared';
 import { stripeValidator } from './stripe.validator';
 import { stripeSignature } from './stripe.signature';
 import type { IReceivedEvent } from '@/types/events/event.types';
@@ -65,7 +65,7 @@ export class StripePipeline {
                 sourceSecret = secretCrypto.decrypt(
                     credentials.secret,
                     credentials.iv,
-                    source.namespaceId.toString()
+                    prefixId(source.namespaceId, 'namespace') as string
                 );
             } catch (error: any) {
                 logger.warn(

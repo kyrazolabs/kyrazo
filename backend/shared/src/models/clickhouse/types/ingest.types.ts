@@ -28,4 +28,9 @@ export interface SQLIngestEvent {
     processing_error: string | null;
 
     associated_event_id: string | null; // UInt64
+
+    // Joined routing metadata (from dispatched_events)
+    route_to?: string;
+    route_max_retries?: number;
+    route_inserted_at?: string;
 }
