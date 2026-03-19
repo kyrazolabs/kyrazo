@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-LOG_DIR="/app/apis/ingest/logs"
+LOG_DIR="/app/apis/integration/logs"
 CERTS_DIR="/data/nats/certs"
 
 # Ensure the logs directory exists and is writable by the bun user (UID 1000)
