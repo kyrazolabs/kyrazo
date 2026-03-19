@@ -125,11 +125,14 @@ export class ingestController {
                 }
             }
 
-            const shard = parseInt(source.workspaceId.toString().slice(-6), 16) % 10;
+            const sourceIdStr = (source.id || source._id).toString();
+            const workspaceIdStr = source.workspaceId.toString();
+            const namespaceIdStr = source.namespaceId.toString();
+            const userIdStr = source.userId.toString();
 
-            const planSlug = await redisConfig.get(
-                `workspace:${unprefixId(source.workspaceId.toString())}`
-            );
+            const shard = parseInt(unprefixId(workspaceIdStr)!.slice(-6), 16) % 10;
+
+            const planSlug = await redisConfig.get(`workspace:${unprefixId(workspaceIdStr)}`);
 
             // Create the received event data
             const receivedEventData: IReceivedEvent & {
@@ -140,11 +143,11 @@ export class ingestController {
                 eventId: snowflake.generate(),
                 source: service ? service : source.service,
                 sourceType: 'receive',
-                sourceId: source._id.toString(),
-                workspaceId: source.workspaceId.toString(),
-                namespaceId: source.namespaceId.toString(),
+                sourceId: sourceIdStr,
+                workspaceId: workspaceIdStr,
+                namespaceId: namespaceIdStr,
                 ingressId: source.ingressId,
-                userId: source.userId.toString(),
+                userId: userIdStr,
 
                 receivedAt: new Date(),
                 headers: mapToObject(new Map(Object.entries(headers))),
@@ -163,7 +166,7 @@ export class ingestController {
 
             // Track usage asynchronously
             usageProducer.trackEvent(
-                source.workspaceId.toString(),
+                workspaceIdStr,
                 undefined, // subscriptionId not available here, consumer will resolve
                 'eventsPerMonth',
                 1
