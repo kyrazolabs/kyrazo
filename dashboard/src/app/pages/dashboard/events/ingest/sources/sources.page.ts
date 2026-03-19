@@ -316,7 +316,7 @@ export class SourcesPage implements OnInit, OnDestroy {
                     new_status: newStatus,
                 });
             },
-            error: (error) => {
+            error: (error: any) => {
                 this.sentry.captureException(error);
                 this.posthog.capture('source_update_error', {
                     source_id: source.id,
@@ -360,7 +360,7 @@ export class SourcesPage implements OnInit, OnDestroy {
                     source_id: source.id,
                 });
             },
-            error: (error) => {
+            error: (error: any) => {
                 this.sentry.captureException(error);
                 this.posthog.capture('source_delete_error', {
                     source_id: source.id,

@@ -105,8 +105,9 @@ export class SourcePage implements OnInit, AfterViewInit {
     private endpointService = inject(EndpointService);
     public subscriptionService = inject(SubscriptionService);
 
-    public readonly hasForwarding =
-        this.subscriptionService.hasFeature('forwardConfiguration');
+    public readonly hasForwarding = this.subscriptionService.hasFeature(
+        'forwardConfiguration',
+    );
 
     // Signals for reactive data
     source = signal<ISource | null>(null);
@@ -184,7 +185,7 @@ export class SourcePage implements OnInit, AfterViewInit {
                 // Load ingest events after source is loaded
                 this.loadIngestEvents();
             },
-            error: (error) => {
+            error: (error: any) => {
                 this.sentry.captureException(error);
                 console.error('Error loading source:', error);
                 this.loading.set(false);
@@ -214,7 +215,7 @@ export class SourcePage implements OnInit, AfterViewInit {
                     } successfully`,
                 });
             },
-            error: (error) => {
+            error: (error: any) => {
                 this.sentry.captureException(error);
                 console.error('Error updating source status:', error);
                 this.mes.add({
@@ -473,7 +474,7 @@ export class SourcePage implements OnInit, AfterViewInit {
                     });
                     this.closeAuthDialog();
                 },
-                error: (error) => {
+                error: (error: any) => {
                     this.sentry.captureException(error);
                     console.error('Error updating auth:', error);
                     this.mes.add({
@@ -531,26 +532,28 @@ export class SourcePage implements OnInit, AfterViewInit {
 
     private updateSourceEndpoints(sourceId: string, endpointIds: string[]) {
         this.loader.show();
-        this.sourceService.update(sourceId, { endpoints: endpointIds }).subscribe({
-            next: () => {
-                this.mes.add({
-                    severity: 'success',
-                    summary: 'Success',
-                    detail: 'Source endpoints updated',
-                });
-                this.loadSourceData(sourceId);
-                this.loader.hide();
-            },
-            error: (err) => {
-                this.sentry.captureException(err);
-                this.mes.add({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: 'Failed to update endpoints',
-                });
-                this.loader.hide();
-            },
-        });
+        this.sourceService
+            .update(sourceId, { endpoints: endpointIds })
+            .subscribe({
+                next: () => {
+                    this.mes.add({
+                        severity: 'success',
+                        summary: 'Success',
+                        detail: 'Source endpoints updated',
+                    });
+                    this.loadSourceData(sourceId);
+                    this.loader.hide();
+                },
+                error: (err) => {
+                    this.sentry.captureException(err);
+                    this.mes.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Failed to update endpoints',
+                    });
+                    this.loader.hide();
+                },
+            });
     }
 
     openAddEndpointDialog() {

@@ -77,9 +77,9 @@ export class EndpointDetailPage implements OnInit {
                     };
                     this.endpoint.set(data);
                 },
-                error: (error) => {
+                error: (error: any) => {
                     this.sentry.captureException(error);
-                    console.error(error);
+                    console.error(error: any);
                 },
             });
         }
@@ -188,7 +188,7 @@ export class EndpointDetailPage implements OnInit {
                 this.isSecretVisible.set(true);
                 this.loadingSecret.set(false);
             },
-            error: (error) => {
+            error: (error: any) => {
                 this.sentry.captureException(error);
                 console.error('Failed to fetch secret:', error);
                 this.loadingSecret.set(false);

@@ -108,7 +108,7 @@ export class CreateFirstNamespaceComponent {
                     this.closeDialog();
                     this.isCreating = false;
                 },
-                error: (error) => {
+                error: (error: any) => {
                     console.error('Failed to create namespace:', error);
                     const errorMessage =
                         error.error?.error?.code === 'LIMIT_EXCEEDED'

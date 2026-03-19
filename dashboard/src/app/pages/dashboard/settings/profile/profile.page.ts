@@ -226,7 +226,7 @@ export class ProfileSettingsPage {
                         });
                     }
                 },
-                error: (error) => {
+                error: (error: any) => {
                     this.sentry.captureException(error);
                     this.messageService.add({
                         severity: 'error',
@@ -271,7 +271,7 @@ export class ProfileSettingsPage {
                         });
                     }
                 },
-                error: (error) => {
+                error: (error: any) => {
                     this.sentry.captureException(error);
                     this.messageService.add({
                         severity: 'error',

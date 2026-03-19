@@ -256,7 +256,7 @@ export class FormPage implements OnInit {
                 this.populateForm(response.data);
                 this.loading.set(false);
             },
-            error: (error) => {
+            error: (error: any) => {
                 this.sentry.captureException(error);
                 this.loading.set(false);
                 this.mes.add({
@@ -360,7 +360,7 @@ export class FormPage implements OnInit {
                     });
                     this.goBack();
                 },
-                error: (error) => {
+                error: (error: any) => {
                     this.sentry.captureException(error);
                     this.posthog.capture('source_update_error', {
                         source_id: this.sourceId,
@@ -424,7 +424,7 @@ export class FormPage implements OnInit {
                     this.dls.showMessage('ingress', response.data);
                     this.router.navigate(['/events/ingest/sources']);
                 },
-                error: (error) => {
+                error: (error: any) => {
                     this.sentry.captureException(error);
                     this.posthog.capture('source_creation_error', {
                         service: createData.service,

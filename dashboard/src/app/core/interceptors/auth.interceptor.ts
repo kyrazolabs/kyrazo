@@ -101,7 +101,7 @@ function handle401Error(
                 return next(addToken(req, newAccessToken));
             }),
 
-            catchError((error) => {
+            catchError((error: any) => {
                 isRefreshing = false;
                 return throwError(() => error);
             }),

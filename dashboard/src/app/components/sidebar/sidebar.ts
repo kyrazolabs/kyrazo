@@ -177,7 +177,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
 
                 this.loading = false;
             },
-            error: (error) => {
+            error: (error: any) => {
                 console.error('Failed to load workspaces:', error);
                 this.loading = false;
             },

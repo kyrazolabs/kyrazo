@@ -116,7 +116,7 @@ export class LogPage {
         try {
             await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
             // Optionally show a message, but for now just copy
-        } catch (err) {
+        } catch (err: any) {
             console.error('Failed to copy: ', err);
         }
     }

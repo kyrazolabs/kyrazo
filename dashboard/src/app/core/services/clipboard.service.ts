@@ -23,7 +23,7 @@ export class ClipboardService {
                 detail: 'Copied to clipboard',
                 life: 3000,
             });
-        } catch (err) {
+        } catch (err: any) {
             console.error('Failed to copy to clipboard:', err);
             this.messageService.add({
                 severity: 'error',

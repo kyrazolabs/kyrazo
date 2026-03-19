@@ -18,7 +18,15 @@ import {
     Router,
     RouterLink,
 } from '@angular/router';
-import { filter, map, take, switchMap, tap, startWith, catchError } from 'rxjs/operators';
+import {
+    filter,
+    map,
+    take,
+    switchMap,
+    tap,
+    startWith,
+    catchError,
+} from 'rxjs/operators';
 import { merge, Subject, of } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -129,7 +137,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
         private router: Router,
         private route: ActivatedRoute,
         private store: StorageService,
-    ) { }
+    ) {}
 
     showCreateNamespace() {
         this.dialogService.openNamespaceDialog();
@@ -184,7 +192,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
                 tap(() => (this.loadingNamespaces = true)),
                 switchMap(() =>
                     this.ps.getWorkspaceNamespaces().pipe(
-                        catchError((error) => {
+                        catchError((error: any) => {
                             console.error('Failed to load namespaces:', error);
                             return of({ success: false, data: [] } as any);
                         }),

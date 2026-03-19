@@ -179,7 +179,7 @@ export class EndpointFormComponent implements OnInit, OnChanges {
                 }
                 this.initialLoading.set(false);
             },
-            error: (error) => {
+            error: (error: any) => {
                 this.sentry.captureException(error);
                 this.initialLoading.set(false);
                 this.mes.add({
@@ -271,7 +271,7 @@ export class EndpointFormComponent implements OnInit, OnChanges {
                 }
                 this.dialogService.closeEndpointDialog();
             },
-            error: (error) => {
+            error: (error: any) => {
                 this.loading.set(false);
                 this.sentry.captureException(error);
                 const errorMessage =

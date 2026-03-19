@@ -261,7 +261,7 @@ export class EndpointsPage implements OnInit {
                     context: 'list_toggle',
                 });
             },
-            error: (error) => {
+            error: (error: any) => {
                 this.sentry.captureException(error);
                 this.posthog.capture('endpoint_update_error', {
                     endpoint_id: endpoint.id,
@@ -309,7 +309,7 @@ export class EndpointsPage implements OnInit {
             life: 3000
           });
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Error deleting endpoint:', error);
           this.messageService.add({
             severity: 'error',

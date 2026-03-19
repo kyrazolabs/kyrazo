@@ -839,7 +839,7 @@ export class TargetPage implements OnInit, AfterViewInit {
                 this.copyTooltip.set('Copy Secret');
                 this.isCopied.set(false);
             }, 2000);
-        } catch (err) {
+        } catch (err: any) {
             console.error('Failed to copy to clipboard:', err);
         }
     }
@@ -944,7 +944,6 @@ export class TargetPage implements OnInit, AfterViewInit {
         return aggregated.sort((a, b) => a.day.localeCompare(b.day));
     }
 
-
     // Secret Management
     signingSecret = signal<string | null>(null);
     isSecretVisible = signal<boolean>(false);
@@ -972,7 +971,7 @@ export class TargetPage implements OnInit, AfterViewInit {
                 this.isSecretVisible.set(true);
                 this.loadingSecret.set(false);
             },
-            error: (error) => {
+            error: (error: any) => {
                 this.sentry.captureException(error);
                 console.error('Failed to fetch secret:', error);
                 this.loadingSecret.set(false);

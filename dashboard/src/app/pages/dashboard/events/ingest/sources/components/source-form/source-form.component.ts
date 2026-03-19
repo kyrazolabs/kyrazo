@@ -105,8 +105,9 @@ export class SourceFormComponent implements OnInit, OnChanges {
     private readonly sentry = inject(SentryService);
     private readonly posthog = inject(PostHogService);
 
-    public readonly hasForwarding =
-        this.subscriptionService.hasFeature('forwardConfiguration');
+    public readonly hasForwarding = this.subscriptionService.hasFeature(
+        'forwardConfiguration',
+    );
 
     @Input() sourceId: string | null = null;
     @Input() sourceType: string | null = null; // For default type when creating
@@ -287,7 +288,7 @@ export class SourceFormComponent implements OnInit, OnChanges {
                 this.populateForm(response.data);
                 this.initialLoading.set(false);
             },
-            error: (error) => {
+            error: (error: any) => {
                 this.sentry.captureException(error);
                 this.initialLoading.set(false);
                 this.mes.add({
@@ -350,12 +351,13 @@ export class SourceFormComponent implements OnInit, OnChanges {
                           (et: string) => et && et.trim(),
                       )
                     : [],
-                forwarding: this.hasForwarding() 
-                    ? (Array.isArray(formValue.endpoints) && formValue.endpoints.length > 0)
+                forwarding: this.hasForwarding()
+                    ? Array.isArray(formValue.endpoints) &&
+                      formValue.endpoints.length > 0
                     : (this.loadedSource()?.forwarding ?? false),
-                endpoints: this.hasForwarding() 
-                    ? formValue.endpoints 
-                    : (this.loadedSource()?.endpoints?.map(e => e.id) ?? []),
+                endpoints: this.hasForwarding()
+                    ? formValue.endpoints
+                    : (this.loadedSource()?.endpoints?.map((e) => e.id) ?? []),
             };
 
             this.sourceService.update(this.sourceId!, updateData).subscribe({
@@ -371,7 +373,7 @@ export class SourceFormComponent implements OnInit, OnChanges {
                     this.loading.set(false);
                     this.onSuccess.emit();
                 },
-                error: (error) => {
+                error: (error: any) => {
                     this.sentry.captureException(error);
                     this.posthog.capture('source_update_error', {
                         source_id: this.sourceId,
@@ -399,7 +401,9 @@ export class SourceFormComponent implements OnInit, OnChanges {
                     this.hasForwarding() &&
                     Array.isArray(formValue.endpoints) &&
                     formValue.endpoints.length > 0,
-                endpoints: this.hasForwarding() ? formValue.endpoints || [] : [], // Map endpoints
+                endpoints: this.hasForwarding()
+                    ? formValue.endpoints || []
+                    : [], // Map endpoints
                 retryPolicy: {
                     maxAttempts: 3,
                     backoffStrategy: backoffStrategy.EXPONENTIAL,
@@ -433,7 +437,7 @@ export class SourceFormComponent implements OnInit, OnChanges {
                     this.loading.set(false);
                     this.onSuccess.emit(response.data); // optional pass back data
                 },
-                error: (error) => {
+                error: (error: any) => {
                     this.sentry.captureException(error);
                     this.posthog.capture('source_creation_error', {
                         service: createData.service,
