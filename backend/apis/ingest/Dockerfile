@@ -59,7 +59,6 @@ RUN mkdir -p /app/apis/ingest/logs && chown -R bun:bun /app/apis/ingest/logs
 COPY apis/ingest/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-
 # Ensure everything is owned by the bun user before switching
 RUN chown -R bun:bun /app
 

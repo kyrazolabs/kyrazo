@@ -47,6 +47,13 @@ COPY --from=builder /app/apis/integration/src /app/apis/integration/src
 # Set working directory to integration package
 WORKDIR /app/apis/integration
 
+# Pre-create logs directory
+RUN mkdir -p /app/apis/integration/logs && chown -R bun:bun /app/apis/integration/logs
+
+# Copy and setup entrypoint script
+COPY apis/integration/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 # Ensure everything is owned by the bun user before switching
 RUN chown -R bun:bun /app
 

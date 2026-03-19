@@ -36,6 +36,7 @@ services:
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
     volumes:
       - ./logs:/app/apis/ingest/logs
+      - /data/nats/certs:/data/nats/certs:ro
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:${PORT}/v1/health"]
