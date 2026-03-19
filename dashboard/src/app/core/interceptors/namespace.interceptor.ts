@@ -17,6 +17,7 @@ export const namespaceInterceptor: HttpInterceptorFn = (req, next) => {
         req.url.includes('/v1/plans') ||
         req.url.includes('/v1/subscriptions') ||
         req.url.includes('/v1/payment') ||
+        req.url.includes('/v1/events') ||
         req.url.includes('/v1/support')
     ) {
         if (!workspace && !namespace) return next(req);
