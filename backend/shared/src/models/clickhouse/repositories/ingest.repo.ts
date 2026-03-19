@@ -59,11 +59,11 @@ export class IngestRepo {
 
             const query = `
                     SELECT * FROM ingest_events
-                    WHERE toString(event_id) = {eventId:String} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
+                    WHERE event_id = {eventId:UInt64} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
                     LIMIT 1
                 `;
             const params: Record<string, string | number> = {
-                eventId: String(unprefixId(eventId) || '0'),
+                eventId: Number(unprefixId(eventId) || '0'),
                 workspaceId: String(prefixId(workspaceId, 'workspace')),
                 namespaceId: String(prefixId(namespaceId, 'namespace')),
             };
@@ -73,17 +73,6 @@ export class IngestRepo {
                 format: 'JSONEachRow',
                 query_params: params,
             });
-
-            // Diagnostic: check if record exists by event_id alone
-            if (process.env.NODE_ENV === 'development' || true) {
-                const diagRows = await client.query({
-                    query: 'SELECT count() as count FROM ingest_events WHERE toString(event_id) = {eventId:String}',
-                    format: 'JSONEachRow',
-                    query_params: { eventId: params.eventId }
-                });
-                const diagData = await diagRows.json<{ count: string }>();
-                logger.debug(`[DIAGNOSTIC] Records with event_id ${params.eventId}:`, diagData[0]?.count);
-            }
 
             const data = await rows.json<SQLIngestEvent>();
             return transformWithId(data, 'event') as SQLIngestEvent[];
@@ -132,8 +121,8 @@ export class IngestRepo {
             }
 
             if (eventId) {
-                conditions.push('toString(event_id) = {eventId:String}');
-                params.eventId = unprefixId(eventId) || '0';
+                conditions.push('event_id = {eventId:UInt64}');
+                params.eventId = Number(unprefixId(eventId) || '0');
             }
 
             const whereClause = `WHERE ${conditions.join(' AND ')}`;
