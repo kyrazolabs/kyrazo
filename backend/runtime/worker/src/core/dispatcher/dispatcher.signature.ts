@@ -85,8 +85,8 @@ export class DispatcherSignature {
                 // Fallback to namespace ID
                 secret = namespaceId;
             }
-        } catch (error) {
-            logger.error('Decryption failed in signature, using fallback', error as Error);
+        } catch (error: any) {
+            logger.error('Decryption failed in signature, using fallback', error);
             secret = namespaceId;
         }
 

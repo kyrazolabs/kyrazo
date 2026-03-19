@@ -3,18 +3,11 @@ import { logger as honoLogger } from 'hono/logger';
 import { requestId as RequestId } from 'hono/request-id';
 import { cors } from 'hono/cors';
 
-import {
-    redisConfig,
-    config,
-    natsConfig /* clickhouseConfig */,
-} from './configs';
+import { redisConfig, config, natsConfig /* clickhouseConfig */ } from './configs';
 
 // import { arcjetMiddleware } from '@/middlewares/arcjet.middleware'
 import { errorHandler } from 'hono-error-handler';
-import {
-    handleMongooseErrors,
-    zodErrorHandler,
-} from '@/core/middlewares/error.middleware';
+import { handleMongooseErrors, zodErrorHandler } from '@/core/middlewares/error.middleware';
 
 // BullMQ Board
 // import { createBullBoard } from '@bull-board/api';
@@ -77,8 +70,8 @@ const initializeConnections = async () => {
             logger.info('NATS connected successfully');
         });
         return true;
-    } catch (error) {
-        logger.error('Failed to initialize connections:', error as Error);
+    } catch (error: any) {
+        logger.error('Failed to initialize connections:', error);
         return false;
     }
 };
@@ -101,7 +94,7 @@ const gracefulShutdown = async (signal: string) => {
             logger.info('Database connection closed');
         })
         .catch(error => {
-            logger.error('Error closing database connection:', error as Error);
+            logger.error('Error closing database connection:', error);
         });
 
     // Close Redis connection
@@ -111,7 +104,7 @@ const gracefulShutdown = async (signal: string) => {
             logger.info('Redis connection closed');
         })
         .catch(error => {
-            logger.error('Error closing Redis connection:', error as Error);
+            logger.error('Error closing Redis connection:', error);
         });
 
     natsConfig
@@ -120,7 +113,7 @@ const gracefulShutdown = async (signal: string) => {
             logger.info('NATS connection closed');
         })
         .catch(error => {
-            logger.error('Error closing NATS connection:', error as Error);
+            logger.error('Error closing NATS connection:', error);
         });
 
     // Close event workers
@@ -128,7 +121,7 @@ const gracefulShutdown = async (signal: string) => {
     //   userMetricsWorker.close().then(() => {
     //     logger.info('Event workers closed');
     //   }).catch((error: any) => {
-    //     logger.error('Error closing event workers:', error as Error);
+    //     logger.error('Error closing event workers:', error);
     //   });
     // }
 
@@ -138,15 +131,13 @@ const gracefulShutdown = async (signal: string) => {
     //   logger.info('Notification queue closed');
     //   process.exit(0);
     // }).catch((error: any) => {
-    //   logger.error('Error closing notification queue:', error as Error);
+    //   logger.error('Error closing notification queue:', error);
     //   process.exit(1);
     // });
 
     // Force close after 30 seconds
     setTimeout(() => {
-        logger.error(
-            'Could not close connections in time, forcefully shutting down'
-        );
+        logger.error('Could not close connections in time, forcefully shutting down');
         process.exit(1);
     }, 30000);
 };
@@ -173,23 +164,17 @@ const startServer = async () => {
             fetch: app.fetch,
         });
 
-        logger.info(
-            `Server running on port ${config.server.port} in ${config.server.env} mode`
-        );
-        logger.info(
-            `API documentation available at http://localhost:${config.server.port}/api/v1`
-        );
-        logger.info(
-            `Health check available at http://localhost:${config.server.port}/health`
-        );
+        logger.info(`Server running on port ${config.server.port} in ${config.server.env} mode`);
+        logger.info(`API documentation available at http://localhost:${config.server.port}/api/v1`);
+        logger.info(`Health check available at http://localhost:${config.server.port}/health`);
 
         // Bun.serve() doesn't return a server object like Node.js
         // It starts the server immediately and throws if there's an error
         logger.info('Server started successfully');
 
         return server;
-    } catch (error) {
-        logger.error('Failed to start server:', error as Error);
+    } catch (error: any) {
+        logger.error('Failed to start server:', error);
         process.exit(1);
     }
 };
@@ -202,7 +187,7 @@ startServer()
         server = startedServer;
     })
     .catch(error => {
-        logger.error('Failed to start server:', error as Error);
+        logger.error('Failed to start server:', error);
         process.exit(1);
     });
 
@@ -212,7 +197,7 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // Handle uncaught exceptions
 process.on('uncaughtException', error => {
-    logger.error('Uncaught Exception:', error as Error);
+    logger.error('Uncaught Exception:', error);
     process.exit(1);
 });
 

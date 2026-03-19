@@ -29,9 +29,7 @@ export class SupportService {
         // Add to queue for reliable delivery
         return this.queue.add(async () => {
             try {
-                logger.info(
-                    `Sending support ticket to webhook for user: ${userDetails.email}`
-                );
+                logger.info(`Sending support ticket to webhook for user: ${userDetails.email}`);
                 await got.post(this.webhookUrl, {
                     json: payload,
                     retry: {
@@ -42,14 +40,9 @@ export class SupportService {
                     },
                 });
 
-                logger.info(
-                    `Support ticket sent successfully for user: ${userDetails.email}`
-                );
-            } catch (error) {
-                logger.error(
-                    'Failed to send support ticket to webhook:',
-                    error as Error
-                );
+                logger.info(`Support ticket sent successfully for user: ${userDetails.email}`);
+            } catch (error: any) {
+                logger.error('Failed to send support ticket to webhook:', error);
                 // Depending on requirements, we might want to retry here or just log the failure.
                 // PQueue doesn't handle retries automatically, but got/manual logic could.
                 throw error;

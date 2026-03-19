@@ -47,7 +47,7 @@ async function main() {
                                         database: 'ClickHouse',
                                     },
                                 };
-                            } catch (error) {
+                            } catch (error: any) {
                                 return {
                                     status: 'unhealthy',
                                     details: {
@@ -75,7 +75,7 @@ async function main() {
                                         stream: { connected: true, ping: streamPing },
                                     },
                                 };
-                            } catch (error) {
+                            } catch (error: any) {
                                 return {
                                     status: 'unhealthy',
                                     details: {
@@ -112,7 +112,7 @@ async function main() {
                             headers: { 'Content-Type': 'application/json' },
                         }
                     );
-                } catch (error) {
+                } catch (error: any) {
                     return new Response(
                         JSON.stringify({
                             success: false,
@@ -149,10 +149,10 @@ async function main() {
 
         try {
             await streamConsumer.stop();
-            
+
             console.info('Cleanup complete. Exiting.');
             process.exit(0);
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error during shutdown:', error);
             process.exit(1);
         }

@@ -1,6 +1,6 @@
-import type { IReceivedEvent } from "@/types/events/event.types";
-import type { PayPalWebhookEvent } from "./paypal.types";
-import { logger } from "@kyrazo/shared";
+import type { IReceivedEvent } from '@/types/events/event.types';
+import type { PayPalWebhookEvent } from './paypal.types';
+import { logger } from '@kyrazo/shared';
 
 export class PayPalValidator {
     private static instance: PayPalValidator;
@@ -20,7 +20,7 @@ export class PayPalValidator {
      */
     public validate(event: IReceivedEvent): boolean {
         if (!event || !event.body) {
-            logger.warn("[PayPalValidator] Empty event or body");
+            logger.warn('[PayPalValidator] Empty event or body');
             return false;
         }
 
@@ -37,51 +37,34 @@ export class PayPalValidator {
             const payload = event.body as unknown as PayPalWebhookEvent;
 
             // Basic structural validation
-            if (!payload.id || typeof payload.id !== "string") {
+            if (!payload.id || typeof payload.id !== 'string') {
                 logger.warn("[PayPalValidator] Missing or invalid 'id'");
                 return false;
             }
 
-            if (!payload.event_type || typeof payload.event_type !== "string") {
-                logger.warn(
-                    "[PayPalValidator] Missing or invalid 'event_type'",
-                );
+            if (!payload.event_type || typeof payload.event_type !== 'string') {
+                logger.warn("[PayPalValidator] Missing or invalid 'event_type'");
                 return false;
             }
 
-            if (
-                !payload.resource_type ||
-                typeof payload.resource_type !== "string"
-            ) {
-                logger.warn(
-                    "[PayPalValidator] Missing or invalid 'resource_type'",
-                );
+            if (!payload.resource_type || typeof payload.resource_type !== 'string') {
+                logger.warn("[PayPalValidator] Missing or invalid 'resource_type'");
                 return false;
             }
 
-            if (
-                !payload.event_version ||
-                typeof payload.event_version !== "string"
-            ) {
-                logger.warn(
-                    "[PayPalValidator] Missing or invalid 'event_version'",
-                );
+            if (!payload.event_version || typeof payload.event_version !== 'string') {
+                logger.warn("[PayPalValidator] Missing or invalid 'event_version'");
                 return false;
             }
 
-            if (
-                !payload.create_time ||
-                typeof payload.create_time !== "string"
-            ) {
-                logger.warn(
-                    "[PayPalValidator] Missing or invalid 'create_time'",
-                );
+            if (!payload.create_time || typeof payload.create_time !== 'string') {
+                logger.warn("[PayPalValidator] Missing or invalid 'create_time'");
                 return false;
             }
 
             return true;
-        } catch (error) {
-            logger.error("[PayPalValidator] Validation error:", error as Error);
+        } catch (error: any) {
+            logger.error('[PayPalValidator] Validation error:', error);
             return false;
         }
     }

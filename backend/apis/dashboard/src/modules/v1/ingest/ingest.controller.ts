@@ -47,8 +47,8 @@ export class IngestController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in IngestController.getDeliveries', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in IngestController.getDeliveries', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -122,11 +122,8 @@ export class IngestController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in IngestController.getDeliveriesBySource',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Unexpected error in IngestController.getDeliveriesBySource', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -176,8 +173,8 @@ export class IngestController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in IngestController.getDeliveryById', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in IngestController.getDeliveryById', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,

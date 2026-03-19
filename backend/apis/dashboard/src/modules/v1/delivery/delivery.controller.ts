@@ -83,11 +83,8 @@ export class DeliveryController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in DeliveryController.getDeliveriesBySource',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Unexpected error in DeliveryController.getDeliveriesBySource', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -145,8 +142,8 @@ export class DeliveryController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in DeliveryController.getDeliveries', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in DeliveryController.getDeliveries', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -202,8 +199,8 @@ export class DeliveryController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in DeliveryController.getTargets', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in DeliveryController.getTargets', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -262,8 +259,8 @@ export class DeliveryController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in DeliveryController.getByTarget', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in DeliveryController.getByTarget', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -313,8 +310,8 @@ export class DeliveryController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in DeliveryController.getDeliveryById', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in DeliveryController.getDeliveryById', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -390,11 +387,8 @@ export class DeliveryController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in DeliveryController.getDeliveryStatsByTarget',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Unexpected error in DeliveryController.getDeliveryStatsByTarget', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -453,8 +447,8 @@ export class DeliveryController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in DeliveryController.getDeliveries', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in DeliveryController.getDeliveries', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -528,11 +522,8 @@ export class DeliveryController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in DeliveryController.getDeliveriesBySource',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Unexpected error in DeliveryController.getDeliveriesBySource', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -582,8 +573,8 @@ export class DeliveryController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in DeliveryController.getDeliveryById', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in DeliveryController.getDeliveryById', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,

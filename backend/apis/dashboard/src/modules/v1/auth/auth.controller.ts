@@ -124,7 +124,7 @@ export class AuthController {
                         html: body,
                     }
                 );
-            } catch (mailError: unknown) {
+            } catch (mailError: any) {
                 const error = mailError as any;
                 logger.error(
                     'Unexpected error on sending verification mail in AuthController.register',
@@ -170,8 +170,8 @@ export class AuthController {
                 },
                 201
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in AuthController.register', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in AuthController.register', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -260,8 +260,8 @@ export class AuthController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in AuthController.login', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in AuthController.login', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -307,8 +307,8 @@ export class AuthController {
             }
 
             return await AuthController._handleGoogleLogin(c, payload);
-        } catch (error: unknown) {
-            logger.error('Unexpected error in AuthController.google', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in AuthController.google', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -487,7 +487,7 @@ export class AuthController {
                     userAgent: (session as any).userAgent,
                 });
             } catch (err: unknown) {
-                logger.error('Failed to store refresh token in MongoDB', err as Error);
+                logger.error('Failed to store refresh token in MongoDB', err);
             }
 
             await setSignedCookie(c, 'access_token', tokens.access, config.jwt.secrets.access, {
@@ -518,8 +518,8 @@ export class AuthController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in AuthController.refreshToken', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in AuthController.refreshToken', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -578,8 +578,8 @@ export class AuthController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in AuthController.logout', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in AuthController.logout', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -639,8 +639,8 @@ export class AuthController {
                     is2FAEnabled: !!user2FA,
                 },
             });
-        } catch (error: unknown) {
-            logger.error('Unexpected error in AuthController.getProfile', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in AuthController.getProfile', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -717,8 +717,8 @@ export class AuthController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in AuthController.updateProfile', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in AuthController.updateProfile', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -780,8 +780,8 @@ export class AuthController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in AuthController.getPreferences', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in AuthController.getPreferences', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -854,8 +854,8 @@ export class AuthController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in AuthController.updatePreferences', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in AuthController.updatePreferences', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -933,8 +933,8 @@ export class AuthController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in AuthController.changePassword', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in AuthController.changePassword', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -989,10 +989,10 @@ export class AuthController {
                     subject: `Verify your ${config.app.name} email address`,
                     html: body,
                 });
-            } catch (mailError: unknown) {
+            } catch (mailError: any) {
                 logger.error(
                     'Unexpected error on sending reset password link in AuthController.forgotPassword',
-                    mailError as Error
+                    mailError
                 );
                 return c.json<IErrorResponse>(
                     {
@@ -1015,8 +1015,8 @@ export class AuthController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in AuthController.forgotPassword', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in AuthController.forgotPassword', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -1077,8 +1077,8 @@ export class AuthController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in AuthController.forgotPassword', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in AuthController.forgotPassword', error);
             return c.json(
                 {
                     success: false,
@@ -1137,8 +1137,8 @@ export class AuthController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in AuthController.verifyEmail', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in AuthController.verifyEmail', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -1198,11 +1198,8 @@ export class AuthController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in AuthController.getEmailVerificationStatus',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Unexpected error in AuthController.getEmailVerificationStatus', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -1289,10 +1286,10 @@ export class AuthController {
                         html: body,
                     }
                 );
-            } catch (mailError: unknown) {
+            } catch (mailError: any) {
                 logger.error(
                     'Unexpected error on sending verification mail in AuthController.resendEmailVerification',
-                    mailError as Error
+                    mailError
                 );
                 return c.json<IErrorResponse>(
                     {
@@ -1314,11 +1311,8 @@ export class AuthController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in AuthController.resendEmailVerification',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Unexpected error in AuthController.resendEmailVerification', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -1400,8 +1394,8 @@ export class AuthController {
                     message: 'OTP sent to your email',
                 });
             }
-        } catch (error) {
-            logger.error('Error in setup2FA', error as Error);
+        } catch (error: any) {
+            logger.error('Error in setup2FA', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -1487,8 +1481,8 @@ export class AuthController {
                     backupCodes,
                 },
             });
-        } catch (error) {
-            logger.error('Error in verify2FASetup', error as Error);
+        } catch (error: any) {
+            logger.error('Error in verify2FASetup', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -1545,8 +1539,8 @@ export class AuthController {
                 success: true,
                 message: '2FA disabled successfully',
             });
-        } catch (error) {
-            logger.error('Error in disable2FA', error as Error);
+        } catch (error: any) {
+            logger.error('Error in disable2FA', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -1644,7 +1638,7 @@ export class AuthController {
                     userAgent: userAgent,
                 });
             } catch (err: unknown) {
-                logger.error('Failed to store refresh token in MongoDB', err as Error);
+                logger.error('Failed to store refresh token in MongoDB', err);
             }
 
             await authRepository.updateLastLogin((user as any).id);
@@ -1679,8 +1673,8 @@ export class AuthController {
                 },
                 200
             );
-        } catch (error) {
-            logger.error('Error in login2FA', error as Error);
+        } catch (error: any) {
+            logger.error('Error in login2FA', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -1756,8 +1750,8 @@ export class AuthController {
                 success: true,
                 message: 'Verification code resent to your email',
             });
-        } catch (error) {
-            logger.error('Error in resend2FAOTP', error as Error);
+        } catch (error: any) {
+            logger.error('Error in resend2FAOTP', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -1829,8 +1823,8 @@ export class AuthController {
                     data: { method: 'email' },
                 });
             }
-        } catch (error) {
-            logger.error('Error in requestSensitiveOTP', error as Error);
+        } catch (error: any) {
+            logger.error('Error in requestSensitiveOTP', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -1906,8 +1900,8 @@ export class AuthController {
                 success: true,
                 message: 'Action verified successfully',
             });
-        } catch (error) {
-            logger.error('Error in verifySensitiveOTP', error as Error);
+        } catch (error: any) {
+            logger.error('Error in verifySensitiveOTP', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,

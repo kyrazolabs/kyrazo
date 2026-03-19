@@ -3,8 +3,7 @@ import { Workspace } from '../models/mongodb/Workspace.model';
 
 async function list() {
     try {
-        const mongoUri =
-            process.env.MONGODB_URI || 'mongodb://localhost:27017/kyrazo-test';
+        const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/kyrazo-test';
         console.log('Connecting to:', mongoUri);
         await mongoose.connect(mongoUri);
         console.log('Connected to MongoDB');
@@ -20,7 +19,7 @@ async function list() {
                 `- ${workspace.name} (${workspace._id}): isDeleted=${workspace.isDeleted}, isArchived=${workspace.isArchived}`
             );
         }
-    } catch (error) {
+    } catch (error: any) {
         console.error('Failed to list:', error);
     } finally {
         await mongoose.disconnect();

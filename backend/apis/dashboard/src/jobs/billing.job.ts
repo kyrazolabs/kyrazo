@@ -21,16 +21,13 @@ export class BillingJob {
             for (const subscription of dueSubscriptions) {
                 try {
                     await this.renewSubscription(subscription);
-                } catch (error) {
-                    logger.error(
-                        `Failed to renew subscription ${subscription._id}`,
-                        error as Error
-                    );
+                } catch (error: any) {
+                    logger.error(`Failed to renew subscription ${subscription._id}`, error);
                     // Continue to next subscription
                 }
             }
-        } catch (error) {
-            logger.error('Billing Job failed (fatal)', error as Error);
+        } catch (error: any) {
+            logger.error('Billing Job failed (fatal)', error);
         }
         logger.info('Billing Job finished.');
     }

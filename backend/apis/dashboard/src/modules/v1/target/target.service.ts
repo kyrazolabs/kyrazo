@@ -30,8 +30,8 @@ export class TargetService {
 
         try {
             return await targetRepository.create(data);
-        } catch (error) {
-            logger.error('Failed to create target:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to create target:', error);
             throw new Error(JSON.stringify(error));
         }
     }
@@ -43,8 +43,8 @@ export class TargetService {
                 limit,
                 page,
             });
-        } catch (error) {
-            logger.error('Failed to get targets:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get targets:', error);
             throw new Error('Failed to get targets');
         }
     }
@@ -56,8 +56,8 @@ export class TargetService {
                 throw new Error('Target not found');
             }
             return target;
-        } catch (error) {
-            logger.error('Failed to get target by id:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get target by id:', error);
             throw new Error('Failed to get target by id');
         }
     }
@@ -87,8 +87,8 @@ export class TargetService {
                 namespaceId
             );
             return secret;
-        } catch (error) {
-            logger.error('Failed to get target secret:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get target secret:', error);
             throw new Error('Failed to get target secret');
         }
     }
@@ -114,8 +114,8 @@ export class TargetService {
                 throw new Error('Failed to update target');
             }
             return updated;
-        } catch (error) {
-            logger.error('Failed to update target:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to update target:', error);
             throw new Error('Failed to update target');
         }
     }
@@ -131,8 +131,8 @@ export class TargetService {
                 throw new Error('Failed to delete target');
             }
             return deleted;
-        } catch (error) {
-            logger.error('Failed to delete target:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to delete target:', error);
             throw new Error('Failed to delete target');
         }
     }

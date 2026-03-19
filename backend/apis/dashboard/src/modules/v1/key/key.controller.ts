@@ -81,8 +81,8 @@ export class KeyController {
                 },
                 201
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in KeyController.createKey', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in KeyController.createKey', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -141,7 +141,7 @@ export class KeyController {
                 },
                 200
             );
-        } catch (error) {
+        } catch (error: any) {
             return c.json(
                 {
                     success: false,
@@ -192,7 +192,7 @@ export class KeyController {
                 },
                 200
             );
-        } catch (error) {
+        } catch (error: any) {
             return c.json(
                 {
                     success: false,
@@ -238,7 +238,7 @@ export class KeyController {
                 },
                 200
             );
-        } catch (error) {
+        } catch (error: any) {
             return c.json(
                 {
                     success: false,

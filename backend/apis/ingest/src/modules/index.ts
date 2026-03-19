@@ -26,15 +26,12 @@ router.get('/health', async (c: Context) => {
                             ping,
                         },
                     };
-                } catch (error) {
+                } catch (error: any) {
                     return {
                         status: 'unhealthy',
                         details: {
                             connected: false,
-                            error:
-                                error instanceof Error
-                                    ? error.message
-                                    : 'Unknown error',
+                            error: error instanceof Error ? error.message : 'Unknown error',
                         },
                     };
                 }
@@ -49,9 +46,7 @@ router.get('/health', async (c: Context) => {
 
         return c.json({
             success: allHealthy,
-            message: allHealthy
-                ? 'All services are healthy'
-                : 'Some services are unhealthy',
+            message: allHealthy ? 'All services are healthy' : 'Some services are unhealthy',
             services: {
                 mongo,
                 redis,
@@ -61,7 +56,7 @@ router.get('/health', async (c: Context) => {
             timestamp: new Date().toISOString(),
             version: '1.0.0',
         });
-    } catch (error) {
+    } catch (error: any) {
         return c.json(
             {
                 success: false,

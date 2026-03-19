@@ -1,37 +1,31 @@
-import { redisConfig, natsConfig } from "@/config";
-import {
-    clickhouseConfig,
-    databaseConfig,
-    logger,
-    Source,
-    Endpoint,
-} from "@kyrazo/shared";
-import { lifecycle } from "./worker.lifecycle";
-import { WorkerConsumer } from "@/consumers/nats/nats.listener";
-import { env } from "./worker.env";
-import { dispatchProducer } from "@/consumers/batch/dispatch.producer";
-import { ingestProducer } from "@/consumers/batch/ingest.producer";
-import { dispatchConsumer } from "@/consumers/queues/dispatch.consumer";
+import { redisConfig, natsConfig } from '@/config';
+import { clickhouseConfig, databaseConfig, logger, Source, Endpoint } from '@kyrazo/shared';
+import { lifecycle } from './worker.lifecycle';
+import { WorkerConsumer } from '@/consumers/nats/nats.listener';
+import { env } from './worker.env';
+import { dispatchProducer } from '@/consumers/batch/dispatch.producer';
+import { ingestProducer } from '@/consumers/batch/ingest.producer';
+import { dispatchConsumer } from '@/consumers/queues/dispatch.consumer';
 
 export const bootstrap = async () => {
     lifecycle();
     try {
         await databaseConfig.connect();
-        logger.info("Database connected successfully");
+        logger.info('Database connected successfully');
 
         // Sync indexes
         await Source.syncIndexes();
         await Endpoint.syncIndexes();
-        logger.info("MongoDB indexes synced");
+        logger.info('MongoDB indexes synced');
 
         await redisConfig.connect();
-        logger.info("Redis connected successfully");
+        logger.info('Redis connected successfully');
 
         await clickhouseConfig.connect();
-        logger.info("ClickHouse connected successfully");
+        logger.info('ClickHouse connected successfully');
 
         await natsConfig.connect().then(() => {
-            logger.info("NATS connected successfully");
+            logger.info('NATS connected successfully');
         });
 
         // Initialize BullMQ Components after Redis is ready
@@ -40,12 +34,12 @@ export const bootstrap = async () => {
         await ingestProducer.initialize();
         const workerConsumer = new WorkerConsumer(env.worker.WORKSPACE_ID!);
         workerConsumer.start().catch((err: any) => {
-            logger.error("WorkerConsumer failed:", err);
+            logger.error('WorkerConsumer failed:', err);
         });
 
         return true;
-    } catch (error) {
-        logger.error("Failed to initialize connections:", error as Error);
+    } catch (error: any) {
+        logger.error('Failed to initialize connections:', error);
         return false;
     }
 };

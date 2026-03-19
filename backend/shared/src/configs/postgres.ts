@@ -54,8 +54,7 @@ export class PostgresConfig {
         }
 
         try {
-            const { url, max, idleTimeoutMillis, connectionTimeoutMillis } =
-                config.postgres;
+            const { url, max, idleTimeoutMillis, connectionTimeoutMillis } = config.postgres;
 
             logger.info('Attempting to connect to Postgres...');
 
@@ -84,8 +83,8 @@ export class PostgresConfig {
                 logger.error('Unexpected error on idle client', err);
                 this.isConnected = false;
             });
-        } catch (error) {
-            logger.error('Failed to connect to PostgreSQL:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to connect to PostgreSQL:', error);
             this.isConnected = false;
             throw error;
         }
@@ -122,9 +121,7 @@ export class PostgresConfig {
      */
     public getDrizzle(): NodePgDatabase<typeof schema> {
         if (!this.drizzle) {
-            throw new Error(
-                'Drizzle ORM not initialized. Call connect() first.'
-            );
+            throw new Error('Drizzle ORM not initialized. Call connect() first.');
         }
         return this.drizzle;
     }
@@ -158,11 +155,8 @@ export class PostgresConfig {
             this.isConnected = false;
             this.pool = null;
             logger.info('Disconnected from PostgreSQL');
-        } catch (error) {
-            logger.error(
-                'Error disconnecting from PostgreSQL:',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Error disconnecting from PostgreSQL:', error);
             throw error;
         }
     }
@@ -204,15 +198,12 @@ export class PostgresConfig {
             } finally {
                 client.release();
             }
-        } catch (error) {
+        } catch (error: any) {
             return {
                 status: 'unhealthy',
                 details: {
                     connected: this.isConnected,
-                    error:
-                        error instanceof Error
-                            ? error.message
-                            : 'Unknown error',
+                    error: error instanceof Error ? error.message : 'Unknown error',
                 },
             };
         }

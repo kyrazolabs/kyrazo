@@ -26,7 +26,7 @@ export const arcjetMiddleware = async (c: AppContext, next: Next) => {
         }
 
         return next();
-    } catch (error) {
+    } catch (error: any) {
         console.log(`Arcjet Middleware Error: ${error}`);
         return next();
     }

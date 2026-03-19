@@ -54,8 +54,8 @@ export class PlanController {
                 },
                 201
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in PlanController.createPlan', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in PlanController.createPlan', error);
 
             const message = error instanceof Error ? error.message : 'Failed to create plan';
             return c.json<IErrorResponse>(
@@ -98,8 +98,8 @@ export class PlanController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in PlanController.getPlanBySlug', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in PlanController.getPlanBySlug', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -135,8 +135,8 @@ export class PlanController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in PlanController.getPlans', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in PlanController.getPlans', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -211,8 +211,8 @@ export class PlanController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in PlanController.updatePlan', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in PlanController.updatePlan', error);
 
             const message = error instanceof Error ? error.message : 'Failed to update plan';
             return c.json<IErrorResponse>(
@@ -286,8 +286,8 @@ export class PlanController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in PlanController.deletePlan', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in PlanController.deletePlan', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -359,11 +359,8 @@ export class PlanController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in PlanController.regenerateStripePrice',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Unexpected error in PlanController.regenerateStripePrice', error);
 
             const message =
                 error instanceof Error ? error.message : 'Failed to regenerate Stripe price';
@@ -424,10 +421,10 @@ export class PlanController {
                 },
                 200
             );
-        } catch (error: unknown) {
+        } catch (error: any) {
             logger.error(
                 'Unexpected error in PlanController.fixAllPlansWithoutStripePrices',
-                error as Error
+                error
             );
 
             const message = error instanceof Error ? error.message : 'Failed to fix plans';

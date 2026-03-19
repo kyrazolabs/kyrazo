@@ -102,7 +102,7 @@ export class NatsConfig {
             try {
                 await this.nc.request('$JS.API.INFO', '', { timeout: 5000 });
                 logger.info('NATS JetStream PING successful');
-            } catch (error) {
+            } catch (error: any) {
                 logger.warn('NATS JetStream PING failed:', error);
             }
 
@@ -114,11 +114,11 @@ export class NatsConfig {
                     this.isConnected = false;
                 })
                 .catch((err: unknown) => {
-                    logger.error('NATS connection error:', err as Error);
+                    logger.error('NATS connection error:', err);
                     this.isConnected = false;
                 });
-        } catch (error) {
-            logger.error('Failed to connect to NATS:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to connect to NATS:', error);
             this.isConnected = false;
             throw error;
         }
@@ -181,8 +181,8 @@ export class NatsConfig {
             this.js = null;
             this.isConnected = false;
             logger.info('Disconnected from NATS');
-        } catch (error) {
-            logger.error('Error disconnecting from NATS:', error as Error);
+        } catch (error: any) {
+            logger.error('Error disconnecting from NATS:', error);
             throw error;
         }
     }
@@ -275,7 +275,7 @@ export class NatsConfig {
                     server: this.nc.getServer(),
                 },
             };
-        } catch (error: unknown) {
+        } catch (error: any) {
             return {
                 status: 'unhealthy',
                 details: {

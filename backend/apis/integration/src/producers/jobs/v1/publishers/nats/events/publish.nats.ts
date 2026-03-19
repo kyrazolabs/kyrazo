@@ -58,18 +58,13 @@ export class PublishEventPublisher {
                 await natsConfig.connect();
             }
 
-
             this.isInitialized = true;
             logger.info('NATS Event Publisher initialized successfully');
-        } catch (error: unknown) {
-            logger.error(
-                'Failed to initialize NATS Event Publisher in publish.nats.ts ',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Failed to initialize NATS Event Publisher in publish.nats.ts ', error);
             throw error;
         }
     }
-
 
     /**
      * @title Publish Event
@@ -129,8 +124,8 @@ export class PublishEventPublisher {
                 targetsCount: data.targets.length,
                 timestamp: data.timestamp,
             };
-        } catch (error) {
-            logger.error('Failed to send publish event to NATS', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to send publish event to NATS', error);
             publishQueues.publishQueue.add(publishQueuesName.retryPublishQueueName, data);
             return {
                 success: false,
@@ -214,11 +209,8 @@ export class PublishEventPublisher {
                             targetsCount: item.targets.length,
                             timestamp: item.timestamp,
                         };
-                    } catch (error: unknown) {
-                        logger.error(
-                            'Unexpected error in PublishEventPublisher.batch',
-                            error as Error
-                        );
+                    } catch (error: any) {
+                        logger.error('Unexpected error in PublishEventPublisher.batch', error);
                         publishQueues.publishQueue.add(
                             publishQueuesName.retryPublishQueueName,
                             item
@@ -236,8 +228,8 @@ export class PublishEventPublisher {
 
             const returns = await Promise.all(publishPromises);
             return returns;
-        } catch (error: unknown) {
-            logger.error('Failed to send batch publish events to NATS', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to send batch publish events to NATS', error);
             return [null];
         }
     }
@@ -291,8 +283,8 @@ export class PublishEventPublisher {
                 // Add to dirty set for synchronization
                 await redisClient.zadd(REDIS_KEYS.dirtyZset, Date.now(), targetKey);
             }
-        } catch (error: unknown) {
-            logger.error('Failed to store delivery tracking:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to store delivery tracking:', error);
             // Don't fail the entire operation for tracking errors
         }
     }
@@ -318,7 +310,7 @@ export class PublishEventPublisher {
                     timestamp: new Date().toISOString(),
                 },
             };
-        } catch (error) {
+        } catch (error: any) {
             return {
                 status: 'unhealthy',
                 details: {

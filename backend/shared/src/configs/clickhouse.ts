@@ -32,8 +32,7 @@ export class ClickHouseConfig {
         }
 
         try {
-            const { url, username, password, database } =
-                await config.clickhouse;
+            const { url, username, password, database } = await config.clickhouse;
             logger.info(
                 `Attempting to connect to ClickHouse: ${url} with user: ${username}, database: ${database}`
             );
@@ -41,7 +40,7 @@ export class ClickHouseConfig {
                 throw new Error('ClickHouse configuration is incomplete');
             }
 
-            this.client = createClient({ 
+            this.client = createClient({
                 url,
                 // @ts-expect-error: int64_handling exists in @clickhouse/client v1.x but might be missing from internal type definitions
                 int64_handling: 'string', // Return UInt64 as strings to prevent precision loss in JS Number
@@ -60,9 +59,9 @@ export class ClickHouseConfig {
             logger.info('Tables Has Been Created Successfully');
             this.isConnected = true;
             logger.info('Connected to ClickHouse successfully');
-        } catch (error) {
+        } catch (error: any) {
             this.isConnected = false;
-            logger.error('Failed to connect to ClickHouse', error as Error);
+            logger.error('Failed to connect to ClickHouse', error);
             throw error;
         }
     }
@@ -86,11 +85,8 @@ export class ClickHouseConfig {
             await this.client.close();
             this.client = null;
             this.isConnected = false;
-        } catch (error) {
-            logger.error(
-                'Error closing ClickHouse connection:',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Error closing ClickHouse connection:', error);
         }
     }
 
@@ -118,11 +114,10 @@ export class ClickHouseConfig {
                 status: 'healthy',
                 details: 'ClickHouse is up and running',
             };
-        } catch (error) {
+        } catch (error: any) {
             return {
                 status: 'unhealthy',
-                details:
-                    error instanceof Error ? error.message : 'Unknown error',
+                details: error instanceof Error ? error.message : 'Unknown error',
             };
         }
     }

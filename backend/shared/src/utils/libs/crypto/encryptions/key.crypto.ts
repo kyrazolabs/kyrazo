@@ -76,11 +76,9 @@ export class KeyCrypto {
             } = opts;
 
             if (!masterKey || typeof masterKey !== 'string') {
-                logger.error(
-                    'Missing or invalid masterKey in API key generation',
-                    undefined,
-                    { opts }
-                );
+                logger.error('Missing or invalid masterKey in API key generation', undefined, {
+                    opts,
+                });
                 throw new Error('masterKey is required and must be a string.');
             }
 
@@ -99,21 +97,11 @@ export class KeyCrypto {
 
             // 2) Derive keys: AES key via PBKDF2, HMAC key via HKDF
             const salt = randomBytes(16);
-            const aesKey = pbkdf2Sync(
-                masterKey,
-                salt,
-                pbkdf2Rounds,
-                32,
-                'sha512'
-            ); // 32 bytes AES-256 key
+            const aesKey = pbkdf2Sync(masterKey, salt, pbkdf2Rounds, 32, 'sha512'); // 32 bytes AES-256 key
 
             // HKDF (RFC 5869) simple using built-in -> implement with HMAC-SHA256 extract/expand
-            const hkdfSalt = createHmac('sha256', salt)
-                .update('hkdf-salt')
-                .digest();
-            const prk = createHmac('sha256', hkdfSalt)
-                .update(masterKey)
-                .digest();
+            const hkdfSalt = createHmac('sha256', salt).update('hkdf-salt').digest();
+            const prk = createHmac('sha256', hkdfSalt).update(masterKey).digest();
             // expand: info | 1
             const infoBuf = Buffer.from(hkdfInfo);
             const t1 = createHmac('sha256', prk)
@@ -123,42 +111,21 @@ export class KeyCrypto {
 
             // 3) Build plaintext payload: timestamp || random || salt || marker
             const marker = Buffer.from('AKV2'); // fixed marker helps detection
-            const plaintext = Buffer.concat([
-                timestampBuf,
-                randomPart,
-                salt,
-                marker,
-            ]);
+            const plaintext = Buffer.concat([timestampBuf, randomPart, salt, marker]);
 
             // 4) Encrypt with AES-256-GCM
             const iv = randomBytes(12); // 12 bytes is standard for GCM
             const cipher = createCipheriv('aes-256-gcm', aesKey, iv);
-            const ciphertext = Buffer.concat([
-                cipher.update(plaintext),
-                cipher.final(),
-            ]);
+            const ciphertext = Buffer.concat([cipher.update(plaintext), cipher.final()]);
             const authTag = cipher.getAuthTag();
 
             // 5) Compute integrity HMAC over (version | iv | ciphertext | authTag)
-            const macPayload = Buffer.concat([
-                Buffer.from(version),
-                iv,
-                ciphertext,
-                authTag,
-            ]);
-            const mac = createHmac('sha512', hmacKey)
-                .update(macPayload)
-                .digest(); // 64 bytes
+            const macPayload = Buffer.concat([Buffer.from(version), iv, ciphertext, authTag]);
+            const mac = createHmac('sha512', hmacKey).update(macPayload).digest(); // 64 bytes
 
             // 6) Compose token parts and encode compactly as base62
             // structure (binary): iv(12) | authTag(16) | salt(16) | ciphertext | mac(64)
-            const composite = Buffer.concat([
-                iv,
-                authTag,
-                salt,
-                ciphertext,
-                mac,
-            ]);
+            const composite = Buffer.concat([iv, authTag, salt, ciphertext, mac]);
             const encoded = base62Encode(composite);
 
             // 7) Generate kid
@@ -178,7 +145,7 @@ export class KeyCrypto {
                 },
             };
         } catch (err: unknown) {
-            logger.error('Error generating complex API key', err as Error, {
+            logger.error('Error generating complex API key', err, {
                 opts: {
                     prefix: opts.prefix,
                     version: opts.version,
@@ -254,42 +221,20 @@ export class KeyCrypto {
             const ciphertext = composite.slice(44, composite.length - 64);
 
             const pbkdf2Rounds = 100_000;
-            const aesKey = pbkdf2Sync(
-                masterKey,
-                salt,
-                pbkdf2Rounds,
-                32,
-                'sha512'
-            );
+            const aesKey = pbkdf2Sync(masterKey, salt, pbkdf2Rounds, 32, 'sha512');
 
-            const hkdfSalt = createHmac('sha256', salt)
-                .update('hkdf-salt')
-                .digest();
-            const prk = createHmac('sha256', hkdfSalt)
-                .update(masterKey)
-                .digest();
-            const infoBuf = Buffer.from(
-                version === 'v2' ? 'api-key-hkdf-v2' : 'api-key-hkdf-v1'
-            );
+            const hkdfSalt = createHmac('sha256', salt).update('hkdf-salt').digest();
+            const prk = createHmac('sha256', hkdfSalt).update(masterKey).digest();
+            const infoBuf = Buffer.from(version === 'v2' ? 'api-key-hkdf-v2' : 'api-key-hkdf-v1');
             const t1 = createHmac('sha256', prk)
                 .update(Buffer.concat([infoBuf, Buffer.from([0x01])]))
                 .digest();
             const hmacKey = t1.slice(0, 32);
 
-            const macPayload = Buffer.concat([
-                Buffer.from(version),
-                iv,
-                ciphertext,
-                authTag,
-            ]);
-            const expectedMac = createHmac('sha512', hmacKey)
-                .update(macPayload)
-                .digest();
+            const macPayload = Buffer.concat([Buffer.from(version), iv, ciphertext, authTag]);
+            const expectedMac = createHmac('sha512', hmacKey).update(macPayload).digest();
 
-            if (
-                expectedMac.length !== mac.length ||
-                !timingSafeEqual(expectedMac, mac)
-            ) {
+            if (expectedMac.length !== mac.length || !timingSafeEqual(expectedMac, mac)) {
                 logger.error('MAC verification failed', undefined, {
                     version,
                     prefix,
@@ -301,19 +246,12 @@ export class KeyCrypto {
             decipher.setAuthTag(authTag);
             let plaintext: Buffer;
             try {
-                plaintext = Buffer.concat([
-                    decipher.update(ciphertext),
-                    decipher.final(),
-                ]);
+                plaintext = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
             } catch (e: unknown) {
-                logger.error(
-                    'Decryption or authentication failed',
-                    e as Error,
-                    {
-                        prefix,
-                        version,
-                    }
-                );
+                logger.error('Decryption or authentication failed', e as Error, {
+                    prefix,
+                    version,
+                });
                 return {
                     valid: false,
                     reason: 'decryption_failed_or_auth_failed',
@@ -329,19 +267,12 @@ export class KeyCrypto {
 
             const timestamp = Number(plaintext.readBigInt64BE(0));
             const marker = Buffer.from('AKV2');
-            if (
-                !plaintext
-                    .slice(plaintext.length - marker.length)
-                    .equals(marker)
-            ) {
+            if (!plaintext.slice(plaintext.length - marker.length).equals(marker)) {
                 logger.error('Marker mismatch', undefined, { prefix, version });
                 return { valid: false, reason: 'marker_mismatch' };
             }
 
-            const randomPart = plaintext.slice(
-                8,
-                plaintext.length - marker.length - 16
-            );
+            const randomPart = plaintext.slice(8, plaintext.length - marker.length - 16);
             const saltBack = plaintext.slice(
                 plaintext.length - marker.length - 16,
                 plaintext.length - marker.length
@@ -356,10 +287,7 @@ export class KeyCrypto {
             }
 
             const now = Math.floor(Date.now() / 1000);
-            if (
-                timestamp <= 0 ||
-                Math.abs(now - timestamp) > toleranceSeconds
-            ) {
+            if (timestamp <= 0 || Math.abs(now - timestamp) > toleranceSeconds) {
                 logger.error('Timestamp outside tolerance', undefined, {
                     timestamp,
                     now,
@@ -380,10 +308,7 @@ export class KeyCrypto {
                 },
             };
         } catch (err: unknown) {
-            logger.error(
-                'Unexpected error in verifyComplexApiKey',
-                err as Error
-            );
+            logger.error('Unexpected error in verifyComplexApiKey', err);
             return { valid: false, reason: 'unknown_error' };
         }
     }

@@ -73,8 +73,8 @@ export class LimitChecker {
             }
 
             return true;
-        } catch (error) {
-            logger.error('Error checking event limit:', error as Error);
+        } catch (error: any) {
+            logger.error('Error checking event limit:', error);
             return true; // Fail open
         }
     }

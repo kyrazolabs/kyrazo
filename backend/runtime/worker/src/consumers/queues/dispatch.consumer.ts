@@ -1,7 +1,13 @@
 import { EventEmitter } from 'events';
 import { Queue, Worker, Job, QueueEvents } from 'bullmq';
 import { redisConfig } from '@/config';
-import { DeliveryStatus, EventStatus, logger, type SQLDeliveryAttempt, snowflake } from '@kyrazo/shared';
+import {
+    DeliveryStatus,
+    EventStatus,
+    logger,
+    type SQLDeliveryAttempt,
+    snowflake,
+} from '@kyrazo/shared';
 import type {
     IConfiguredTarget,
     IDispatchedEvent,
@@ -120,7 +126,7 @@ export class DispatchConsumer extends EventEmitter {
             );
 
             return jobIds || deliveryIds;
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error adding job to dispatch queue:', error);
             throw error;
         }
@@ -368,7 +374,7 @@ export class DispatchConsumer extends EventEmitter {
             await this.queueEvents?.close();
 
             console.log('✅ Event processor shutdown complete');
-        } catch (error) {
+        } catch (error: any) {
             console.error('❌ Error shutting down event processor:', error);
             throw error;
         }
@@ -386,7 +392,7 @@ export class DispatchConsumer extends EventEmitter {
                 await job.promote();
             }
             console.log(`✅ Promoted ${waitingJobs.length} jobs for immediate processing`);
-        } catch (error) {
+        } catch (error: any) {
             console.error('❌ Error force processing jobs:', error);
             throw error;
         }

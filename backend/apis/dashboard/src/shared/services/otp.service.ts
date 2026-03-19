@@ -34,8 +34,8 @@ export class OTPService {
         try {
             const result = await this.totpInstance.verify({ token, secret, epochTolerance: 30 });
             return result.valid;
-        } catch (error) {
-            logger.error('TOTP verification error', error as Error);
+        } catch (error: any) {
+            logger.error('TOTP verification error', error);
             return false;
         }
     }
@@ -91,8 +91,8 @@ export class OTPService {
                     html: `<p>Your verification code is: <strong>${otp}</strong>. It will expire in 10 minutes.</p>`,
                 }
             );
-        } catch (error) {
-            logger.error('Failed to send OTP email', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to send OTP email', error);
             throw new Error('Failed to send verification email');
         }
 

@@ -1,7 +1,7 @@
-import { config, natsConfig, redisConfig } from "@/config";
-import { dispatcherPipeline } from "@/core/dispatcher/dispatcher.pipeline";
-import { receiverPipeline } from "@/core/receiver/receiver.pipeline";
-import { validateMessage } from "@/utils";
+import { config, natsConfig, redisConfig } from '@/config';
+import { dispatcherPipeline } from '@/core/dispatcher/dispatcher.pipeline';
+import { receiverPipeline } from '@/core/receiver/receiver.pipeline';
+import { validateMessage } from '@/utils';
 import {
     AckPolicy,
     DeliverPolicy,
@@ -9,10 +9,10 @@ import {
     type JetStreamClient,
     type JetStreamManager,
     type NatsConnection,
-} from "nats";
-import { logger, signatureCrypto } from "@kyrazo/shared";
-import { SubscriptionService } from "@/services/mongo/subscription";
-import { env } from "@/app/worker.env";
+} from 'nats';
+import { logger, signatureCrypto } from '@kyrazo/shared';
+import { SubscriptionService } from '@/services/mongo/subscription';
+import { env } from '@/app/worker.env';
 
 /**
  * @title Worker Consumer
@@ -28,7 +28,7 @@ class Semaphore {
             this.value++;
             return;
         }
-        await new Promise<void>((res) => this.waiting.push(res));
+        await new Promise<void>(res => this.waiting.push(res));
         this.value++;
     }
     release(): void {
@@ -51,9 +51,9 @@ export class WorkerConsumer {
     }
 
     async start(): Promise<void> {
-        const streamName = "EVENTS";
-        const subject = `workspace.${this.workspaceId}.plan.${this.workspaceId === "*" ? "free" : "*"}.events.>`;
-        const durableName = `worker_${this.workspaceId === "*" ? "shared" : this.workspaceId}`;
+        const streamName = 'EVENTS';
+        const subject = `workspace.${this.workspaceId}.plan.${this.workspaceId === '*' ? 'free' : '*'}.events.>`;
+        const durableName = `worker_${this.workspaceId === '*' ? 'shared' : this.workspaceId}`;
 
         try {
             await this.jsm.consumers.add(streamName, {
@@ -75,11 +75,11 @@ export class WorkerConsumer {
 
             logger.info(`Consumer ${durableName} ready`);
         } catch (err: any) {
-            if (!err.message.includes("already exists")) {
-                logger.error("Failed to create consumer", err);
+            if (!err.message.includes('already exists')) {
+                logger.error('Failed to create consumer', err);
                 throw err;
             }
-            logger.info("Consumer already exists, continuing");
+            logger.info('Consumer already exists, continuing');
         }
         // Consume messages
         const consumer = await this.js.consumers.get(streamName, durableName);
@@ -101,14 +101,10 @@ export class WorkerConsumer {
                     continue;
                 }
                 // Process batch with concurrency limited by semaphore
-                const promises = batch.map((msg) =>
-                    this.processWithSemaphore(msg),
-                );
+                const promises = batch.map(msg => this.processWithSemaphore(msg));
                 // do not await all to completion to allow next fetch (rely on max_ack_pending)
                 // but we await here to at least process current batch's promises kicking off.
-                await Promise.all(
-                    promises.map((p) => p.catch(() => undefined)),
-                );
+                await Promise.all(promises.map(p => p.catch(() => undefined)));
 
                 // let running = 0;
                 // const pending: any[] = [];
@@ -130,8 +126,8 @@ export class WorkerConsumer {
                 //     pending.push(msg);
                 //     schedule();
                 // }
-            } catch (error) {
-                logger.error("Fetch loop error", error as Error);
+            } catch (error: any) {
+                logger.error('Fetch loop error', error);
                 // small backoff on error
                 await this.sleep(100);
             }
@@ -148,15 +144,15 @@ export class WorkerConsumer {
                 try {
                     await msg.ack();
                 } catch (ackErr) {
-                    logger.warn("ACK failed", ackErr);
+                    logger.warn('ACK failed', ackErr);
                 }
             } catch (procErr) {
-                logger.error("Processing error", procErr as Error);
+                logger.error('Processing error', procErr as Error);
                 // Nak to trigger retry/backoff on server side
                 try {
                     await msg.nak();
                 } catch (nakErr) {
-                    logger.warn("NAK failed", nakErr);
+                    logger.warn('NAK failed', nakErr);
                 }
             } finally {
                 this.sem.release();
@@ -165,11 +161,11 @@ export class WorkerConsumer {
     }
 
     private async process(msg: any): Promise<void> {
-        const parts = msg.subject.split(".");
+        const parts = msg.subject.split('.');
         const workspaceId = parts[1];
 
         if (!workspaceId) {
-            logger.warn("Missing workspaceId on subject", msg.subject);
+            logger.warn('Missing workspaceId on subject', msg.subject);
             try {
                 // terminal: not recoverable
                 await msg.term();
@@ -177,8 +173,7 @@ export class WorkerConsumer {
             return;
         }
 
-        const subscription =
-            await SubscriptionService.getSubscription(workspaceId);
+        const subscription = await SubscriptionService.getSubscription(workspaceId);
         if (!subscription) {
             logger.warn(`Subscription ${workspaceId} not found`);
             await msg.term();
@@ -192,9 +187,7 @@ export class WorkerConsumer {
 
             // Validate message structure
             if (!validateMessage(data)) {
-                logger.warn(
-                    `Invalid message format for subscription ${workspaceId}`,
-                );
+                logger.warn(`Invalid message format for subscription ${workspaceId}`);
                 return;
             }
 
@@ -204,33 +197,28 @@ export class WorkerConsumer {
                 signature,
                 timestamp,
                 nonce,
-                5 * 60 * 1000,
+                5 * 60 * 1000
             );
 
             if (!isValid) {
-                logger.warn(
-                    "❌ Invalid or expired signature, ignoring message",
-                    {
-                        eventId: event.eventId,
-                        webhookType: event.webhookType,
-                        signatureLength: signature?.length,
-                        timestamp,
-                        nonceLength: nonce?.length,
-                        currentTime: Date.now(),
-                        timeDiff: Math.abs(Date.now() - timestamp),
-                        maxAge: 5 * 60 * 1000,
-                        keyLength: config.encryptions.key?.length,
-                        keyPreview:
-                            config.encryptions.key?.substring(0, 8) + "...",
-                    },
-                );
+                logger.warn('❌ Invalid or expired signature, ignoring message', {
+                    eventId: event.eventId,
+                    webhookType: event.webhookType,
+                    signatureLength: signature?.length,
+                    timestamp,
+                    nonceLength: nonce?.length,
+                    currentTime: Date.now(),
+                    timeDiff: Math.abs(Date.now() - timestamp),
+                    maxAge: 5 * 60 * 1000,
+                    keyLength: config.encryptions.key?.length,
+                    keyPreview: config.encryptions.key?.substring(0, 8) + '...',
+                });
                 msg.ack();
                 return;
             }
 
             // Get subscription
-            const subscription =
-                await SubscriptionService.getSubscription(workspaceId);
+            const subscription = await SubscriptionService.getSubscription(workspaceId);
             if (!subscription) {
                 logger.warn(`Subscription ${workspaceId} not found`);
                 return;
@@ -242,24 +230,18 @@ export class WorkerConsumer {
             logger.info(`DEBUG: Raw NATS Data: ${rawData}`);
 
             if (msg.subject.includes(`events.publish.`)) {
-                logger.info(
-                    `📤 Routing publish event ${event.eventId} to publish consumer`,
-                );
+                logger.info(`📤 Routing publish event ${event.eventId} to publish consumer`);
                 await dispatcherPipeline.process(event);
-            } else if (msg.subject.includes("events.receive.")) {
+            } else if (msg.subject.includes('events.receive.')) {
+                logger.info(`📥 Routing receive event ${event.eventId} to receive consumer`);
                 logger.info(
-                    `📥 Routing receive event ${event.eventId} to receive consumer`,
+                    `[WorkerConsumer] Received Event Keys: ${Object.keys(event).join(', ')}`
                 );
-                logger.info(
-                    `[WorkerConsumer] Received Event Keys: ${Object.keys(event).join(", ")}`,
-                );
-                logger.info(
-                    `[WorkerConsumer] Received sourceId: ${event.sourceId}`,
-                );
+                logger.info(`[WorkerConsumer] Received sourceId: ${event.sourceId}`);
                 await receiverPipeline.process(event);
             } else {
                 logger.warn(
-                    `❓ Unknown subject pattern (${msg.subject}), acknowledging without processing`,
+                    `❓ Unknown subject pattern (${msg.subject}), acknowledging without processing`
                 );
             }
 
@@ -281,6 +263,6 @@ export class WorkerConsumer {
     }
 
     private sleep(ms: number): Promise<void> {
-        return new Promise((resolve) => setTimeout(resolve, ms));
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 }

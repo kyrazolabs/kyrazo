@@ -141,8 +141,8 @@ export class UsageService {
             const client = redisConfig.getClient();
             await client.incrby(redisKey, count);
             await client.expire(redisKey, 60 * 60 * 24 * 35);
-        } catch (error) {
-            logger.error('Failed to update usage', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to update usage', error);
             throw error;
         }
     }

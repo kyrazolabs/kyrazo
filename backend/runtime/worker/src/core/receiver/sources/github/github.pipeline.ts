@@ -77,10 +77,10 @@ export class GitHubPipeline {
                     credentials.iv,
                     source.namespaceId.toString()
                 );
-            } catch (error) {
+            } catch (error: any) {
                 logger.warn(
                     `[GitHubPipeline] Failed to decrypt source secret for ${event.sourceId}, attempting fallback to raw value:`,
-                    error as Error
+                    error
                 );
                 sourceSecret = credentials.secret;
             }
@@ -108,8 +108,8 @@ export class GitHubPipeline {
             await this.enqueue(data, true);
 
             logger.info('✅ Successfully processed GitHub event', event.eventId);
-        } catch (error) {
-            logger.error('❌ Error processing GitHub event:', error as Error);
+        } catch (error: any) {
+            logger.error('❌ Error processing GitHub event:', error);
             throw error;
         }
     }

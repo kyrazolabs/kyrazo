@@ -59,11 +59,8 @@ export class RedisStreamConsumer {
             for (const msg of messages) {
                 try {
                     dataBatch.push(JSON.parse(msg.payload));
-                } catch (err) {
-                    logger.error(
-                        `Failed to parse payload for dispatch message ${msg.id}:`,
-                        err as Error
-                    );
+                } catch (err: any) {
+                    logger.error(`Failed to parse payload for dispatch message ${msg.id}:`, err);
                     await this.redis.xack(this.dispatchStream, this.consumerGroup, msg.id);
                 }
             }
@@ -77,11 +74,8 @@ export class RedisStreamConsumer {
             for (const msg of messages) {
                 try {
                     dataBatch.push(JSON.parse(msg.payload));
-                } catch (err) {
-                    logger.error(
-                        `Failed to parse payload for ingest message ${msg.id}:`,
-                        err as Error
-                    );
+                } catch (err: any) {
+                    logger.error(`Failed to parse payload for ingest message ${msg.id}:`, err);
                     await this.redis.xack(this.ingestStream, this.consumerGroup, msg.id);
                 }
             }
@@ -96,9 +90,11 @@ export class RedisStreamConsumer {
     public async stop() {
         console.error('🛑 Stopping Redis Stream Consumer...');
         this.running = false;
-        
+
         if (this.processingPromises.size > 0) {
-            console.info(`⏳ Waiting for ${this.processingPromises.size} active batches to finish processing...`);
+            console.info(
+                `⏳ Waiting for ${this.processingPromises.size} active batches to finish processing...`
+            );
             await Promise.allSettled(Array.from(this.processingPromises));
         }
 
@@ -138,7 +134,9 @@ export class RedisStreamConsumer {
                             const msgId = msg[0];
                             const deliveryCount = await this.getDeliveryCount(streamName, msgId);
                             if (deliveryCount > maxRetries) {
-                                logger.warn(`Message ${msgId} in ${streamName} exceeded max retries. Dead-lettering and acknowledging.`);
+                                logger.warn(
+                                    `Message ${msgId} in ${streamName} exceeded max retries. Dead-lettering and acknowledging.`
+                                );
                                 // In a real system, you might move this to a DLQ stream here
                                 await this.redis.xack(streamName, this.consumerGroup, msgId);
                             } else {
@@ -195,14 +193,11 @@ export class RedisStreamConsumer {
                             // Acknowledge processed messages
                             const idsToAck = parsedMessages.map((msg: any) => msg.id);
                             await this.redis.xack(streamName, this.consumerGroup, ...idsToAck);
-                        } catch (error) {
-                            logger.error(
-                                `Failed to process batch for ${streamName}:`,
-                                error as Error
-                            );
+                        } catch (error: any) {
+                            logger.error(`Failed to process batch for ${streamName}:`, error);
                         }
                     })();
-                    
+
                     this.processingPromises.add(activeWork);
                     await activeWork;
                     this.processingPromises.delete(activeWork);
@@ -212,7 +207,7 @@ export class RedisStreamConsumer {
                     // Expected error during shutdown
                     return;
                 }
-                logger.error(`Error in stream processing loop for ${streamName}:`, error as Error);
+                logger.error(`Error in stream processing loop for ${streamName}:`, error);
                 await new Promise(resolve => setTimeout(resolve, 5000)); // Backoff on error
             }
 
@@ -229,13 +224,13 @@ export class RedisStreamConsumer {
     private async getDeliveryCount(streamName: string, messageId: string): Promise<number> {
         // XPENDING returns info about pending messages
         // Format: xpending stream group start end count
-        const pendingInfo = await this.redis.xpending(
+        const pendingInfo = (await this.redis.xpending(
             streamName,
             this.consumerGroup,
             messageId,
             messageId,
             1
-        ) as any[];
+        )) as any[];
 
         if (pendingInfo && pendingInfo.length > 0) {
             // First (and only) result for this specific ID.

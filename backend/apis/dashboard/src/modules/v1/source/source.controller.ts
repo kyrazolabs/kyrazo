@@ -58,8 +58,8 @@ export class SourceController {
                 },
                 201
             );
-        } catch (error: unknown) {
-            logger.error('Error in createSource:', error as Error);
+        } catch (error: any) {
+            logger.error('Error in createSource:', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -111,7 +111,7 @@ export class SourceController {
                 },
                 200
             );
-        } catch (error: unknown) {
+        } catch (error: any) {
             const message = error instanceof Error ? error.message : 'Unknown error';
             const code = message === 'Source not found' ? 404 : 500;
             return c.json<IErrorResponse>(
@@ -178,7 +178,7 @@ export class SourceController {
                 },
                 200
             );
-        } catch (error: unknown) {
+        } catch (error: any) {
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -234,7 +234,7 @@ export class SourceController {
                     source: updated,
                 },
             });
-        } catch (error: unknown) {
+        } catch (error: any) {
             const message = error instanceof Error ? error.message : 'Unknown error';
             const code = message === 'Source not found' ? 404 : 500;
             return c.json<IErrorResponse>(
@@ -303,7 +303,7 @@ export class SourceController {
                 },
                 200
             );
-        } catch (error: unknown) {
+        } catch (error: any) {
             const message = error instanceof Error ? error.message : 'Unknown error';
             // If delete failed (not found), service might throw 'Failed to delete source' (if repo returns false).
             // Repo returns false if not found.
@@ -358,7 +358,7 @@ export class SourceController {
                 success: true,
                 message: 'Source authentication updated successfully.',
             });
-        } catch (error: unknown) {
+        } catch (error: any) {
             const message = error instanceof Error ? error.message : 'Unknown error';
             const code = message === 'Source not found' ? 404 : 500;
             return c.json<IErrorResponse>(

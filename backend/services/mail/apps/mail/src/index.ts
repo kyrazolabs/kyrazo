@@ -24,7 +24,7 @@ Bun.serve({
                 serverInfo: info.split("\r\n").slice(0, 5).join("\n"),
               },
             };
-          } catch (error) {
+          } catch (error: any) {
             return {
               status: "unhealthy",
               details: {
@@ -54,7 +54,7 @@ Bun.serve({
             status: allHealthy ? 200 : 503,
           },
         );
-      } catch (error) {
+      } catch (error: any) {
         return Response.json(
           {
             success: false,

@@ -60,8 +60,8 @@ export const requireRecentOTP = (action: SensitiveAction) => {
             }
 
             await next();
-        } catch (error) {
-            logger.error('Error in requireRecentOTP middleware', error as Error);
+        } catch (error: any) {
+            logger.error('Error in requireRecentOTP middleware', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,

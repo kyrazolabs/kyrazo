@@ -1,5 +1,5 @@
-import crypto from "crypto";
-import { logger } from "@kyrazo/shared";
+import crypto from 'crypto';
+import { logger } from '@kyrazo/shared';
 
 interface CertificateCache {
     [certUrl: string]: {
@@ -24,16 +24,16 @@ export class PayPalSignature {
     public async verify(
         rawBody: string,
         headers: Record<string, string>,
-        webhookId: string,
+        webhookId: string
     ): Promise<boolean> {
         try {
-            const transmissionId = headers["paypal-transmission-id"];
-            const timeStamp = headers["paypal-transmission-time"];
-            const certUrl = headers["paypal-cert-url"];
-            const signature = headers["paypal-transmission-sig"];
+            const transmissionId = headers['paypal-transmission-id'];
+            const timeStamp = headers['paypal-transmission-time'];
+            const certUrl = headers['paypal-cert-url'];
+            const signature = headers['paypal-transmission-sig'];
 
             if (!transmissionId || !timeStamp || !certUrl || !signature) {
-                logger.warn("Missing required PayPal signature headers");
+                logger.warn('Missing required PayPal signature headers');
                 return false;
             }
 
@@ -47,20 +47,20 @@ export class PayPalSignature {
             const certPem = await this.downloadCertificate(certUrl);
 
             // Create signature buffer from base64
-            const signatureBuffer = Buffer.from(signature, "base64");
+            const signatureBuffer = Buffer.from(signature, 'base64');
 
             // Verify signature using PayPal certificate
-            const verifier = crypto.createVerify("SHA256");
+            const verifier = crypto.createVerify('SHA256');
             verifier.update(message);
             const isValid = verifier.verify(certPem, signatureBuffer);
 
             if (!isValid) {
-                logger.warn("Invalid PayPal signature");
+                logger.warn('Invalid PayPal signature');
             }
 
             return isValid;
         } catch (error) {
-            logger.error("Error verifying PayPal signature:", error as Error);
+            logger.error('Error verifying PayPal signature:', error);
             return false;
         }
     }
@@ -94,35 +94,33 @@ export class PayPalSignature {
             logger.debug(`Downloading PayPal certificate from: ${certUrl}`);
 
             // Download certificate using HTTPS
-            const https = await import("https");
+            const https = await import('https');
             const certificate = await new Promise<string>((resolve, reject) => {
                 const request = https.get(certUrl, (response: any) => {
-                    let data = "";
+                    let data = '';
 
-                    response.on("data", (chunk: string) => {
+                    response.on('data', (chunk: string) => {
                         data += chunk;
                     });
 
-                    response.on("end", () => {
+                    response.on('end', () => {
                         if (response.statusCode === 200) {
                             resolve(data);
                         } else {
                             reject(
-                                new Error(
-                                    `Failed to download certificate: ${response.statusCode}`,
-                                ),
+                                new Error(`Failed to download certificate: ${response.statusCode}`)
                             );
                         }
                     });
                 });
 
-                request.on("error", (error: Error) => {
+                request.on('error', (error: Error) => {
                     reject(error);
                 });
 
                 request.setTimeout(10000, () => {
                     request.destroy();
-                    reject(new Error("Certificate download timeout"));
+                    reject(new Error('Certificate download timeout'));
                 });
             });
 
@@ -132,15 +130,10 @@ export class PayPalSignature {
                 expiresAt: Date.now() + this.CERT_CACHE_TTL,
             };
 
-            logger.debug(
-                `Successfully downloaded and cached PayPal certificate`,
-            );
+            logger.debug(`Successfully downloaded and cached PayPal certificate`);
             return certificate;
         } catch (error) {
-            logger.error(
-                "Error downloading PayPal certificate:",
-                error as Error,
-            );
+            logger.error('Error downloading PayPal certificate:', error);
             throw error;
         }
     }

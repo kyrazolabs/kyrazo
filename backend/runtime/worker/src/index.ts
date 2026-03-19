@@ -88,7 +88,7 @@ async function main() {
         appLogger.info(
             `🚀 Worker HTTP Healthcheck server running on port ${port} (reusePort active)`
         );
-    } catch (error) {
+    } catch (error: any) {
         console.error('❌ Failed to start worker service:', error);
         process.exit(1);
     }

@@ -47,18 +47,13 @@ export class ReceiveEventPublisher {
                 await natsConfig.connect();
             }
 
-
             this.isInitialized = true;
             logger.info('NATS Event Publisher initialized successfully');
-        } catch (error: unknown) {
-            logger.error(
-                'Failed to initialize NATS Event Publisher in receive.nats.ts',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Failed to initialize NATS Event Publisher in receive.nats.ts', error);
             throw error;
         }
     }
-
 
     /**
      * @title Receive Event
@@ -103,8 +98,8 @@ export class ReceiveEventPublisher {
             );
 
             return { success: true };
-        } catch (error: unknown) {
-            logger.error('Failed to publish receive event to NATS', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to publish receive event to NATS', error);
             throw error;
         }
     }
@@ -130,7 +125,7 @@ export class ReceiveEventPublisher {
                     timestamp: new Date().toISOString(),
                 },
             };
-        } catch (error) {
+        } catch (error: any) {
             return {
                 status: 'unhealthy',
                 details: {

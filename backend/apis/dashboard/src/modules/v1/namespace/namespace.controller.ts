@@ -116,8 +116,8 @@ export class NamespaceController {
                 },
                 201
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in NamespaceController.createNamespace', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in NamespaceController.createNamespace', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -181,11 +181,8 @@ export class NamespaceController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in NamespaceController.getNamespaceById',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Unexpected error in NamespaceController.getNamespaceById', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -277,8 +274,8 @@ export class NamespaceController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in NamespaceController.updateNamespace', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in NamespaceController.updateNamespace', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -343,8 +340,8 @@ export class NamespaceController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in NamespaceController.deleteNamespace', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in NamespaceController.deleteNamespace', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -411,11 +408,8 @@ export class NamespaceController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in NamespaceController.restoreNamespace',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Unexpected error in NamespaceController.restoreNamespace', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -478,11 +472,8 @@ export class NamespaceController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in NamespaceController.listWorkspaceNamespaces',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Unexpected error in NamespaceController.listWorkspaceNamespaces', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,

@@ -28,7 +28,7 @@ async function migrate() {
         }
 
         console.log('Migration completed successfully');
-    } catch (error) {
+    } catch (error: any) {
         console.error('Migration failed:', error);
     } finally {
         await databaseConfig.disconnect();

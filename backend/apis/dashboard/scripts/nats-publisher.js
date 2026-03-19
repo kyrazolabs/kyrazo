@@ -47,7 +47,7 @@ async function publishToJetStream() {
 
         await nc.drain();
         console.log('👋 Connection drained');
-    } catch (error) {
+    } catch (error: any) {
         console.error('❌ Error:', error.message);
         process.exit(1);
     }

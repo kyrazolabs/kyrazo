@@ -68,7 +68,7 @@ app.onError((err, c) => {
     // Report unhandled errors to Sentry
     Sentry.captureException(err);
 
-    logger.error('Unhandled Application Error', err as Error, {
+    logger.error('Unhandled Application Error', err, {
         path: c.req.path,
         method: c.req.method,
         requestId: c.get('requestId'),
@@ -118,8 +118,8 @@ const initializeConnections = async () => {
 
         logger.info('All connections initialized successfully');
         return true;
-    } catch (error) {
-        logger.error('Failed to initialize connections:', error as Error);
+    } catch (error: any) {
+        logger.error('Failed to initialize connections:', error);
         return false;
     }
 };
@@ -217,8 +217,8 @@ const startServer = async () => {
         logger.info('Server started successfully');
 
         return server;
-    } catch (error) {
-        logger.error('Failed to start server:', error as Error);
+    } catch (error: any) {
+        logger.error('Failed to start server:', error);
         process.exit(1);
     }
 };
@@ -231,7 +231,7 @@ startServer()
         server = startedServer;
     })
     .catch(error => {
-        logger.error('Failed to start server:', error as Error);
+        logger.error('Failed to start server:', error);
         process.exit(1);
     });
 
@@ -241,7 +241,7 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // Handle uncaught exceptions
 process.on('uncaughtException', error => {
-    logger.error('Uncaught Exception:', error as Error);
+    logger.error('Uncaught Exception:', error);
     process.exit(1);
 });
 

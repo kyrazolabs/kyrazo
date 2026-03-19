@@ -85,8 +85,8 @@ export class PlanService {
                 stripeMeterId: meter.id,
                 stripeMeterEventName: planData.meterEventName,
             });
-        } catch (error) {
-            logger.error('Failed to create Stripe plan', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to create Stripe plan', error);
             throw new Error('Failed to create payment configuration for plan');
         }
     }
@@ -182,8 +182,8 @@ export class PlanService {
             return await planRepository.updateById(id, {
                 stripePriceId: stripePrice.id,
             });
-        } catch (error) {
-            logger.error('Failed to regenerate Stripe price for plan:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to regenerate Stripe price for plan:', error);
             throw new Error('Failed to regenerate payment configuration for plan');
         }
     }
@@ -202,9 +202,9 @@ export class PlanService {
                     await this.regenerateStripePrice(plan._id.toString());
                     fixed++;
                     logger.info(`Fixed plan ${plan.slug} with new Stripe price`);
-                } catch (error) {
+                } catch (error: any) {
                     errors++;
-                    logger.error(`Failed to fix plan ${plan.slug}:`, error as Error);
+                    logger.error(`Failed to fix plan ${plan.slug}:`, error);
                 }
             }
         }

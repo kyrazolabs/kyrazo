@@ -227,15 +227,15 @@ export const authenticate = async (c: AppContext, next: Next) => {
         };
 
         await next();
-    } catch (error) {
-        logger.error('API key authentication error:', error as Error);
+    } catch (error: any) {
+        logger.error('API key authentication error:', error);
         return c.json<IErrorResponse>(
             {
                 success: false,
                 error: {
                     code: 'INVALID_API_KEY',
                     message: 'Invalid API key',
-                    details: error as Error,
+                    details: error,
                     requestId: c.get('requestId'),
                 },
             },
@@ -264,7 +264,7 @@ export const checkScope = (requiredScope: string) => {
             }
 
             await next();
-        } catch (error: unknown) {
+        } catch (error: any) {
             return c.json<IErrorResponse>(
                 {
                     success: false,

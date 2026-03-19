@@ -46,11 +46,8 @@ export class SubscriptionController {
                 },
                 201
             );
-        } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in SubscriptionController.createSubscription',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Unexpected error in SubscriptionController.createSubscription', error);
 
             const message =
                 error instanceof Error ? error.message : 'Failed to create subscription';
@@ -137,11 +134,8 @@ export class SubscriptionController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in SubscriptionController.getSubscription',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Unexpected error in SubscriptionController.getSubscription', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -185,10 +179,10 @@ export class SubscriptionController {
                 },
                 200
             );
-        } catch (error: unknown) {
+        } catch (error: any) {
             logger.error(
                 'Unexpected error in SubscriptionController.getWorkspaceSubscriptions',
-                error as Error
+                error
             );
             return c.json<IErrorResponse>(
                 {
@@ -254,8 +248,8 @@ export class SubscriptionController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in SubscriptionController.changePlan', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in SubscriptionController.changePlan', error);
 
             const message = error instanceof Error ? error.message : 'Failed to change plan';
             return c.json<IErrorResponse>(
@@ -319,11 +313,8 @@ export class SubscriptionController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in SubscriptionController.cancelSubscription',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Unexpected error in SubscriptionController.cancelSubscription', error);
 
             const message =
                 error instanceof Error ? error.message : 'Failed to cancel subscription';
@@ -370,8 +361,8 @@ export class SubscriptionController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in SubscriptionController.checkLimits', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in SubscriptionController.checkLimits', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -414,8 +405,8 @@ export class SubscriptionController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in SubscriptionController.getInvoices', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in SubscriptionController.getInvoices', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,

@@ -30,8 +30,8 @@ export class EndpointService {
 
         try {
             return await endpointRepository.create(data);
-        } catch (error) {
-            logger.error('Failed to create target:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to create target:', error);
             throw new Error(JSON.stringify(error));
         }
     }
@@ -43,8 +43,8 @@ export class EndpointService {
                 limit,
                 page,
             });
-        } catch (error) {
-            logger.error('Failed to get endpoints:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get endpoints:', error);
             throw new Error('Failed to get endpoints');
         }
     }
@@ -60,8 +60,8 @@ export class EndpointService {
                 throw new Error('Endpoint not found');
             }
             return endpoint;
-        } catch (error) {
-            logger.error('Failed to get endpoint by id:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get endpoint by id:', error);
             throw new Error('Failed to get endpoint by id');
         }
     }
@@ -91,8 +91,8 @@ export class EndpointService {
                 namespaceId
             );
             return secret;
-        } catch (error) {
-            logger.error('Failed to get endpoint secret:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get endpoint secret:', error);
             throw new Error('Failed to get endpoint secret');
         }
     }
@@ -122,8 +122,8 @@ export class EndpointService {
                 throw new Error('Failed to update endpoint');
             }
             return updated;
-        } catch (error) {
-            logger.error('Failed to update endpoint:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to update endpoint:', error);
             throw new Error('Failed to update endpoint');
         }
     }
@@ -143,8 +143,8 @@ export class EndpointService {
                 throw new Error('Failed to delete endpoint');
             }
             return deleted;
-        } catch (error) {
-            logger.error('Failed to delete endpoint:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to delete endpoint:', error);
             throw new Error('Failed to delete endpoint');
         }
     }

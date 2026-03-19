@@ -63,8 +63,8 @@ const handleMongooseErrors = (error: Error) => {
 const zodErrorHandler = async (c: AppContext, next: Next) => {
     try {
         await next();
-    } catch (err) {
-        logger.error('Zod Validation Error', err as Error);
+    } catch (err: any) {
+        logger.error('Zod Validation Error', err);
         if (err instanceof ZodError) {
             return c.json(
                 {

@@ -91,7 +91,7 @@ export class DatabaseConfig {
                 logger.info('MongoDB reconnected');
                 this.isConnected = true;
             });
-        } catch (error) {
+        } catch (error: any) {
             let errorMessage = 'Failed to connect to MongoDB';
             if (
                 (error as any).message?.includes('ESERVFAIL') ||
@@ -100,7 +100,7 @@ export class DatabaseConfig {
                 errorMessage +=
                     ' (Tip: If using a replica set in a restricted network, try adding ?directConnection=true to your MONGODB_URI)';
             }
-            logger.error(errorMessage, error as Error);
+            logger.error(errorMessage, error);
             this.isConnected = false;
             throw error;
         }
@@ -122,8 +122,8 @@ export class DatabaseConfig {
             await mongoose.disconnect();
             this.isConnected = false;
             logger.info('Disconnected from MongoDB');
-        } catch (error) {
-            logger.error('Error disconnecting from MongoDB:', error as Error);
+        } catch (error: any) {
+            logger.error('Error disconnecting from MongoDB:', error);
             throw error;
         }
     }
@@ -162,7 +162,7 @@ export class DatabaseConfig {
                     ping: result,
                 },
             };
-        } catch (error) {
+        } catch (error: any) {
             return {
                 status: 'unhealthy',
                 details: {

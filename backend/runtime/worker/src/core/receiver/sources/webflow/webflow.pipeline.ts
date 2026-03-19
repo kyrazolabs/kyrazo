@@ -71,10 +71,10 @@ export class WebflowPipeline {
                     credentials.iv,
                     source.namespaceId.toString()
                 );
-            } catch (error) {
+            } catch (error: any) {
                 logger.warn(
                     `[WebflowPipeline] Failed to decrypt source secret for ${event.sourceId}, attempting fallback:`,
-                    error as Error
+                    error
                 );
                 sourceSecret = credentials.secret;
             }
@@ -107,8 +107,8 @@ export class WebflowPipeline {
             await this.enqueue(data, true);
 
             logger.info('✅ Successfully processed Webflow event', event.eventId);
-        } catch (error) {
-            logger.error('❌ Error processing Webflow event:', error as Error);
+        } catch (error: any) {
+            logger.error('❌ Error processing Webflow event:', error);
             throw error;
         }
     }

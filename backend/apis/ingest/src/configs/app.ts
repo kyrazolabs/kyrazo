@@ -2,15 +2,11 @@ import * as dotenv from 'dotenv';
 import { AckPolicy, DeliverPolicy } from 'nats';
 
 // Load environment variables
-dotenv.config({ path: './backend/api/.env' });
+dotenv.config(); // Default .env in current directory
+dotenv.config({ path: './backend/api/.env' }); // Fallback for previous setup
 
 // Validate required environment variables
-const requiredEnvVars = [
-    'MONGODB_URI',
-    'REDIS_HOST',
-    'REDIS_PORT',
-    'ENCRYPTION_KEY',
-];
+const requiredEnvVars = ['MONGODB_URI', 'REDIS_HOST', 'REDIS_PORT', 'ENCRYPTION_KEY'];
 
 console.log('Checking required env vars:');
 requiredEnvVars.forEach(envVar => {
@@ -20,9 +16,7 @@ requiredEnvVars.forEach(envVar => {
 const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
 
 if (missingEnvVars.length > 0) {
-    throw new Error(
-        `Missing required environment variables: ${missingEnvVars.join(', ')}`
-    );
+    throw new Error(`Missing required environment variables: ${missingEnvVars.join(', ')}`);
 }
 
 /**
@@ -37,7 +31,7 @@ export const config = {
     // Application Configuration
     app: {
         name: process.env.APP_NAME || 'Kyrazo Ingest',
-        version: process.env.APP_VERSION || '1.0.0',
+        container: process.env.COOLIFY_CONTAINER_NAME,
     },
 
     // Server Configuration
@@ -57,22 +51,15 @@ export const config = {
         queue: {
             url: process.env.QUEUE_REDIS_URL!,
             host: process.env.QUEUE_REDIS_HOST || process.env.REDIS_HOST!,
-            port: parseInt(
-                process.env.QUEUE_REDIS_PORT || process.env.REDIS_PORT!
-            ),
-            password:
-                process.env.QUEUE_REDIS_PASSWORD ||
-                process.env.REDIS_PASSWORD ||
-                '',
+            port: parseInt(process.env.QUEUE_REDIS_PORT || process.env.REDIS_PORT!),
+            password: process.env.QUEUE_REDIS_PASSWORD || process.env.REDIS_PASSWORD || '',
             db: parseInt(process.env.QUEUE_REDIS_DB || '1'),
         },
     },
 
     // NATS Configuration
     nats: {
-        servers: process.env.NATS_SERVERS?.split(',') || [
-            'nats://localhost:4222',
-        ],
+        servers: process.env.NATS_SERVERS?.split(',') || ['nats://localhost:4222'],
         tls: {
             certFile: process.env.NATS_CERT_FILE,
             keyFile: process.env.NATS_KEY_FILE,
@@ -80,12 +67,8 @@ export const config = {
         },
         user: process.env.NATS_USER || 'admin',
         password: process.env.NATS_PASSWORD || 'adminPass',
-        maxReconnectAttempts: parseInt(
-            process.env.NATS_MAX_RECONNECT_ATTEMPTS || '10'
-        ),
-        reconnectTimeWait: parseInt(
-            process.env.NATS_RECONNECT_TIME_WAIT || '2000'
-        ),
+        maxReconnectAttempts: parseInt(process.env.NATS_MAX_RECONNECT_ATTEMPTS || '10'),
+        reconnectTimeWait: parseInt(process.env.NATS_RECONNECT_TIME_WAIT || '2000'),
         timeout: parseInt(process.env.NATS_TIMEOUT || '20000'),
     },
 
@@ -122,27 +105,17 @@ export function validateConfig(): void {
     const errors: string[] = [];
 
     // Validate server port
-    if (
-        isNaN(config.server.port) ||
-        config.server.port < 1 ||
-        config.server.port > 65535
-    ) {
+    if (isNaN(config.server.port) || config.server.port < 1 || config.server.port > 65535) {
         errors.push('Invalid server port');
     }
 
     // Validate Redis port
-    if (
-        isNaN(config.redis.port) ||
-        config.redis.port < 1 ||
-        config.redis.port > 65535
-    ) {
+    if (isNaN(config.redis.port) || config.redis.port < 1 || config.redis.port > 65535) {
         errors.push('Invalid Redis port');
     }
 
     if (errors.length > 0) {
-        throw new Error(
-            `Configuration validation failed: ${errors.join(', ')}`
-        );
+        throw new Error(`Configuration validation failed: ${errors.join(', ')}`);
     }
 }
 

@@ -74,10 +74,10 @@ export class PayPalPipeline {
                     credentials.iv,
                     source.namespaceId.toString()
                 );
-            } catch (error) {
+            } catch (error: any) {
                 logger.warn(
                     `Failed to decrypt source secret for ${event.sourceId}, attempting fallback to raw value:`,
-                    error as Error
+                    error
                 );
                 // Fallback: use the raw secret value (in case it was stored plaintext or user error)
                 // Cast to any to avoid TS error with Mixed type
@@ -136,8 +136,8 @@ export class PayPalPipeline {
             });
 
             logger.info('✅ Successfully processed paypal event', event.eventId);
-        } catch (error) {
-            logger.error('❌ Error processing paypal event:', error as Error);
+        } catch (error: any) {
+            logger.error('❌ Error processing paypal event:', error);
             throw error;
         }
     }

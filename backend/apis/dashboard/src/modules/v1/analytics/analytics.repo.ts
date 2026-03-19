@@ -6,8 +6,8 @@ export class AnalyticsRepo {
             const data = await CHAnalyticsRepo.getDispatchOverview(days, workspaceId, namespaceId);
             if (!data) throw new Error('Failed to get dispatch overview from ClickHouse');
             return data;
-        } catch (error) {
-            logger.error('Failed to get dispatch overview', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get dispatch overview', error);
             throw error;
         }
     }
@@ -27,8 +27,8 @@ export class AnalyticsRepo {
             );
             if (!data) throw new Error('Failed to get target overview from ClickHouse');
             return data;
-        } catch (error) {
-            logger.error('Failed to get target overview', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get target overview', error);
             throw error;
         }
     }
@@ -38,8 +38,8 @@ export class AnalyticsRepo {
             const data = await CHAnalyticsRepo.getIngestOverview(days, workspaceId, namespaceId);
             if (!data) throw new Error('Failed to get ingest overview from ClickHouse');
             return data;
-        } catch (error) {
-            logger.error('Failed to get ingest overview', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get ingest overview', error);
             throw error;
         }
     }

@@ -76,7 +76,7 @@ router.get('/health', async c => {
                             ping,
                         },
                     };
-                } catch (error) {
+                } catch (error: any) {
                     return {
                         status: 'unhealthy',
                         details: {
@@ -106,7 +106,7 @@ router.get('/health', async c => {
             timestamp: new Date().toISOString(),
             version: '1.0.0',
         });
-    } catch (error) {
+    } catch (error: any) {
         return c.json(
             {
                 success: false,
