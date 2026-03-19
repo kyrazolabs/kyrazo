@@ -30,7 +30,7 @@ export const config = {
     // Application Configuration
     app: {
         name: process.env.APP_NAME || 'Kyrazo Integration',
-        version: process.env.APP_VERSION || '1.0.0',
+        container: process.env.COOLIFY_CONTAINER_NAME || '1.0.0',
         ingest: {
             v1: 'https://api.kyrazo.com/ingest/v1/',
         },

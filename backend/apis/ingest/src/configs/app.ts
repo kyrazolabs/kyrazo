@@ -31,7 +31,7 @@ export const config = {
     // Application Configuration
     app: {
         name: process.env.APP_NAME || 'Kyrazo Ingest',
-        version: process.env.COOLIFY_CONTAINER_NAME,
+        container: process.env.COOLIFY_CONTAINER_NAME,
     },
 
     // Server Configuration
