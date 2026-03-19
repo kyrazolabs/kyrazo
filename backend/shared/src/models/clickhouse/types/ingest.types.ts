@@ -31,6 +31,7 @@ export interface SQLIngestEvent {
 
     // Joined routing metadata (from dispatched_events)
     route_to?: string;
+    route_priority?: string;
     route_max_retries?: number;
     route_inserted_at?: string;
 }
