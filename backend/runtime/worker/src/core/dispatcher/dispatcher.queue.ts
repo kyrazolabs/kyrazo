@@ -54,7 +54,7 @@ export class DispatcherQueue extends EventEmitter {
 
             logger.info(`✅ Queued ${jobIds.length} dispatch jobs for event ${event.id}`);
         } catch (error: any) {
-            logger.error('Error dispatching to targets via queue:', error as Error);
+            logger.error('Error dispatching to targets via queue:', error);
             throw error;
         }
     }
@@ -156,7 +156,9 @@ export class DispatcherQueue extends EventEmitter {
                         );
                         continue;
                     }
-                    logger.info(`✅ Endpoint found: ${endpoint.id || endpoint._id} (${endpoint.url})`);
+                    logger.info(
+                        `✅ Endpoint found: ${endpoint.id || endpoint._id} (${endpoint.url})`
+                    );
 
                     targets.push({
                         type: 'endpoint',

@@ -197,8 +197,8 @@ export class RedisConfig {
 
             this.isConnected = true;
             logger.info('Connected to Redis successfully');
-        } catch (error) {
-            logger.error('Failed to connect to Redis:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to connect to Redis:', error);
             this.isConnected = false;
             throw error;
         }
@@ -230,8 +230,8 @@ export class RedisConfig {
             this.isConnected = false;
 
             logger.info('Disconnected from Redis');
-        } catch (error) {
-            logger.error('Error disconnecting from Redis:', error as Error);
+        } catch (error: any) {
+            logger.error('Error disconnecting from Redis:', error);
             throw error;
         }
     }
@@ -322,7 +322,7 @@ export class RedisConfig {
                     serverInfo: info.split('\r\n').slice(0, 5).join('\n'),
                 },
             };
-        } catch (error) {
+        } catch (error: any) {
             return {
                 status: 'unhealthy',
                 details: {

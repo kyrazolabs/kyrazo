@@ -1,5 +1,5 @@
-import { logger } from "@kyrazo/shared";
-import { receiverDetector } from "./receiver.detector";
+import { logger } from '@kyrazo/shared';
+import { receiverDetector } from './receiver.detector';
 
 export class ReceiverPipeline {
     private static instance: ReceiverPipeline;
@@ -17,8 +17,8 @@ export class ReceiverPipeline {
             await receiverDetector.detect(event);
 
             logger.debug(`✅ Publish event processed: ${event.eventId}`);
-        } catch (error) {
-            logger.error("❌ Error processing publish event:", error as Error);
+        } catch (error: any) {
+            logger.error('❌ Error processing publish event:', error);
             throw error;
         }
     }

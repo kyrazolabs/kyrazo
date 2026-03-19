@@ -1,8 +1,8 @@
-import { redisConfig, natsConfig, clickhouseConfig } from "@/config";
-import { dispatchProducer } from "@/consumers/batch/dispatch.producer";
-import { ingestProducer } from "@/consumers/batch/ingest.producer";
-import { dispatchConsumer } from "@/consumers/queues/dispatch.consumer";
-import { databaseConfig, logger } from "@kyrazo/shared";
+import { redisConfig, natsConfig, clickhouseConfig } from '@/config';
+import { dispatchProducer } from '@/consumers/batch/dispatch.producer';
+import { ingestProducer } from '@/consumers/batch/ingest.producer';
+import { dispatchConsumer } from '@/consumers/queues/dispatch.consumer';
+import { databaseConfig, logger } from '@kyrazo/shared';
 
 // Graceful shutdown handler
 let isShuttingDown = false;
@@ -19,61 +19,59 @@ const gracefulShutdown = async (signal: string) => {
 
     try {
         await databaseConfig.disconnect();
-        logger.info("Database connection closed");
+        logger.info('Database connection closed');
     } catch (error: any) {
-        logger.error("Error closing database connection:", error);
+        logger.error('Error closing database connection:', error);
     }
 
     // Close Redis connection
     try {
         await redisConfig.disconnect();
-        logger.info("Redis connection closed");
+        logger.info('Redis connection closed');
     } catch (error: any) {
-        logger.error("Error closing Redis connection:", error);
+        logger.error('Error closing Redis connection:', error);
     }
 
     // Close NATS connection
     try {
         await natsConfig.disconnect();
-        logger.info("NATS connection closed");
+        logger.info('NATS connection closed');
     } catch (error: any) {
-        logger.error("Error closing NATS connection:", error);
+        logger.error('Error closing NATS connection:', error);
     }
 
     // Close ClickHouse connection
     try {
         await clickhouseConfig.disconnect();
-        logger.info("ClickHouse connection closed");
+        logger.info('ClickHouse connection closed');
     } catch (error: any) {
-        logger.error("Error closing ClickHouse connection:", error);
+        logger.error('Error closing ClickHouse connection:', error);
     }
 
     // Force close after 30 seconds
     setTimeout(() => {
-        logger.error(
-            "Could not close connections in time, forcefully shutting down",
-        );
+        logger.error('Could not close connections in time, forcefully shutting down');
         process.exit(1);
     }, 30000);
 };
 
 export const lifecycle = async () => {
     // Handle graceful shutdown
-    process.on("SIGINT", async () => {
-        logger.info("\n👋 Shutting down worker...");
-        await gracefulShutdown("SIGINT");
+    process.on('SIGINT', async () => {
+        logger.info('\n👋 Shutting down worker...');
+        await gracefulShutdown('SIGINT');
         process.exit(0);
     });
 
-    process.on("SIGTERM", async () => {
-        logger.info("\n👋 Shutting down worker...");
-        await gracefulShutdown("SIGTERM");
+    process.on('SIGTERM', async () => {
+        logger.info('\n👋 Shutting down worker...');
+        await gracefulShutdown('SIGTERM');
         process.exit(0);
     });
 
-    process.on("uncaughtException", async (error) => {
-        logger.error("Uncaught Exception:", error);
-        await gracefulShutdown("uncaughtException");
+    process.on('uncaughtException', async (error: any) => {
+        logger.error('Uncaught Exception:', error);
+        await gracefulShutdown('uncaughtException');
         process.exit(1);
     });
 };

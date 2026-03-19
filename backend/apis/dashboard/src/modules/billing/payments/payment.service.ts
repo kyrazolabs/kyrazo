@@ -39,7 +39,7 @@ export class PaymentService {
                 hostedInvoiceUrl: stripeInvoice.hosted_invoice_url,
             });
             logger.info(`Saved local invoice for Stripe Invoice ${stripeInvoice.id}`);
-        } catch (error) {
+        } catch (error: any) {
             logger.error(`Failed to save local invoice: ${error}`);
         }
     }
@@ -140,8 +140,8 @@ export class PaymentService {
             await paymentRepository.recordWebhookEvent(event.id, event.type);
 
             logger.info(`Successfully processed source event: ${event.type}`);
-        } catch (error) {
-            logger.error('Webhook processing error:', error as Error);
+        } catch (error: any) {
+            logger.error('Webhook processing error:', error);
             throw error;
         }
     }
@@ -334,7 +334,7 @@ export class PaymentService {
                     hostedInvoiceUrl: invoice.hosted_invoice_url,
                 }
             );
-        } catch (err) {
+        } catch (err: any) {
             logger.error(`Failed to update local invoice status to paid: ${err}`);
         }
 
@@ -358,7 +358,7 @@ export class PaymentService {
                     amountPaid: invoice.amount_paid,
                 }
             );
-        } catch (err) {
+        } catch (err: any) {
             logger.error(`Failed to update local invoice status on failure: ${err}`);
         }
 

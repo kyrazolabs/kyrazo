@@ -34,10 +34,7 @@ export class RedisSnapshotConsumer {
 
     start() {
         console.info('🚀 Redis Snapshot Consumer started...');
-        this.timer = setInterval(
-            () => this.consume(),
-            Config.get().snapshotIntervalMs
-        );
+        this.timer = setInterval(() => this.consume(), Config.get().snapshotIntervalMs);
     }
 
     async consume() {
@@ -64,20 +61,13 @@ export class RedisSnapshotConsumer {
                     if (results) {
                         results.forEach((result, index) => {
                             const [err, rawData] = result;
-                            if (
-                                err ||
-                                !rawData ||
-                                !Array.isArray(rawData) ||
-                                rawData.length === 0
-                            )
+                            if (err || !rawData || !Array.isArray(rawData) || rawData.length === 0)
                                 return;
 
                             // Convert Redis HGETALL array response ['key', 'value', 'key2', 'value2'] to object
                             const data: Record<string, string> = {};
                             for (let i = 0; i < rawData.length; i += 2) {
-                                data[rawData[i] as string] = rawData[
-                                    i + 1
-                                ] as string;
+                                data[rawData[i] as string] = rawData[i + 1] as string;
                             }
 
                             // Attach the key itself for parsing context later if needed (e.g. valid timestamps in key)
@@ -108,19 +98,15 @@ export class RedisSnapshotConsumer {
             stream.on('end', async () => {
                 try {
                     if (dispatchBatch.length > 0) {
-                        console.info(
-                            `Processing ${dispatchBatch.length} dispatch events`
-                        );
+                        console.info(`Processing ${dispatchBatch.length} dispatch events`);
                         await this.dispatchAgg.aggregateMany(dispatchBatch);
                     }
                     if (ingestBatch.length > 0) {
-                        console.info(
-                            `Processing ${ingestBatch.length} ingest events`
-                        );
+                        console.info(`Processing ${ingestBatch.length} ingest events`);
                         await this.ingestAgg.aggregateMany(ingestBatch);
                     }
                     resolve();
-                } catch (err) {
+                } catch (err: any) {
                     reject(err);
                 }
             });

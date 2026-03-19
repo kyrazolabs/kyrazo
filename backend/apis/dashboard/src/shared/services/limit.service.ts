@@ -28,8 +28,8 @@ export class LimitService {
             if (subscription?.planSnapshot?.limits) {
                 return subscription.planSnapshot.limits;
             }
-        } catch (error) {
-            logger.error('Error fetching cached subscription for limits', error as Error);
+        } catch (error: any) {
+            logger.error('Error fetching cached subscription for limits', error);
         }
 
         // Fallback to DB

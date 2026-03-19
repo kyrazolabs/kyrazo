@@ -7,10 +7,7 @@ import { redisConfig, config, natsConfig } from './configs';
 
 // import { arcjetMiddleware } from '@/middlewares/arcjet.middleware'
 import { errorHandler } from 'hono-error-handler';
-import {
-    handleMongooseErrors,
-    zodErrorHandler,
-} from '@/core/middlewares/error.middleware';
+import { handleMongooseErrors, zodErrorHandler } from '@/core/middlewares/error.middleware';
 
 // BullMQ Board
 // import { createBullBoard } from '@bull-board/api';
@@ -73,8 +70,8 @@ const initializeConnections = async () => {
             logger.info('NATS connected successfully');
         });
         return true;
-    } catch (error) {
-        logger.error('Failed to initialize connections', error as Error);
+    } catch (error: any) {
+        logger.error('Failed to initialize connections', error);
         return false;
     }
 };
@@ -140,9 +137,7 @@ const gracefulShutdown = async (signal: string) => {
 
     // Force close after 30 seconds
     setTimeout(() => {
-        logger.error(
-            'Could not close connections in time, forcefully shutting down'
-        );
+        logger.error('Could not close connections in time, forcefully shutting down');
         process.exit(1);
     }, 30000);
 };
@@ -164,21 +159,15 @@ const startServer = async () => {
             fetch: app.fetch,
         });
 
-        logger.info(
-            `Server running on port ${config.server.port} in ${config.server.env} mode`
-        );
-        logger.info(
-            `API documentation available at http://localhost:${config.server.port}/api/v1`
-        );
-        logger.info(
-            `Health check available at http://localhost:${config.server.port}/health`
-        );
+        logger.info(`Server running on port ${config.server.port} in ${config.server.env} mode`);
+        logger.info(`API documentation available at http://localhost:${config.server.port}/api/v1`);
+        logger.info(`Health check available at http://localhost:${config.server.port}/health`);
 
         logger.info('Server started successfully');
 
         return server;
-    } catch (error) {
-        logger.error('Failed to start server:', error as Error);
+    } catch (error: any) {
+        logger.error('Failed to start server:', error);
         process.exit(1);
     }
 };

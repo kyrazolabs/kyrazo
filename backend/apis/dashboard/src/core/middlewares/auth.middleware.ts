@@ -69,7 +69,7 @@ export const authenticate = async (c: AppContext, next: Next) => {
         c.user = result.payload;
 
         await next();
-    } catch (error: unknown) {
+    } catch (error: any) {
         return c.json<IErrorResponse>(
             {
                 success: false,
@@ -161,8 +161,8 @@ export const requireOwnership = (resourceType: 'workspace' | 'namespace') => {
             }
 
             await next();
-        } catch (error) {
-            logger.error('Ownership check error:', error as Error);
+        } catch (error: any) {
+            logger.error('Ownership check error:', error);
             return c.json(
                 {
                     success: false,

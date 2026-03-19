@@ -97,8 +97,8 @@ export class SourceService {
 
         try {
             return await sourceRepository.create(data);
-        } catch (error) {
-            logger.error('Failed to create source:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to create source:', error);
             throw error;
         }
     }
@@ -112,8 +112,8 @@ export class SourceService {
             });
             const sanitizedSources = sources.map(source => this.sanitizeSource(source));
             return { sources: sanitizedSources, total };
-        } catch (error) {
-            logger.error('Failed to get sources:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get sources:', error);
             throw new Error('Failed to get sources');
         }
     }
@@ -125,8 +125,8 @@ export class SourceService {
                 throw new Error('Source not found');
             }
             return this.sanitizeSource(source);
-        } catch (error) {
-            logger.error('Failed to get source by id:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get source by id:', error);
             throw error;
         }
     }
@@ -155,8 +155,8 @@ export class SourceService {
                 throw new Error('Failed to update source');
             }
             return this.sanitizeSource(updated);
-        } catch (error) {
-            logger.error('Failed to update source:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to update source:', error);
             throw error;
         }
     }
@@ -172,8 +172,8 @@ export class SourceService {
                 throw new Error('Failed to delete source');
             }
             return deleted;
-        } catch (error) {
-            logger.error('Failed to delete source:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to delete source:', error);
             throw error;
         }
     }
@@ -217,8 +217,8 @@ export class SourceService {
             return {
                 message: 'Authentication updated successfully',
             };
-        } catch (error) {
-            logger.error('Failed to update source auth:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to update source auth:', error);
             throw error;
         }
     }

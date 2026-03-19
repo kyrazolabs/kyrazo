@@ -94,8 +94,8 @@ export class SourceService {
             delete source.authentication?.credentials;
 
             return source;
-        } catch (error) {
-            logger.error('Failed to create source:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to create source:', error);
             throw error;
         }
     }
@@ -116,8 +116,8 @@ export class SourceService {
                 return s;
             });
             return { sources: sanitizedSources, total };
-        } catch (error) {
-            logger.error('Failed to get sources:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get sources:', error);
             throw new Error('Failed to get sources');
         }
     }
@@ -133,8 +133,8 @@ export class SourceService {
             const s = { ...source };
             delete s.authentication;
             return s;
-        } catch (error) {
-            logger.error('Failed to get source by id:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get source by id:', error);
             throw error;
         }
     }
@@ -163,8 +163,8 @@ export class SourceService {
             const sourceDoc = updated;
             delete sourceDoc.authentication?.credentials;
             return sourceDoc;
-        } catch (error) {
-            logger.error('Failed to update source:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to update source:', error);
             throw error;
         }
     }
@@ -180,8 +180,8 @@ export class SourceService {
                 throw new Error('Failed to delete source');
             }
             return deleted;
-        } catch (error) {
-            logger.error('Failed to delete source:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to delete source:', error);
             throw error;
         }
     }

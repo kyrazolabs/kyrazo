@@ -20,7 +20,7 @@ export class AutoScalerService {
         let allApps: any[] = [];
         try {
             allApps = (await getApplications()) || [];
-        } catch (err) {
+        } catch (err: any) {
             console.error('[AutoScaler] Failed to fetch apps for reconciliation:', err);
         }
         const kyrazoApps = allApps.filter(
@@ -58,7 +58,9 @@ export class AutoScalerService {
         // 5. Merge both lists to ensure we process everyone:
         // - Those who have a subscription (Scale UP/DOWN)
         // - Those who have NO subscription but have workers (Scale DOWN to 0)
-        const subscriptionClientMap = new Map(subscriptions.map(s => [s.workspaceId.toString(), s]));
+        const subscriptionClientMap = new Map(
+            subscriptions.map(s => [s.workspaceId.toString(), s])
+        );
 
         // Final set of client IDs to process
         const allClientIds = new Set([...clientsWithWorkers, ...subscriptionClientMap.keys()]);
@@ -94,7 +96,7 @@ export class AutoScalerService {
                 console.warn(`[AutoScaler] Found orphaned Coolify app: ${app.name}. Deleting.`);
                 try {
                     await CommandDispatcher.dispatchStopWorker('', workerId, '', true);
-                } catch (err) {
+                } catch (err: any) {
                     console.error(`[AutoScaler] Failed to delete orphan ${workerId}:`, err);
                 }
             }
@@ -114,7 +116,8 @@ export class AutoScalerService {
             const plan = await Plan.findById(subscription.planId);
 
             if (workspace && plan) {
-                maxWorkers = subscription.planSnapshot?.limits?.maxWorkers ?? plan.limits.maxWorkers;
+                maxWorkers =
+                    subscription.planSnapshot?.limits?.maxWorkers ?? plan.limits.maxWorkers;
                 // Sync limit to PG
                 await WorkerRepo.upsertClient(db, clientIdStr, maxWorkers);
             }
@@ -165,7 +168,7 @@ export class AutoScalerService {
             for (const worker of extraWorkers) {
                 try {
                     await WorkerService.decommissionWorker(worker.worker_id, kyrazoApps);
-                } catch (err) {
+                } catch (err: any) {
                     console.error('Failed to decommission worker:', err);
                 }
             }
@@ -182,10 +185,7 @@ export class AutoScalerService {
      *
      * The next reconcile loop will see fewer actual workers and provision fresh ones.
      */
-    private static async syncState(
-        clientId: string,
-        kyrazoApps: any[]
-    ) {
+    private static async syncState(clientId: string, kyrazoApps: any[]) {
         const GRACE_PERIOD_MS = 2 * 60 * 1000; // 2 minutes grace for "pending" starts
         const staleThreshold = new Date(Date.now() - GRACE_PERIOD_MS);
 
@@ -230,9 +230,18 @@ export class AutoScalerService {
                     // Reap-and-replace: mark failed (releases resources) then delete Coolify app
                     await WorkerService.updateWorkerStatus(w.worker_id, 'failed');
                     try {
-                        await CommandDispatcher.dispatchStopWorker('', w.worker_id, '', true, kyrazoApps);
-                    } catch (err) {
-                        console.error(`[AutoScaler] Failed to delete unhealthy worker app ${w.worker_id}:`, err);
+                        await CommandDispatcher.dispatchStopWorker(
+                            '',
+                            w.worker_id,
+                            '',
+                            true,
+                            kyrazoApps
+                        );
+                    } catch (err: any) {
+                        console.error(
+                            `[AutoScaler] Failed to delete unhealthy worker app ${w.worker_id}:`,
+                            err
+                        );
                     }
                 }
             } else {
@@ -246,7 +255,9 @@ export class AutoScalerService {
 
                 // Case 4: Worker was supposed to stop and is now gone from Coolify
                 if (w.status === 'stopping') {
-                    console.log(`[AutoScaler] Worker ${w.worker_id} successfully stopped in Coolify. Marking as stopped.`);
+                    console.log(
+                        `[AutoScaler] Worker ${w.worker_id} successfully stopped in Coolify. Marking as stopped.`
+                    );
                     await WorkerService.updateWorkerStatus(w.worker_id, 'stopped');
                 }
             }

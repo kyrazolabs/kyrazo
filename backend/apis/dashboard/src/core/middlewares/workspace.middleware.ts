@@ -80,11 +80,8 @@ export const requireWorkspaceMembership = (requiredRole?: string[]) => {
 
             c.workspace = membership;
             await next();
-        } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in requireWorkspaceMembership middleware',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Unexpected error in requireWorkspaceMembership middleware', error);
 
             return c.json<IErrorResponse>(
                 {
@@ -178,11 +175,8 @@ export const requireWorkspaceMembershipParam = (requiredRole?: string[]) => {
 
             c.workspace = membership;
             await next();
-        } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in requireWorkspaceMembershipParam middleware',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Unexpected error in requireWorkspaceMembershipParam middleware', error);
 
             return c.json<IErrorResponse>(
                 {

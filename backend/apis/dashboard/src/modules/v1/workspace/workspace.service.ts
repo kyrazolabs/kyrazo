@@ -70,9 +70,9 @@ export class WorkspaceService {
 
             await session.commitTransaction();
             return workspace;
-        } catch (error) {
+        } catch (error: any) {
             await session.abortTransaction();
-            logger.error('Workspace creation failed, transaction aborted:', error as Error);
+            logger.error('Workspace creation failed, transaction aborted:', error);
             throw error;
         } finally {
             session.endSession();
@@ -181,8 +181,8 @@ export class WorkspaceService {
                 subject: `You’ve been invited to ${config.app.name}`,
                 html: body,
             });
-        } catch (error) {
-            logger.error('Failed to send invitation email:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to send invitation email:', error);
             // We still created the invitation, so we return true but log the error
             // Or we could throw depending on UX preference
         }

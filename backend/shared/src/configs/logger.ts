@@ -52,8 +52,10 @@ const devFormat = winston.format.combine(
     winston.format.printf(info => {
         const { timestamp, level, message, error, metadata, ...rest } = info;
         const meta = metadata ? JSON.stringify(metadata, null, 2) : '';
-        const errorDetails = error ? ((error as any).stack || (error as any).message || JSON.stringify(error, null, 2)) : '';
-        
+        const errorDetails = error
+            ? (error as any).stack || (error as any).message || JSON.stringify(error, null, 2)
+            : '';
+
         // Include any other properties from rest if they exist
         const extra = Object.keys(rest).length > 0 ? JSON.stringify(rest, null, 2) : '';
 
@@ -83,8 +85,11 @@ if (process.env.DISABLE_FILE_LOGGING === 'true') {
         fs.writeFileSync(testFile, '');
         fs.unlinkSync(testFile);
         isLogDirWritable = true;
-    } catch (err) {
-        console.error(`Logging: Failed to initialize log directory at ${logDir}. Falling back to Console-only logging. Error:`, (err as Error).message);
+    } catch (err: any) {
+        console.error(
+            `Logging: Failed to initialize log directory at ${logDir}. Falling back to Console-only logging. Error:`,
+            err.message
+        );
     }
 }
 
@@ -131,7 +136,9 @@ if (isLogDirWritable) {
         );
     }
 } else if (config.isProduction) {
-    console.warn('Logging: Skipping file transports because log directory is not writable or file logging is disabled.');
+    console.warn(
+        'Logging: Skipping file transports because log directory is not writable or file logging is disabled.'
+    );
 }
 
 // === Logger ===
@@ -155,7 +162,7 @@ export const loggerStream = {
 
 export const logger = {
     // === Structured helper functions ===
-    error: (message: string, error?: Error, metadata?: any) => {
+    error: (message: string, error?: any, metadata?: any) => {
         log.error(message, {
             error,
             metadata: sanitize(metadata),

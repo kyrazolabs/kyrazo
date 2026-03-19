@@ -67,10 +67,10 @@ export class StripePipeline {
                     credentials.iv,
                     source.namespaceId.toString()
                 );
-            } catch (error) {
+            } catch (error: any) {
                 logger.warn(
                     `[StripePipeline] Failed to decrypt source secret for ${event.sourceId}, attempting fallback to raw value:`,
-                    error as Error
+                    error
                 );
                 sourceSecret = credentials.secret;
             }
@@ -132,8 +132,8 @@ export class StripePipeline {
             });
 
             logger.info('✅ Successfully processed Stripe event', event.eventId);
-        } catch (error) {
-            logger.error('❌ Error processing Stripe event:', error as Error);
+        } catch (error: any) {
+            logger.error('❌ Error processing Stripe event:', error);
             throw error;
         }
     }

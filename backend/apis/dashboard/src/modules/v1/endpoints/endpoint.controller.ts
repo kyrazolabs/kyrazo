@@ -56,9 +56,9 @@ export class EndpointController {
                 },
                 201
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in EndpointController.createEndpoint', error as Error);
-            if ((error as Error).message.includes('E11000')) {
+        } catch (error: any) {
+            logger.error('Unexpected error in EndpointController.createEndpoint', error);
+            if (error.message.includes('E11000')) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -119,8 +119,8 @@ export class EndpointController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in EndpointController.getEndpoint', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in EndpointController.getEndpoint', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -169,11 +169,8 @@ export class EndpointController {
                 },
                 200
             );
-        } catch (error) {
-            logger.error(
-                'Unexpected error in EndpointController.getEndpointSecret',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Unexpected error in EndpointController.getEndpointSecret', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -228,8 +225,8 @@ export class EndpointController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in EndpointController.getEndpoints', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in EndpointController.getEndpoints', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -293,11 +290,8 @@ export class EndpointController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in EndpointController.updateEndpointStatus',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Unexpected error in EndpointController.updateEndpointStatus', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -349,8 +343,8 @@ export class EndpointController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in EndpointController.updateEndpoint', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in EndpointController.updateEndpoint', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -398,8 +392,8 @@ export class EndpointController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in EndpointController.deleteEndpoint', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in EndpointController.deleteEndpoint', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,

@@ -79,8 +79,7 @@ export class RedisConfig {
                 queueRedisClientOptions = {
                     host: config.redis.queue.host || config.redis.host,
                     port: config.redis.queue.port || config.redis.port,
-                    password:
-                        config.redis.queue.password || config.redis.password,
+                    password: config.redis.queue.password || config.redis.password,
                     db: config.redis.queue.db || config.redis.db,
                 };
             }
@@ -112,8 +111,8 @@ export class RedisConfig {
 
             // IORedis connects automatically on instantiation
             logger.info('Connected to Redis successfully');
-        } catch (error) {
-            logger.error('Failed to connect to Redis:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to connect to Redis:', error);
             this.isConnected = false;
             throw error;
         }
@@ -145,8 +144,8 @@ export class RedisConfig {
             this.isConnected = false;
 
             logger.info('Disconnected from Redis');
-        } catch (error) {
-            logger.error('Error disconnecting from Redis:', error as Error);
+        } catch (error: any) {
+            logger.error('Error disconnecting from Redis:', error);
             throw error;
         }
     }
@@ -189,9 +188,7 @@ export class RedisConfig {
      * const isConnected = redis.getConnectionStatus();
      */
     public getConnectionStatus(): boolean {
-        return (
-            this.isConnected && !!this.client && this.client.status === 'ready'
-        );
+        return this.isConnected && !!this.client && this.client.status === 'ready';
     }
 
     /**
@@ -224,15 +221,12 @@ export class RedisConfig {
                     serverInfo: info.split('\r\n').slice(0, 5).join('\n'),
                 },
             };
-        } catch (error) {
+        } catch (error: any) {
             return {
                 status: 'unhealthy',
                 details: {
                     connected: this.isConnected,
-                    error:
-                        error instanceof Error
-                            ? error.message
-                            : 'Unknown error',
+                    error: error instanceof Error ? error.message : 'Unknown error',
                 },
             };
         }
@@ -281,11 +275,7 @@ export class RedisConfig {
      * @example
      * const data = await redis.cache('user:1', async () => fetchUser(), 60);
      */
-    public async cache<T>(
-        key: string,
-        cb: () => Promise<T>,
-        ttl?: number
-    ): Promise<T> {
+    public async cache<T>(key: string, cb: () => Promise<T>, ttl?: number): Promise<T> {
         const client = this.getClient();
         const value = await client.get(key);
         if (value != null) {

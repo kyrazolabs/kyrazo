@@ -24,11 +24,8 @@ export async function runSqlFile(filePath: string) {
                 },
             });
             console.log(`Successfully executed statement`);
-        } catch (error) {
-            console.error(
-                `Failed to execute statement: ${stmt.substring(0, 100)}...`,
-                error
-            );
+        } catch (error: any) {
+            console.error(`Failed to execute statement: ${stmt.substring(0, 100)}...`, error);
             throw error;
         }
     }

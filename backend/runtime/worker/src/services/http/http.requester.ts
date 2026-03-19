@@ -1,13 +1,12 @@
-import got from "got";
-import { logger } from "@kyrazo/shared";
-import type { HttpRequestOptions, HttpRequestResult } from "./http.types";
+import got from 'got';
+import { logger } from '@kyrazo/shared';
+import type { HttpRequestOptions, HttpRequestResult } from './http.types';
 
 export class HttpRequester {
     private static instance: HttpRequester;
     private constructor() {}
     public static getInstance(): HttpRequester {
-        if (!HttpRequester.instance)
-            HttpRequester.instance = new HttpRequester();
+        if (!HttpRequester.instance) HttpRequester.instance = new HttpRequester();
         return HttpRequester.instance;
     }
 
@@ -18,16 +17,16 @@ export class HttpRequester {
     public async post(
         url: string,
         body: any,
-        options?: HttpRequestOptions,
+        options?: HttpRequestOptions
     ): Promise<HttpRequestResult> {
-        return this.request("POST", url, body, options);
+        return this.request('POST', url, body, options);
     }
 
     public async request(
-        method: "POST" | "PUT" | "PATCH" | string,
+        method: 'POST' | 'PUT' | 'PATCH' | string,
         url: string,
         body: any,
-        options?: HttpRequestOptions,
+        options?: HttpRequestOptions
     ): Promise<HttpRequestResult> {
         const retries = options?.retry ?? 0;
         const timeout = options?.timeout ?? 15_000;
@@ -45,9 +44,7 @@ export class HttpRequester {
                 });
 
                 if (options?.logResponse) {
-                    logger.debug(
-                        `Response from ${url}: ${JSON.stringify(response.body)}`,
-                    );
+                    logger.debug(`Response from ${url}: ${JSON.stringify(response.body)}`);
                 }
 
                 return {
@@ -57,15 +54,12 @@ export class HttpRequester {
                     headers: response.headers,
                     duration: Date.now() - start,
                 };
-            } catch (err) {
+            } catch (err: any) {
                 lastError = err as any;
                 logger.error(
-                    `${method} failed (${i + 1}/${retries + 1}) to ${url}: ${
-                        lastError.message
-                    }`,
+                    `${method} failed (${i + 1}/${retries + 1}) to ${url}: ${lastError.message}`
                 );
-                if (i < retries)
-                    await new Promise((r) => setTimeout(r, this.backoff(i)));
+                if (i < retries) await new Promise(r => setTimeout(r, this.backoff(i)));
             }
         }
 
@@ -75,7 +69,7 @@ export class HttpRequester {
             duration: 0,
             data: lastError?.response?.body,
             headers: lastError?.response?.headers,
-            error: lastError?.message ?? "Unknown HTTP request error",
+            error: lastError?.message ?? 'Unknown HTTP request error',
         };
     }
 }

@@ -98,7 +98,7 @@ export function decryptSourceSecrets(source: ISource, key?: string): ISource {
         try {
             // Try with prefixed key (or custom key) first
             return secretCrypto.decrypt(encrypted, iv, prefixedKey);
-        } catch (error) {
+        } catch (error: any) {
             try {
                 // If it fails and we used the prefixed key, try fallback to raw key
                 if (prefixedKey !== rawKey) {

@@ -17,7 +17,7 @@ const worker = new Worker<
       const result = await HandleMailSend.send(job.data);
       console.log("HandleMailSend.send result:", result);
       return result;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in HandleMailSend.send:", error);
       throw error;
     }

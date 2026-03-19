@@ -127,7 +127,7 @@ export class CommandDispatcher {
             await startApplication(appUuid);
 
             console.log(`🚀 Coolify Auto-Scaled UP worker ${workerId} on Server ${serverId}`);
-        } catch (err) {
+        } catch (err: any) {
             console.error(
                 `[CommandDispatcher] Failed to dispatch Coolify Worker ${workerId}:`,
                 err
@@ -158,7 +158,7 @@ export class CommandDispatcher {
                     `[CommandDispatcher] Could not find Coolify application named "Worker - ${workerId}" to scale down.`
                 );
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error(
                 `[CommandDispatcher] Failed to terminate Coolify Worker ${workerId}:`,
                 err

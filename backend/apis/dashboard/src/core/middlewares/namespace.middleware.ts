@@ -66,8 +66,8 @@ export const requireNamespaceAccess = (options?: { allowDeleted?: boolean }) => 
                 namespaceId: new Types.ObjectId(unprefixId(access.id)),
             } as any;
             await next();
-        } catch (error: unknown) {
-            logger.error('Unexpected error in requireNamespaceAccess middleware', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in requireNamespaceAccess middleware', error);
 
             return c.json<IErrorResponse>(
                 {
@@ -167,18 +167,15 @@ export const requireNamespaceAccessParam = (
                 namespaceId: new Types.ObjectId(unprefixId(access.id)),
             } as any;
             await next();
-        } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in requireNamespaceAccessParam middleware',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Unexpected error in requireNamespaceAccessParam middleware', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
                     error: {
                         code: 'INTERNAL_ERROR',
                         message: 'Internal server error',
-                        details: error as Error,
+                        details: error,
                         requestId: c.get('requestId'),
                     },
                 },

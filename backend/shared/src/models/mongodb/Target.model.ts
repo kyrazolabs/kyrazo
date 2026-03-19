@@ -185,7 +185,7 @@ TargetSchema.pre('save', async function () {
             if (!['http:', 'https:'].includes(url.protocol)) {
                 throw new Error('Invalid URL protocol. Must be http or https');
             }
-        } catch (error) {
+        } catch (error: any) {
             throw error;
         }
     }

@@ -43,15 +43,12 @@ async function verify() {
         const foundWithOption = await Workspace.findOne({
             _id: workspace._id,
         }).setOptions({ findDeleted: true });
-        console.log(
-            'Found AFTER delete (with findDeleted option):',
-            !!foundWithOption
-        );
+        console.log('Found AFTER delete (with findDeleted option):', !!foundWithOption);
 
         // 7. Clean up
         await Workspace.deleteOne({ _id: workspace._id });
         console.log('Cleaned up');
-    } catch (error) {
+    } catch (error: any) {
         console.error('Verification failed:', error);
     } finally {
         await mongoose.disconnect();

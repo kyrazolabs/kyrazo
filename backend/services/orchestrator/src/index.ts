@@ -29,7 +29,7 @@ app.get('/v1/health', async c => {
                             database: 'PostgreSQL',
                         },
                     };
-                } catch (error) {
+                } catch (error: any) {
                     return {
                         status: 'unhealthy',
                         details: {
@@ -55,7 +55,7 @@ app.get('/v1/health', async c => {
             timestamp: new Date().toISOString(),
             version: '1.0.0',
         });
-    } catch (error) {
+    } catch (error: any) {
         return c.json(
             {
                 success: false,
@@ -80,14 +80,14 @@ const startServer = async () => {
         // cron.schedule('*/1 * * * *', async () => {
         //     try {
         //         await subscriptionsJob();
-        //     } catch (err) {
+        //     } catch (err: any) {
         //         console.error('Monitor Job Failed:', err);
         //     }
         // });
         setInterval(async () => {
             try {
                 await subscriptionsJob();
-            } catch (err) {
+            } catch (err: any) {
                 console.error('Monitor Job Failed:', err);
             }
         }, 60 * 1000);
@@ -102,8 +102,8 @@ const startServer = async () => {
         });
 
         return server;
-    } catch (error) {
-        console.error('Failed to start server:', error as Error);
+    } catch (error: any) {
+        console.error('Failed to start server:', error);
         process.exit(1);
     }
 };
@@ -117,7 +117,7 @@ startServer()
         console.log(`🚀 Scheduler running at http://${server.hostname}:${server.port}`);
     })
     .catch(error => {
-        console.error('Failed to start server:', error as Error);
+        console.error('Failed to start server:', error);
         process.exit(1);
     });
 

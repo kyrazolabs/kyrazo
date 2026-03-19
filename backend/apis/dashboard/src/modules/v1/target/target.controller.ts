@@ -48,9 +48,9 @@ export class TargetController {
                 },
                 201
             );
-        } catch (error) {
-            logger.error('Unexpected error in TargetController.createTarget', error as Error);
-            if ((error as Error).message.includes('E11000')) {
+        } catch (error: any) {
+            logger.error('Unexpected error in TargetController.createTarget', error);
+            if (error.message.includes('E11000')) {
                 return c.json<IErrorResponse>(
                     {
                         success: false,
@@ -116,8 +116,8 @@ export class TargetController {
                 },
                 200
             );
-        } catch (error) {
-            logger.error('Unexpected error in TargetController.getTargets', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in TargetController.getTargets', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -163,8 +163,8 @@ export class TargetController {
                 },
                 200
             );
-        } catch (error) {
-            logger.error('Unexpected error in TargetController.getTarget', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in TargetController.getTarget', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -210,8 +210,8 @@ export class TargetController {
                 },
                 200
             );
-        } catch (error) {
-            logger.error('Unexpected error in TargetController.getTargetSecret', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in TargetController.getTargetSecret', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -258,8 +258,8 @@ export class TargetController {
                 },
                 200
             );
-        } catch (error) {
-            logger.error('Unexpected error in TargetController.updateTarget', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in TargetController.updateTarget', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -305,8 +305,8 @@ export class TargetController {
                 },
                 200
             );
-        } catch (error) {
-            logger.error('Unexpected error in TargetController.updateTarget', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in TargetController.updateTarget', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -351,8 +351,8 @@ export class TargetController {
                 },
                 200
             );
-        } catch (error) {
-            logger.error('Unexpected error in TargetController.deleteTarget', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in TargetController.deleteTarget', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,

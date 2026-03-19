@@ -69,7 +69,7 @@ export class DispatcherHeaders {
                     });
                 }
             }
-        } catch (error) {
+        } catch (error: any) {
             // Silently fail and use base headers to avoid breaking dispatch flow
             // But log internally if possible
         }

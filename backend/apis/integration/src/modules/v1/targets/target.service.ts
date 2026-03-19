@@ -34,9 +34,9 @@ export class TargetService {
 
         try {
             return await targetRepository.create(data);
-        } catch (error) {
-            logger.error('Failed to create target:', error as Error);
-            throw new Error(JSON.stringify(error));
+        } catch (error: any) {
+            logger.error('Failed to create target:', error);
+            throw new Error(JSON.stringify(error: any));
         }
     }
 
@@ -47,8 +47,8 @@ export class TargetService {
                 limit,
                 page,
             });
-        } catch (error) {
-            logger.error('Failed to get targets:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get targets:', error);
             throw new Error('Failed to get targets');
         }
     }
@@ -60,8 +60,8 @@ export class TargetService {
                 throw new Error('Target not found');
             }
             return target;
-        } catch (error) {
-            logger.error('Failed to get target by id:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get target by id:', error);
             throw new Error('Failed to get target by id');
         }
     }
@@ -91,7 +91,7 @@ export class TargetService {
             try {
                 // Try with prefixed key first
                 secret = secretCrypto.decrypt(activeSecret.value_enc, activeSecret.iv, prefixedKey);
-            } catch (error) {
+            } catch (error: any) {
                 try {
                     // Fallback to raw namespaceId
                     secret = secretCrypto.decrypt(
@@ -111,15 +111,15 @@ export class TargetService {
                 } catch (innerError) {
                     logger.error(
                         'Failed to decrypt target secret with both prefixed and raw keys',
-                        innerError as Error
+                        innerError
                     );
                     throw new Error('Failed to get target secret');
                 }
             }
 
             return secret;
-        } catch (error) {
-            logger.error('Failed to get target secret:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get target secret:', error);
             throw new Error('Failed to get target secret');
         }
     }
@@ -148,8 +148,8 @@ export class TargetService {
                 `workspace:${unprefixId(workspaceId)}:namespace:${unprefixId(namespaceId)}:targets`
             );
             return updated;
-        } catch (error) {
-            logger.error('Failed to update target:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to update target:', error);
             throw new Error('Failed to update target');
         }
     }
@@ -168,8 +168,8 @@ export class TargetService {
                 `workspace:${unprefixId(workspaceId)}:namespace:${unprefixId(namespaceId)}:targets`
             );
             return deleted;
-        } catch (error) {
-            logger.error('Failed to delete target:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to delete target:', error);
             throw new Error('Failed to delete target');
         }
     }

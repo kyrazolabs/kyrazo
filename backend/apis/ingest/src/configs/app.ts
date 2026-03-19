@@ -2,7 +2,8 @@ import * as dotenv from 'dotenv';
 import { AckPolicy, DeliverPolicy } from 'nats';
 
 // Load environment variables
-dotenv.config({ path: './backend/api/.env' });
+dotenv.config(); // Default .env in current directory
+dotenv.config({ path: './backend/api/.env' }); // Fallback for previous setup
 
 // Validate required environment variables
 const requiredEnvVars = [

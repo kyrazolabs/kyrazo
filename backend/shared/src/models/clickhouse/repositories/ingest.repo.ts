@@ -28,7 +28,9 @@ export class IngestRepo {
                 workspace_id: String(prefixId(event.workspace_id, 'workspace')),
                 namespace_id: String(prefixId(event.namespace_id, 'namespace')),
                 source_id: String(prefixId(event.source_id, 'source')),
-                associated_event_id: event.associated_event_id ? String(unprefixId(event.associated_event_id)) : null,
+                associated_event_id: event.associated_event_id
+                    ? String(unprefixId(event.associated_event_id))
+                    : null,
             }));
 
             await client.insert({
@@ -38,8 +40,8 @@ export class IngestRepo {
             });
 
             logger.info(`Successfully inserted ${data.length} record(s) into ingest_events`);
-        } catch (error) {
-            logger.error(`Failed to insert data into ingest_events:`, error as Error);
+        } catch (error: any) {
+            logger.error(`Failed to insert data into ingest_events:`, error);
             logger.warn('Continuing without ClickHouse analytics storage');
             throw error;
         }
@@ -76,12 +78,13 @@ export class IngestRepo {
 
             const data = await rows.json<SQLIngestEvent>();
             return transformWithId(data, 'event') as SQLIngestEvent[];
-        } catch (error) {
+        } catch (error: any) {
             (logger as any).error('Failed to get delivered event from ClickHouse', {
-                error: error instanceof Error ? { message: error.message, stack: error.stack } : error,
+                error:
+                    error instanceof Error ? { message: error.message, stack: error.stack } : error,
                 eventId,
                 workspaceId,
-                namespaceId
+                namespaceId,
             });
             throw error;
         }
@@ -157,8 +160,8 @@ export class IngestRepo {
             const transformedData = transformWithId(data, 'event') as SQLIngestEvent[];
 
             return { data: transformedData, total };
-        } catch (error) {
-            logger.error('Unexpected error in IngestRepo.getIngestEvents', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in IngestRepo.getIngestEvents', error);
             throw error;
         }
     }
@@ -218,8 +221,8 @@ export class IngestRepo {
             const transformedData = transformWithId(data, 'event') as SQLIngestEvent[];
 
             return { data: transformedData, total };
-        } catch (error) {
-            logger.error('Unexpected error in DeliveryRepo.getDeliveriesBySource', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in DeliveryRepo.getDeliveriesBySource', error);
             throw error;
         }
     }
@@ -424,18 +427,18 @@ export class IngestRepo {
                               events: 0,
                           },
                       ],
-                topSources: resultTopSources.length 
+                topSources: resultTopSources.length
                     ? resultTopSources.map((s: any) => ({
-                        ...transformWithId(s, 'source'),
-                        source: s.source || 'unknown',
-                        total: Number(s.total),
-                    }))
+                          ...transformWithId(s, 'source'),
+                          source: s.source || 'unknown',
+                          total: Number(s.total),
+                      }))
                     : [
-                        {
-                            source: '',
-                            total: 0,
-                        },
-                    ],
+                          {
+                              source: '',
+                              total: 0,
+                          },
+                      ],
                 processStatusDistribution: resultProcessStatusDistribution || [
                     {
                         processing_status: 0,
@@ -449,8 +452,8 @@ export class IngestRepo {
                     },
                 ],
             };
-        } catch (error) {
-            logger.error('Failed to get stats ', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get stats ', error);
             throw error;
         }
     }

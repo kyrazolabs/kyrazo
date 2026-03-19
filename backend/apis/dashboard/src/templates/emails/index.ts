@@ -71,10 +71,7 @@ export interface EmailTemplateData {
  * @param data - Data to replace in the template
  * @returns Rendered HTML string
  */
-export function loadEmailTemplate(
-    templateName: string,
-    data: EmailTemplateData = {}
-): string {
+export function loadEmailTemplate(templateName: string, data: EmailTemplateData = {}): string {
     try {
         const templatePath = path.join(__dirname, `${templateName}.html`);
         let template = fs.readFileSync(templatePath, 'utf-8');
@@ -91,10 +88,8 @@ export function loadEmailTemplate(
         template = template.replace(/{{[^}]+}}/g, '');
 
         return template;
-    } catch (error) {
-        throw new Error(
-            `Failed to load email template '${templateName}': ${error}`
-        );
+    } catch (error: any) {
+        throw new Error(`Failed to load email template '${templateName}': ${error}`);
     }
 }
 
@@ -109,18 +104,14 @@ export const EMAIL_TEMPLATES = {
     WORKSPACE_INVITATION: 'workspace-invitation',
 } as const;
 
-export type EmailTemplateType =
-    (typeof EMAIL_TEMPLATES)[keyof typeof EMAIL_TEMPLATES];
+export type EmailTemplateType = (typeof EMAIL_TEMPLATES)[keyof typeof EMAIL_TEMPLATES];
 
 /**
  * @title Render Welcome Email
  * @description Renders the welcome email template
  */
 export function renderWelcomeEmail(
-    data: Pick<
-        EmailTemplateData,
-        'firstName' | 'email' | 'brandName' | 'baseUrl' | 'supportEmail'
-    >
+    data: Pick<EmailTemplateData, 'firstName' | 'email' | 'brandName' | 'baseUrl' | 'supportEmail'>
 ): string {
     return loadEmailTemplate(EMAIL_TEMPLATES.WELCOME, data);
 }
@@ -130,10 +121,7 @@ export function renderWelcomeEmail(
  * @description Renders the password reset email template
  */
 export function renderPasswordResetEmail(
-    data: Pick<
-        EmailTemplateData,
-        'firstName' | 'email' | 'resetUrl' | 'brandName' | 'supportEmail'
-    >
+    data: Pick<EmailTemplateData, 'firstName' | 'email' | 'resetUrl' | 'brandName' | 'supportEmail'>
 ): string {
     return loadEmailTemplate(EMAIL_TEMPLATES.PASSWORD_RESET, data);
 }

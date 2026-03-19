@@ -22,9 +22,7 @@ export class UsageProducer {
     ): Promise<void> {
         const usageInfo = await this.getUsageInfo(workspaceId);
         if (!usageInfo) {
-            logger.warn(
-                `Could not find usage info for workspace ${workspaceId}`
-            );
+            logger.warn(`Could not find usage info for workspace ${workspaceId}`);
             return;
         }
 
@@ -45,8 +43,8 @@ export class UsageProducer {
                     removeOnFail: 1000,
                 }
             );
-        } catch (error) {
-            logger.error('Failed to queue usage event', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to queue usage event', error);
         }
     }
 
@@ -70,26 +68,18 @@ export class UsageProducer {
                 Customer.findOne({ workspaceId }),
             ]);
 
-            if (
-                subscription &&
-                customer &&
-                subscription.planSnapshot.stripeMeterEventName
-            ) {
+            if (subscription && customer && subscription.planSnapshot.stripeMeterEventName) {
                 const info = {
                     subscriptionId: (subscription._id as any).toString(),
                     stripeCustomerId: customer.stripeCustomerId,
-                    stripeMeterEventName:
-                        subscription.planSnapshot.stripeMeterEventName,
+                    stripeMeterEventName: subscription.planSnapshot.stripeMeterEventName,
                 };
                 // Cache for 1 hour
                 await redisConfig.set(cacheKey, JSON.stringify(info), 3600);
                 return info;
             }
-        } catch (error) {
-            logger.error(
-                'Error fetching usage info for tracking',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Error fetching usage info for tracking', error);
         }
         return undefined;
     }

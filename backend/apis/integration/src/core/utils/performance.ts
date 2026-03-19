@@ -17,9 +17,7 @@ export class PerformanceTimer {
      */
     end(): number {
         const duration = performance.now() - this.startTime;
-        logger.debug(
-            `Performance: ${this.label} took ${duration.toFixed(2)}ms`
-        );
+        logger.debug(`Performance: ${this.label} took ${duration.toFixed(2)}ms`);
         return duration;
     }
 
@@ -47,10 +45,7 @@ export async function measureAsync<T>(
 /**
  * Measure execution time of a synchronous function
  */
-export function measure<T>(
-    label: string,
-    fn: () => T
-): { result: T; duration: number } {
+export function measure<T>(label: string, fn: () => T): { result: T; duration: number } {
     const timer = new PerformanceTimer(label);
     const result = fn();
     const duration = timer.end();
@@ -61,11 +56,7 @@ export function measure<T>(
  * Simple performance decorator
  */
 export function timed(label?: string) {
-    return function (
-        target: any,
-        propertyKey: string,
-        descriptor: PropertyDescriptor
-    ) {
+    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
         const originalMethod = descriptor.value;
         const timerLabel = label || `${target.constructor.name}.${propertyKey}`;
 
@@ -75,7 +66,7 @@ export function timed(label?: string) {
                 const result = await originalMethod.apply(this, args);
                 timer.end();
                 return result;
-            } catch (error) {
+            } catch (error: any) {
                 timer.end();
                 throw error;
             }
@@ -93,9 +84,7 @@ export function trackResponseTime(req: any, res: any, next: any) {
 
     res.on('finish', () => {
         const duration = performance.now() - startTime;
-        logger.info(
-            `API Response Time: ${req.method} ${req.path} - ${duration.toFixed(2)}ms`
-        );
+        logger.info(`API Response Time: ${req.method} ${req.path} - ${duration.toFixed(2)}ms`);
     });
 
     next();

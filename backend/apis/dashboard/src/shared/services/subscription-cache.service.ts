@@ -15,8 +15,8 @@ export class SubscriptionCacheService {
             if (cached) {
                 return JSON.parse(cached);
             }
-        } catch (error) {
-            logger.error('Error fetching subscription from Redis', error as Error);
+        } catch (error: any) {
+            logger.error('Error fetching subscription from Redis', error);
         }
         return null;
     }
@@ -25,8 +25,8 @@ export class SubscriptionCacheService {
         const key = this.getKey(workspaceId);
         try {
             await redisConfig.set(key, JSON.stringify(subscription), this.CACHE_TTL);
-        } catch (error) {
-            logger.error('Error caching subscription to Redis', error as Error);
+        } catch (error: any) {
+            logger.error('Error caching subscription to Redis', error);
         }
     }
 
@@ -34,8 +34,8 @@ export class SubscriptionCacheService {
         const key = this.getKey(workspaceId);
         try {
             await redisConfig.del(key);
-        } catch (error) {
-            logger.error('Error invalidating subscription cache', error as Error);
+        } catch (error: any) {
+            logger.error('Error invalidating subscription cache', error);
         }
     }
 }

@@ -73,7 +73,7 @@ export class AuthJWT {
                     new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
             });
         } catch (error: any) {
-            logger.error('Error storing refresh token', error as Error);
+            logger.error('Error storing refresh token', error);
             throw error;
         }
     }
@@ -134,7 +134,7 @@ export class AuthJWT {
             if (error?.name === 'TokenExpiredError') {
                 return { valid: false, reason: 'expired' };
             }
-            logger.error('Invalid access token', error as Error);
+            logger.error('Invalid access token', error);
             return { valid: false, reason: 'invalid' };
         }
     }
@@ -150,7 +150,7 @@ export class AuthJWT {
         try {
             return jwt.verify(token, config.jwt.secrets.refresh) as JWTPayload;
         } catch (error: any) {
-            logger.error('Refresh token verify error', error as Error);
+            logger.error('Refresh token verify error', error);
             throw new Error('Invalid refresh token');
         }
     }
@@ -173,7 +173,7 @@ export class AuthJWT {
                 audience: config.app.url,
             }) as { userId: string; email: string; type: string };
         } catch (error: any) {
-            logger.error('Reset token verify error', error as Error);
+            logger.error('Reset token verify error', error);
             throw new Error('Invalid or expired reset token');
         }
     }
@@ -198,7 +198,7 @@ export class AuthJWT {
                 audience: config.app.url,
             }) as { userId: string; email: string; type: string };
         } catch (error: any) {
-            logger.error('Verification token verify error', error as Error);
+            logger.error('Verification token verify error', error);
             throw new Error('Invalid or expired verification token');
         }
     }
@@ -217,7 +217,7 @@ export class AuthJWT {
             }
             return null;
         } catch (error: any) {
-            logger.error('Get Token Expiration Error', error as Error);
+            logger.error('Get Token Expiration Error', error);
             return null;
         }
     }
@@ -261,7 +261,7 @@ export class AuthJWT {
                 audience: config.app.url,
             }) as { userId: string; secret: string; type: string };
         } catch (error: any) {
-            logger.error('2FA token verify error', error as Error);
+            logger.error('2FA token verify error', error);
             throw new Error('Invalid or expired 2FA token');
         }
     }

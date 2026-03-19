@@ -42,8 +42,8 @@ export class SupportController {
                 },
                 201
             );
-        } catch (error: unknown) {
-            logger.error('Error in createTicket:', error as Error);
+        } catch (error: any) {
+            logger.error('Error in createTicket:', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,

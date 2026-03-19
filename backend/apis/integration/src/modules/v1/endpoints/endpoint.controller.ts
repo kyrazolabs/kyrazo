@@ -45,8 +45,8 @@ export class EndpointController {
                 },
                 201
             );
-        } catch (error) {
-            logger.error('Failed to create endpoint:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to create endpoint:', error);
             return c.json(
                 {
                     success: false,
@@ -93,8 +93,8 @@ export class EndpointController {
                 },
                 200
             );
-        } catch (error) {
-            logger.error('Failed to get endpoints:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get endpoints:', error);
             return c.json(
                 {
                     success: false,
@@ -127,7 +127,7 @@ export class EndpointController {
                 200
             );
         } catch (error: any) {
-            logger.error('Failed to get endpoint:', error as Error);
+            logger.error('Failed to get endpoint:', error);
             if (error.message === 'Endpoint not found') {
                 return c.json(
                     {
@@ -169,7 +169,7 @@ export class EndpointController {
                 200
             );
         } catch (error: any) {
-            logger.error('Failed to get endpoint secret:', error as Error);
+            logger.error('Failed to get endpoint secret:', error);
             if (
                 error.message === 'Endpoint not found' ||
                 error.message === 'Active secret not found'
@@ -218,7 +218,7 @@ export class EndpointController {
                 200
             );
         } catch (error: any) {
-            logger.error('Failed to update endpoint:', error as Error);
+            logger.error('Failed to update endpoint:', error);
             if (error.message === 'Endpoint not found') {
                 return c.json(
                     {
@@ -260,7 +260,7 @@ export class EndpointController {
                 200
             );
         } catch (error: any) {
-            logger.error('Failed to delete endpoint:', error as Error);
+            logger.error('Failed to delete endpoint:', error);
             if (error.message === 'Endpoint not found') {
                 return c.json(
                     {

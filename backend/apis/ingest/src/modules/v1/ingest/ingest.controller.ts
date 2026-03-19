@@ -127,7 +127,9 @@ export class ingestController {
 
             const shard = parseInt(source.workspaceId.toString().slice(-6), 16) % 10;
 
-            const planSlug = await redisConfig.get(`workspace:${unprefixId(source.workspaceId.toString())}`);
+            const planSlug = await redisConfig.get(
+                `workspace:${unprefixId(source.workspaceId.toString())}`
+            );
 
             // Create the received event data
             const receivedEventData: IReceivedEvent & {
@@ -178,9 +180,12 @@ export class ingestController {
                 },
                 200
             );
-        } catch (error: unknown) {
+        } catch (error: any) {
             timer.end();
-            logger.error('Error receiving event:', error as Error);
+            logger.error(
+                'Error receiving event:',
+                error instanceof Error ? { message: error.message, stack: error.stack } : error
+            );
 
             return c.json<IErrorResponse>(
                 {

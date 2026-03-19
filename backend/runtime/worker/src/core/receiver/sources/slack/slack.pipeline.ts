@@ -80,10 +80,10 @@ export class SlackPipeline {
                     credentials.iv,
                     source.namespaceId.toString()
                 );
-            } catch (error) {
+            } catch (error: any) {
                 logger.warn(
                     `[SlackPipeline] Failed to decrypt source secret for ${event.sourceId}, attempting fallback:`,
-                    error as Error
+                    error
                 );
                 sourceSecret = credentials.secret;
             }
@@ -114,8 +114,8 @@ export class SlackPipeline {
             await this.enqueue(data, true);
 
             logger.info('✅ Successfully processed Slack event', event.eventId);
-        } catch (error) {
-            logger.error('❌ Error processing Slack event:', error as Error);
+        } catch (error: any) {
+            logger.error('❌ Error processing Slack event:', error);
             throw error;
         }
     }

@@ -47,7 +47,7 @@ export class WorkerService {
         // Phase 2: Deploy on Coolify OUTSIDE the transaction
         try {
             await CommandDispatcher.dispatchStartWorker(serverId, newWorker.worker_id, clientId);
-        } catch (err) {
+        } catch (err: any) {
             // Coolify deploy failed — rollback by marking worker as failed (releases resources)
             console.error(
                 `[WorkerService] Coolify deploy failed for worker ${newWorker.worker_id}. Rolling back.`
@@ -131,8 +131,11 @@ export class WorkerService {
             try {
                 // Attempt to delete Coolify app if it still exists
                 await CommandDispatcher.dispatchStopWorker('', w.worker_id, '', true, kyrazoApps);
-            } catch (err) {
-                console.warn(`[WorkerService] Failed to delete Coolify app for stale worker ${w.worker_id}:`, err);
+            } catch (err: any) {
+                console.warn(
+                    `[WorkerService] Failed to delete Coolify app for stale worker ${w.worker_id}:`,
+                    err
+                );
             }
 
             try {
@@ -141,8 +144,11 @@ export class WorkerService {
                     await WorkerRepo.deleteWorker(tx, w.worker_id);
                 });
                 console.log(`[WorkerService] Reaped stale worker ${w.worker_id}`);
-            } catch (err) {
-                console.error(`[WorkerService] Failed to delete DB record for worker ${w.worker_id}:`, err);
+            } catch (err: any) {
+                console.error(
+                    `[WorkerService] Failed to delete DB record for worker ${w.worker_id}:`,
+                    err
+                );
             }
         }
     }

@@ -69,7 +69,7 @@ export class DispatcherPipeline {
             logger.debug(`✅ Publish event processed: ${messageData.eventId}`);
         } catch (error: any) {
             const errDetails = {
-                errStr: String(error),
+                errStr: String(error: any),
                 message: error?.message,
                 name: error?.name,
                 stack: error?.stack,

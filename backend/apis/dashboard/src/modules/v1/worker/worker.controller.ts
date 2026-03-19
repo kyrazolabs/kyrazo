@@ -34,8 +34,8 @@ export class WorkerController {
                 success: true,
                 data: workers,
             });
-        } catch (error) {
-            logger.error('Failed to fetch worker status', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to fetch worker status', error);
             return c.json(
                 {
                     success: false,

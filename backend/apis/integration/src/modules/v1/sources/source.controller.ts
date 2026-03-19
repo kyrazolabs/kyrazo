@@ -40,8 +40,8 @@ export class SourceController {
                 },
                 201
             );
-        } catch (error) {
-            logger.error('Failed to create source:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to create source:', error);
             return c.json(
                 {
                     success: false,
@@ -83,8 +83,8 @@ export class SourceController {
                 },
                 200
             );
-        } catch (error) {
-            logger.error('Failed to get sources:', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get sources:', error);
             return c.json(
                 {
                     success: false,
@@ -113,7 +113,7 @@ export class SourceController {
                 200
             );
         } catch (error: any) {
-            logger.error('Failed to get source:', error as Error);
+            logger.error('Failed to get source:', error);
             if (error.message === 'Source not found') {
                 return c.json(
                     {
@@ -159,7 +159,7 @@ export class SourceController {
                 200
             );
         } catch (error: any) {
-            logger.error('Failed to update source:', error as Error);
+            logger.error('Failed to update source:', error);
             if (error.message === 'Source not found') {
                 return c.json(
                     {
@@ -197,7 +197,7 @@ export class SourceController {
                 200
             );
         } catch (error: any) {
-            logger.error('Failed to delete source:', error as Error);
+            logger.error('Failed to delete source:', error);
             if (error.message === 'Failed to delete source') {
                 // This message is a bit ambiguous in service, assuming if it failed it might be not found or other issue
                 // But generally 404 is checked before delete attempt in some patterns.

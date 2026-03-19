@@ -41,8 +41,8 @@ export class DeliveryRepo {
             });
 
             logger.info(`Successfully inserted ${data.length} record(s) into delivery_attempts`);
-        } catch (error) {
-            logger.error(`Failed to insert data into delivery_attempts:`, error as Error);
+        } catch (error: any) {
+            logger.error(`Failed to insert data into delivery_attempts:`, error);
             logger.warn('Continuing without ClickHouse analytics storage');
             throw error;
         }
@@ -113,8 +113,8 @@ export class DeliveryRepo {
             const transformedData = transformWithId(data, 'delivery') as SQLDeliveryAttempt[];
 
             return { data: transformedData, total };
-        } catch (error) {
-            logger.error('Unexpected error in DeliveryRepo.getDeliveries', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in DeliveryRepo.getDeliveries', error);
             throw error;
         }
     }
@@ -205,8 +205,8 @@ export class DeliveryRepo {
             const transformedData = transformWithId(data, 'target') as any[];
 
             return { data: transformedData, total };
-        } catch (error) {
-            logger.error('Unexpected error in DeliveryRepo.getTargets', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in DeliveryRepo.getTargets', error);
             throw error;
         }
     }
@@ -271,8 +271,8 @@ export class DeliveryRepo {
             const transformedData = transformWithId(data, 'delivery') as SQLDeliveryAttempt[];
 
             return { data: transformedData, total };
-        } catch (error) {
-            logger.error('Failed to get delivered event', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get delivered event', error);
             throw error;
         }
     }
@@ -333,8 +333,8 @@ export class DeliveryRepo {
             const transformedData = transformWithId(data, 'delivery') as SQLDeliveryAttempt[];
 
             return { data: transformedData, total };
-        } catch (error) {
-            logger.error('Unexpected error in DeliveryRepo.getDeliveriesBySource', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in DeliveryRepo.getDeliveriesBySource', error);
             throw error;
         }
     }
@@ -373,7 +373,7 @@ export class DeliveryRepo {
 
             const data = await rows.json<SQLDeliveryAttempt>();
             return transformWithId(data, 'delivery') as SQLDeliveryAttempt[];
-        } catch (error) {
+        } catch (error: any) {
             (logger as any).error('Failed to get delivered event from ClickHouse', {
                 error:
                     error instanceof Error ? { message: error.message, stack: error.stack } : error,
@@ -410,8 +410,8 @@ export class DeliveryRepo {
 
             const data = await rows.json<SQLDeliveryAttempt>();
             return transformWithId(data, 'delivery') as SQLDeliveryAttempt[];
-        } catch (error) {
-            logger.error('Failed to get pending events ', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get pending events ', error);
             throw error;
         }
     }
@@ -475,8 +475,8 @@ export class DeliveryRepo {
                     average_delivery_time: null,
                 }
             );
-        } catch (error) {
-            logger.error('Failed to get stats ', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get stats ', error);
             throw error;
         }
     }
@@ -693,8 +693,8 @@ export class DeliveryRepo {
                           },
                       ],
             };
-        } catch (error) {
-            logger.error('Failed to get stats ', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get stats ', error);
             throw error;
         }
     }
@@ -896,8 +896,8 @@ export class DeliveryRepo {
                     'target'
                 ) as any[],
             };
-        } catch (error) {
-            logger.error('Failed to get stats ', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get stats ', error);
             throw error;
         }
     }

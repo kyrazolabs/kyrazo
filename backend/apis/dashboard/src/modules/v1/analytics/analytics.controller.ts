@@ -69,11 +69,8 @@ export class AnalyticsController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in AnalyticsController.getDeliveryStats',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Unexpected error in AnalyticsController.getDeliveryStats', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -158,8 +155,8 @@ export class AnalyticsController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in AnalyticsController.getIngestUsage', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in AnalyticsController.getIngestUsage', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,
@@ -231,8 +228,8 @@ export class AnalyticsController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in AnalyticsController.getTargetStats', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in AnalyticsController.getTargetStats', error);
             return c.json<IErrorResponse>(
                 {
                     success: false,

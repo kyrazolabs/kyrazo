@@ -39,11 +39,8 @@ export class PaymentController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error(
-                'Unexpected error in PaymentController.createBillingPortal',
-                error as Error
-            );
+        } catch (error: any) {
+            logger.error('Unexpected error in PaymentController.createBillingPortal', error);
 
             const message =
                 error instanceof Error ? error.message : 'Failed to create billing portal session';
@@ -91,8 +88,8 @@ export class PaymentController {
                 },
                 200
             );
-        } catch (error: unknown) {
-            logger.error('Unexpected error in PaymentController.handleWebhook', error as Error);
+        } catch (error: any) {
+            logger.error('Unexpected error in PaymentController.handleWebhook', error);
 
             // Return 200 to Stripe to avoid retries for validation errors
             // But log the error for debugging

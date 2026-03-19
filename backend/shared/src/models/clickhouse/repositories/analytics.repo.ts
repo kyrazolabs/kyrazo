@@ -28,7 +28,9 @@ export class AnalyticsRepo {
                     const transformedBatch = batch.map(row => ({
                         ...row,
                         namespace_id: prefixId(row.namespace_id, 'namespace') as string,
-                        target_id: row.target_id ? (prefixId(row.target_id, 'target') as string) : null,
+                        target_id: row.target_id
+                            ? (prefixId(row.target_id, 'target') as string)
+                            : null,
                     }));
                     await client.insert({
                         table: 'analytics_dispatch_day',
@@ -51,10 +53,7 @@ export class AnalyticsRepo {
                         delay *= 2; // Exponential backoff
                         continue;
                     }
-                    logger.error(
-                        `Failed to insert data into analytics_dispatch_day:`,
-                        error as Error
-                    );
+                    logger.error(`Failed to insert data into analytics_dispatch_day:`, error);
                     throw error;
                 }
             }
@@ -81,7 +80,9 @@ export class AnalyticsRepo {
                     const transformedBatch = batch.map(row => ({
                         ...row,
                         namespace_id: prefixId(row.namespace_id, 'namespace') as string,
-                        source_id: row.source_id ? (prefixId(row.source_id, 'source') as string) : null,
+                        source_id: row.source_id
+                            ? (prefixId(row.source_id, 'source') as string)
+                            : null,
                     }));
                     await client.insert({
                         table: 'analytics_ingest_day',
@@ -104,10 +105,7 @@ export class AnalyticsRepo {
                         delay *= 2;
                         continue;
                     }
-                    logger.error(
-                        `Failed to insert data into analytics_ingest_day:`,
-                        error as Error
-                    );
+                    logger.error(`Failed to insert data into analytics_ingest_day:`, error);
                     throw error;
                 }
             }
@@ -226,8 +224,8 @@ export class AnalyticsRepo {
                     total: Number(s.total),
                 })),
             };
-        } catch (error) {
-            logger.error('Failed to get ClickHouse dispatch overview', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get ClickHouse dispatch overview', error);
             throw error;
         }
     }
@@ -353,8 +351,8 @@ export class AnalyticsRepo {
                     total: Number(s.total),
                 })),
             };
-        } catch (error) {
-            logger.error('Failed to get ClickHouse target overview', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get ClickHouse target overview', error);
             throw error;
         }
     }
@@ -489,8 +487,8 @@ export class AnalyticsRepo {
                     total: Number(f.total),
                 })),
             };
-        } catch (error) {
-            logger.error('Failed to get ClickHouse ingest overview', error as Error);
+        } catch (error: any) {
+            logger.error('Failed to get ClickHouse ingest overview', error);
             throw error;
         }
     }

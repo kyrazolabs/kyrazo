@@ -249,8 +249,8 @@ export class RateLimiterUtils {
         try {
             const res = await limiter.get(key);
             return res ? res.remainingPoints : limiter.points;
-        } catch (error) {
-            logger.error('Error getting remaining points:', error as Error);
+        } catch (error: any) {
+            logger.error('Error getting remaining points:', error);
             return 0;
         }
     }
@@ -262,8 +262,8 @@ export class RateLimiterUtils {
         try {
             const res = await limiter.get(key);
             return res ? res.msBeforeNext : 0;
-        } catch (error) {
-            logger.error('Error getting ms before next:', error as Error);
+        } catch (error: any) {
+            logger.error('Error getting ms before next:', error);
             return 0;
         }
     }
@@ -275,8 +275,8 @@ export class RateLimiterUtils {
         try {
             await limiter.delete(key);
             return true;
-        } catch (error) {
-            logger.error('Error deleting rate limit key:', error as Error);
+        } catch (error: any) {
+            logger.error('Error deleting rate limit key:', error);
             return false;
         }
     }
