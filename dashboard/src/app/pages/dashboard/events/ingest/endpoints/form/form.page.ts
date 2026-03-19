@@ -151,7 +151,7 @@ export class EndpointFormPage implements OnInit {
             },
             error: (error: any) => {
                 this.sentry.captureException(error);
-                console.error(error: any);
+                console.error(error);
             },
         });
     }
