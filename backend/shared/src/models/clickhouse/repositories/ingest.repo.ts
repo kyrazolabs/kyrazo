@@ -60,16 +60,8 @@ export class IngestRepo {
             }
 
             const query = `
-                    SELECT 
-                        ie.*,
-                        de.target_url AS route_to,
-                        de.meta_max_retries AS route_max_retries,
-                        de.meta_inserted_at AS route_inserted_at
-                    FROM ingest_events AS ie
-                    LEFT JOIN dispatched_events AS de ON ie.event_id = de.event_id 
-                        AND ie.workspace_id = de.workspace_id 
-                        AND ie.namespace_id = de.namespace_id
-                    WHERE ie.event_id = {eventId:UInt64} AND ie.workspace_id = {workspaceId:String} AND ie.namespace_id = {namespaceId:String}
+                    SELECT * FROM ingest_events
+                    WHERE event_id = {eventId:UInt64} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
                     LIMIT 1
                 `;
             const params: Record<string, string | number> = {
@@ -85,6 +77,30 @@ export class IngestRepo {
             });
 
             const data = await rows.json<SQLIngestEvent>();
+
+            if (data.length > 0) {
+                const event = data[0];
+                const dispatchQuery = `
+                    SELECT 
+                        target_url AS route_to,
+                        meta_priority AS route_priority,
+                        meta_max_retries AS route_max_retries,
+                        meta_inserted_at AS route_inserted_at
+                    FROM dispatched_events
+                    WHERE event_id = {eventId:UInt64} AND workspace_id = {workspaceId:String} AND namespace_id = {namespaceId:String}
+                    LIMIT 1
+                `;
+                const dispatchRows = await client.query({
+                    query: dispatchQuery,
+                    format: 'JSONEachRow',
+                    query_params: params,
+                });
+                const dispatchData = await dispatchRows.json<any>();
+                if (dispatchData.length > 0) {
+                    Object.assign(event, dispatchData[0]);
+                }
+            }
+
             return transformWithId(data, 'event') as SQLIngestEvent[];
         } catch (error: any) {
             (logger as any).error('Failed to get delivered event from ClickHouse', {
@@ -139,23 +155,15 @@ export class IngestRepo {
             const whereClause = `WHERE ${conditions.join(' AND ')}`;
 
             const query = `
-                    SELECT 
-                        ie.*,
-                        de.target_url AS route_to,
-                        de.meta_max_retries AS route_max_retries,
-                        de.meta_inserted_at AS route_inserted_at
-                    FROM ingest_events AS ie
-                    LEFT JOIN dispatched_events AS de ON ie.event_id = de.event_id 
-                        AND ie.workspace_id = de.workspace_id 
-                        AND ie.namespace_id = de.namespace_id
-                    ${whereClause.replace(/workspace_id/g, 'ie.workspace_id').replace(/namespace_id/g, 'ie.namespace_id').replace(/status/g, 'ie.status').replace(/event_id/g, 'ie.event_id')}
-                    ORDER BY ie.received_at DESC
+                    SELECT * FROM ingest_events
+                    ${whereClause}
+                    ORDER BY received_at DESC
                     LIMIT {limit:Int32} OFFSET {offset:Int32}
                 `;
 
             const countQuery = `
-                    SELECT count() AS total FROM ingest_events AS ie
-                    ${whereClause.replace(/workspace_id/g, 'ie.workspace_id').replace(/namespace_id/g, 'ie.namespace_id').replace(/status/g, 'ie.status').replace(/event_id/g, 'ie.event_id')}
+                    SELECT count() AS total FROM ingest_events
+                    ${whereClause}
                 `;
 
             const [rows, countRows] = await Promise.all([
