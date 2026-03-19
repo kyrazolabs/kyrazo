@@ -164,7 +164,7 @@ export class LoginPage implements OnInit {
 
                 this.onLoginSuccess();
             },
-            error: (error) => {
+            error: (error: any) => {
                 this.loading.set(false);
                 const errorMessage =
                     error?.error?.error?.message ||
@@ -319,7 +319,7 @@ export class LoginPage implements OnInit {
                 this.authService.handleAuthSuccess(response);
                 this.router.navigate(['/'], { replaceUrl: true });
             },
-            error: (error) => {
+            error: (error: any) => {
                 this.loading.set(false);
                 this.messageService.add({
                     severity: 'error',
@@ -354,7 +354,7 @@ export class LoginPage implements OnInit {
                 this.authService.handleAuthSuccess(response);
                 this.router.navigate(['/'], { replaceUrl: true });
             },
-            error: (error) => {
+            error: (error: any) => {
                 this.loading.set(false);
                 this.messageService.add({
                     severity: 'error',

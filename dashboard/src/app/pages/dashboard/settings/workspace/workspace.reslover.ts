@@ -34,7 +34,7 @@ export class WorkspaceSettingsResolver implements Resolve<IWorkspace | null> {
                     return null;
                 }
             }),
-            catchError((error) => {
+            catchError((error: any) => {
                 console.error('Error loading workspace data:', error);
                 this.router.navigate(['/']);
                 return of(null);

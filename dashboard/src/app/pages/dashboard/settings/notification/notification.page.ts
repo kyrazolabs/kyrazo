@@ -124,7 +124,7 @@ export class NotificationSettingsPage implements OnInit {
                     this.preferences = response.data;
                 },
 
-                error: (error) => {
+                error: (error: any) => {
                     this.sentry.captureException(error);
                     this.isLoading = false;
                     this.messageService.add({

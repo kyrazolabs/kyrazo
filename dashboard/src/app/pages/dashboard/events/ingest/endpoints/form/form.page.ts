@@ -149,9 +149,9 @@ export class EndpointFormPage implements OnInit {
                 }
                 this.loading = false;
             },
-            error: (error) => {
+            error: (error: any) => {
                 this.sentry.captureException(error);
-                console.error(error);
+                console.error(error: any);
             },
         });
     }
@@ -223,7 +223,7 @@ export class EndpointFormPage implements OnInit {
                         method: endpointData.method,
                     });
                 },
-                error: (error) => {
+                error: (error: any) => {
                     this.sentry.captureException(error);
                     this.posthog.capture('endpoint_creation_error', {
                         method: endpointData.method,
@@ -259,7 +259,7 @@ export class EndpointFormPage implements OnInit {
                         context: 'form',
                     });
                 },
-                error: (error) => {
+                error: (error: any) => {
                     this.sentry.captureException(error);
                     this.posthog.capture('endpoint_update_error', {
                         endpoint_id: this.endpointId(),

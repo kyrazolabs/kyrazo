@@ -98,7 +98,7 @@ export class InviteMemberFormComponent implements OnInit {
                         this.inviteForm.reset({ role: 'member' });
                     }
                 },
-                error: (error) => {
+                error: (error: any) => {
                     this.sentry.captureException(error);
                     const errorMessage =
                         error.error?.error?.code === 'LIMIT_EXCEEDED'

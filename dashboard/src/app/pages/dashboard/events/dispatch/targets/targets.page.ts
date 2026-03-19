@@ -205,7 +205,7 @@ export class TargetsPage implements OnInit {
                     context: 'list_toggle',
                 });
             },
-            error: (error) => {
+            error: (error: any) => {
                 this.sentry.captureException(error);
                 this.posthog.capture('target_update_error', {
                     target_id: target.id,
@@ -238,7 +238,7 @@ export class TargetsPage implements OnInit {
                         });
                         this.loadTargets(this.currentPage, this.rows);
                     },
-                    error: (error) => {
+                    error: (error: any) => {
                         this.sentry.captureException(error);
                         this.posthog.capture('target_delete_error', {
                             target_id: target.id,

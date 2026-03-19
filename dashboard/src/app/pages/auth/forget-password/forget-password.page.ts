@@ -118,9 +118,9 @@ export class ForgetPasswordPage {
           life: 3000,
         });
       },
-      error: (error) => {
+      error: (error: any) => {
         this.loading.set(false);
-        console.log(error);
+        console.log(error: any);
 
         const errorCode =
           error?.error?.error?.code || error?.error?.code || "UNKNOWN_ERROR";

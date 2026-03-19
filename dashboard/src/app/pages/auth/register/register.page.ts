@@ -262,7 +262,7 @@ export class RegisterPage {
                     // Navigate to dashboard or onboarding
                     this.onRegisterSuccess();
                 },
-                error: (error) => {
+                error: (error: any) => {
                     this.loading.set(false);
                     const errorMessage =
                         error?.error?.error?.message ||

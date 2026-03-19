@@ -188,7 +188,7 @@ export class TargetFormComponent implements OnInit, OnChanges {
                 }
                 this.initialLoading.set(false);
             },
-            error: (error) => {
+            error: (error: any) => {
                 this.sentry.captureException(error);
                 this.initialLoading.set(false);
                 this.mes.add({
@@ -292,7 +292,7 @@ export class TargetFormComponent implements OnInit, OnChanges {
                 );
                 this.dls.closeTargetDialog();
             },
-            error: (error) => {
+            error: (error: any) => {
                 this.loading.set(false);
                 this.sentry.captureException(error);
                 const errorMessage =

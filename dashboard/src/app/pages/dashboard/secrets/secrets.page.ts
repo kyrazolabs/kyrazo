@@ -167,7 +167,7 @@ export class SecretsPage implements OnInit {
                         maskedKey: `••••••••••••••••${s.lastFour}`,
                     }));
                 },
-                error: (error) => {
+                error: (error: any) => {
                     this.sentry.captureException(error);
                     this.messageService.add({
                         severity: 'error',
@@ -230,7 +230,7 @@ export class SecretsPage implements OnInit {
                         data: { secret: newSecret.key },
                     });
                 },
-                error: (error) => {
+                error: (error: any) => {
                     this.sentry.captureException(error);
                     this.messageService.add({
                         severity: 'error',
@@ -280,7 +280,7 @@ export class SecretsPage implements OnInit {
                             detail: 'API key has been revoked successfully',
                         });
                     },
-                    error: (error) => {
+                    error: (error: any) => {
                         this.sentry.captureException(error);
                         this.messageService.add({
                             severity: 'error',
