@@ -30,7 +30,9 @@ export class DeliveryRepo {
                 event_id: unprefixId(attempt.event_id) as string,
                 workspace_id: prefixId(attempt.workspace_id, 'workspace') as string,
                 namespace_id: prefixId(attempt.namespace_id, 'namespace') as string,
-                source_id: attempt.source_id ? (prefixId(attempt.source_id, 'source') as string) : null,
+                source_id: attempt.source_id
+                    ? (prefixId(attempt.source_id, 'source') as string)
+                    : null,
                 target_id: prefixId(attempt.target_id, 'target') as string,
             }));
 
@@ -357,6 +359,7 @@ export class DeliveryRepo {
                 LIMIT 1
             `;
 
+            logger.info(unprefixId(deliveryId) || '0');
             const queryParams = {
                 deliveryId: Number(unprefixId(deliveryId) || '0'),
                 workspaceId: String(prefixId(workspaceId, 'workspace')),
@@ -375,10 +378,11 @@ export class DeliveryRepo {
             return transformWithId(data, 'delivery') as SQLDeliveryAttempt[];
         } catch (error) {
             (logger as any).error('Failed to get delivered event from ClickHouse', {
-                error: error instanceof Error ? { message: error.message, stack: error.stack } : error,
+                error:
+                    error instanceof Error ? { message: error.message, stack: error.stack } : error,
                 deliveryId,
                 workspaceId,
-                namespaceId
+                namespaceId,
             });
             throw error;
         }
@@ -670,27 +674,27 @@ export class DeliveryRepo {
                     pending_deliveries: 0,
                     average_delivery_time: null,
                 },
-                deliveryTrends: resultDeliveryTrends.length 
-                    ? (transformWithId(resultDeliveryTrends, 'delivery') as any[]) 
+                deliveryTrends: resultDeliveryTrends.length
+                    ? (transformWithId(resultDeliveryTrends, 'delivery') as any[])
                     : [],
-                topEventTypes: resultTopEventTypes 
-                    ? (transformWithId(resultTopEventTypes, 'event') as any[]) 
+                topEventTypes: resultTopEventTypes
+                    ? (transformWithId(resultTopEventTypes, 'event') as any[])
                     : [
-                    {
-                        target: '',
-                        event_type: '',
-                        total: 0,
-                    },
-                ],
-                statusCodeDistribution: resultStatusCodeDistribution 
-                    ? (transformWithId(resultStatusCodeDistribution, 'target') as any[]) 
+                          {
+                              target: '',
+                              event_type: '',
+                              total: 0,
+                          },
+                      ],
+                statusCodeDistribution: resultStatusCodeDistribution
+                    ? (transformWithId(resultStatusCodeDistribution, 'target') as any[])
                     : [
-                    {
-                        target: '',
-                        response_code: 0,
-                        total: 0,
-                    },
-                ],
+                          {
+                              target: '',
+                              response_code: 0,
+                              total: 0,
+                          },
+                      ],
             };
         } catch (error) {
             logger.error('Failed to get stats ', error as Error);
@@ -888,9 +892,12 @@ export class DeliveryRepo {
                     pending_deliveries: 0,
                     average_delivery_time: null,
                 },
-                deliveryTrends: (transformWithId(resultDeliveryTrends, 'delivery') as any[]),
-                topEventTypes: (transformWithId(resultTopEventTypes, 'event') as any[]),
-                statusCodeDistribution: (transformWithId(resultStatusCodeDistribution, 'target') as any[]),
+                deliveryTrends: transformWithId(resultDeliveryTrends, 'delivery') as any[],
+                topEventTypes: transformWithId(resultTopEventTypes, 'event') as any[],
+                statusCodeDistribution: transformWithId(
+                    resultStatusCodeDistribution,
+                    'target'
+                ) as any[],
             };
         } catch (error) {
             logger.error('Failed to get stats ', error as Error);

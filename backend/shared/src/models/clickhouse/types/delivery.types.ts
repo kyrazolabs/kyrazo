@@ -8,7 +8,7 @@ export enum DeliveryStatus {
 }
 
 export interface SQLDeliveryAttempt {
-    delivery_id: string; // UInt64
+    delivery_id: string | number | bigint; // UInt64
 
     workspace_id: string;
     namespace_id: string;
