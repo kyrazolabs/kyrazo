@@ -6,6 +6,8 @@ WORKDIR /app
 # Stage 1: Builder (Install & Build everything in strict order)
 FROM base AS builder
 
+RUN apk update && apk add wget
+
 # 1. Install Shared Dependencies
 COPY shared/package.json shared/bun.lock ./shared/
 WORKDIR /app/shared
@@ -28,6 +30,9 @@ COPY apis/ingest ./
 FROM oven/bun:${BUN_VERSION}-alpine AS runner
 WORKDIR /app
 
+# Install su-exec for dropping privileges from root
+RUN apk add --no-cache su-exec
+
 # Copy all installed dependencies
 COPY --from=builder /app/apis/ingest/node_modules /app/apis/ingest/node_modules
 
@@ -46,6 +51,14 @@ COPY --from=builder /app/apis/ingest/src /app/apis/ingest/src
 
 # Set working directory to ingest package
 WORKDIR /app/apis/ingest
+
+# Pre-create logs directory
+RUN mkdir -p /app/apis/ingest/logs && chown -R bun:bun /app/apis/ingest/logs
+
+# Copy and setup entrypoint script
+COPY apis/ingest/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 
 # Ensure everything is owned by the bun user before switching
 RUN chown -R bun:bun /app

@@ -69,7 +69,7 @@ export const config = {
     logging: {
         meta: {
             service: process.env.APP_NAME,
-            version: process.env.APP_VERSION || '1.0.0',
+            container: process.env.COOLIFY_CONTAINER_NAME,
             env: process.env.NODE_ENV,
             pid: process.pid,
         },
