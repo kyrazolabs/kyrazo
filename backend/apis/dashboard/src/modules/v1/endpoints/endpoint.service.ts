@@ -32,7 +32,7 @@ export class EndpointService {
             return await endpointRepository.create(data);
         } catch (error: any) {
             logger.error('Failed to create target:', error);
-            throw new Error(JSON.stringify(error: any));
+            throw new Error(JSON.stringify(error));
         }
     }
 

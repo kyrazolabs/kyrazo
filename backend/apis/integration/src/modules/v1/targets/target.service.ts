@@ -36,7 +36,7 @@ export class TargetService {
             return await targetRepository.create(data);
         } catch (error: any) {
             logger.error('Failed to create target:', error);
-            throw new Error(JSON.stringify(error: any));
+            throw new Error(JSON.stringify(error));
         }
     }
 

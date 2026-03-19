@@ -249,7 +249,7 @@ export class WorkerConsumer {
             msg.ack();
         } catch (error: any) {
             const errDetails = {
-                errStr: String(error: any),
+                errStr: String(error),
                 message: error?.message,
                 name: error?.name,
                 stack: error?.stack,

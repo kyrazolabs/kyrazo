@@ -1,8 +1,11 @@
-import { queuesName, redisBullmqClient } from "@mail/lib/bullMQ/config.bullmq";
+import {
+  queuesName,
+  redisBullmqClient,
+} from "@mail/lib/bullMQ/config.bullmq.js";
 import type { MailPayloadSchema } from "@mailq/utils/zod";
 import { Worker } from "bullmq";
 import type z from "zod";
-import { HandleMailSend } from "./handle-mail-send.handler";
+import { HandleMailSend } from "./handle-mail-send.handler.js";
 import type nodemailer from "nodemailer";
 
 const worker = new Worker<

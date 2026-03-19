@@ -59,7 +59,7 @@ export class PayPalSignature {
             }
 
             return isValid;
-        } catch (error: any) {
+        } catch (error) {
             logger.error('Error verifying PayPal signature:', error);
             return false;
         }
@@ -115,7 +115,7 @@ export class PayPalSignature {
                 });
 
                 request.on('error', (error: Error) => {
-                    reject(error: any);
+                    reject(error);
                 });
 
                 request.setTimeout(10000, () => {
@@ -132,7 +132,7 @@ export class PayPalSignature {
 
             logger.debug(`Successfully downloaded and cached PayPal certificate`);
             return certificate;
-        } catch (error: any) {
+        } catch (error) {
             logger.error('Error downloading PayPal certificate:', error);
             throw error;
         }

@@ -8,7 +8,7 @@ export interface DispatchEventInput {
     status: DeliveryStatus;
     latencyMs: number;
     timestamp?: Date;
-    deliveryId?: string;
+    deliveryId?: string | number | bigint;
 }
 
 export interface IngestEventInput {
