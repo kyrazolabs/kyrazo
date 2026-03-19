@@ -329,8 +329,8 @@ export class SourcePage implements OnInit, AfterViewInit {
             filtered = filtered.filter(
                 (event) =>
                     event.event_id.toLowerCase().includes(query) ||
-                    event.source.toLowerCase().includes(query) ||
-                    event.source.toLowerCase().includes(query),
+                    event.provider.toLowerCase().includes(query) ||
+                    event.provider.toLowerCase().includes(query),
             );
         }
 

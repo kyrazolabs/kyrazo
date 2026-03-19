@@ -16,24 +16,37 @@ import { environment } from 'environments/environment';
 
 // Ingest event types - matches SQLReceivedEvent from backend
 export interface IngestEvent {
-    event_id: string;
-    webhook_id: string;
+    event_id: string; // UInt64
+
     workspace_id: string;
     namespace_id: string;
     user_id: string;
+
+    source_id: string;
+    source_type: string;
     ingress_id: string;
-    source: string;
-    received_at: string;
-    created_at: string;
-    updated_at: string;
+
+    received_at: string; // DateTime64
+    created_at: string; // DateTime64
+    processed_at: string; // DateTime64
+
+    provider: string;
+    provider_event_id: string;
+    provider_resource_id: string;
+
     headers: string;
     body: string;
+
     verified: boolean;
+
     processing_status: 'pending' | 'processed' | 'failed';
-    processing_error: string;
-    associated_event_id: string;
-    route_to?: string | null;
-    route_priority?: 'low' | 'normal' | 'high' | 'urgent';
+    processing_error: string | null;
+
+    associated_event_id: string | null; // UInt64
+
+    // Joined routing metadata (from dispatched_events)
+    route_to?: string;
+    route_priority?: string;
     route_max_retries?: number;
     route_inserted_at?: string;
 }
