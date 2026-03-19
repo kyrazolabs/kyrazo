@@ -1,9 +1,9 @@
 services:
-  ingest-api:
+  integration-api:
     build:
       context: .
-      dockerfile: apis/ingest/Dockerfile
-    container_name: kyrazo-ingest-api
+      dockerfile: apis/integration/Dockerfile
+    container_name: kyrazo-integration-api
     ports:
       - "${PORT}:${PORT}"
     environment:
@@ -35,7 +35,7 @@ services:
       # Security Configuration
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
     volumes:
-      - ./logs:/app/apis/ingest/logs
+      - ./logs:/app/apis/integration/logs
       - /data/nats/certs:/data/nats/certs:ro
     restart: unless-stopped
     healthcheck:
