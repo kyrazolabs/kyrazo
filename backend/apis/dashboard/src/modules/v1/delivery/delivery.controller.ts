@@ -20,6 +20,7 @@ import {
     logger,
     secretCrypto,
     transformWithId,
+    unprefixId,
 } from '@kyrazo/shared';
 
 export class DeliveryController {
@@ -178,7 +179,7 @@ export class DeliveryController {
                     401
                 );
             }
-
+            // @ts-ignore
             const { limit = 10, page = 1 }: IFilterDelivery = c.req.valid('query');
 
             const { data: deliveries, total } = await DeliveryRepo.getTargets(
@@ -448,7 +449,7 @@ export class DeliveryController {
                         limit,
                         pages: Math.ceil(total / limit),
                     },
-                    data: deliveries,
+                    data: deliveries.map(DeliveryController.decryptIngestEvent),
                 },
                 200
             );
@@ -523,7 +524,7 @@ export class DeliveryController {
                         limit,
                         pages: Math.ceil(total / limit),
                     },
-                    data: deliveries,
+                    data: deliveries.map(DeliveryController.decryptIngestEvent),
                 },
                 200
             );
@@ -577,7 +578,7 @@ export class DeliveryController {
             return c.json<IGetIngestEventResponse>(
                 {
                     success: true,
-                    data: delivery,
+                    data: DeliveryController.decryptIngestEvent(delivery),
                 },
                 200
             );
@@ -599,7 +600,7 @@ export class DeliveryController {
 
     private static decryptDelivery(delivery: any) {
         if (!delivery) return delivery;
-        const namespaceId = delivery.namespace_id;
+        const namespaceId = unprefixId(delivery.namespace_id);
         if (!namespaceId) return delivery;
 
         const tryDecrypt = (field: string) => {
@@ -613,15 +614,35 @@ export class DeliveryController {
             }
         };
 
-        return transformWithId(
-            {
-                ...delivery,
-                request_body: tryDecrypt(delivery.request_body),
-                request_header: tryDecrypt(delivery.request_header),
-                response_body: tryDecrypt(delivery.response_body),
-                response_header: tryDecrypt(delivery.response_header),
-            },
-            'delivery'
-        );
+        return {
+            ...delivery,
+            request_body: tryDecrypt(delivery.request_body),
+            request_header: tryDecrypt(delivery.request_header),
+            response_body: tryDecrypt(delivery.response_body),
+            response_header: tryDecrypt(delivery.response_header),
+        };
+    }
+
+    private static decryptIngestEvent(event: any) {
+        if (!event) return event;
+        const namespaceId = unprefixId(event.namespace_id);
+        if (!namespaceId) return event;
+
+        const tryDecrypt = (field: string) => {
+            if (!field || typeof field !== 'string' || !field.includes(':')) return field;
+            const [iv, encrypted] = field.split(':');
+            if (!iv || !encrypted) return field;
+            try {
+                return secretCrypto.decrypt(encrypted, iv, namespaceId);
+            } catch (e) {
+                return field;
+            }
+        };
+
+        return {
+            ...event,
+            headers: tryDecrypt(event.headers),
+            body: tryDecrypt(event.body),
+        };
     }
 }
