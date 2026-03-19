@@ -45,6 +45,9 @@ export class ClickHouseConfig {
                 url,
                 // @ts-expect-error: int64_handling exists in @clickhouse/client v1.x but might be missing from internal type definitions
                 int64_handling: 'string', // Return UInt64 as strings to prevent precision loss in JS Number
+                clickhouse_settings: {
+                    output_format_json_quote_64bit_integers: 1, // Force ClickHouse to wrap result integers in quotes for JSON formats
+                },
             });
             logger.info('ClickHouse client created, testing connection...');
 
