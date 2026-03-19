@@ -1,4 +1,4 @@
-import { logger, type SQLIngestEvent, Source, secretCrypto, unprefixId } from '@kyrazo/shared';
+import { logger, type SQLIngestEvent, Source, secretCrypto, unprefixId, prefixId } from '@kyrazo/shared';
 import { slackValidator } from './slack.validator';
 import { slackSignature } from './slack.signature';
 import { slackTransformer } from './slack.transformer';
@@ -78,7 +78,7 @@ export class SlackPipeline {
                 sourceSecret = secretCrypto.decrypt(
                     credentials.secret,
                     credentials.iv,
-                    source.namespaceId.toString()
+                    prefixId(source.namespaceId, 'namespace') as string
                 );
             } catch (error: any) {
                 logger.warn(

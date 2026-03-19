@@ -1,4 +1,4 @@
-import { logger, type SQLIngestEvent, Source, secretCrypto, unprefixId } from '@kyrazo/shared';
+import { logger, type SQLIngestEvent, Source, secretCrypto, unprefixId, prefixId } from '@kyrazo/shared';
 import { paypalValidator } from './paypal.validator';
 import { paypalSignature } from './paypal.signature';
 import type { IReceivedEvent } from '@/types/events/event.types';
@@ -72,7 +72,7 @@ export class PayPalPipeline {
                 sourceSecret = secretCrypto.decrypt(
                     credentials.secret,
                     credentials.iv,
-                    source.namespaceId.toString()
+                    prefixId(source.namespaceId, 'namespace') as string
                 );
             } catch (error: any) {
                 logger.warn(

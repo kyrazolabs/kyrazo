@@ -1,5 +1,5 @@
 import type { IReceivedEvent } from '@/types/events/event.types';
-import type { SQLIngestEvent } from '@kyrazo/shared';
+import { type SQLIngestEvent, secretCrypto, unprefixId } from '@kyrazo/shared';
 
 export class ReceiverTransformer {
     static instance: ReceiverTransformer;
@@ -16,6 +16,13 @@ export class ReceiverTransformer {
     public transform<T = any>(event: IReceivedEvent<T>): SQLIngestEvent {
         const toCHDate = (date: Date | string | number) =>
             new Date(date).toISOString().slice(0, 23).replace('T', ' ');
+
+        const salt = unprefixId(event.namespaceId) || event.namespaceId;
+        const headersJson = JSON.stringify(event.headers || {});
+        const bodyJson = JSON.stringify(event.body || {});
+
+        const encryptedHeaders = secretCrypto.encrypt(salt, headersJson);
+        const encryptedBody = secretCrypto.encrypt(salt, bodyJson);
 
         return {
             event_id: event.eventId,
@@ -36,8 +43,8 @@ export class ReceiverTransformer {
             provider_event_id: (event.body as any).id ?? '',
             provider_resource_id: (event.body as any).resource_id ?? '',
 
-            headers: JSON.stringify(event.headers),
-            body: JSON.stringify(event.body),
+            headers: `${encryptedHeaders.iv}:${encryptedHeaders.encrypted}`,
+            body: `${encryptedBody.iv}:${encryptedBody.encrypted}`,
 
             verified: event.verified,
 

@@ -1,4 +1,4 @@
-import { logger, type SQLIngestEvent, Source, secretCrypto, unprefixId } from '@kyrazo/shared';
+import { logger, type SQLIngestEvent, Source, secretCrypto, unprefixId, prefixId } from '@kyrazo/shared';
 import { githubValidator } from './github.validator';
 import { githubSignature } from './github.signature';
 import { githubTransformer } from './github.transformer';
@@ -75,7 +75,7 @@ export class GitHubPipeline {
                 sourceSecret = secretCrypto.decrypt(
                     credentials.secret,
                     credentials.iv,
-                    source.namespaceId.toString()
+                    prefixId(source.namespaceId, 'namespace') as string
                 );
             } catch (error: any) {
                 logger.warn(

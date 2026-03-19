@@ -37,8 +37,13 @@ describe('ReceiverTransformer', () => {
         expect(result.source_id).toBe(receivedEvent.sourceId);
         expect(result.provider).toBe(receivedEvent.source);
         expect(result.provider_event_id).toBe('pp_1');
-        expect(result.headers).toBe(JSON.stringify(receivedEvent.headers));
-        expect(result.body).toBe(JSON.stringify(receivedEvent.body));
+        
+        // Encrypted fields should contain a colon (iv:encrypted)
+        expect(result.headers).toContain(':');
+        expect(result.body).toContain(':');
+        expect(result.headers).not.toBe(JSON.stringify(receivedEvent.headers));
+        expect(result.body).not.toBe(JSON.stringify(receivedEvent.body));
+        
         expect(result.verified).toBe(true);
         expect(result.processing_status).toBe(ProcessingStatus.PROCESSED);
     });
