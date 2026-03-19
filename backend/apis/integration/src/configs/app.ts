@@ -5,7 +5,7 @@ import { AckPolicy, DeliverPolicy } from 'nats';
 dotenv.config({ path: './backend/api/.env' });
 
 // Validate required environment variables
-const requiredEnvVars = ['MONGODB_URI', 'REDIS_HOST', 'REDIS_PORT', 'ENCRYPTION_KEY'];
+const requiredEnvVars = ['MONGODB_URI', 'REDIS_URL', 'ENCRYPTION_KEY'];
 
 console.log('Checking required env vars:');
 requiredEnvVars.forEach(envVar => {
