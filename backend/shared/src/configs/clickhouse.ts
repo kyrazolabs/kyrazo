@@ -41,7 +41,11 @@ export class ClickHouseConfig {
                 throw new Error('ClickHouse configuration is incomplete');
             }
 
-            this.client = createClient({ url });
+            this.client = createClient({ 
+                url,
+                // @ts-expect-error: int64_handling exists in @clickhouse/client v1.x but might be missing from internal type definitions
+                int64_handling: 'string', // Return UInt64 as strings to prevent precision loss in JS Number
+            });
             logger.info('ClickHouse client created, testing connection...');
 
             // Test connection

@@ -22,14 +22,9 @@ export type IdType = keyof typeof ID_PREFIXES;
  * @param type The type of the ID
  * @returns Prefixed ID string
  */
-export function prefixId(
-    id: any,
-    type: IdType
-): string | undefined {
+export function prefixId(id: any, type: IdType): string | undefined {
     if (id === undefined || id === null) return undefined;
-    const stringId = id instanceof Types.ObjectId 
-        ? id.toHexString() 
-        : String(id);
+    const stringId = id instanceof Types.ObjectId ? id.toHexString() : String(id);
     const prefix = ID_PREFIXES[type];
     if (stringId.startsWith(`${prefix}_`)) return stringId;
     return `${prefix}_${stringId}`;
@@ -40,15 +35,18 @@ export function prefixId(
  * @param prefixedId The prefixed ID string
  * @returns Plain hex string (ObjectId compatible)
  */
-export function unprefixId(prefixedId: string | undefined | null): string | undefined {
-    if (!prefixedId) return undefined;
-    if (typeof prefixedId !== 'string') return prefixedId;
+export function unprefixId(prefixedId: any): string | undefined {
+    if (prefixedId === undefined || prefixedId === null) return undefined;
 
-    const parts = prefixedId.split('_');
+    // Convert to string for processing
+    const str = String(prefixedId);
+    if (!str) return undefined;
+
+    const parts = str.split('_');
     if (parts.length === 2 && Object.values(ID_PREFIXES).includes(parts[0] as any)) {
         return parts[1];
     }
-    return prefixedId;
+    return str;
 }
 
 /**
@@ -60,12 +58,14 @@ export function unprefixId(prefixedId: string | undefined | null): string | unde
 export function isValidPrefixedId(id: string | undefined | null, type?: IdType): boolean {
     if (!id) return false;
     const prefix = type ? ID_PREFIXES[type] : undefined;
-    
+
     // For event and delivery, we now use Snowflake IDs (UInt64 numeric strings)
-    if (type === 'event' || type === 'delivery' || (!type && (id.startsWith('evt_') || id.startsWith('del_')))) {
-        const regex = prefix
-            ? new RegExp(`^${prefix}_[0-9]+$`)
-            : new RegExp(`^(evt|del)_[0-9]+$`);
+    if (
+        type === 'event' ||
+        type === 'delivery' ||
+        (!type && (id.startsWith('evt_') || id.startsWith('del_')))
+    ) {
+        const regex = prefix ? new RegExp(`^${prefix}_[0-9]+$`) : new RegExp(`^(evt|del)_[0-9]+$`);
         return regex.test(id);
     }
 

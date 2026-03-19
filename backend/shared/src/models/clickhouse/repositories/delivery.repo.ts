@@ -26,14 +26,12 @@ export class DeliveryRepo {
             //   consistent namespacing/entity identification across external systems and APIs.
             const transformedData = data.map(attempt => ({
                 ...attempt,
-                delivery_id: unprefixId(attempt.delivery_id) as string,
-                event_id: unprefixId(attempt.event_id) as string,
-                workspace_id: prefixId(attempt.workspace_id, 'workspace') as string,
-                namespace_id: prefixId(attempt.namespace_id, 'namespace') as string,
-                source_id: attempt.source_id
-                    ? (prefixId(attempt.source_id, 'source') as string)
-                    : null,
-                target_id: prefixId(attempt.target_id, 'target') as string,
+                delivery_id: Number(unprefixId(attempt.delivery_id)),
+                event_id: Number(unprefixId(attempt.event_id)),
+                workspace_id: String(prefixId(attempt.workspace_id, 'workspace')),
+                namespace_id: String(prefixId(attempt.namespace_id, 'namespace')),
+                source_id: attempt.source_id ? String(prefixId(attempt.source_id, 'source')) : null,
+                target_id: String(prefixId(attempt.target_id, 'target')),
             }));
 
             await client.insert({
@@ -359,9 +357,8 @@ export class DeliveryRepo {
                 LIMIT 1
             `;
 
-            logger.info(unprefixId(deliveryId) || '0');
             const queryParams = {
-                deliveryId: Number(unprefixId(deliveryId) || '0'),
+                deliveryId: BigInt(unprefixId(deliveryId) || '0').toString(),
                 workspaceId: String(prefixId(workspaceId, 'workspace')),
                 namespaceId: String(prefixId(namespaceId, 'namespace')),
             };

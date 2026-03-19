@@ -24,11 +24,11 @@ export class IngestRepo {
             //   namespacing/entity identification across external systems and APIs.
             const transformedData = data.map(event => ({
                 ...event,
-                event_id: unprefixId(event.event_id) as string,
-                workspace_id: prefixId(event.workspace_id, 'workspace') as string,
-                namespace_id: prefixId(event.namespace_id, 'namespace') as string,
-                source_id: prefixId(event.source_id, 'source') as string,
-                associated_event_id: event.associated_event_id ? (unprefixId(event.associated_event_id) as string) : null,
+                event_id: String(unprefixId(event.event_id)),
+                workspace_id: String(prefixId(event.workspace_id, 'workspace')),
+                namespace_id: String(prefixId(event.namespace_id, 'namespace')),
+                source_id: String(prefixId(event.source_id, 'source')),
+                associated_event_id: event.associated_event_id ? String(unprefixId(event.associated_event_id)) : null,
             }));
 
             await client.insert({
@@ -63,7 +63,7 @@ export class IngestRepo {
                     LIMIT 1
                 `;
             const params: Record<string, string | number> = {
-                eventId: Number(unprefixId(eventId) || '0'),
+                eventId: BigInt(unprefixId(eventId) || '0').toString(),
                 workspaceId: String(prefixId(workspaceId, 'workspace')),
                 namespaceId: String(prefixId(namespaceId, 'namespace')),
             };
@@ -122,7 +122,7 @@ export class IngestRepo {
 
             if (eventId) {
                 conditions.push('event_id = {eventId:UInt64}');
-                params.eventId = Number(unprefixId(eventId) || '0');
+                params.eventId = BigInt(unprefixId(eventId) || '0').toString();
             }
 
             const whereClause = `WHERE ${conditions.join(' AND ')}`;
