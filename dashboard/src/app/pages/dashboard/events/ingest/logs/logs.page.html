@@ -44,16 +44,10 @@
                         ID
                     </th>
                     <th class="text-left rounded-xl! border-none!">
-                        Source
-                    </th>
-                    <th class="text-left rounded-xl! border-none!">
-                        Source
+                        Provider
                     </th>
                     <th class="text-left rounded-xl! border-none!">
                         Status
-                    </th>
-                    <th class="text-left rounded-xl! border-none!">
-                        Retries
                     </th>
                     <th class="text-left rounded-xl! border-none!">
                         Processed At
@@ -69,16 +63,9 @@
                         <app-copy-id [id]="event.event_id" />
                     </td>
 
-                    <!-- Source -->
+                    <!-- provider -->
                     <td>
-                        <p-tag [value]="event.source" severity="info" class="text-xs!" />
-                    </td>
-
-                    <!-- Source -->
-                    <td>
-                        <div class="text-sm font-medium text-surface-900 dark:text-surface-0">
-                            {{ event.source }}
-                        </div>
+                        <p-tag [value]="event.provider" severity="info" class="text-xs!" />
                     </td>
 
                     <!-- Status -->
@@ -90,13 +77,6 @@
                                 class="text-xs text-surface-500 dark:text-surface-400">
                                 ({{ event.retry_count }} retries)
                             </span>
-                        </div>
-                    </td>
-
-                    <!-- Retries -->
-                    <td>
-                        <div class="text-sm text-surface-700 dark:text-surface-300">
-                            {{ event.retry_count || 0 }}
                         </div>
                     </td>
 

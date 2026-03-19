@@ -127,7 +127,7 @@
                 </div>
 
 
-                <div>
+                <div *ngIf="ingestEvent.route_max_retries !== undefined && ingestEvent.route_max_retries !== null">
                     <label
                         class="block text-sm font-semibold text-surface-900 dark:text-surface-0 mb-1"
                         >Max Retries</label
@@ -141,7 +141,7 @@
                     />
                 </div>
 
-                <div>
+                <div *ngIf="ingestEvent.route_inserted_at">
                     <label
                         class="block text-sm font-semibold text-surface-900 dark:text-surface-0 mb-1"
                         >Route Inserted At</label
