@@ -147,7 +147,7 @@ export const log = winston.createLogger({
     levels,
     defaultMeta: {
         service: config.logging.meta.service,
-        version: config.logging.meta.version,
+        container: config.logging.meta.container,
         env: config.logging.meta.env,
         pid: config.logging.meta.pid,
     },
