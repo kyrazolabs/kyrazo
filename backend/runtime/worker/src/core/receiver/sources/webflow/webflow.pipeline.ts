@@ -1,4 +1,4 @@
-import { logger, type SQLIngestEvent, Source, secretCrypto } from '@kyrazo/shared';
+import { logger, type SQLIngestEvent, Source, secretCrypto, unprefixId } from '@kyrazo/shared';
 import { webflowValidator } from './webflow.validator';
 import { webflowSignature } from './webflow.signature';
 import { webflowTransformer } from './webflow.transformer';
@@ -28,7 +28,7 @@ export class WebflowPipeline {
             const source = await redisConfig.cache(
                 `source:${event.sourceId}`,
                 async () => {
-                    return await Source.findById(event.sourceId).populate('endpoints');
+                    return await Source.findById(unprefixId(event.sourceId)).populate('endpoints');
                 },
                 60 * 60 * 24
             );
