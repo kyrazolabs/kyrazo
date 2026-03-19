@@ -42,7 +42,7 @@ export class ReceiverDetector {
                 const source = await redisConfig.cache(
                     `source:${unprefixId(event.sourceId)}`,
                     async () => {
-                        return await Source.findById(event.sourceId).populate('endpoints');
+                        return await Source.findById(unprefixId(event.sourceId)).populate('endpoints');
                     },
                     60 * 60 * 24
                 );
@@ -74,7 +74,7 @@ export class ReceiverDetector {
                 const stripeSource = await redisConfig.cache(
                     `source:${unprefixId(event.sourceId)}`,
                     async () => {
-                        return await Source.findById(event.sourceId).populate('endpoints');
+                        return await Source.findById(unprefixId(event.sourceId)).populate('endpoints');
                     },
                     60 * 60 * 24
                 );
@@ -110,7 +110,7 @@ export class ReceiverDetector {
                 const githubSource = await redisConfig.cache(
                     `source:${unprefixId(event.sourceId)}`,
                     async () => {
-                        return await Source.findById(event.sourceId).populate('endpoints');
+                        return await Source.findById(unprefixId(event.sourceId)).populate('endpoints');
                     },
                     60 * 60 * 24
                 );
@@ -146,7 +146,7 @@ export class ReceiverDetector {
                 const shopifySource = await redisConfig.cache(
                     `source:${unprefixId(event.sourceId)}`,
                     async () => {
-                        return await Source.findById(event.sourceId).populate('endpoints');
+                        return await Source.findById(unprefixId(event.sourceId)).populate('endpoints');
                     },
                     60 * 60 * 24
                 );
@@ -182,7 +182,7 @@ export class ReceiverDetector {
                 const slackSource = await redisConfig.cache(
                     `source:${unprefixId(event.sourceId)}`,
                     async () => {
-                        return await Source.findById(event.sourceId).populate('endpoints');
+                        return await Source.findById(unprefixId(event.sourceId)).populate('endpoints');
                     },
                     60 * 60 * 24
                 );
@@ -218,7 +218,7 @@ export class ReceiverDetector {
                 const webflowSource = await redisConfig.cache(
                     `source:${unprefixId(event.sourceId)}`,
                     async () => {
-                        return await Source.findById(event.sourceId).populate('endpoints');
+                        return await Source.findById(unprefixId(event.sourceId)).populate('endpoints');
                     },
                     60 * 60 * 24
                 );
