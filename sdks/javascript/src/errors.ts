@@ -36,7 +36,7 @@ export interface APIErrorResponse {
  * ```typescript
  * try {
  *   await kyrazo.dispatch.publishEvent(namespaceId, payload);
- * } catch (error) {
+ * } catch (error: any) {
  *   if (error instanceof KyrazoError) {
  *     console.log('Error code:', error.code);
  *     console.log('Request ID:', error.requestId);
@@ -70,7 +70,7 @@ export class KyrazoError extends Error {
  *
  * @example
  * ```typescript
- * catch (error) {
+ * catch (error: any) {
  *   if (error instanceof AuthenticationError) {
  *     console.log('Please check your API key');
  *   }
@@ -95,7 +95,7 @@ export class AuthenticationError extends KyrazoError {
  *
  * @example
  * ```typescript
- * catch (error) {
+ * catch (error: any) {
  *   if (error instanceof ValidationError) {
  *     console.log('Invalid input:', error.details);
  *   }
@@ -139,7 +139,7 @@ export class NotFoundError extends KyrazoError {
  *
  * @example
  * ```typescript
- * catch (error) {
+ * catch (error: any) {
  *   if (error instanceof RateLimitError) {
  *     console.log(`Rate limited. Retry in ${error.retryAfter} seconds`);
  *     console.log(`Remaining requests: ${error.remainingRequests}`);
@@ -173,7 +173,7 @@ export class RateLimitError extends KyrazoError {
  *
  * @example
  * ```typescript
- * catch (error) {
+ * catch (error: any) {
  *   if (error instanceof LimitExceededError) {
  *     console.log('Monthly limit exceeded. Please upgrade your plan.');
  *   }

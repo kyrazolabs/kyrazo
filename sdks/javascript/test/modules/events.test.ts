@@ -75,7 +75,7 @@ describe("EventsModule", () => {
 
       try {
         await events.single("proj_123", validEvent);
-      } catch (error) {
+      } catch (error: any) {
         expect(error).toBeInstanceOf(RateLimitError);
         expect((error as RateLimitError).retryAfter).toBe(30);
       }
