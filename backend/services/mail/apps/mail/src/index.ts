@@ -1,6 +1,6 @@
 import "dotenv/config"; // It must be the first import
-import "./lib/bullMQ/workers/workers";
-import { redisBullmqClient } from "./lib/bullMQ/config.bullmq";
+import "./lib/bullMQ/workers/workers.js";
+import { redisBullmqClient } from "./lib/bullMQ/config.bullmq.js";
 
 const port = process.env.PORT || 4040;
 
