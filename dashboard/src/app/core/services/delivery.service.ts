@@ -33,9 +33,9 @@ export interface IngestEvent {
     processing_error: string;
     associated_event_id: string;
     route_to?: string | null;
-    route_priority: 'low' | 'normal' | 'high' | 'urgent';
-    route_max_retries: number;
-    route_inserted_at: string;
+    route_priority?: 'low' | 'normal' | 'high' | 'urgent';
+    route_max_retries?: number;
+    route_inserted_at?: string;
 }
 
 export interface IngestEventStats {
