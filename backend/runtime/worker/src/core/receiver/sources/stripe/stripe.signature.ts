@@ -25,12 +25,12 @@ export class StripeSignature {
      * @param secret The webhook signing secret
      * @param tolerance Seconds of tolerance for the timestamp (default 5 minutes)
      */
-    public verify(
+    public async verify(
         rawBody: string,
         signatureHeader: string,
         secret: string,
         tolerance: number = 300,
-    ): boolean {
+    ): Promise<boolean> {
         try {
             if (!signatureHeader) {
                 logger.warn(
@@ -39,8 +39,8 @@ export class StripeSignature {
                 return false;
             }
 
-            // constructEvent throws if the signature is invalid or timestamp is outside tolerance
-            this.stripe.webhooks.constructEvent(
+            // constructEventAsync is required in environments like Cloudflare Workers or when using SubtleCryptoProvider
+            await this.stripe.webhooks.constructEventAsync(
                 rawBody,
                 signatureHeader,
                 secret,

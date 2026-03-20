@@ -97,7 +97,7 @@ export class StripePipeline {
 
             if (
                 !signatureHeader ||
-                !stripeSignature.verify(payloadToVerify, signatureHeader, sourceSecret)
+                !(await stripeSignature.verify(payloadToVerify, signatureHeader, sourceSecret))
             ) {
                 logger.warn(
                     `[StripePipeline] Invalid Stripe signature for event: ${event.eventId}`

@@ -77,13 +77,8 @@ export class BatchWriter {
             const encryptedEvents: SQLIngestEvent[] = [];
 
             for (const event of events) {
-                const headers = secretCrypto.encrypt(event.namespace_id, event.headers);
-                const body = secretCrypto.encrypt(event.namespace_id, event.body);
-
                 encryptedEvents.push({
                     ...event,
-                    headers: `${headers.iv}:${headers.encrypted}`,
-                    body: `${body.iv}:${body.encrypted}`,
                 });
             }
 
