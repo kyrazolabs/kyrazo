@@ -224,7 +224,12 @@ export class AnalyticsRepo {
                 })),
             };
         } catch (error: any) {
-            logger.error('Failed to get ClickHouse dispatch overview', error);
+            logger.error('Failed to get ClickHouse dispatch overview', {
+                message: error?.message,
+                code: error?.code,
+                type: error?.type,
+                stack: error?.stack,
+            });
             throw error;
         }
     }
@@ -350,7 +355,12 @@ export class AnalyticsRepo {
                 })),
             };
         } catch (error: any) {
-            logger.error('Failed to get ClickHouse target overview', error);
+            logger.error('Failed to get ClickHouse target overview', {
+                message: error?.message,
+                code: error?.code,
+                type: error?.type,
+                stack: error?.stack,
+            });
             throw error;
         }
     }
@@ -486,7 +496,12 @@ export class AnalyticsRepo {
                 })),
             };
         } catch (error: any) {
-            logger.error('Failed to get ClickHouse ingest overview', error);
+            logger.error('Failed to get ClickHouse ingest overview', {
+                message: error?.message,
+                code: error?.code,
+                type: error?.type,
+                stack: error?.stack,
+            });
             throw error;
         }
     }
