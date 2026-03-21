@@ -471,6 +471,22 @@ export class SubscriptionService {
             limits: subscription.planSnapshot.limits,
         };
     }
+
+    async verifyCheckoutSession(sessionId: string): Promise<{
+        status: string;
+        workspaceId?: string;
+        userId?: string;
+        subscriptionId?: string;
+    }> {
+        const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+        return {
+            status: session.status || 'unknown',
+            workspaceId: session.metadata?.workspaceId,
+            userId: session.metadata?.userId,
+            subscriptionId: session.subscription as string,
+        };
+    }
 }
 
 export const subscriptionService = new SubscriptionService();

@@ -420,4 +420,46 @@ export class SubscriptionController {
             );
         }
     }
+
+    static async verifyCheckoutSession(c: AppContext): Promise<Response> {
+        try {
+            const { session_id } = c.req.query();
+            if (!session_id) {
+                return c.json<IErrorResponse>(
+                    {
+                        success: false,
+                        error: {
+                            code: 'MISSING_SESSION_ID',
+                            message: 'Session ID is required',
+                            requestId: c.get('requestId'),
+                        },
+                    },
+                    400
+                );
+            }
+
+            const result = await subscriptionService.verifyCheckoutSession(session_id);
+
+            return c.json(
+                {
+                    success: true,
+                    data: result,
+                },
+                200
+            );
+        } catch (error: any) {
+            logger.error('Unexpected error in SubscriptionController.verifyCheckoutSession', error);
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'VERIFY_SESSION_FAILED',
+                        message: 'Failed to verify checkout session',
+                        requestId: c.get('requestId'),
+                    },
+                },
+                500
+            );
+        }
+    }
 }
