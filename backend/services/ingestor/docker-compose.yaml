@@ -1,0 +1,31 @@
+services:
+  ingestor:
+    build:
+      context: .
+      dockerfile: services/ingestor/Dockerfile
+    restart: always
+    environment:
+      - PORT=${PORT}
+      - WORKERS=${WORKERS}
+      - NODE_ENV=${NODE_ENV}
+
+      - DATABASE_URL=${DATABASE_URL}
+      - CLICKHOUSE_URL=${CLICKHOUSE_URL}
+
+      # STREAM Configuration
+      - STREAM_REDIS_URL=${STREAM_REDIS_URL}
+      - SNAPSHOT_INTERVAL_MS=${SNAPSHOT_INTERVAL_MS}
+      - STREAM_BATCH_COUNT=${STREAM_BATCH_COUNT}
+      - STREAM_BLOCK_MS=${STREAM_BLOCK_MS}
+      - STREAM_MAX_IDLE_MS=${STREAM_MAX_IDLE_MS}
+      - STREAM_MAX_RETRIES=${STREAM_MAX_RETRIES}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+    volumes:
+      - ./logs:/app/services/ingestor/logs
+      - /data/nats/certs:/data/nats/certs:ro
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:${PORT}/v1/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 20s
