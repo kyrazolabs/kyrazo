@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-LOG_DIR="/app/apis/dashboard/logs"
+LOG_DIR="/app/services/ingestor/logs"
 
 # Ensure the logs directory exists and is writable by the bun user (UID 1000)
 # This runs as root so it works even when the host volume is owned by root.
