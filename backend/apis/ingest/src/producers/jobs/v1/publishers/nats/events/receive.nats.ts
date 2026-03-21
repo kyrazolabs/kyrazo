@@ -83,6 +83,7 @@ export class ReceiveEventPublisher {
                 receivedAt: data.receivedAt,
                 headers: data.headers,
                 body: data.body,
+                rawBody: data.rawBody,
 
                 associatedEventId: data.associatedEventId,
             };
