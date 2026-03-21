@@ -9,44 +9,63 @@ import { CardModule } from 'primeng/card';
     standalone: true,
     imports: [CommonModule, RouterModule, ButtonModule, CardModule],
     template: `
-        <div class="flex flex-col items-center justify-center min-h-[60vh] p-4">
-            <p-card
-                styleClass="card-panel border-t-4! border-amber-500!"
-            >
-                <div class="text-center py-8">
+        <div class="space-y-6 mb-4 animate-fade-in">
+            <!-- Header -->
+            <div class="flex flex-col gap-1">
+                <h1 class="text-2xl font-bold">Billing Status</h1>
+                <p class="opacity-80 text-surface-600 dark:text-surface-400">
+                    Your subscription transaction details
+                </p>
+            </div>
+
+            <p-card styleClass="card-panel">
+                <div
+                    class="flex flex-col items-center justify-center py-12 gap-6 text-center max-w-2xl mx-auto"
+                >
                     <div
-                        class="bg-amber-100 text-amber-600 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+                        class="w-20 h-20 rounded-2xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-amber-600"
                     >
-                        <i class="pi pi-info-circle text-4xl"></i>
+                        <i
+                            class="icon-[hugeicons--information-circle] size-12"
+                        ></i>
                     </div>
-                    <h2 class="text-3xl font-bold text-slate-800">
-                        Checkout Cancelled
-                    </h2>
-                    <p class="text-slate-600 mt-4 text-lg">
-                        Your payment was not completed and no charges were made.
-                    </p>
-                    <p class="text-slate-500 mt-2">
-                        If you experienced any issues, please feel free to
-                        contact our support.
-                    </p>
-                    <div class="mt-10 flex flex-col gap-3">
-                        <button
-                            pButton
-                            pRipple
+
+                    <div class="space-y-2">
+                        <h2
+                            class="text-3xl font-bold text-surface-900 dark:text-surface-0"
+                        >
+                            Checkout Cancelled
+                        </h2>
+                        <p
+                            class="text-surface-600 dark:text-surface-400 text-lg max-w-md mx-auto"
+                        >
+                            Your payment was not completed and no charges were
+                            made.
+                        </p>
+                        <p class="text-surface-500 text-sm italic">
+                            If you experienced any issues, please feel free to
+                            contact our support.
+                        </p>
+                    </div>
+
+                    <div
+                        class="flex flex-col sm:flex-row gap-3 mt-4 w-full justify-center"
+                    >
+                        <p-button
                             label="Back to Settings"
                             icon="pi pi-arrow-left"
                             [routerLink]="['/settings']"
                             [queryParams]="{ tab: 'billing' }"
-                            class="p-button-lg w-full"
-                        ></button>
-                        <button
-                            pButton
-                            pRipple
+                            styleClass="rounded-xl!"
+                        />
+                        <p-button
                             label="Go to Dashboard"
                             icon="pi pi-home"
                             routerLink="/"
-                            class="p-button-text p-button-lg w-full"
-                        ></button>
+                            severity="secondary"
+                            [text]="true"
+                            styleClass="rounded-xl!"
+                        />
                     </div>
                 </div>
             </p-card>
