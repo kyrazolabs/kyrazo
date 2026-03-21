@@ -20,13 +20,22 @@ import { SubscriptionService } from '@core/services/subscription.service';
         MessageModule,
     ],
     template: `
-        <div class="space-y-6 mb-4 animate-fade-in">
-            <!-- Header -->
-            <div class="flex flex-col gap-1">
-                <h1 class="text-2xl font-bold">Billing Status</h1>
-                <p class="opacity-80 text-surface-600 dark:text-surface-400">
-                    Your subscription transaction details
-                </p>
+        <div
+            class="flex flex-col w-full mx-auto gap-8 flex-1 animate-fade-in p-4 lg:p-6"
+        >
+            <!-- Header Section -->
+            <div class="flex flex-row items-center justify-left gap-4">
+                <!-- Left section: Titles -->
+                <div>
+                    <h1
+                        class="text-3xl font-bold text-surface-900 dark:text-surface-0"
+                    >
+                        Billing Status
+                    </h1>
+                    <p class="text-surface-500 dark:text-surface-400">
+                        Your subscription transaction details
+                    </p>
+                </div>
             </div>
 
             <p-card styleClass="card-panel">
@@ -34,10 +43,63 @@ import { SubscriptionService } from '@core/services/subscription.service';
                     class="flex flex-col items-center justify-center py-12 gap-6 text-center max-w-2xl mx-auto"
                 >
                     @if (loading) {
-                        <p-progress-spinner
-                            styleClass="w-16! h-16!"
-                            strokeWidth="4"
-                        ></p-progress-spinner>
+                        <div
+                            class="relative w-24 h-24 mx-auto flex items-center justify-center"
+                        >
+                            <!-- Background Ring -->
+                            <div
+                                class="absolute inset-0 rounded-full border-4 border-primary-500/10"
+                            ></div>
+
+                            <!-- Pulsing Glow -->
+                            <div
+                                class="absolute inset-0 rounded-full bg-primary-500/20 blur-xl animate-pulse"
+                            ></div>
+
+                            <!-- Custom SVG Spinner -->
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="w-16 h-16 text-primary-500 relative z-10"
+                                viewBox="0 0 24 24"
+                            >
+                                <g stroke="currentColor" stroke-width="1.5">
+                                    <circle
+                                        cx="12"
+                                        cy="12"
+                                        r="9.5"
+                                        fill="none"
+                                        stroke-linecap="round"
+                                        stroke-width="2.5"
+                                    >
+                                        <animate
+                                            attributeName="stroke-dasharray"
+                                            calcMode="spline"
+                                            dur="0.8s"
+                                            keySplines="0.42,0,0.58,1;0.42,0,0.58,1;0.42,0,0.58,1"
+                                            keyTimes="0;0.475;0.95;1"
+                                            repeatCount="indefinite"
+                                            values="0 150;60 150;60 150;60 150"
+                                        />
+                                        <animate
+                                            attributeName="stroke-dashoffset"
+                                            calcMode="spline"
+                                            dur="0.8s"
+                                            keySplines="0.42,0,0.58,1;0.42,0,0.58,1;0.42,0,0.58,1"
+                                            keyTimes="0;0.475;0.95;1"
+                                            repeatCount="indefinite"
+                                            values="0;-20;-75;-75"
+                                        />
+                                    </circle>
+                                    <animateTransform
+                                        attributeName="transform"
+                                        dur="1.2s"
+                                        repeatCount="indefinite"
+                                        type="rotate"
+                                        values="0 12 12;360 12 12"
+                                    />
+                                </g>
+                            </svg>
+                        </div>
                         <div class="space-y-2">
                             <h2
                                 class="text-2xl font-bold text-surface-900 dark:text-surface-0"
@@ -51,7 +113,7 @@ import { SubscriptionService } from '@core/services/subscription.service';
                         </div>
                     } @else if (success) {
                         <div
-                            class="w-20 h-20 rounded-2xl bg-primary-50 dark:bg-primary-500/10 flex items-center justify-center text-primary-500"
+                            class="w-20 h-20 rounded-full bg-primary-50 dark:bg-primary-500/10 flex items-center justify-center text-primary-500"
                         >
                             <i
                                 class="icon-[hugeicons--checkmark-circle-01] size-12"
@@ -155,17 +217,19 @@ export class BillingSuccessPage implements OnInit {
     private settingsService = inject(SettingService);
     private subscriptionService = inject(SubscriptionService);
 
-    loading = true;
+    loading = false;
     success = false;
     sessionId: string | null = null;
 
     ngOnInit() {
-        this.sessionId = this.route.snapshot.queryParamMap.get('session_id');
-        if (this.sessionId) {
-            this.verifySession();
-        } else {
-            this.loading = false;
-            this.success = false;
+        const session = this.route.snapshot.data['session'];
+        if (session) {
+            this.success = session.success;
+            this.sessionId = session.sessionId;
+
+            if (this.success) {
+                this.subscriptionService.refreshSubscription();
+            }
         }
     }
 

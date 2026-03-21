@@ -9,15 +9,23 @@ import { CardModule } from 'primeng/card';
     standalone: true,
     imports: [CommonModule, RouterModule, ButtonModule, CardModule],
     template: `
-        <div class="space-y-6 mb-4 animate-fade-in">
-            <!-- Header -->
-            <div class="flex flex-col gap-1">
-                <h1 class="text-2xl font-bold">Billing Status</h1>
-                <p class="opacity-80 text-surface-600 dark:text-surface-400">
-                    Your subscription transaction details
-                </p>
+        <div
+            class="flex flex-col w-full mx-auto gap-8 flex-1 animate-fade-in p-4 lg:p-6"
+        >
+            <!-- Header Section -->
+            <div class="flex flex-row items-center justify-left gap-4">
+                <!-- Left section: Titles -->
+                <div>
+                    <h1
+                        class="text-3xl font-bold text-surface-900 dark:text-surface-0"
+                    >
+                        Billing Status
+                    </h1>
+                    <p class="text-surface-500 dark:text-surface-400">
+                        Your subscription transaction details
+                    </p>
+                </div>
             </div>
-
             <p-card styleClass="card-panel">
                 <div
                     class="flex flex-col items-center justify-center py-12 gap-6 text-center max-w-2xl mx-auto"

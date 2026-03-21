@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '@core/guards/auth.guard';
 import { noAuthGuard } from '@core/guards/no-auth.guard';
+import { billingSuccessResolver } from '@pages/dashboard/billing/success/billing-success.resolver';
 
 export const routes: Routes = [
     {
@@ -91,6 +92,7 @@ export const routes: Routes = [
                     import(
                         '@pages/dashboard/billing/success/billing-success.page'
                     ).then((m) => m.BillingSuccessPage),
+                resolve: { session: billingSuccessResolver },
                 data: { title: 'Billing Success', animation: 'billing-success' },
             },
             {
