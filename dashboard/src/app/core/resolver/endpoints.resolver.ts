@@ -11,3 +11,9 @@ export const endpointsResolver: ResolveFn<IEndpoint<string>[]> = (route, state) 
     map((response) => response.data ?? []) // <-- إرجاع المصفوفة مباشرة
   );
 };
+export const endpointResolver: ResolveFn<IEndpoint> = (route) => {
+  const endpointService = inject(EndpointService);
+  const id = route.paramMap.get('id')!;
+
+  return endpointService.get(id).pipe(map((res) => res.data));
+};

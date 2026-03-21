@@ -3,9 +3,10 @@ import {
     deliveriesResolver,
     deliveryResolver,
     eventResolver,
+    ingestLogsResolver,
 } from '@core/resolver/delivery.resolver';
-import { targetResolver } from '@core/resolver/target.resolver';
-import { endpointsResolver } from '@core/resolver/endpoints.resolver';
+import { targetResolver, targetsResolver } from '@core/resolver/target.resolver';
+import { endpointsResolver, endpointResolver } from '@core/resolver/endpoints.resolver';
 import { sourcesResolver } from '@core/resolver/source.resolver';
 
 export const eventsRoutes: Routes = [
@@ -26,6 +27,7 @@ export const eventsRoutes: Routes = [
             import('./dispatch/targets/targets.page').then(
                 (p) => p.TargetsPage,
             ),
+        resolve: { targets: targetsResolver },
         data: { title: 'Dispatch Targets', animation: 'dispatch-targets' },
     },
     // {
@@ -128,6 +130,7 @@ export const eventsRoutes: Routes = [
             import('./ingest/endpoints/detail/detail.page').then(
                 (p) => p.EndpointDetailPage,
             ),
+        resolve: { endpoint: endpointResolver },
         data: { title: 'Endpoint Details', animation: 'endpoint-detail' },
     },
     // {
@@ -142,6 +145,7 @@ export const eventsRoutes: Routes = [
         path: 'ingest/logs',
         loadComponent: () =>
             import('./ingest/logs/logs.page').then((p) => p.IngestLogsPage),
+        resolve: { data: ingestLogsResolver },
         data: { title: 'Ingest Logs', animation: 'ingest-logs' },
     },
     {

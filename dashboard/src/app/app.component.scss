@@ -1,0 +1,42 @@
+// Loading Shimmer Effect
+@keyframes textShimmer {
+    0% {
+        background-position: 200% center;
+    }
+    100% {
+        background-position: -200% center;
+    }
+}
+
+.animate-shimmer-text {
+    background: linear-gradient(
+        90deg,
+        currentColor 0%,
+        color-mix(in srgb, currentColor, transparent 60%) 50%,
+        currentColor 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: textShimmer 2s linear infinite;
+}
+@keyframes fadeInUpSmall {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-message-fade {
+    animation: fadeInUpSmall 0.3s ease-out forwards;
+}
+
+.loader-container {
+    interpolate-size: allow-keywords;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}

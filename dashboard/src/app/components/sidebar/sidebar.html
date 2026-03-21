@@ -224,7 +224,7 @@
                                     <li>
                                         <a pRipple [routerLink]="'/settings'" [queryParams]="{ tab: 'profile' }"
                                             class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect"
-                                            [class]="isRouteActive('/settings') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                            [class]="isRouteActive('/settings?tab=profile') || isRouteActive('/settings?tab=workspace') || isRouteActive('/settings?tab=billing') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
                                             <i class="pi pi-cog mr-2"></i>
                                             <span class="font-medium">Settings</span>
                                         </a>

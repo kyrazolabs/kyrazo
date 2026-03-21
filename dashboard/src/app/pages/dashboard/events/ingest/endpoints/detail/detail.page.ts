@@ -54,7 +54,20 @@ export class EndpointDetailPage implements OnInit {
     endpoint = signal<Partial<Endpoint>>({});
 
     ngOnInit(): void {
-        this.loadEndpoint();
+        const resolvedEndpoint = this.route.snapshot.data['endpoint'] as Endpoint;
+        if (resolvedEndpoint) {
+            this.endpoint.set({
+                ...resolvedEndpoint,
+                stats: {
+                    totalRequests: 1547,
+                    successfulRequests: 1489,
+                    failedRequests: 58,
+                    avgResponseTime: 245,
+                },
+            });
+        } else {
+            this.loadEndpoint();
+        }
 
         this.dialogService.endpointSaved$.subscribe(() => {
             this.loadEndpoint();

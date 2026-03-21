@@ -28,3 +28,9 @@ export const eventResolver: ResolveFn<IngestEvent> = (route) => {
   const eventId = route.paramMap.get("eventId")!;
   return das.getIngestEventById(eventId).pipe(map((res) => res.data));
 };
+export const ingestLogsResolver: ResolveFn<ApiResponse<IngestEvent[]>> = (
+  route
+) => {
+  const das = inject(DeliveryService);
+  return das.getIngestEvents();
+};

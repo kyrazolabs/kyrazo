@@ -18,6 +18,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { SentryService } from '@core/3rd-party/sentry';
 import { PostHogService } from '@core/3rd-party/posthog';
+import { ApiResponse } from '@models/index';
 import { CopyIdComponent } from '@shared/components/copy-id/copy-id.component';
 
 import { DeliveryService } from '@core/services/delivery.service';
@@ -111,6 +112,16 @@ export class IngestLogsPage implements OnInit {
     constructor(private route: ActivatedRoute) {}
 
     ngOnInit() {
+        // Load from resolver
+        const resolvedData = this.route.snapshot.data['data'] as ApiResponse<IngestEvent[]>;
+        if (resolvedData) {
+            this.ingestEvents = resolvedData.data || [];
+            this.totalRecords = Number(resolvedData.pagination?.total) || this.ingestEvents.length;
+            this.applyClientSideFiltering();
+        } else {
+            this.loadIngestEvents();
+        }
+
         // Load stats on component initialization
         this.loadStats();
     }
