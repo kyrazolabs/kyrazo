@@ -1,238 +1,291 @@
-<div class="min-h-screen bg-surface-0 dark:bg-surface-950 pt-24 md:pt-32 pb-16 md:pb-24">
-            <div class="px-4 md:px-6 max-w-7xl mx-auto">
-                <!-- Header -->
+<div
+    class="min-h-screen bg-surface-0 dark:bg-surface-950 pt-24 md:pt-32 pb-16 md:pb-24"
+>
+    <div class="px-4 md:px-6 max-w-7xl mx-auto">
+        <!-- Header -->
+        <div
+            class="text-center mb-16 md:mb-24 max-w-4xl mx-auto"
+            appScrollReveal
+        >
+            <span
+                class="text-sky-500 font-bold uppercase tracking-[0.2em] text-[10px] px-3 py-1 bg-sky-500/10 rounded-full border border-sky-500/20"
+                >Ingestion Engine</span
+            >
+            <h1
+                class="text-4xl md:text-7xl font-bold mt-6 mb-8 text-surface-900 dark:text-surface-0 tracking-tight leading-tight px-4"
+            >
+                Secure Webhook <br class="hidden md:block" />
+                Ingestion & Verification
+            </h1>
+            <p
+                class="text-lg md:text-xl text-surface-600 dark:text-surface-400 leading-relaxed max-w-2xl mx-auto px-6"
+            >
+                Stop writing custom verification logic for every provider.
+                Kyrazo normalizes, verifies, and logs every incoming event
+                before it touches your infrastructure.
+            </p>
+        </div>
+
+        <!-- content -->
+        <div
+            class="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-start"
+        >
+            <!-- Features List -->
+            <div class="space-y-8 md:space-y-12">
                 <div
-                    class="text-center mb-16 md:mb-24 max-w-4xl mx-auto" appScrollReveal
+                    class="group px-4 md:px-0"
+                    appScrollReveal
+                    delay="delay-100"
                 >
-                    <span
-                        class="text-sky-500 font-bold uppercase tracking-[0.2em] text-[10px] px-3 py-1 bg-sky-500/10 rounded-full border border-sky-500/20"
-                        >Ingestion Engine</span
-                    >
-                    <h1
-                        class="text-4xl md:text-7xl font-bold mt-6 mb-8 text-surface-900 dark:text-surface-0 tracking-tight leading-tight px-4"
-                    >
-                        Secure Webhook <br class="hidden md:block" />
-                        Ingestion & Verification
-                    </h1>
-                    <p
-                        class="text-lg md:text-xl text-surface-600 dark:text-surface-400 leading-relaxed max-w-2xl mx-auto px-6"
-                    >
-                        Stop writing custom verification logic for every
-                        provider. Kyrazo normalizes, verifies, and logs every
-                        incoming event before it touches your infrastructure.
-                    </p>
-                </div>
-
-                <!-- content -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-start">
-                    <!-- Features List -->
-                    <div class="space-y-8 md:space-y-12">
-                        <div class="group px-4 md:px-0" appScrollReveal delay="delay-100">
-                            <div class="flex items-center gap-4 mb-4">
-                                <div
-                                    class="p-2.5 md:p-3 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 aspect-square flex items-center justify-center shrink-0"
-                                >
-                                    <span
-                                        class="icon-[hugeicons--shield-02] text-xl md:text-2xl"
-                                    ></span>
-                                </div>
-                                <h3
-                                    class="text-xl md:text-2xl font-bold text-surface-900 dark:text-surface-0"
-                                >
-                                    HMAC Verification
-                                </h3>
-                            </div>
-                            <p
-                                class="text-base md:text-lg text-surface-600 dark:text-surface-400 pl-4 md:pl-20 border-l border-surface-200 dark:border-surface-800 md:border-none"
-                            >
-                                We automatically verify cryptographic signatures
-                                from Stripe, GitHub, Shopify, and standard HMAC
-                                providers. Malicious payloads are rejected at
-                                the edge, never reaching your servers.
-                            </p>
-                        </div>
-
-                        <div class="group px-4 md:px-0" appScrollReveal delay="delay-200">
-                            <div class="flex items-center gap-4 mb-4">
-                                <div
-                                    class="p-2.5 md:p-3 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 aspect-square flex items-center justify-center shrink-0"
-                                >
-                                    <span
-                                        class="icon-[hugeicons--file-edit] text-xl md:text-2xl"
-                                    ></span>
-                                </div>
-                                <h3
-                                    class="text-xl md:text-2xl font-bold text-surface-900 dark:text-surface-0"
-                                >
-                                    Payload Normalization
-                                </h3>
-                            </div>
-                            <p
-                                class="text-base md:text-lg text-surface-600 dark:text-surface-400 pl-4 md:pl-20 border-l border-surface-200 dark:border-surface-800 md:border-none"
-                            >
-                                Every provider sends data differently. Kyrazo
-                                wraps events in a standard envelope, giving you
-                                a consistent JSON structure regardless of the
-                                source.
-                            </p>
-                        </div>
-
-                        <div class="group px-4 md:px-0" appScrollReveal delay="delay-300">
-                            <div class="flex items-center gap-4 mb-4">
-                                <div
-                                    class="p-2.5 md:p-3 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 aspect-square flex items-center justify-center shrink-0"
-                                >
-                                    <span
-                                        class="icon-[hugeicons--database-01] text-xl md:text-2xl"
-                                    ></span>
-                                </div>
-                                <h3
-                                    class="text-xl md:text-2xl font-bold text-surface-900 dark:text-surface-0"
-                                >
-                                    Persistent Audit Log
-                                </h3>
-                            </div>
-                            <p
-                                class="text-base md:text-lg text-surface-600 dark:text-surface-400 pl-4 md:pl-20 border-l border-surface-200 dark:border-surface-800 md:border-none"
-                            >
-                                Never lose an event. We store the raw payload,
-                                headers, and verification status for 30 days.
-                                Replay failed events with a single click.
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Visual / Code Snippet -->
-                    <div
-                        class="relative rounded-2xl bg-surface-900 border border-surface-800 p-8 shadow-2xl overflow-hidden" appScrollReveal delay="delay-400"
-                    >
+                    <div class="flex items-center gap-4 mb-4">
                         <div
-                            class="absolute top-0 left-0 w-full h-10 bg-surface-950/50 border-b border-surface-800 flex items-center px-4 gap-2"
+                            class="p-2.5 md:p-3 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 aspect-square flex items-center justify-center shrink-0"
                         >
-                            <div
-                                class="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50"
-                            ></div>
-                            <div
-                                class="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50"
-                            ></div>
-                            <div
-                                class="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50"
-                            ></div>
+                            <span
+                                class="icon-[hugeicons--shield-02] text-xl md:text-2xl"
+                            ></span>
                         </div>
-
-                        <div class="mt-8 font-mono text-sm leading-relaxed">
-                            <div class="text-surface-500 mb-4">
-                                // Kyrazo handles this complexity for you
-                            </div>
-
-                            <div class="text-purple-400">
-                                async function verifyStripeSignature(req)
-                                {{ '{' }}
-                            </div>
-                            <div class="pl-4 text-sky-300">
-                                const sig = req.headers['stripe-signature'];
-                            </div>
-                            <div class="pl-4 text-sky-300">
-                                const secret = process.env.STRIPE_SECRET;
-                            </div>
-                            <div class="pl-4 mb-4"></div>
-                            <div class="pl-4 text-surface-300">
-                                try {{ '{' }}
-                            </div>
-                            <div class="pl-8 text-surface-400">
-                                // Manual verification is error-prone
-                            </div>
-                            <div class="pl-8 text-emerald-400">
-                                const event = stripe.webhooks.constructEvent(
-                            </div>
-                            <div class="pl-12 text-emerald-400">
-                                req.body, sig, secret
-                            </div>
-                            <div class="pl-8 text-emerald-400">);</div>
-                            <div class="pl-4 text-surface-300">
-                                {{ '}' }} catch (err) {{ '{' }}
-                            </div>
-                            <div class="pl-8 text-red-400">
-                                console.error('Webhook Error:', err.message);
-                            </div>
-                            <div class="pl-8 text-red-400">
-                                return res.status(400).send(\`Webhook Error\`);
-                            </div>
-                            <div class="pl-4 text-surface-300">{{ '}' }}</div>
-                            <div class="text-purple-400">{{ '}' }}</div>
-
-                            <div
-                                class="my-6 border-t border-surface-800 border-dashed"
-                            ></div>
-
-                            <div class="text-surface-500 mb-4">
-                                // With Kyrazo, you just receive verified JSON
-                            </div>
-                            <div class="text-purple-400">
-                                app.post('/webhooks', (req, res) => {{ '{' }}
-                            </div>
-                            <div class="pl-4 text-surface-400">
-                                // Already verified & normalized
-                            </div>
-                            <div class="pl-4 text-sky-300">
-                                const {{ '{' }} type, data {{ '}' }} = req.body;
-                            </div>
-                            <div class="pl-4 text-emerald-400">
-                                processEvent(type, data);
-                            </div>
-                            <div class="pl-4 text-emerald-400">
-                                res.sendStatus(200);
-                            </div>
-                            <div class="text-purple-400">{{ '}' }});</div>
-                        </div>
+                        <h3
+                            class="text-xl md:text-2xl font-bold text-surface-900 dark:text-surface-0"
+                        >
+                            HMAC Verification
+                        </h3>
                     </div>
+                    <p
+                        class="text-base md:text-lg text-surface-600 dark:text-surface-400 pl-4 md:pl-20 border-l border-surface-200 dark:border-surface-800 md:border-none"
+                    >
+                        We automatically verify cryptographic signatures from
+                        Stripe, GitHub, Shopify, and standard HMAC providers.
+                        Malicious payloads are rejected at the edge, never
+                        reaching your servers.
+                    </p>
                 </div>
 
-                <!-- Ingest from Any Service Section -->
-                <div class="mt-32 md:mt-48 text-center" appScrollReveal>
-                    <h2 class="text-3xl md:text-5xl font-black text-white tracking-tighter mb-6 font-sansation! text-shadow-sky-500">
-                        Ingest from Any Service.
-                    </h2>
-                    <p class="text-lg md:text-xl text-surface-400 font-medium max-w-2xl mx-auto mb-16">
-                        Kyrazo provides first-class support for every major provider.
-                        No more custom logic for security and normalization.
-                    </p>
-
-                    <div class="relative overflow-hidden mt-16 md:mt-24 py-12" appScrollReveal delay="delay-200">
-                        <!-- Gradient Masks -->
-                        <div class="absolute inset-y-0 left-0 w-24 md:w-48 bg-gradient-to-r from-surface-0 dark:from-surface-950 to-transparent z-10"></div>
-                        <div class="absolute inset-y-0 right-0 w-24 md:w-48 bg-gradient-to-l from-surface-0 dark:from-surface-950 to-transparent z-10"></div>
-
-                        <div class="flex items-center gap-12 md:gap-24 animate-scroll whitespace-nowrap w-max px-6">
-                            <!-- Logo Set 1 -->
-                            <span class="icon-[logos--stripe] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"></span>
-                            <span class="icon-[logos--github-icon] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer dark:invert"></span>
-                            <span class="icon-[logos--paypal] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"></span>
-                            <span class="icon-[logos--shopify] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"></span>
-                            <span class="icon-[logos--slack-icon] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"></span>
-                            <span class="icon-[logos--webflow] text-3xl md:text-5xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"></span>
-                            <!-- <span class="icon-[logos--discord-icon] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"></span> -->
-                            <!-- <span class="icon-[logos--whatsapp-icon] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"></span> -->
-                            <!-- <span class="icon-[logos--zoom-icon] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"></span> -->
-
-                            <!-- Repeat Logo Set 1 (for seamless loop) -->
-                            <span class="icon-[logos--stripe] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"></span>
-                            <span class="icon-[logos--github-icon] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer dark:invert"></span>
-                            <span class="icon-[logos--paypal] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"></span>
-                            <span class="icon-[logos--shopify] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"></span>
-                            <span class="icon-[logos--slack-icon] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"></span>
-                            <span class="icon-[logos--webflow] text-3xl md:text-5xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"></span>
-                            <!-- <span class="icon-[logos--discord-icon] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"></span> -->
-                            <!-- <span class="icon-[logos--whatsapp-icon] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"></span> -->
-                            <!-- <span class="icon-[logos--zoom-icon] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"></span> -->
+                <div
+                    class="group px-4 md:px-0"
+                    appScrollReveal
+                    delay="delay-200"
+                >
+                    <div class="flex items-center gap-4 mb-4">
+                        <div
+                            class="p-2.5 md:p-3 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 aspect-square flex items-center justify-center shrink-0"
+                        >
+                            <span
+                                class="icon-[hugeicons--file-edit] text-xl md:text-2xl"
+                            ></span>
                         </div>
+                        <h3
+                            class="text-xl md:text-2xl font-bold text-surface-900 dark:text-surface-0"
+                        >
+                            Payload Normalization
+                        </h3>
+                    </div>
+                    <p
+                        class="text-base md:text-lg text-surface-600 dark:text-surface-400 pl-4 md:pl-20 border-l border-surface-200 dark:border-surface-800 md:border-none"
+                    >
+                        Every provider sends data differently. Kyrazo wraps
+                        events in a standard envelope, giving you a consistent
+                        JSON structure regardless of the source.
+                    </p>
+                </div>
+
+                <div
+                    class="group px-4 md:px-0"
+                    appScrollReveal
+                    delay="delay-300"
+                >
+                    <div class="flex items-center gap-4 mb-4">
+                        <div
+                            class="p-2.5 md:p-3 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 aspect-square flex items-center justify-center shrink-0"
+                        >
+                            <span
+                                class="icon-[hugeicons--database-01] text-xl md:text-2xl"
+                            ></span>
+                        </div>
+                        <h3
+                            class="text-xl md:text-2xl font-bold text-surface-900 dark:text-surface-0"
+                        >
+                            Persistent Audit Log
+                        </h3>
+                    </div>
+                    <p
+                        class="text-base md:text-lg text-surface-600 dark:text-surface-400 pl-4 md:pl-20 border-l border-surface-200 dark:border-surface-800 md:border-none"
+                    >
+                        Never lose an event. We store the raw payload, headers,
+                        and verification status for 30 days. Replay failed
+                        events with a single click.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Visual / Code Snippet -->
+            <div
+                class="relative rounded-2xl bg-surface-900 border border-surface-800 p-8 shadow-2xl overflow-hidden"
+                appScrollReveal
+                delay="delay-400"
+            >
+                <div
+                    class="absolute top-0 left-0 w-full h-10 bg-surface-950/50 border-b border-surface-800 flex items-center px-4 gap-2"
+                >
+                    <div
+                        class="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50"
+                    ></div>
+                    <div
+                        class="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50"
+                    ></div>
+                    <div
+                        class="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50"
+                    ></div>
+                </div>
+
+                <div class="mt-8 font-mono text-sm leading-relaxed">
+                    <div class="text-surface-500 mb-4">
+                        // Kyrazo handles this complexity for you
                     </div>
 
-                    <!-- <div class="mt-16 text-center">
+                    <div class="text-purple-400">
+                        async function verifyStripeSignature(req) {{ '{' }}
+                    </div>
+                    <div class="pl-4 text-sky-300">
+                        const sig = req.headers['stripe-signature'];
+                    </div>
+                    <div class="pl-4 text-sky-300">
+                        const secret = process.env.STRIPE_SECRET;
+                    </div>
+                    <div class="pl-4 mb-4"></div>
+                    <div class="pl-4 text-surface-300">try {{ '{' }}</div>
+                    <div class="pl-8 text-surface-400">
+                        // Manual verification is error-prone
+                    </div>
+                    <div class="pl-8 text-emerald-400">
+                        const event = stripe.webhooks.constructEvent(
+                    </div>
+                    <div class="pl-12 text-emerald-400">
+                        req.body, sig, secret
+                    </div>
+                    <div class="pl-8 text-emerald-400">);</div>
+                    <div class="pl-4 text-surface-300">
+                        {{ '}' }} catch (err: any) {{ '{' }}
+                    </div>
+                    <div class="pl-8 text-red-400">
+                        console.error('Webhook Error:', err.message);
+                    </div>
+                    <div class="pl-8 text-red-400">
+                        return res.status(400).send(\`Webhook Error\`);
+                    </div>
+                    <div class="pl-4 text-surface-300">{{ '}' }}</div>
+                    <div class="text-purple-400">{{ '}' }}</div>
+
+                    <div
+                        class="my-6 border-t border-surface-800 border-dashed"
+                    ></div>
+
+                    <div class="text-surface-500 mb-4">
+                        // With Kyrazo, you just receive verified JSON
+                    </div>
+                    <div class="text-purple-400">
+                        app.post('/webhooks', (req, res) => {{ '{' }}
+                    </div>
+                    <div class="pl-4 text-surface-400">
+                        // Already verified & normalized
+                    </div>
+                    <div class="pl-4 text-sky-300">
+                        const {{ '{' }} type, data {{ '}' }} = req.body;
+                    </div>
+                    <div class="pl-4 text-emerald-400">
+                        processEvent(type, data);
+                    </div>
+                    <div class="pl-4 text-emerald-400">
+                        res.sendStatus(200);
+                    </div>
+                    <div class="text-purple-400">{{ '}' }});</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ingest from Any Service Section -->
+        <div class="mt-32 md:mt-48 text-center" appScrollReveal>
+            <h2
+                class="text-3xl md:text-5xl font-black text-white tracking-tighter mb-6 font-sansation! text-shadow-sky-500"
+            >
+                Ingest from Any Service.
+            </h2>
+            <p
+                class="text-lg md:text-xl text-surface-400 font-medium max-w-2xl mx-auto mb-16"
+            >
+                Kyrazo provides first-class support for every major provider. No
+                more custom logic for security and normalization.
+            </p>
+
+            <div
+                class="relative overflow-hidden mt-16 md:mt-24 py-12"
+                appScrollReveal
+                delay="delay-200"
+            >
+                <!-- Gradient Masks -->
+                <div
+                    class="absolute inset-y-0 left-0 w-24 md:w-48 bg-gradient-to-r from-surface-0 dark:from-surface-950 to-transparent z-10"
+                ></div>
+                <div
+                    class="absolute inset-y-0 right-0 w-24 md:w-48 bg-gradient-to-l from-surface-0 dark:from-surface-950 to-transparent z-10"
+                ></div>
+
+                <div
+                    class="flex items-center gap-12 md:gap-24 animate-scroll whitespace-nowrap w-max px-6"
+                >
+                    <!-- Logo Set 1 -->
+                    <span
+                        class="icon-[logos--stripe] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"
+                    ></span>
+                    <span
+                        class="icon-[logos--github-icon] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer dark:invert"
+                    ></span>
+                    <span
+                        class="icon-[logos--paypal] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"
+                    ></span>
+                    <span
+                        class="icon-[logos--shopify] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"
+                    ></span>
+                    <span
+                        class="icon-[logos--slack-icon] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"
+                    ></span>
+                    <span
+                        class="icon-[logos--webflow] text-3xl md:text-5xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"
+                    ></span>
+                    <!-- <span class="icon-[logos--discord-icon] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"></span> -->
+                    <!-- <span class="icon-[logos--whatsapp-icon] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"></span> -->
+                    <!-- <span class="icon-[logos--zoom-icon] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"></span> -->
+
+                    <!-- Repeat Logo Set 1 (for seamless loop) -->
+                    <span
+                        class="icon-[logos--stripe] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"
+                    ></span>
+                    <span
+                        class="icon-[logos--github-icon] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer dark:invert"
+                    ></span>
+                    <span
+                        class="icon-[logos--paypal] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"
+                    ></span>
+                    <span
+                        class="icon-[logos--shopify] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"
+                    ></span>
+                    <span
+                        class="icon-[logos--slack-icon] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"
+                    ></span>
+                    <span
+                        class="icon-[logos--webflow] text-3xl md:text-5xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"
+                    ></span>
+                    <!-- <span class="icon-[logos--discord-icon] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"></span> -->
+                    <!-- <span class="icon-[logos--whatsapp-icon] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"></span> -->
+                    <!-- <span class="icon-[logos--zoom-icon] text-4xl md:text-6xl grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"></span> -->
+                </div>
+            </div>
+
+            <!-- <div class="mt-16 text-center">
                         <p class="text-sm text-surface-500 font-medium">
                             Don't see your provider? <span class="text-primary-500">Kyrazo supports all standard HMAC and JSON webhooks.</span>
                         </p>
                     </div> -->
-                </div>
-            </div>
         </div>
+    </div>
+</div>

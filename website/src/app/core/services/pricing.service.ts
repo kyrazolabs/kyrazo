@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, Observable, of } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 import { environment } from 'environments/environment';
 import { PricingPlan } from '../../pages/pricing/pricing.model';
 
@@ -86,6 +86,10 @@ export class PricingService {
                 return Array.from(grouped.values()).sort(
                     (a, b) => a.priceCentsMonthly - b.priceCentsMonthly,
                 );
+            }),
+            catchError((error) => {
+                console.error('Failed to fetch pricing plans:', error);
+                return of([]);
             }),
         );
     }

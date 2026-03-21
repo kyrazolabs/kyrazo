@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { pricingResolver } from '@core/resolvers/pricing.resolver';
 
 export const routes: Routes = [
     {
@@ -190,6 +191,7 @@ export const routes: Routes = [
                     import('@pages/pricing/pricing.page').then(
                         (p) => p.PricingPage,
                     ),
+                resolve: { plans: pricingResolver },
                 data: {
                     title: 'Pricing - Kyrazo',
                     meta: {
