@@ -129,7 +129,7 @@ export class AnalyticsRepo {
                     sum(pending_deliveries) AS pending_deliveries,
                     sum(delivery_time_sum) AS weighted_time_sum
                 FROM analytics_dispatch_day
-                WHERE bucket_day >= today() - INTERVAL {days:Int32} DAY
+                WHERE bucket_day >= today() - INTERVAL {days:Int32} days
                   AND namespace_id = {namespaceId:String}
             `;
 
@@ -140,10 +140,10 @@ export class AnalyticsRepo {
                     sum(successful_deliveries) AS successful,
                     sum(failed_deliveries) AS failed
                 FROM analytics_dispatch_day
-                WHERE bucket_day >= today() - INTERVAL {days:Int32} DAY
+                WHERE bucket_day >= today() - INTERVAL {days:Int32} days
                   AND namespace_id = {namespaceId:String}
                 GROUP BY bucket_day
-                ORDER BY day DESC
+                ORDER BY bucket_day DESC
             `;
 
             // 3. Top Event Types
@@ -152,7 +152,7 @@ export class AnalyticsRepo {
                     event_type,
                     sum(total_deliveries) AS total
                 FROM analytics_dispatch_day
-                WHERE bucket_day >= today() - INTERVAL {days:Int32} DAY
+                WHERE bucket_day >= today() - INTERVAL {days:Int32} days
                   AND namespace_id = {namespaceId:String}
                 GROUP BY event_type
                 ORDER BY total DESC
@@ -165,9 +165,8 @@ export class AnalyticsRepo {
                     response_code,
                     sum(total_deliveries) AS total
                 FROM analytics_dispatch_day
-                WHERE bucket_day >= today() - INTERVAL {days:Int32} DAY
+                WHERE bucket_day >= today() - INTERVAL {days:Int32} days
                   AND namespace_id = {namespaceId:String}
-                  AND response_code IS NOT NULL
                 GROUP BY response_code
                 ORDER BY total DESC
             `;
@@ -255,7 +254,7 @@ export class AnalyticsRepo {
                     sum(pending_deliveries) AS pending_deliveries,
                     sum(delivery_time_sum) AS weighted_time_sum
                 FROM analytics_dispatch_day
-                WHERE bucket_day >= today() - INTERVAL {days:Int32} DAY
+                WHERE bucket_day >= today() - INTERVAL {days:Int32} days
                   AND namespace_id = {namespaceId:String}
                   AND target_id = {targetId:String}
             `;
@@ -266,11 +265,11 @@ export class AnalyticsRepo {
                     sum(successful_deliveries) AS successful,
                     sum(failed_deliveries) AS failed
                 FROM analytics_dispatch_day
-                WHERE bucket_day >= today() - INTERVAL {days:Int32} DAY
+                WHERE bucket_day >= today() - INTERVAL {days:Int32} days
                   AND namespace_id = {namespaceId:String}
                   AND target_id = {targetId:String}
                 GROUP BY bucket_day
-                ORDER BY day DESC
+                ORDER BY bucket_day DESC
             `;
 
             const topEventsQuery = `
@@ -278,7 +277,7 @@ export class AnalyticsRepo {
                     event_type,
                     sum(total_deliveries) AS total
                 FROM analytics_dispatch_day
-                WHERE bucket_day >= today() - INTERVAL {days:Int32} DAY
+                WHERE bucket_day >= today() - INTERVAL {days:Int32} days
                   AND namespace_id = {namespaceId:String}
                   AND target_id = {targetId:String}
                 GROUP BY event_type
@@ -291,10 +290,9 @@ export class AnalyticsRepo {
                     response_code,
                     sum(total_deliveries) AS total
                 FROM analytics_dispatch_day
-                WHERE bucket_day >= today() - INTERVAL {days:Int32} DAY
+                WHERE bucket_day >= today() - INTERVAL {days:Int32} days
                   AND namespace_id = {namespaceId:String}
                   AND target_id = {targetId:String}
-                  AND response_code IS NOT NULL
                 GROUP BY response_code
                 ORDER BY total DESC
             `;
@@ -372,7 +370,7 @@ export class AnalyticsRepo {
                     sum(pending_events) AS pending_events,
                     count(DISTINCT source_id) AS ingests
                 FROM analytics_ingest_day
-                WHERE bucket_day >= today() - INTERVAL {days:Int32} DAY
+                WHERE bucket_day >= today() - INTERVAL {days:Int32} days
                   AND namespace_id = {namespaceId:String}
             `;
 
@@ -381,10 +379,10 @@ export class AnalyticsRepo {
                     bucket_day AS day,
                     sum(total_events) AS events
                 FROM analytics_ingest_day
-                WHERE bucket_day >= today() - INTERVAL {days:Int32} DAY
+                WHERE bucket_day >= today() - INTERVAL {days:Int32} days
                   AND namespace_id = {namespaceId:String}
                 GROUP BY bucket_day
-                ORDER BY day DESC
+                ORDER BY bucket_day DESC
             `;
 
             const topSourcesQuery = `
@@ -392,7 +390,7 @@ export class AnalyticsRepo {
                     source_id AS source,
                     sum(total_events) AS total
                 FROM analytics_ingest_day
-                WHERE bucket_day >= today() - INTERVAL {days:Int32} DAY
+                WHERE bucket_day >= today() - INTERVAL {days:Int32} days
                   AND namespace_id = {namespaceId:String}
                 GROUP BY source_id
                 ORDER BY total DESC
@@ -404,7 +402,7 @@ export class AnalyticsRepo {
                     processing_status,
                     sum(total_events) AS total
                 FROM analytics_ingest_day
-                WHERE bucket_day >= today() - INTERVAL {days:Int32} DAY
+                WHERE bucket_day >= today() - INTERVAL {days:Int32} days
                   AND namespace_id = {namespaceId:String}
                 GROUP BY processing_status
                 ORDER BY total DESC
@@ -415,10 +413,10 @@ export class AnalyticsRepo {
                     bucket_day AS day,
                     sum(failed_events) AS total
                 FROM analytics_ingest_day
-                WHERE bucket_day >= today() - INTERVAL {days:Int32} DAY
+                WHERE bucket_day >= today() - INTERVAL {days:Int32} days
                   AND namespace_id = {namespaceId:String}
                 GROUP BY bucket_day
-                ORDER BY day DESC
+                ORDER BY bucket_day DESC
             `;
 
             const [statsRes, trendsRes, topSourcesRes, statusRes, failureTrendsRes] =
