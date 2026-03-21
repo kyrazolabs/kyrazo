@@ -2,7 +2,7 @@ import { logger, type SQLIngestEvent, Source, secretCrypto, unprefixId, prefixId
 import { webflowValidator } from './webflow.validator';
 import { webflowSignature } from './webflow.signature';
 import { webflowTransformer } from './webflow.transformer';
-import type { IReceivedEvent } from '@/types/events/event.types';
+import { ProcessingStatus, type IReceivedEvent } from '@/types/events/event.types';
 import { redisConfig } from '@/config';
 import { ingestProducer } from '@/consumers/batch/ingest.producer';
 import { receiverTransformer } from '../../receiver.transformer';
@@ -20,6 +20,7 @@ export class WebflowPipeline {
 
     public async process(event: IReceivedEvent): Promise<void> {
         try {
+            event.processingStatus = ProcessingStatus.PROCESSED;
             if (!webflowValidator.validate(event)) {
                 logger.debug('[WebflowPipeline] Invalid event structure, skipping');
                 return;

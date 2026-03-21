@@ -1,4 +1,5 @@
 import { logger, type SQLIngestEvent, Source, secretCrypto, unprefixId, prefixId } from '@kyrazo/shared';
+import { ProcessingStatus } from '@/types/events/event.types';
 import { paypalValidator } from './paypal.validator';
 import { paypalSignature } from './paypal.signature';
 import type { IReceivedEvent } from '@/types/events/event.types';
@@ -19,6 +20,7 @@ export class PayPalPipeline {
 
     public async process(event: IReceivedEvent): Promise<void> {
         try {
+            event.processingStatus = ProcessingStatus.PROCESSED;
             if (!paypalValidator.validate(event)) {
                 logger.debug('Invalid event structure, skipping');
                 return;

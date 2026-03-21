@@ -1,8 +1,8 @@
 import { logger, type SQLIngestEvent, Source, secretCrypto, unprefixId, prefixId } from '@kyrazo/shared';
+import { ProcessingStatus, type IReceivedEvent } from '@/types/events/event.types';
 import { slackValidator } from './slack.validator';
 import { slackSignature } from './slack.signature';
 import { slackTransformer } from './slack.transformer';
-import type { IReceivedEvent } from '@/types/events/event.types';
 import { redisConfig } from '@/config';
 import { ingestProducer } from '@/consumers/batch/ingest.producer';
 import { receiverTransformer } from '../../receiver.transformer';
@@ -20,6 +20,7 @@ export class SlackPipeline {
 
     public async process(event: IReceivedEvent): Promise<void> {
         try {
+            event.processingStatus = ProcessingStatus.PROCESSED;
             if (!slackValidator.validate(event)) {
                 logger.debug('[SlackPipeline] Invalid event structure, skipping');
                 return;
