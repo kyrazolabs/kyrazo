@@ -1,6 +1,6 @@
 <div class="min-w-screen" [@routeAnimations]="prepareRoute(outlet)">
   <div *ngIf="loader.loading$ | async"
-    class="fixed right-6 bottom-6 z-1 bg-surface-0 dark:bg-surface-900 flex justify-center items-center gap-3 py-1.5 px-3 rounded-xl border border-surface-200 dark:border-surface-800 shadow">
+    class="fixed right-6 bottom-6 z-1 bg-surface-0 dark:bg-surface-900 flex justify-center items-center gap-3 py-1.5 px-3 rounded-xl border border-surface-200 dark:border-surface-800 shadow loader-container overflow-hidden">
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
       <g stroke="currentColor" stroke-width="1">
         <circle cx="12" cy="12" r="9.5" fill="none" stroke-linecap="round" stroke-width="2">
@@ -15,7 +15,9 @@
           values="0 12 12;360 12 12" />
       </g>
     </svg>
-    <span class="text-sm font-semibold">Loading...</span>
+    @for (msg of [currentMessage()]; track msg) {
+        <span class="text-sm font-semibold animate-shimmer-text animate-message-fade -translate-y-px text-left">{{ msg }}</span>
+    }
   </div>
   <router-outlet #outlet="outlet"></router-outlet>
   <p-toast></p-toast>

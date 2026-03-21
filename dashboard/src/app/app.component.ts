@@ -1,4 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal, computed, effect } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {
     Router,
     NavigationStart,
@@ -37,6 +38,21 @@ export class AppComponent {
     private posthog = inject(PostHogService);
     private seoService = inject(SeoService);
 
+    loadingMessages = [
+        'Loading data...',
+        'Checking sessions...',
+        'Verifying access...',
+        'Almost ready...',
+        'Syncing with Kyrazo...',
+        'Optimizing interface...',
+    ];
+
+    private isLoading = toSignal(this.loader.loading$);
+    currentMessageIndex = signal(0);
+    currentMessage = computed(
+        () => this.loadingMessages[this.currentMessageIndex()],
+    );
+
     constructor(private router: Router) {
         this.seoService.init();
         this.router.events.subscribe((event) => {
@@ -52,6 +68,20 @@ export class AppComponent {
                     this.posthog.trackPageView();
                 }
             }
+        });
+
+        // Cycle messages when loading
+        effect(() => {
+            if (this.isLoading()) {
+                const intervalId = setInterval(() => {
+                    this.currentMessageIndex.update(
+                        (i) => (i + 1) % this.loadingMessages.length,
+                    );
+                }, 6000);
+                return () => clearInterval(intervalId);
+            }
+            this.currentMessageIndex.set(0);
+            return;
         });
     }
 
