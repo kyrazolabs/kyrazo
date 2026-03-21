@@ -29,6 +29,9 @@ RUN bun run build
 FROM oven/bun:${BUN_VERSION}-alpine AS runner
 WORKDIR /app
 
+# Install su-exec for dropping privileges from root
+RUN apk add --no-cache su-exec
+
 # Copy all installed dependencies
 COPY --from=builder /app/services/ingestor/node_modules /app/services/ingestor/node_modules
 
