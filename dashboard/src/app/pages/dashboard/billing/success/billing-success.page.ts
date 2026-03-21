@@ -20,91 +20,129 @@ import { SubscriptionService } from '@core/services/subscription.service';
         MessageModule,
     ],
     template: `
-        <div class="flex flex-col items-center justify-center min-h-[60vh] p-4">
-            <p-card
-                styleClass="max-w-lg w-full shadow-xl border-t-4 border-primary-500"
-            >
-                <div class="text-center py-8">
+        <div class="space-y-6 mb-4 animate-fade-in">
+            <!-- Header -->
+            <div class="flex flex-col gap-1">
+                <h1 class="text-2xl font-bold">Billing Status</h1>
+                <p class="opacity-80 text-surface-600 dark:text-surface-400">
+                    Your subscription transaction details
+                </p>
+            </div>
+
+            <p-card styleClass="card-panel">
+                <div
+                    class="flex flex-col items-center justify-center py-12 gap-6 text-center max-w-2xl mx-auto"
+                >
                     @if (loading) {
-                        <p-progressSpinner
-                            styleClass="mx-auto block"
+                        <p-progress-spinner
+                            styleClass="w-16! h-16!"
                             strokeWidth="4"
-                        ></p-progressSpinner>
-                        <h2 class="text-2xl font-bold mt-6 text-slate-800">
-                            Verifying your subscription...
-                        </h2>
-                        <p class="text-slate-500 mt-2">
-                            Please wait while we confirm your payment with
-                            Stripe.
-                        </p>
+                        ></p-progress-spinner>
+                        <div class="space-y-2">
+                            <h2
+                                class="text-2xl font-bold text-surface-900 dark:text-surface-0"
+                            >
+                                Verifying your subscription...
+                            </h2>
+                            <p class="text-surface-500">
+                                Please wait while we confirm your payment with
+                                Stripe.
+                            </p>
+                        </div>
                     } @else if (success) {
                         <div
-                            class="bg-green-100 text-green-600 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+                            class="w-20 h-20 rounded-2xl bg-primary-50 dark:bg-primary-500/10 flex items-center justify-center text-primary-500"
                         >
-                            <i class="pi pi-check text-4xl"></i>
+                            <i
+                                class="icon-[hugeicons--checkmark-circle-01] size-12"
+                            ></i>
                         </div>
-                        <h2 class="text-3xl font-bold text-slate-800">
-                            Payment Successful!
-                        </h2>
-                        <p class="text-slate-600 mt-4 text-lg">
-                            Thank you for your purchase. Your subscription is
-                            now active.
-                        </p>
-                        <div class="mt-10 flex flex-col gap-3">
-                            <button
-                                pButton
-                                pRipple
-                                label="Go to Dashboard"
+                        <div class="space-y-2">
+                            <h2
+                                class="text-3xl font-bold text-surface-900 dark:text-surface-0"
+                            >
+                                Payment Successful!
+                            </h2>
+                            <p
+                                class="text-surface-600 dark:text-surface-400 text-lg max-w-md mx-auto"
+                            >
+                                Thank you for your purchase. Your subscription
+                                is now active and your limits have been updated.
+                            </p>
+                        </div>
+
+                        <div
+                            class="flex flex-col sm:flex-row gap-3 mt-4 w-full justify-center"
+                        >
+                            <p-button
+                                label="Back to Dashboard"
                                 icon="pi pi-home"
                                 routerLink="/"
-                                class="p-button-lg w-full"
-                            ></button>
-                            <button
-                                pButton
-                                pRipple
+                                styleClass="rounded-xl!"
+                            />
+                            <p-button
                                 label="Manage Billing"
                                 icon="pi pi-credit-card"
                                 [routerLink]="['/settings']"
                                 [queryParams]="{ tab: 'billing' }"
-                                class="p-button-outlined p-button-lg w-full"
-                            ></button>
+                                severity="secondary"
+                                [outlined]="true"
+                                styleClass="rounded-xl!"
+                            />
                         </div>
                     } @else {
                         <div
-                            class="bg-red-100 text-red-600 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+                            class="w-20 h-20 rounded-2xl bg-red-50 dark:bg-red-500/10 flex items-center justify-center text-red-500"
                         >
-                            <i class="pi pi-times text-4xl"></i>
+                            <i class="icon-[hugeicons--cancel-01] size-12"></i>
                         </div>
-                        <h2 class="text-2xl font-bold text-slate-800">
-                            Verification Failed
-                        </h2>
-                        <p class="text-slate-600 mt-4">
-                            We couldn't verify your checkout session. This might
-                            be because the payment is still being processed.
-                        </p>
-                        <p-message
-                            severity="warn"
-                            variant="outlined"
-                            styleClass="mt-6 w-full"
-                        >Don't worry, your subscription will be activated automatically once the payment is confirmed.</p-message>
-                        <div class="mt-8 flex flex-col gap-3">
-                            <button
-                                pButton
-                                pRipple
+                        <div class="space-y-2">
+                            <h2
+                                class="text-2xl font-bold text-surface-900 dark:text-surface-0"
+                            >
+                                Verification Failed
+                            </h2>
+                            <p
+                                class="text-surface-600 dark:text-surface-400 max-w-md mx-auto"
+                            >
+                                We couldn't verify your checkout session. This
+                                might be because the payment is still being
+                                processed by Stripe.
+                            </p>
+                        </div>
+
+                        <div
+                            class="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl p-4 flex items-start gap-3 text-left w-full max-w-md"
+                        >
+                            <i
+                                class="pi pi-info-circle text-amber-500 mt-0.5"
+                            ></i>
+                            <span
+                                class="text-amber-800 dark:text-amber-400 text-sm"
+                            >
+                                Don't worry, your subscription will activate
+                                automatically once the payment is confirmed.
+                            </span>
+                        </div>
+
+                        <div
+                            class="flex flex-col sm:flex-row gap-3 mt-4 w-full justify-center"
+                        >
+                            <p-button
                                 label="Try Again"
                                 icon="pi pi-refresh"
-                                (click)="verifySession()"
-                                class="p-button-lg w-full"
-                            ></button>
-                            <button
-                                pButton
-                                pRipple
-                                label="Go to Settings"
+                                (onClick)="verifySession()"
+                                styleClass="rounded-xl!"
+                            />
+                            <p-button
+                                label="Billing Settings"
                                 icon="pi pi-cog"
                                 [routerLink]="['/settings']"
                                 [queryParams]="{ tab: 'billing' }"
-                                class="p-button-text w-full"
-                            ></button>
+                                severity="secondary"
+                                [text]="true"
+                                styleClass="rounded-xl!"
+                            />
                         </div>
                     }
                 </div>
