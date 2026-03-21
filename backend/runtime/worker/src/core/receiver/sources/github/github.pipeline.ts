@@ -1,4 +1,5 @@
 import { logger, type SQLIngestEvent, Source, secretCrypto, unprefixId, prefixId } from '@kyrazo/shared';
+import { ProcessingStatus } from '@/types/events/event.types';
 import { githubValidator } from './github.validator';
 import { githubSignature } from './github.signature';
 import { githubTransformer } from './github.transformer';
@@ -20,6 +21,7 @@ export class GitHubPipeline {
 
     public async process(event: IReceivedEvent): Promise<void> {
         try {
+            event.processingStatus = ProcessingStatus.PROCESSED;
             // Check for application/x-www-form-urlencoded specific "payload" key
             if (event.body && event.body.payload && typeof event.body.payload === 'string') {
                 try {

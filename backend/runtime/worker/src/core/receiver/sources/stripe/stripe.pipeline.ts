@@ -1,4 +1,5 @@
 import { logger, type SQLIngestEvent, Source, secretCrypto, unprefixId, prefixId } from '@kyrazo/shared';
+import { ProcessingStatus } from '@/types/events/event.types';
 import { stripeValidator } from './stripe.validator';
 import { stripeSignature } from './stripe.signature';
 import type { IReceivedEvent } from '@/types/events/event.types';
@@ -19,6 +20,7 @@ export class StripePipeline {
 
     public async process(event: IReceivedEvent): Promise<void> {
         try {
+            event.processingStatus = ProcessingStatus.PROCESSED;
             if (!stripeValidator.validate(event)) {
                 logger.debug('[StripePipeline] Invalid event structure, skipping');
                 return;

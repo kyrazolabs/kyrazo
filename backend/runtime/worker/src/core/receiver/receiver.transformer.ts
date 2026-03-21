@@ -1,4 +1,5 @@
 import type { IReceivedEvent } from '@/types/events/event.types';
+import { ProcessingStatus } from '@/types/events/event.types';
 import { type SQLIngestEvent, secretCrypto, unprefixId } from '@kyrazo/shared';
 
 export class ReceiverTransformer {
@@ -48,7 +49,7 @@ export class ReceiverTransformer {
 
             verified: event.verified,
 
-            processing_status: event.processingStatus,
+            processing_status: event.processingStatus || ProcessingStatus.PROCESSED,
             processing_error: event.processingError ?? '',
 
             associated_event_id: event.associatedEventId ?? '',

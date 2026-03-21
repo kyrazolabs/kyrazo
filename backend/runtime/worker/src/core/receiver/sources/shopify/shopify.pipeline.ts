@@ -1,4 +1,5 @@
 import { logger, type SQLIngestEvent, Source, secretCrypto, unprefixId, prefixId } from '@kyrazo/shared';
+import { ProcessingStatus } from '@/types/events/event.types';
 import { shopifyValidator } from './shopify.validator';
 import { shopifySignature } from './shopify.signature';
 import { shopifyTransformer } from './shopify.transformer';
@@ -20,6 +21,7 @@ export class ShopifyPipeline {
 
     public async process(event: IReceivedEvent): Promise<void> {
         try {
+            event.processingStatus = ProcessingStatus.PROCESSED;
             if (!shopifyValidator.validate(event)) {
                 logger.debug('[ShopifyPipeline] Invalid event structure, skipping');
                 return;
