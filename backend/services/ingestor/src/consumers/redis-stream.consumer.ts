@@ -203,11 +203,14 @@ export class RedisStreamConsumer {
                     this.processingPromises.delete(activeWork);
                 }
             } catch (error: any) {
-                if (!this.running || error.message.includes('Connection is closed')) {
+                if (!this.running || error.message?.includes('Connection is closed')) {
                     // Expected error during shutdown
                     return;
                 }
-                logger.error(`Error in stream processing loop for ${streamName}:`, error);
+                logger.error(`Error in stream processing loop for ${streamName}: ${error.message}`, {
+                    stack: error.stack,
+                    command: error.command
+                });
                 await new Promise(resolve => setTimeout(resolve, 5000)); // Backoff on error
             }
 
