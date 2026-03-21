@@ -10,4 +10,4 @@ chown -R bun:bun "$LOG_DIR"
 chmod 775 "$LOG_DIR"
 
 # Drop down to the bun user and start the application
-exec su-exec bun bun run src/index.ts
+exec su-exec bun bun run start

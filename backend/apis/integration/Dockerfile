@@ -28,6 +28,9 @@ COPY apis/integration ./
 FROM oven/bun:${BUN_VERSION}-alpine AS runner
 WORKDIR /app
 
+# Install su-exec for dropping privileges from root
+RUN apk add --no-cache su-exec
+
 # Copy all installed dependencies
 COPY --from=builder /app/apis/integration/node_modules /app/apis/integration/node_modules
 
@@ -47,8 +50,9 @@ COPY --from=builder /app/apis/integration/src /app/apis/integration/src
 # Set working directory to integration package
 WORKDIR /app/apis/integration
 
-# Pre-create logs directory
+# Pre-create logs & certs directory
 RUN mkdir -p /app/apis/integration/logs && chown -R bun:bun /app/apis/integration/logs
+RUN mkdir -p /data/nats/certs && chown -R bun:bun /data/nats/certs
 
 # Copy and setup entrypoint script
 COPY apis/integration/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
@@ -56,9 +60,6 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Ensure everything is owned by the bun user before switching
 RUN chown -R bun:bun /app
-
-# Run as non-root user for security
-USER bun
 
 # Expose the application port
 EXPOSE ${PORT}
@@ -68,4 +69,4 @@ HEALTHCHECK  --start-period=20s --interval=30s --timeout=3s --retries=3 \
     CMD wget -qO- http://127.0.0.1:${PORT}/v1/health || exit 1
 
 # Start the application
-CMD ["bun", "run", "src/index.ts"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

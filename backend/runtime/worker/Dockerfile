@@ -57,8 +57,10 @@ COPY --from=builder /app/runtime/worker/src /app/runtime/worker/src
 # Set working directory to worker package so "bun run start" works
 WORKDIR /app/runtime/worker
 
-# Pre-create logs directory
+# Pre-create logs&certs directory
+RUN mkdir -p /app/runtime/worker/logs && chown -R bun:bun /app/runtime/worker/logs
 RUN mkdir -p /data/nats/certs && chown -R bun:bun /data/nats/certs
+
 
 # Copy and setup entrypoint script
 COPY runtime/worker/entrypoint.sh /usr/local/bin/entrypoint.sh

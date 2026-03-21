@@ -50,6 +50,7 @@ services:
       - APP_NAME=${APP_NAME}
       - APP_VERSION=${APP_VERSION}
     volumes:
+      - ./logs:/app/runtime/worker/logs
       - /data/nats/certs:/data/nats/certs:ro
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/v1/health"]
