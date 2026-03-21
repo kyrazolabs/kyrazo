@@ -207,11 +207,36 @@ export class RedisStreamConsumer {
                     // Expected error during shutdown
                     return;
                 }
-                logger.error(`Error in stream processing loop for ${streamName}: ${error.message}`, {
-                    stack: error.stack,
-                    command: error.command
-                });
-                await new Promise(resolve => setTimeout(resolve, 5000)); // Backoff on error
+
+                // If the stream or consumer group no longer exists (e.g. Redis was flushed/restarted),
+                // re-create the group and continue — the next iteration will pick up new messages.
+                if (error.message?.includes('NOGROUP')) {
+                    logger.warn(
+                        `Consumer group missing for ${streamName}, recreating...`
+                    );
+                    try {
+                        await this.redis.xgroup(
+                            'CREATE',
+                            streamName,
+                            this.consumerGroup,
+                            '$', // Start from newest messages (don't replay old ones)
+                            'MKSTREAM'
+                        );
+                        logger.info(`Recreated consumer group for ${streamName}`);
+                    } catch (groupErr: any) {
+                        if (!groupErr.message?.includes('BUSYGROUP')) {
+                            logger.error(`Failed to recreate consumer group for ${streamName}:`, groupErr);
+                        }
+                    }
+                    // Short backoff before retrying
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                } else {
+                    logger.error(`Error in stream processing loop for ${streamName}: ${error.message}`, {
+                        stack: error.stack,
+                        command: error.command
+                    });
+                    await new Promise(resolve => setTimeout(resolve, 5000)); // Backoff on error
+                }
             }
 
             // Continue loop
