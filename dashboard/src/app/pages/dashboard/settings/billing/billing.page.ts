@@ -443,7 +443,7 @@ export class BillingSettingsPage implements OnInit {
             .pipe(finalize(() => (this.isRedirectingToPortal = false)))
             .subscribe({
                 next: (res) => {
-                    if (res.data?.url) window.open(res.data.url, '_blank');
+                    if (res.data?.url) window.location.href = res.data.url;
                 },
                 error: (err) => {
                     this.sentry.captureException(err);
@@ -480,10 +480,8 @@ export class BillingSettingsPage implements OnInit {
                     next: (res) => {
                         const data = res.data as any;
                         if (data?.checkoutUrl || data?.hostedInvoiceUrl)
-                            window.open(
-                                data.checkoutUrl || data.hostedInvoiceUrl,
-                                '_blank',
-                            );
+                            window.location.href =
+                                data.checkoutUrl || data.hostedInvoiceUrl;
                         else {
                             this.messageService.add({
                                 severity: 'success',
@@ -543,10 +541,8 @@ export class BillingSettingsPage implements OnInit {
                 next: (res) => {
                     const data = res.data as any;
                     if (data?.paymentUrl || data?.hostedInvoiceUrl) {
-                        window.open(
-                            data.paymentUrl || data.hostedInvoiceUrl,
-                            '_blank',
-                        );
+                        window.location.href =
+                            data.paymentUrl || data.hostedInvoiceUrl;
                     } else {
                         this.messageService.add({
                             severity: 'success',
