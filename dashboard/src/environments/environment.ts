@@ -98,6 +98,7 @@ export const environment = {
         cancel: (id: string) =>
             `https://api.kyrazo.com/dashboard/v1/subscriptions/${id}/cancel`,
         invoices: `https://api.kyrazo.com/dashboard/v1/subscriptions/invoices`,
+        verifyCheckout: `https://api.kyrazo.com/dashboard/v1/subscriptions/checkout/verify`,
     },
     payment: {
         subscribe: `https://api.kyrazo.com/dashboard/v1/payments/subscribe`,

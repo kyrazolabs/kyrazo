@@ -130,6 +130,15 @@ export class SettingService {
             .pipe(catchError(this.handleError));
     }
 
+    verifyCheckoutSession(sessionId: string): Observable<ApiResponse<any>> {
+        const params = new HttpParams().set('session_id', sessionId);
+        return this.http
+            .get<ApiResponse<any>>(environment.subscription.verifyCheckout, {
+                params,
+            })
+            .pipe(catchError(this.handleError));
+    }
+
     private handleError(error: HttpErrorResponse): Observable<never> {
         console.error('SettingService Error:', error);
         return throwError(() => error);
