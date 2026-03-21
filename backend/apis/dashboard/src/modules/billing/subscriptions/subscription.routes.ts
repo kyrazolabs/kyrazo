@@ -148,4 +148,10 @@ subscription.post(
     SubscriptionController.cancelSubscription
 );
 
+subscription.get(
+    '/checkout/verify',
+    subscriptionReadRateLimiter,
+    SubscriptionController.verifyCheckoutSession
+);
+
 export default subscription;
