@@ -142,7 +142,7 @@ export class AnalyticsRepo {
                 FROM analytics_dispatch_day
                 WHERE bucket_day >= today() - INTERVAL {days:Int32} DAY
                   AND namespace_id = {namespaceId:String}
-                GROUP BY day
+                GROUP BY bucket_day
                 ORDER BY day DESC
             `;
 
@@ -269,7 +269,7 @@ export class AnalyticsRepo {
                 WHERE bucket_day >= today() - INTERVAL {days:Int32} DAY
                   AND namespace_id = {namespaceId:String}
                   AND target_id = {targetId:String}
-                GROUP BY day
+                GROUP BY bucket_day
                 ORDER BY day DESC
             `;
 
@@ -383,7 +383,7 @@ export class AnalyticsRepo {
                 FROM analytics_ingest_day
                 WHERE bucket_day >= today() - INTERVAL {days:Int32} DAY
                   AND namespace_id = {namespaceId:String}
-                GROUP BY day
+                GROUP BY bucket_day
                 ORDER BY day DESC
             `;
 
@@ -394,7 +394,7 @@ export class AnalyticsRepo {
                 FROM analytics_ingest_day
                 WHERE bucket_day >= today() - INTERVAL {days:Int32} DAY
                   AND namespace_id = {namespaceId:String}
-                GROUP BY source
+                GROUP BY source_id
                 ORDER BY total DESC
                 LIMIT 10
             `;
@@ -417,7 +417,7 @@ export class AnalyticsRepo {
                 FROM analytics_ingest_day
                 WHERE bucket_day >= today() - INTERVAL {days:Int32} DAY
                   AND namespace_id = {namespaceId:String}
-                GROUP BY day
+                GROUP BY bucket_day
                 ORDER BY day DESC
             `;
 
