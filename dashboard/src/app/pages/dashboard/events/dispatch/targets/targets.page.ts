@@ -29,6 +29,7 @@ import { TargetService, ITarget } from '@core/services/target.service';
 import { DialogService } from '@shared/services/dialog.service';
 import { SentryService } from '@core/3rd-party/sentry';
 import { PostHogService } from '@core/3rd-party/posthog';
+import { ApiResponse } from '@models/index';
 import { CopyIdComponent } from '@shared/components/copy-id/copy-id.component';
 
 @Component({
@@ -87,7 +88,14 @@ export class TargetsPage implements OnInit {
     activeFilter: boolean | undefined = undefined; // undefined = all, true = enabled, false = disabled
 
     ngOnInit() {
-        this.loadTargets();
+        // Initial load from resolver
+        const resolvedData = this.route.snapshot.data['targets'] as ApiResponse<ITarget[]>;
+        if (resolvedData) {
+            this.targets = resolvedData.data || [];
+            this.totalRecords = (resolvedData as any).pagination?.total || this.targets.length;
+        } else {
+            this.loadTargets();
+        }
 
         this.dialogService.targetSaved$.subscribe(() => {
             this.loadTargets(this.currentPage, this.rows);
