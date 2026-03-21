@@ -50,6 +50,15 @@ COPY --from=builder /app/services/ingestor/drizzle /app/services/ingestor/drizzl
 # Set working directory to ingestor package
 WORKDIR /app/services/ingestor
 
+# Pre-create logs&certs directory
+RUN mkdir -p /app/services/ingestor/logs && chown -R bun:bun /app/services/ingestor/logs
+RUN mkdir -p /data/nats/certs && chown -R bun:bun /data/nats/certs
+
+
+# Copy and setup entrypoint script
+COPY services/ingestor/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 # Ensure everything is owned by the bun user before switching
 RUN chown -R bun:bun /app
 
@@ -64,4 +73,4 @@ HEALTHCHECK --start-period=20s --interval=30s --timeout=3s --retries=3 \
     CMD wget -qO- http://localhost:${PORT}/v1/health || exit 1
 
 # Start the application
-CMD ["bun", "run", "start"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
