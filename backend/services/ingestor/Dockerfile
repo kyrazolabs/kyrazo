@@ -55,7 +55,6 @@ WORKDIR /app/services/ingestor
 
 # Pre-create logs&certs directory
 RUN mkdir -p /app/services/ingestor/logs && chown -R bun:bun /app/services/ingestor/logs
-RUN mkdir -p /data/nats/certs && chown -R bun:bun /data/nats/certs
 
 
 # Copy and setup entrypoint script
