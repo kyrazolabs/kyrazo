@@ -1,5 +1,5 @@
 import { AppContext } from '@/core/middlewares/auth.middleware';
-import { IErrorResponse, IngestRepo, logger, secretCrypto, transformWithId } from '@kyrazo/shared';
+import { IErrorResponse, IngestRepo, logger, secretCrypto, transformWithId, unprefixId } from '@kyrazo/shared';
 import { GetIngestsBySourceIdInput, IFilterIngest } from './ingest.schema';
 import { IGetIngestEventResponse, IGetIngestEventsResponse } from './ingest.type';
 
@@ -199,7 +199,8 @@ export class IngestController {
             const [iv, encrypted] = field.split(':');
             if (!iv || !encrypted) return field;
             try {
-                return secretCrypto.decrypt(encrypted, iv, namespaceId);
+                const salt = unprefixId(namespaceId) || namespaceId;
+                return secretCrypto.decrypt(encrypted, iv, salt);
             } catch (e) {
                 return field;
             }

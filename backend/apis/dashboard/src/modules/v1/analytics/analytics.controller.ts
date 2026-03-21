@@ -161,7 +161,7 @@ export class AnalyticsController {
                 {
                     success: false,
                     error: {
-                        code: 'GET_PRECEST_STATS_FAILED',
+                        code: 'GET_INGEST_STATS_FAILED',
                         message: 'Failed to get ingest statistics',
                         requestId: c.get('requestId'),
                     },

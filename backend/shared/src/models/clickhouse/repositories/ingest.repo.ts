@@ -349,13 +349,13 @@ export class IngestRepo {
 
             const topSourcesQuery = `
                 SELECT
-                    source,
+                    source_id as source,
                     COUNT() AS total
                 FROM ingest_events
                 WHERE toDate(received_at) >= today() - INTERVAL {days:Int32} days
                     AND workspace_id = {workspaceId:String}
                     AND namespace_id = {namespaceId:String}
-                GROUP BY source
+                GROUP BY source_id
                 ORDER BY total DESC
                 LIMIT 10;
             `;
