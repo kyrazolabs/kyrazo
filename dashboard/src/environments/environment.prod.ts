@@ -81,6 +81,7 @@ export const environment = {
             `${baseUrl}/v1/subscriptions/${id}/change-plan`,
         cancel: (id: string) => `${baseUrl}/v1/subscriptions/${id}/cancel`,
         invoices: `${baseUrl}/v1/subscriptions/invoices`,
+        verifyCheckout: `${baseUrl}/dashboard/v1/subscriptions/checkout/verify`,
     },
     payment: {
         subscribe: `${baseUrl}/v1/payments/subscribe`,

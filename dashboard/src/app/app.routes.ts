@@ -85,6 +85,22 @@ export const routes: Routes = [
                         (p) => p.settingsRoutes,
                     ),
             },
+            {
+                path: 'billing/success',
+                loadComponent: () =>
+                    import(
+                        '@pages/dashboard/billing/success/billing-success.page'
+                    ).then((m) => m.BillingSuccessPage),
+                data: { title: 'Billing Success', animation: 'billing-success' },
+            },
+            {
+                path: 'billing/cancel',
+                loadComponent: () =>
+                    import(
+                        '@pages/dashboard/billing/cancel/billing-cancel.page'
+                    ).then((m) => m.BillingCancelPage),
+                data: { title: 'Billing Cancel', animation: 'billing-cancel' },
+            },
         ],
     },
     {
