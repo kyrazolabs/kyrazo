@@ -1,6 +1,6 @@
 import { AppContext } from '@/core/middlewares/auth.middleware';
 
-import { Key, IErrorResponse, logger, unprefixId, Subscription } from '@kyrazo/shared';
+import { Key, IErrorResponse, logger, unprefixId, Subscription, transformWithId } from '@kyrazo/shared';
 import { keyCrypto, secretCrypto } from '@kyrazo/shared';
 import { ICheckScopes, ICreateKey, IGetKey, IRevokeKey } from './key.schema';
 
@@ -70,7 +70,7 @@ export class KeyController {
                 {
                     success: true,
                     data: {
-                        _id: saved._id,
+                        id: `key_${saved._id.toString()}`,
                         name: saved.name,
                         lastFour: saved.lastFour,
                         scopes: saved.scopes,
@@ -137,7 +137,7 @@ export class KeyController {
                         limit: perPage,
                         pages: Math.ceil(total / perPage),
                     },
-                    data: keys,
+                    data: transformWithId(keys, 'apiKey'),
                 },
                 200
             );
@@ -186,7 +186,7 @@ export class KeyController {
                     success: true,
                     message: 'Check Scopes has been checked Successfully',
                     data: {
-                        _id: data?._id,
+                        id: data ? `key_${data._id.toString()}` : undefined,
                         scopes: data?.scopes,
                     },
                 },
