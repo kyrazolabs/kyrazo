@@ -84,26 +84,6 @@ export const ChangePasswordSchema = z.object({
         ),
 });
 
-export const UpdateProfileSchema = RegisterSchema.omit({
-    email: true,
-    password: true,
-}).partial();
-
-export const UpdatePreferencesSchema = z
-    .object({
-        notification: z.object({
-            sourceFailures: z.boolean().optional(),
-            dailySummary: z.boolean().optional(),
-            securityAlerts: z.boolean().optional(),
-            weeklyReports: z.boolean().optional(),
-            preferences: z.object({
-                emailFrequency: z.string().min(1, 'Email frequency is required'),
-                quietHours: z.string().min(1, 'Quiet hours is required').optional(),
-            }),
-        }),
-    })
-    .partial();
-
 export const Setup2FASchema = z.object({
     method: z.enum(['email', 'app']),
 });
@@ -156,9 +136,6 @@ export type ResetPasswordInput = z.infer<typeof ResetPasswordSchema>;
 export type ChangePasswordInput = z.infer<typeof ChangePasswordSchema>;
 
 export type VerifyEmailInput = z.infer<typeof VerifyEmailSchema>;
-
-export type UpdateProfileInput = z.infer<typeof UpdateProfileSchema>;
-export type UpdatePreferencesInput = z.infer<typeof UpdatePreferencesSchema>;
 
 export type Setup2FAInput = z.infer<typeof Setup2FASchema>;
 export type Verify2FASetupInput = z.infer<typeof Verify2FASetupSchema>;

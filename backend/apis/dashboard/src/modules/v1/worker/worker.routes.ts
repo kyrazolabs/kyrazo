@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { workerController } from './worker.controller';
 import { authenticate } from '@/core/middlewares/auth.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
-import { workerReadRateLimiter } from './worker.rate-limiter';
+import { workerReadRateLimiter } from './worker.ratelimiter';
 
 const worker = new Hono();
 

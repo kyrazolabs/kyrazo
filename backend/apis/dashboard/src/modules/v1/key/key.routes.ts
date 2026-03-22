@@ -6,7 +6,7 @@ import { requireRecentOTP } from '@/core/middlewares/otp.middleware';
 
 import { checkScopeSchema, createAPIKeySchema, getKeysSchema, revokeKeyById } from './key.schema';
 import { KeyController } from '@/modules/v1/key/key.controller';
-import { keyManagementRateLimiter } from './key.rate-limiter';
+import { keyManagementRateLimiter } from './key.ratelimiter';
 
 const key = new Hono();
 

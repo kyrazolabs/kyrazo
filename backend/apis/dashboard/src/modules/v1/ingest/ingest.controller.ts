@@ -1,5 +1,12 @@
 import { AppContext } from '@/core/middlewares/auth.middleware';
-import { IErrorResponse, IngestRepo, logger, secretCrypto, transformWithId, unprefixId } from '@kyrazo/shared';
+import {
+    IErrorResponse,
+    IngestRepo,
+    logger,
+    secretCrypto,
+    transformWithId,
+    unprefixId,
+} from '@kyrazo/shared';
 import { GetIngestsBySourceIdInput, IFilterIngest } from './ingest.schema';
 import { IGetIngestEventResponse, IGetIngestEventsResponse } from './ingest.type';
 
@@ -157,7 +164,7 @@ export class IngestController {
                 );
             }
             // @ts-ignore
-            const { eventId } = c.req.valid('param');
+            const { eventId }: GetIngestsByEventIdInput = c.req.valid('param');
 
             const result = await IngestRepo.getIngestEventById(
                 eventId,

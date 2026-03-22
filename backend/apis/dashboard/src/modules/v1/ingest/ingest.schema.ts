@@ -2,7 +2,8 @@ import z from 'zod';
 
 const objectIdSchema = z
     .string()
-    .regex(/^[0-9a-fA-F]{24}$/, 'Invalid ID format');
+    .regex(/^([a-z]{2}_)?[0-9a-fA-F]{24}$/, 'Invalid ID format')
+    .transform((val: string) => (val.includes('_') ? val.split('_')[1] : val));
 
 export const GetIngestsEventsBySourceSchema = z.object({
     q: z
@@ -29,10 +30,10 @@ export const GetIngestsBySourceIdSchema = z.object({
     sourceId: objectIdSchema,
 });
 
+export const GetIngestsByEventIdSchema = z.object({
+    eventId: objectIdSchema,
+});
 export type IFilterIngest = z.infer<typeof GetIngestEventsSchema>;
-export type GetIngestsEventsBySourceInput = z.infer<
-    typeof GetIngestsEventsBySourceSchema
->;
-export type GetIngestsBySourceIdInput = z.infer<
-    typeof GetIngestsBySourceIdSchema
->;
+export type GetIngestsEventsBySourceInput = z.infer<typeof GetIngestsEventsBySourceSchema>;
+export type GetIngestsBySourceIdInput = z.infer<typeof GetIngestsBySourceIdSchema>;
+export type GetIngestsByEventIdInput = z.infer<typeof GetIngestsByEventIdSchema>;

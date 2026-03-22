@@ -1,18 +1,19 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { NamespaceHeadersSchema } from '@/core/utils/libs/zod';
-import { AppContext, authenticate } from '@/core/middlewares/auth.middleware';
+import { authenticate } from '@/core/middlewares/auth.middleware';
 import { sentryMiddleware } from '@/core/middlewares/sentry.middleware';
-import {
-    createRateLimitMiddleware,
-    createSlidingWindowLimiter,
-} from '@/core/middlewares/rate-limiter.middleware';
-import { config } from '@/configs';
+
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
 import { requireNamespaceAccess } from '@/core/middlewares/namespace.middleware';
-import { GetIngestEventsSchema, GetIngestsEventsBySourceSchema } from './ingest.schema';
+import {
+    GetIngestEventsSchema,
+    GetIngestsByEventIdSchema,
+    GetIngestsEventsBySourceSchema,
+} from './ingest.schema';
 import z from 'zod';
 import { IngestController } from './ingest.controller';
+import { ingestRateLimiter } from './ingest.ratelimiter';
 
 const ingest = new Hono();
 
@@ -32,20 +33,6 @@ const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema, (r
         );
     }
 });
-
-// Lazy wrapper for ingest routes rate limiter (user-based, normal level for read operations)
-const ingestRateLimiter = async (c: AppContext, next: () => Promise<void>) => {
-    const limiter = createRateLimitMiddleware(
-        createSlidingWindowLimiter({
-            points: config.security.rateLimiter.protected.normal.points,
-            duration: config.security.rateLimiter.protected.normal.duration,
-            blockDuration: config.security.rateLimiter.protected.normal.blockDuration,
-        }),
-        c => config.security.rateLimiter.protected.normal.keyPrefix((c as any).user.userId),
-        'Too many ingest requests'
-    );
-    return limiter(c, next);
-};
 
 ingest.use('*', authenticate);
 ingest.use('*', sentryMiddleware);
@@ -122,7 +109,7 @@ ingest.get(
 ingest.get(
     '/events/:eventId',
     ingestRateLimiter,
-    zValidator('param', z.object({ eventId: z.string().regex(/^evt_[0-9]+$/) }), (result, c) => {
+    zValidator('param', GetIngestsByEventIdSchema, (result, c) => {
         if (!result.success) {
             return c.json(
                 {
