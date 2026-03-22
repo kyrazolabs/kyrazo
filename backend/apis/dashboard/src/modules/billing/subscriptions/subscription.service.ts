@@ -257,51 +257,22 @@ export class SubscriptionService {
         }
 
         const updateData: Partial<ISubscription> = {
-            status: cancelData.cancelAtPeriodEnd ? 'active' : 'canceled',
+            status: 'active', // Keep active until period ends
             canceledAt: new Date(),
-        };
-
-        if (cancelData.cancelAtPeriodEnd) {
-            // Schedule cancellation at end of billing period — no refund involved
-            if (subscription.stripeSubscriptionId) {
-                await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
-                    cancel_at_period_end: true,
-                });
-            }
-            updateData.metadata = {
+            updatedAt: new Date(),
+            metadata: {
                 ...subscription.metadata,
                 cancelAtPeriodEnd: true,
                 cancelReason: cancelData.reason,
-            };
-        } else {
-            // Immediate cancellation — enforce one-time refund policy
-            const hasRefundHistory = await subscriptionRepository.hasWorkspaceEverReceivedRefund(
-                subscription.workspaceId.toString()
-            );
+            },
+        };
 
-            if (hasRefundHistory) {
-                // FALLBACK: If refund already used, gracefully fallback to cancel at period end
-                if (subscription.stripeSubscriptionId) {
-                    await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
-                        cancel_at_period_end: true,
-                    });
-                }
-                updateData.status = 'active'; // Stay active until period ends
-                updateData.metadata = {
-                    ...subscription.metadata,
-                    cancelAtPeriodEnd: true,
-                    cancelReason: cancelData.reason,
-                    refundSkipped: true, // Flag for frontend to notice the user
-                };
-            } else {
-                // Issue Stripe refund and cancel the subscription
-                if (subscription.stripeSubscriptionId) {
-                    await stripe.subscriptions.cancel(subscription.stripeSubscriptionId);
-                }
-
-                // Stamp refundIssuedAt to permanently prevent future refunds for this workspace
-                updateData.refundIssuedAt = new Date();
-            }
+        // All cancellations are now forced to be at period end to prevent abuse.
+        // Refunds must be requested manually via support.
+        if (subscription.stripeSubscriptionId) {
+            await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+                cancel_at_period_end: true,
+            });
         }
 
         const updatedSubscription = await subscriptionRepository.updateById(
