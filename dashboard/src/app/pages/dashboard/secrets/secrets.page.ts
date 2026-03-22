@@ -269,10 +269,10 @@ export class SecretsPage implements OnInit {
             icon: 'pi pi-exclamation-triangle',
             acceptButtonStyleClass: 'p-button-danger',
             accept: () => {
-                this.kes.revoke(secret._id).subscribe({
+                this.kes.revoke(secret.id).subscribe({
                     next: () => {
                         this.secrets = this.secrets.filter(
-                            (s) => s._id !== secret._id,
+                            (s) => s.id !== secret.id,
                         );
                         this.messageService.add({
                             severity: 'success',

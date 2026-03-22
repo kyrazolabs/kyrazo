@@ -1,5 +1,5 @@
 export interface ISecret {
-    _id: string;
+    id: string;
     kid: string;
     key?: string; // Only returned on create
     name: string;
