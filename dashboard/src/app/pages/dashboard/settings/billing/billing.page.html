@@ -1,15 +1,4 @@
 <div class="space-y-6">
-    @if (isFirstMonth) {
-        <p-message severity="info" styleClass="w-full justify-start rounded-xl! mb-6!">
-                <div class="flex items-center gap-2 ml-2">
-                    <i class="pi pi-info-circle mr-1"></i>
-                    <span>Using Kyrazo for the first month? You're eligible for a refund! just </span>
-                    <button type="button" class="font-bold underline cursor-pointer bg-transparent border-none p-0 text-inherit hover:opacity-80 transition-opacity" (click)="openSupportDialog()">contact our support team</button>
-                    <span> for first-month refund!</span>
-                </div>
-        </p-message>
-    }
-
     <div class="grid grid-cols-1 gap-6">
         <!-- Usage & Billing History -->
         <div class="space-y-6">
@@ -113,6 +102,21 @@
                     billing cycle.
                 </p>
             </div>
+
+            @if (isFirstMonth) {
+                <p-message severity="info" styleClass="w-full justify-start rounded-xl! border-blue-100! bg-blue-50/50!">
+                    <div class="flex items-center gap-2 ml-2 py-1">
+                        <i class="pi pi-info-circle text-blue-500"></i>
+                        <span class="text-sm text-blue-700">
+                            Since this is your first month, you may be eligible for a <strong>refund.</strong>
+                            To request a refund, please
+                            <button type="button" class="font-bold underline cursor-pointer bg-transparent border-none p-0 text-inherit hover:opacity-80 transition-opacity" (click)="openSupportDialog()">
+                                contact our support team.
+                            </button>
+                        </span>
+                    </div>
+                </p-message>
+            }
             <div class="space-y-2 text-surface-600 dark:text-surface-400 text-sm">
                 <p>After cancellation:</p>
                 <div class="flex items-start gap-2">
@@ -169,10 +173,16 @@
                 </div>
             </div>
             <h4 class="text-2xl font-bold text-surface-900 dark:text-surface-0">Final confirmation</h4>
-            <p class="text-surface-600 dark:text-surface-400 max-w-xs mx-auto">
-                Your subscription will remain active until <strong>{{formatDate(nextBillingDate)}}</strong>.
-                After that, your workspace will be downgraded to the Free plan.
-            </p>
+            <div class="space-y-4">
+                <p class="text-surface-600 dark:text-surface-400 max-w-xs mx-auto">
+                    Your subscription will remain active until <strong>{{formatDate(nextBillingDate)}}</strong>.
+                    After that, your workspace will be downgraded to the Free plan.
+                </p>
+                <p class="text-xs text-surface-500 italic max-w-xs mx-auto">
+                    Note: Cancellations via the dashboard take effect at the end of the current billing cycle.
+                    For refund inquiries, please contact support.
+                </p>
+            </div>
         </div>
         }
 

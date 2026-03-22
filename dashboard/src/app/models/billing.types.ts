@@ -82,6 +82,7 @@ export interface ISubscription {
     currentPeriodEnd: string;
     plan?: IPlan;
     planSnapshot?: IPlanSnapshot;
+    refundIssuedAt?: string | Date;
     createdAt: string;
     updatedAt: string;
     isVirtual?: boolean;

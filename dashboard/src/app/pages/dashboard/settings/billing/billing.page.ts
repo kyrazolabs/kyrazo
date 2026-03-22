@@ -86,7 +86,6 @@ export class BillingSettingsPage implements OnInit {
     // Premium UI Signals
     hasInteracted = signal(false);
     shakeToggle = signal(false);
-    lightningOffset = signal(0);
     plans = signal<PricingPlan[]>([]);
 
     get isFirstMonth(): boolean {
