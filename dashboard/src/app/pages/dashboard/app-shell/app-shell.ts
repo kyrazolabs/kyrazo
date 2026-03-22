@@ -29,6 +29,7 @@ import { TwofaSetupDialogComponent } from '@shared/components/twofa-setup-dialog
 import { InviteMemberFormComponent } from '@shared/components/invite-member-form/invite-member-form.component';
 import { NamespaceFormComponent } from '@shared/components/namespace-form/namespace-form.component';
 import { SupportDialogComponent } from '@shared/components/support-dialog/support-dialog.component';
+import { AvatarSelectionDialogComponent } from '@shared/components/avatar-selection-dialog/avatar-selection-dialog.component';
 
 @Component({
     selector: 'app-shell',
@@ -47,6 +48,7 @@ import { SupportDialogComponent } from '@shared/components/support-dialog/suppor
         InviteMemberFormComponent,
         NamespaceFormComponent,
         SupportDialogComponent,
+        AvatarSelectionDialogComponent,
     ],
     templateUrl: './app-shell.html',
     styleUrl: './app-shell.scss',
@@ -106,6 +108,10 @@ export class AppShell implements OnInit, AfterViewInit {
     // Support Dialog
     supportDialogVisible = false;
 
+    // Avatar Dialog
+    avatarDialogVisible = false;
+    currentAvatar: string | null = null;
+
     constructor(private dialogService: DialogService) {}
 
     childRoute(outlet: RouterOutlet) {
@@ -115,7 +121,7 @@ export class AppShell implements OnInit, AfterViewInit {
         this.router.events
             .pipe(
                 filter((event) => event instanceof NavigationEnd),
-                takeUntilDestroyed(this.destroyRef)
+                takeUntilDestroyed(this.destroyRef),
             )
             .subscribe(() => {
                 this.footerAnimationKey = this.router.url;
@@ -197,6 +203,14 @@ export class AppShell implements OnInit, AfterViewInit {
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe((state) => {
                 this.supportDialogVisible = state.visible;
+            });
+
+        // Listen for Avatar Dialog State
+        this.dialogService.avatarDialogState$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe((state) => {
+                this.avatarDialogVisible = state.visible;
+                this.currentAvatar = state.currentAvatar;
             });
     }
 
@@ -287,5 +301,24 @@ export class AppShell implements OnInit, AfterViewInit {
 
     onSupportDialogHide() {
         this.dialogService.closeSupportDialog();
+    }
+
+    onAvatarSelected(avatar: any) {
+        console.log('AppShell: avatar selected', avatar, typeof avatar);
+        if (typeof avatar === 'string') {
+            this.dialogService.notifyAvatarSelected(avatar);
+        } else if (avatar && avatar.target && avatar.target.value) {
+            this.dialogService.notifyAvatarSelected(avatar.target.value);
+        } else {
+            console.warn(
+                'AppShell: unexpected avatar selection payload',
+                avatar,
+            );
+        }
+        this.dialogService.closeAvatarDialog();
+    }
+
+    onAvatarDialogHide() {
+        this.dialogService.closeAvatarDialog();
     }
 }

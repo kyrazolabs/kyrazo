@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, catchError, tap, throwError } from 'rxjs';
 
@@ -32,6 +32,23 @@ export class AuthService {
     private readonly http = inject(HttpClient);
     private readonly storage = inject(StorageService);
     private readonly posthog = inject(PostHogService);
+    
+    currentUser = signal<any>(null);
+
+    constructor() {
+        this.initializeUserFromStorage();
+    }
+
+    private initializeUserFromStorage() {
+        if (this.storage.hasItem('user_id')) {
+            this.currentUser.set({
+                id: this.storage.getItem('user_id'),
+                avatar: this.storage.getItem('avatar'),
+                workspaceId: this.storage.getItem('workspace'),
+                fullName: this.storage.getItem('user_name'),
+            });
+        }
+    }
 
     login(credentials: LoginRequest): Observable<LoginResponse> {
         return this.http
@@ -123,6 +140,7 @@ export class AuthService {
         this.storage.removeItem('access_token');
         this.storage.removeItem('refresh_token');
         this.storage.removeItem('user_id');
+        this.currentUser.set(null);
         this.posthog.reset();
     }
 
@@ -184,15 +202,27 @@ export class AuthService {
 
         const { tokens, user } = response.data;
         const { access, refresh } = tokens;
-        const { workspaceId, avatar, id, email, firstName, lastName } = user;
-        const fullName = `${firstName} ${lastName}`.trim();
+        this.updateUserLocal(user);
 
         this.storage.setItem('access_token', access);
         this.storage.setItem('refresh_token', refresh);
-        this.storage.setItem('workspace', workspaceId);
-        this.storage.setItem('avatar', avatar);
-        this.storage.setItem('user_id', id);
-        this.storage.setItem('user_name', fullName);
+    }
+
+    updateUserLocal(user: any): void {
+        const { workspaceId, avatar, id, email, firstName, lastName } = user;
+        const fullName = `${firstName} ${lastName}`.trim();
+
+        if (workspaceId) this.storage.setItem('workspace', workspaceId);
+        if (avatar) this.storage.setItem('avatar', avatar);
+        if (id) this.storage.setItem('user_id', id);
+        if (fullName) this.storage.setItem('user_name', fullName);
+
+        console.log('AuthService: updating user local with:', user);
+        this.currentUser.set({
+            ...user,
+            fullName,
+        });
+        console.log('AuthService: currentUser signal set to:', this.currentUser());
 
         this.posthog.identify(id, {
             email,

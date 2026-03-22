@@ -4,52 +4,73 @@
         <!-- Basic Information -->
         <p-card header="Basic Information"
             class="card-panel">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- First Name -->
-                <div class="flex flex-col gap-2">
-                    <label class="font-semibold text-surface-900 dark:text-surface-0">First Name</label>
-                    <input pInputText type="text" formControlName="firstName" placeholder="Enter your first name"
-                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
-                        [class.border-red-500]="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched" />
-                    @if (profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched) {
-                    <small class="text-red-500 text-sm">
-                        First name is required and must be at least 2 characters
-                    </small>
-                    }
+             <div class="flex flex-col md:flex-row gap-8">
+                <!-- Avatar Section -->
+                <div class="flex flex-col items-center gap-4 w-32 h-32 aspect-square!">
+                    <div class="relative group">
+                        <img [src]="getAvatarUrl(profileForm.get('avatar')?.value)"
+                            alt="Profile Avatar"
+                            class="rounded-full object-cover border-2 border-primary" />
+                        <button type="button"
+                            (click)="showAvatarDialog()"
+                            pTooltip="Change Avatar"
+                            tooltipPosition="top"
+                            class="absolute bottom-0 right-0 w-8 h-8 bg-primary text-white rounded-xl flex items-center justify-center click-effect">
+                            <i class="pi pi-pencil"></i>
+                        </button>
+                    </div>
+                    <span class="font-semibold text-surface-900 dark:text-surface-0">
+                        Profile Avatar
+                    </span>
                 </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
 
-                <!-- Last Name -->
-                <div class="flex flex-col gap-2">
-                    <label class="font-semibold text-surface-900 dark:text-surface-0">Last Name</label>
-                    <input pInputText type="text" formControlName="lastName" placeholder="Enter your last name"
-                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
-                        [class.border-red-500]="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched" />
-                    @if (profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched) {
-                    <small class="text-red-500 text-sm">
-                        Last name is required and at least 2 characters
-                    </small>
-                    }
-                </div>
+                    <!-- First Name -->
+                    <div class="flex flex-col gap-2">
+                        <label class="font-semibold text-surface-900 dark:text-surface-0">First Name</label>
+                        <input pInputText type="text" formControlName="firstName" placeholder="Enter your first name"
+                            class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
+                            [class.border-red-500]="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched" />
+                        @if (profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched) {
+                        <small class="text-red-500 text-sm">
+                            First name is required and must be at least 2 characters
+                        </small>
+                        }
+                    </div>
 
-                <!-- Email Address -->
-                <div class="flex flex-col gap-2">
-                    <label class="font-semibold text-surface-900 dark:text-surface-0">Email Address</label>
-                    <input pInputText type="email" formControlName="email" placeholder="Enter your email address"
-                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
-                        [class.border-red-500]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched" />
-                    @if (profileForm.get('email')?.invalid && profileForm.get('email')?.touched) {
-                    <small class="text-red-500 text-sm">
-                        Please enter a valid email address
-                    </small>
-                    }
-                </div>
+                    <!-- Last Name -->
+                    <div class="flex flex-col gap-2">
+                        <label class="font-semibold text-surface-900 dark:text-surface-0">Last Name</label>
+                        <input pInputText type="text" formControlName="lastName" placeholder="Enter your last name"
+                            class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
+                            [class.border-red-500]="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched" />
+                        @if (profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched) {
+                        <small class="text-red-500 text-sm">
+                            Last name is required and at least 2 characters
+                        </small>
+                        }
+                    </div>
+
+                    <!-- Email Address -->
+                    <div class="flex flex-col gap-2">
+                        <label class="font-semibold text-surface-900 dark:text-surface-0">Email Address</label>
+                        <input pInputText type="email" formControlName="email" placeholder="Enter your email address"
+                            class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
+                            [class.border-red-500]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched" />
+                        @if (profileForm.get('email')?.invalid && profileForm.get('email')?.touched) {
+                        <small class="text-red-500 text-sm">
+                            Please enter a valid email address
+                        </small>
+                        }
+                    </div>
 
 
-                <!-- Job Title -->
-                <div class="flex flex-col gap-2">
-                    <label class="font-semibold text-surface-900 dark:text-surface-0">Job Title</label>
-                    <input pInputText type="text" formControlName="jobTitle" placeholder="Enter your job title"
-                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800" />
+                    <!-- Job Title -->
+                    <div class="flex flex-col gap-2">
+                        <label class="font-semibold text-surface-900 dark:text-surface-0">Job Title</label>
+                        <input pInputText type="text" formControlName="jobTitle" placeholder="Enter your job title"
+                            class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800" />
+                    </div>
                 </div>
             </div>
         </p-card>
@@ -167,4 +188,5 @@
             </div>
         </p-card>
     </form>
+
 </div>

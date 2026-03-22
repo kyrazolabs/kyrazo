@@ -66,6 +66,14 @@ export class DialogService {
     }>({ visible: false });
     supportDialogState$ = this.supportDialogStateSubject.asObservable();
 
+    // Avatar Selection Dialog State
+    private avatarDialogStateSubject = new BehaviorSubject<{
+        visible: boolean;
+        currentAvatar: string | null;
+    }>({ visible: false, currentAvatar: null });
+    avatarDialogState$ = this.avatarDialogStateSubject.asObservable();
+
+
     // Event Sources
     private sourceSavedSource = new Subject<any>();
     sourceSaved$ = this.sourceSavedSource.asObservable();
@@ -84,6 +92,10 @@ export class DialogService {
 
     private namespaceSavedSource = new Subject<any>();
     namespaceSaved$ = this.namespaceSavedSource.asObservable();
+
+    private avatarSelectedSource = new Subject<string>();
+    avatarSelected$ = this.avatarSelectedSource.asObservable();
+
 
     private router = inject(Router);
 
@@ -207,5 +219,21 @@ export class DialogService {
 
     closeSupportDialog() {
         this.supportDialogStateSubject.next({ visible: false });
+    }
+
+    // Avatar Selection Dialog Methods
+    openAvatarDialog(currentAvatar: string | null = null) {
+        this.avatarDialogStateSubject.next({ visible: true, currentAvatar });
+    }
+
+    closeAvatarDialog() {
+        this.avatarDialogStateSubject.next({
+            visible: false,
+            currentAvatar: null,
+        });
+    }
+
+    notifyAvatarSelected(avatar: string) {
+        this.avatarSelectedSource.next(avatar);
     }
 }

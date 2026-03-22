@@ -1,0 +1,30 @@
+<p-dialog
+    header="Choose Your Avatar"
+    [(visible)]="visible"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    styleClass="w-full max-w-2xl rounded-2xl!"
+    maskStyleClass="backdrop-blur-sm"
+    (onHide)="onHide.emit()">
+
+    <div class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-4 p-4 max-h-[60vh] overflow-y-auto">
+        @for (avatar of avatars; track avatar) {
+            <div class="relative group cursor-pointer" (click)="selectAvatar(avatar)">
+                <img [src]="getAvatarUrl(avatar)"
+                    [alt]="avatar"
+                    class="w-full aspect-square rounded-full click-effect"
+                    [class.border-2]="currentAvatar === avatar"
+                    [class.border-primary]="currentAvatar === avatar" />
+                @if (currentAvatar === avatar) {
+                    <div class="absolute top-0 right-0 bg-primary text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] shadow-md">
+                        <i class="pi pi-check text-[10px]!"></i>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+    <ng-template pTemplate="footer">
+        <!-- <p-button label="Close" icon="pi pi-times" [outlined]="true" (onClick)="visible = false" styleClass="rounded-xl! mt-2!" [size]="'small'" /> -->
+    </ng-template>
+</p-dialog>

@@ -9,6 +9,7 @@ import {
     HostListener,
     signal,
     DestroyRef,
+    effect,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -94,7 +95,14 @@ export class TopbarComponent implements OnInit, OnDestroy {
     value1: string = '';
     pageTitle = '';
     searchVisible: boolean = false;
-    avatar: string | null;
+    currentUser = this.as.currentUser;
+    avatar = computed(() => this.currentUser()?.avatar);
+    avatarUrl = computed(() => {
+        const av = this.avatar();
+        if (!av) return null;
+        if (av.startsWith('http')) return av;
+        return `avatars/${av}`;
+    });
 
     isDarkMode = computed(() => this.layoutService.appState().darkMode);
     isOpenSidebar = computed(() => this.layoutService.appState().openSidebar);
@@ -137,7 +145,12 @@ export class TopbarComponent implements OnInit, OnDestroy {
         private router: Router,
         private route: ActivatedRoute,
         private store: StorageService,
-    ) {}
+    ) {
+        effect(() => {
+            console.log('Topbar: currentUser signal changed', this.currentUser());
+            console.log('Topbar: avatar computed changed', this.avatar());
+        });
+    }
 
     showCreateNamespace() {
         this.dialogService.openNamespaceDialog();
@@ -163,22 +176,17 @@ export class TopbarComponent implements OnInit, OnDestroy {
             )
             .subscribe((title) => (this.pageTitle = title || 'Dashboard'));
 
-        // Initialize avatar
-        this.avatar = this.ss.getItem('avatar');
-
         // Initialize worker loading
         this.workerService.acquireWorkerPolling();
 
         // Unified trigger for namespace loading
         merge(
             this.store.changes$.pipe(
-                filter((c) => c?.key === 'workspace' || c?.key === 'avatar'),
+                filter((c) => c?.key === 'workspace'),
                 tap((c) => {
                     if (c?.key === 'workspace') {
                         this.selectedNamespace = null;
                         this.ss.removeItem('namespace');
-                    } else {
-                        this.avatar = this.ss.getItem('avatar');
                     }
                 }),
             ),
@@ -305,4 +313,6 @@ export class TopbarComponent implements OnInit, OnDestroy {
         this.as.logout();
         this.router.navigate(['/auth/login']);
     }
+
 }
+
