@@ -67,11 +67,11 @@ export const environment = {
         revoke: (id: string) => `${baseUrl}/v1/keys/${id}`,
     },
     profile: {
-        get: `${baseUrl}/v1/auth/profile`,
-        update: `${baseUrl}/v1/auth/profile`,
+        get: `${baseUrl}/v1/profile`,
+        update: `${baseUrl}/v1/profile`,
         preference: {
-            get: `${baseUrl}/v1/auth/profile/preferences`,
-            update: `${baseUrl}/v1/auth/profile/preferences`,
+            get: `${baseUrl}/v1/profile/preferences`,
+            update: `${baseUrl}/v1/profile/preferences`,
         },
     },
     subscription: {

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
     FormsModule,
@@ -7,6 +7,7 @@ import {
     FormGroup,
     Validators,
 } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 // PrimeNG Imports
 import { CardModule } from 'primeng/card';
@@ -27,6 +28,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { finalize } from 'rxjs';
 import { SentryService } from '@core/3rd-party/sentry';
+
 import { PostHogService } from '@core/3rd-party/posthog';
 import { DialogService } from '@shared/services/dialog.service';
 
@@ -60,6 +62,7 @@ export class ProfileSettingsPage {
     private readonly posthog = inject(PostHogService);
     private readonly dialogService = inject(DialogService);
     private readonly confirmationService = inject(ConfirmationService);
+    private readonly destroyRef = inject(DestroyRef);
 
     // Reactive forms
     profileForm!: FormGroup;
@@ -67,6 +70,12 @@ export class ProfileSettingsPage {
     originalProfile: UserProfileResponse | null = null;
     isSaving = false;
     isChangingPassword = false;
+    isAvatarDialogVisible = false;
+    isPasswordChanging = false;
+    isSavingPreference = false;
+
+    // Avatar list
+    avatars = Array.from({ length: 100 }, (_, i) => `AV${i + 1}.png`);
 
     // 2FA state from DialogService is now used
 
@@ -138,6 +147,7 @@ export class ProfileSettingsPage {
         this.initializeForm();
         this.originalProfile = this.route.snapshot.data['profile'];
         if (this.originalProfile) {
+            this.authService.updateUserLocal(this.originalProfile);
             this.profileForm.patchValue({
                 firstName: this.originalProfile.firstName,
                 lastName: this.originalProfile.lastName,
@@ -145,15 +155,26 @@ export class ProfileSettingsPage {
                 jobTitle: this.originalProfile.jobTitle,
                 timeZone: this.originalProfile.timeZone,
                 language: this.originalProfile.language,
+                avatar: this.originalProfile.avatar || 'AV1.png',
             });
         }
 
         // Listen for 2FA enablement from global dialog
-        this.dialogService.twofaEnabled$.subscribe(() => {
-            if (this.originalProfile) {
-                this.originalProfile.is2FAEnabled = true;
-            }
-        });
+        this.dialogService.twofaEnabled$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(() => {
+                if (this.originalProfile) {
+                    this.originalProfile.is2FAEnabled = true;
+                }
+            });
+
+        // Listen for global avatar selection
+        this.dialogService.avatarSelected$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe((avatar) => {
+                console.log('Avatar selected globally:', avatar);
+                this.selectAvatar(avatar);
+            });
     }
 
     private initializeForm() {
@@ -167,6 +188,7 @@ export class ProfileSettingsPage {
             jobTitle: [''],
             timeZone: [''],
             language: [''],
+            avatar: ['AV1.png'],
         });
 
         this.passwordForm = this.fb.group(
@@ -204,12 +226,14 @@ export class ProfileSettingsPage {
                 jobTitle: formData.jobTitle,
                 timeZone: formData.timeZone,
                 language: formData.language,
+                avatar: formData.avatar,
             })
             .pipe(finalize(() => (this.isSaving = false)))
             .subscribe({
                 next: (response) => {
                     if (response.success && response.data) {
                         this.originalProfile = response.data;
+                        this.authService.updateUserLocal(response.data);
                         this.messageService.add({
                             summary: 'Success',
                             detail: 'Profile settings saved successfully!',
@@ -293,6 +317,7 @@ export class ProfileSettingsPage {
                 jobTitle: this.originalProfile.jobTitle,
                 timeZone: this.originalProfile.timeZone,
                 language: this.originalProfile.language,
+                avatar: this.originalProfile.avatar || 'AV1.png',
             });
         }
         this.messageService.add({
@@ -410,5 +435,24 @@ export class ProfileSettingsPage {
                 });
             },
         });
+    }
+
+    showAvatarDialog() {
+        this.dialogService.openAvatarDialog(
+            this.profileForm.get('avatar')?.value,
+        );
+    }
+
+    selectAvatar(avatar: string) {
+        console.log('Applying avatar selection to form:', avatar);
+        this.profileForm.patchValue({ avatar });
+        this.isAvatarDialogVisible = false;
+        this.profileForm.markAsDirty();
+    }
+
+    getAvatarUrl(avatar: string | null | undefined): string {
+        if (!avatar) return 'avatars/AV1.png';
+        if (avatar.startsWith('http')) return avatar;
+        return `avatars/${avatar}`;
     }
 }

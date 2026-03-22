@@ -136,8 +136,8 @@
                 [text]="true"
                 styleClass="p-0! rounded-xl!"
                 (click)="op.toggle($event)" >
-                @if (avatar) {
-                    <p-avatar [image]="avatar" size="normal" />
+                @if (avatarUrl()) {
+                    <p-avatar [image]="avatarUrl()!" size="normal" />
                 } @else {
                     <p-avatar icon="pi pi-user" size="normal" />
                 }

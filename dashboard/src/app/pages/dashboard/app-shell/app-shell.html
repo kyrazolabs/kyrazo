@@ -311,3 +311,10 @@
 
 <app-support-dialog [(visible)]="supportDialogVisible" (visibleChange)="!$event && onSupportDialogHide()"></app-support-dialog>
 
+<app-avatar-selection-dialog 
+    [(visible)]="avatarDialogVisible"
+    [currentAvatar]="currentAvatar"
+    (avatarSelected)="onAvatarSelected($any($event))"
+    (onHide)="onAvatarDialogHide()">
+</app-avatar-selection-dialog>
+
