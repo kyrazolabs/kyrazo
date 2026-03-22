@@ -256,29 +256,52 @@ export class SubscriptionService {
             throw new Error('Subscription not found');
         }
 
-        // 1️⃣ Update Stripe if it exists
-        if (subscription.stripeSubscriptionId) {
-            if (cancelData.cancelAtPeriodEnd) {
-                await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
-                    cancel_at_period_end: true,
-                });
-            } else {
-                await stripe.subscriptions.cancel(subscription.stripeSubscriptionId);
-            }
-        }
-
         const updateData: Partial<ISubscription> = {
             status: cancelData.cancelAtPeriodEnd ? 'active' : 'canceled',
             canceledAt: new Date(),
         };
 
         if (cancelData.cancelAtPeriodEnd) {
-            // Will be canceled at period end by a job or webhook
+            // Schedule cancellation at end of billing period — no refund involved
+            if (subscription.stripeSubscriptionId) {
+                await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+                    cancel_at_period_end: true,
+                });
+            }
             updateData.metadata = {
                 ...subscription.metadata,
                 cancelAtPeriodEnd: true,
                 cancelReason: cancelData.reason,
             };
+        } else {
+            // Immediate cancellation — enforce one-time refund policy
+            const hasRefundHistory = await subscriptionRepository.hasWorkspaceEverReceivedRefund(
+                subscription.workspaceId.toString()
+            );
+
+            if (hasRefundHistory) {
+                // FALLBACK: If refund already used, gracefully fallback to cancel at period end
+                if (subscription.stripeSubscriptionId) {
+                    await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+                        cancel_at_period_end: true,
+                    });
+                }
+                updateData.status = 'active'; // Stay active until period ends
+                updateData.metadata = {
+                    ...subscription.metadata,
+                    cancelAtPeriodEnd: true,
+                    cancelReason: cancelData.reason,
+                    refundSkipped: true, // Flag for frontend to notice the user
+                };
+            } else {
+                // Issue Stripe refund and cancel the subscription
+                if (subscription.stripeSubscriptionId) {
+                    await stripe.subscriptions.cancel(subscription.stripeSubscriptionId);
+                }
+
+                // Stamp refundIssuedAt to permanently prevent future refunds for this workspace
+                updateData.refundIssuedAt = new Date();
+            }
         }
 
         const updatedSubscription = await subscriptionRepository.updateById(
@@ -291,7 +314,6 @@ export class SubscriptionService {
                 updatedSubscription.workspaceId.toString()
             );
 
-            // If immediate cancellation (not at period end), revert to free plan right away
             if (!cancelData.cancelAtPeriodEnd) {
                 await this.revertToFreePlan(
                     updatedSubscription.workspaceId.toString(),
