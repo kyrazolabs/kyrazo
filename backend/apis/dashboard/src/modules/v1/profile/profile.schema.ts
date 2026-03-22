@@ -4,7 +4,9 @@ import { RegisterSchema } from '../auth/auth.schema';
 export const UpdateProfileSchema = RegisterSchema.omit({
     email: true,
     password: true,
-}).partial();
+}).partial().extend({
+    avatar: z.string().optional(),
+});
 
 export const UpdatePreferencesSchema = z
     .object({

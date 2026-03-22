@@ -26,8 +26,8 @@ export const RegisterSchema = z.object({
         .max(100, 'Last name must be at most 100 characters'),
     avatar: z
         .string()
-        .url('Avatar must be a valid URL')
-        .default('https://avatar.iran.liara.run/public/boy'),
+        .min(1, 'Avatar is required')
+        .default('AV1.png'),
     jobTitle: z.string(),
     timeZone: z.string().default('UTC'),
     language: z.enum(['en', 'ar', 'es', 'fr', 'de', 'it', 'pt', 'ru', 'zh', 'ja']).default('en'),
