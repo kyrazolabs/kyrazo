@@ -5,7 +5,7 @@ import { authenticate } from '@/core/middlewares/auth.middleware';
 import { requireWorkspaceMembershipParam } from '@/core/middlewares/workspace.middleware';
 import { checkWorkspaceLimits } from '@/core/middlewares/limits.middleware';
 import { requireRecentOTP } from '@/core/middlewares/otp.middleware';
-import { workspaceReadRateLimiter, workspaceWriteRateLimiter } from './workspace.rate-limiter';
+import { workspaceReadRateLimiter, workspaceWriteRateLimiter } from './workspace.ratelimiter';
 import {
     CreateWorkspaceSchema,
     GetWorkspaceByIdSchema,

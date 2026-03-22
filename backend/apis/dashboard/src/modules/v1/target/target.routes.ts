@@ -5,7 +5,7 @@ import { sentryMiddleware } from '@/core/middlewares/sentry.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
 import { requireNamespaceAccess } from '@/core/middlewares/namespace.middleware';
 import { zValidator } from '@/core/middlewares/validator.middleware';
-import { targetReadRateLimiter, targetWriteRateLimiter } from './target.rate-limiter';
+import { targetReadRateLimiter, targetWriteRateLimiter } from './target.ratelimiter';
 import {
     CreateTargetSchema,
     GetTargetByIdSchema,

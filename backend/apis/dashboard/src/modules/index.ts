@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import authRouter from './v1/auth/auth.routes';
+import profileRouter from './v1/profile/profile.routes';
 import workspaceRouter from './v1/workspace/workspace.routes';
 import keyRouter from './v1/key/key.routes';
 import endpointRouter from './v1/endpoints/endpoint.routes';
@@ -20,8 +21,13 @@ const router = new Hono();
 // Mount auth routes
 router.route('/auth', authRouter);
 
+// Mount profile routes
+router.route('/profile', profileRouter);
+
+// Mount workspace routes
 router.route('/workspaces', workspaceRouter);
 
+// Mount namespace routes
 router.route('/namespaces', namespaceRouter);
 
 // Mount api key routes

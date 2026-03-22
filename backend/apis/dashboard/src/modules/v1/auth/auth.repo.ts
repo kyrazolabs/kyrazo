@@ -20,15 +20,6 @@ export class AuthRepository {
         return transformed;
     }
 
-    async findUserById(id: string, includePasswordHash: boolean = false): Promise<IUser | null> {
-        const query = User.findById(unprefixId(id));
-        if (includePasswordHash) {
-            query.select('+passwordHash');
-        }
-        const user = await query.lean();
-        return this._transformUser(user);
-    }
-
     async findUserByEmail(
         email: string,
         includePasswordHash: boolean = false
@@ -71,13 +62,6 @@ export class AuthRepository {
         return this._transformUser(saved.toObject()) as IUser;
     }
 
-    async updateUser(id: string, data: any): Promise<IUser | null> {
-        const user = await User.findByIdAndUpdate(unprefixId(id), data, {
-            new: true,
-        }).lean();
-        return this._transformUser(user);
-    }
-
     async createRefreshToken(data: any): Promise<any> {
         const refreshToken = new RefreshToken(data);
         return await refreshToken.save();
@@ -86,18 +70,6 @@ export class AuthRepository {
     async createUserPreference(data: any): Promise<any> {
         const preference = new UserPreference(data);
         return await preference.save();
-    }
-
-    async getUserPreference(userId: string): Promise<any | null> {
-        return await UserPreference.findOne({ userId: unprefixId(userId) }).lean();
-    }
-
-    async updateUserPreference(userId: string, data: any): Promise<any> {
-        return await UserPreference.findOneAndUpdate(
-            { userId: unprefixId(userId) },
-            { $set: data },
-            { upsert: true, new: true }
-        );
     }
 
     async updatePassword(id: string, newPassword: string): Promise<void> {

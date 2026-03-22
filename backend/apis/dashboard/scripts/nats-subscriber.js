@@ -29,7 +29,7 @@ async function subscribeWithJetStream() {
                 subjects: ['workspace.>'],
             });
             console.log('📚 Created EVENTS stream');
-        } catch (error: any) {
+        } catch (error) {
             if (!error.message.includes('stream already exists')) {
                 throw error;
             }
@@ -48,7 +48,7 @@ async function subscribeWithJetStream() {
                 replay_policy: 'instant',
             });
             console.log('✅ Created JetStream consumer with ACK support');
-        } catch (error: any) {
+        } catch (error) {
             if (!error.message.includes('already exists')) {
                 throw error;
             }
@@ -69,9 +69,7 @@ async function subscribeWithJetStream() {
             console.log(`📨 Received JetStream message:`);
             console.log(`   Subject: ${msg.subject}`);
             console.log(`   Sequence: ${msg.info.streamSequence}`);
-            console.log(
-                `   Data: ${msg.data ? msg.data.toString() : 'No data'}`
-            );
+            console.log(`   Data: ${msg.data ? msg.data.toString() : 'No data'}`);
             console.log(`   Time: ${new Date().toISOString()}`);
 
             // Process the message (simulate processing time)
@@ -82,7 +80,7 @@ async function subscribeWithJetStream() {
             console.log(`   ✅ Message acknowledged`);
             console.log('---');
         }
-    } catch (error: any) {
+    } catch (error) {
         console.error('❌ Error:', error.message);
         process.exit(1);
     }

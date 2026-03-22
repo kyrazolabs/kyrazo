@@ -31,7 +31,6 @@ import { usageService } from '@/shared/services/usage.service';
 import { serveStatic } from 'hono/bun';
 
 import v1Router from './modules';
-import { AppContext } from './core/middlewares/auth.middleware';
 
 const app = new Hono();
 

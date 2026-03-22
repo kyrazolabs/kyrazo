@@ -13,8 +13,6 @@ import {
     ResetPasswordSchema,
     VerifyEmailSchema,
     ChangePasswordSchema,
-    UpdateProfileSchema,
-    UpdatePreferencesSchema,
     GoogleLoginSchema,
     Setup2FASchema,
     Verify2FASetupSchema,
@@ -30,13 +28,13 @@ import {
     forgotPasswordRateLimiter,
     resetPasswordRateLimiter,
     verifyEmailRateLimiter,
-    profileUpdateRateLimiter,
-    preferencesReadRateLimiter,
-    preferencesUpdateRateLimiter,
     changePasswordProtectedRateLimiter,
     logoutProtectedRateLimiter,
+} from './auth.ratelimiter';
+import {
     profileReadRateLimiter,
-} from './auth.rate-limiter';
+    profileUpdateRateLimiter,
+} from '@/modules/v1/profile/profile.ratelimiter';
 
 const auth = new Hono();
 
@@ -188,54 +186,8 @@ auth.post(
 );
 
 // Protected routes (authentication required)
-auth.use('/profile/*', authenticate);
 auth.use('/change-password', authenticate);
 auth.use('/logout', authenticate);
-
-auth.get('/profile', profileReadRateLimiter, AuthController.getProfile);
-auth.patch(
-    '/profile',
-    profileUpdateRateLimiter,
-    requireRecentOTP('update_profile'),
-    zValidator('json', UpdateProfileSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
-    AuthController.updateProfile
-);
-
-auth.get('/profile/preferences', preferencesReadRateLimiter, AuthController.getPreferences);
-auth.patch(
-    '/profile/preferences',
-    preferencesUpdateRateLimiter,
-    zValidator('json', UpdatePreferencesSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
-    AuthController.updatePreferences
-);
 
 auth.post(
     '/change-password',

@@ -9,8 +9,6 @@ import {
     AuthResponse,
     IErrorResponse,
     IUser,
-    ProfileActionsResponse,
-    PreferencesActionsResponse,
     logger,
     unprefixId,
 } from '@kyrazo/shared';
@@ -19,11 +17,8 @@ import {
     ForgotPasswordInput,
     GoogleLoginInput,
     LoginInput,
-    RefreshTokenInput,
     RegisterInput,
     ResetPasswordInput,
-    UpdatePreferencesInput,
-    UpdateProfileInput,
     VerifyEmailInput,
     Setup2FAInput,
     Verify2FASetupInput,
@@ -38,6 +33,7 @@ import { authUtils } from '@/core/utils/libs/jwt';
 import { AppContext } from '@/core/middlewares/auth.middleware';
 import GoogleAuthConfig from '@/configs/google';
 import { authRepository } from './auth.repo';
+import { profileRepository } from '@/modules/v1/profile/profile.repo';
 
 export class AuthController {
     /**
@@ -282,7 +278,6 @@ export class AuthController {
     static async google(c: AppContext): Promise<Response> {
         try {
             // @ts-ignore
-            // @ts-ignore
             const valid: GoogleLoginInput = c.req.valid('json');
 
             let payload: TokenPayload | undefined;
@@ -370,7 +365,7 @@ export class AuthController {
         } else {
             // Link Google ID to existing user
             if (!user.googleId) {
-                await authRepository.updateUser((user as any).id, { googleId: payload.sub });
+                await profileRepository.updateUser((user as any).id, { googleId: payload.sub });
             }
         }
         const appPayload = {
@@ -453,7 +448,7 @@ export class AuthController {
                 );
             }
 
-            const user = await authRepository.findUserById(payload.userId);
+            const user = await profileRepository.findUserById(payload.userId);
             if (!user || !(user as any).isActive) {
                 return c.json<IErrorResponse>(
                     {
@@ -595,282 +590,6 @@ export class AuthController {
     }
 
     /**
-     * Get current user profile
-     */
-    static async getProfile(c: AppContext): Promise<Response> {
-        try {
-            const userId = c.user?.userId;
-            if (!userId) {
-                return c.json<IErrorResponse>(
-                    {
-                        success: false,
-                        error: {
-                            code: 'UNAUTHORIZED',
-                            message: 'Authentication required',
-                            requestId: c.get('requestId'),
-                        },
-                    },
-                    401
-                );
-            }
-
-            const user = await authRepository.findUserById(userId);
-            const user2FA = await authRepository.findEnabledUser2FA(userId);
-
-            if (!user) {
-                return c.json<IErrorResponse>(
-                    {
-                        success: false,
-                        error: {
-                            code: 'USER_NOT_FOUND',
-                            message: 'User not found',
-                            requestId: c.get('requestId'),
-                        },
-                    },
-                    404
-                );
-            }
-
-            return c.json({
-                success: true,
-                message: 'Here is your profile',
-                data: {
-                    ...user,
-                    is2FAEnabled: !!user2FA,
-                },
-            });
-        } catch (error: any) {
-            logger.error('Unexpected error in AuthController.getProfile', error);
-            return c.json<IErrorResponse>(
-                {
-                    success: false,
-                    error: {
-                        code: 'PROFILE_FETCH_FAILED',
-                        message: 'Failed to fetch user profile',
-                        requestId: c.get('requestId'),
-                    },
-                },
-                500
-            );
-        }
-    }
-
-    /**
-     * Update user profile
-     */
-    static async updateProfile(c: AppContext): Promise<Response> {
-        try {
-            const userId = c.user?.userId;
-            if (!userId) {
-                return c.json<IErrorResponse>(
-                    {
-                        success: false,
-                        error: {
-                            code: 'UNAUTHORIZED',
-                            message: 'Authentication required',
-                            requestId: c.get('requestId'),
-                        },
-                    },
-                    401
-                );
-            }
-
-            // @ts-ignore
-            const valid: UpdateProfileInput = c.req.valid('json');
-
-            const user = await authRepository.findUserById(userId);
-            if (!user || !(user as any).isActive) {
-                return c.json<IErrorResponse>(
-                    {
-                        success: false,
-                        error: {
-                            code: 'USER_NOT_FOUND',
-                            message: 'User not found or inactive',
-                            requestId: c.get('requestId'),
-                        },
-                    },
-                    404
-                );
-            }
-
-            const update = await authRepository.updateUser(userId, valid);
-
-            if (!update) {
-                return c.json<IErrorResponse>(
-                    {
-                        success: false,
-                        error: {
-                            code: 'UPDATE_PROFILE_FAILED',
-                            message: 'Update profile failed',
-                            requestId: c.get('requestId'),
-                        },
-                    },
-                    400
-                );
-            }
-
-            return c.json<ProfileActionsResponse>(
-                {
-                    success: true,
-                    message: 'Profile updated successfully',
-                    data: update as IUser,
-                },
-                200
-            );
-        } catch (error: any) {
-            logger.error('Unexpected error in AuthController.updateProfile', error);
-            return c.json<IErrorResponse>(
-                {
-                    success: false,
-                    error: {
-                        code: 'PROFILE_UPDATE_FAILED',
-                        message: 'Failed to update profile',
-                        requestId: c.get('requestId'),
-                    },
-                },
-                500
-            );
-        }
-    }
-
-    /**
-     * Get user preferences
-     */
-    static async getPreferences(c: AppContext): Promise<Response> {
-        try {
-            const userId = c.user?.userId;
-            if (!userId) {
-                return c.json<IErrorResponse>(
-                    {
-                        success: false,
-                        error: {
-                            code: 'UNAUTHORIZED',
-                            message: 'Authentication required',
-                            requestId: c.get('requestId'),
-                        },
-                    },
-                    401
-                );
-            }
-
-            let preferences = await authRepository.getUserPreference(userId);
-
-            if (!preferences) {
-                // Create default preferences
-                preferences = await authRepository.createUserPreference({
-                    userId: unprefixId(userId),
-                    notification: {
-                        sourceFailures: true,
-                        dailySummary: true,
-                        securityAlerts: true,
-                        weeklyReports: true,
-                        preferences: {
-                            emailFrequency: 'immediate',
-                            quietHours: '22:00-08:00',
-                        },
-                    },
-                });
-            }
-
-            return c.json<PreferencesActionsResponse>(
-                {
-                    success: true,
-                    message: 'Preferences retrieved successfully',
-                    data: preferences,
-                },
-                200
-            );
-        } catch (error: any) {
-            logger.error('Unexpected error in AuthController.getPreferences', error);
-            return c.json<IErrorResponse>(
-                {
-                    success: false,
-                    error: {
-                        code: 'PREFERENCES_FETCH_FAILED',
-                        message: 'Failed to fetch preferences',
-                        requestId: c.get('requestId'),
-                    },
-                },
-                500
-            );
-        }
-    }
-
-    /**
-     * Update user preferences
-     */
-    static async updatePreferences(c: AppContext): Promise<Response> {
-        try {
-            const userId = c.user?.userId;
-            if (!userId) {
-                return c.json<IErrorResponse>(
-                    {
-                        success: false,
-                        error: {
-                            code: 'UNAUTHORIZED',
-                            message: 'Authentication required',
-                            requestId: c.get('requestId'),
-                        },
-                    },
-                    401
-                );
-            }
-
-            // @ts-ignore
-            const valid: UpdatePreferencesInput = c.req.valid('json');
-
-            let preferences = await authRepository.getUserPreference(userId);
-
-            if (!preferences) {
-                preferences = await authRepository.createUserPreference({
-                    userId: unprefixId(userId),
-                    notification: {
-                        sourceFailures: true,
-                        dailySummary: true,
-                        securityAlerts: true,
-                        weeklyReports: true,
-                        preferences: {
-                            emailFrequency: 'daily',
-                            quietHours: '22:00-08:00',
-                        },
-                    },
-                });
-            }
-
-            if (valid.notification) {
-                preferences = await authRepository.updateUserPreference(userId, {
-                    notification: {
-                        ...preferences.notification,
-                        ...valid.notification,
-                    },
-                });
-            }
-
-            return c.json<PreferencesActionsResponse>(
-                {
-                    success: true,
-                    message: 'Preferences updated successfully',
-                    data: preferences,
-                },
-                200
-            );
-        } catch (error: any) {
-            logger.error('Unexpected error in AuthController.updatePreferences', error);
-            return c.json<IErrorResponse>(
-                {
-                    success: false,
-                    error: {
-                        code: 'PREFERENCES_UPDATE_FAILED',
-                        message: 'Failed to update preferences',
-                        requestId: c.get('requestId'),
-                    },
-                },
-                500
-            );
-        }
-    }
-
-    /**
      * Change password
      */
     static async changePassword(c: AppContext): Promise<Response> {
@@ -892,7 +611,7 @@ export class AuthController {
 
             // @ts-ignore
             const valid: ChangePasswordInput = c.req.valid('json');
-            const user = await authRepository.findUserById(userId);
+            const user = await profileRepository.findUserById(userId);
 
             if (!user || !(user as any).isActive) {
                 return c.json<IErrorResponse>(
@@ -1052,7 +771,7 @@ export class AuthController {
                 });
             }
 
-            const user = await authRepository.findUserById(decoded.userId);
+            const user = await profileRepository.findUserById(decoded.userId);
 
             if (!user || !(user as any).isActive) {
                 return c.json<IErrorResponse>(
@@ -1173,7 +892,7 @@ export class AuthController {
                 );
             }
 
-            const user = await authRepository.findUserById(userId);
+            const user = await profileRepository.findUserById(userId);
 
             if (!user || !(user as any).isActive) {
                 return c.json<IErrorResponse>(
@@ -1234,7 +953,7 @@ export class AuthController {
                 );
             }
 
-            const user = await authRepository.findUserById(userId);
+            const user = await profileRepository.findUserById(userId);
 
             if (!user || !(user as any).isActive) {
                 return c.json<IErrorResponse>(
@@ -1350,7 +1069,7 @@ export class AuthController {
                 );
             }
 
-            const user = await authRepository.findUserById(userId);
+            const user = await profileRepository.findUserById(userId);
             if (!user) {
                 return c.json<IErrorResponse>(
                     {
@@ -1577,7 +1296,7 @@ export class AuthController {
                 );
             }
 
-            const user = await authRepository.findUserById(userId);
+            const user = await profileRepository.findUserById(userId);
             const user2FA = await authRepository.findEnabledUser2FA(userId, true);
 
             if (!user) {
@@ -1711,7 +1430,7 @@ export class AuthController {
                 );
             }
 
-            const user = await authRepository.findUserById(userId);
+            const user = await profileRepository.findUserById(userId);
             const user2FA = await authRepository.findEnabledUser2FA(userId, true);
 
             if (!user) {
@@ -1788,7 +1507,7 @@ export class AuthController {
                 );
             }
 
-            const user = await authRepository.findUserById(userId);
+            const user = await profileRepository.findUserById(userId);
             const user2FA = await authRepository.findEnabledUser2FA(userId, true);
 
             if (!user) {

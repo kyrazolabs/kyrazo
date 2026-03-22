@@ -32,7 +32,7 @@ const userSchema = new Schema<IUser>(
         },
         avatar: {
             type: String,
-            default: 'https://avatar.iran.liara.run/public',
+            default: 'AV1.png',
         },
         passwordHash: {
             type: String,

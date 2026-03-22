@@ -13,7 +13,7 @@ import {
     GetNamespaceByIdSchema,
     FilterNamespaceSchema,
 } from './namespace.schema';
-import { namespaceWriteRateLimiter, namespaceReadRateLimiter } from './namespace.rate-limiter';
+import { namespaceWriteRateLimiter, namespaceReadRateLimiter } from './namespace.ratelimiter';
 
 const router = new Hono();
 
