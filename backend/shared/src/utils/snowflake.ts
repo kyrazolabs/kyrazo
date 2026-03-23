@@ -1,22 +1,44 @@
 import { logger } from '../configs/logger';
 
 /**
+ * Simple hash function to map a string to a 10-bit integer (0-1023).
+ * This ensures that UUIDs or other non-numeric IDs produce a deterministic
+ * numeric ID for Snowflake, minimizing collision risk.
+ */
+function stringTo10BitHash(str: string): number {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = (hash << 5) - hash + str.charCodeAt(i);
+        hash |= 0; // Convert to 32bit integer
+    }
+    return Math.abs(hash) % 1024;
+}
+
+/**
  * Parse and validate WORKER_ID environment variable.
- * Returns a number between 0 and maxWorkerId (default 1023).
- * If invalid or out of range, logs a warning and returns 0.
+ * Returns a number between 0 and maxWorkerId (1023).
+ *
+ * If the value is a valid numeric ID, it is used directly.
+ * If it's a UUID or other string, it is hashed into the 10-bit space.
  */
 function parseWorkerId(envValue: string | undefined, maxWorkerId: number): number {
     if (!envValue) return 0;
+
+    // 1. Attempt to parse as a direct integer
     const parsed = parseInt(envValue, 10);
-    if (isNaN(parsed)) {
-        logger.warn(`Invalid WORKER_ID "${envValue}", defaulting to 0`);
-        return 0;
+
+    // 2. If it's a valid integer within range [0, 1023], use it
+    // We check that the parsed number is exactly what the string represents (to avoid partial matches like "123-uuid")
+    if (!isNaN(parsed) && parsed.toString() === envValue && parsed >= 0 && parsed <= maxWorkerId) {
+        return parsed;
     }
-    if (parsed > maxWorkerId || parsed < 0) {
-        logger.warn(`WORKER_ID ${parsed} out of range (0‑${maxWorkerId}), defaulting to 0`);
-        return 0;
-    }
-    return parsed;
+
+    // 3. Otherwise (UUID or out-of-range integer), hash it
+    const hashed = stringTo10BitHash(envValue);
+    logger.info(
+        `WORKER_ID/RESOURCE_UUID "${envValue}" is not a valid 0-${maxWorkerId} integer. Hashing to ${hashed} for Snowflake.`
+    );
+    return hashed;
 }
 
 /**
@@ -85,7 +107,8 @@ class Snowflake {
     }
 }
 
-// Parse WORKER_ID with validation, default to 0 if invalid
+// Parse WORKER_ID or COOLIFY_RESOURCE_UUID with validation/hashing
 const maxWorkerId = -1 ^ (-1 << 10); // 1023
-const workerId = parseWorkerId(process.env.WORKER_ID, maxWorkerId);
+const workerIdStr = process.env.WORKER_ID || process.env.COOLIFY_RESOURCE_UUID;
+const workerId = parseWorkerId(workerIdStr, maxWorkerId);
 export const snowflake = new Snowflake(workerId);
