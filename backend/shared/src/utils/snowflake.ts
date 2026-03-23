@@ -1,6 +1,25 @@
 import { logger } from '../configs/logger';
 
 /**
+ * Parse and validate WORKER_ID environment variable.
+ * Returns a number between 0 and maxWorkerId (default 1023).
+ * If invalid or out of range, logs a warning and returns 0.
+ */
+function parseWorkerId(envValue: string | undefined, maxWorkerId: number): number {
+    if (!envValue) return 0;
+    const parsed = parseInt(envValue, 10);
+    if (isNaN(parsed)) {
+        logger.warn(`Invalid WORKER_ID "${envValue}", defaulting to 0`);
+        return 0;
+    }
+    if (parsed > maxWorkerId || parsed < 0) {
+        logger.warn(`WORKER_ID ${parsed} out of range (0‑${maxWorkerId}), defaulting to 0`);
+        return 0;
+    }
+    return parsed;
+}
+
+/**
  * Snowflake ID Generator
  *
  * 1 bit reserved (0)
@@ -66,4 +85,7 @@ class Snowflake {
     }
 }
 
-export const snowflake = new Snowflake(process.env.WORKER_ID ? parseInt(process.env.WORKER_ID) : 0);
+// Parse WORKER_ID with validation, default to 0 if invalid
+const maxWorkerId = -1 ^ (-1 << 10); // 1023
+const workerId = parseWorkerId(process.env.WORKER_ID, maxWorkerId);
+export const snowflake = new Snowflake(workerId);
