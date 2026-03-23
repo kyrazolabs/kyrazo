@@ -11,8 +11,8 @@
                 class="after:border after:border-surface-300 dark:after:border-surface-600" />
             <div class="flex items-center gap-1 lg:gap-2 overflow-hidden">
                 <!-- Namespace Selector (shown only when workspace is selected) -->
-                <div 
-                    class="flex items-center justify-between cursor-pointer duration-300 hover:bg-surface-50 dark:hover:bg-surface-800/50 transition-all shrink-0 click-effect outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded-lg" 
+                <div
+                    class="flex items-center justify-between cursor-pointer duration-300 hover:bg-surface-50 dark:hover:bg-surface-800/50 transition-all shrink-0 click-effect outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded-lg"
                     role="button"
                     tabindex="0"
                     aria-label="Select Namespace"
@@ -130,16 +130,16 @@
                 pTooltip="Toggle Dark Mode" tooltipPosition="bottom"
             />
             <p-button pRipple
-                [outlined]="false"
-                variant="text"
+                [outlined]="true"
+                severity="primary"
                 [raised]="false"
-                [text]="true"
-                styleClass="p-0! rounded-xl!"
+                styleClass="p-0!"
+                rounded
                 (click)="op.toggle($event)" >
                 @if (avatarUrl()) {
-                    <p-avatar [image]="avatarUrl()!" size="normal" />
+                    <p-avatar [image]="avatarUrl()!" size="normal"/>
                 } @else {
-                    <p-avatar icon="pi pi-user" size="normal" />
+                    <p-avatar icon="pi pi-user" size="normal"/>
                 }
             </p-button>
 

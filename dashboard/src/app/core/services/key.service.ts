@@ -60,9 +60,9 @@ export class KeyService {
 
   checkScopes(
     keyId: string
-  ): Observable<ApiResponse<{ _id: string; scopes: string[] }>> {
+  ): Observable<ApiResponse<{ id: string; scopes: string[] }>> {
     return this.http
-      .get<ApiResponse<{ _id: string; scopes: string[] }>>(
+      .get<ApiResponse<{ id: string; scopes: string[] }>>(
         environment.key.checkScopes(keyId)
       )
       .pipe(catchError(this.handleError));
