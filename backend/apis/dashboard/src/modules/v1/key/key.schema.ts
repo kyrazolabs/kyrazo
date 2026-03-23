@@ -1,6 +1,6 @@
 import z from 'zod';
 
-const objectIdSchema = z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid ID format');
+const objectIdSchema = z.string().regex(/^(key_)?[0-9a-fA-F]{24}$/, 'Invalid ID format');
 
 export const createAPIKeySchema = z.object({
     name: z

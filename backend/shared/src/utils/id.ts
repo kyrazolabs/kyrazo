@@ -12,6 +12,7 @@ export const ID_PREFIXES = {
     subscription: 'sub',
     event: 'evt',
     delivery: 'del',
+    apiKey: 'key',
 } as const;
 
 export type IdType = keyof typeof ID_PREFIXES;
@@ -119,6 +120,8 @@ export function transformWithId<T>(data: T, type: IdType): TransformedWithId<T> 
             subscriptionId: 'subscription',
             eventId: 'event',
             deliveryId: 'delivery',
+            apiKeyId: 'apiKey',
+            keyId: 'apiKey',
             event_id: 'event',
             delivery_id: 'delivery',
             associated_event_id: 'event',

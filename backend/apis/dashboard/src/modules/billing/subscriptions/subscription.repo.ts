@@ -126,6 +126,18 @@ export class SubscriptionRepository {
         );
     }
 
+    /**
+     * Returns true if this workspace has ever had a refund issued on any subscription.
+     * Used to enforce the one-time first-month refund policy.
+     */
+    async hasWorkspaceEverReceivedRefund(workspaceId: string): Promise<boolean> {
+        const existing = await (Subscription as any).findOne({
+            workspaceId: unprefixId(workspaceId),
+            refundIssuedAt: { $ne: null, $exists: true },
+        }).select('_id').lean();
+        return !!existing;
+    }
+
     async deactivateOtherSubscriptions(
         workspaceId: string,
         excludeStripeSubId?: string

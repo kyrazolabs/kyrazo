@@ -318,6 +318,7 @@ export class SubscriptionController {
 
             const message =
                 error instanceof Error ? error.message : 'Failed to cancel subscription';
+
             return c.json<IErrorResponse>(
                 {
                     success: false,

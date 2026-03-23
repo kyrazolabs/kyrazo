@@ -256,29 +256,23 @@ export class SubscriptionService {
             throw new Error('Subscription not found');
         }
 
-        // 1️⃣ Update Stripe if it exists
-        if (subscription.stripeSubscriptionId) {
-            if (cancelData.cancelAtPeriodEnd) {
-                await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
-                    cancel_at_period_end: true,
-                });
-            } else {
-                await stripe.subscriptions.cancel(subscription.stripeSubscriptionId);
-            }
-        }
-
         const updateData: Partial<ISubscription> = {
-            status: cancelData.cancelAtPeriodEnd ? 'active' : 'canceled',
+            status: 'active', // Keep active until period ends
             canceledAt: new Date(),
-        };
-
-        if (cancelData.cancelAtPeriodEnd) {
-            // Will be canceled at period end by a job or webhook
-            updateData.metadata = {
+            updatedAt: new Date(),
+            metadata: {
                 ...subscription.metadata,
                 cancelAtPeriodEnd: true,
                 cancelReason: cancelData.reason,
-            };
+            },
+        };
+
+        // All cancellations are now forced to be at period end to prevent abuse.
+        // Refunds must be requested manually via support.
+        if (subscription.stripeSubscriptionId) {
+            await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+                cancel_at_period_end: true,
+            });
         }
 
         const updatedSubscription = await subscriptionRepository.updateById(
@@ -291,7 +285,6 @@ export class SubscriptionService {
                 updatedSubscription.workspaceId.toString()
             );
 
-            // If immediate cancellation (not at period end), revert to free plan right away
             if (!cancelData.cancelAtPeriodEnd) {
                 await this.revertToFreePlan(
                     updatedSubscription.workspaceId.toString(),

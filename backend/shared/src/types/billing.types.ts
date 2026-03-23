@@ -107,6 +107,7 @@ export interface ISubscription {
     quantity: number;
     metadata?: Record<string, unknown>;
     canceledAt?: Date;
+    refundIssuedAt?: Date;
     createdAt: Date;
     updatedAt: Date;
 }

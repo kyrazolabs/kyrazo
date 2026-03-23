@@ -138,6 +138,12 @@ const subscriptionSchema = new Schema<ISubscription>(
         canceledAt: {
             type: Date,
         },
+        refundIssuedAt: {
+            type: Date,
+            default: null,
+            index: true,
+            sparse: true,
+        },
     },
     {
         timestamps: true,
