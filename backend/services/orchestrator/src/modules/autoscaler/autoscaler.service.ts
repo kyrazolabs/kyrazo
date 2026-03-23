@@ -7,7 +7,7 @@ import { Plan, Subscription, Workspace } from '@kyrazo/shared';
 import { and, eq, inArray } from 'drizzle-orm';
 import { config } from '@/common/config';
 
-import { getApplications } from '@/modules/coolify/actions';
+import { getApplications, getDeployments } from '@/modules/coolify/actions';
 
 export class AutoScalerService {
     /**
@@ -224,6 +224,29 @@ export class AutoScalerService {
                     (coolifyStatus.includes('running') && coolifyStatus.includes('unhealthy'));
 
                 if (isUnhealthy) {
+                    // Before reaping, check if there's an active deployment
+                    try {
+                        const deploymentRes = await getDeployments(app.uuid);
+                        const hasActiveDeployment = deploymentRes?.deployments?.some(
+                            (d: any) => d.status === 'in_progress' || d.status === 'queued'
+                        );
+
+                        if (hasActiveDeployment) {
+                            console.log(
+                                `[AutoScaler] Worker ${w.worker_id} is unhealthy but has an active deployment. Skipping reaping.`
+                            );
+                            continue;
+                        }
+                    } catch (err: any) {
+                        console.error(
+                            `[AutoScaler] Failed to check deployments for ${w.worker_id}:`,
+                            err
+                        );
+                        // Fall through to reaping if check fails, or we could continue to be safe.
+                        // Let's continue to be safe and avoid deleting if we can't verify.
+                        continue;
+                    }
+
                     console.warn(
                         `[AutoScaler] Worker ${w.worker_id} is ${coolifyStatus} in Coolify. Reaping (mark failed + delete app).`
                     );
