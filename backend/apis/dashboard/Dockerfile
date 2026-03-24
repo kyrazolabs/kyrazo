@@ -30,8 +30,8 @@ COPY apis/dashboard ./
 FROM oven/bun:${BUN_VERSION}-alpine AS runner
 WORKDIR /app
 
-# Install su-exec for dropping privileges from root
-RUN apk add --no-cache su-exec
+# Install su-exec and wget for healthchecks
+RUN apk add --no-cache su-exec wget
 
 # Copy all installed dependencies
 COPY --from=builder /app/apis/dashboard/node_modules /app/apis/dashboard/node_modules
