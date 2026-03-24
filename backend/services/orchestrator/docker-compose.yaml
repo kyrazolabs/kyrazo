@@ -1,0 +1,43 @@
+services:
+  orchestrator:
+    build:
+      context: .
+      dockerfile: services/orchestrator/Dockerfile
+    restart: always
+    environment:
+      - PORT=${PORT}
+      - WORKERS=${WORKERS}
+      - NODE_ENV=${NODE_ENV}
+
+      - POSTGRES_URL=${POSTGRES_URL}
+      - POSTGRES_SSL=${POSTGRES_SSL}
+      - POSTGRES_SSL_MODE=${POSTGRES_SSL_MODE}
+      - POSTGRES_CA_FILE=${POSTGRES_CA_FILE:-/etc/ssl/certs/coolify-ca.crt}
+
+      - MONGODB_URI=${MONGODB_URI}
+      - MONGODB_SSL=${MONGODB_SSL}
+      - MONGODB_CA_FILE=${MONGODB_CA_FILE:-/etc/ssl/certs/coolify-ca.crt}
+      - MONGODB_DB_NAME=${MONGODB_DB_NAME}
+
+      - CLICKHOUSE_URL=${CLICKHOUSE_URL}
+
+      # STREAM Configuration
+      - REDIS_TLS=${REDIS_TLS}
+      - SNAPSHOT_REDIS_TLS=${SNAPSHOT_REDIS_TLS}
+      - STREAM_REDIS_URL=${STREAM_REDIS_URL}
+      - STREAM_REDIS_TLS=${STREAM_REDIS_TLS}
+      - SNAPSHOT_INTERVAL_MS=${SNAPSHOT_INTERVAL_MS}
+      - STREAM_BATCH_COUNT=${STREAM_BATCH_COUNT}
+      - STREAM_BLOCK_MS=${STREAM_BLOCK_MS}
+      - STREAM_MAX_IDLE_MS=${STREAM_MAX_IDLE_MS}
+      - STREAM_MAX_RETRIES=${STREAM_MAX_RETRIES}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+    volumes:
+      - ./logs:/app/services/ingestor/logs
+      - /data/coolify/ssl/coolify-ca.crt:/etc/ssl/certs/coolify-ca.crt:ro
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:${PORT}/v1/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 20s

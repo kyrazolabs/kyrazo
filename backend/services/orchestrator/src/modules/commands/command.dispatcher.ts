@@ -58,61 +58,45 @@ export class CommandDispatcher {
                 WORKSPACE_ID: clientId,
                 WORKER_ID: workerId,
 
-                //  Worker Configuration
-                WORKER_CONCURRENCY: process.env.WORKER_CONCURRENCY!,
-                BATCH_SIZE: process.env.WORKER_BATCH_SIZE!,
-                MAX_ACK_PENDING: process.env.WORKER_MAX_ACK_PENDING!,
-                FETCH_TIMEOUT_MS: process.env.WORKER_FETCH_TIMEOUT_MS!,
-                NODE_ENV: process.env.WORKER_NODE_ENV!,
+                // ================ WORKER CONFIGURATION ================ //
+                NODE_ENV: '{{ environment.WORKER_NODE_ENV }}',
+                BATCH_SIZE: '{{ environment.BATCH_SIZE }}',
+                CONCURRENCY: '{{ environment.WORKER_CONCURRENCY }}',
+                MAX_ACK_PENDING: '{{ environment.MAX_ACK_PENDING }}',
+                FETCH_TIMEOUT_MS: '{{ environment.FETCH_TIMEOUT_MS }}',
 
-                //  NATS Configuration
-                NATS_SERVERS: process.env.WORKER_NATS_SERVERS!,
-                NATS_USER: process.env.WORKER_NATS_USER!,
-                NATS_PASSWORD: process.env.WORKER_NATS_PASSWORD!,
-                NATS_MAX_RECONNECT_ATTEMPTS: process.env.WORKER_NATS_MAX_RECONNECT_ATTEMPTS!,
-                NATS_RECONNECT_TIME_WAIT: process.env.WORKER_NATS_RECONNECT_TIME_WAIT!,
-                NATS_TIMEOUT: process.env.WORKER_NATS_TIMEOUT!,
-                NATS_CERT_FILE: process.env.WORKER_NATS_CERT_FILE!,
-                NATS_KEY_FILE: process.env.WORKER_NATS_KEY_FILE!,
-                NATS_CA_FILE: process.env.WORKER_NATS_CA_FILE!,
+                // NATS Configuration
+                NATS_SERVERS: '{{ project.NATS_SERVERS }}',
+                NATS_USER: '{{ project.WORKER_NATS_USER }}',
+                NATS_PASSWORD: '{{ project.WORKER_NATS_PASS }}',
+                NATS_MAX_RECONNECT_ATTEMPTS: '{{ environment.NATS_MAX_RECONNECT_ATTEMPTS }}',
+                NATS_RECONNECT_TIME_WAIT: '{{ environment.NATS_RECONNECT_TIME_WAIT }}',
+                NATS_TIMEOUT: '{{ environment.NATS_TIMEOUT }}',
+                NATS_CERT_FILE: '{{ environment.NATS_CERT_FILE }}',
+                NATS_KEY_FILE: '{{ environment.NATS_KEY_FILE }}',
+                NATS_CA_FILE: '{{ environment.NATS_CA_FILE }}',
+                NATS_TLS: '{{ environment.NATS_TLS }}',
 
                 //  Database Configuration
-                MONGODB_URI: process.env.WORKER_MONGODB_URI!,
-                DB_NAME: process.env.WORKER_DB_NAME!,
-                MONGODB_MAX_POOL_SIZE: process.env.WORKER_MONGODB_MAX_POOL_SIZE!,
-                MONGODB_MIN_POOL_SIZE: process.env.WORKER_MONGODB_MIN_POOL_SIZE!,
+                MONGODB_URI: '{{ project.MONGODB_URI }}',
+                MONGODB_DB_NAME: '{{ project.MONGODB_DB_NAME }}',
+                MONGODB_MAX_POOL_SIZE: '{{ environment.MONGODB_MAX_POOL_SIZE}}',
+                MONGODB_MIN_POOL_SIZE: '{{ environment.MONGODB_MIN_POOL_SIZE}}',
+                MONGODB_SSL: '{{ project.MONGODB_SSL}}',
+                MONGODB_CA_FILE: '{{ environment.MONGODB_CA_FILE}}',
 
                 //  Clickhouse Configuration
-                CLICKHOUSE_URL: process.env.WORKER_CLICKHOUSE_URL!,
-                CLICKHOUSE_HOST: process.env.WORKER_CLICKHOUSE_HOST!,
-                CLICKHOUSE_USERNAME: process.env.WORKER_CLICKHOUSE_USERNAME!,
-                CLICKHOUSE_PASSWORD: process.env.WORKER_CLICKHOUSE_PASSWORD!,
-                CLICKHOUSE_DATABASE: process.env.WORKER_CLICKHOUSE_DATABASE!,
+                CLICKHOUSE_URL: '{{ project.CLICKHOUSE_URL }}',
 
                 //  Redis Configuration
-                REDIS_DB: process.env.WORKER_REDIS_DB!,
-                REDIS_HOST: process.env.WORKER_REDIS_HOST!,
-                REDIS_PASSWORD: process.env.WORKER_REDIS_PASSWORD!,
-                REDIS_PORT: process.env.WORKER_REDIS_PORT!,
-                REDIS_URL: process.env.WORKER_REDIS_URL!,
-                REDIS_USERNAME: process.env.WORKER_REDIS_USERNAME!,
+                REDIS_URL: '{{ project.REDIS_URL }}',
+                REDIS_TLS: '{{ project.REDIS_TLS }}',
+                QUEUE_REDIS_URL: '{{ project.QUEUE_REDIS_URL }}',
+                QUEUE_REDIS_TLS: '{{ project.QUEUE_REDIS_TLS }}',
+                STREAM_REDIS_URL: '{{ project.STREAM_REDIS_URL }}',
+                STREAM_REDIS_TLS: '{{ project.STREAM_REDIS_TLS }}',
 
-                //  Background Jobs Configuration
-                QUEUE_REDIS_DB: process.env.WORKER_QUEUE_REDIS_DB!,
-                QUEUE_REDIS_HOST: process.env.WORKER_QUEUE_REDIS_HOST!,
-                QUEUE_REDIS_PASSWORD: process.env.WORKER_QUEUE_REDIS_PASSWORD!,
-                QUEUE_REDIS_PORT: process.env.WORKER_QUEUE_REDIS_PORT!,
-                QUEUE_REDIS_URL: process.env.WORKER_QUEUE_REDIS_URL!,
-                QUEUE_REDIS_USERNAME: process.env.WORKER_QUEUE_REDIS_USERNAME!,
-
-                ENCRYPTION_KEY: process.env.WORKER_ENCRYPTION_KEY!,
-
-                //  Logging Configuration
-                LOG_LEVEL: process.env.WORKER_LOG_LEVEL!,
-                LOG_FILE: process.env.WORKER_LOG_FILE!,
-                ERROR_LOG_FILE: process.env.WORKER_ERROR_LOG_FILE!,
-                APP_NAME: process.env.WORKER_APP_NAME!,
-                APP_VERSION: process.env.WORKER_APP_VERSION!,
+                ENCRYPTION_KEY: '{{ project.ENCRYPTION_KEY }}',
             };
 
             const envData = Object.entries(envsToInject)

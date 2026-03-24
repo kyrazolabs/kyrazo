@@ -1,5 +1,6 @@
 import { Pool, PoolClient, QueryResult } from 'pg';
 import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as fs from 'fs';
 import { logger } from './logger';
 import config from './app';
 import * as schema from '../models/postgres/index';
@@ -54,15 +55,36 @@ export class PostgresConfig {
         }
 
         try {
-            const { url, max, idleTimeoutMillis, connectionTimeoutMillis } = config.postgres;
+            const { url, max, idleTimeoutMillis, connectionTimeoutMillis, ssl, sslMode, caFile } = config.postgres;
 
-            logger.info('Attempting to connect to Postgres...');
+            logger.info('Attempting to connect to Postgres...', {
+                sslEnabled: ssl,
+                sslMode: sslMode,
+            });
+
+            let sslConfig: any = false;
+            if (ssl) {
+                if (sslMode === 'verify-ca' || sslMode === 'verify-full') {
+                    sslConfig = {
+                        rejectUnauthorized: true,
+                        ca: caFile ? fs.readFileSync(caFile).toString() : undefined,
+                    };
+                    if (sslMode === 'verify-ca') {
+                        // Skip hostname verification for verify-ca as per Coolify docs
+                        sslConfig.checkServerIdentity = () => undefined;
+                    }
+                } else {
+                    // Default to require (encrypted, but no CA verification)
+                    sslConfig = { rejectUnauthorized: false };
+                }
+            }
 
             this.pool = new Pool({
                 connectionString: url,
                 max,
                 idleTimeoutMillis,
                 connectionTimeoutMillis,
+                ssl: sslConfig,
             });
 
             // Initialize Drizzle ORM

@@ -72,9 +72,10 @@ openssl req -new -key "$OUTPUT_DIR/$CERT_NAME.key" \
 # Third step: SAN (IPs and DNSs)
 echo ""
 echo "Step 3: SAN Configuration (Subject Alt Names)"
-IP_COUNT=1
+echo "ℹ️ Adding 127.0.0.1 by default."
+IP_COUNT=2
 DNS_COUNT=1
-ALTS=""
+ALTS="IP.1 = 127.0.0.1\n"
 
 while true; do
   read -p "Add an IP? (y/n): " add_ip

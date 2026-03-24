@@ -20,8 +20,12 @@ async function main() {
     await streamConsumer.start();
 
     // Initialize Redis clients for health checks
-    const snapshotRedis = new Redis(Config.get().snapshotRedisUrl);
-    const streamRedis = new Redis(Config.get().streamRedisUrl);
+    const snapshotRedis = new Redis(Config.get().snapshotRedisUrl, {
+        tls: Config.get().snapshotRedisTls ? { rejectUnauthorized: false } : undefined,
+    });
+    const streamRedis = new Redis(Config.get().streamRedisUrl, {
+        tls: Config.get().streamRedisTls ? { rejectUnauthorized: false } : undefined,
+    });
 
     // Start health check server using Bun.serve
     Bun.serve({

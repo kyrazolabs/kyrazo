@@ -17,9 +17,13 @@ services:
       - MONGODB_DB_NAME=${MONGODB_DB_NAME}
       - MONGODB_MAX_POOL_SIZE=${MONGODB_MAX_POOL_SIZE}
       - MONGODB_MIN_POOL_SIZE=${MONGODB_MIN_POOL_SIZE}
+      - MONGODB_SSL=${MONGODB_SSL}
+      - MONGODB_CA_FILE=${MONGODB_CA_FILE:-/etc/ssl/certs/coolify-ca.crt}
 
       - REDIS_URL=${REDIS_URL}
+      - REDIS_TLS=${REDIS_TLS}
       - QUEUE_REDIS_URL=${QUEUE_REDIS_URL}
+      - QUEUE_REDIS_TLS=${QUEUE_REDIS_TLS}
 
       # NATS Configuration
       - NATS_SERVERS=${NATS_SERVERS}
@@ -30,13 +34,15 @@ services:
       - NATS_TIMEOUT=${NATS_TIMEOUT}
       - NATS_CERT_FILE=${NATS_CERT_FILE}
       - NATS_KEY_FILE=${NATS_KEY_FILE}
-      - NATS_CA_FILE=${NATS_CA_FILE}
+      - NATS_CA_FILE=${NATS_CA_FILE:-/etc/nats/certs/ca.pem}
+      - NATS_TLS=${NATS_TLS}
 
       # Security Configuration
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
     volumes:
       - ./logs:/app/apis/ingest/logs
       - /data/nats/certs:/data/nats/certs:ro
+      - /data/coolify/ssl/coolify-ca.crt:/etc/ssl/certs/coolify-ca.crt:ro
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:${PORT}/v1/health"]

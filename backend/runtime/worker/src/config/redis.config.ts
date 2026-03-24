@@ -63,26 +63,27 @@ export class RedisConfig {
 
         try {
             // Main Redis client for general operations
-            let redisClientOptions: any;
             if (config.redis.url) {
-                redisClientOptions = config.redis.url;
+                this.client = new Redis(config.redis.url, {
+                    maxRetriesPerRequest: null,
+                    tls: config.redis.tls ? { rejectUnauthorized: false } : undefined,
+                });
             } else {
-                redisClientOptions = {
+                this.client = new Redis({
                     host: config.redis.host,
                     port: config.redis.port,
                     db: config.redis.db,
+                    password: config.redis.password,
                     maxRetriesPerRequest: null, // Essential for BullMQ
-                };
-                if (config.redis.password) {
-                    redisClientOptions.password = config.redis.password;
-                }
+                    tls: config.redis.tls ? { rejectUnauthorized: false } : undefined,
+                });
             }
-            this.client = new Redis(redisClientOptions);
 
             // Queue Redis client for BullMQ
             if (config.redis.queue.url) {
                 this.queueClient = new Redis(config.redis.queue.url, {
                     maxRetriesPerRequest: null,
+                    tls: (config.redis.queue as any).tls ? { rejectUnauthorized: false } : undefined,
                 });
             } else {
                 this.queueClient = new Redis({
@@ -91,6 +92,7 @@ export class RedisConfig {
                     password: config.redis.queue.password || config.redis.password,
                     db: config.redis.queue.db || config.redis.db,
                     maxRetriesPerRequest: null, // Essential for BullMQ
+                    tls: (config.redis.queue as any).tls ? { rejectUnauthorized: false } : undefined,
                 });
             }
 
@@ -98,6 +100,7 @@ export class RedisConfig {
             if (config.redis.stream.url) {
                 this.streamClient = new Redis(config.redis.stream.url, {
                     maxRetriesPerRequest: null,
+                    tls: (config.redis.stream as any).tls ? { rejectUnauthorized: false } : undefined,
                 });
             } else {
                 this.streamClient = new Redis({
@@ -106,6 +109,7 @@ export class RedisConfig {
                     password: config.redis.stream.password || config.redis.password,
                     db: config.redis.stream.db || config.redis.db,
                     maxRetriesPerRequest: null,
+                    tls: (config.redis.stream as any).tls ? { rejectUnauthorized: false } : undefined,
                 });
             }
 

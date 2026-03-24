@@ -28,6 +28,9 @@ COPY services/orchestrator ./
 FROM oven/bun:${BUN_VERSION}-alpine AS runner
 WORKDIR /app
 
+# Install su-exec for dropping privileges from root
+RUN apk add --no-cache su-exec
+
 # Copy all installed dependencies
 COPY --from=builder /app/services/orchestrator/node_modules /app/services/orchestrator/node_modules
 
@@ -48,11 +51,15 @@ COPY --from=builder /app/services/orchestrator/src /app/services/orchestrator/sr
 # Set working directory to orchestrator package
 WORKDIR /app/services/orchestrator
 
+# Pre-create logs directory
+RUN mkdir -p /app/services/orchestrator/logs && chown -R bun:bun /app/services/orchestrator/logs
+
+# Copy and setup entrypoint script
+COPY services/orchestrator/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 # Ensure everything is owned by the bun user before switching
 RUN chown -R bun:bun /app
-
-# Run as non-root user for security
-USER bun
 
 # Expose the application port
 EXPOSE ${PORT}
@@ -61,5 +68,5 @@ EXPOSE ${PORT}
 HEALTHCHECK  --start-period=20s --interval=30s --timeout=3s --retries=3 \
     CMD wget -qO- http://127.0.0.1:${PORT}/v1/health || exit 1
 
-# Start the application
-CMD ["sh", "-c", "bun run prod && bun run start"]
+# Entrypoint runs as root to fix log dir permissions, then drops to bun
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
