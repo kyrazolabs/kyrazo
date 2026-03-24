@@ -74,7 +74,7 @@ cluster {
   tls {
     cert_file: "/etc/nats/certs/nats.pem"
     key_file:  "/etc/nats/certs/nats.key"
-    ca_file:   "/etc/ssl/certs/coolify-ca.crt"
+    ca_file:   "/etc/ssl/certs/ca.pem"
     verify: true
   }
 
