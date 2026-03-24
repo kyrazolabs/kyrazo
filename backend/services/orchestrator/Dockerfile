@@ -28,8 +28,8 @@ COPY services/orchestrator ./
 FROM oven/bun:${BUN_VERSION}-alpine AS runner
 WORKDIR /app
 
-# Install su-exec for dropping privileges from root
-RUN apk add --no-cache su-exec
+# Install su-exec and wget for healthchecks
+RUN apk add --no-cache su-exec wget
 
 # Copy all installed dependencies
 COPY --from=builder /app/services/orchestrator/node_modules /app/services/orchestrator/node_modules
