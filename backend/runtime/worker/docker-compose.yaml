@@ -5,14 +5,16 @@ services:
       dockerfile: runtime/worker/Dockerfile
     restart: always
     environment:
+      - NODE_ENV=${NODE_ENV}
       - WORKERS=1
-      - WORKSPACE_ID=${WORKSPACE_ID}
       - WORKER_ID=${WORKER_ID}
-      - WORKER_CONCURRENCY=${WORKER_CONCURRENCY}
+      - WORKSPACE_ID=${WORKSPACE_ID}
       - BATCH_SIZE=${BATCH_SIZE}
       - MAX_ACK_PENDING=${MAX_ACK_PENDING}
       - FETCH_TIMEOUT_MS=${FETCH_TIMEOUT_MS}
-      - NODE_ENV=${NODE_ENV}
+      - WORKER_CONCURRENCY=${WORKER_CONCURRENCY}
+
+      # NATS Configuration
       - NATS_SERVERS=${NATS_SERVERS}
       - NATS_USER=${NATS_USER}
       - NATS_PASSWORD=${NATS_PASSWORD}
@@ -22,36 +24,30 @@ services:
       - NATS_CERT_FILE=${NATS_CERT_FILE}
       - NATS_KEY_FILE=${NATS_KEY_FILE}
       - NATS_CA_FILE=${NATS_CA_FILE}
+      - NATS_TLS=${NATS_TLS}
+
       - MONGODB_URI=${MONGODB_URI}
-      - DB_NAME=${DB_NAME}
+      - MONGODB_DB_NAME=${DB_NAME}
       - MONGODB_MAX_POOL_SIZE=${MONGODB_MAX_POOL_SIZE}
       - MONGODB_MIN_POOL_SIZE=${MONGODB_MIN_POOL_SIZE}
+      - MONGODB_SSL=${MONGODB_SSL}
+      - MONGODB_CA_FILE=${MONGODB_CA_FILE:-/etc/ssl/certs/coolify-ca.crt}
+
+      # Clickhouse Configuration
       - CLICKHOUSE_URL=${CLICKHOUSE_URL}
-      - CLICKHOUSE_HOST=${CLICKHOUSE_HOST}
-      - CLICKHOUSE_USERNAME=${CLICKHOUSE_USERNAME}
-      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
-      - CLICKHOUSE_DATABASE=${CLICKHOUSE_DATABASE}
-      - REDIS_DB=${REDIS_DB}
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-      - REDIS_PORT=${REDIS_PORT}
+
+      # Redis Configuration
       - REDIS_URL=${REDIS_URL}
-      - REDIS_USERNAME=${REDIS_USERNAME}
-      - QUEUE_REDIS_DB=${QUEUE_REDIS_DB}
-      - QUEUE_REDIS_HOST=${QUEUE_REDIS_HOST}
-      - QUEUE_REDIS_PASSWORD=${QUEUE_REDIS_PASSWORD}
-      - QUEUE_REDIS_PORT=${QUEUE_REDIS_PORT}
+      - REDIS_TLS=${REDIS_TLS}
+      - STREAM_REDIS_URL=${STREAM_REDIS_URL}
+      - STREAM_REDIS_TLS=${STREAM_REDIS_TLS}
       - QUEUE_REDIS_URL=${QUEUE_REDIS_URL}
-      - QUEUE_REDIS_USERNAME=${QUEUE_REDIS_USERNAME}
+      - QUEUE_REDIS_TLS=${QUEUE_REDIS_TLS}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
-      - LOG_LEVEL=${LOG_LEVEL}
-      - LOG_FILE=${LOG_FILE}
-      - ERROR_LOG_FILE=${ERROR_LOG_FILE}
-      - APP_NAME=${APP_NAME}
-      - APP_VERSION=${APP_VERSION}
     volumes:
       - ./logs:/app/runtime/worker/logs
       - /data/nats/certs:/data/nats/certs:ro
+      - /data/coolify/ssl/coolify-ca.crt:/etc/ssl/certs/coolify-ca.crt:ro
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/v1/health"]
       interval: 30s

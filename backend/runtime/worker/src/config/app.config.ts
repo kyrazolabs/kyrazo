@@ -27,6 +27,19 @@ export const config = {
     database: {
         uri: process.env.MONGODB_URI!,
         dbName: process.env.DB_NAME!,
+        ssl: process.env.MONGODB_SSL === 'true' || process.env.NODE_ENV === 'production',
+        caFile: process.env.MONGODB_CA_FILE,
+    },
+
+    // Postgres Configuration
+    postgres: {
+        url: process.env.POSTGRES_URL || 'postgresql://postgres:postgres@localhost:5432/postgres',
+        max: parseInt(process.env.POSTGRES_MAX_POOL || '20'),
+        idleTimeoutMillis: parseInt(process.env.POSTGRES_IDLE_TIMEOUT || '30000'),
+        connectionTimeoutMillis: parseInt(process.env.POSTGRES_CONNECTION_TIMEOUT || '2000'),
+        ssl: process.env.POSTGRES_SSL === 'true' || process.env.NODE_ENV === 'production',
+        sslMode: process.env.POSTGRES_SSL_MODE || 'require',
+        caFile: process.env.POSTGRES_CA_FILE,
     },
 
     clickhouse: {
@@ -43,12 +56,14 @@ export const config = {
         port: parseInt(process.env.REDIS_PORT!),
         password: process.env.REDIS_PASSWORD,
         db: parseInt(process.env.REDIS_DB || '0'),
+        tls: process.env.REDIS_TLS === 'true' || process.env.NODE_ENV === 'production',
         queue: {
             url: process.env.QUEUE_REDIS_URL || process.env.REDIS_URL!,
             host: process.env.QUEUE_REDIS_HOST || process.env.REDIS_HOST!,
             port: parseInt(process.env.QUEUE_REDIS_PORT || process.env.REDIS_PORT!),
             password: process.env.QUEUE_REDIS_PASSWORD || process.env.REDIS_PASSWORD,
             db: parseInt(process.env.QUEUE_REDIS_DB || '1'),
+            tls: process.env.QUEUE_REDIS_TLS === 'true' || process.env.REDIS_TLS === 'true' || process.env.NODE_ENV === 'production',
         },
         stream: {
             url: process.env.STREAM_REDIS_URL || process.env.REDIS_URL!,
@@ -56,6 +71,7 @@ export const config = {
             port: parseInt(process.env.STREAM_REDIS_PORT || process.env.REDIS_PORT!),
             password: process.env.STREAM_REDIS_PASSWORD || process.env.REDIS_PASSWORD,
             db: parseInt(process.env.STREAM_REDIS_DB || '2'),
+            tls: process.env.STREAM_REDIS_TLS === 'true' || process.env.REDIS_TLS === 'true' || process.env.NODE_ENV === 'production',
         },
     },
 
@@ -67,6 +83,7 @@ export const config = {
     nats: {
         servers: process.env.NATS_SERVERS?.split(',') || ['nats://localhost:4222'],
         tls: {
+            enabled: process.env.NATS_TLS === 'true' || process.env.NODE_ENV === 'production',
             certFile: process.env.NATS_CERT_FILE,
             keyFile: process.env.NATS_KEY_FILE,
             caFile: process.env.NATS_CA_FILE,

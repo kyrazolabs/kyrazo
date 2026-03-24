@@ -61,7 +61,7 @@ export class NatsConfig {
             // Connect to NATS
             this.nc = await connect({
                 servers: config.nats.servers,
-                tls: config.isProduction
+                tls: config.nats.tls.enabled
                     ? {
                           certFile: config.nats.tls.certFile,
                           keyFile: config.nats.tls.keyFile,

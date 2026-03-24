@@ -36,6 +36,9 @@ RUN bun run build
 FROM oven/bun:${BUN_VERSION}-alpine AS runner
 WORKDIR /app
 
+# Install su-exec for dropping privileges from root
+RUN apk add --no-cache su-exec
+
 # Copy necessary files from builder
 COPY --from=builder /app/package.json /app/package.json
 COPY --from=builder /app/bun.lock /app/bun.lock
@@ -52,11 +55,12 @@ COPY --from=builder /app/apps/mail/src /app/apps/mail/src
 # Ensure everything is owned by the bun user
 RUN chown -R bun:bun /app
 
-# Run as non-root user
-USER bun
-
 # Set working directory to the mail app
 WORKDIR /app/apps/mail
+
+# Copy and setup entrypoint script
+COPY /entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 ENV NODE_ENV=production
 
@@ -68,4 +72,4 @@ HEALTHCHECK --start-period=10s --interval=30s --timeout=3s --retries=3 \
     CMD wget -qO- http://localhost:${PORT}/health || exit 1
 
 # Start the application
-CMD ["bun", "run", "start"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

@@ -1,189 +1,99 @@
-# NATS Cluster TLS Setup (mTLS)
+# NATS Production Cluster Setup (Public Network)
 
-هذا الدليل يوضح كيفية إعداد **NATS Cluster** باستخدام شهادات صحيحة مع **mTLS**.
-
-> الخطأ الشائع عند استخدام mkcert:
->
-> ```
-> x509: certificate specifies an incompatible key usage
-> ```
->
-> هذا ليس خطأ إعداد NATS، بل بسبب نوع الشهادة نفسها. شهادات mkcert صالحة فقط للمتصفحات وليست صالحة لـ Server-to-Server mTLS مثل NATS، gRPC، أو Database TLS.
+This directory contains the configuration and utilities for deploying a secure, production-grade NATS cluster on a public network using **mTLS** and **Cluster Authentication**.
 
 ---
 
-## 1️⃣ لماذا mkcert لا يصلح
+## 🔐 1. Certificate Management (`certs.sh`)
 
-- مخصص لـ **HTTPS / Browsers** فقط
-- لا يضع KeyUsage و ExtendedKeyUsage المناسبة لـ NATS Routes
-- Go TLS يرفض استخدامها في Cluster/Routes
+For public networks, **mTLS (Mutual TLS)** is mandatory. Use the provided script to generate your certificates.
 
-**الحل:** استخدم **OpenSSL**, **cfssl** أو **step-ca**. هنا نستخدم OpenSSL.
+### How to use:
+1.  Run `bash certs.sh` on your main server.
+2.  **Step 3 (SANs)**: This is critical. You must add the **Public IPs** of all servers that will participate in the cluster or connect as clients.
+    *   `127.0.0.1` is added by default.
+    *   Add the Public IP of **Server 1** (NATS/API)
+    *   Add the Public IP of **Server 2** (NATS/API)
+    *   Add the Public IP of **Server 3** (Worker)
+    *   Add the Public IP of **Server 4** (Worker)
+3.  The script will generate `nats.pem` and `nats.key`.
 
----
-
-## 2️⃣ إنشاء CA (مرة واحدة)
-
-```bash
-openssl genrsa -out ca.key 4096
-openssl req -x509 -new -nodes -key ca.key \
-  -sha256 -days 3650 \
-  -subj "/CN=NATS-CA" \
-  -out ca.pem
-```
-
-> **ca.key** يُحتفظ به فقط على سيرفر توقيع الشهادات.
+### Distribution:
+Copy the following files to `/etc/nats/certs/` (or the mapped volume path) on **all servers**:
+- `ca.pem` (The Root CA)
+- `nats.pem` (The Certificate)
+- `nats.key` (The Private Key)
 
 ---
 
-## 3️⃣ إنشاء شهادة لكل سيرفر NATS
+## 🏗️ 2. Cluster Architecture (4-Server Example)
 
-### مثال: سيرفر 10.8.0.3
+If you have 2 NATS nodes and 2 Worker nodes:
 
-```bash
-openssl genrsa -out nats-3.key 2048
+1.  **Nodes 1 & 2**: Run NATS + Dashboard/Ingest APIs.
+2.  **Nodes 3 & 4**: Run pure Workers.
 
-openssl req -new -key nats-3.key \
-  -subj "/CN=nats-3" \
-  -out nats-3.csr
-```
-
-ملف **extensions** مهم جدًا:
-
-```bash
-cat > nats-3.ext <<EOF
-basicConstraints = CA:FALSE
-keyUsage = digitalSignature, keyEncipherment
-extendedKeyUsage = serverAuth, clientAuth
-subjectAltName = @alt_names
-
-[alt_names]
-IP.1 = 10.8.10.1
-DNS.1 = nats-3
-EOF
-```
-
-توقيع الشهادة:
-
-```bash
-openssl x509 -req -in nats-3.csr \
-  -CA ca.pem -CAkey ca.key -CAcreateserial \
-  -out nats-3.pem -days 365 -sha256 \
-  -extfile nats-3.ext
-```
-
-### كرر للسيرفر 10.8.0.4
-
-غيّر:
-
-- `nats-4.key / nats-4.csr / nats-4.ext / nats-4.pem`
-- IP و CN حسب السيرفر
+All 4 servers should use the **same certificate files** (which list all 4 Public IPs in their SANs) to ensure they are trusted by the NATS nodes.
 
 ---
 
-## 4️⃣ نسخ الملفات إلى كل سيرفر
+## ⚙️ 3. NATS Configuration (`nats.conf`)
 
-على كل سيرفر:
+The configuration is hardened for the public network:
 
-```
-/etc/nats/certs/
-├── ca.pem
-├── nats-X.pem
-└── nats-X.key
-```
-
-> `X` = رقم السيرفر
-
----
-
-## 5️⃣ إعداد NATS مع TLS
-
-```conf
+### Client Security (`tls`)
+Requires all clients (APIs/Workers) to provide a valid certificate signed by your CA.
+```hcl
 tls {
-  cert_file: "/etc/nats/certs/nats-X.pem"
-  key_file: "/etc/nats/certs/nats-X.key"
-  ca_file: "/etc/nats/certs/ca.pem"
+  cert_file: "/etc/nats/certs/nats.pem"
+  key_file:  "/etc/nats/certs/nats.key"
+  ca_file:   "/etc/ssl/certs/coolify-ca.crt" # Project-wide CA
   verify: true
 }
+```
 
+### Cluster Security (`cluster`)
+Uses both **mTLS** and **Cluster Authentication** (password) to prevent unauthorized nodes from joining.
+```hcl
 cluster {
   name: "nats-cluster"
   listen: "0.0.0.0:6222"
 
+  authorization {
+    user: "cluster_user"
+    password: "YOUR_BCRYPT_PASSWORD"
+  }
+
   tls {
-    cert_file: "/etc/nats/certs/nats-X.pem"
-    key_file: "/etc/nats/certs/nats-X.key"
-    ca_file: "/etc/nats/certs/ca.pem"
+    cert_file: "/etc/nats/certs/nats.pem"
+    key_file:  "/etc/nats/certs/nats.key"
+    ca_file:   "/etc/ssl/certs/coolify-ca.crt"
     verify: true
   }
 
   routes = [
-    "nats://10.8.0.Y:6222"
+    "nats://cluster_user:PASSWORD@PUBLIC_IP_NODE_2:6222"
   ]
 }
 ```
 
-> استبدل `X` و `Y` حسب السيرفرين.
-
 ---
 
-## 6️⃣ إعادة التشغيل
+## 🐳 4. Docker Integration
 
-```bash
-systemctl restart nats
-# أو
-docker restart nats
+Ensure your `docker-compose.yml` mounts the project-wide Coolify CA cert:
+
+```yaml
+volumes:
+  - '/data/nats/certs:/etc/nats/certs:ro'
+  - '/data/coolify/ssl/coolify-ca.crt:/etc/ssl/certs/coolify-ca.crt:ro'
 ```
 
 ---
 
-## 7️⃣ النتيجة المتوقعة
+## ✅ 5. Verification
 
-```
-Route connection established
-Cluster formed
-JetStream cluster leader elected
-```
-
----
-
-## 8️⃣ ملفات غير مطلوبة
-
-- `rootCA.pem` من mkcert → **احذف لتفادي اللبس**
-
-```bash
-rm -f rootCA.pem
-```
-
-- `ca.srl` → يستخدم داخليًا عند توقيع الشهادات، لا يُنسخ للسيرفرات ولا يدخل في config.
-
----
-
-## 9️⃣ ملاحظات أمان
-
-- `ca.key` يبقى فقط على سيرفر CA
-- على السيرفرات يكفي:
-
-```
-ca.pem
-nats-X.pem
-nats-X.key
-```
-
----
-
-## 🔑 خلاصة
-
-- mkcert لا يصلح لـ NATS Cluster mTLS
-- استخدم OpenSSL مع keyUsage `serverAuth, clientAuth`
-- تأكد من تطابق fingerprint لـ `ca.pem` على كل السيرفرات
-- هذا إعداد Production-grade جاهز للعمل
-
----
-
-يمكن إضافة أقسام لاحقة مثل:
-
-- 3-node JetStream
-- Leafnodes TLS
-- JWT / Operator mode
-- Zero Trust NATS
+Once deployed, check your NATS logs. You should see:
+1. `TLS required for client connections`
+2. `Cluster Name: nats-cluster`
+3. `Route connection established` (when nodes connect to each other)

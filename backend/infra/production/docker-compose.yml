@@ -9,6 +9,7 @@ services:
     volumes:
       - '/data/nats/nats:/data'
       - '/data/nats/certs:/etc/nats/certs:ro'
+      - '/data/coolify/ssl/coolify-ca.crt:/etc/ssl/certs/coolify-ca.crt:ro'
       - '/data/nats/nats-x.conf:/etc/nats/nats-server.conf:ro'
     command:
       - '-c'

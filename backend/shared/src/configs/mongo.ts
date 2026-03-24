@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import * as fs from 'fs';
 import { logger } from './logger';
 import config from './app';
 
@@ -70,8 +71,10 @@ export class DatabaseConfig {
                 retryWrites: config.database.retryWrites,
                 retryReads: config.database.retryReads,
                 bufferCommands: false,
+                ssl: (config.database as any).ssl,
+                ca: (config.database as any).caFile ? fs.readFileSync((config.database as any).caFile) : undefined,
                 // bufferMaxEntries: 0,
-            });
+            } as any);
 
             this.isConnected = true;
             logger.info('Mongoose connected to MongoDB successfully');

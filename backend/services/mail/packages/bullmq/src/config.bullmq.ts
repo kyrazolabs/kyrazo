@@ -8,11 +8,12 @@ export class BullmqHandler {
   private bullmqOptions: QueueOptions;
   public redisClient: Redis;
 
-  constructor(redisUrl: string) {
+  constructor(redisUrl: string, tls: boolean = false) {
     this.redisUrl = redisUrl;
     this.redisClient = new Redis(this.redisUrl, {
       maxRetriesPerRequest: null,
       enableOfflineQueue: true,
+      tls: tls ? { rejectUnauthorized: false } : undefined,
       reconnectOnError: (err) => {
         const targetError = "READONLY";
         const isRecoverable = err.message.includes(targetError);

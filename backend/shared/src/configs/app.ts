@@ -26,6 +26,8 @@ export const config = {
         heartbeatFrequencyMS: parseInt(process.env.MONGODB_HEARTBEAT_FREQUENCY_MS || '10000'),
         retryWrites: process.env.MONGODB_RETRY_WRITES !== 'false',
         retryReads: process.env.MONGODB_RETRY_READS !== 'false',
+        ssl: process.env.MONGODB_SSL === 'true' || process.env.NODE_ENV === 'production',
+        caFile: process.env.MONGODB_CA_FILE,
     },
 
     clickhouse: {
@@ -41,6 +43,9 @@ export const config = {
         max: parseInt(process.env.POSTGRES_MAX_POOL || '20'),
         idleTimeoutMillis: parseInt(process.env.POSTGRES_IDLE_TIMEOUT || '30000'),
         connectionTimeoutMillis: parseInt(process.env.POSTGRES_CONNECTION_TIMEOUT || '2000'),
+        ssl: process.env.POSTGRES_SSL === 'true' || process.env.NODE_ENV === 'production',
+        sslMode: process.env.POSTGRES_SSL_MODE || 'require',
+        caFile: process.env.POSTGRES_CA_FILE,
     },
 
     // Redis Configuration
@@ -50,6 +55,7 @@ export const config = {
         port: parseInt(process.env.REDIS_PORT!),
         password: process.env.REDIS_PASSWORD,
         db: parseInt(process.env.REDIS_DB || '0'),
+        tls: process.env.REDIS_TLS === 'true' || process.env.NODE_ENV === 'production',
         queue: {
             url: process.env.QUEUE_REDIS_URL!,
             host: process.env.QUEUE_REDIS_HOST || process.env.REDIS_HOST!,
