@@ -28,6 +28,7 @@ services:
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
     volumes:
       - ./logs:/app/services/ingestor/logs
+<<<<<<< HEAD
 
       - /etc/ssl/mongodb/ca.crt:/etc/ssl/mongodb/ca.crt:ro
       - /etc/ssl/mongodb/client.pem:/etc/ssl/mongodb/client.pem:ro
@@ -35,6 +36,9 @@ services:
       - /etc/ssl/redis/ca.crt:/etc/ssl/redis/ca.crt:ro
       - /etc/ssl/redis/client.crt:/etc/ssl/redis/client.crt:ro
       - /etc/ssl/redis/client.key:/etc/ssl/redis/client.:ro
+=======
+      - /data/coolify/ssl/coolify-ca.crt:/etc/ssl/certs/ca.pem:ro
+>>>>>>> 0fc75fd (✨ feat: merge develop into main)
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:${PORT}/v1/health"]
       interval: 30s
