@@ -144,12 +144,12 @@ export class NatsConfig {
                     subjects: STREAM_SUBJECTS,
                     retention: RetentionPolicy.Workqueue,
                     storage: StorageType.File,
-                    num_replicas: config.isDevelopment ? 1 : 2,
-                    max_age: 72 * 60 * 60 * 1e9, // 72H
-                    max_bytes: 1024 * 1024 * 1024 * 2, // 2GB
+                    num_replicas: 1, // config.isDevelopment ? 1 : 2,
+                    max_age: 168 * 60 * 60 * 1e9, // 168H ~ 7 days
+                    max_bytes: 1024 * 1024 * 1024 * 10, // 10GB
                     max_msg_size: 1024 * 512, // 512KB
                     discard: DiscardPolicy.Old,
-                    duplicate_window: 5 * 60 * 1e9, // 5 minute dedup window
+                    duplicate_window: 10 * 60 * 1e9, // 10 minute dedup window
                     allow_rollup_hdrs: false,
                     deny_delete: false,
                     deny_purge: false,
