@@ -45,7 +45,6 @@ COPY --from=builder /app/shared /app/shared
 # Copy orchestrator package binaries and config
 COPY --from=builder /app/services/orchestrator/package.json /app/services/orchestrator/package.json
 COPY --from=builder /app/services/orchestrator/tsconfig.json /app/services/orchestrator/tsconfig.json
-COPY --from=builder /app/services/orchestrator/drizzle.config.ts /app/services/orchestrator/drizzle.config.ts
 COPY --from=builder /app/services/orchestrator/src /app/services/orchestrator/src
 
 # Set working directory to orchestrator package
