@@ -9,12 +9,16 @@ mkdir -p "$LOG_DIR"
 chown -R bun:bun "$LOG_DIR"
 chmod 775 "$LOG_DIR"
 
-# Handle Coolify CA certificate if mounted
-CA_CRT="/etc/ssl/certs/ca.pem"
-if [ -f "$CA_CRT" ]; then
-    echo "📜 Found Coolify CA certificate at $CA_CRT"
-    chmod 644 "$CA_CRT" 2>/dev/null || echo "ℹ️ $CA_CRT is read-only, skipping chmod."
-fi
+# Handle unified certificates if mounted
+for dir in mongodb; do
+    if [ -d "/etc/ssl/$dir" ]; then
+        echo "🔧 Setting permissions for /etc/ssl/$dir..."
+        chown -R bun:bun "/etc/ssl/$dir" 2>/dev/null || echo "ℹ️ /etc/ssl/$dir is read-only, skipping chown."
+        chmod 755 "/etc/ssl/$dir" 2>/dev/null || echo "ℹ️ /etc/ssl/$dir is read-only, skipping chmod."
+        find "/etc/ssl/$dir" -type f \( -name "*.crt" -o -name "*.pem" \) -exec chmod 644 {} \; 2>/dev/null
+        find "/etc/ssl/$dir" -type f -name "*.key" -exec chmod 600 {} \; 2>/dev/null
+    fi
+done
 
 # Drop down to the bun user and start the application
 exec su-exec bun bun run prod && bun run start

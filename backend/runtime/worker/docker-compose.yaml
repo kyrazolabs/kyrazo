@@ -46,6 +46,13 @@ services:
     volumes:
       - ./logs:/app/runtime/worker/logs
       - /data/nats/certs:/data/nats/certs:ro
+
+      - /etc/ssl/mongodb/ca.crt:/etc/ssl/mongodb/ca.crt:ro
+      - /etc/ssl/mongodb/client.pem:/etc/ssl/mongodb/client.pem:ro
+
+      - /etc/ssl/redis/ca.crt:/etc/ssl/redis/ca.crt:ro
+      - /etc/ssl/redis/client.crt:/etc/ssl/redis/client.crt:ro
+      - /etc/ssl/redis/client.key:/etc/ssl/redis/client.:ro
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/v1/health"]
       interval: 30s
