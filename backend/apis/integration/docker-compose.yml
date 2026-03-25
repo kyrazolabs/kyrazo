@@ -42,12 +42,12 @@ services:
       - ./logs:/app/apis/integration/logs
 
       - /data/nats/certs:/data/nats/certs:ro
-      - /etc/ssl/mongodb/ca.crt:/etc/ssl/mongodb/ca.crt
-      - /etc/ssl/mongodb/mongodb.pem:/etc/ssl/mongodb/mongodb.pem
+      - /etc/ssl/mongodb/ca.crt:/etc/ssl/mongodb/ca.crt:ro
+      - /etc/ssl/mongodb/mongodb.pem:/etc/ssl/mongodb/mongodb.pem:ro
 
-      - /etc/ssl/redis/ca.crt:/etc/ssl/redis/ca.crt
-      - /etc/ssl/redis/client.crt:/etc/ssl/redis/client.crt
-      - /etc/ssl/redis/client.key:/etc/ssl/redis/client.key
+      - /etc/ssl/redis/ca.crt:/etc/ssl/redis/ca.crt:ro
+      - /etc/ssl/redis/client.crt:/etc/ssl/redis/client.crt:ro
+      - /etc/ssl/redis/client.key:/etc/ssl/redis/client.key:ro
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:${PORT}/v1/health"]
