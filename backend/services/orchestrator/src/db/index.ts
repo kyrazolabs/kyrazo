@@ -1,31 +1,22 @@
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
-import * as fs from 'fs';
-import * as schema from './schema';
+import mongoose from 'mongoose';
 import { config } from '../common/config';
 
-const connectionString = config.POSTGRES_URL;
+const connectionString = config.MONGODB_URI;
 
 if (!connectionString) {
-    throw new Error('POSTGRES_URL is not defined');
+    throw new Error('MONGODB_URI is not defined');
 }
 
-let sslConfig: any = false;
-if ((config as any).POSTGRES_SSL) {
-    if (
-        (config as any).POSTGRES_SSL_MODE === 'verify-ca' ||
-        (config as any).POSTGRES_SSL_MODE === 'verify-full'
-    ) {
-        sslConfig = {
-            ca: (config as any).POSTGRES_CA_FILE
-                ? fs.readFileSync((config as any).POSTGRES_CA_FILE).toString()
-                : undefined,
-        };
-    } else {
-        sslConfig = 'require';
+export const connectDB = async () => {
+    try {
+        await mongoose.connect(connectionString, {
+            autoIndex: true,
+        });
+        console.log('🚀 MongoDB connected successfully');
+    } catch (error) {
+        console.error('❌ MongoDB connection error:', error);
+        process.exit(1);
     }
-}
+};
 
-// Disable prefetch as it is not supported for "Transaction" pool mode
-export const client = postgres(connectionString, { prepare: false, ssl: sslConfig });
-export const db = drizzle(client, { schema });
+export * from './models';

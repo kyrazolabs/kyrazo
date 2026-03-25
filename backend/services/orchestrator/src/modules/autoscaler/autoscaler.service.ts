@@ -1,10 +1,8 @@
-import { db } from '@/db';
-import { clients, workers } from '@/db/schema';
+import { OrchestratorClient, OrchestratorWorker, WorkerStatus } from '@/db';
 import { WorkerService } from '@/modules/workers/worker.service';
 import { WorkerRepo } from '@/modules/workers/worker.repo';
 import { CommandDispatcher } from '@/modules/commands/command.dispatcher';
 import { Plan, Subscription, Workspace } from '@kyrazo/shared';
-import { and, eq, inArray } from 'drizzle-orm';
 import { config } from '@/common/config';
 
 import { getApplications, getDeployments } from '@/modules/coolify/actions';
@@ -27,14 +25,14 @@ export class AutoScalerService {
             (app: any) => app.name && app.name.startsWith('Worker - ')
         );
 
-        // 1. Reap stale terminated workers (stopped/failed for > 1 hour)
+        // 1. Reap stale terminated workers
         try {
             await WorkerService.reapStaleWorkers(kyrazoApps);
         } catch (err: any) {
             console.warn(`[AutoScaler] Stale worker reaping error: ${err.message}`);
         }
 
-        // 2. Reconcile server active_workers counts from actual worker records
+        // 2. Reconcile server active_workers counts
         try {
             await WorkerService.reconcileServerCounts();
         } catch (err: any) {
@@ -42,22 +40,18 @@ export class AutoScalerService {
         }
 
         // 3. Fetch ALL known clients that have workers in active state
-        const activeClientsRes = await db
-            .select({ clientId: workers.client_id })
-            .from(workers)
-            .where(inArray(workers.status, ['pending', 'starting', 'running', 'stopping']))
-            .groupBy(workers.client_id);
+        const activeClientsRes = await OrchestratorWorker.distinct('client_id', {
+            status: { $in: [WorkerStatus.PENDING, WorkerStatus.STARTING, WorkerStatus.RUNNING, WorkerStatus.STOPPING] }
+        });
 
-        const clientsWithWorkers = new Set(activeClientsRes.map(c => c.clientId));
+        const clientsWithWorkers = new Set(activeClientsRes);
 
         // 4. Fetch all ACTIVE/TRIALING subscriptions from Mongo
         const subscriptions = await Subscription.find({
             status: { $in: ['active', 'trialing'] },
         });
 
-        // 5. Merge both lists to ensure we process everyone:
-        // - Those who have a subscription (Scale UP/DOWN)
-        // - Those who have NO subscription but have workers (Scale DOWN to 0)
+        // 5. Merge both lists
         const subscriptionClientMap = new Map(
             subscriptions.map(s => [s.workspaceId.toString(), s])
         );
@@ -65,7 +59,7 @@ export class AutoScalerService {
         // Final set of client IDs to process
         const allClientIds = new Set([...clientsWithWorkers, ...subscriptionClientMap.keys()]);
 
-        // 6. Cleanup Orphans: Coolify apps that don't have a record in PG workers
+        // 6. Cleanup Orphans
         await this.cleanupOrphans(kyrazoApps);
 
         // 7. Process each client
@@ -86,12 +80,8 @@ export class AutoScalerService {
             const workerId = app.name.replace('Worker - ', '');
             if (!workerId) continue;
 
-            const [workerRecord] = await db
-                .select()
-                .from(workers)
-                .where(eq(workers.worker_id, workerId));
+            const workerRecord = await OrchestratorWorker.findOne({ worker_id: workerId });
 
-            // If no DB record, it's a leak — delete the Coolify app
             if (!workerRecord) {
                 console.warn(`[AutoScaler] Found orphaned Coolify app: ${app.name}. Deleting.`);
                 try {
@@ -118,26 +108,21 @@ export class AutoScalerService {
             if (workspace && plan) {
                 maxWorkers =
                     subscription.planSnapshot?.limits?.maxWorkers ?? plan.limits.maxWorkers;
-                // Sync limit to PG
-                await WorkerRepo.upsertClient(db, clientIdStr, maxWorkers);
+                // Sync limit
+                await WorkerRepo.upsertClient(clientIdStr, maxWorkers);
             }
         }
 
         const desiredWorkers = maxWorkers;
 
-        // 2. Sync & Health Check (Verify health and sync pending -> running)
+        // 2. Sync & Health Check
         await this.syncState(clientIdStr, kyrazoApps);
 
-        // 3. Identify Actual ACTIVE Workers for this specific client AFTER sync
-        const runningWorkerRecords = await db
-            .select()
-            .from(workers)
-            .where(
-                and(
-                    eq(workers.client_id, clientIdStr),
-                    inArray(workers.status, ['pending', 'starting', 'running'])
-                )
-            );
+        // 3. Identify Actual ACTIVE Workers
+        const runningWorkerRecords = await OrchestratorWorker.find({
+            client_id: clientIdStr,
+            status: { $in: [WorkerStatus.PENDING, WorkerStatus.STARTING, WorkerStatus.RUNNING] }
+        });
 
         const actualWorkers = runningWorkerRecords.length;
 
@@ -177,46 +162,31 @@ export class AutoScalerService {
 
     /**
      * Sync DB State with Actual (Coolify) State.
-     *
-     * Strategy: Reap-and-Replace
-     * - Transition pending/starting -> running when confirmed by Coolify
-     * - Mark unhealthy workers as failed AND delete their Coolify apps immediately
-     * - Mark zombie workers (missing from Coolify after grace period) as failed
-     *
-     * The next reconcile loop will see fewer actual workers and provision fresh ones.
      */
     private static async syncState(clientId: string, kyrazoApps: any[]) {
-        const GRACE_PERIOD_MS = 2 * 60 * 1000; // 2 minutes grace for "pending" starts
+        const GRACE_PERIOD_MS = 2 * 60 * 1000;
         const staleThreshold = new Date(Date.now() - GRACE_PERIOD_MS);
 
-        const activeWorkers = await db
-            .select()
-            .from(workers)
-            .where(
-                and(
-                    eq(workers.client_id, clientId),
-                    inArray(workers.status, ['pending', 'starting', 'running', 'stopping'])
-                )
-            );
+        const activeWorkers = await OrchestratorWorker.find({
+            client_id: clientId,
+            status: { $in: [WorkerStatus.PENDING, WorkerStatus.STARTING, WorkerStatus.RUNNING, WorkerStatus.STOPPING] }
+        });
 
         for (const w of activeWorkers) {
             const app = kyrazoApps.find(a => a.name === `Worker - ${w.worker_id}`);
             const isStale = (w.created_at?.getTime() || 0) < staleThreshold.getTime();
 
             if (app) {
-                // Coolify returns status in lowercase usually (running, exited, starting, etc.)
                 const coolifyStatus = app.status?.toLowerCase() || '';
 
-                // Case 1: Transition Pending/Starting -> Running
                 if (
-                    ['pending', 'starting'].includes(w.status) &&
+                    [WorkerStatus.PENDING, WorkerStatus.STARTING].includes(w.status as any) &&
                     coolifyStatus.includes('running')
                 ) {
                     console.log(`[AutoScaler] Worker ${w.worker_id} confirmed RUNNING in Coolify.`);
-                    await WorkerService.updateWorkerStatus(w.worker_id, 'running');
+                    await WorkerService.updateWorkerStatus(w.worker_id, WorkerStatus.RUNNING);
                 }
 
-                // Case 2: Transition to Failed if Exited or Unhealthy
                 const isUnhealthy =
                     ['exited', 'unhealthy', 'degraded', 'error'].some(s =>
                         coolifyStatus.includes(s)
@@ -224,7 +194,6 @@ export class AutoScalerService {
                     (coolifyStatus.includes('running') && coolifyStatus.includes('unhealthy'));
 
                 if (isUnhealthy) {
-                    // Before reaping, check if there's an active deployment
                     try {
                         const deploymentRes = await getDeployments(app.uuid);
                         const hasActiveDeployment = deploymentRes?.deployments?.some(
@@ -242,16 +211,13 @@ export class AutoScalerService {
                             `[AutoScaler] Failed to check deployments for ${w.worker_id}:`,
                             err
                         );
-                        // Fall through to reaping if check fails, or we could continue to be safe.
-                        // Let's continue to be safe and avoid deleting if we can't verify.
                         continue;
                     }
 
                     console.warn(
                         `[AutoScaler] Worker ${w.worker_id} is ${coolifyStatus} in Coolify. Reaping (mark failed + delete app).`
                     );
-                    // Reap-and-replace: mark failed (releases resources) then delete Coolify app
-                    await WorkerService.updateWorkerStatus(w.worker_id, 'failed');
+                    await WorkerService.updateWorkerStatus(w.worker_id, WorkerStatus.FAILED);
                     try {
                         await CommandDispatcher.dispatchStopWorker(
                             '',
@@ -268,20 +234,18 @@ export class AutoScalerService {
                     }
                 }
             } else {
-                // Case 3: Worker should be running but is missing entirely from Coolify
-                if (isStale && ['pending', 'starting', 'running'].includes(w.status)) {
+                if (isStale && [WorkerStatus.PENDING, WorkerStatus.STARTING, WorkerStatus.RUNNING].includes(w.status as any)) {
                     console.log(
                         `[AutoScaler] Confirming zombie: ${w.worker_id} missing from Coolify after grace period. Marking as failed.`
                     );
-                    await WorkerService.updateWorkerStatus(w.worker_id, 'failed');
+                    await WorkerService.updateWorkerStatus(w.worker_id, WorkerStatus.FAILED);
                 }
 
-                // Case 4: Worker was supposed to stop and is now gone from Coolify
-                if (w.status === 'stopping') {
+                if (w.status === WorkerStatus.STOPPING) {
                     console.log(
                         `[AutoScaler] Worker ${w.worker_id} successfully stopped in Coolify. Marking as stopped.`
                     );
-                    await WorkerService.updateWorkerStatus(w.worker_id, 'stopped');
+                    await WorkerService.updateWorkerStatus(w.worker_id, WorkerStatus.STOPPED);
                 }
             }
         }

@@ -4,7 +4,7 @@ import { config as loadEnv } from 'dotenv';
 loadEnv();
 
 const envSchema = z.object({
-    POSTGRES_URL: z.string().min(1, 'POSTGRES_URL is required'),
+    MONGODB_URI: z.string().min(1, 'MONGODB_URI is required'),
     PORT: z
         .string()
         .transform(v => parseInt(v, 10))

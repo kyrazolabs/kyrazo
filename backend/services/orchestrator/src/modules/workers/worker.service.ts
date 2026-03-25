@@ -1,4 +1,5 @@
-import { db } from '@/db';
+import { connectDB, OrchestratorWorker, WorkerStatus } from '@/db';
+import mongoose from 'mongoose';
 import { CommandDispatcher } from '@/modules/commands/command.dispatcher';
 import { WorkerRepo } from './worker.repo';
 
@@ -6,119 +7,123 @@ export class WorkerService {
     /**
      * Finds the best available server based on load.
      */
-    static async findAvailableServer(tx = db) {
-        return await WorkerRepo.findAvailableServer(tx);
+    static async findAvailableServer() {
+        return await WorkerRepo.findAvailableServer();
     }
 
     /**
      * Provision a new worker for a client.
-     *
-     * Two-phase approach:
-     *   Phase 1 (Transaction): Lock capacity on server + client, create pending worker record.
-     *   Phase 2 (Outside TX): Deploy via Coolify API. If it fails, rollback by marking failed.
-     *
-     * This prevents long-running Coolify HTTP calls from holding DB locks.
      */
     static async provisionWorker(clientId: string) {
-        // Phase 1: Reserve capacity in a serializable transaction
-        const { newWorker, serverId } = await db.transaction(async tx => {
-            // Lock client row to prevent concurrent over-provisioning
-            const client = await WorkerRepo.getClientForUpdate(tx, clientId);
-            if (!client) throw new Error(`Client ${clientId} not found`);
+        const session = await mongoose.startSession();
+        let newWorkerRecord: any;
+        let serverId: string;
 
-            if (client.used_workers >= client.plan_max_workers) {
-                throw new Error('Plan limit reached');
-            }
+        try {
+            await session.withTransaction(async () => {
+                // Lock client row to prevent concurrent over-provisioning
+                const client = await WorkerRepo.getClientForUpdate(clientId, session);
+                if (!client) throw new Error(`Client ${clientId} not found`);
 
-            // Lock server row — FOR UPDATE prevents two TXs claiming the last slot
-            const server = await WorkerRepo.findAvailableServerForUpdate(tx);
-            if (!server) throw new Error('No available capacity');
+                if (client.used_workers >= client.plan_max_workers) {
+                    throw new Error('Plan limit reached');
+                }
 
-            // Atomically increment counters
-            await WorkerRepo.lockCapacity(tx, clientId, server.server_id);
+                // Lock server row
+                const server = await WorkerRepo.findAvailableServerForUpdate(session);
+                if (!server) throw new Error('No available capacity');
 
-            // Create the worker record
-            const newWorker = await WorkerRepo.createPendingWorker(tx, clientId, server.server_id);
-            if (!newWorker) throw new Error('Failed to create worker record');
+                // Atomically increment counters
+                await WorkerRepo.lockCapacity(clientId, server.server_id, session);
 
-            return { newWorker, serverId: server.server_id };
-        });
+                // Create the worker record
+                newWorkerRecord = await WorkerRepo.createPendingWorker(clientId, server.server_id, session);
+                if (!newWorkerRecord) throw new Error('Failed to create worker record');
+                serverId = server.server_id;
+            });
+        } finally {
+            await session.endSession();
+        }
 
         // Phase 2: Deploy on Coolify OUTSIDE the transaction
         try {
-            await CommandDispatcher.dispatchStartWorker(serverId, newWorker.worker_id, clientId);
+            await CommandDispatcher.dispatchStartWorker(serverId!, newWorkerRecord.worker_id, clientId);
         } catch (err: any) {
-            // Coolify deploy failed — rollback by marking worker as failed (releases resources)
             console.error(
-                `[WorkerService] Coolify deploy failed for worker ${newWorker.worker_id}. Rolling back.`
+                `[WorkerService] Coolify deploy failed for worker ${newWorkerRecord.worker_id}. Rolling back.`
             );
-            await WorkerService.updateWorkerStatus(newWorker.worker_id, 'failed');
+            await WorkerService.updateWorkerStatus(newWorkerRecord.worker_id, 'failed');
             throw err;
         }
 
-        return newWorker;
+        return newWorkerRecord;
     }
 
     /**
      * Decommission a worker.
      */
     static async decommissionWorker(workerId: string, apps?: any[]) {
-        return await db.transaction(async tx => {
-            const worker = await WorkerRepo.getWorker(tx, workerId);
+        const session = await mongoose.startSession();
+        try {
+            await session.withTransaction(async () => {
+                const worker = await WorkerRepo.getWorker(workerId);
 
-            if (!worker) throw new Error('Worker not found');
-            if (worker.status === 'stopped') return;
+                if (!worker) throw new Error('Worker not found');
+                if (worker.status === 'stopped') return;
 
-            // 1. Update status
-            await WorkerRepo.setWorkerStopping(tx, workerId);
+                // 1. Update status
+                await WorkerRepo.setWorkerStopping(workerId, session);
 
-            // 2. Dispatch Stop
-            await CommandDispatcher.dispatchStopWorker(
-                worker.server_id,
-                workerId,
-                worker.client_id,
-                false,
-                apps
-            );
-        });
+                // 2. Dispatch Stop
+                await CommandDispatcher.dispatchStopWorker(
+                    worker.server_id,
+                    workerId,
+                    worker.client_id,
+                    false,
+                    apps
+                );
+            });
+        } finally {
+            await session.endSession();
+        }
     }
 
     /**
-     * Update worker status. If transitioning to a terminal state (stopped/failed),
-     * atomically release capacity on both the client and server.
+     * Update worker status.
      */
     static async updateWorkerStatus(workerId: string, status: string) {
-        await db.transaction(async tx => {
-            const currentWorker = await WorkerRepo.getWorker(tx, workerId);
+        const session = await mongoose.startSession();
+        try {
+            await session.withTransaction(async () => {
+                const currentWorker = await WorkerRepo.getWorker(workerId);
 
-            if (!currentWorker) return;
+                if (!currentWorker) return;
 
-            // Update status
-            await WorkerRepo.updateWorkerStatus(tx, workerId, status);
+                // Update status
+                await WorkerRepo.updateWorkerStatus(workerId, status, session);
 
-            // If transitioning to terminal state, release resources
-            if (
-                ['stopped', 'failed'].includes(status) &&
-                !['stopped', 'failed'].includes(currentWorker.status)
-            ) {
-                await WorkerRepo.releaseResources(
-                    tx,
-                    currentWorker.client_id,
-                    currentWorker.server_id
-                );
-                console.log(`[WorkerService] Released resources for worker ${workerId}`);
-            }
-        });
+                // If transitioning to terminal state, release resources
+                if (
+                    ['stopped', 'failed'].includes(status) &&
+                    !['stopped', 'failed'].includes(currentWorker.status)
+                ) {
+                    await WorkerRepo.releaseResources(
+                        currentWorker.client_id,
+                        currentWorker.server_id,
+                        session
+                    );
+                    console.log(`[WorkerService] Released resources for worker ${workerId}`);
+                }
+            });
+        } finally {
+            await session.endSession();
+        }
 
         console.log(`✅ Worker ${workerId} status updated to ${status}`);
     }
 
     /**
      * Reap stale terminated workers from the DB.
-     * Deletes Coolify apps first, then removes the DB records.
-     *
-     * @param kyrazoApps - Pre-fetched list of Coolify apps for efficient lookup.
-     * @param ttlMs - How long a worker must be in stopped/failed before reaping (default 1h).
      */
     static async reapStaleWorkers(kyrazoApps: any[] = [], ttlMs: number = 60 * 60 * 1000) {
         const staleWorkers = await WorkerRepo.findStaleTerminatedWorkers(ttlMs);
@@ -129,7 +134,6 @@ export class WorkerService {
 
         for (const w of staleWorkers) {
             try {
-                // Attempt to delete Coolify app if it still exists
                 await CommandDispatcher.dispatchStopWorker('', w.worker_id, '', true, kyrazoApps);
             } catch (err: any) {
                 console.warn(
@@ -139,10 +143,7 @@ export class WorkerService {
             }
 
             try {
-                // Delete the DB record
-                await db.transaction(async tx => {
-                    await WorkerRepo.deleteWorker(tx, w.worker_id);
-                });
+                await WorkerRepo.deleteWorker(w.worker_id);
                 console.log(`[WorkerService] Reaped stale worker ${w.worker_id}`);
             } catch (err: any) {
                 console.error(
@@ -157,9 +158,6 @@ export class WorkerService {
         await WorkerRepo.reconcileServerCounts();
     }
 
-    /**
-     * Periodically reconcile client stats to fix drift.
-     */
     static async reconcileClientCounts() {
         await WorkerRepo.reconcileClientCounts();
     }

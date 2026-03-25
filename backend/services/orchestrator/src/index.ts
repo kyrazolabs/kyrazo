@@ -5,8 +5,7 @@ import { config } from '@/common/config'; // Validation runs on import
 import { globalErrorHandler } from '@/common/error';
 import { subscriptionsJob } from './jobs/subscriptions.job';
 import { databaseConfig } from '@kyrazo/shared';
-import { db } from '@/db';
-import { sql } from 'drizzle-orm';
+import { connectDB } from '@/db';
 
 const app = new Hono();
 
@@ -17,40 +16,16 @@ app.onError(globalErrorHandler);
 app.get('/v1/health', async c => {
     try {
         // Check all services in parallel
-        const [mongo, postgres] = await Promise.all([
-            databaseConfig.healthCheck(),
-            (async () => {
-                try {
-                    await db.execute(sql`SELECT 1`);
-                    return {
-                        status: 'healthy',
-                        details: {
-                            connected: true,
-                            database: 'PostgreSQL',
-                        },
-                    };
-                } catch (error: any) {
-                    return {
-                        status: 'unhealthy',
-                        details: {
-                            connected: false,
-                            database: 'PostgreSQL',
-                            error: error instanceof Error ? error.message : 'Unknown error',
-                        },
-                    };
-                }
-            })(),
-        ]);
+        const mongo = await databaseConfig.healthCheck();
 
         // Determine overall health status
-        const allHealthy = [mongo, postgres].every(service => service.status === 'healthy');
+        const allHealthy = mongo.status === 'healthy';
 
         return c.json({
             success: allHealthy,
             message: allHealthy ? 'All services are healthy' : 'Some services are unhealthy',
             services: {
                 mongo,
-                postgres,
             },
             timestamp: new Date().toISOString(),
             version: '1.0.0',
@@ -74,7 +49,7 @@ console.log('⏱️ Starting Background Jobs...');
 
 const startServer = async () => {
     try {
-        await databaseConfig.connect();
+        await connectDB();
         // make sure db is connected
         console.log('Database connected successfully');
         // cron.schedule('*/1 * * * *', async () => {

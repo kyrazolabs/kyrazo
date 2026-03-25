@@ -1,7 +1,5 @@
-import { db } from '@/db';
-import { servers } from '@/db/schema';
+import { OrchestratorServer, WorkerStatus } from '@/db';
 import { config } from '@/common/config';
-import { eq } from 'drizzle-orm';
 
 import {
     createGitHubApp,
@@ -17,7 +15,7 @@ export class CommandDispatcher {
      */
     static async dispatchStartWorker(serverId: string, workerId: string, clientId: string) {
         // 1. Fetch Server from DB to get Coolify Target params
-        const [server] = await db.select().from(servers).where(eq(servers.server_id, serverId));
+        const server = await OrchestratorServer.findOne({ server_id: serverId });
 
         if (
             !server ||
