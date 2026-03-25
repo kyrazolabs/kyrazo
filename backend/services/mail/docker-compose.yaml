@@ -19,8 +19,6 @@ services:
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASS=${SMTP_PASS}
       - SMTP_SECURE=${SMTP_SECURE}
-    volumes:
-      - /data/coolify/ssl/coolify-ca.crt:/etc/ssl/certs/ca.pem:ro
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:${PORT}/v1/health"]
       interval: 30s

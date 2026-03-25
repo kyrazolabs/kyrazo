@@ -29,15 +29,6 @@ services:
       - MONGODB_RETRY_WRITES=${MONGODB_RETRY_WRITES}
       - MONGODB_RETRY_READS=${MONGODB_RETRY_READS}
       - MONGODB_SSL=${MONGODB_SSL}
-      - MONGODB_CA_FILE=${MONGODB_CA_FILE:-/etc/ssl/certs/ca.pem}
-
-      - POSTGRES_URL=${POSTGRES_URL}
-      - POSTGRES_MAX_POOL=${POSTGRES_MAX_POOL}
-      - POSTGRES_IDLE_TIMEOUT=${POSTGRES_IDLE_TIMEOUT}
-      - POSTGRES_CONNECTION_TIMEOUT=${POSTGRES_CONNECTION_TIMEOUT}
-      - POSTGRES_SSL=${POSTGRES_SSL}
-      - POSTGRES_SSL_MODE=${POSTGRES_SSL_MODE}
-      - POSTGRES_CA_FILE=${POSTGRES_CA_FILE:-/etc/ssl/certs/ca.pem}
 
       - CLICKHOUSE_URL=${CLICKHOUSE_URL}
       - REDIS_URL=${REDIS_URL}
@@ -74,7 +65,6 @@ services:
       - SENTRY_DSN=${SENTRY_DSN}
     volumes:
       - ./logs:/app/apis/dashboard/logs
-      - /data/coolify/ssl/coolify-ca.crt:/etc/ssl/certs/ca.pem:ro
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:${PORT}/v1/health"]

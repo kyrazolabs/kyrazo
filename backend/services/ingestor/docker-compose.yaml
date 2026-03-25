@@ -26,7 +26,6 @@ services:
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
     volumes:
       - ./logs:/app/services/ingestor/logs
-      - /data/coolify/ssl/coolify-ca.crt:/etc/ssl/certs/ca.pem:ro
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:${PORT}/v1/health"]
       interval: 30s
