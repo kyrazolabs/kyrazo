@@ -27,18 +27,14 @@ services:
       - STREAM_MAX_RETRIES=${STREAM_MAX_RETRIES}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
     volumes:
-      - ./logs:/app/services/ingestor/logs
-<<<<<<< HEAD
-
+      - ./logs:/app/services/orchestrator/logs
+      
       - /etc/ssl/mongodb/ca.crt:/etc/ssl/mongodb/ca.crt:ro
       - /etc/ssl/mongodb/mongodb.pem:/etc/ssl/mongodb/mongodb.pem:ro
 
       - /etc/ssl/redis/ca.crt:/etc/ssl/redis/ca.crt:ro
       - /etc/ssl/redis/client.crt:/etc/ssl/redis/client.crt:ro
-      - /etc/ssl/redis/client.key:/etc/ssl/redis/client.:ro
-=======
-      - /data/coolify/ssl/coolify-ca.crt:/etc/ssl/certs/ca.pem:ro
->>>>>>> 0fc75fd (✨ feat: merge develop into main)
+      - /etc/ssl/redis/client.key:/etc/ssl/redis/client.key:ro
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:${PORT}/v1/health"]
       interval: 30s

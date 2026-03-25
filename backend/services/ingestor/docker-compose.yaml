@@ -29,7 +29,7 @@ services:
       
       - /etc/ssl/redis/ca.crt:/etc/ssl/redis/ca.crt:ro
       - /etc/ssl/redis/client.crt:/etc/ssl/redis/client.crt:ro
-      - /etc/ssl/redis/client.key:/etc/ssl/redis/client.:ro
+      - /etc/ssl/redis/client.key:/etc/ssl/redis/client.key:ro
 
       - /etc/ssl/clickhouse/ca.crt:/etc/ssl/clickhouse/ca.crt:ro
     healthcheck:
