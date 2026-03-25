@@ -14,20 +14,37 @@ export class BullmqConfig {
     constructor() {
         if (config.redis.queue.url) {
             this.redisUrl = config.redis.queue.url;
-            this.redisClient = new Redis(this.redisUrl, {
+            const options: any = {
                 maxRetriesPerRequest: null,
                 enableOfflineQueue: true,
                 reconnectOnError: (err: Error) => {
                     const targetError = 'READONLY';
                     const isRecoverable = err.message.includes(targetError);
                     if (isRecoverable) {
-                        console.warn(
-                            '[Redis BullMQ] Reconnecting due to READONLY error.'
-                        );
+                        console.warn('[Redis BullMQ] Reconnecting due to READONLY error.');
                     }
                     return isRecoverable;
                 },
-            });
+            };
+
+            if (config.redis.tls) {
+                options.tls = {
+                    rejectUnauthorized: true,
+                    checkServerIdentity: () => undefined,
+                };
+                const fs = require('fs');
+                if (config.redis.queue.caFile && fs.existsSync(config.redis.queue.caFile)) {
+                    options.tls.ca = fs.readFileSync(config.redis.queue.caFile);
+                }
+                if (config.redis.queue.certFile && fs.existsSync(config.redis.queue.certFile)) {
+                    options.tls.cert = fs.readFileSync(config.redis.queue.certFile);
+                }
+                if (config.redis.queue.keyFile && fs.existsSync(config.redis.queue.keyFile)) {
+                    options.tls.key = fs.readFileSync(config.redis.queue.keyFile);
+                }
+            }
+
+            this.redisClient = new Redis(this.redisUrl, options);
         } else {
             this.redisOptions = {
                 host: config.redis.queue.host,
@@ -35,11 +52,31 @@ export class BullmqConfig {
                 password: config.redis.queue.password,
                 db: config.redis.queue.db,
             };
-            this.redisClient = new Redis({
+
+            const options: any = {
                 ...this.redisOptions,
                 maxRetriesPerRequest: null,
                 enableOfflineQueue: true,
-            });
+            };
+
+            if (config.redis.tls) {
+                options.tls = {
+                    rejectUnauthorized: true,
+                    checkServerIdentity: () => undefined,
+                };
+                const fs = require('fs');
+                if (config.redis.queue.caFile && fs.existsSync(config.redis.queue.caFile)) {
+                    options.tls.ca = fs.readFileSync(config.redis.queue.caFile);
+                }
+                if (config.redis.queue.certFile && fs.existsSync(config.redis.queue.certFile)) {
+                    options.tls.cert = fs.readFileSync(config.redis.queue.certFile);
+                }
+                if (config.redis.queue.keyFile && fs.existsSync(config.redis.queue.keyFile)) {
+                    options.tls.key = fs.readFileSync(config.redis.queue.keyFile);
+                }
+            }
+
+            this.redisClient = new Redis(options);
         }
 
         this.redisClient.on('connect', () => {

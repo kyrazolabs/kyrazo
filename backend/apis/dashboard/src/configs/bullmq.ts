@@ -1,4 +1,5 @@
 import { Redis } from 'ioredis';
+import * as fs from 'fs';
 import type { QueueOptions } from 'bullmq';
 import * as queuesName from '@/producers/constants/constants.bullmq';
 import * as queues from '@/producers/queues/queues.bullmq';
@@ -6,26 +7,88 @@ import config from './app';
 
 export class BullmqConfig {
     private static instance: BullmqConfig;
-    private redisUrl: string;
+    private redisUrl: string | undefined;
     private bullmqOptions: QueueOptions;
     public redisClient: Redis;
+    private redisOptions: any;
 
-    constructor(redisUrl: string) {
-        this.redisUrl = redisUrl;
-        this.redisClient = new Redis(this.redisUrl, {
-            maxRetriesPerRequest: null,
-            enableOfflineQueue: true,
-            reconnectOnError: (err: Error) => {
-                const targetError = 'READONLY';
-                const isRecoverable = err.message.includes(targetError);
-                if (isRecoverable) {
-                    console.warn(
-                        '[Redis BullMQ] Reconnecting due to READONLY error.'
-                    );
+    constructor(redisUrl?: string) {
+        if (redisUrl) {
+            this.redisUrl = redisUrl;
+        } else if (config.redis.queue.url) {
+            this.redisUrl = config.redis.queue.url;
+        }
+        if (this.redisUrl) {
+            const options: any = {
+                maxRetriesPerRequest: null,
+                enableOfflineQueue: true,
+                reconnectOnError: (err: Error) => {
+                    const targetError = 'READONLY';
+                    const isRecoverable = err.message.includes(targetError);
+                    if (isRecoverable) {
+                        console.warn('[Redis BullMQ] Reconnecting due to READONLY error.');
+                    }
+                    return isRecoverable;
+                },
+            };
+
+            if (config.redis.tls) {
+                options.tls = {
+                    rejectUnauthorized: true,
+                    checkServerIdentity: () => undefined,
+                };
+                if (config.redis.queue.caFile && fs.existsSync(config.redis.queue.caFile)) {
+                    options.tls.ca = fs.readFileSync(config.redis.queue.caFile);
                 }
-                return isRecoverable;
-            },
-        });
+                if (config.redis.queue.certFile && fs.existsSync(config.redis.queue.certFile)) {
+                    options.tls.cert = fs.readFileSync(config.redis.queue.certFile);
+                }
+                if (config.redis.queue.keyFile && fs.existsSync(config.redis.queue.keyFile)) {
+                    options.tls.key = fs.readFileSync(config.redis.queue.keyFile);
+                }
+            }
+
+            this.redisClient = new Redis(this.redisUrl!, options);
+        } else {
+            this.redisOptions = {
+                host: config.redis.queue.host,
+                port: config.redis.queue.port,
+                password: config.redis.queue.password,
+                db: config.redis.queue.db,
+            };
+
+            const options: any = {
+                ...this.redisOptions,
+                maxRetriesPerRequest: null,
+                enableOfflineQueue: true,
+                reconnectOnError: (err: Error) => { // Added reconnectOnError to this branch as well
+                    const targetError = 'READONLY';
+                    const isRecoverable = err.message.includes(targetError);
+                    if (isRecoverable) {
+                        console.warn('[Redis BullMQ] Reconnecting due to READONLY error.');
+                    }
+                    return isRecoverable;
+                },
+            };
+
+            if (config.redis.tls) {
+                options.tls = {
+                    rejectUnauthorized: true,
+                    checkServerIdentity: () => undefined,
+                };
+                if (config.redis.queue.caFile && fs.existsSync(config.redis.queue.caFile)) {
+                    options.tls.ca = fs.readFileSync(config.redis.queue.caFile);
+                }
+                if (config.redis.queue.certFile && fs.existsSync(config.redis.queue.certFile)) {
+                    options.tls.cert = fs.readFileSync(config.redis.queue.certFile);
+                }
+                if (config.redis.queue.keyFile && fs.existsSync(config.redis.queue.keyFile)) {
+                    options.tls.key = fs.readFileSync(config.redis.queue.keyFile);
+                }
+            }
+
+            this.redisClient = new Redis(options);
+        }
         this.redisClient.on('connect', () => {
             console.info('[Redis BullMQ] Connection established');
         });

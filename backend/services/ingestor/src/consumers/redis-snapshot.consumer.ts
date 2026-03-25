@@ -1,4 +1,5 @@
-import Redis from 'ioredis';
+import Redis, { type RedisOptions } from 'ioredis';
+import * as fs from 'fs';
 import { Config } from '../config';
 import { DispatchAggregator } from '../aggregators/dispatch.aggregator';
 import { IngestAggregator } from '../aggregators/ingest.aggregator';
@@ -21,9 +22,27 @@ export class RedisSnapshotConsumer {
         private ingestAgg: IngestAggregator,
         redisClient?: Redis
     ) {
-        this.redis = redisClient || new Redis(Config.get().snapshotRedisUrl, {
-            tls: Config.get().snapshotRedisTls ? { rejectUnauthorized: false } : undefined,
-        });
+        if (redisClient) {
+            this.redis = redisClient;
+        } else {
+            const options: RedisOptions = {};
+            if (Config.get().snapshotRedisTls) {
+                options.tls = {
+                    rejectUnauthorized: true,
+                    checkServerIdentity: () => undefined,
+                };
+                if (Config.get().snapshotRedisCaFile && fs.existsSync(Config.get().snapshotRedisCaFile!)) {
+                    options.tls.ca = fs.readFileSync(Config.get().snapshotRedisCaFile!);
+                }
+                if (Config.get().snapshotRedisCertFile && fs.existsSync(Config.get().snapshotRedisCertFile!)) {
+                    options.tls.cert = fs.readFileSync(Config.get().snapshotRedisCertFile!);
+                }
+                if (Config.get().snapshotRedisKeyFile && fs.existsSync(Config.get().snapshotRedisKeyFile!)) {
+                    options.tls.key = fs.readFileSync(Config.get().snapshotRedisKeyFile!);
+                }
+            }
+            this.redis = new Redis(Config.get().snapshotRedisUrl, options);
+        }
         // Define the custom command to make it easier to call
         // Check if defineCommand exists (mock might not have it or needs it)
         if (typeof this.redis.defineCommand === 'function') {

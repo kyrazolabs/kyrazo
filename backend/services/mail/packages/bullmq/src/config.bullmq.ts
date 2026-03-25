@@ -10,11 +10,10 @@ export class BullmqHandler {
 
   constructor(redisUrl: string, tls: boolean = false) {
     this.redisUrl = redisUrl;
-    this.redisClient = new Redis(this.redisUrl, {
+    const options: any = {
       maxRetriesPerRequest: null,
       enableOfflineQueue: true,
-      tls: tls ? { rejectUnauthorized: false } : undefined,
-      reconnectOnError: (err) => {
+      reconnectOnError: (err: Error) => {
         const targetError = "READONLY";
         const isRecoverable = err.message.includes(targetError);
         if (isRecoverable) {
@@ -22,7 +21,31 @@ export class BullmqHandler {
         }
         return isRecoverable;
       },
-    });
+    };
+
+    if (tls) {
+      options.tls = {
+        rejectUnauthorized: true,
+        checkServerIdentity: () => undefined,
+      };
+
+      const fs = require("fs");
+      const caFile = "/etc/ssl/redis/ca.crt";
+      const certFile = "/etc/ssl/redis/client.crt";
+      const keyFile = "/etc/ssl/redis/client.key";
+
+      if (caFile && fs.existsSync(caFile)) {
+        options.tls.ca = fs.readFileSync(caFile);
+      }
+      if (certFile && fs.existsSync(certFile)) {
+        options.tls.cert = fs.readFileSync(certFile);
+      }
+      if (keyFile && fs.existsSync(keyFile)) {
+        options.tls.key = fs.readFileSync(keyFile);
+      }
+    }
+
+    this.redisClient = new Redis(this.redisUrl, options);
     this.redisClient.on("connect", () => {
       console.info("[Redis BullMQ] Connection established");
     });

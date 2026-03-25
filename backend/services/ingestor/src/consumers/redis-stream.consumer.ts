@@ -1,4 +1,5 @@
-import { Redis } from 'ioredis';
+import { Redis, type RedisOptions } from 'ioredis';
+import * as fs from 'fs';
 import { Config } from '../config';
 import { batchWriter } from '../db/clickhouse/batch.writer';
 import { logger, type SQLDeliveryAttempt, type SQLIngestEvent } from '@kyrazo/shared';
@@ -14,9 +15,27 @@ export class RedisStreamConsumer {
     public readonly consumerName = `consumer:${Math.random().toString(36).substring(7)}`;
 
     constructor(redisClient?: Redis) {
-        this.redis = redisClient || new Redis(Config.get().streamRedisUrl, {
-            tls: Config.get().streamRedisTls ? { rejectUnauthorized: false } : undefined,
-        });
+        if (redisClient) {
+            this.redis = redisClient;
+        } else {
+            const options: RedisOptions = {};
+            if (Config.get().streamRedisTls) {
+                options.tls = {
+                    rejectUnauthorized: true,
+                    checkServerIdentity: () => undefined,
+                };
+                if (Config.get().streamRedisCaFile && fs.existsSync(Config.get().streamRedisCaFile!)) {
+                    options.tls.ca = fs.readFileSync(Config.get().streamRedisCaFile!);
+                }
+                if (Config.get().streamRedisCertFile && fs.existsSync(Config.get().streamRedisCertFile!)) {
+                    options.tls.cert = fs.readFileSync(Config.get().streamRedisCertFile!);
+                }
+                if (Config.get().streamRedisKeyFile && fs.existsSync(Config.get().streamRedisKeyFile!)) {
+                    options.tls.key = fs.readFileSync(Config.get().streamRedisKeyFile!);
+                }
+            }
+            this.redis = new Redis(Config.get().streamRedisUrl, options);
+        }
     }
 
     async start() {

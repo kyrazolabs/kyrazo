@@ -54,13 +54,6 @@ export const config = {
         },
     },
 
-    clickhouse: {
-        url: process.env.CLICKHOUSE_URL || 'http://127.0.0.1:8123',
-        username: process.env.CLICKHOUSE_USERNAME || 'default',
-        password: process.env.CLICKHOUSE_PASSWORD || '',
-        database: process.env.CLICKHOUSE_DATABASE || 'default',
-    },
-
     // Redis Configuration
     redis: {
         url: process.env.REDIS_URL,
@@ -68,12 +61,19 @@ export const config = {
         port: parseInt(process.env.REDIS_PORT!),
         password: process.env.REDIS_PASSWORD,
         db: parseInt(process.env.REDIS_DB || '0'),
+        tls: process.env.NODE_ENV === 'production',
+        caFile: '/etc/ssl/redis/ca.crt',
+        certFile: '/etc/ssl/redis/client.crt',
+        keyFile: '/etc/ssl/redis/client.key',
         queue: {
             url: process.env.QUEUE_REDIS_URL,
             host: process.env.QUEUE_REDIS_HOST || process.env.REDIS_HOST!,
             port: parseInt(process.env.QUEUE_REDIS_PORT || process.env.REDIS_PORT!),
             password: process.env.QUEUE_REDIS_PASSWORD || process.env.REDIS_PASSWORD || '',
             db: parseInt(process.env.QUEUE_REDIS_DB || '1'),
+            caFile: '/etc/ssl/redis/ca.crt',
+            certFile: '/etc/ssl/redis/client.crt',
+            keyFile: '/etc/ssl/redis/client.key',
         },
     },
 

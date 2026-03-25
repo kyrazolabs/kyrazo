@@ -3,7 +3,9 @@ import { RedisStreamConsumer } from './consumers/redis-stream.consumer';
 import { DispatchAggregator } from './aggregators/dispatch.aggregator';
 import { IngestAggregator } from './aggregators/ingest.aggregator';
 import { Config } from './config';
-import Redis from 'ioredis';
+import Redis, { type RedisOptions } from 'ioredis';
+import * as fs from 'fs';
+import * as path from 'path';
 
 async function main() {
     const { clickhouseConfig } = await import('@kyrazo/shared');
@@ -20,12 +22,41 @@ async function main() {
     await streamConsumer.start();
 
     // Initialize Redis clients for health checks
-    const snapshotRedis = new Redis(Config.get().snapshotRedisUrl, {
-        tls: Config.get().snapshotRedisTls ? { rejectUnauthorized: false } : undefined,
-    });
-    const streamRedis = new Redis(Config.get().streamRedisUrl, {
-        tls: Config.get().streamRedisTls ? { rejectUnauthorized: false } : undefined,
-    });
+    const snapshotRedisOptions: RedisOptions = {};
+    if (Config.get().snapshotRedisTls) {
+        snapshotRedisOptions.tls = {
+            rejectUnauthorized: true,
+            checkServerIdentity: () => undefined,
+        };
+        if (Config.get().snapshotRedisCaFile && fs.existsSync(Config.get().snapshotRedisCaFile!)) {
+            snapshotRedisOptions.tls.ca = fs.readFileSync(Config.get().snapshotRedisCaFile!);
+        }
+        if (Config.get().snapshotRedisCertFile && fs.existsSync(Config.get().snapshotRedisCertFile!)) {
+            snapshotRedisOptions.tls.cert = fs.readFileSync(Config.get().snapshotRedisCertFile!);
+        }
+        if (Config.get().snapshotRedisKeyFile && fs.existsSync(Config.get().snapshotRedisKeyFile!)) {
+            snapshotRedisOptions.tls.key = fs.readFileSync(Config.get().snapshotRedisKeyFile!);
+        }
+    }
+    const snapshotRedis = new Redis(Config.get().snapshotRedisUrl, snapshotRedisOptions);
+
+    const streamRedisOptions: RedisOptions = {};
+    if (Config.get().streamRedisTls) {
+        streamRedisOptions.tls = {
+            rejectUnauthorized: true,
+            checkServerIdentity: () => undefined,
+        };
+        if (Config.get().streamRedisCaFile && fs.existsSync(Config.get().streamRedisCaFile!)) {
+            streamRedisOptions.tls.ca = fs.readFileSync(Config.get().streamRedisCaFile!);
+        }
+        if (Config.get().streamRedisCertFile && fs.existsSync(Config.get().streamRedisCertFile!)) {
+            streamRedisOptions.tls.cert = fs.readFileSync(Config.get().streamRedisCertFile!);
+        }
+        if (Config.get().streamRedisKeyFile && fs.existsSync(Config.get().streamRedisKeyFile!)) {
+            streamRedisOptions.tls.key = fs.readFileSync(Config.get().streamRedisKeyFile!);
+        }
+    }
+    const streamRedis = new Redis(Config.get().streamRedisUrl, streamRedisOptions);
 
     // Start health check server using Bun.serve
     Bun.serve({

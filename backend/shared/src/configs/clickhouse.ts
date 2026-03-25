@@ -1,4 +1,6 @@
 import { createClient } from '@clickhouse/client';
+import * as fs from 'fs';
+import * as path from 'path';
 import { logger } from './logger';
 import config from './app';
 import { runMigrations } from '../models/clickhouse/migrations';
@@ -40,14 +42,27 @@ export class ClickHouseConfig {
                 throw new Error('ClickHouse configuration is incomplete');
             }
 
-            this.client = createClient({
+            const clientOptions: any = {
                 url,
-                // @ts-expect-error: int64_handling exists in @clickhouse/client v1.x but might be missing from internal type definitions
                 int64_handling: 'string', // Return UInt64 as strings to prevent precision loss in JS Number
                 clickhouse_settings: {
                     output_format_json_quote_64bit_integers: 1, // Force ClickHouse to wrap result integers in quotes for JSON formats
                 },
-            });
+            };
+
+            const chConfig = await config.clickhouse;
+            if (chConfig.ssl) {
+                clientOptions.tls = {
+                    rejectUnauthorized: chConfig.rejectUnauthorized,
+                    // IP-based certificates might not match hostnames, so we skip identity check
+                    checkServerIdentity: () => undefined,
+                };
+                if (chConfig.caFile && fs.existsSync(chConfig.caFile)) {
+                    clientOptions.tls.ca = fs.readFileSync(chConfig.caFile);
+                }
+            }
+
+            this.client = createClient(clientOptions);
             logger.info('ClickHouse client created, testing connection...');
 
             // Test connection

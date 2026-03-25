@@ -1,5 +1,7 @@
-import Redis from 'ioredis';
+import Redis, { type RedisOptions } from 'ioredis';
 import * as dotenv from 'dotenv';
+import * as fs from 'fs';
+import * as path from 'path';
 
 import { config } from '@/configs';
 import { logger } from '@kyrazo/shared';
@@ -60,26 +62,54 @@ export class RedisConfig {
 
         try {
             // Main Redis client for general operations
-            let redisClientOptions: any;
+            let redisClientOptions: RedisOptions;
             if (config.redis.url) {
-                redisClientOptions = config.redis.url;
+                redisClientOptions = {
+                    ...(typeof config.redis.url === 'string'
+                        ? { url: config.redis.url }
+                        : (config.redis.url as any)),
+                };
             } else {
                 redisClientOptions = {
                     host: config.redis.host,
                     port: config.redis.port,
                     db: config.redis.db,
                     maxRetriesPerRequest: 20, // Essential for BullMQ
-                };
+                } as RedisOptions;
                 if (config.redis.password) {
                     redisClientOptions.password = config.redis.password;
                 }
             }
+
+            // Add TLS options if enabled
+            if (config.redis.tls) {
+                redisClientOptions.tls = {
+                    rejectUnauthorized: true,
+                };
+                if (config.redis.caFile && fs.existsSync(config.redis.caFile)) {
+                    redisClientOptions.tls.ca = fs.readFileSync(config.redis.caFile);
+                }
+                if (config.redis.certFile && fs.existsSync(config.redis.certFile)) {
+                    redisClientOptions.tls.cert = fs.readFileSync(config.redis.certFile);
+                }
+                if (config.redis.keyFile && fs.existsSync(config.redis.keyFile)) {
+                    redisClientOptions.tls.key = fs.readFileSync(config.redis.keyFile);
+                }
+                // Skip hostname identity check for IP-based certificates
+                (redisClientOptions.tls as any).checkServerIdentity = () => undefined;
+            }
+
             this.client = new Redis(redisClientOptions);
 
             // Queue Redis client for BullMQ
-            let queueRedisClientOptions: any;
+            let queueRedisClientOptions: RedisOptions;
             if (config.redis.queue.url) {
-                queueRedisClientOptions = config.redis.queue.url;
+                queueRedisClientOptions = {
+                    ...(typeof config.redis.queue.url === 'string'
+                        ? { url: config.redis.queue.url }
+                        : (config.redis.queue.url as any)),
+                    maxRetriesPerRequest: 20, // Essential for BullMQ
+                };
             } else {
                 queueRedisClientOptions = {
                     host: config.redis.queue.host || config.redis.host,
@@ -87,7 +117,27 @@ export class RedisConfig {
                     password: config.redis.queue.password || config.redis.password,
                     db: config.redis.queue.db || config.redis.db,
                     maxRetriesPerRequest: 20, // Essential for BullMQ
+                } as RedisOptions;
+            }
+
+            // Add TLS options if enabled for queue
+            if (config.redis.tls) {
+                queueRedisClientOptions.tls = {
+                    rejectUnauthorized: true,
                 };
+                if (config.redis.queue.caFile && fs.existsSync(config.redis.queue.caFile)) {
+                    queueRedisClientOptions.tls.ca = fs.readFileSync(config.redis.queue.caFile);
+                } else if (config.redis.caFile && fs.existsSync(config.redis.caFile)) {
+                    queueRedisClientOptions.tls.ca = fs.readFileSync(config.redis.caFile);
+                }
+                if (config.redis.queue.certFile && fs.existsSync(config.redis.queue.certFile)) {
+                    queueRedisClientOptions.tls.cert = fs.readFileSync(config.redis.queue.certFile);
+                }
+                if (config.redis.queue.keyFile && fs.existsSync(config.redis.queue.keyFile)) {
+                    queueRedisClientOptions.tls.key = fs.readFileSync(config.redis.queue.keyFile);
+                }
+                // Skip hostname identity check for IP-based certificates
+                (queueRedisClientOptions.tls as any).checkServerIdentity = () => undefined;
             }
             this.queueClient = new Redis(queueRedisClientOptions);
 

@@ -26,8 +26,9 @@ export const config = {
         heartbeatFrequencyMS: parseInt(process.env.MONGODB_HEARTBEAT_FREQUENCY_MS || '10000'),
         retryWrites: process.env.MONGODB_RETRY_WRITES !== 'false',
         retryReads: process.env.MONGODB_RETRY_READS !== 'false',
-        ssl: process.env.MONGODB_SSL === 'true' || process.env.NODE_ENV === 'production',
-        caFile: process.env.MONGODB_CA_FILE,
+        ssl: process.env.NODE_ENV === 'production',
+        caFile: '/etc/ssl/mongodb/ca.crt',
+        tlsCertificateKeyFile: '/etc/ssl/mongodb/client.pem',
     },
 
     clickhouse: {
@@ -35,6 +36,9 @@ export const config = {
         username: process.env.CLICKHOUSE_USERNAME || 'default',
         password: process.env.CLICKHOUSE_PASSWORD || '',
         database: process.env.CLICKHOUSE_DATABASE || 'default',
+        ssl: process.env.CLICKHOUSE_URL?.startsWith('https') || false,
+        caFile: '/etc/ssl/clickhouse/ca.crt',
+        rejectUnauthorized: true,
     },
 
     // Postgres Configuration
@@ -43,9 +47,9 @@ export const config = {
         max: parseInt(process.env.POSTGRES_MAX_POOL || '20'),
         idleTimeoutMillis: parseInt(process.env.POSTGRES_IDLE_TIMEOUT || '30000'),
         connectionTimeoutMillis: parseInt(process.env.POSTGRES_CONNECTION_TIMEOUT || '2000'),
-        ssl: process.env.POSTGRES_SSL === 'true' || process.env.NODE_ENV === 'production',
+        ssl: process.env.NODE_ENV === 'production',
         sslMode: process.env.POSTGRES_SSL_MODE || 'require',
-        caFile: process.env.POSTGRES_CA_FILE,
+        caFile: process.env.POSTGRES_CA_FILE || '/etc/ssl/postgres/ca.crt',
     },
 
     // Redis Configuration
@@ -55,13 +59,19 @@ export const config = {
         port: parseInt(process.env.REDIS_PORT!),
         password: process.env.REDIS_PASSWORD,
         db: parseInt(process.env.REDIS_DB || '0'),
-        tls: process.env.REDIS_TLS === 'true' || process.env.NODE_ENV === 'production',
+        tls: process.env.NODE_ENV === 'production',
+        caFile: '/etc/ssl/redis/ca.crt',
+        certFile: '/etc/ssl/redis/client.crt',
+        keyFile: '/etc/ssl/redis/client.key',
         queue: {
             url: process.env.QUEUE_REDIS_URL!,
             host: process.env.QUEUE_REDIS_HOST || process.env.REDIS_HOST!,
             port: parseInt(process.env.QUEUE_REDIS_PORT || process.env.REDIS_PORT!),
             password: process.env.QUEUE_REDIS_PASSWORD || process.env.REDIS_PASSWORD || '',
             db: parseInt(process.env.QUEUE_REDIS_DB || '1'),
+            caFile: '/etc/ssl/redis/ca.crt',
+            certFile: '/etc/ssl/redis/client.crt',
+            keyFile: '/etc/ssl/redis/client.key',
         },
     },
 
