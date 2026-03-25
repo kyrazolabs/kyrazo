@@ -1,38 +1,61 @@
-import { postgresConfig, workers, servers, eq, and } from '@kyrazo/shared';
+import { OrchestratorWorker, OrchestratorServer } from '@kyrazo/shared';
 
 export class WorkerRepository {
-    private get db() {
-        return postgresConfig.getDrizzle();
-    }
-
     async findByClientId(clientId: string) {
-        return await this.db
-            .select({
-                worker_id: workers.worker_id,
-                status: workers.status,
-                created_at: workers.created_at,
-                updated_at: workers.updated_at,
-                server_ip: servers.ipv4,
-                server_ipv6: servers.ipv6,
-            })
-            .from(workers)
-            .innerJoin(servers, eq(workers.server_id, servers.server_id))
-            .where(and(eq(workers.client_id, clientId), eq(workers.status, 'running')));
+        // Fetch running workers
+        const workers = await OrchestratorWorker.find({
+            client_id: clientId,
+            status: 'running',
+        }).lean();
+
+        if (workers.length === 0) return [];
+
+        // Join with servers to get IP info
+        const serverIds = [...new Set(workers.map(w => w.server_id))];
+        const servers = await OrchestratorServer.find({
+            server_id: { $in: serverIds },
+        }).lean();
+
+        const serverMap = new Map(servers.map(s => [s.server_id, s]));
+
+        return workers.map(w => {
+            const server = serverMap.get(w.server_id);
+            return {
+                worker_id: w.worker_id,
+                status: w.status,
+                created_at: w.created_at,
+                updated_at: w.updated_at,
+                server_ip: server?.ipv4,
+                server_ipv6: server?.ipv6,
+            };
+        });
     }
 
     async findAllByClientId(clientId: string) {
-        return await this.db
-            .select({
-                worker_id: workers.worker_id,
-                status: workers.status,
-                created_at: workers.created_at,
-                updated_at: workers.updated_at,
-                server_ip: servers.ipv4,
-                server_ipv6: servers.ipv6,
-            })
-            .from(workers)
-            .innerJoin(servers, eq(workers.server_id, servers.server_id))
-            .where(eq(workers.client_id, clientId));
+        const workers = await OrchestratorWorker.find({
+            client_id: clientId,
+        }).lean();
+
+        if (workers.length === 0) return [];
+
+        const serverIds = [...new Set(workers.map(w => w.server_id))];
+        const servers = await OrchestratorServer.find({
+            server_id: { $in: serverIds },
+        }).lean();
+
+        const serverMap = new Map(servers.map(s => [s.server_id, s]));
+
+        return workers.map(w => {
+            const server = serverMap.get(w.server_id);
+            return {
+                worker_id: w.worker_id,
+                status: w.status,
+                created_at: w.created_at,
+                updated_at: w.updated_at,
+                server_ip: server?.ipv4,
+                server_ipv6: server?.ipv6,
+            };
+        });
     }
 }
 
