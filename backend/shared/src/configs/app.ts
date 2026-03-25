@@ -28,7 +28,7 @@ export const config = {
         retryReads: process.env.MONGODB_RETRY_READS !== 'false',
         ssl: process.env.NODE_ENV === 'production',
         caFile: '/etc/ssl/mongodb/ca.crt',
-        tlsCertificateKeyFile: '/etc/ssl/mongodb/client.pem',
+        tlsCertificateKeyFile: '/etc/ssl/mongodb/mongodb.pem',
     },
 
     clickhouse: {

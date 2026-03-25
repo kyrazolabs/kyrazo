@@ -31,7 +31,7 @@ services:
 <<<<<<< HEAD
 
       - /etc/ssl/mongodb/ca.crt:/etc/ssl/mongodb/ca.crt:ro
-      - /etc/ssl/mongodb/client.pem:/etc/ssl/mongodb/client.pem:ro
+      - /etc/ssl/mongodb/mongodb.pem:/etc/ssl/mongodb/mongodb.pem:ro
 
       - /etc/ssl/redis/ca.crt:/etc/ssl/redis/ca.crt:ro
       - /etc/ssl/redis/client.crt:/etc/ssl/redis/client.crt:ro
