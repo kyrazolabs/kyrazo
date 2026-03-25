@@ -1,4 +1,4 @@
-import { redisConfig, natsConfig, clickhouseConfig } from '@/config';
+import { redisConfig, natsConfig } from '@/config';
 import { dispatchProducer } from '@/consumers/batch/dispatch.producer';
 import { ingestProducer } from '@/consumers/batch/ingest.producer';
 import { dispatchConsumer } from '@/consumers/queues/dispatch.consumer';
@@ -40,13 +40,6 @@ const gracefulShutdown = async (signal: string) => {
         logger.error('Error closing NATS connection:', error);
     }
 
-    // Close ClickHouse connection
-    try {
-        await clickhouseConfig.disconnect();
-        logger.info('ClickHouse connection closed');
-    } catch (error: any) {
-        logger.error('Error closing ClickHouse connection:', error);
-    }
 
     // Force close after 30 seconds
     setTimeout(() => {

@@ -1,6 +1,16 @@
 import { describe, it, expect, beforeEach } from 'bun:test';
 import { ReceiverTransformer } from './receiver.transformer';
 import { ProcessingStatus } from '@kyrazo/shared';
+import { mock } from 'bun:test';
+
+mock.module("@kyrazo/shared", () => ({
+    secretCrypto: {
+        encrypt: (salt: string, text: string) => ({ iv: "iv", encrypted: "enc" }),
+        decrypt: (salt: string, iv: string, encrypted: string) => "dec",
+    },
+    unprefixId: (id: string) => id,
+    ProcessingStatus: { PROCESSED: "processed" },
+}));
 
 describe('ReceiverTransformer', () => {
     let transformer: ReceiverTransformer;

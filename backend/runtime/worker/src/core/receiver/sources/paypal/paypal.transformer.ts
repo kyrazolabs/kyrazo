@@ -41,7 +41,7 @@ export class PayPalTransformer {
             },
 
             targets: (endpoints ?? []).map((t: any) => ({
-                targetId: t.id || t.id,
+                targetId: t._id || t.id,
                 targetUrl: t.url,
                 method: t.method,
                 customHeaders: t.customHeaders,

@@ -16,13 +16,23 @@ mock.module("@/consumers/queues/dispatch.consumer", () => ({
     dispatchConsumer: mockDispatchConsumer,
 }));
 mock.module("@kyrazo/shared", () => ({
-    logger: { info: () => {}, error: () => {} },
+    logger: {
+        info: mock(() => {}),
+        error: mock(() => {}),
+        warn: mock(() => {}),
+        debug: mock(() => {}),
+    },
     databaseConfig: { disconnect: mock(() => Promise.resolve()) },
+    secretCrypto: {
+        encrypt: (salt: string, text: string) => ({ iv: "iv", encrypted: "enc" }),
+        decrypt: (salt: string, iv: string, encrypted: string) => "dec",
+    },
+    unprefixId: (id: string) => id,
+    ProcessingStatus: { PROCESSED: "processed" },
 }));
 mock.module("@/config", () => ({
     redisConfig: { disconnect: mock(() => Promise.resolve()) },
     natsConfig: { disconnect: mock(() => Promise.resolve()) },
-    clickhouseConfig: { disconnect: mock(() => Promise.resolve()) },
 }));
 
 describe("WorkerLifecycle", () => {

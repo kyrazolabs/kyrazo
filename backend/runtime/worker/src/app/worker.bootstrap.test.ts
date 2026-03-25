@@ -5,17 +5,26 @@ import { bootstrap } from "./worker.bootstrap";
 mock.module("@/config", () => ({
     redisConfig: { connect: mock(() => Promise.resolve()) },
     natsConfig: { connect: mock(() => Promise.resolve()) },
-    clickhouseConfig: { connect: mock(() => Promise.resolve()) },
 }));
 mock.module("./worker.lifecycle", () => ({
     lifecycle: mock(() => {}),
 }));
 mock.module("@kyrazo/shared", () => ({
-    logger: { info: mock(() => {}), error: mock(() => {}) },
+    logger: {
+        info: mock(() => {}),
+        error: mock(() => {}),
+        warn: mock(() => {}),
+        debug: mock(() => {}),
+    },
     databaseConfig: { connect: mock(() => Promise.resolve()) },
     Source: { syncIndexes: mock(() => Promise.resolve()) },
     Endpoint: { syncIndexes: mock(() => Promise.resolve()) },
-    clickhouseConfig: { connect: mock(() => Promise.resolve()) },
+    secretCrypto: {
+        encrypt: (salt: string, text: string) => ({ iv: "iv", encrypted: "enc" }),
+        decrypt: (salt: string, iv: string, encrypted: string) => "dec",
+    },
+    unprefixId: (id: string) => id,
+    ProcessingStatus: { PROCESSED: "processed" },
 }));
 mock.module("@/consumers/nats/nats.listener", () => ({
     WorkerConsumer: class {

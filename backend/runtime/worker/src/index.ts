@@ -3,7 +3,7 @@
 import { Hono } from 'hono';
 import { logger } from 'hono/logger';
 import { bootstrap } from './app/worker.bootstrap';
-import { logger as appLogger, databaseConfig, clickhouseConfig } from '@kyrazo/shared';
+import { logger as appLogger, databaseConfig } from '@kyrazo/shared';
 import { redisConfig, natsConfig } from '@/config';
 import { env } from './app/worker.env';
 
@@ -23,32 +23,18 @@ app.use('*', logger());
 app.get('/v1/health', async c => {
     try {
         // Check all services in parallel utilizing their native health checks where applicable
-        const [mongo, redis, nats, clickhouse] = await Promise.all([
+        const [mongo, redis, nats] = await Promise.all([
             databaseConfig.healthCheck(),
             redisConfig.healthCheck(),
             natsConfig.healthCheck(),
-            (async () => {
-                try {
-                    const isConnected = await clickhouseConfig.getClient().ping();
-                    return {
-                        status: isConnected ? 'healthy' : 'unhealthy',
-                        details: { connected: isConnected, database: 'ClickHouse' },
-                    };
-                } catch (e: any) {
-                    return {
-                        status: 'unhealthy',
-                        details: { connected: false, database: 'ClickHouse', error: e.message },
-                    };
-                }
-            })(),
         ]);
 
-        const allHealthy = [mongo, redis, nats, clickhouse].every(s => s.status === 'healthy');
+        const allHealthy = [mongo, redis, nats].every(s => s.status === 'healthy');
 
         return c.json({
             success: allHealthy,
             message: allHealthy ? 'All services are healthy' : 'Some services are unhealthy',
-            services: { mongo, redis, nats, clickhouse },
+            services: { mongo, redis, nats },
             timestamp: new Date().toISOString(),
             version: env.worker.VERSION || '1.0.0',
         });

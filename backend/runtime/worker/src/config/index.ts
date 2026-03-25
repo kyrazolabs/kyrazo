@@ -6,6 +6,5 @@
  */
 export { config, validateConfig } from "./app.config";
 export { databaseConfig } from "@kyrazo/shared";
-export { clickhouseConfig } from "@kyrazo/shared";
 export { redisConfig } from "./redis.config";
 export { natsConfig } from "./nats.config";

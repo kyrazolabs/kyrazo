@@ -17,7 +17,10 @@ mock.module("bullmq", () => ({
 }));
 
 mock.module("@/config", () => ({
-    redisConfig: { getQueueClient: () => ({}) },
+    redisConfig: { 
+        getQueueClient: () => ({}),
+        getStreamClient: () => ({}),
+    },
     config: { worker: { concurrency: 10 } },
 }));
 
