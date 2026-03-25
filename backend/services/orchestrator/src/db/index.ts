@@ -1,22 +1,13 @@
-import mongoose from 'mongoose';
-import { config } from '../common/config';
-
-const connectionString = config.MONGODB_URI;
-
-if (!connectionString) {
-    throw new Error('MONGODB_URI is not defined');
-}
+import { databaseConfig } from '@kyrazo/shared';
 
 export const connectDB = async () => {
     try {
-        await mongoose.connect(connectionString, {
-            autoIndex: true,
-        });
-        console.log('🚀 MongoDB connected successfully');
+        await databaseConfig.connect();
+        console.log('🚀 MongoDB (Shared) connected successfully');
     } catch (error) {
-        console.error('❌ MongoDB connection error:', error);
+        console.error('Failed to connect to MongoDB:', error);
         process.exit(1);
     }
 };
 
-export * from './models';
+export * from '@kyrazo/shared';

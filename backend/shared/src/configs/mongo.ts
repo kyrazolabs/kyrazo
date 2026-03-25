@@ -75,7 +75,7 @@ export class DatabaseConfig {
                 tls: (config.database as any).ssl,
                 tlsInsecure: !(config.database as any).ssl, // If not SSL, it's insecure
                 rejectUnauthorized: (config.database as any).ssl,
-                ca: (config.database as any).caFile ? fs.readFileSync((config.database as any).caFile) : undefined,
+                ca: (config.database as any).caFile && fs.existsSync((config.database as any).caFile) ? fs.readFileSync((config.database as any).caFile) : undefined,
                 tlsCertificateKeyFile: (config.database as any).tlsCertificateKeyFile && fs.existsSync((config.database as any).tlsCertificateKeyFile) ? (config.database as any).tlsCertificateKeyFile : undefined,
             } as any);
 
