@@ -34,7 +34,7 @@ export class ClickHouseConfig {
         }
 
         try {
-            const chConfig = await config.clickhouse;
+            const chConfig = config.clickhouse;
             const parsed = new URL(chConfig.url);
 
             const host = `${parsed.protocol}//${parsed.hostname}${parsed.port ? `:${parsed.port}` : ''}`;
@@ -44,11 +44,11 @@ export class ClickHouseConfig {
                 parsed.pathname.replace(/^\//, '') || chConfig.database || 'default';
 
             logger.info(
-                `Attempting to connect to ClickHouse: ${host} with user: ${username}, database: ${database}`
+                `Attempting to connect to ClickHouse: ${host} (Port: ${parsed.port || (parsed.protocol === 'https:' ? '8443' : '8123')}) with user: ${username}, database: ${database}`
             );
 
             const clientOptions: any = {
-                host,
+                url: host,
                 username,
                 password,
                 database,
