@@ -5,6 +5,13 @@ import config from './app';
 import { runMigrations } from '../models/clickhouse/migrations';
 
 /**
+ * Interface matching the result shape returned by query() so repositories can call .json<T>()
+ */
+interface ClickHouseQueryResult {
+    json<T>(): Promise<T[]>;
+}
+
+/**
  * @title Manual ClickHouse Client
  * @description A minimal fetch-based client that mirrors verified 'curl' logic from clickhouse-test.ts.
  * Bypasses official library to use raw GET requests with queries in the URL.
@@ -108,13 +115,14 @@ class ManualClickHouseClient {
         query_params?: Record<string, any>;
         format?: string;
         clickhouse_settings?: any;
-    }): Promise<any> {
+    }): Promise<ClickHouseQueryResult> {
         // Force output format if specified
         let fullQuery = params.query;
         if (params.format && !fullQuery.toUpperCase().includes('FORMAT')) {
             fullQuery += ` FORMAT ${params.format}`;
         }
 
+        const capturedFormat = params.format;
         const res = await this.exec({
             query: fullQuery,
             query_params: params.query_params,
@@ -126,15 +134,15 @@ class ManualClickHouseClient {
                 const text = await res.text();
                 if (!text.trim()) return [];
                 // Handle JSONEachRow (newline delimited) or standard JSON
-                if (params.format === 'JSONEachRow') {
+                if (capturedFormat === 'JSONEachRow') {
                     return text
                         .split('\n')
                         .filter((l: string) => l.trim())
-                        .map((l: string) => JSON.parse(l));
+                        .map((l: string) => JSON.parse(l)) as T[];
                 }
                 try {
                     const parsed = JSON.parse(text);
-                    return parsed.data || parsed;
+                    return (parsed.data || parsed) as T[];
                 } catch {
                     return text as any;
                 }
