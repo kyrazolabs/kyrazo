@@ -12,10 +12,6 @@ export class Config {
     readonly streamRedisCaFile = '/etc/ssl/redis/ca.crt';
     readonly streamRedisCertFile = '/etc/ssl/redis/client.crt';
     readonly streamRedisKeyFile = '/etc/ssl/redis/client.key';
-    readonly pgUrl = process.env.DATABASE_URL!;
-    readonly pgSsl = process.env.NODE_ENV === 'production';
-    readonly pgSslMode = process.env.POSTGRES_SSL_MODE || 'require';
-    readonly pgCaFile = '/etc/ssl/postgres/ca.crt';
     readonly snapshotIntervalMs = 5000;
 
     // Stream configuration

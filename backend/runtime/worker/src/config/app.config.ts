@@ -6,7 +6,7 @@ import { AckPolicy, DeliverPolicy } from 'nats';
 dotenv.config();
 
 // Validate required environment variables
-const requiredEnvVars = ['MONGODB_URI', 'REDIS_HOST', 'REDIS_PORT'];
+const requiredEnvVars = ['MONGODB_URI', 'REDIS_URL', 'ENCRYPTION_KEY'];
 
 const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
 
@@ -25,9 +25,9 @@ if (missingEnvVars.length > 0) {
 export const config = {
     // Redis Configuration
     redis: {
-        url: process.env.REDIS_URL,
-        host: process.env.REDIS_HOST!,
-        port: parseInt(process.env.REDIS_PORT!),
+        url: process.env.REDIS_URL!,
+        host: process.env.REDIS_HOST,
+        port: parseInt(process.env.REDIS_PORT || '6379'),
         password: process.env.REDIS_PASSWORD,
         db: parseInt(process.env.REDIS_DB || '0'),
         tls: process.env.NODE_ENV === 'production',
