@@ -23,8 +23,9 @@ COPY apis/dashboard/package.json apis/dashboard/bun.lock ./apis/dashboard/
 WORKDIR /app/apis/dashboard
 RUN bun install --frozen-lockfile
 
-# 4. Copy Dashboard source
+# 4. Copy Dashboard source and BUILD
 COPY apis/dashboard ./
+RUN bun run build
 
 # Stage 2: Production runner
 FROM oven/bun:${BUN_VERSION}-alpine AS runner
@@ -43,10 +44,11 @@ COPY --from=builder /app/shared /app/apis/dashboard/node_modules/@kyrazo/shared
 # ALSO Copy shared to /app/shared because tsconfig paths point to "../../shared"
 COPY --from=builder /app/shared /app/shared
 
-# Copy dashboard package binaries and config
+# Copy dashboard package binaries, config, and BUILT dist
 COPY --from=builder /app/apis/dashboard/package.json /app/apis/dashboard/package.json
 COPY --from=builder /app/apis/dashboard/tsconfig.json /app/apis/dashboard/tsconfig.json
-COPY --from=builder /app/apis/dashboard/src /app/apis/dashboard/src
+COPY --from=builder /app/apis/dashboard/dist /app/apis/dashboard/dist
+COPY --from=builder /app/apis/dashboard/sql /app/apis/dashboard/sql
 
 # Set working directory to dashboard package
 WORKDIR /app/apis/dashboard
