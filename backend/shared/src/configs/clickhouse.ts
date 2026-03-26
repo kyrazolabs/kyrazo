@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { execSync } from 'child_process';
 import { logger } from './logger';
 import config from './app';
 import { runMigrations } from '../models/clickhouse/migrations';
@@ -13,101 +14,86 @@ interface ClickHouseQueryResult {
 
 /**
  * @title Manual ClickHouse Client
- * @description A minimal fetch-based client that mirrors verified 'curl' logic from clickhouse-test.ts.
- * Bypasses official library to use raw GET requests with queries in the URL.
+ * @description Uses curl + execSync exactly like clickhouse-test.ts.
+ * This is the only approach verified to work with the production CA cert across servers.
  */
 class ManualClickHouseClient {
-    private url: string;
+    private baseUrl: string;
     private auth: string;
-    private tlsConfig: any;
+    private caFile: string | undefined;
 
     constructor(options: {
         url: string;
         username?: string;
         password?: string;
         caFile?: string;
-        rejectUnauthorized?: boolean;
     }) {
-        this.url = options.url;
+        this.baseUrl = options.url;
         const user = options.username || 'default';
         const pass = options.password || '';
-        this.auth = Buffer.from(`${user}:${pass}`).toString('base64');
-
-        if (options.url.startsWith('https')) {
-            this.tlsConfig = {
-                rejectUnauthorized: options.rejectUnauthorized ?? false,
-            };
-            if (options.caFile && fs.existsSync(options.caFile)) {
-                this.tlsConfig.ca = fs.readFileSync(options.caFile);
-            }
-        }
+        this.auth = `${user}:${pass}`;
+        this.caFile = options.caFile;
     }
 
-    private getHeaders() {
-        return {
-            Authorization: `Basic ${this.auth}`,
-            Accept: 'application/json',
-        };
+    private buildEndpoint(query: string, params?: Record<string, any>): string {
+        const parsed = new URL(this.baseUrl);
+        const endpoint = new URL(`${parsed.protocol}//${parsed.hostname}:${parsed.port}/`);
+        endpoint.searchParams.set('query', query);
+        if (params) {
+            Object.entries(params).forEach(([k, v]) => {
+                endpoint.searchParams.set(`param_${k}`, String(v));
+            });
+        }
+        return endpoint.toString();
+    }
+
+    private runCurl(endpoint: string, body?: string): string {
+        const parts: string[] = ['curl', '--silent', '--fail'];
+
+        if (this.caFile && fs.existsSync(this.caFile)) {
+            parts.push(`--cacert "${this.caFile}"`);
+        } else {
+            // No CA — skip TLS verification (development/unknown cert)
+            parts.push('--insecure');
+        }
+
+        parts.push(`--user "${this.auth}"`);
+
+        if (body !== undefined) {
+            parts.push('--request POST');
+            parts.push(`--data-binary @-`);
+        }
+
+        parts.push(`"${endpoint}"`);
+
+        const cmd = parts.join(' ');
+        logger.debug(`ClickHouse curl: ${cmd.substring(0, 120)}...`);
+
+        return execSync(cmd, {
+            encoding: 'utf8',
+            input: body,
+            timeout: 30_000,
+        }).trim();
     }
 
     async ping(): Promise<boolean> {
         try {
-            const res = await fetch(`${this.url}/ping`, {
-                headers: this.getHeaders(),
-                // @ts-ignore - Bun/Node-compatible fetch supports tls
-                tls: this.tlsConfig,
-            });
-            return res.status === 200;
-        } catch (error) {
-            logger.error('ClickHouse Manual Ping failed', error);
+            const result = this.runCurl(this.buildEndpoint('SELECT 1'));
+            return result.trim() === '1';
+        } catch (error: any) {
+            const msg = error?.stderr?.toString?.().trim() || error?.message || String(error);
+            logger.error('ClickHouse Ping failed', { error: msg });
             return false;
         }
-    }
-
-    private buildUrl(query: string, params?: Record<string, any>, settings?: Record<string, any>) {
-        const queryUrl = new URL(this.url);
-        queryUrl.searchParams.set('query', query);
-
-        if (params) {
-            Object.entries(params).forEach(([k, v]) => {
-                queryUrl.searchParams.set(`param_${k}`, String(v));
-            });
-        }
-
-        if (settings) {
-            Object.entries(settings).forEach(([k, v]) => {
-                queryUrl.searchParams.set(k, String(v));
-            });
-        }
-
-        return queryUrl.toString();
     }
 
     async exec(params: {
         query: string;
         query_params?: Record<string, any>;
         clickhouse_settings?: any;
-    }): Promise<any> {
-        const url = this.buildUrl(params.query, params.query_params, params.clickhouse_settings);
-
-        const res = await fetch(url, {
-            method: 'GET',
-            headers: this.getHeaders(),
-            // @ts-ignore - Bun/Node-compatible fetch supports tls
-            tls: this.tlsConfig,
-        });
-
-        if (!res.ok) {
-            const errorText = await res.text();
-            logger.error('ClickHouse Manual Exec failed', {
-                status: res.status,
-                error: errorText,
-                query: params.query.substring(0, 100),
-            });
-            throw new Error(`ClickHouse error: ${errorText}`);
-        }
-
-        return res;
+    }): Promise<string> {
+        const endpoint = this.buildEndpoint(params.query, params.query_params);
+        return this.runCurl(endpoint);
     }
 
     async query(params: {
@@ -116,24 +102,19 @@ class ManualClickHouseClient {
         format?: string;
         clickhouse_settings?: any;
     }): Promise<ClickHouseQueryResult> {
-        // Force output format if specified
-        let fullQuery = params.query;
-        if (params.format && !fullQuery.toUpperCase().includes('FORMAT')) {
-            fullQuery += ` FORMAT ${params.format}`;
+        const format = params.format || 'JSONEachRow';
+        let fullQuery = params.query.trim();
+        if (!fullQuery.toUpperCase().includes('FORMAT')) {
+            fullQuery += ` FORMAT ${format}`;
         }
 
-        const capturedFormat = params.format;
-        const res = await this.exec({
-            query: fullQuery,
-            query_params: params.query_params,
-            clickhouse_settings: params.clickhouse_settings,
-        });
+        const endpoint = this.buildEndpoint(fullQuery, params.query_params);
+        const capturedFormat = format;
 
         return {
             json: async <T>(): Promise<T[]> => {
-                const text = await res.text();
+                const text = this.runCurl(endpoint);
                 if (!text.trim()) return [];
-                // Handle JSONEachRow (newline delimited) or standard JSON
                 if (capturedFormat === 'JSONEachRow') {
                     return text
                         .split('\n')
@@ -144,7 +125,7 @@ class ManualClickHouseClient {
                     const parsed = JSON.parse(text);
                     return (parsed.data || parsed) as T[];
                 } catch {
-                    return text as any;
+                    return [] as T[];
                 }
             },
         };
@@ -153,32 +134,13 @@ class ManualClickHouseClient {
     async insert(params: { table: string; values: any[]; format?: string }): Promise<void> {
         const format = params.format || 'JSONEachRow';
         const query = `INSERT INTO ${params.table} FORMAT ${format}`;
-        const url = this.buildUrl(query);
-
-        // For JSONEachRow, ClickHouse expects newline-delimited JSON
         const body = params.values.map(v => JSON.stringify(v)).join('\n') + '\n';
 
-        const res = await fetch(url, {
-            method: 'POST',
-            headers: this.getHeaders(),
-            body,
-            // @ts-ignore - Bun/Node-compatible fetch supports tls
-            tls: this.tlsConfig,
-        });
-
-        if (!res.ok) {
-            const errorText = await res.text();
-            logger.error('ClickHouse Manual Insert failed', {
-                status: res.status,
-                table: params.table,
-                error: errorText,
-            });
-            throw new Error(`ClickHouse Insert error: ${errorText}`);
-        }
+        const endpoint = this.buildEndpoint(query);
+        this.runCurl(endpoint, body);
     }
 
-    // Required for compatibility
-    async close() {
+    async close(): Promise<void> {
         return Promise.resolve();
     }
 }
@@ -237,7 +199,6 @@ export class ClickHouseConfig {
                 username,
                 password,
                 caFile: chConfig.caFile,
-                rejectUnauthorized: true, // matches test script's flexible approach
             });
 
             logger.info('ClickHouse client created, testing connection...');
