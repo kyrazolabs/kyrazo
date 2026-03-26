@@ -6,7 +6,7 @@
         "tunnel": "bun run src/tunnel.ts",
         "test": "bun test",
         "clean": "rm -rf dist && echo 'Done.'",
-        "build": "tsc -p tsconfig.json && cp -r ../../shared/src/models/clickhouse/sql ./sql",
+        "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json && cp -r ../../shared/src/models/clickhouse/sql ./sql",
         "build:watch": "bun run build && bun run watch",
         "prod": "bun run build && bun run src/index.ts",
         "watch": "concurrently -k -n TSC -c blue \"tsc -p tsconfig.json -w\"",
@@ -84,6 +84,7 @@
         "globals": "^16.5.0",
         "jiti": "^2.6.1",
         "prettier": "^3.8.1",
+        "tsc-alias": "^1.8.16",
         "typescript-eslint": "^8.57.2"
     }
 }
