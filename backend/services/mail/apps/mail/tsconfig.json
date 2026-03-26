@@ -5,7 +5,7 @@
     "strict": true,
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
-    "types": ["bun-types"],
+    "types": ["bun"],
     "paths": {
       "@mail/*": ["./src/*"]
     },

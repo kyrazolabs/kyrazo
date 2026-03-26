@@ -131,10 +131,13 @@ export class SubscriptionRepository {
      * Used to enforce the one-time first-month refund policy.
      */
     async hasWorkspaceEverReceivedRefund(workspaceId: string): Promise<boolean> {
-        const existing = await (Subscription as any).findOne({
-            workspaceId: unprefixId(workspaceId),
-            refundIssuedAt: { $ne: null, $exists: true },
-        }).select('_id').lean();
+        const existing = await (Subscription as any)
+            .findOne({
+                workspaceId: unprefixId(workspaceId),
+                refundIssuedAt: { $ne: null, $exists: true },
+            })
+            .select('_id')
+            .lean();
         return !!existing;
     }
 

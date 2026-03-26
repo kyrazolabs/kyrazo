@@ -306,6 +306,7 @@ export class PlanController {
         try {
             const userId = c.user?.userId;
             const workspace = c.workspace;
+            // @ts-ignore
             const { id } = c.req.param();
 
             if (!userId || !workspace) {

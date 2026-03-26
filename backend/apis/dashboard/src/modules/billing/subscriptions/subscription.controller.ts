@@ -201,6 +201,7 @@ export class SubscriptionController {
     static async changePlan(c: AppContext): Promise<Response> {
         try {
             const workspace = c.workspace;
+            // @ts-ignore
             const { id } = c.req.param();
 
             if (!workspace) {
