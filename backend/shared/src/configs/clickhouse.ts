@@ -37,17 +37,21 @@ export class ClickHouseConfig {
             const chConfig = config.clickhouse;
             const parsed = new URL(chConfig.url);
 
-            // Always preserve the explicit port from the URL.
-            // new URL() sets parsed.port to '' for default ports (80/443) but ClickHouse
-            // typically listens on non-standard ports (8123 / 8443), so we must keep it.
-            const explicitPort = parsed.protocol === 'https:' ? '8443' : '8123';
-            const sanitizedUrl = `${parsed.protocol}//${parsed.hostname}:${explicitPort}`;
+            // Align with test script behavior: use port from URL if present, else ClickHouse defaults
+            const portPart = parsed.port
+                ? `:${parsed.port}`
+                : parsed.protocol === 'https:'
+                  ? ':8443'
+                  : ':8123';
+
+            // Construct sanitized URL for the client and logging
+            const sanitizedUrl = `${parsed.protocol}//${parsed.hostname}${portPart}`;
             const username = parsed.username || chConfig.username || 'default';
-            const password = decodeURIComponent(parsed.password) || chConfig.password || '';
+            const password = decodeURIComponent(parsed.password || chConfig.password || '');
             const database = parsed.pathname.replace(/^\//, '') || chConfig.database || 'default';
 
             logger.info(
-                `Attempting to connect to ClickHouse: ${sanitizedUrl} with user: ${username}, database: ${database}`
+                `Attempting to connect to ClickHouse: ${sanitizedUrl} (Database: ${database}, User: ${username})`
             );
 
             const clientOptions: any = {
