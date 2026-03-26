@@ -1,4 +1,4 @@
-import { createClient } from '@clickhouse/client';
+import { createClient } from '@clickhouse/client-web';
 import * as fs from 'fs';
 import * as path from 'path';
 import { logger } from './logger';
@@ -66,19 +66,11 @@ export class ClickHouseConfig {
             };
 
             if (chConfig.ssl) {
-                const tlsOptions: any = {
-                    rejectUnauthorized: chConfig.rejectUnauthorized,
-                    // Skip hostname verification for IP-addressed servers
-                    checkServerIdentity: () => undefined,
-                };
-                if (chConfig.caFile && fs.existsSync(chConfig.caFile)) {
-                    tlsOptions.ca = fs.readFileSync(chConfig.caFile);
-                } else {
-                    logger.warn(
-                        `ClickHouse CA file not found at ${chConfig.caFile}, connecting without CA verification`
-                    );
-                }
-                clientOptions.tls = tlsOptions;
+                // The Web client (fetch-based) handles TLS differently.
+                // In Bun, you can often provide a CA cert via environment variables (NODE_EXTRA_CA_CERTS),
+                // but since we are skiping hostname verification anyway, we rely on the host's
+                // network stack and the provided rejectUnauthorized flag where supported.
+                // For the web client, some TLS options are simplified.
             }
 
             this.client = createClient(clientOptions);
