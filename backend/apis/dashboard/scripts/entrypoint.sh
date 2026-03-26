@@ -21,4 +21,4 @@ for dir in redis mongodb clickhouse; do
 done
 
 # Drop down to the bun user and start the application
-exec su-exec bun bun run src/index.ts
+exec su-exec bun bun run dist/index.js
