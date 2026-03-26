@@ -97,7 +97,10 @@ export class ClickHouseConfig {
     /**
      * @title Get ClickHouse client
      */
-    public getClient(): ClickHouseClient | null {
+    public getClient(): ClickHouseClient {
+        if (!this.client) {
+            throw new Error('ClickHouse client not initialized. Call connect() first.');
+        }
         return this.client;
     }
 
