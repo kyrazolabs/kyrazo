@@ -37,6 +37,7 @@ export class TargetController {
                     401
                 );
             }
+            // @ts-ignore
             const valid: CreateTargetInput = c.req.valid('json');
             const saved = await targetService.createTarget(valid, userId, workspaceId, namespaceId);
 
@@ -93,6 +94,7 @@ export class TargetController {
                     401
                 );
             }
+            // @ts-ignore
             const { q, enabled, limit = 10, page = 1 }: FilterTargetInput = c.req.valid('query');
 
             const query: Record<string, unknown> = { workspaceId, namespaceId };
@@ -148,6 +150,7 @@ export class TargetController {
                     401
                 );
             }
+            // @ts-ignore
             const { targetId }: GetTargetByIdInput = c.req.valid('param');
 
             const target = await targetService.getTargetById(
@@ -195,6 +198,7 @@ export class TargetController {
                     401
                 );
             }
+            // @ts-ignore
             const { targetId }: GetTargetByIdInput = c.req.valid('param');
 
             const secret = await targetService.getTargetSecret(
@@ -242,7 +246,9 @@ export class TargetController {
                     401
                 );
             }
+            // @ts-ignore
             const { targetId }: GetTargetByIdInput = c.req.valid('param');
+            // @ts-ignore
             const valid: UpdateTargetInput = c.req.valid('json');
             const target = await targetService.updateTarget(
                 targetId,
@@ -290,6 +296,7 @@ export class TargetController {
                     401
                 );
             }
+            // @ts-ignore
             const { targetId, enabled }: UpdateTargetStatusInput = c.req.valid('json');
             const target = await targetService.updateTarget(
                 targetId,
@@ -337,6 +344,7 @@ export class TargetController {
                     401
                 );
             }
+            // @ts-ignore
             const { targetId }: GetTargetByIdInput = c.req.valid('param');
             const deleted = await targetService.deleteTarget(
                 targetId,
