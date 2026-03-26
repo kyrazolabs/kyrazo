@@ -6,7 +6,7 @@
         "tunnel": "bun run src/tunnel.ts",
         "test": "bun test",
         "clean": "rm -rf dist && echo 'Done.'",
-        "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json && cp -r ../../shared/src/models/clickhouse/sql ./sql",
+        "build": "tsc -p tsconfig.json && bunx tsc-alias -p tsconfig.json --src src --out dist && cp -r ../../shared/src/models/clickhouse/sql ./sql",
         "build:watch": "bun run build && bun run watch",
         "prod": "bun run build && bun run src/index.ts",
         "watch": "concurrently -k -n TSC -c blue \"tsc -p tsconfig.json -w\"",
@@ -71,6 +71,9 @@
         "winston": "^3.19.0",
         "winston-daily-rotate-file": "^5.0.0",
         "zod": "^4.3.6"
+    },
+    "peerDependencies": {
+        "typescript": "^5.9.3"
     },
     "devDependencies": {
         "@eslint/js": "^9.39.4",
