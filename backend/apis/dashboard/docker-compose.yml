@@ -31,6 +31,8 @@ services:
       - MONGODB_SSL=${MONGODB_SSL}
 
       - CLICKHOUSE_URL=${CLICKHOUSE_URL}
+      - CLICKHOUSE_CA_FILE=/etc/ssl/clickhouse/ca.crt
+      - NODE_EXTRA_CA_CERTS=/etc/ssl/clickhouse/ca.crt
       - REDIS_URL=${REDIS_URL}
       - REDIS_TLS=${REDIS_TLS}
       - QUEUE_REDIS_URL=${QUEUE_REDIS_URL}
