@@ -1,4 +1,4 @@
-import { Context, Next } from 'hono';
+import { Context, Next, Input } from 'hono';
 
 import {
     IErrorResponse,
@@ -14,7 +14,7 @@ import { getSignedCookie } from 'hono/cookie';
 import { authUtils, JWTPayload } from '@/core/utils/libs/jwt';
 import { Types } from 'mongoose';
 
-export interface AppContext extends Context {
+export interface AppContext<P extends string = string, I extends Input = any> extends Context<any, P, I> {
     user?: JWTPayload;
     workspace?: IUserWorkspace;
     namespace?: INamespace & { namespaceId: Types.ObjectId };

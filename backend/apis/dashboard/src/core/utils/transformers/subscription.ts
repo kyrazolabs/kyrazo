@@ -1,4 +1,5 @@
-import { SubscriptionResponse } from '@/shared/types';
+import { SubscriptionResponse } from '@/modules/billing/subscriptions/subscription.dto';
+
 import { IPlan, IPlanSnapshot, transformWithId } from '@kyrazo/shared';
 
 export class SubscriptionTransformer {

@@ -28,6 +28,7 @@ describe('SupportController', () => {
             message: 'Test message with more than ten characters',
             Types: 'Bug' as const,
             Category: 'Dashboard',
+            kind: 'support' as const,
         };
 
         const serviceSpy = spyOn(
@@ -67,6 +68,7 @@ describe('SupportController', () => {
             message: 'Test message',
             Types: 'Bug' as const,
             Category: 'Dashboard',
+            kind: 'support' as const,
         });
         const result: any = await SupportController.createTicket(c);
 

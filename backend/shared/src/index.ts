@@ -8,5 +8,5 @@ export * from './types';
 export * from './models/clickhouse/repositories';
 export * from './models/clickhouse/migrations';
 export * from './models/clickhouse/types';
-export { mongoose, Types } from './configs/mongo';
+export { mongoose, Types, ClientSession } from './configs/mongo';
 export * from 'drizzle-orm';

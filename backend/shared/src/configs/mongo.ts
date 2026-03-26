@@ -208,4 +208,5 @@ export class DatabaseConfig {
  */
 export const databaseConfig = DatabaseConfig.getInstance();
 const Types = mongoose.Types;
+export type ClientSession = mongoose.ClientSession;
 export { mongoose, Types };
