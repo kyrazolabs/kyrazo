@@ -41,6 +41,7 @@
     },
     "dependencies": {
         "@clickhouse/client": "^1.18.2",
+        "@clickhouse/client-web": "^1.18.2",
         "@supabase/supabase-js": "^2.100.1",
         "crypto": "^1.0.1",
         "dotenv": "^16.6.1",
