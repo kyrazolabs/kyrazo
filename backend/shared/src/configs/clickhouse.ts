@@ -37,14 +37,18 @@ export class ClickHouseConfig {
             const chConfig = config.clickhouse;
             const parsed = new URL(chConfig.url);
 
-            // Construct sanitized URL without credentials for the 'url' property
-            const sanitizedUrl = `${parsed.protocol}//${parsed.hostname}${parsed.port ? `:${parsed.port}` : ''}`;
+            // Always preserve the explicit port from the URL.
+            // new URL() sets parsed.port to '' for default ports (80/443) but ClickHouse
+            // typically listens on non-standard ports (8123 / 8443), so we must keep it.
+            const explicitPort = parsed.protocol === 'https:' ? '8443' : '8123';
+            const sanitizedUrl = `${parsed.protocol}//${parsed.hostname}:${explicitPort}`;
             const username = parsed.username || chConfig.username || 'default';
             const password = decodeURIComponent(parsed.password) || chConfig.password || '';
-            const database =
-                parsed.pathname.replace(/^\//, '') || chConfig.database || 'default';
+            const database = parsed.pathname.replace(/^\//, '') || chConfig.database || 'default';
 
-            logger.info(`Attempting to connect to ClickHouse: ${sanitizedUrl} (Port: ${parsed.port || '8123'}) with user: ${username}, database: ${database}`);
+            logger.info(
+                `Attempting to connect to ClickHouse: ${sanitizedUrl} with user: ${username}, database: ${database}`
+            );
 
             const clientOptions: any = {
                 url: sanitizedUrl,
@@ -58,14 +62,19 @@ export class ClickHouseConfig {
             };
 
             if (chConfig.ssl) {
-                clientOptions.tls = {
+                const tlsOptions: any = {
                     rejectUnauthorized: chConfig.rejectUnauthorized,
-                    // IP-based certificates might not match hostnames, so we skip identity check
+                    // Skip hostname verification for IP-addressed servers
                     checkServerIdentity: () => undefined,
                 };
                 if (chConfig.caFile && fs.existsSync(chConfig.caFile)) {
-                    clientOptions.tls.ca = fs.readFileSync(chConfig.caFile);
+                    tlsOptions.ca = fs.readFileSync(chConfig.caFile);
+                } else {
+                    logger.warn(
+                        `ClickHouse CA file not found at ${chConfig.caFile}, connecting without CA verification`
+                    );
                 }
+                clientOptions.tls = tlsOptions;
             }
 
             this.client = createClient(clientOptions);
