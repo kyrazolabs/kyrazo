@@ -62,14 +62,8 @@ export class RedisConfig {
 
         try {
             // Main Redis client for general operations
-            let redisClientOptions: RedisOptions;
-            if (config.redis.url) {
-                redisClientOptions = {
-                    ...(typeof config.redis.url === 'string'
-                        ? { url: config.redis.url }
-                        : (config.redis.url as any)),
-                };
-            } else {
+            let redisClientOptions: RedisOptions = {};
+            if (!config.redis.url) {
                 redisClientOptions = {
                     host: config.redis.host,
                     port: config.redis.port,
@@ -99,24 +93,18 @@ export class RedisConfig {
                 (redisClientOptions.tls as any).checkServerIdentity = () => undefined;
             }
 
-            this.client = new Redis(redisClientOptions);
+            this.client = config.redis.url ? new Redis(config.redis.url, redisClientOptions) : new Redis(redisClientOptions);
 
-            // Queue Redis client for BullMQ
-            let queueRedisClientOptions: RedisOptions;
-            if (config.redis.queue.url) {
+            let queueRedisClientOptions: RedisOptions = {
+                maxRetriesPerRequest: null,
+            };
+            if (!config.redis.queue.url) {
                 queueRedisClientOptions = {
-                    ...(typeof config.redis.queue.url === 'string'
-                        ? { url: config.redis.queue.url }
-                        : (config.redis.queue.url as any)),
-                    maxRetriesPerRequest: null, // Essential for BullMQ
-                };
-            } else {
-                queueRedisClientOptions = {
+                    ...queueRedisClientOptions,
                     host: config.redis.queue.host || config.redis.host,
                     port: config.redis.queue.port || config.redis.port,
                     password: config.redis.queue.password || config.redis.password,
                     db: config.redis.queue.db || config.redis.db,
-                    maxRetriesPerRequest: null, // Essential for BullMQ
                 } as RedisOptions;
             }
 
@@ -139,7 +127,7 @@ export class RedisConfig {
                 // Skip hostname identity check for IP-based certificates
                 (queueRedisClientOptions.tls as any).checkServerIdentity = () => undefined;
             }
-            this.queueClient = new Redis(queueRedisClientOptions);
+            this.queueClient = config.redis.queue.url ? new Redis(config.redis.queue.url, queueRedisClientOptions) : new Redis(queueRedisClientOptions);
 
             // Set up error handlers
             this.client.on('error', (error: Error) => {
