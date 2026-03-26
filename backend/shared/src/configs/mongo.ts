@@ -82,6 +82,24 @@ export class DatabaseConfig {
             this.isConnected = true;
             logger.info('Mongoose connected to MongoDB successfully');
 
+            // Check if the connected node is primary (important for replica sets with index syncing)
+            const adminDb = mongoose.connection.db?.admin();
+            const serverStatus = await adminDb?.serverStatus();
+            const isPrimary = serverStatus?.repl?.isWritablePrimary ?? true; // Default to true if not a replSet
+
+            if (serverStatus?.repl) {
+                logger.info('MongoDB Replica Set Status:', {
+                    set: serverStatus.repl.setName,
+                    isPrimary,
+                    me: serverStatus.repl.me,
+                });
+
+                if (!isPrimary) {
+                    logger.warn('⚠️ Connected to a SECONDARY node. Index synchronization and writes will fail.');
+                    logger.warn('Tip: Ensure your replica set is initialized with rs.initiate() and your URI is correct.');
+                }
+            }
+
             // Handle connection events
             mongoose.connection.on('error', error => {
                 logger.error('MongoDB connection error:', error);
