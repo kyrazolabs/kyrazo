@@ -84,7 +84,7 @@ router.use(
                 400
             );
         }
-    }),
+    }) as any,
     requireWorkspaceMembership(['owner', 'admin', 'member'])
 ); // Assuming namespace access is tied to workspace membership
 

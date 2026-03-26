@@ -70,7 +70,7 @@ const zodErrorHandler = async (c: AppContext, next: Next) => {
                 {
                     success: false,
                     statusCode: 400,
-                    errors: err.errors.map((e: any) => ({
+                    errors: err.issues.map((e: any) => ({
                         field: e.path.join('.') || 'unknown',
                         message: e.message,
                     })),
