@@ -15,7 +15,6 @@ import {
     databaseConfig,
     clickhouseConfig,
     Namespace,
-    postgresConfig,
     logger,
     IErrorResponse,
 } from '@kyrazo/shared';
@@ -88,22 +87,18 @@ const initializeConnections = async () => {
         await Namespace.syncIndexes();
         logger.info('MongoDB indexes synced successfully');
 
-        logger.info('Stage 3: Connecting to Postgres...');
-        await postgresConfig.connect();
-        logger.info('Postgres connected successfully');
-
-        logger.info('Stage 4: Connecting to Redis...');
+        logger.info('Stage 3: Connecting to Redis...');
         await redisConfig.connect();
         logger.info('Redis connected successfully');
 
-        logger.info('Stage 5: Initializing Usage Service...');
+        logger.info('Stage 4: Initializing Usage Service...');
         usageService.init();
 
-        logger.info('Stage 6: Connecting to ClickHouse...');
+        logger.info('Stage 5: Connecting to ClickHouse...');
         await clickhouseConfig.connect();
         logger.info('ClickHouse connected successfully');
 
-        logger.info('Stage 7: Setting up Bull Board...');
+        logger.info('Stage 6: Setting up Bull Board...');
         const serverAdapter = new HonoAdapter(serveStatic);
 
         createBullBoard({

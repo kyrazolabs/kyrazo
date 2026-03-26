@@ -13,7 +13,7 @@ import targetRouter from './v1/target/target.routes';
 import ingestRouter from './v1/ingest/ingest.routes';
 import supportRouter from './v1/support/support.routes';
 import workerRouter from './v1/worker/worker.routes';
-import { clickhouseConfig, databaseConfig, postgresConfig } from '@kyrazo/shared';
+import { clickhouseConfig, databaseConfig } from '@kyrazo/shared';
 import { redisConfig } from '@/configs';
 
 const router = new Hono();
@@ -66,9 +66,8 @@ router.route('/plans', billingRouter.plans);
 router.get('/health', async c => {
     try {
         // Check all database services in parallel
-        const [mongo, postgres, clickhouse, redis, redisQueue] = await Promise.all([
+        const [mongo, clickhouse, redis, redisQueue] = await Promise.all([
             databaseConfig.healthCheck(),
-            postgresConfig.healthCheck(),
             clickhouseConfig.healthCheck(),
             redisConfig.healthCheck(),
             (async () => {
@@ -95,7 +94,7 @@ router.get('/health', async c => {
         ]);
 
         // Determine overall health status
-        const allHealthy = [mongo, postgres, clickhouse, redis, redisQueue].every(
+        const allHealthy = [mongo, clickhouse, redis, redisQueue].every(
             service => service.status === 'healthy'
         );
 
@@ -104,7 +103,6 @@ router.get('/health', async c => {
             message: allHealthy ? 'All services are healthy' : 'Some services are unhealthy',
             services: {
                 mongo,
-                postgres,
                 clickhouse,
                 redis,
                 redisQueue,
