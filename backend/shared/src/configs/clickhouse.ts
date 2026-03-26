@@ -34,23 +34,30 @@ export class ClickHouseConfig {
         }
 
         try {
-            const { url, username, password, database } = await config.clickhouse;
+            const chConfig = await config.clickhouse;
+            const parsed = new URL(chConfig.url);
+
+            const host = `${parsed.protocol}//${parsed.hostname}${parsed.port ? `:${parsed.port}` : ''}`;
+            const username = parsed.username || chConfig.username || 'default';
+            const password = decodeURIComponent(parsed.password) || chConfig.password || '';
+            const database =
+                parsed.pathname.replace(/^\//, '') || chConfig.database || 'default';
+
             logger.info(
-                `Attempting to connect to ClickHouse: ${url} with user: ${username}, database: ${database}`
+                `Attempting to connect to ClickHouse: ${host} with user: ${username}, database: ${database}`
             );
-            if (!url || !username) {
-                throw new Error('ClickHouse configuration is incomplete');
-            }
 
             const clientOptions: any = {
-                url,
+                host,
+                username,
+                password,
+                database,
                 int64_handling: 'string', // Return UInt64 as strings to prevent precision loss in JS Number
                 clickhouse_settings: {
                     output_format_json_quote_64bit_integers: 1, // Force ClickHouse to wrap result integers in quotes for JSON formats
                 },
             };
 
-            const chConfig = await config.clickhouse;
             if (chConfig.ssl) {
                 clientOptions.tls = {
                     rejectUnauthorized: chConfig.rejectUnauthorized,
