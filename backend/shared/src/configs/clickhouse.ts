@@ -35,11 +35,22 @@ export class ClickHouseConfig {
 
         try {
             const chConfig = config.clickhouse;
+            const parsed = new URL(chConfig.url);
 
-            logger.info(`Attempting to connect to ClickHouse with URL: ${chConfig.url.split('@').pop()} (redacted auth)`);
+            // Construct sanitized URL without credentials for the 'url' property
+            const sanitizedUrl = `${parsed.protocol}//${parsed.hostname}${parsed.port ? `:${parsed.port}` : ''}`;
+            const username = parsed.username || chConfig.username || 'default';
+            const password = decodeURIComponent(parsed.password) || chConfig.password || '';
+            const database =
+                parsed.pathname.replace(/^\//, '') || chConfig.database || 'default';
+
+            logger.info(`Attempting to connect to ClickHouse: ${sanitizedUrl} (Port: ${parsed.port || '8123'}) with user: ${username}, database: ${database}`);
 
             const clientOptions: any = {
-                url: chConfig.url,
+                url: sanitizedUrl,
+                username,
+                password,
+                database,
                 int64_handling: 'string', // Return UInt64 as strings to prevent precision loss in JS Number
                 clickhouse_settings: {
                     output_format_json_quote_64bit_integers: 1, // Force ClickHouse to wrap result integers in quotes for JSON formats
