@@ -33,6 +33,8 @@ services:
       - /etc/ssl/redis/client.key:/etc/ssl/redis/client.key:ro
 
       - /etc/ssl/clickhouse/ca.crt:/etc/ssl/clickhouse/ca.crt:ro
+    ports:
+      - ${PORT}:${PORT}
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:${PORT}/v1/health"]
       interval: 30s
