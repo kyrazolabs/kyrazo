@@ -54,8 +54,9 @@ COPY --from=builder /app/apis/ingest/dist /app/apis/ingest/dist
 # Set working directory to ingest package
 WORKDIR /app/apis/ingest
 
-# Pre-create logs directory
+# Pre-create logs & certs directory
 RUN mkdir -p /app/apis/ingest/logs && chown -R bun:bun /app/apis/ingest/logs
+RUN mkdir -p /data/nats/certs && chown -R bun:bun /data/nats/certs
 
 # Copy and setup entrypoint script
 COPY apis/ingest/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh

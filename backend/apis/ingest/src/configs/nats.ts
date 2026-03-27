@@ -67,22 +67,20 @@ export class NatsConfig {
 
         try {
             // Build TLS options if in production
-            let tlsOptions = undefined;
+            let tlsOptions: any = undefined;
             if (config.isProduction) {
                 const fs = await import('fs');
                 const { certFile, keyFile, caFile } = config.nats.tls;
 
+                logger.info(`NATS: Loading TLS certificates from ${certFile}, ${keyFile}, ${caFile}`);
+                
+                // Standardized certificate loading for production
+                // Reading file contents directly to avoid path resolution issues in some environments
                 tlsOptions = {
-                    cert: fs.existsSync(certFile) ? fs.readFileSync(certFile, 'utf8') : undefined,
-                    key: fs.existsSync(keyFile) ? fs.readFileSync(keyFile, 'utf8') : undefined,
-                    ca: fs.existsSync(caFile) ? fs.readFileSync(caFile, 'utf8') : undefined,
-                }; // Cast to avoid specific library/runtime type conflicts
-
-                if (!tlsOptions.cert || !tlsOptions.key) {
-                    logger.warn(
-                        `NATS: TLS files missing or unreadable (Cert: ${!!tlsOptions.cert}, Key: ${!!tlsOptions.key})`
-                    );
-                }
+                    cert: fs.readFileSync(certFile),
+                    key: fs.readFileSync(keyFile),
+                    ca: fs.readFileSync(caFile),
+                };
             }
 
             // Connect to NATS
