@@ -23,6 +23,7 @@ RUN bun install --frozen-lockfile
 
 # 4. Copy integration source
 COPY apis/integration ./
+RUN bun run build
 
 # Stage 2: Production runner
 FROM oven/bun:${BUN_VERSION}-alpine AS runner
@@ -46,6 +47,7 @@ COPY --from=builder /app/shared /app/shared
 COPY --from=builder /app/apis/integration/package.json /app/apis/integration/package.json
 COPY --from=builder /app/apis/integration/tsconfig.json /app/apis/integration/tsconfig.json
 COPY --from=builder /app/apis/integration/src /app/apis/integration/src
+COPY --from=builder /app/apis/integration/dist /app/apis/integration/dist
 
 # Set working directory to integration package
 WORKDIR /app/apis/integration
