@@ -113,7 +113,11 @@ const initializeConnections = async () => {
         logger.info('All connections initialized successfully');
         return true;
     } catch (error: any) {
-        logger.error('Failed to initialize connections:', error);
+        logger.error('Failed to initialize connections:', {
+            message: error.message,
+            stack: error.stack,
+            error: error,
+        });
         return false;
     }
 };
