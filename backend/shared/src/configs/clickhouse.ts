@@ -50,7 +50,7 @@ export class ClickHouseConfig {
             const database = parsed.pathname.replace(/^\//, '') || chConfig.database || 'default';
 
             logger.info(
-                `Attempting to connect to ClickHouse: ${sanitizedUrl} (Database: ${database}, User: ${username})`
+                `ClickHouse: Attempting to connect to ${sanitizedUrl} (Database: ${database}, User: ${username}, SSL: ${parsed.protocol === 'https:'})`
             );
 
             // Build TLS configuration from the CA cert file
