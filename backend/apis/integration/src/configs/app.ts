@@ -70,9 +70,9 @@ export const config = {
     nats: {
         servers: process.env.NATS_SERVERS?.split(',') || ['nats://localhost:4222'],
         tls: {
-            certFile: process.env.NATS_CERT_FILE || '/data/nats/certs/client.crt',
-            keyFile: process.env.NATS_KEY_FILE || '/data/nats/certs/client.key',
-            caFile: process.env.NATS_CA_FILE || '/data/nats/certs/ca.crt',
+            certFile: process.env.NATS_CERT_FILE || '/data/nats/certs/nats.pem',
+            keyFile: process.env.NATS_KEY_FILE || '/data/nats/certs/nats.key',
+            caFile: process.env.NATS_CA_FILE || '/data/nats/certs/ca.pem',
         },
         user: process.env.NATS_USER || 'admin',
         password: process.env.NATS_PASSWORD || 'adminPass',
