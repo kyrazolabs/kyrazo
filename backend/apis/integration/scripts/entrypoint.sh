@@ -7,8 +7,8 @@ CERTS_DIR="/data/nats/certs"
 # Ensure the logs directory exists and is writable by the bun user (UID 1000)
 # This runs as root so it works even when the host volume is owned by root.
 mkdir -p "$LOG_DIR"
-chown -R bun:bun "$LOG_DIR"
-chmod 775 "$LOG_DIR"
+chown -R bun:bun "$LOG_DIR" 2>/dev/null || echo "ℹ️ $LOG_DIR appears to be read-only, skipping chown."
+chmod 775 "$LOG_DIR" 2>/dev/null || echo "ℹ️ $LOG_DIR appears to be read-only, skipping chmod."
 
 
 # Use a more robust check: attempt to fix permissions but don't fail if the filesystem is read-only.
@@ -31,4 +31,4 @@ done
 
 
 # Drop down to the bun user and start the application
-exec su-exec bun bun run src/index.ts
+exec su-exec bun bun run prod
