@@ -31,5 +31,9 @@ done
 
 
 
-# Drop down to the bun user and start the application
-exec su-exec bun bun run src/index.ts
+# Drop down to the bun user and start the application if running as root
+if [ "$(id -u)" = "0" ]; then
+    exec su-exec bun bun run src/index.ts
+else
+    exec bun run src/index.ts
+fi
