@@ -29,5 +29,9 @@ for dir in redis mongodb; do
     fi
 done
 
-# Drop down to the bun user and start the application
-exec su-exec bun bun run prod
+# Drop down to the bun user and start the application if running as root
+if [ "$(id -u)" = "0" ]; then
+    exec su-exec bun bun run prod
+else
+    exec bun run prod
+fi

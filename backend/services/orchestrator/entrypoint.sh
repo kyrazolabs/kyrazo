@@ -20,5 +20,9 @@ for dir in mongodb; do
     fi
 done
 
-# Drop down to the bun user and start the application
-exec su-exec bun bun run prod && bun run start
+# Drop down to the bun user and start the application if running as root
+if [ "$(id -u)" = "0" ]; then
+    exec su-exec bun bun run prod && bun run start
+else
+    exec bun run prod && bun run start
+fi

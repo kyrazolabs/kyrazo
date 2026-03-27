@@ -20,5 +20,9 @@ for dir in redis mongodb clickhouse; do
     fi
 done
 
-# Drop down to the bun user and start the application
-exec su-exec bun bun run dist/index.js
+# Drop down to the bun user and start the application if running as root
+if [ "$(id -u)" = "0" ]; then
+    exec su-exec bun bun run dist/index.js
+else
+    exec bun run dist/index.js
+fi
