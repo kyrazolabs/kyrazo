@@ -192,6 +192,11 @@ export class RedisConfig {
 
             this.isConnected = true;
             logger.info('Connected to Redis successfully');
+
+            // Check for eviction policy (Best effort)
+            this.checkEvictionPolicy().catch(err =>
+                logger.warn(`Redis: Could not verify eviction policy: ${err.message}`)
+            );
         } catch (error: any) {
             logger.error('Failed to connect to Redis:', error);
             this.isConnected = false;
@@ -405,6 +410,33 @@ export class RedisConfig {
     public async expire(key: string, seconds: number): Promise<number> {
         const client = this.getClient();
         return await client.expire(key, seconds);
+    }
+
+    /**
+     * @title Check Eviction Policy
+     * @description Checks the current Redis eviction policy and logs it.
+     */
+    public async checkEvictionPolicy(): Promise<void> {
+        if (!this.client) return;
+        try {
+            const configResult = (await this.client.config(
+                'GET',
+                'maxmemory-policy'
+            )) as unknown as string[];
+            if (configResult && configResult.length >= 2) {
+                const policy = configResult[1];
+                if (policy !== 'noeviction') {
+                    logger.warn(
+                        `IMPORTANT: Redis eviction policy is "${policy}". It should be "noeviction" for production!`
+                    );
+                } else {
+                    logger.info(`Redis eviction policy is correctly set to "${policy}"`);
+                }
+            }
+        } catch (error: any) {
+            // Some managed Redis instances (like Upstash or AWS ElastiCache) might restrict CONFIG GET
+            logger.debug(`Could not check Redis config: ${error.message}`);
+        }
     }
 }
 
