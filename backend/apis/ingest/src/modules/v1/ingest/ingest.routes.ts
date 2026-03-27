@@ -1,4 +1,4 @@
-import { Hono, Context } from 'hono';
+import { Hono, type Context } from 'hono';
 import z from 'zod';
 import { zValidator } from '@hono/zod-validator';
 import { ingestController } from './ingest.controller';
@@ -11,6 +11,7 @@ import { logger, Source, unprefixId } from '@kyrazo/shared';
 
 // Helper to resolve IEId to WorkspaceId
 const resolveWorkspaceId = async (c: Context): Promise<string | undefined> => {
+    // @ts-ignore
     const { IEId } = c.req.valid('param');
     if (!IEId) return undefined;
 

@@ -74,5 +74,5 @@ EXPOSE ${PORT}
 HEALTHCHECK  --start-period=20s --interval=30s --timeout=3s --retries=3 \
     CMD wget -qO- http://127.0.0.1:${PORT}/v1/health || exit 1
 
-# Start the application
-CMD ["bun", "run", "src/index.ts"]
+# Start the application using entrypoint script
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

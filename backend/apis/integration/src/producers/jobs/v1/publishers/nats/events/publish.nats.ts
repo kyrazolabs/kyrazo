@@ -96,7 +96,7 @@ export class PublishEventPublisher {
                 data: data.payload,
                 previous: data.previous ?? null,
 
-                targets: data.targets,
+                targets: data.targets as any,
 
                 meta: data.meta,
             };
@@ -179,7 +179,7 @@ export class PublishEventPublisher {
                             data: item.payload,
                             previous: item.previous ?? null,
 
-                            targets: item.targets,
+                            targets: item.targets as any,
 
                             meta: item.meta,
                         };
@@ -191,7 +191,7 @@ export class PublishEventPublisher {
 
                         const publishResult = await js.publish(subject, JSON.stringify(message));
 
-                        logger.info(`Published receive event ${item.event_id} to JetStream`, {
+                        logger.info(`Published receive event ${item.eventId} to JetStream`, {
                             subject,
                             stream: publishResult.stream,
                             sequence: publishResult.seq,

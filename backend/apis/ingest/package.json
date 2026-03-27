@@ -6,10 +6,10 @@
   "scripts": {
     "start": "bun run dist/index.js",
     "dev": "bun run --hot src/index.ts",
-    "prod": "bun run src/cluster.ts",
+    "prod": "bun run dist/cluster.js",
     "tunnel": "bun run src/tunnel.ts",
     "watch": "concurrently -k -n TSC -c blue \"tsc -p tsconfig.json -w\"",
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && bunx tsc-alias -p tsconfig.json",
     "build:watch": "bun run build && bun run watch",
     "build:prod": "bun build  --production --target=bun --outdir=dist ./src",
     "rebuild": "rm -rf dist && bun run build",

@@ -1,6 +1,6 @@
 import type { Context, Next } from 'hono';
 import type { Error } from 'hono-error-handler';
-import ZodError from 'zod';
+import { ZodError } from 'zod';
 
 const handleMongooseErrors = (error: Error) => {
     // Mongoose bad ObjectId
@@ -66,7 +66,7 @@ const zodErrorHandler = async (c: Context, next: Next) => {
                 {
                     success: false,
                     statusCode: 400,
-                    errors: err.errors.map((e: any) => ({
+                    errors: err.issues.map((e: any) => ({
                         field: e.path.join('.') || 'unknown',
                         message: e.message,
                     })),

@@ -40,7 +40,7 @@ if (cluster.isPrimary) {
 } else {
   console.log(`👷 Worker ${process.pid} started`);
   // كل عامل يشغل الملف الأصلي حق الـ worker
-  const workerProcess = spawn("bun", ["run", "src/index.ts"], {
+  const workerProcess = spawn("bun", ["run", "dist/index.js"], {
     stdio: "inherit",
     env: process.env,
   });

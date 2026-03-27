@@ -36,12 +36,15 @@ export class BullmqHandler {
 
       if (caFile && fs.existsSync(caFile)) {
         options.tls.ca = fs.readFileSync(caFile);
+        console.info("[Redis BullMQ] Loaded CA certificate from /etc/ssl/redis/ca.crt");
       }
       if (certFile && fs.existsSync(certFile)) {
         options.tls.cert = fs.readFileSync(certFile);
+        console.info("[Redis BullMQ] Loaded client certificate from /etc/ssl/redis/client.crt");
       }
       if (keyFile && fs.existsSync(keyFile)) {
         options.tls.key = fs.readFileSync(keyFile);
+        console.info("[Redis BullMQ] Loaded client key from /etc/ssl/redis/client.key");
       }
     }
 

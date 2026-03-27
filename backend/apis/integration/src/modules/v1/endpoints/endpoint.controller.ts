@@ -113,7 +113,7 @@ export class EndpointController {
             const namespaceId = c.namespace!.namespaceId.toString();
 
             const endpoint = await endpointService.getEndpointById(
-                endpointId,
+                endpointId!,
                 workspaceId,
                 namespaceId
             );
@@ -155,7 +155,7 @@ export class EndpointController {
             const namespaceId = c.namespace!.namespaceId.toString();
 
             const secret = await endpointService.getEndpointSecret(
-                endpointId,
+                endpointId!,
                 workspaceId,
                 namespaceId
             );
@@ -203,7 +203,7 @@ export class EndpointController {
             const namespaceId = c.namespace!.namespaceId.toString();
 
             const updated = await endpointService.updateEndpoint(
-                endpointId,
+                endpointId!,
                 workspaceId,
                 namespaceId,
                 data
@@ -246,7 +246,7 @@ export class EndpointController {
             const namespaceId = c.namespace!.namespaceId.toString();
 
             const deleted = await endpointService.deleteEndpoint(
-                endpointId,
+                endpointId!,
                 workspaceId,
                 namespaceId
             );

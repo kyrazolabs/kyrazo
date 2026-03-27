@@ -1,8 +1,8 @@
+import type { Context } from 'hono';
+import { getConnInfo } from 'hono/bun';
 import { RateLimiterRedis } from 'rate-limiter-flexible';
 import { LimitChecker } from '../services/limit.checker';
 import { config, redisConfig } from '@/configs';
-import { Context } from 'hono';
-import { getConnInfo } from 'hono/bun';
 import { logger } from '@kyrazo/shared';
 
 /**
@@ -21,9 +21,7 @@ export interface RateLimiterConfig {
  * @description Creates a token bucket rate limiter that tracks requests by any key
  * @param config - Rate limiter configuration
  */
-export function createTokenBucketLimiter(
-    config: RateLimiterConfig
-): RateLimiterRedis {
+export function createTokenBucketLimiter(config: RateLimiterConfig): RateLimiterRedis {
     return new RateLimiterRedis({
         storeClient: redisConfig.getClient(),
         keyPrefix: config.keyPrefix || 'token_bucket',
@@ -57,8 +55,7 @@ export function createRateLimitMiddleware(
                         success: false,
                         error: {
                             code: 'RATE_LIMIT_KEY_MISSING',
-                            message:
-                                'Unable to identify request for rate limiting',
+                            message: 'Unable to identify request for rate limiting',
                         },
                     },
                     400
@@ -115,9 +112,7 @@ const getLimiterByRPS = (rps: number): RateLimiterRedis => {
  * @param keyExtractor Function to extract workspaceId from context
  */
 export function createDynamicRateLimiter(
-    keyExtractor: (
-        c: Context
-    ) => string | undefined | Promise<string | undefined>
+    keyExtractor: (c: Context) => string | undefined | Promise<string | undefined>
 ) {
     return async (c: Context, next: () => Promise<void>) => {
         try {
@@ -126,9 +121,7 @@ export function createDynamicRateLimiter(
             if (!workspaceId) {
                 // If no workspaceId, strict fallback (e.g. 5 req/s)
                 const fallbackLimiter = getLimiterByRPS(5);
-                await fallbackLimiter.consume(
-                    getConnInfo(c).remote.address || 'unknown'
-                );
+                await fallbackLimiter.consume(getConnInfo(c).remote.address || 'unknown');
                 await next();
                 return;
             }
@@ -144,17 +137,14 @@ export function createDynamicRateLimiter(
         } catch (rejRes: any) {
             const msBeforeNext = rejRes.msBeforeNext || 0;
             const key = (await keyExtractor(c)) || 'unknown';
-            logger.warn(
-                `Rate limit exceeded for workspace ${key}, retry in ${msBeforeNext}ms`
-            );
+            logger.warn(`Rate limit exceeded for workspace ${key}, retry in ${msBeforeNext}ms`);
 
             return c.json(
                 {
                     success: false,
                     error: {
                         code: 'RATE_LIMIT_EXCEEDED',
-                        message:
-                            'Too many requests. Please upgrade your plan or slow down.',
+                        message: 'Too many requests. Please upgrade your plan or slow down.',
                         retryAfter: Math.ceil(msBeforeNext / 1000),
                     },
                 },

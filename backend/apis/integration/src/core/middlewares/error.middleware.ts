@@ -1,6 +1,6 @@
 import type { Next } from 'hono';
 import type { Error } from 'hono-error-handler';
-import ZodError from 'zod';
+import { ZodError } from 'zod';
 import type { AppContext } from './auth.middleware';
 
 const handleMongooseErrors = (error: Error) => {
@@ -67,7 +67,7 @@ const zodErrorHandler = async (c: AppContext, next: Next) => {
                 {
                     success: false,
                     statusCode: 400,
-                    errors: err.errors.map((e: any) => ({
+                    errors: err.issues.map((e: any) => ({
                         field: e.path.join('.') || 'unknown',
                         message: e.message,
                     })),

@@ -19,10 +19,11 @@ services:
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASS=${SMTP_PASS}
       - SMTP_SECURE=${SMTP_SECURE}
+      - NODE_EXTRA_CA_CERTS=/etc/ssl/redis/ca.crt
     volumes:
-      - /etc/ssl/redis/ca.crt:/etc/ssl/redis/ca.crt:ro
-      - /etc/ssl/redis/client.crt:/etc/ssl/redis/client.crt:ro
-      - /etc/ssl/redis/client.key:/etc/ssl/redis/client.key:ro
+      - '/etc/ssl/redis/ca.crt:/etc/ssl/redis/ca.crt:ro'
+      - '/etc/ssl/redis/client.crt:/etc/ssl/redis/client.crt:ro'
+      - '/etc/ssl/redis/client.key:/etc/ssl/redis/client.key:ro'
     ports:
       - ${PORT}:${PORT}
     healthcheck:
