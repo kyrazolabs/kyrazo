@@ -49,7 +49,6 @@ COPY --from=builder /app/apis/dashboard/package.json /app/apis/dashboard/package
 COPY --from=builder /app/apis/dashboard/tsconfig.json /app/apis/dashboard/tsconfig.json
 COPY --from=builder /app/apis/dashboard/dist /app/apis/dashboard/dist
 COPY --from=builder /app/apis/dashboard/src /app/apis/dashboard/src
-COPY --from=builder /app/apis/dashboard/sql /app/apis/dashboard/sql
 
 # Set working directory to dashboard package
 WORKDIR /app/apis/dashboard
