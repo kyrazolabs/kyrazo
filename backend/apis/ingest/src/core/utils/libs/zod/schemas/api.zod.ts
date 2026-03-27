@@ -1,8 +1,6 @@
 import z from 'zod';
 
-const objectIdSchema = z
-    .string()
-    .regex(/^[0-9a-fA-F]{24}$/, 'Invalid ID format');
+const objectIdSchema = z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid ID format');
 
 export const createAPIKeySchema = z.object({
     name: z
@@ -25,7 +23,7 @@ export const createAPIKeySchema = z.object({
     expiresAt: z
         .union([z.string().datetime(), z.number().int().positive(), z.date()])
         .optional()
-        .transform((val: string | number | Date) => {
+        .transform((val: string | number | Date | undefined) => {
             if (!val) return null;
             if (val instanceof Date) return val;
             if (typeof val === 'string') return new Date(val);

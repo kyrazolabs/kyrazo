@@ -1,4 +1,4 @@
-import { Context } from 'hono';
+import { type Context } from 'hono';
 import { v4 as uuidv4 } from 'uuid';
 
 import { redisConfig } from '@/configs';
@@ -15,6 +15,7 @@ export class ingestController {
         const timer = new PerformanceTimer('event_received');
         try {
             // Extract the ingress endpoint ID from the URL parameter
+            // @ts-ignore
             const { IEId, service }: ingestInput = c.req.valid('param');
 
             if (!IEId) {
