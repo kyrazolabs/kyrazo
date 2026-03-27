@@ -6,7 +6,7 @@
   "scripts": {
     "start": "bun run dist/index.js",
     "dev": "bun run --hot src/index.ts",
-    "prod": "bun run src/cluster.ts",
+    "prod": "bun run dist/cluster.js",
     "tunnel": "bun run src/tunnel.ts",
     "test": "bun test",
     "watch": "concurrently -k -n TSC -c blue \"tsc -p tsconfig.json -w\"",

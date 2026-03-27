@@ -1,52 +1,53 @@
 #!/usr/bin/env bun
 
-import cluster from "node:cluster";
-import os from "node:os";
-import { spawn } from "node:child_process";
+import cluster from 'node:cluster';
+import os from 'node:os';
+import { spawn } from 'node:child_process';
 
 const numCPUs = Number(process.env.WORKERS) || os.cpus().length;
 const workers: Record<number, any> = {};
 
 if (cluster.isPrimary) {
-  console.log(`🚀 Master process PID ${process.pid} starting ${numCPUs} workers...`);
+    console.log(`🚀 Master process PID ${process.pid} starting ${numCPUs} workers...`);
 
-  for (let i = 0; i < numCPUs; i++) {
-    const worker = cluster.fork();
-    workers[worker.id] = worker;
+    for (let i = 0; i < numCPUs; i++) {
+        const worker = cluster.fork();
+        workers[worker.id] = worker;
 
-    worker.on("exit", (code, signal) => {
-      console.error(`❌ Worker ${worker.process.pid} exited (code: ${code}, signal: ${signal}). Restarting...`);
-      const newWorker = cluster.fork();
-      workers[newWorker.id] = newWorker;
+        worker.on('exit', (code, signal) => {
+            console.error(
+                `❌ Worker ${worker.process.pid} exited (code: ${code}, signal: ${signal}). Restarting...`
+            );
+            const newWorker = cluster.fork();
+            workers[newWorker.id] = newWorker;
+        });
+    }
+
+    process.on('SIGINT', () => {
+        console.log('\n🛑 SIGINT received, shutting down all workers...');
+        for (const id in workers) {
+            workers[id].kill('SIGTERM');
+        }
+        process.exit(0);
     });
-  }
 
-  process.on("SIGINT", () => {
-    console.log("\n🛑 SIGINT received, shutting down all workers...");
-    for (const id in workers) {
-      workers[id].kill("SIGTERM");
-    }
-    process.exit(0);
-  });
-
-  process.on("SIGTERM", () => {
-    console.log("\n🛑 SIGTERM received, shutting down all workers...");
-    for (const id in workers) {
-      workers[id].kill("SIGTERM");
-    }
-    process.exit(0);
-  });
-
+    process.on('SIGTERM', () => {
+        console.log('\n🛑 SIGTERM received, shutting down all workers...');
+        for (const id in workers) {
+            workers[id].kill('SIGTERM');
+        }
+        process.exit(0);
+    });
 } else {
-  console.log(`👷 Worker ${process.pid} started`);
-  // كل عامل يشغل الملف الأصلي حق الـ worker
-  const workerProcess = spawn("bun", ["run", "src/index.ts"], {
-    stdio: "inherit",
-    env: process.env,
-  });
+    console.log(`👷 Worker ${process.pid} started`);
+    // كل عامل يشغل الملف الأصلي حق الـ worker
+    const workerProcess = spawn('bun', ['run', 'dist/index.js'], {
+        stdio: 'inherit',
+        env: process.env,
+    });
 
-  workerProcess.on("exit", (code) => {
-    console.error(`Worker ${process.pid} internal process exited with code ${code}`);
-    process.exit(code ?? 1);
-  });
+    workerProcess.on('exit', code => {
+        console.error(`Worker ${process.pid} internal process exited with code ${code}`);
+        process.exit(code ?? 1);
+    });
 }

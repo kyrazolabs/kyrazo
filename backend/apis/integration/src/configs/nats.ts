@@ -66,16 +66,29 @@ export class NatsConfig {
         }
 
         try {
+            // Build TLS options if in production
+            let tlsOptions = undefined;
+            if (config.isProduction) {
+                const fs = await import('fs');
+                const { certFile, keyFile, caFile } = config.nats.tls;
+
+                tlsOptions = {
+                    cert: fs.existsSync(certFile) ? fs.readFileSync(certFile, 'utf8') : undefined,
+                    key: fs.existsSync(keyFile) ? fs.readFileSync(keyFile, 'utf8') : undefined,
+                    ca: fs.existsSync(caFile) ? fs.readFileSync(caFile, 'utf8') : undefined,
+                };
+
+                if (!tlsOptions.cert || !tlsOptions.key) {
+                    logger.warn(
+                        `NATS: TLS files missing or unreadable (Cert: ${!!tlsOptions.cert}, Key: ${!!tlsOptions.key})`
+                    );
+                }
+            }
+
             // Connect to NATS
             this.nc = await connect({
                 servers: config.nats.servers,
-                tls: config.isProduction
-                    ? {
-                          certFile: config.nats.tls.certFile,
-                          keyFile: config.nats.tls.keyFile,
-                          caFile: config.nats.tls.caFile,
-                      }
-                    : undefined,
+                tls: tlsOptions,
                 user: config.nats.user,
                 pass: config.nats.password,
                 maxReconnectAttempts: config.nats.maxReconnectAttempts,
