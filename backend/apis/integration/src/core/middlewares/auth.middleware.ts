@@ -1,6 +1,5 @@
-import { Context, type Next } from 'hono';
+import { type Context, type Next } from 'hono';
 import { getConnInfo } from 'hono/bun';
-import { ipRestriction } from 'hono/ip-restriction';
 
 import type { IErrorResponse, INamespace } from '@kyrazo/shared';
 import { Key, logger, Namespace, unprefixId } from '@kyrazo/shared';
@@ -170,8 +169,10 @@ export const authenticate = async (c: AppContext, next: Next) => {
 
         // IP Whitelisting Check
         if (workspace.ipWhitelist && workspace.ipWhitelist.length > 0) {
+            const forwardedFor = c.req.header('x-forwarded-for');
             const clientIp =
-                c.req.header('x-forwarded-for')?.split(',')[0].trim() ||
+                // @ts-ignore
+                (forwardedFor ? forwardedFor.split(',')[0].trim() : null) ||
                 c.req.header('x-real-ip') ||
                 getConnInfo(c).remote.address ||
                 (c.req.raw as any).socket?.remoteAddress;
@@ -212,7 +213,6 @@ export const authenticate = async (c: AppContext, next: Next) => {
             );
         }
 
-        const owner = workspace.workspace;
         const workspacePayload: { workspaceId: Types.ObjectId } = {
             workspaceId: new Types.ObjectId(unprefixId((workspace.workspace as any).id)!),
         };
@@ -235,7 +235,7 @@ export const authenticate = async (c: AppContext, next: Next) => {
                 error: {
                     code: 'INVALID_API_KEY',
                     message: 'Invalid API key',
-                    details: error,
+                    details: error.message,
                     requestId: c.get('requestId'),
                 },
             },
@@ -271,7 +271,7 @@ export const checkScope = (requiredScope: string) => {
                     error: {
                         code: 'INTERNAL_ERROR',
                         message: 'Internal server error',
-                        details: error,
+                        details: error.message,
                         requestId: c.get('requestId'),
                     },
                 },

@@ -158,7 +158,8 @@ export function createSDKsRateLimiter(
                 c.req.header('X-Forwarded-For') ||
                 c.req.header('X-Real-IP') ||
                 'unknown';
-            const cleanIp = ip.split(',')[0].trim();
+            // @ts-ignore
+            const cleanIp = (ip || 'unknown').split(',')[0].trim();
             return `publish:ip:${cleanIp}`;
         });
 

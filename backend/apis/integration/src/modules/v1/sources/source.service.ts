@@ -79,7 +79,7 @@ export class SourceService {
         const data: Partial<ISource> = {
             ...valid,
             service: valid.service as any, // Cast service to any to bypass shared type restrictions if stripe is not yet in ISource
-            endpoints: valid.endpoints?.map((id: string) => new Types.ObjectId(unprefixId(id)!)),
+            endpoints: valid.endpoints?.map((id: string | undefined) => new Types.ObjectId(unprefixId(id!) as any)),
             userId: new Types.ObjectId(userId),
             workspaceId: new Types.ObjectId(workspaceId),
             namespaceId: new Types.ObjectId(namespaceId),

@@ -79,7 +79,7 @@ export class SourceController {
                 {
                     success: true,
                     total,
-                    sources,
+                    sources: sources as any,
                 },
                 200
             );
@@ -102,13 +102,13 @@ export class SourceController {
             const workspaceId = c.workspace!.workspaceId.toString();
             const namespaceId = c.namespace!.namespaceId.toString();
 
-            const source = await sourceService.getSourceById(sourceId, workspaceId, namespaceId);
+            const source = await sourceService.getSourceById(sourceId!, workspaceId, namespaceId);
 
             return c.json<GetSourceResponse>(
                 {
                     success: true,
                     message: 'Source fetched successfully',
-                    data: source,
+                    data: source as any,
                 },
                 200
             );
@@ -144,7 +144,7 @@ export class SourceController {
             const namespaceId = c.namespace!.namespaceId.toString();
 
             const updated = await sourceService.updateSource(
-                sourceId,
+                sourceId!,
                 workspaceId,
                 namespaceId,
                 data
@@ -186,7 +186,7 @@ export class SourceController {
             const workspaceId = c.workspace!.workspaceId.toString();
             const namespaceId = c.namespace!.namespaceId.toString();
 
-            const deleted = await sourceService.deleteSource(sourceId, workspaceId, namespaceId);
+            const deleted = await sourceService.deleteSource(sourceId!, workspaceId, namespaceId);
 
             return c.json<DeleteSourceResponse>(
                 {
