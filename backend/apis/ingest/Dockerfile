@@ -25,6 +25,7 @@ RUN bun install --frozen-lockfile
 
 # 4. Copy ingest source
 COPY apis/ingest ./
+RUN bun run build
 
 # Stage 2: Production runner
 FROM oven/bun:${BUN_VERSION}-alpine AS runner
@@ -48,6 +49,7 @@ COPY --from=builder /app/shared /app/shared
 COPY --from=builder /app/apis/ingest/package.json /app/apis/ingest/package.json
 COPY --from=builder /app/apis/ingest/tsconfig.json /app/apis/ingest/tsconfig.json
 COPY --from=builder /app/apis/ingest/src /app/apis/ingest/src
+COPY --from=builder /app/apis/ingest/dist /app/apis/ingest/dist
 
 # Set working directory to ingest package
 WORKDIR /app/apis/ingest
