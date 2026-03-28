@@ -33,7 +33,7 @@ services:
       - NATS_TIMEOUT=${NATS_TIMEOUT}
       - NATS_CERT_FILE=${NATS_CERT_FILE}
       - NATS_KEY_FILE=${NATS_KEY_FILE}
-      - NATS_CA_FILE=${NATS_CA_FILE:-/data/nats/certs/ca.pem}
+      - NATS_CA_FILE=${NATS_CA_FILE}
       - NATS_TLS=${NATS_TLS}
 
       # Security Configuration

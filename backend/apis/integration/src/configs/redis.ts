@@ -57,71 +57,69 @@ export class RedisConfig {
         }
 
         try {
-            let redisClientOptions: RedisOptions = {};
-            if (!config.redis.url) {
-                redisClientOptions = {
-                    host: config.redis.host,
-                    port: config.redis.port,
-                    db: config.redis.db,
-                    maxRetriesPerRequest: null, // Essential for BullMQ
-                } as RedisOptions;
-                if (config.redis.password) {
-                    redisClientOptions.password = config.redis.password;
-                }
-            }
+            const commonOptions: RedisOptions = {
+                maxRetriesPerRequest: null, // Essential for BullMQ and command queuing
+                enableOfflineQueue: true,
+            };
 
-            // Add TLS options if enabled
             if (config.redis.tls) {
-                redisClientOptions.tls = {
+                commonOptions.tls = {
                     rejectUnauthorized: true,
                 };
                 if (config.redis.caFile && fs.existsSync(config.redis.caFile)) {
-                    redisClientOptions.tls.ca = fs.readFileSync(config.redis.caFile);
+                    commonOptions.tls.ca = fs.readFileSync(config.redis.caFile);
                 }
                 if (config.redis.certFile && fs.existsSync(config.redis.certFile)) {
-                    redisClientOptions.tls.cert = fs.readFileSync(config.redis.certFile);
+                    commonOptions.tls.cert = fs.readFileSync(config.redis.certFile);
                 }
                 if (config.redis.keyFile && fs.existsSync(config.redis.keyFile)) {
-                    redisClientOptions.tls.key = fs.readFileSync(config.redis.keyFile);
+                    commonOptions.tls.key = fs.readFileSync(config.redis.keyFile);
                 }
                 // Skip hostname identity check for IP-based certificates
-                (redisClientOptions.tls as any).checkServerIdentity = () => undefined;
+                (commonOptions.tls as any).checkServerIdentity = () => undefined;
+            }
+
+            const redisClientOptions: RedisOptions = {
+                ...commonOptions,
+            };
+
+            if (!config.redis.url) {
+                Object.assign(redisClientOptions, {
+                    host: config.redis.host,
+                    port: config.redis.port,
+                    db: config.redis.db,
+                    password: config.redis.password,
+                });
             }
 
             this.client = config.redis.url ? new Redis(config.redis.url, redisClientOptions) : new Redis(redisClientOptions);
 
-            let queueRedisClientOptions: RedisOptions = {
-                maxRetriesPerRequest: null,
+            const queueRedisClientOptions: RedisOptions = {
+                ...commonOptions,
             };
+
             if (!config.redis.queue.url) {
-                queueRedisClientOptions = {
-                    ...queueRedisClientOptions,
+                Object.assign(queueRedisClientOptions, {
                     host: config.redis.queue.host || config.redis.host,
                     port: config.redis.queue.port || config.redis.port,
                     password: config.redis.queue.password || config.redis.password,
                     db: config.redis.queue.db || config.redis.db,
-                } as RedisOptions;
+                });
             }
 
-            // Add TLS options if enabled for queue
-            if (config.redis.tls) {
-                queueRedisClientOptions.tls = {
-                    rejectUnauthorized: true,
-                };
+            // Adjust TLS for queue if specific ones provided
+            if (config.redis.tls && commonOptions.tls) {
                 if (config.redis.queue.caFile && fs.existsSync(config.redis.queue.caFile)) {
-                    queueRedisClientOptions.tls.ca = fs.readFileSync(config.redis.queue.caFile);
-                } else if (config.redis.caFile && fs.existsSync(config.redis.caFile)) {
-                    queueRedisClientOptions.tls.ca = fs.readFileSync(config.redis.caFile);
+                    queueRedisClientOptions.tls!.ca = fs.readFileSync(config.redis.queue.caFile);
                 }
                 if (config.redis.queue.certFile && fs.existsSync(config.redis.queue.certFile)) {
-                    queueRedisClientOptions.tls.cert = fs.readFileSync(config.redis.queue.certFile);
+                    queueRedisClientOptions.tls!.cert = fs.readFileSync(config.redis.queue.certFile);
                 }
                 if (config.redis.queue.keyFile && fs.existsSync(config.redis.queue.keyFile)) {
-                    queueRedisClientOptions.tls.key = fs.readFileSync(config.redis.queue.keyFile);
+                    queueRedisClientOptions.tls!.key = fs.readFileSync(config.redis.queue.keyFile);
                 }
-                // Skip hostname identity check for IP-based certificates
-                (queueRedisClientOptions.tls as any).checkServerIdentity = () => undefined;
             }
+
             this.queueClient = config.redis.queue.url ? new Redis(config.redis.queue.url, queueRedisClientOptions) : new Redis(queueRedisClientOptions);
 
             // Set up error handlers
@@ -139,8 +137,13 @@ export class RedisConfig {
                 this.isConnected = true;
             });
 
-            this.client.on('disconnect', () => {
-                logger.warn('Redis client disconnected');
+            this.client.on('ready', () => {
+                logger.info('Redis client ready');
+                this.isConnected = true;
+            });
+
+            this.client.on('close', () => {
+                logger.warn('Redis client connection closed');
                 this.isConnected = false;
             });
 
@@ -148,7 +151,29 @@ export class RedisConfig {
                 logger.info('Redis client reconnecting');
             });
 
-            // IORedis connects automatically on instantiation
+            // Wait for initial connection with a timeout
+            await new Promise<void>((resolve, reject) => {
+                const timeout = setTimeout(() => {
+                    logger.warn('Redis connection timeout - will continue in background');
+                    resolve();
+                }, 5000);
+
+                const onReady = () => {
+                    clearTimeout(timeout);
+                    this.client?.off('error', onError);
+                    resolve();
+                };
+
+                const onError = (err: Error) => {
+                    clearTimeout(timeout);
+                    this.client?.off('ready', onReady);
+                    reject(err);
+                };
+
+                this.client!.once('ready', onReady);
+                this.client!.once('error', onError);
+            });
+
             logger.info('Connected to Redis successfully');
         } catch (error: any) {
             logger.error('Failed to connect to Redis:', error);
@@ -156,6 +181,7 @@ export class RedisConfig {
             throw error;
         }
     }
+
 
     /**
      * @title Disconnect from Redis
@@ -198,11 +224,13 @@ export class RedisConfig {
      * const client = redis.getClient();
      */
     public getClient(): Redis {
-        if (!this.client || this.client.status !== 'ready') {
-            throw new Error('Redis client is not connected');
+        const allowedStatuses = ['ready', 'connecting', 'reconnecting'];
+        if (!this.client || !allowedStatuses.includes(this.client.status)) {
+            throw new Error(`Redis client is not connected (current status: ${this.client?.status || 'null'})`);
         }
         return this.client;
     }
+
 
     /**
      * @title Get Queue Redis Client
@@ -213,11 +241,13 @@ export class RedisConfig {
      * const queueClient = redis.getQueueClient();
      */
     public getQueueClient(): Redis {
-        if (!this.queueClient || this.queueClient.status !== 'ready') {
-            throw new Error('Redis queue client is not connected');
+        const allowedStatuses = ['ready', 'connecting', 'reconnecting'];
+        if (!this.queueClient || !allowedStatuses.includes(this.queueClient.status)) {
+            throw new Error(`Redis queue client is not connected (current status: ${this.queueClient?.status || 'null'})`);
         }
         return this.queueClient;
     }
+
 
     /**
      * @title Get Connection Status
@@ -227,8 +257,10 @@ export class RedisConfig {
      * const isConnected = redis.getConnectionStatus();
      */
     public getConnectionStatus(): boolean {
-        return this.isConnected && !!this.client && this.client.status === 'ready';
+        const allowedStatuses = ['ready', 'connecting', 'reconnecting'];
+        return !!this.client && allowedStatuses.includes(this.client.status);
     }
+
 
     /**
      * @title Health Check
