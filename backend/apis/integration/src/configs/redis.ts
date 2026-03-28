@@ -19,6 +19,7 @@ dotenv.config();
  */
 export class RedisConfig {
     private static instance: RedisConfig;
+    private instanceId: string;
     public client: Redis | null = null;
     private queueClient: Redis | null = null;
     private isConnected = false;
@@ -27,7 +28,11 @@ export class RedisConfig {
      * @title RedisConfig Constructor
      * @description Private constructor to enforce singleton pattern.
      */
-    private constructor() {}
+    private constructor() {
+        this.instanceId = Math.random().toString(36).substring(7);
+        logger.info(`RedisConfig instance ${this.instanceId} created`);
+    }
+
 
     /**
      * @title Get RedisConfig Instance
@@ -51,6 +56,7 @@ export class RedisConfig {
      * await redis.connect();
      */
     public async connect(): Promise<void> {
+        logger.info(`RedisConfig[${this.instanceId}].connect() called, current status: ${this.client?.status || 'null'}`);
         if (this.isConnected && this.client) {
             logger.info('Redis already connected');
             return;
@@ -226,10 +232,13 @@ export class RedisConfig {
     public getClient(): Redis {
         const allowedStatuses = ['ready', 'connecting', 'reconnecting'];
         if (!this.client || !allowedStatuses.includes(this.client.status)) {
-            throw new Error(`Redis client is not connected (current status: ${this.client?.status || 'null'})`);
+            const status = this.client?.status || 'null';
+            logger.error(`RedisConfig[${this.instanceId}].getClient() failed: client is ${this.client ? 'present' : 'null'}, status: ${status}`);
+            throw new Error(`Redis client is not connected (instance: ${this.instanceId}, current status: ${status})`);
         }
         return this.client;
     }
+
 
 
     /**

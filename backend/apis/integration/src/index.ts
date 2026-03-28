@@ -3,7 +3,7 @@ import { logger as honoLogger } from 'hono/logger';
 import { requestId as RequestId } from 'hono/request-id';
 import { cors } from 'hono/cors';
 
-import { redisConfig, config, natsConfig /* clickhouseConfig */ } from './configs';
+import { redisConfig, config, natsConfig /* clickhouseConfig */ } from '@/configs';
 
 // import { arcjetMiddleware } from '@/middlewares/arcjet.middleware'
 import { errorHandler } from 'hono-error-handler';
