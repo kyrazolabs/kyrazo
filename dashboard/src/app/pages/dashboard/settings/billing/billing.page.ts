@@ -597,10 +597,10 @@ export class BillingSettingsPage implements OnInit {
                 .createTicket({
                     subject: 'Cancellation Feedback',
                     message: `Reason: ${this.cancelReasons.find((r) => r.value === feedback.reason)?.label || 'None'}\nComment: ${feedback.comment || 'None'}`,
-                    Types: 'Billing' as any,
-                    Category: 'Usage Limits', // Fallback category
-                    kind: 'cancellation' as any,
-                } as any)
+                    Types: 'Billing',
+                    Category: 'Cancellation',
+                    kind: 'cancellation',
+                })
                 .subscribe({
                     error: (err) => this.sentry.captureException(err),
                 });

@@ -73,20 +73,22 @@ export class SupportDialogComponent {
 
     supportTypes = SUPPORT_TYPES;
     currentCategories: string[] = [];
+    isUncategorized = false;
 
     constructor() {
         this.onTypeChange();
     }
 
     onTypeChange() {
-        this.currentCategories =
-            CATEGORIES_BY_TYPE[this.supportForm.Types] || [];
-        if (
-            !this.currentCategories.includes(
-                this.supportForm.Category as string,
-            )
-        ) {
-            this.supportForm.Category = this.currentCategories[0] as any;
+        this.currentCategories = [...(CATEGORIES_BY_TYPE[this.supportForm.Types] || [])];
+        this.isUncategorized = this.currentCategories.length === 0;
+
+        if (!this.isUncategorized) {
+            if (!this.currentCategories.includes(this.supportForm.Category as string)) {
+                (this.supportForm as any).Category = this.currentCategories[0];
+            }
+        } else {
+            delete (this.supportForm as any).Category;
         }
     }
 
@@ -103,14 +105,16 @@ export class SupportDialogComponent {
             Types: 'Bug',
             Category: 'Dashboard',
         };
+        this.isUncategorized = false;
         this.onTypeChange();
     }
 
     submitForm() {
+        const needsCategory = !this.isUncategorized;
         if (
             !this.supportForm.subject ||
             !this.supportForm.message ||
-            !this.supportForm.Category
+            (needsCategory && !(this.supportForm as any).Category)
         ) {
             this.messageService.add({
                 severity: 'warn',
