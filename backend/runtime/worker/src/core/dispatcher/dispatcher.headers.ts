@@ -1,5 +1,5 @@
 import type { IDispatchedEvent, IWebhookHeaders } from './dispatcher.types';
-import { Namespace, Subscription, unprefixId } from '@kyrazo/shared';
+import { Namespace, Subscription, unprefixId, RedisKeys } from '@kyrazo/shared';
 import { redisConfig } from '../../config';
 
 export class DispatcherHeaders {
@@ -34,7 +34,7 @@ export class DispatcherHeaders {
         try {
             // Fetch namespace config (cached in Redis)
             const namespace = await redisConfig.cache(
-                `namespace:${unprefixId(event.namespaceId)}:config`,
+                RedisKeys.context.namespaceConfig(event.namespaceId),
                 async () => {
                     return await Namespace.findById(unprefixId(event.namespaceId)).lean();
                 },
@@ -46,7 +46,7 @@ export class DispatcherHeaders {
             if (prefix !== 'X-Webhook') {
                 // Check if feature is enabled in subscription (cached in Redis)
                 const hasFeature = await redisConfig.cache(
-                    `workspace:${unprefixId(event.workspaceId)}:feature:whiteLabelHeaders`,
+                    RedisKeys.limit.feature('whiteLabelHeaders', event.workspaceId),
                     async () => {
                         const subscription = await Subscription.findOne({
                             workspaceId: unprefixId(event.workspaceId),

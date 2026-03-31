@@ -2,7 +2,7 @@ import { type Context, type Next } from 'hono';
 import { getConnInfo } from 'hono/bun';
 
 import type { IErrorResponse, INamespace } from '@kyrazo/shared';
-import { Key, logger, Namespace, unprefixId } from '@kyrazo/shared';
+import { Key, logger, Namespace, unprefixId, RedisKeys } from '@kyrazo/shared';
 import { redisConfig } from '@/configs';
 import { keyCrypto, secretCrypto, config } from '@kyrazo/shared';
 import { Types } from 'mongoose';
@@ -75,7 +75,7 @@ export const authenticate = async (c: AppContext, next: Next) => {
         }
 
         const workspace = await redisConfig.cache(
-            `workspace:kid:${key.parts.kid}:with-user`,
+            RedisKeys.auth.apiKey(key.parts.kid),
             async () => {
                 return await Key.findOne({
                     kid: key.parts.kid,

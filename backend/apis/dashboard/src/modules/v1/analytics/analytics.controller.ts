@@ -1,7 +1,7 @@
 import { AppContext } from '@/core/middlewares/auth.middleware';
 import { redisConfig } from '@/configs';
 import { OverviewFilterInput, TargetQueryInput } from '@/core/utils/libs/zod';
-import { IErrorResponse, logger, Source, Target, unprefixId } from '@kyrazo/shared';
+import { IErrorResponse, logger, Source, Target, unprefixId, RedisKeys } from '@kyrazo/shared';
 import { AnalyticsService } from './analytics.service';
 import { IAnalyticsDispatchResponse, IAnalyticsIngestResponse } from './analytics.schema';
 import { Types } from 'mongoose';
@@ -117,7 +117,7 @@ export class AnalyticsController {
                 );
 
             const sources = await redisConfig.cache(
-                `workspace:${unprefixId(workspaceId.toString())}:namespace:${unprefixId(namespaceId.toString())}:sources`,
+                RedisKeys.context.workspaceNamespaceSources(workspaceId.toString(), namespaceId.toString()),
                 async () => {
                     return await Source.find({
                         workspaceId: new Types.ObjectId(unprefixId(workspaceId.toString())),

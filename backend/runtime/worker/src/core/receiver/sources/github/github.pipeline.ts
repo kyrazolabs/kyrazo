@@ -1,4 +1,4 @@
-import { logger, type SQLIngestEvent, Source, secretCrypto, unprefixId, prefixId } from '@kyrazo/shared';
+import { logger, type SQLIngestEvent, Source, secretCrypto, unprefixId, prefixId, RedisKeys } from '@kyrazo/shared';
 import { ProcessingStatus } from '@/types/events/event.types';
 import { githubValidator } from './github.validator';
 import { githubSignature } from './github.signature';
@@ -37,7 +37,7 @@ export class GitHubPipeline {
             }
 
             const source = await redisConfig.cache(
-                `source:${event.sourceId}`,
+                RedisKeys.context.source(event.sourceId),
                 async () => {
                     return await Source.findById(unprefixId(event.sourceId)).populate('endpoints');
                 },

@@ -1,6 +1,6 @@
 import { subscriptionRepository } from './subscription.repo';
 import { planService } from '@/modules/billing/plans/plan.service';
-import { ISubscription, IPlanSnapshot, User, Customer, unprefixId, Invoice } from '@kyrazo/shared';
+import { ISubscription, IPlanSnapshot, User, Customer, unprefixId, Invoice, RedisKeys } from '@kyrazo/shared';
 import {
     CreateSubscriptionInput,
     ChangePlanInput,
@@ -10,7 +10,7 @@ import { Types } from 'mongoose';
 import { limitService } from '@/shared/services/limit.service';
 import { usageService } from '@/shared/services/usage.service';
 import { stripe } from '@/configs/stripe';
-import { config } from '@/configs';
+import { config, redisConfig } from '@/configs';
 import { snapshot } from '@/core/utils/transformers';
 import { subscriptionCacheService } from '@/shared/services/subscription-cache.service';
 
@@ -321,6 +321,9 @@ export class SubscriptionService {
         });
 
         await limitService.invalidateWorkspaceLimits(workspaceId);
+        await redisConfig.del(RedisKeys.billing.workspacePlan(workspaceId));
+        await redisConfig.del(RedisKeys.billing.subscription(workspaceId));
+        await subscriptionCacheService.invalidate(workspaceId);
         return subscription;
     }
 

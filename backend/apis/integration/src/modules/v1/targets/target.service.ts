@@ -1,7 +1,7 @@
 import { Types } from 'mongoose';
 import type { CreateTargetInput, UpdateTargetInput } from './target.schema';
 import { targetRepository } from './target.repo';
-import { secretCrypto, logger, unprefixId, prefixId } from '@kyrazo/shared';
+import { secretCrypto, logger, unprefixId, prefixId, RedisKeys } from '@kyrazo/shared';
 import type { ITarget } from '@kyrazo/shared';
 import { redisConfig } from '@/configs';
 
@@ -144,9 +144,7 @@ export class TargetService {
             if (!updated) {
                 throw new Error('Failed to update target');
             }
-            await redisConfig.del(
-                `workspace:${unprefixId(workspaceId)}:namespace:${unprefixId(namespaceId)}:targets`
-            );
+            await redisConfig.del(RedisKeys.context.workspaceNamespaceTargets(workspaceId, namespaceId));
             return updated;
         } catch (error: any) {
             logger.error('Failed to update target:', error);
@@ -164,9 +162,7 @@ export class TargetService {
             if (!deleted) {
                 throw new Error('Failed to delete target');
             }
-            await redisConfig.del(
-                `workspace:${unprefixId(workspaceId)}:namespace:${unprefixId(namespaceId)}:targets`
-            );
+            await redisConfig.del(RedisKeys.context.workspaceNamespaceTargets(workspaceId, namespaceId));
             return deleted;
         } catch (error: any) {
             logger.error('Failed to delete target:', error);

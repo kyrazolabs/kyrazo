@@ -2,7 +2,7 @@ import { Next } from 'hono';
 import { AppContext } from './auth.middleware';
 import { redisConfig } from '@/configs';
 import { GetWorkspaceByIdInput } from '@/modules/v1/workspace/workspace.schema';
-import { IErrorResponse, logger, UserWorkspace, unprefixId } from '@kyrazo/shared';
+import { IErrorResponse, logger, UserWorkspace, unprefixId, RedisKeys } from '@kyrazo/shared';
 
 /**
  * @title requireWorkspaceMembership Middleware
@@ -42,7 +42,7 @@ export const requireWorkspaceMembership = (requiredRole?: string[]) => {
             }
 
             const membership = await redisConfig.cache(
-                `workspace:${unprefixId(workspaceId)}:user:${unprefixId(userId)}`,
+                RedisKeys.context.workspaceUser(workspaceId, userId),
                 async () => {
                     return await UserWorkspace.findByUserAndWorkspace(userId, workspaceId);
                 },
@@ -137,7 +137,7 @@ export const requireWorkspaceMembershipParam = (requiredRole?: string[]) => {
             }
 
             const membership = await redisConfig.cache(
-                `workspace:${unprefixId(workspaceId)}:user:${unprefixId(userId)}`,
+                RedisKeys.context.workspaceUser(workspaceId, userId),
                 async () => {
                     return await UserWorkspace.findByUserAndWorkspace(userId, workspaceId);
                 },

@@ -1,5 +1,5 @@
 import { redisConfig } from '@/configs';
-import { IErrorResponse, INamespace, logger, Namespace, unprefixId } from '@kyrazo/shared';
+import { IErrorResponse, INamespace, logger, Namespace, unprefixId, RedisKeys } from '@kyrazo/shared';
 import { Next } from 'hono';
 import { Types } from 'mongoose';
 import { AppContext } from './auth.middleware';
@@ -28,7 +28,7 @@ export const requireNamespaceAccess = (options?: { allowDeleted?: boolean }) => 
             }
 
             const access = await redisConfig.cache(
-                `workspace:${unprefixId(workspace.workspaceId.toString())}:namespace:${unprefixId(namespaceId)}`,
+                RedisKeys.context.workspaceNamespace(workspace.workspaceId.toString(), namespaceId),
                 async () => {
                     if (options?.allowDeleted) {
                         // Allow access to deleted namespaces for restore operations

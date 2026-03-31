@@ -7,7 +7,7 @@ import {
     getIngestRateLimiter,
     createWorkspaceRateLimiter,
 } from '@/core/middlewares/rate-limiter.middleware';
-import { logger, Source, unprefixId } from '@kyrazo/shared';
+import { logger, Source, unprefixId, RedisKeys } from '@kyrazo/shared';
 
 // Helper to resolve IEId to WorkspaceId
 const resolveWorkspaceId = async (c: Context): Promise<string | undefined> => {
@@ -17,7 +17,7 @@ const resolveWorkspaceId = async (c: Context): Promise<string | undefined> => {
 
     // Try to get from cache first
     const endpoint = await redisConfig.cache(
-        `source:ingest:${unprefixId(IEId)}`,
+        RedisKeys.ingest.endpoint(IEId),
         async () => {
             return await Source.findOne({
                 ingressId: IEId,

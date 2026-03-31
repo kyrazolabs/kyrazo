@@ -1,6 +1,6 @@
 import { Queue, Worker } from 'bullmq';
 import { redisConfig } from '@/configs/redis';
-import { logger, Usage, unprefixId } from '@kyrazo/shared';
+import { logger, Usage, unprefixId, RedisKeys } from '@kyrazo/shared';
 import { Types } from 'mongoose';
 import { subscriptionService } from '@/modules/billing/subscriptions/subscription.service';
 import stripe from '@/configs/stripe';
@@ -136,8 +136,9 @@ export class UsageService {
             );
 
             // 3. Update real-time usage counter in Redis
+            const date = new Date(timestamp);
             const currentMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-            const redisKey = `usage:events:${unprefixId(workspaceId)}:${currentMonth}`;
+            const redisKey = RedisKeys.usage.eventCount(workspaceId, currentMonth);
             const client = redisConfig.getClient();
             await client.incrby(redisKey, count);
             await client.expire(redisKey, 60 * 60 * 24 * 35);

@@ -1,11 +1,11 @@
 import { redisConfig } from '@/configs';
-import { ISubscription, logger, unprefixId } from '@kyrazo/shared';
+import { ISubscription, logger, unprefixId, RedisKeys } from '@kyrazo/shared';
 
 export class SubscriptionCacheService {
     private readonly CACHE_TTL = 60 * 60 * 24; // 24 hours
 
     private getKey(workspaceId: string): string {
-        return `workspace:subscription:${unprefixId(workspaceId)}`;
+        return RedisKeys.billing.subscription(workspaceId);
     }
 
     async get(workspaceId: string): Promise<ISubscription | null> {
