@@ -22,11 +22,11 @@ jobs:
           bun-version: latest
 
       - name: Install dependencies
-        working-directory: sdks/javascript
+        working-directory: javascript
         run: bun install
 
       - name: Build package
-        working-directory: sdks/javascript
+        working-directory: javascript
         run: bun run build
 
       - name: Publish to npm
