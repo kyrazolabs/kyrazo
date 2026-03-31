@@ -1,0 +1,36 @@
+name: Publish JavaScript SDK to npm
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    name: Build and publish JavaScript SDK
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        working-directory: sdks/javascript
+        run: bun install
+
+      - name: Build package
+        working-directory: sdks/javascript
+        run: bun run build
+
+      - name: Publish to npm
+        working-directory: sdks/javascript
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} # npm Trusted Publishing (OIDC) will use the id-token instead
