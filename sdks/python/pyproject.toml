@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [project]
 name = "kyrazo"
-version = "1.1.0"
+version = "1.1.1"
 description = "Official Kyrazo SDK for Python. Build reliable event-driven systems with ease."
 authors = [
     { name = "Kyrazo", email = "support@kyrazo.com" }
