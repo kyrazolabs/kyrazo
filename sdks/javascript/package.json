@@ -1,6 +1,6 @@
 {
     "name": "@kyrazo/sdk",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "description": "Official Kyrazo SDK for JavaScript/TypeScript",
     "main": "dist/index.js",
     "module": "dist/index.mjs",
