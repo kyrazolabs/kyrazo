@@ -34,10 +34,10 @@ jobs:
         run: poetry install --no-interaction
 
       - name: Build package
-        working-directory: sdks/python
+        working-directory: python
         run: poetry build
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: sdks/python/dist/
+          packages-dir: python/dist/
