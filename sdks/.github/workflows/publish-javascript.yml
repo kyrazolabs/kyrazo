@@ -30,7 +30,7 @@ jobs:
         run: bun run build
 
       - name: Publish to npm
-        working-directory: sdks/javascript
+        working-directory: javascript
         run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} # npm Trusted Publishing (OIDC) will use the id-token instead
