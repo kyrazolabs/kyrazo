@@ -16,6 +16,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "latest"
+          registry-url: "https://registry.npmjs.org"
+
       - name: Set up Bun
         uses: oven-sh/setup-bun@v1
         with:
@@ -33,4 +39,4 @@ jobs:
         working-directory: javascript
         run: npm publish --provenance --access public
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} # npm Trusted Publishing (OIDC) will use the id-token instead
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} # npm Trusted Publishing (OIDC) will use the id-token if this is empty, but setup-node requires it if registry-url is set. If utilizing purely OIDC, ensure the NPM_TOKEN secret is an OIDC-compatible one or remove the env if the publisher is fully configured on npm.
