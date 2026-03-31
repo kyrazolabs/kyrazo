@@ -30,7 +30,7 @@ jobs:
           virtualenvs-in-project: true
 
       - name: Install dependencies
-        working-directory: sdks/python
+        working-directory: python
         run: poetry install --no-interaction
 
       - name: Build package
