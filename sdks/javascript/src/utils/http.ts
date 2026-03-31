@@ -149,8 +149,8 @@ export class HttpClient {
           status: response.status,
           headers: response.headers,
         };
-      } catch (error) {
-        lastError = error as Error;
+      } catch (error: any) {
+        lastError = error;
 
         // Don't retry on client errors (4xx) or abort
         if (

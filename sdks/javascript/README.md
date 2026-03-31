@@ -97,7 +97,7 @@ import {
 
 try {
   await kyrazo.events.single(namespaceId, payload);
-} catch (error) {
+} catch (error: any) {
   if (error instanceof RateLimitError) {
     console.log(`Rate limited. Retry in ${error.retryAfter}s`);
   } else if (error instanceof LimitExceededError) {

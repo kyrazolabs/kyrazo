@@ -1,19 +1,44 @@
-[tool.poetry]
-name = "kyrazo"
-version = "1.0.0"
-description = "Official Kyrazo SDK for Python"
-authors = ["Kyrazo <support@kyrazo.com>"]
-readme = "README.md"
-packages = [{include = "kyrazo"}]
-license = "MIT"
-repository = "https://github.com/kyrazolabs/sdks"
-homepage = "https://github.com/kyrazolabs/sdks/tree/main/sdks/python#readme"
-keywords = ["kyrazo", "webhooks", "events", "sdk", "api"]
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
-[tool.poetry.dependencies]
-python = "^3.9"
-httpx = "^0.27.0"
-pydantic = "^2.6.0"
+[project]
+name = "kyrazo"
+version = "1.1.0"
+description = "Official Kyrazo SDK for Python. Build reliable event-driven systems with ease."
+authors = [
+    { name = "Kyrazo", email = "support@kyrazo.com" }
+]
+readme = "README.md"
+license = "MIT"
+keywords = ["kyrazo", "webhooks", "events", "sdk", "api", "event-driven", "webhooks-as-a-service"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Communications :: Chat",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "httpx>=0.27.0",
+    "pydantic>=2.6.0",
+]
+
+[project.urls]
+Homepage = "https://kyrazo.com"
+Documentation = "https://docs.kyrazo.com"
+Repository = "https://github.com/kyrazolabs/sdks"
+"Bug Tracker" = "https://github.com/kyrazolabs/sdks/issues"
+Source = "https://github.com/kyrazolabs/sdks/tree/main/sdks/python"
+
+[tool.poetry]
+packages = [{include = "kyrazo"}]
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
@@ -21,10 +46,6 @@ pytest-asyncio = "^0.23.5"
 respx = "^0.20.2"
 ruff = "^0.3.0"
 mypy = "^1.8.0"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
 line-length = 88
