@@ -100,11 +100,13 @@ export class DispatcherQueue extends EventEmitter {
                     let target: any = cachedTargetRaw ? JSON.parse(cachedTargetRaw) : null;
 
                     if (!target) {
+                        logger.info(`🔍 Cache miss for target ${tar.targetId}, querying MongoDB...`);
                         target = await targetRepository.getTargetById(
                             tar.targetId,
                             event.workspaceId,
                             event.namespaceId
                         );
+                        logger.info(`🔍 MongoDB result for target ${tar.targetId}: ${target ? 'FOUND' : 'NULL'}`);
                         // Only cache if the target actually exists — never cache null
                         if (target) {
                             await redisConfig.set(targetCacheKey, JSON.stringify(target), 60 * 60 * 10);
@@ -112,8 +114,32 @@ export class DispatcherQueue extends EventEmitter {
                     }
 
                     if (!target) {
+                        // Fallback: the event controller already verified this target exists
+                        // and embedded testUrl in the event payload. Use it to prevent
+                        // silent delivery loss when a transient DB/cache issue occurs.
+                        if (tar.targetUrl) {
+                            logger.warn(
+                                `⚠️ Target ${tar.targetId} not in DB/Cache — using event-embedded URL as fallback`
+                            );
+                            targets.push({
+                                type: 'target',
+                                targetId: tar.targetId,
+                                url: tar.targetUrl,
+                                priority:
+                                    event.meta?.priority === 'urgent'
+                                        ? JOB_PRIORITIES.CRITICAL
+                                        : event.meta?.priority === 'high'
+                                          ? JOB_PRIORITIES.HIGH
+                                          : event.meta?.priority === 'normal'
+                                            ? JOB_PRIORITIES.NORMAL
+                                            : JOB_PRIORITIES.LOW,
+                                retryCount: event.meta?.maxRetries ?? 3,
+                                method: 'POST',
+                            });
+                            continue;
+                        }
                         logger.warn(
-                            `❌ Target not found in DB or Cache: ${tar.targetId} (Workspace: ${event.workspaceId}, Namespace: ${event.namespaceId})`
+                            `❌ Target not found in DB or Cache (no fallback URL): ${tar.targetId} (Workspace: ${event.workspaceId}, Namespace: ${event.namespaceId})`
                         );
                         continue;
                     }
@@ -131,9 +157,9 @@ export class DispatcherQueue extends EventEmitter {
                                   : event.meta?.priority === 'normal'
                                     ? JOB_PRIORITIES.NORMAL
                                     : JOB_PRIORITIES.LOW,
-                        rateLimit: target.config.rateLimit,
-                        rateLimitDuration: target.config.rateLimitDuration,
-                        retryCount: target.config.retryCount,
+                        rateLimit: target.config?.rateLimit,
+                        rateLimitDuration: target.config?.rateLimitDuration,
+                        retryCount: target.config?.retryCount ?? event.meta?.maxRetries ?? 3,
                         customHeaders: target.customHeaders,
                         method: target.method,
                     });
