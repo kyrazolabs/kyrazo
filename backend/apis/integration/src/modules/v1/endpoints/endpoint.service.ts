@@ -1,8 +1,8 @@
 import { Types } from 'mongoose';
 import type { CreateEndpointInput } from './endpoint.schema';
-import { secretCrypto, prefixId } from '@kyrazo/shared';
+import { secretCrypto, prefixId, RedisKeys, logger } from '@kyrazo/shared';
 import { endpointRepository } from './endpoint.repo';
-import { logger } from '@kyrazo/shared';
+import { redisConfig } from '@/configs';
 
 export class EndpointService {
     async createEndpoint(
@@ -32,7 +32,12 @@ export class EndpointService {
         };
 
         try {
-            return await endpointRepository.create(data);
+            const created = await endpointRepository.create(data);
+            if (created) {
+                await redisConfig.del(RedisKeys.context.workspaceNamespaceEndpoints(workspaceId.toString(), namespaceId.toString()));
+                await redisConfig.del(RedisKeys.context.workspaceNamespaceEndpoint(workspaceId.toString(), namespaceId.toString(), created.id || created._id));
+            }
+            return created;
         } catch (error: any) {
             logger.error('Failed to create target:', error);
             throw new Error(JSON.stringify(error));
@@ -152,6 +157,8 @@ export class EndpointService {
             if (!updated) {
                 throw new Error('Failed to update endpoint');
             }
+            await redisConfig.del(RedisKeys.context.workspaceNamespaceEndpoints(workspaceId, namespaceId));
+            await redisConfig.del(RedisKeys.context.workspaceNamespaceEndpoint(workspaceId, namespaceId, endpointId));
             return updated;
         } catch (error: any) {
             logger.error('Failed to update endpoint:', error);
@@ -173,6 +180,8 @@ export class EndpointService {
             if (!deleted) {
                 throw new Error('Failed to delete endpoint');
             }
+            await redisConfig.del(RedisKeys.context.workspaceNamespaceEndpoints(workspaceId, namespaceId));
+            await redisConfig.del(RedisKeys.context.workspaceNamespaceEndpoint(workspaceId, namespaceId, endpointId));
             return deleted;
         } catch (error: any) {
             logger.error('Failed to delete endpoint:', error);

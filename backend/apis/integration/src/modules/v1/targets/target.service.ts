@@ -33,7 +33,12 @@ export class TargetService {
         };
 
         try {
-            return await targetRepository.create(data);
+            const created = await targetRepository.create(data);
+            if (created) {
+                await redisConfig.del(RedisKeys.context.workspaceNamespaceTargets(workspaceId.toString(), namespaceId.toString()));
+                await redisConfig.del(RedisKeys.context.workspaceNamespaceTarget(workspaceId.toString(), namespaceId.toString(), created.id || created._id));
+            }
+            return created;
         } catch (error: any) {
             logger.error('Failed to create target:', error);
             throw new Error(JSON.stringify(error));
@@ -145,6 +150,7 @@ export class TargetService {
                 throw new Error('Failed to update target');
             }
             await redisConfig.del(RedisKeys.context.workspaceNamespaceTargets(workspaceId, namespaceId));
+            await redisConfig.del(RedisKeys.context.workspaceNamespaceTarget(workspaceId, namespaceId, targetId));
             return updated;
         } catch (error: any) {
             logger.error('Failed to update target:', error);
@@ -163,6 +169,7 @@ export class TargetService {
                 throw new Error('Failed to delete target');
             }
             await redisConfig.del(RedisKeys.context.workspaceNamespaceTargets(workspaceId, namespaceId));
+            await redisConfig.del(RedisKeys.context.workspaceNamespaceTarget(workspaceId, namespaceId, targetId));
             return deleted;
         } catch (error: any) {
             logger.error('Failed to delete target:', error);
