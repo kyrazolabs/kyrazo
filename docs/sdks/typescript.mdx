@@ -1,0 +1,111 @@
+---
+title: "JavaScript / TypeScript"
+description: "Official Kyrazo SDK for JavaScript and TypeScript"
+---
+
+The Kyrazo JavaScript SDK provides a type-safe, production-ready client for interacting with the Kyrazo API. It supports both CommonJS and ESM, and works in Node.js, Browsers, and Edge environments.
+
+## Installation
+
+Install the SDK using your preferred package manager:
+
+<CodeGroup>
+```bash npm
+npm install @kyrazo/sdk
+```
+
+```bash yarn
+yarn add @kyrazo/sdk
+```
+
+```bash pnpm
+pnpm add @kyrazo/sdk
+```
+</CodeGroup>
+
+## Quickstart
+
+To get started, you'll need an **API Key** from the [Kyrazo Dashboard](https://kyrazo.com/dashboard).
+
+```typescript
+import { Kyrazo } from "@kyrazo/sdk";
+
+const kyrazo = new Kyrazo({
+  apiKey: "your_api_key_here",
+});
+
+// Publish a single event
+const response = await kyrazo.events.single("namespace_id", {
+  eventType: "user.signup",
+  payload: {
+    userId: "123",
+    email: "user@example.com",
+  },
+  targets: [{ targetId: "target_id" }],
+});
+
+console.log("Event dispatched:", response.id);
+```
+
+## Error Handling
+
+The SDK provides specific error classes to help you handle different failure scenarios gracefully.
+
+```typescript
+import { 
+  Kyrazo, 
+  RateLimitError, 
+  ValidationError, 
+  AuthenticationError 
+} from "@kyrazo/sdk";
+
+try {
+  await kyrazo.events.single(...);
+} catch (error) {
+  if (error instanceof RateLimitError) {
+    console.log(`Rate limited! Retry after ${error.retryAfter}s`);
+  } else if (error instanceof ValidationError) {
+    console.log("Invalid request data:", error.message);
+  } else if (error instanceof AuthenticationError) {
+    console.log("Invalid API Key");
+  }
+}
+```
+
+## Batch Publishing
+
+You can send up to 100 events in a single request to improve performance.
+
+```typescript
+const batchResponse = await kyrazo.events.batch("namespace_id", [
+  {
+    eventType: "user.login",
+    payload: { userId: "1" },
+    targets: [{ targetId: "target_A" }],
+  },
+  {
+    eventType: "user.login",
+    payload: { userId: "2" },
+    targets: [{ targetId: "target_A" }],
+  }
+]);
+
+console.log(`Sent ${batchResponse.length} events`);
+```
+
+## Webhook Verification
+
+When receiving webhooks from Kyrazo, you should verify the signature to ensure the request is authentic.
+
+```typescript
+import { Webhook } from "@kyrazo/sdk";
+
+// In your Express handler (or similar)
+const isValid = Webhook.verify(
+  rawRequestBody,
+  req.headers,
+  "your_target_secret"
+);
+```
+
+For more details on verification, see the [Signature Verification](/essentials/webhooks-verification) guide.

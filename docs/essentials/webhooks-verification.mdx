@@ -23,7 +23,29 @@ The signature is a `hex` encoded HMAC-SHA256 hash. The "signed payload" is const
 Select your preferred language to see a verification implementation.
 
 <Tabs>
-  <Tab title="TypeScript">
+  <Tab title="TypeScript (SDK)">
+    ```typescript
+    import { Webhook } from "@kyrazo/sdk";
+
+    // req.body should be the raw request body string
+    // req.headers is the headers object from your framework (e.g. Express)
+    try {
+      const isValid = Webhook.verify(
+        req.body, 
+        req.headers, 
+        process.env.KYRAZO_TARGET_SECRET
+      );
+      
+      if (isValid) {
+        // Handle the verified webhook
+      }
+    } catch (error) {
+      // Signature verification failed
+      console.error(error.message);
+    }
+    ```
+  </Tab>
+  <Tab title="TypeScript (Manual)">
     ```typescript
     import * as crypto from 'crypto';
 
@@ -32,7 +54,7 @@ Select your preferred language to see a verification implementation.
       'x-webhook-timestamp': string;
       'x-webhook-nonce': string;
       'x-webhook-version': string;
-      [key: string]: string | undefined;
+      [key: string]: string | string[] | undefined;
     }
 
     function verifySignature(
@@ -70,48 +92,53 @@ Select your preferred language to see a verification implementation.
   </Tab>
   <Tab title="Node.js">
     ```javascript
-    const crypto = require('crypto');
+    const { Webhook } = require('@kyrazo/sdk');
 
-    function verifySignature(requestBody, headers, secret) {
-      const signatureHeader = headers['x-webhook-signature']; // e.g. "v1=..."
-      const timestamp = headers['x-webhook-timestamp'];
-      const nonce = headers['x-webhook-nonce'];
-      const version = headers['x-webhook-version'];
-
-      if (!signatureHeader || !timestamp || !nonce || !version) {
-        return false;
+    // Express example
+    app.post('/webhook', (req, res) => {
+      try {
+        Webhook.verify(
+          req.body, // Ensure this is the raw body string
+          req.headers, 
+          process.env.KYRAZO_TARGET_SECRET
+        );
+        res.status(200).send('OK');
+      } catch (error) {
+        res.status(401).send('Unauthorized');
       }
-
-      // Extract the signature value after the "v1=" prefix
-      const signature = signatureHeader.split('=')[1];
-
-      // Construct the signed string
-      const signedPayload = `${version}.${timestamp}.${nonce}.${requestBody}`;
-
-      // Compute the expected HMAC
-      const expectedSignature = crypto
-        .createHmac('sha256', secret)
-        .update(signedPayload)
-        .digest('hex');
-
-      // Use timing-safe comparison to prevent timing attacks
-      return crypto.timingSafeEqual(
-        Buffer.from(signature),
-        Buffer.from(expectedSignature)
-      );
-    }
+    });
     ```
   </Tab>
-  <Tab title="Python">
+  <Tab title="Python (SDK)">
+    ```python
+    from kyrazo import Webhook, ValidationError
+
+    # payload should be the raw request body string
+    # headers is the headers dictionary from your framework
+    try:
+        Webhook.verify(
+            payload,
+            headers,
+            "your_target_secret"
+        )
+        # Handle verified webhook
+    except ValidationError as e:
+        print(f"Verification failed: {e}")
+    ```
+  </Tab>
+  <Tab title="Python (Manual)">
     ```python
     import hmac
     import hashlib
 
     def verify_signature(request_body, headers, secret):
-        signature_header = headers.get('X-Webhook-Signature')
-        timestamp = headers.get('X-Webhook-Timestamp')
-        nonce = headers.get('X-Webhook-Nonce')
-        version = headers.get('X-Webhook-Version')
+        # Header keys are case-insensitive
+        headers = {k.lower(): v for k, v in headers.items()}
+        
+        signature_header = headers.get('x-webhook-signature')
+        timestamp = headers.get('x-webhook-timestamp')
+        nonce = headers.get('x-webhook-nonce')
+        version = headers.get('x-webhook-version')
 
         if not all([signature_header, timestamp, nonce, version]):
             return False
