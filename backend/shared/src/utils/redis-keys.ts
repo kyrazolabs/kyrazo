@@ -7,9 +7,11 @@ import { unprefixId } from './id';
  */
 export const RedisKeys = {
     auth: {
-        otpEmail: (action: string, userId: string) => `auth:otp:email:${action}:${unprefixId(userId)}`,
+        otpEmail: (action: string, userId: string) =>
+            `auth:otp:email:${action}:${unprefixId(userId)}`,
         otpTemp2fa: (token: string) => `auth:otp:temp-2fa:${token}`,
-        otpVerified: (action: string, userId: string) => `auth:otp:verified:${action}:${unprefixId(userId)}`,
+        otpVerified: (action: string, userId: string) =>
+            `auth:otp:verified:${action}:${unprefixId(userId)}`,
         sensitiveAction: (action: string) => `auth:sensitive-action:${action}`,
         apiKey: (kid: string) => `auth:api-key:with-user:${kid}`,
     },
@@ -32,20 +34,23 @@ export const RedisKeys = {
         userRate: (id: string) => `limit:user-rate:${unprefixId(id)}`,
         ipRate: (ip: string) => `limit:ip-rate:${ip}`,
         planReadIp: (ip: string) => `limit:plan-read-ip:${ip}`,
-        feature: (feature: string, workspaceId: string) => `limit:feature:${feature}:${unprefixId(workspaceId)}`,
+        feature: (feature: string, workspaceId: string) =>
+            `limit:feature:${feature}:${unprefixId(workspaceId)}`,
     },
     context: {
-        workspaceUser: (workspaceId: string, userId: string) => 
+        workspaceUser: (workspaceId: string, userId: string) =>
             `context:workspace:${unprefixId(workspaceId)}:user:${unprefixId(userId)}`,
-        workspaceNamespace: (workspaceId: string, namespaceId: string) => 
+        workspaceNamespace: (workspaceId: string, namespaceId: string) =>
             `context:workspace:${unprefixId(workspaceId)}:namespace:${unprefixId(namespaceId)}`,
-        workspaceNamespaceSources: (workspaceId: string, namespaceId: string) => 
+        workspaceNamespaceSources: (workspaceId: string, namespaceId: string) =>
             `context:workspace:${unprefixId(workspaceId)}:namespace:${unprefixId(namespaceId)}:sources`,
-        workspaceNamespaceTargets: (workspaceId: string, namespaceId: string) => 
+        workspaceNamespaceTargets: (workspaceId: string, namespaceId: string) =>
             `context:workspace:${unprefixId(workspaceId)}:namespace:${unprefixId(namespaceId)}:targets`,
-        workspaceNamespaceTarget: (workspaceId: string, namespaceId: string, targetId: string) => 
+        workspaceNamespaceEndpoints: (workspaceId: string, namespaceId: string) =>
+            `context:workspace:${unprefixId(workspaceId)}:namespace:${unprefixId(namespaceId)}:endpoints`,
+        workspaceNamespaceTarget: (workspaceId: string, namespaceId: string, targetId: string) =>
             `context:workspace:${unprefixId(workspaceId)}:namespace:${unprefixId(namespaceId)}:target:${unprefixId(targetId)}`,
-        workspaceNamespaceEndpoint: (workspaceId: string, namespaceId: string, endpointId: string) => 
+        workspaceNamespaceEndpoint: (workspaceId: string, namespaceId: string, endpointId: string) =>
             `context:workspace:${unprefixId(workspaceId)}:namespace:${unprefixId(namespaceId)}:endpoint:${unprefixId(endpointId)}`,
         namespace: (id: string) => `context:namespace:${unprefixId(id)}`,
         namespaceConfig: (id: string) => `context:namespace:${unprefixId(id)}:config`,

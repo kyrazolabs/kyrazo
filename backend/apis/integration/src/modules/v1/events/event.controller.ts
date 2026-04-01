@@ -30,9 +30,10 @@ export class EventController {
         unfoundTargets: string[];
     }> {
         const cacheKey = RedisKeys.context.workspaceNamespaceTargets(workspaceId, namespaceId);
+        const normalizedInputTargets = targets.map(id => unprefixId(id)!);
 
         // 1. Try to get it from the cache
-        let cachedTargets = await redisConfig.cache(cacheKey, async () => [], 100);
+        let cachedTargets: any[] = await redisConfig.cache(cacheKey, async () => [], 100);
 
         // 2. Split: Found in cache / Missing
         const cachedMap = new Map(
@@ -41,7 +42,7 @@ export class EventController {
                 return [unprefixId(id as string), t];
             })
         );
-        const missingFromCache = targets.filter(id => !cachedMap.has(unprefixId(id)));
+        const missingFromCache = normalizedInputTargets.filter(id => !cachedMap.has(id));
 
         // 3. Retrieve missing information from the database
         let fetchedTargets: any[] = [];
@@ -52,38 +53,41 @@ export class EventController {
                     namespaceId,
                     missingFromCache
                 );
-        }
 
-        // 4. Merge cache with retrieved data and update cache
-        const allTargets = [
-            ...cachedTargets,
-            ...fetchedTargets.filter(t => {
-                const id = t.id || t.targetId || `trg_${t._id?.toString()}`;
-                return !cachedMap.has(unprefixId(id as string));
-            }),
-        ];
+            // Merge cache with retrieved data and update cache
+            const allTargets = [
+                ...cachedTargets,
+                ...fetchedTargets.filter(t => {
+                    const id = t.id || t.targetId || `trg_${t._id?.toString()}`;
+                    return !cachedMap.has(unprefixId(id as string));
+                }),
+            ];
 
-        if (fetchedTargets.length > 0) {
             await redisConfig.cache(
                 cacheKey,
                 async () => allTargets,
-                60 * 60 * 24 // Cache for 24h
+                60 * 60 * 10 // Cache for 10h
             );
+
+            cachedTargets = allTargets;
         }
 
-        const foundTargets = allTargets
-            .filter(t =>
-                targets.includes(
-                    unprefixId((t.id || t.targetId || t._id?.toString()) as string) || ''
-                )
-            )
-            .map(t => ({
-                targetId: (t.id || t.targetId || `trg_${t._id?.toString()}`) as string,
-                targetUrl: (t.url || t.targetUrl) as string,
-            }));
+        const foundTargets: { targetId: string; targetUrl: string }[] = [];
+        const foundSet = new Set<string>();
 
-        const foundSet = new Set(foundTargets.map(t => unprefixId(t.targetId)));
-        const unfoundTargets = targets.filter(id => !foundSet.has(unprefixId(id)));
+        cachedTargets.forEach((t: any) => {
+            const id = (t.id || t.targetId || t._id?.toString()) as string;
+            const normalizedId = unprefixId(id)!;
+            if (normalizedInputTargets.includes(normalizedId)) {
+                foundTargets.push({
+                    targetId: id,
+                    targetUrl: (t.url || t.targetUrl) as string,
+                });
+                foundSet.add(normalizedId);
+            }
+        });
+
+        const unfoundTargets = targets.filter(id => !foundSet.has(unprefixId(id)!));
 
         return { foundTargets, unfoundTargets };
     }
@@ -117,9 +121,13 @@ export class EventController {
 
                 if (idempotencyKey && workspaceId) {
                     await redisConfig.set(
-                        RedisKeys.idempotency.key(workspaceId.toString(), c.req.path, idempotencyKey),
+                        RedisKeys.idempotency.key(
+                            workspaceId.toString(),
+                            c.req.path,
+                            idempotencyKey
+                        ),
                         JSON.stringify({ status: 'failed', error: errorResponse.error }),
-                        60 * 60 * 24
+                        60 * 30 // Cache for 30 Minute
                     );
                 }
 
@@ -158,9 +166,13 @@ export class EventController {
 
                 if (idempotencyKey) {
                     await redisConfig.set(
-                        `idem:${workspaceId}:${c.req.path}:${idempotencyKey}`,
+                        RedisKeys.idempotency.key(
+                            workspaceId!.toString(),
+                            c.req.path,
+                            idempotencyKey
+                        ),
                         JSON.stringify({ status: 'failed', error: errorResponse.error }),
-                        60 * 60 * 24
+                        60 * 30 // Cache for 30 Minute
                     );
                 }
 
@@ -183,9 +195,13 @@ export class EventController {
 
                 if (idempotencyKey) {
                     await redisConfig.set(
-                        `idem:${workspaceId}:${c.req.path}:${idempotencyKey}`,
+                        RedisKeys.idempotency.key(
+                            workspaceId!.toString(),
+                            c.req.path,
+                            idempotencyKey
+                        ),
                         JSON.stringify({ status: 'failed', error: errorResponse.error }),
-                        60 * 60 * 24
+                        60 * 30 // Cache for 30 Minute
                     );
                 }
 
@@ -214,9 +230,13 @@ export class EventController {
 
                 if (idempotencyKey) {
                     await redisConfig.set(
-                        `idem:${workspaceId}:${c.req.path}:${idempotencyKey}`,
+                        RedisKeys.idempotency.key(
+                            workspaceId!.toString(),
+                            c.req.path,
+                            idempotencyKey
+                        ),
                         JSON.stringify({ status: 'failed', error: errorResponse.error }),
-                        60 * 60 * 24
+                        60 * 30 // Cache for 30 Minute
                     );
                 }
 
@@ -235,11 +255,11 @@ export class EventController {
                 processingTimeMs: Math.round(duration),
             };
 
-            if (idempotencyKey) {
+            if (idempotencyKey && workspaceId) {
                 await redisConfig.set(
-                    `idem:${workspaceId}:${c.req.path}:${idempotencyKey}`,
+                    RedisKeys.idempotency.key(workspaceId.toString(), c.req.path, idempotencyKey),
                     JSON.stringify({ status: 'completed', response: successResponse }),
-                    60 * 60 * 24
+                    60 * 30 // Cache for 30 Minute
                 );
             }
 
@@ -297,9 +317,13 @@ export class EventController {
 
                 if (idempotencyKey && workspaceId) {
                     await redisConfig.set(
-                        RedisKeys.idempotency.key(workspaceId.toString(), c.req.path, idempotencyKey),
+                        RedisKeys.idempotency.key(
+                            workspaceId.toString(),
+                            c.req.path,
+                            idempotencyKey
+                        ),
                         JSON.stringify({ status: 'failed', error: errorResponse.error }),
-                        60 * 60 * 24
+                        60 * 30 // Cache for 30 Minute
                     );
                 }
 
@@ -316,11 +340,15 @@ export class EventController {
                     },
                 };
 
-                if (idempotencyKey) {
+                if (idempotencyKey && workspaceId) {
                     await redisConfig.set(
-                        `idem:${workspaceId}:${c.req.path}:${idempotencyKey}`,
+                        RedisKeys.idempotency.key(
+                            workspaceId.toString(),
+                            c.req.path,
+                            idempotencyKey
+                        ),
                         JSON.stringify({ status: 'failed', error: errorResponse.error }),
-                        60 * 60 * 24
+                        60 * 30 // Cache for 30 Minute
                     );
                 }
 
@@ -337,11 +365,15 @@ export class EventController {
                     },
                 };
 
-                if (idempotencyKey) {
+                if (idempotencyKey && workspaceId) {
                     await redisConfig.set(
-                        `idem:${workspaceId}:${c.req.path}:${idempotencyKey}`,
+                        RedisKeys.idempotency.key(
+                            workspaceId.toString(),
+                            c.req.path,
+                            idempotencyKey
+                        ),
                         JSON.stringify({ status: 'failed', error: errorResponse.error }),
-                        60 * 60 * 24
+                        60 * 30 // Cache for 30 Minute
                     );
                 }
 
@@ -418,11 +450,15 @@ export class EventController {
                     },
                 };
 
-                if (idempotencyKey) {
+                if (idempotencyKey && workspaceId) {
                     await redisConfig.set(
-                        `idem:${workspaceId}:${c.req.path}:${idempotencyKey}`,
+                        RedisKeys.idempotency.key(
+                            workspaceId.toString(),
+                            c.req.path,
+                            idempotencyKey
+                        ),
                         JSON.stringify({ status: 'failed', error: errorResponse.error }),
-                        60 * 60 * 24
+                        60 * 30 // Cache for 30 Minute
                     );
                 }
 
@@ -480,11 +516,11 @@ export class EventController {
                 processingTimeMs: Math.round(duration),
             };
 
-            if (idempotencyKey) {
+            if (idempotencyKey && workspaceId) {
                 await redisConfig.set(
-                    `idem:${workspaceId}:${c.req.path}:${idempotencyKey}`,
+                    RedisKeys.idempotency.key(workspaceId.toString(), c.req.path, idempotencyKey),
                     JSON.stringify({ status: 'completed', response: finalResponse }),
-                    60 * 60 * 24
+                    60 * 30 // Cache for 30 Minute
                 );
             }
 
