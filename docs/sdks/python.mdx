@@ -1,0 +1,83 @@
+---
+title: "Python"
+description: "Official Kyrazo SDK for Python"
+---
+
+The Kyrazo Python SDK provides a type-safe, asynchronous-ready client for interacting with the Kyrazo API. It supports Python 3.9+ and is designed for high-performance event orchestration.
+
+## Installation
+
+Install the SDK using your preferred package manager:
+
+<CodeGroup>
+```bash pip
+pip install kyrazo
+```
+
+```bash poetry
+poetry add kyrazo
+```
+</CodeGroup>
+
+## Quickstart
+
+Initialize the client with your **API Key** from the [Kyrazo Dashboard](https://kyrazo.com/dashboard).
+
+```python
+from kyrazo import Kyrazo
+
+client = Kyrazo(api_key="your_api_key_here")
+
+# Publish a single event
+event = client.events.publish(
+    namespace_id="namespace_id",
+    body={
+        "eventType": "user.signup",
+        "payload": {
+            "userId": "123",
+            "email": "user@example.com"
+        },
+        "targets": [{"targetId": "target_id"}]
+    }
+)
+
+print(f"Event published! ID: {event.event_id}")
+```
+
+## Error Handling
+
+The SDK provides specialized exception classes for precise error handling.
+
+```python
+from kyrazo import Kyrazo, RateLimitError, ValidationError, AuthenticationError
+
+try:
+    client.events.publish(...)
+except RateLimitError as e:
+    print(f"Rate limited! Retry after {e.retry_after}s")
+except ValidationError as e:
+    print(f"Invalid request data: {e.message}")
+except AuthenticationError:
+    print("Invalid API Key")
+```
+
+## Webhook Verification
+
+Verify incoming webhooks from Kyrazo using the built-in helper.
+
+```python
+from kyrazo import Webhook, ValidationError
+
+# headers should be a dictionary of incoming request headers
+try:
+    Webhook.verify(
+        raw_body_string,
+        headers,
+        "your_target_secret"
+    )
+    print("Successfully verified webhook")
+except ValidationError as e:
+    print(f"Verification failed: {e}")
+```
+
+For more details on verification policies and best practices, see the [Signature Verification](/essentials/webhooks-verification) guide.

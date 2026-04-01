@@ -14,10 +14,15 @@
         "tab": "Guides",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Getting Started",
             "pages": [
               "index",
-              "quickstart",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Essentials",
+            "pages": [
               "essentials/concepts",
               "essentials/architecture",
               "essentials/use-cases",
@@ -27,7 +32,8 @@
           {
             "group": "SDKs",
             "pages": [
-              "sdks/typescript"
+              "sdks/typescript",
+              "sdks/python"
             ]
           },
           {
