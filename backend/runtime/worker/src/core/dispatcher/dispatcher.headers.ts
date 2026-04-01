@@ -46,7 +46,7 @@ export class DispatcherHeaders {
             if (prefix !== 'X-Webhook') {
                 // Check if feature is enabled in subscription (cached in Redis)
                 const hasFeature = await redisConfig.cache(
-                    RedisKeys.limit.feature('whiteLabelHeaders', event.workspaceId),
+                    RedisKeys.limit.feature('whiteLabelHeaders', unprefixId(event.workspaceId)!),
                     async () => {
                         const subscription = await Subscription.findOne({
                             workspaceId: unprefixId(event.workspaceId),
