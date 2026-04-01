@@ -67,7 +67,11 @@ export class EventController {
                 }),
             ];
 
-            await redisConfig.set(cacheKey, JSON.stringify(allTargets), 60 * 60 * 10);
+            // Only cache if we actually found something — never cache an empty list
+            // to avoid locking out targets that are temporarily unavailable or disabled.
+            if (allTargets.length > 0) {
+                await redisConfig.set(cacheKey, JSON.stringify(allTargets), 60 * 60 * 10);
+            }
 
             cachedTargets = allTargets;
         }

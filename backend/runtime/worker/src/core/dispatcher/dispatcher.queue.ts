@@ -95,17 +95,22 @@ export class DispatcherQueue extends EventEmitter {
                     if (!tar) {
                         continue;
                     }
-                    const target = await redisConfig.cache(
-                        RedisKeys.context.workspaceNamespaceTarget(event.workspaceId, event.namespaceId, tar.targetId),
-                        async () => {
-                            const target = await targetRepository.getTargetById(
-                                tar.targetId,
-                                event.workspaceId,
-                                event.namespaceId
-                            );
-                            return target;
+                    const targetCacheKey = RedisKeys.context.workspaceNamespaceTarget(event.workspaceId, event.namespaceId, tar.targetId);
+                    const cachedTargetRaw = await redisConfig.get(targetCacheKey);
+                    let target: any = cachedTargetRaw ? JSON.parse(cachedTargetRaw) : null;
+
+                    if (!target) {
+                        target = await targetRepository.getTargetById(
+                            tar.targetId,
+                            event.workspaceId,
+                            event.namespaceId
+                        );
+                        // Only cache if the target actually exists — never cache null
+                        if (target) {
+                            await redisConfig.set(targetCacheKey, JSON.stringify(target), 60 * 60 * 10);
                         }
-                    );
+                    }
+
                     if (!target) {
                         logger.warn(
                             `❌ Target not found in DB or Cache: ${tar.targetId} (Workspace: ${event.workspaceId}, Namespace: ${event.namespaceId})`
@@ -139,17 +144,22 @@ export class DispatcherQueue extends EventEmitter {
                     if (!tar) {
                         continue;
                     }
-                    const endpoint = await redisConfig.cache(
-                        RedisKeys.context.workspaceNamespaceEndpoint(event.workspaceId, event.namespaceId, tar.targetId),
-                        async () => {
-                            const target = await endpointRepository.getEndpointById(
-                                tar.targetId,
-                                event.workspaceId,
-                                event.namespaceId
-                            );
-                            return target;
+                    const endpointCacheKey = RedisKeys.context.workspaceNamespaceEndpoint(event.workspaceId, event.namespaceId, tar.targetId);
+                    const cachedEndpointRaw = await redisConfig.get(endpointCacheKey);
+                    let endpoint: any = cachedEndpointRaw ? JSON.parse(cachedEndpointRaw) : null;
+
+                    if (!endpoint) {
+                        endpoint = await endpointRepository.getEndpointById(
+                            tar.targetId,
+                            event.workspaceId,
+                            event.namespaceId
+                        );
+                        // Only cache if the endpoint actually exists — never cache null
+                        if (endpoint) {
+                            await redisConfig.set(endpointCacheKey, JSON.stringify(endpoint), 60 * 60 * 10);
                         }
-                    );
+                    }
+
                     if (!endpoint) {
                         logger.warn(
                             `❌ Endpoint not found in DB or Cache: ${tar.targetId} (Workspace: ${event.workspaceId}, Namespace: ${event.namespaceId})`
