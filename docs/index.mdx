@@ -30,7 +30,20 @@ Implementing webhooks manually often leads to several recurring pain points:
 
 ### The Solution: Kyrazo
 
-Kyrazo abstracts this complexity into a single, high-performance API. By offloading your event delivery to Kyrazo, you gain:
+Kyrazo abstracts this complexity into a single, high-performance API.
+
+```mermaid
+graph LR
+    A["Your System"] -- "Publish Event" --> B["Kyrazo API"]
+    B -- "Orchestration" --> C["Dispatcher"]
+    C -- "Verify & Deliver" --> D["Target A"]
+    C -- "Retry Loop" --> E["Target B"]
+    
+    style B fill:#f9f,stroke:#333,stroke-width:2px
+    style C fill:#bbf,stroke:#333,stroke-width:2px
+```
+
+By offloading your event delivery to Kyrazo, you gain:
 
 - **Bulletproof Delivery**: Automatic retries with configurable policies.
 - **Enterprise Security**: Standardized HMAC signatures and payload integrity checks.
