@@ -112,7 +112,7 @@ export class HeaderComponent {
                         icon: 'icon-[hugeicons--zap] size-5',
                         command: () => {
                             window.open(
-                                'https://docs.kyrazo.com/introduction',
+                                'https://docs.kyrazo.com/quickstart',
                                 '_blank',
                             );
                             this.activeDropdown.set(null);
