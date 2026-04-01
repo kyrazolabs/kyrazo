@@ -1,7 +1,7 @@
 import type { AppContext } from '@/core/middlewares/auth.middleware';
 import { redisConfig } from '@/configs';
 import { PerformanceTimer } from '@/core/utils';
-import { logger, type IErrorResponse, snowflake } from '@kyrazo/shared';
+import { logger, type IErrorResponse, snowflake, RedisKeys } from '@kyrazo/shared';
 import { publishEventPublisher } from '@/producers/jobs/v1/publishers';
 import type {
     BatchCreatePublishedEvent,
@@ -29,7 +29,7 @@ export class EventController {
         foundTargets: { targetId: string; targetUrl: string }[];
         unfoundTargets: string[];
     }> {
-        const cacheKey = `workspace:${unprefixId(workspaceId)}:namespace:${unprefixId(namespaceId)}:targets`;
+        const cacheKey = RedisKeys.context.workspaceNamespaceTargets(workspaceId, namespaceId);
 
         // 1. Try to get it from the cache
         let cachedTargets = await redisConfig.cache(cacheKey, async () => [], 100);
@@ -117,7 +117,7 @@ export class EventController {
 
                 if (idempotencyKey && workspaceId) {
                     await redisConfig.set(
-                        `idem:${workspaceId}:${c.req.path}:${idempotencyKey}`,
+                        RedisKeys.idempotency.key(workspaceId.toString(), c.req.path, idempotencyKey),
                         JSON.stringify({ status: 'failed', error: errorResponse.error }),
                         60 * 60 * 24
                     );
@@ -193,7 +193,7 @@ export class EventController {
             }
 
             const planSlugRaw = await redisConfig.get(
-                `workspace:${unprefixId(workspaceId.toString())}`
+                RedisKeys.billing.workspacePlan(workspaceId.toString())
             );
             const planSlug = planSlugRaw ? JSON.parse(planSlugRaw).planSlug : 'free';
 
@@ -297,7 +297,7 @@ export class EventController {
 
                 if (idempotencyKey && workspaceId) {
                     await redisConfig.set(
-                        `idem:${workspaceId}:${c.req.path}:${idempotencyKey}`,
+                        RedisKeys.idempotency.key(workspaceId.toString(), c.req.path, idempotencyKey),
                         JSON.stringify({ status: 'failed', error: errorResponse.error }),
                         60 * 60 * 24
                     );
@@ -430,7 +430,7 @@ export class EventController {
             }
 
             const planSlugRaw = await redisConfig.get(
-                `workspace:${unprefixId(workspaceId.toString())}`
+                RedisKeys.billing.workspacePlan(workspaceId.toString())
             );
             const planSlug = planSlugRaw ? JSON.parse(planSlugRaw).planSlug : 'free';
 

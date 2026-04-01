@@ -1,17 +1,9 @@
 import { redisConfig } from '@/configs/redis';
 import { subscriptionRepository } from '@/modules/billing/subscriptions/subscription.repo';
-import { IPlanLimits, logger, unprefixId } from '@kyrazo/shared';
+import { IPlanLimits, logger, unprefixId, FREE_PLAN_LIMITS, RedisKeys } from '@kyrazo/shared';
 import { subscriptionCacheService } from './subscription-cache.service';
 
-export const FREE_PLAN_LIMITS: IPlanLimits = {
-    eventsPerSecond: 25,
-    eventsPerMonth: 100000,
-    maxNamespaces: 3,
-    maxMembers: 3,
-    maxConnectors: 3,
-    maxIntegrations: 1,
-    maxWorkers: 0,
-};
+export { FREE_PLAN_LIMITS };
 
 export class LimitService {
     /**
@@ -78,7 +70,7 @@ export class LimitService {
 
         const date = new Date();
         const currentMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-        const redisKey = `usage:events:${unprefixId(workspaceId)}:${currentMonth}`;
+        const redisKey = RedisKeys.usage.eventCount(workspaceId, currentMonth);
 
         const client = redisConfig.getClient();
         const usageStr = await client.get(redisKey);

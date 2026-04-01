@@ -1,7 +1,7 @@
 import { redisConfig } from '@/configs';
 
 import { subscriptionRepository } from '../../repositories/subscription.repo';
-import { logger, unprefixId } from '@kyrazo/shared';
+import { logger, unprefixId, RedisKeys } from '@kyrazo/shared';
 
 const FREE_PLAN_LIMITS = {
     eventsPerSecond: 10,
@@ -16,7 +16,7 @@ const FREE_PLAN_LIMITS = {
 export class LimitChecker {
     static async getWorkspaceSub(workspaceId: string) {
         return await redisConfig.cache(
-            `workspace:${unprefixId(workspaceId)}`,
+            RedisKeys.billing.workspacePlan(workspaceId),
             async () => {
                 const subscription = await subscriptionRepository.findActiveByWorkspace(
                     unprefixId(workspaceId)!
@@ -59,7 +59,7 @@ export class LimitChecker {
             // 2. Get current usage from Redis
             const date = new Date();
             const currentMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-            const redisKey = `usage:events:${unprefixId(workspaceId)}:${currentMonth}`;
+            const redisKey = RedisKeys.usage.eventCount(workspaceId, currentMonth);
 
             const usageStr = await redisConfig.client!.get(redisKey);
             const usage = usageStr ? parseInt(usageStr, 10) : 0;

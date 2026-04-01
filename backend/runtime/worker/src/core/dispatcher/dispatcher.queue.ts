@@ -3,7 +3,7 @@ import { dispatchConsumer } from '@/consumers/queues/dispatch.consumer';
 import type { IDispatchedEvent, IWebhookHeaders } from './dispatcher.types';
 import { redisConfig } from '@/config';
 import { targetRepository } from '@/services/mongo/target.repo';
-import { logger } from '@kyrazo/shared';
+import { logger, RedisKeys } from '@kyrazo/shared';
 import { endpointRepository } from '@/services/mongo/endpoint.repo';
 
 export enum JOB_PRIORITIES {
@@ -96,7 +96,7 @@ export class DispatcherQueue extends EventEmitter {
                         continue;
                     }
                     const target = await redisConfig.cache(
-                        `workspace:${event.workspaceId}:namespace:${event.namespaceId}:targets:${tar.targetId}`,
+                        RedisKeys.context.workspaceNamespaceTarget(event.workspaceId, event.namespaceId, tar.targetId),
                         async () => {
                             const target = await targetRepository.getTargetById(
                                 tar.targetId,
@@ -140,7 +140,7 @@ export class DispatcherQueue extends EventEmitter {
                         continue;
                     }
                     const endpoint = await redisConfig.cache(
-                        `workspace:${event.workspaceId}:namespace:${event.namespaceId}:endpoint:${tar.targetId}`,
+                        RedisKeys.context.workspaceNamespaceEndpoint(event.workspaceId, event.namespaceId, tar.targetId),
                         async () => {
                             const target = await endpointRepository.getEndpointById(
                                 tar.targetId,

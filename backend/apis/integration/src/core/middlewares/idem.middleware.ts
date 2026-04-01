@@ -1,7 +1,7 @@
 import type { Next } from 'hono';
 import { redisConfig } from '@/configs';
 import type { AppContext } from './auth.middleware';
-import type { IErrorResponse } from '@kyrazo/shared';
+import { type IErrorResponse, RedisKeys } from '@kyrazo/shared';
 
 export const idempotencyMiddleware = async (c: AppContext, next: Next) => {
     const key = c.req.header('Idempotency-Key');
@@ -21,7 +21,7 @@ export const idempotencyMiddleware = async (c: AppContext, next: Next) => {
         );
     }
 
-    const redisKey = `idem:${workspaceId}:${c.req.path}:${key}`;
+    const redisKey = RedisKeys.idempotency.key(workspaceId.toString(), c.req.path, key);
 
     const exists = await redisConfig.get(redisKey);
     if (exists) {

@@ -2,7 +2,7 @@ import { type Context } from 'hono';
 import { v4 as uuidv4 } from 'uuid';
 
 import { redisConfig } from '@/configs';
-import { logger, mapToObject, PerformanceTimer, snowflake } from '@kyrazo/shared';
+import { logger, mapToObject, PerformanceTimer, snowflake, RedisKeys } from '@kyrazo/shared';
 import { type IErrorResponse, type IReceivedEvent, Source, unprefixId } from '@kyrazo/shared';
 import { receiveEventPublisher } from '@/producers/jobs/v1/publishers';
 import { usageProducer } from '@/core/services/usage.producer';
@@ -33,7 +33,7 @@ export class ingestController {
 
             // Look up the IngressEndpoint to get user and workspace details
             const source = await redisConfig.cache(
-                `source:ingest:${IEId}`,
+                RedisKeys.ingest.endpoint(IEId),
                 async () => {
                     return await Source.findOne({
                         ingressId: IEId,
@@ -133,7 +133,7 @@ export class ingestController {
 
             const shard = parseInt(unprefixId(workspaceIdStr)!.slice(-6), 16) % 10;
 
-            const planSlug = await redisConfig.get(`workspace:${unprefixId(workspaceIdStr)}`);
+            const planSlug = await redisConfig.get(RedisKeys.billing.workspacePlan(workspaceIdStr));
 
             // Create the received event data
             const receivedEventData: IReceivedEvent & {

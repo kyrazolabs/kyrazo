@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import { redisConfig } from '@/config';
-import { Target, Endpoint, logger, secretCrypto, unprefixId } from '@kyrazo/shared';
+import { Target, Endpoint, logger, secretCrypto, unprefixId, RedisKeys } from '@kyrazo/shared';
 import type { SignaturePayload, SignatureResult } from './dispatcher.types';
 
 export class DispatcherSignature {
@@ -33,7 +33,7 @@ export class DispatcherSignature {
 
         if (type === 'endpoint') {
             entity = await redisConfig.cache(
-                `${type}:${targetId}`,
+                RedisKeys.context.endpoint(targetId),
                 async () => {
                     return await Endpoint.findOne({
                         _id: unprefixId(targetId),
@@ -45,7 +45,7 @@ export class DispatcherSignature {
             );
         } else {
             entity = await redisConfig.cache(
-                `${type}:${targetId}`,
+                RedisKeys.context.target(targetId),
                 async () => {
                     return await Target.findOne({
                         _id: unprefixId(targetId),

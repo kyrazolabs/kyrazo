@@ -2,14 +2,11 @@ import { OTP } from 'otplib';
 import * as QRCode from 'qrcode';
 import { redisConfig } from '@/configs/redis';
 import { config } from '@/configs/app';
-import { logger, unprefixId } from '@kyrazo/shared';
+import { logger, unprefixId, RedisKeys } from '@kyrazo/shared';
 import { mailQueues, mailQueuesName } from '@/producers/jobs/v1/publishers';
 
 export class OTPService {
     private static readonly totpInstance = new OTP();
-    private static readonly REDIS_PREFIX = 'otp:';
-    private static readonly TEMP_2FA_PREFIX = 'otp:temp_2fa:';
-    private static readonly RECENT_VERIFIED_PREFIX = 'otp:verified:';
 
     /**
      * Generate a TOTP secret and QR code for a user
@@ -45,7 +42,7 @@ export class OTPService {
      */
     static async generateTemp2FAToken(userId: string): Promise<string> {
         const tempToken = crypto.randomUUID();
-        const key = `${this.TEMP_2FA_PREFIX}${tempToken}`;
+        const key = RedisKeys.auth.otpTemp2fa(tempToken);
         // Store for 5 minutes
         await redisConfig.set(key, unprefixId(userId)!, 300);
         return tempToken;
@@ -55,7 +52,7 @@ export class OTPService {
      * Get userId from temporary 2FA token
      */
     static async getUserIdFromTempToken(tempToken: string): Promise<string | null> {
-        const key = `${this.TEMP_2FA_PREFIX}${tempToken}`;
+        const key = RedisKeys.auth.otpTemp2fa(tempToken);
         return await redisConfig.get(key);
     }
 
@@ -63,7 +60,7 @@ export class OTPService {
      * Invalidate temporary 2FA token
      */
     static async invalidateTempToken(tempToken: string): Promise<void> {
-        const key = `${this.TEMP_2FA_PREFIX}${tempToken}`;
+        const key = RedisKeys.auth.otpTemp2fa(tempToken);
         await redisConfig.del(key);
     }
 
@@ -76,7 +73,7 @@ export class OTPService {
         action: string
     ): Promise<string> {
         const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6 digit OTP
-        const key = `${this.REDIS_PREFIX}${action}:${unprefixId(userId)}`;
+        const key = RedisKeys.auth.otpEmail(action, userId);
 
         // Store for 10 minutes
         await redisConfig.set(key, otp, 600);
@@ -103,7 +100,7 @@ export class OTPService {
      * Verify an Email OTP
      */
     static async verifyEmailOTP(userId: string, action: string, otp: string): Promise<boolean> {
-        const key = `${this.REDIS_PREFIX}${action}:${unprefixId(userId)}`;
+        const key = RedisKeys.auth.otpEmail(action, userId);
         const storedOtp = await redisConfig.get(key);
 
         if (storedOtp === otp) {
@@ -117,7 +114,7 @@ export class OTPService {
      * Mark an action as recently verified
      */
     static async markActionAsVerified(userId: string, action: string): Promise<void> {
-        const key = `${this.RECENT_VERIFIED_PREFIX}${action}:${unprefixId(userId)}`;
+        const key = RedisKeys.auth.otpVerified(action, userId);
         // Valid for 15 minutes
         await redisConfig.set(key, 'true', 900);
     }
@@ -126,7 +123,7 @@ export class OTPService {
      * Check if an action was recently verified
      */
     static async isActionRecentlyVerified(userId: string, action: string): Promise<boolean> {
-        const key = `${this.RECENT_VERIFIED_PREFIX}${action}:${unprefixId(userId)}`;
+        const key = RedisKeys.auth.otpVerified(action, userId);
         const verified = await redisConfig.get(key);
         return verified === 'true';
     }

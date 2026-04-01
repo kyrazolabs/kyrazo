@@ -1,9 +1,10 @@
 import Stripe from 'stripe';
 import { Types } from 'mongoose';
 import { stripe, stripeConfig } from '@/configs/stripe';
+import { redisConfig } from '@/configs';
 import { paymentRepository } from './payment.repo';
 import { subscriptionService } from '@/modules/billing/subscriptions/subscription.service';
-import { Invoice, logger, unprefixId } from '@kyrazo/shared';
+import { Invoice, logger, unprefixId, RedisKeys } from '@kyrazo/shared';
 import { subscriptionRepository } from '@/modules/billing/subscriptions/subscription.repo';
 import { planRepository } from '@/modules/billing/plans/plan.repo';
 import { snapshot } from '@/core/utils/transformers';
@@ -250,17 +251,30 @@ export class PaymentService {
     }
 
     async onSubscriptionDeleted(subscription: Stripe.Subscription) {
+        // Update local status
         await subscriptionRepository.updateByStripeId(subscription.id, {
             status: 'canceled',
             canceledAt: new Date(),
         });
 
-        // Revert to free plan
-        if (subscription.metadata.workspaceId && subscription.customer) {
-            await subscriptionService.revertToFreePlan(
-                subscription.metadata.workspaceId,
-                subscription.metadata.userId // metadata should have userId from createSubscriptionCheckout
-            );
+        let workspaceId = subscription.metadata.workspaceId;
+        let userId = subscription.metadata.userId;
+
+        // Fallback: If metadata is missing, look up in our database
+        if (!workspaceId || !userId) {
+            const localSub = await subscriptionRepository.findByStripeId(subscription.id);
+            if (localSub) {
+                workspaceId = localSub.workspaceId.toString();
+                userId = localSub.userId.toString();
+            }
+        }
+
+        // Revert to free plan if we found the workspace
+        if (workspaceId && userId) {
+            await subscriptionService.revertToFreePlan(workspaceId, userId);
+            logger.info(`Reverted workspace ${workspaceId} to free plan after Stripe deletion`);
+        } else {
+            logger.warn(`Could not revert to free plan: Missing workspace/user for sub ${subscription.id}`);
         }
     }
 
@@ -302,9 +316,11 @@ export class PaymentService {
                 existing.workspaceId.toString(),
                 existing.userId.toString()
             );
+            logger.info(`Reverted workspace ${existing.workspaceId} to free plan after cancellation update`);
         }
 
         await limitService.invalidateWorkspaceLimits(existing.workspaceId.toString());
+        await redisConfig.del(RedisKeys.billing.workspacePlan(existing.workspaceId.toString()));
     }
 
     private async handleCheckoutSessionCompleted(session: Stripe.Checkout.Session): Promise<void> {

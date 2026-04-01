@@ -1,4 +1,4 @@
-import { logger, type SQLIngestEvent, Source, secretCrypto, unprefixId, prefixId } from '@kyrazo/shared';
+import { logger, type SQLIngestEvent, Source, secretCrypto, unprefixId, prefixId, RedisKeys } from '@kyrazo/shared';
 import { ProcessingStatus } from '@/types/events/event.types';
 import { shopifyValidator } from './shopify.validator';
 import { shopifySignature } from './shopify.signature';
@@ -28,7 +28,7 @@ export class ShopifyPipeline {
             }
 
             const source = await redisConfig.cache(
-                `source:${event.sourceId}`,
+                RedisKeys.context.source(event.sourceId),
                 async () => {
                     return await Source.findById(unprefixId(event.sourceId)).populate('endpoints');
                 },

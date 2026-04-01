@@ -1,7 +1,7 @@
 import type { AppContext } from '@/core/middlewares/auth.middleware';
 import { RateLimiterRedis } from 'rate-limiter-flexible';
 import { redisConfig } from '@/configs';
-import { logger, unprefixId } from '@kyrazo/shared';
+import { logger, unprefixId, RedisKeys } from '@kyrazo/shared';
 
 /**
  * @title Rate Limiter Configuration
@@ -131,8 +131,8 @@ export function createSDKsRateLimiter(
     } = {}
 ) {
     const limiter = createTokenBucketLimiter({
-        keyPrefix: 'publish',
-        points: options.points || 20, // 30 tokens (requests per second)
+        keyPrefix: RedisKeys.limit.prefix,
+        points: options.points || 20, // 20 tokens (requests per second)
         duration: options.duration || 1, // refill every 1 second
         blockDuration: options.blockDuration || 10, // 10 seconds block
     });
@@ -143,13 +143,13 @@ export function createSDKsRateLimiter(
             // Extract API key or user ID for publish endpoints
             const apiKey = c.req.header('x-api-key') || c.req.query('api_key');
             if (apiKey) {
-                return `publish:api:${apiKey}`;
+                return RedisKeys.limit.apiRateSuffix(apiKey as string);
             }
 
             // Fallback to user ID if authenticated
             const user = (c as any).user;
             if (user && user.userId) {
-                return `publish:user:${unprefixId(user.userId)}`;
+                return RedisKeys.limit.userRateSuffix(user.userId);
             }
 
             // Fallback to IP
@@ -160,7 +160,7 @@ export function createSDKsRateLimiter(
                 'unknown';
             // @ts-ignore
             const cleanIp = (ip || 'unknown').split(',')[0].trim();
-            return `publish:ip:${cleanIp}`;
+            return RedisKeys.limit.ipRateSuffix(cleanIp);
         });
 
     return createRateLimitMiddleware(

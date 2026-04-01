@@ -21,8 +21,9 @@ export class UsageProducer {
         count: number = 1
     ): Promise<void> {
         const usageInfo = await this.getUsageInfo(workspaceId);
-        if (!usageInfo) {
-            logger.warn(`Could not find usage info for workspace ${workspaceId}`);
+        if (!usageInfo || !usageInfo.stripeMeterEventName) {
+            // Log for debugging but don't warn for every event if it's expected (e.g. free plan without metering)
+            logger.debug(`No metering info for workspace ${workspaceId}, skipping Stripe usage tracking`);
             return;
         }
 
@@ -78,6 +79,13 @@ export class UsageProducer {
                 await redisConfig.set(cacheKey, JSON.stringify(info), 3600);
                 return info;
             }
+
+            // Fallback for free plans or plans without metering
+            return {
+                subscriptionId: subscription ? (subscription._id as any).toString() : 'free',
+                stripeCustomerId: customer ? customer.stripeCustomerId : 'none',
+                stripeMeterEventName: '',
+            };
         } catch (error: any) {
             logger.error('Error fetching usage info for tracking', error);
         }

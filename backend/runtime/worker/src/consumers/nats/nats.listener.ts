@@ -175,9 +175,13 @@ export class WorkerConsumer {
 
         const subscription = await SubscriptionService.getSubscription(workspaceId);
         if (!subscription) {
-            logger.warn(`Subscription ${workspaceId} not found`);
+            logger.warn(`Subscription for workspace ${workspaceId} not found and no default available`);
             await msg.term();
             return;
+        }
+
+        if (subscription.planSnapshot.slug === 'free') {
+            logger.debug(`Processing event for workspace ${workspaceId} on free plan fallback`);
         }
 
         try {
@@ -217,12 +221,6 @@ export class WorkerConsumer {
                 return;
             }
 
-            // Get subscription
-            const subscription = await SubscriptionService.getSubscription(workspaceId);
-            if (!subscription) {
-                logger.warn(`Subscription ${workspaceId} not found`);
-                return;
-            }
 
             // Route based on subject pattern instead of webhookType
             logger.info(`Subject: ${msg.subject}`);
