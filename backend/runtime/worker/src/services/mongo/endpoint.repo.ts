@@ -1,4 +1,4 @@
-import { Endpoint, type IEndpoint } from '@kyrazo/shared';
+import { Endpoint, unprefixId, type IEndpoint } from '@kyrazo/shared';
 
 export class EndpointRepository {
     async getEndpointsByWorkspaceIdAndNamespaceIdAndEndpointIds(
@@ -7,9 +7,9 @@ export class EndpointRepository {
         endpointIds: string[]
     ): Promise<IEndpoint[]> {
         return await Endpoint.findActiveByWorkspaceAndNamespaceAndIds(
-            workspaceId,
-            namespaceId,
-            endpointIds
+            unprefixId(workspaceId)!,
+            unprefixId(namespaceId)!,
+            endpointIds.map(id => unprefixId(id)).filter((id): id is string => !!id)
         );
     }
 
@@ -19,9 +19,9 @@ export class EndpointRepository {
         namespaceId: string
     ): Promise<IEndpoint | null> {
         return await Endpoint.findActiveByWorkspaceAndNamespaceAndId(
-            workspaceId,
-            namespaceId,
-            endpointId
+            unprefixId(workspaceId)!,
+            unprefixId(namespaceId)!,
+            unprefixId(endpointId)!
         );
     }
 }

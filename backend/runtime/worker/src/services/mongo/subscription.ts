@@ -1,6 +1,6 @@
 import { redisConfig } from "@/config";
 import type { ISubscription } from "@kyrazo/shared";
-import { Subscription, DEFAULT_FREE_SUBSCRIPTION, RedisKeys } from "@kyrazo/shared";
+import { Subscription, DEFAULT_FREE_SUBSCRIPTION, RedisKeys, unprefixId } from "@kyrazo/shared";
 
 export class SubscriptionService {
     static async getSubscription(
@@ -10,7 +10,7 @@ export class SubscriptionService {
         const subscription = await redisConfig.cache(
             RedisKeys.billing.subscription(workspaceId),
             async () => {
-                const sub = await Subscription.findActiveByWorkspace(workspaceId);
+                const sub = await Subscription.findActiveByWorkspace(unprefixId(workspaceId)!);
                 return sub || DEFAULT_FREE_SUBSCRIPTION;
             },
             60 * 60 * 24,

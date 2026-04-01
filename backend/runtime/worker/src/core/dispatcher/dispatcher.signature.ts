@@ -32,29 +32,37 @@ export class DispatcherSignature {
         logger.info(`Sign Type: ${type}`);
 
         if (type === 'endpoint') {
-            entity = await redisConfig.cache(
-                RedisKeys.context.endpoint(targetId),
-                async () => {
-                    return await Endpoint.findOne({
-                        _id: unprefixId(targetId),
-                        workspaceId,
-                        namespaceId,
-                    }).select('+secrets');
-                },
-                60 * 60 * 24
-            );
+            const cacheKey = RedisKeys.context.endpoint(targetId);
+            const cached = await redisConfig.get(cacheKey);
+            entity = cached ? JSON.parse(cached) : null;
+
+            if (!entity) {
+                entity = await Endpoint.findOne({
+                    _id: unprefixId(targetId),
+                    workspaceId: unprefixId(workspaceId),
+                    namespaceId: unprefixId(namespaceId),
+                }).select('+secrets').lean();
+                
+                if (entity) {
+                    await redisConfig.set(cacheKey, JSON.stringify(entity), 60 * 60 * 24);
+                }
+            }
         } else {
-            entity = await redisConfig.cache(
-                RedisKeys.context.target(targetId),
-                async () => {
-                    return await Target.findOne({
-                        _id: unprefixId(targetId),
-                        workspaceId,
-                        namespaceId,
-                    }).select('+secrets');
-                },
-                60 * 60 * 24
-            );
+            const cacheKey = RedisKeys.context.target(targetId);
+            const cached = await redisConfig.get(cacheKey);
+            entity = cached ? JSON.parse(cached) : null;
+
+            if (!entity) {
+                entity = await Target.findOne({
+                    _id: unprefixId(targetId),
+                    workspaceId: unprefixId(workspaceId),
+                    namespaceId: unprefixId(namespaceId),
+                }).select('+secrets').lean();
+                
+                if (entity) {
+                    await redisConfig.set(cacheKey, JSON.stringify(entity), 60 * 60 * 24);
+                }
+            }
         }
 
         if (!entity) {
