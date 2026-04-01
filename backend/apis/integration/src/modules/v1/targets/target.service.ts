@@ -36,7 +36,7 @@ export class TargetService {
             const created = await targetRepository.create(data);
             if (created) {
                 await redisConfig.del(RedisKeys.context.workspaceNamespaceTargets(workspaceId.toString(), namespaceId.toString()));
-                await redisConfig.del(RedisKeys.context.workspaceNamespaceTarget(workspaceId.toString(), namespaceId.toString(), created.id || created._id));
+                await redisConfig.del(RedisKeys.context.workspaceNamespaceTarget(workspaceId.toString(), namespaceId.toString(), (created.id || created._id).toString()));
             }
             return created;
         } catch (error: any) {
