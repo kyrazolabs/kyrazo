@@ -1,4 +1,4 @@
-import { Target, type ITarget } from '@kyrazo/shared';
+import { Target, unprefixId, type ITarget } from '@kyrazo/shared';
 
 export class TargetRepository {
     async getTargetsByWorkspaceIdAndNamespaceIdAndTargetIds(
@@ -19,9 +19,9 @@ export class TargetRepository {
         namespaceId: string
     ): Promise<ITarget | null> {
         return await Target.findActiveByWorkspaceAndNamespaceAndTargetId(
-            workspaceId,
-            namespaceId,
-            targetId
+            unprefixId(workspaceId)!,
+            unprefixId(namespaceId)!,
+            unprefixId(targetId)!
         );
     }
 }
