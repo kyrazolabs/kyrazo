@@ -33,7 +33,9 @@ export class EventController {
         const normalizedInputTargets = targets.map(id => unprefixId(id)!);
 
         // 1. Try to get it from the cache
-        let cachedTargets: any[] = await redisConfig.cache(cacheKey, async () => [], 100);
+        const cachedData = await redisConfig.get(cacheKey);
+        let cachedTargets: any[] = cachedData ? JSON.parse(cachedData) : [];
+        const isCacheMiss = !cachedData;
 
         // 2. Split: Found in cache / Missing
         const cachedMap = new Map(
@@ -44,15 +46,17 @@ export class EventController {
         );
         const missingFromCache = normalizedInputTargets.filter(id => !cachedMap.has(id));
 
-        // 3. Retrieve missing information from the database
-        let fetchedTargets: any[] = [];
-        if (missingFromCache.length > 0) {
-            fetchedTargets =
-                await targetRepository.getTargetsByWorkspaceIdAndNamespaceIdAndTargetIds(
-                    workspaceId,
-                    namespaceId,
-                    missingFromCache
-                );
+        // 3. Retrieve missing information from the database or update cache if stale
+        if (isCacheMiss || missingFromCache.length > 0) {
+            let fetchedTargets: any[] = [];
+            if (missingFromCache.length > 0) {
+                fetchedTargets =
+                    await targetRepository.getTargetsByWorkspaceIdAndNamespaceIdAndTargetIds(
+                        workspaceId,
+                        namespaceId,
+                        missingFromCache
+                    );
+            }
 
             // Merge cache with retrieved data and update cache
             const allTargets = [
@@ -63,11 +67,7 @@ export class EventController {
                 }),
             ];
 
-            await redisConfig.cache(
-                cacheKey,
-                async () => allTargets,
-                60 * 60 * 10 // Cache for 10h
-            );
+            await redisConfig.set(cacheKey, JSON.stringify(allTargets), 60 * 60 * 10);
 
             cachedTargets = allTargets;
         }
