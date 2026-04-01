@@ -1,4 +1,5 @@
 from .client import Kyrazo
+from .webhook import Webhook
 from .core.exceptions import (
     KyrazoError,
     AuthenticationError,
@@ -12,8 +13,11 @@ from .core.exceptions import (
     NetworkError,
 )
 
+__version__ = "1.3.0"
+
 __all__ = [
     "Kyrazo",
+    "Webhook",
     "KyrazoError",
     "AuthenticationError",
     "ForbiddenError",
@@ -24,4 +28,5 @@ __all__ = [
     "ConflictError",
     "ServerError",
     "NetworkError",
+    "__version__",
 ]

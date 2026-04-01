@@ -20,6 +20,7 @@
 
 // Main client
 export { Kyrazo } from "./client";
+export { Webhook, type WebhookHeaders } from "./webhook";
 
 // Configuration
 export { type KyrazoConfig, DEFAULT_CONFIG } from "./config";
