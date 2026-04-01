@@ -202,22 +202,22 @@ export const routes: Routes = [
             },
         ],
     },
-    {
-        path: 'changelogs',
-        loadComponent: () =>
-            import('@pages/changelogs/changelogs.page').then(
-                (p) => p.ChangelogsPage,
-            ),
-        data: {
-            title: 'Changelogs & Updates',
-            meta: {
-                description:
-                    'Stay up to date with the latest features, improvements, and bug fixes in Kyrazo. Track our evolution as we build the best platform for SaaS engineering.',
-                keywords:
-                    'Kyrazo Changelog, SaaS Updates, Product News, Engineering Blog',
-            },
-        },
-    },
+    // {
+    //     path: 'changelogs',
+    //     loadComponent: () =>
+    //         import('@pages/changelogs/changelogs.page').then(
+    //             (p) => p.ChangelogsPage,
+    //         ),
+    //     data: {
+    //         title: 'Changelogs & Updates',
+    //         meta: {
+    //             description:
+    //                 'Stay up to date with the latest features, improvements, and bug fixes in Kyrazo. Track our evolution as we build the best platform for SaaS engineering.',
+    //             keywords:
+    //                 'Kyrazo Changelog, SaaS Updates, Product News, Engineering Blog',
+    //         },
+    //     },
+    // },
     {
         path: 'not-found',
         loadComponent: () =>
