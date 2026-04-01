@@ -30,25 +30,112 @@ A Target is where Kyrazo will deliver your events.
 
 ## 3. Dispatch your first event
 
-Now you're ready to send data. Use the following `curl` command (replace the placeholders with your actual values):
+Now you're ready to send data. Use one of our official SDKs or a simple `curl` command to dispatch your first event.
 
-```bash
-curl -X POST "https://api.kyrazo.com/v1/namespaces/{NAMESPACE_ID}/publish" \
-     -H "x-api-key: {YOUR_API_KEY}" \
-     -H "Content-Type: application/json" \
-     -d '{
-       "eventType": "user.signup",
-       "data": {
-         "userId": "123",
-         "email": "user@example.com"
-       },
-       "targets": [
-         { "targetId": "{YOUR_TARGET_ID}" }
-       ]
-     }'
-```
+<Tabs>
+  <Tab title="TypeScript">
+    ```typescript
+    import { Kyrazo } from "@kyrazo/sdk";
 
-## 4. Verify Delivery
+    const kyrazo = new Kyrazo({ apiKey: "{YOUR_API_KEY}" });
+
+    await kyrazo.events.single("{NAMESPACE_ID}", {
+      eventType: "user.signup",
+      payload: { userId: "123", email: "user@example.com" },
+      targets: [{ targetId: "{YOUR_TARGET_ID}" }]
+    });
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    from kyrazo import Kyrazo
+
+    client = Kyrazo(api_key="{YOUR_API_KEY}")
+
+    client.events.publish(
+        namespace_id="{NAMESPACE_ID}",
+        body={
+            "eventType": "user.signup",
+            "payload": {"userId": "123", "email": "user@example.com"},
+            "targets": [{"targetId": "{YOUR_TARGET_ID}"}]
+        }
+    )
+    ```
+  </Tab>
+  <Tab title="cURL">
+    ```bash
+    curl -X POST "https://api.kyrazo.com/v1/namespaces/{NAMESPACE_ID}/publish" \
+         -H "x-api-key: {YOUR_API_KEY}" \
+         -H "Content-Type: application/json" \
+         -d '{
+           "eventType": "user.signup",
+           "data": {
+             "userId": "123",
+             "email": "user@example.com"
+           },
+           "targets": [
+             { "targetId": "{YOUR_TARGET_ID}" }
+           ]
+         }'
+    ```
+  </Tab>
+</Tabs>
+
+## 4. Receive and verify webhooks
+
+When Kyrazo delivers an event to your target, you should verify its signature to ensure it's authentic.
+
+<Tabs>
+  <Tab title="Node.js (Express)">
+    ```javascript
+    const { Webhook } = require("@kyrazo/sdk");
+    const express = require("express");
+    const app = express();
+
+    // Kyrazo sends the raw request body for signature verification
+    app.post("/webhook", express.text({ type: "application/json" }), (req, res) => {
+      try {
+        Webhook.verify(
+          req.body, 
+          req.headers, 
+          "YOUR_TARGET_SECRET"
+        );
+        console.log("Verified webhook:", JSON.parse(req.body));
+        res.status(200).send("OK");
+      } catch (err) {
+        res.status(401).send("Unauthorized");
+      }
+    });
+    ```
+  </Tab>
+  <Tab title="Python (Flask)">
+    ```python
+    from flask import Flask, request, abort
+    from kyrazo import Webhook, ValidationError
+
+    app = Flask(__name__)
+
+    @app.route("/webhook", methods=["POST"])
+    def webhook():
+        payload = request.get_data(as_text=True)
+        headers = dict(request.headers)
+        
+        try:
+            Webhook.verify(payload, headers, "YOUR_TARGET_SECRET")
+            return "OK", 200
+        except ValidationError:
+            abort(401)
+    ```
+  </Tab>
+  <Tab title="Go">
+    ```go
+    // See the Signature Verification guide for a full Go implementation
+    // using crypto/hmac and crypto/sha256.
+    ```
+  </Tab>
+</Tabs>
+
+## 5. Verify Delivery
 
 Once you send the request, you can verify the result:
 
@@ -63,6 +150,9 @@ Once you send the request, you can verify the result:
 Now that you've sent your first event, explore more advanced features:
 
 <CardGroup cols={2}>
+  <Card title="SDKs" icon="rocket" href="/sdks/typescript">
+    Get started quickly with our official client libraries.
+  </Card>
   <Card title="Key Concepts" icon="book-open" href="/essentials/concepts">
     Learn more about Dispatch, Events, and Targets.
   </Card>

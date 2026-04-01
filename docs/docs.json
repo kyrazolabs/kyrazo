@@ -25,6 +25,12 @@
             ]
           },
           {
+            "group": "SDKs",
+            "pages": [
+              "sdks/typescript"
+            ]
+          },
+          {
             "group": "Dispatch",
             "pages": [
               "essentials/dispatch-overview",
