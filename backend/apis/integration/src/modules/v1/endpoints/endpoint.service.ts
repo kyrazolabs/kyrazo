@@ -35,7 +35,7 @@ export class EndpointService {
             const created = await endpointRepository.create(data);
             if (created) {
                 await redisConfig.del(RedisKeys.context.workspaceNamespaceEndpoints(workspaceId.toString(), namespaceId.toString()));
-                await redisConfig.del(RedisKeys.context.workspaceNamespaceEndpoint(workspaceId.toString(), namespaceId.toString(), created.id || created._id));
+                await redisConfig.del(RedisKeys.context.workspaceNamespaceEndpoint(workspaceId.toString(), namespaceId.toString(), (created.id || created._id).toString()));
             }
             return created;
         } catch (error: any) {
