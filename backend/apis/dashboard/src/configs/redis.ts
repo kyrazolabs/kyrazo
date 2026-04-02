@@ -364,11 +364,21 @@ export class RedisConfig {
     public async cache<T>(key: string, cb: () => Promise<T>, ttl?: number): Promise<T> {
         const client = this.getClient();
         const value = await client.get(key);
-        if (value != null) {
-            return JSON.parse(value) as T;
+        
+        if (value !== null && value !== 'null') {
+            try {
+                return JSON.parse(value) as T;
+            } catch (e) {
+                // If parsing fails, ignore and fetch fresh data
+            }
         }
+        
         const freshData = await cb();
-        await client.setex(key, ttl ?? 3600, JSON.stringify(freshData));
+        
+        if (freshData !== null && freshData !== undefined) {
+            await client.setex(key, ttl ?? 3600, JSON.stringify(freshData));
+        }
+        
         return freshData;
     }
 
