@@ -1,184 +1,86 @@
-# JavaScript SDK Development Guide
+# Contributing to Kyrazo JavaScript SDK
 
-## 📁 Project Structure
+Welcome! This document provides an overview of the architecture, project structure, and guidelines for contributing to the Kyrazo JavaScript SDK.
 
+## Architecture
+
+The SDK is designed with a layered, modular architecture to ensure testability and robustness across different JavaScript environments (Node.js, Browsers, Edge).
+
+### High-Level Design
+
+```mermaid
+graph TD
+    UserCode[User Application] --> Client[Kyrazo Client]
+    Client --> Events[Events Module]
+    Client --> Targets[Targets Module]
+    Client --> Endpoints[Endpoints Module]
+    Client --> Sources[Sources Service]
+    
+    Events --> HttpClient[Internal HttpClient]
+    Targets --> HttpClient
+    Endpoints --> HttpClient
+    Sources --> HttpClient
+    
+    HttpClient --> ErrorMapping[Error Transformation]
+    HttpClient --> Retry[Exponential Backoff]
+    HttpClient --> Fetch[Fetch API API API]
 ```
+
+### Components
+
+1.  **Kyrazo Client (`src/client.ts`)**: The main entry point. It orchestrates the initialization of service modules and the internal HTTP client.
+2.  **Internal HttpClient (`src/utils/http.ts`)**: A low-level wrapper around the `fetch` API. This is the "brain" of the SDK, handling:
+    - **Retries**: Automatic exponential backoff on 5xx and 429 status codes.
+    - **Idempotency**: Automatic `Idempotency-Key` generation.
+    - **Global Headers**: Injection of `User-Agent` and `x-api-key`.
+3.  **Service Modules**: Domain-specific logic (`src/modules/`) that translates method calls into HTTP requests.
+4.  **Error System (`src/errors.ts`)**: A rich hierarchy of errors that map to Kyrazo API codes.
+
+## Project Structure
+
+```text
 sdk/javascript/
-├── package.json          # Dependencies and scripts
-├── tsconfig.json         # TypeScript configuration
-├── README.md             # User-facing documentation
-├── CONTRIBUTING.md       # This file
 ├── src/
 │   ├── index.ts          # Main entry - exports everything
 │   ├── client.ts         # Kyrazo client class
-│   ├── core/
-│   │   ├── config.ts     # Configuration types
-│   │   ├── errors.ts     # Error classes
-│   │   └── version.ts    # SDK version
-│   ├── types/
-│   │   ├── index.ts      # Type re-exports
-│   │   ├── common.ts     # Shared types (EventTarget, etc.)
-│   │   ├── events.ts     # Event types
-│   │   ├── sources.ts    # Source types
-│   │   ├── endpoints.ts  # Endpoint types
-│   │   └── targets.ts    # Target types
-│   ├── utils/
-│   │   ├── http.ts       # HTTP client with retries
-│   │   ├── validation.ts # Input validation
-│   │   └── helpers.ts    # Utility functions
-│   └── modules/
-│       ├── events/       # Events module (Publishing)
-│       │   ├── index.ts
-│       │   ├── types.ts
-│       │   ├── publish-event.ts
-│       │   └── publish-events.ts
-│       ├── sources/      # Sources module (CRUD)
-│       ├── endpoints/    # Endpoints module (CRUD)
-│       └── targets/      # Targets module (CRUD)
-└── dist/                 # Built output (gitignored)
+│   ├── modules/          # Service modules (Events, Targets, etc.)
+│   ├── types/            # TypeScript definitions
+│   ├── utils/            # HTTP client and helpers
+│   └── errors.ts         # Error classes and mapping
+├── test/                 # Vitest test suite
+├── package.json          # Dependencies and scripts
+└── tsconfig.json         # TypeScript configuration
 ```
 
-## 🚀 Quick Start
+## Development Workflow
 
-```bash
-# Install dependencies
-npm install
+### Prerequisites
+- Node.js 18+
+- `npm` or `pnpm`
 
-# Build the SDK
-npm run build
-
-# Type check without building
-npm run typecheck
-
-# Watch mode for development
-npm run dev
-
-# Run linting
-npm run lint
-```
-
-## 🔧 How It Works
-
-### Client Architecture
-
-The SDK uses a modular functional factory pattern.
-
-```
-Kyrazo (client.ts)
-    │
-    ├── config (KyrazoConfig)
-    │       └── apiKey, baseURL, timeout, maxRetries
-    │
-    ├── _httpClient (HttpClient)
-    │       └── Handles all HTTP requests with retry logic
-    │
-    ├── events (EventsModule)
-    │       ├── single(namespaceId, payload) → PublishEventResponse
-    │       └── batch(namespaceId, events[]) → BatchPublishEventResponse[]
-    │
-    ├── sources (SourcesModule)
-    │       └── list, get, create, update, delete
-    │
-    ├── endpoints (EndpointsModule)
-    │       └── list, get, create, update, delete
-    │
-    └── targets (TargetsModule)
-            └── list, get, create, update, delete
-```
-
-### Request Flow
-
-1. User calls `kyrazo.events.single(namespaceId, payload)`
-2. Factory function creates the request context
-3. Validation runs on `namespaceId` and `payload`
-4. `HttpClient.post()` sends request with:
-   - `x-api-key` header
-   - JSON body
-   - Retry logic on failures
-5. Response is parsed and returned
-6. Errors are mapped to specific error classes (e.g. `RateLimitError` with retry headers)
-
-### Error Handling
-
-All API errors extend `KyrazoError`:
-
-| Error Class           | HTTP Code | When                                      |
-| --------------------- | --------- | ----------------------------------------- |
-| `AuthenticationError` | 401       | Invalid API key                           |
-| `ValidationError`     | 400       | Invalid payload                           |
-| `LimitExceededError`  | 403       | Monthly limit hit                         |
-| `RateLimitError`      | 429       | Too many requests (includes `retryAfter`) |
-| `ServerError`         | 500       | Backend error                             |
-| `NetworkError`        | -         | Connection issues                         |
-
-## 🧪 Testing
-
-### Run Tests
+### Testing
+We maintain a high bar for testing. All logic in `HttpClient` and the service modules must be covered by unit tests.
 
 ```bash
 # Run all tests
 npm test
 
-# Run with coverage
+# Run tests with coverage
 npm run test:coverage
-
-# Watch mode
-npm run test:watch
 ```
 
-### Manual Testing
+### Code Style
+- Follow standard JavaScript/TypeScript conventions.
+- Use the functional factory pattern for service modules.
+- Ensure all services support `AbortSignal` for request cancellation.
 
-```typescript
-import { Kyrazo } from "./src";
+## Pull Request Process
 
-const client = new Kyrazo({
-  apiKey: "your-api-key",
-  baseURL: "http://localhost:4000",
-});
+1.  **Open an Issue**: Discuss the proposed change before implementing it.
+2.  **Add Tests**: Every fix or feature must include unit tests.
+3.  **Documentation**: Update the `README.md` if the API surface changes.
+4.  **Verify**: Ensure `npm run build` and `npm run typecheck` pass.
 
-// Test single event
-const response = await client.events.single("namespace-id", {
-  webhookId: "68c674dd3b96f77d9426a93b",
-  eventType: "user.created",
-  payload: { userId: "u_123" },
-  targets: [{ targetUrl: "https://webhook.site/xxx" }],
-});
-console.log("Response:", response);
-```
+## License
 
-## 📝 Adding New Features
-
-### Adding a New Module
-
-1. Create folder: `src/modules/newmodule/`
-2. Create types: `src/types/newmodule.ts`
-3. Create factory: `src/modules/newmodule/index.ts` (export `createNewModule` and `NewModule` interface)
-4. Export from `src/index.ts`
-5. Add to client in `src/client.ts`
-
-### Adding a New Method
-
-1. Create file: `src/modules/events/new-method.ts`
-2. Export from `src/modules/events/index.ts`
-3. Add to `EventsModule` interface
-
-## 🔑 Key Files
-
-| File                                   | Purpose                 |
-| -------------------------------------- | ----------------------- |
-| `src/index.ts`                         | Main entry, all exports |
-| `src/client.ts`                        | `Kyrazo` client class   |
-| `src/utils/http.ts`                    | HTTP client             |
-| `src/errors.ts`                        | Error classes           |
-| `src/modules/events/publish-event.ts`  | `single()` method       |
-| `src/modules/events/publish-events.ts` | `batch()` method        |
-
-## 🛠️ Scripts Reference
-
-| Script      | Command                                            | Description      |
-| ----------- | -------------------------------------------------- | ---------------- |
-| `build`     | `tsup src/index.ts --format cjs,esm --dts --clean` | Production build |
-| `dev`       | `tsup src/index.ts --format cjs,esm --dts --watch` | Watch mode       |
-| `typecheck` | `tsc --noEmit`                                     | Type checking    |
-| `lint`      | `eslint src --ext .ts`                             | Linting          |
-| `test`      | `vitest`                                           | Run tests        |
+By contributing, you agree that your contributions will be licensed under the MIT License.

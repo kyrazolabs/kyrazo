@@ -22,7 +22,8 @@ def test_handle_response_401_authentication_error():
     )
     
     with pytest.raises(AuthenticationError) as excinfo:
-        client._handle_response(response)
+        error = client._map_error(response)
+        raise error
     assert excinfo.value.code == "INVALID_TOKEN"
 
 def test_handle_response_403_forbidden_error():
@@ -34,7 +35,8 @@ def test_handle_response_403_forbidden_error():
     )
     
     with pytest.raises(ForbiddenError) as excinfo:
-        client._handle_response(response)
+        error = client._map_error(response)
+        raise error
     assert excinfo.value.code == "INSUFFICIENT_PERMISSIONS"
 
 def test_handle_response_403_limit_exceeded_error():
@@ -46,7 +48,8 @@ def test_handle_response_403_limit_exceeded_error():
     )
     
     with pytest.raises(LimitExceededError) as excinfo:
-        client._handle_response(response)
+        error = client._map_error(response)
+        raise error
     assert excinfo.value.code == "LIMIT_EXCEEDED"
 
 def test_handle_response_429_rate_limit_error():
@@ -59,7 +62,8 @@ def test_handle_response_429_rate_limit_error():
     )
     
     with pytest.raises(RateLimitError) as excinfo:
-        client._handle_response(response)
+        error = client._map_error(response)
+        raise error
     assert excinfo.value.retry_after == 60
     assert excinfo.value.remaining == 0
 
@@ -72,7 +76,8 @@ def test_handle_response_400_validation_error():
     )
     
     with pytest.raises(ValidationError) as excinfo:
-        client._handle_response(response)
+        error = client._map_error(response)
+        raise error
     assert excinfo.value.details == {"field": "missing"}
 
 def test_handle_response_404_not_found_error():
@@ -84,7 +89,8 @@ def test_handle_response_404_not_found_error():
     )
     
     with pytest.raises(NotFoundError) as excinfo:
-        client._handle_response(response)
+        error = client._map_error(response)
+        raise error
     assert excinfo.value.code == "PLAN_NOT_FOUND"
 
 def test_handle_response_409_conflict_error():
@@ -96,7 +102,8 @@ def test_handle_response_409_conflict_error():
     )
     
     with pytest.raises(ConflictError) as excinfo:
-        client._handle_response(response)
+        error = client._map_error(response)
+        raise error
     assert excinfo.value.code == "IDEMPOTENCY_CONFLICT"
 
 def test_handle_response_500_server_error():
@@ -108,7 +115,8 @@ def test_handle_response_500_server_error():
     )
     
     with pytest.raises(ServerError) as excinfo:
-        client._handle_response(response)
+        error = client._map_error(response)
+        raise error
     assert excinfo.value.code == "CREATE_NAMESPACE_FAILED"
 
 def test_handle_response_typo_fallback():
@@ -120,7 +128,8 @@ def test_handle_response_typo_fallback():
     )
     
     with pytest.raises(AuthenticationError):
-        client._handle_response(response)
+        error = client._map_error(response)
+        raise error
 
 def test_handle_response_unknown_fallback():
     client = HttpClient(api_key="test")
@@ -131,5 +140,6 @@ def test_handle_response_unknown_fallback():
     )
     
     with pytest.raises(KyrazoError) as excinfo:
-        client._handle_response(response)
+        error = client._map_error(response)
+        raise error
     assert excinfo.value.code == "IM_A_TEAPOT"

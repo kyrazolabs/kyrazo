@@ -1,5 +1,6 @@
 import httpx
 import uuid
+import time
 from typing import Optional, Any, Dict, Union, List
 from .exceptions import (
     KyrazoError,
@@ -32,10 +33,9 @@ class HttpClient:
             headers={
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json",
-                "User-Agent": "kyrazo-python-sdk/1.1.0",
+                "User-Agent": "kyrazo-python-sdk/1.2.0",
             },
             timeout=timeout,
-            transport=httpx.HTTPTransport(retries=retries),
         )
 
     def _get_rate_limit_info(self, response: httpx.Response, error_data: Dict[str, Any]):
@@ -54,105 +54,84 @@ class HttpClient:
 
         return retry_after, remaining
 
-    def _handle_response(self, response: httpx.Response) -> Any:
+    def _map_error(self, response: httpx.Response) -> KyrazoError:
+        error_data = {}
         try:
-            response.raise_for_status()
-            if response.status_code == 204:
-                return None
-            return response.json()
-        except httpx.HTTPStatusError as e:
-            error_data_body = {}
-            try:
-                error_data_body = response.json()
-            except Exception:
-                pass
+            error_data = response.json().get("error", {})
+        except Exception:
+            pass
 
-            error_info = error_data_body.get("error", {})
-            message = error_info.get("message", str(e))
-            code = error_info.get("code", "UNKNOWN_ERROR")
-            details = error_info.get("details")
+        message = error_data.get("message", response.text or "An unexpected error occurred")
+        code = error_data.get("code", "UNKNOWN_ERROR")
+        rid = error_data.get("requestId") or response.headers.get("x-request-id")
+        details = error_data.get("details")
 
-            # Map by error code first (more specific)
-            
-            # 401 Unauthorized
-            if code in [
-                "UNAUTHORIZED", "UNAUTHORIZED_USER", "UNAUTHORIZED_WORKSPACE",
-                "AUTH_ERROR", "INVALID_TOKEN", "INVALID_API_KEY",
-                "MISSING_TOKEN", "API_KEY_MISSING", "UNAUTORIZED_USER"
-            ]:
-                raise AuthenticationError(message, code)
+        # Map by error code first (more specific)
+        if code in [
+            "UNAUTHORIZED", "UNAUTHORIZED_USER", "UNAUTHORIZED_WORKSPACE",
+            "AUTH_ERROR", "INVALID_TOKEN", "INVALID_API_KEY",
+            "MISSING_TOKEN", "API_KEY_MISSING", "UNAUTORIZED_USER"
+        ]:
+            return AuthenticationError(message, code, rid)
 
-            # 403 Forbidden / RBAC
-            if code in [
-                "ACCESS_DENIED", "INSUFFICIENT_PERMISSIONS", "INSUFFICIENT_KEY_ROLE",
-                "INSUFFICIENT_WORKSPACE_ROLE", "WORKSPACE_ACCESS_DENIED",
-                "NAMESPACE_ACCESS_DENIED", "IP_NOT_WHITELISTED",
-                "OTP_REQUIRED", "OWNERSHIP_REQUIRED"
-            ]:
-                raise ForbiddenError(message, code)
+        if code in [
+            "ACCESS_DENIED", "INSUFFICIENT_PERMISSIONS", "INSUFFICIENT_KEY_ROLE",
+            "INSUFFICIENT_WORKSPACE_ROLE", "WORKSPACE_ACCESS_DENIED",
+            "NAMESPACE_ACCESS_DENIED", "IP_NOT_WHITELISTED",
+            "OTP_REQUIRED", "OWNERSHIP_REQUIRED"
+        ]:
+            return ForbiddenError(message, code, rid)
 
-            # 403/429 Limits
-            if code in ["LIMIT_EXCEEDED", "PLAN_LIMIT_EXCEEDED"]:
-                retry_after, remaining = self._get_rate_limit_info(response, error_info)
-                raise LimitExceededError(message, code, retry_after, remaining)
+        if code in ["LIMIT_EXCEEDED", "PLAN_LIMIT_EXCEEDED"]:
+            retry_after, remaining = self._get_rate_limit_info(response, error_data)
+            return LimitExceededError(message, code, retry_after, remaining, rid)
 
-            if code == "RATE_LIMIT_EXCEEDED":
-                retry_after, remaining = self._get_rate_limit_info(response, error_info)
-                raise RateLimitError(message, retry_after, remaining)
+        if code == "RATE_LIMIT_EXCEEDED":
+            retry_after, remaining = self._get_rate_limit_info(response, error_data)
+            return RateLimitError(message, retry_after, remaining, rid)
 
-            # 400 Validation
-            if code in [
-                "INVALID_PAYLOAD", "BATCH_TOO_LARGE", "RATE_LIMIT_KEY_MISSING",
-                "IDS_MISSING", "PROJECT_ID_MISSING", "RESOURCE_ID_MISSING",
-                "WORKSPACE_ID_MISSING", "IDEMPOTENCY_KEY_REQUIRED", "BAD_REQUEST",
-                "INVALID_CODE", "INVALID_STATUS", "INVALID_NAMESPACE",
-                "INVALID_TEMP_TOKEN", "INVALID_CURRENT_PASSWORD", "GOOGLE_NO_EMAIL",
-                "USER_EXISTS", "ENDPOINT_ALREADY_EXISTS", "TARGET_ALREADY_EXISTS",
-                "FEATURE_NOT_AVAILABLE", "NO_VALID_TARGETS"
-            ]:
-                raise ValidationError(message, code, details)
+        if code in [
+            "INVALID_PAYLOAD", "BATCH_TOO_LARGE", "RATE_LIMIT_KEY_MISSING",
+            "IDS_MISSING", "PROJECT_ID_MISSING", "RESOURCE_ID_MISSING",
+            "WORKSPACE_ID_MISSING", "IDEMPOTENCY_KEY_REQUIRED", "BAD_REQUEST",
+            "INVALID_CODE", "INVALID_STATUS", "INVALID_NAMESPACE",
+            "INVALID_TEMP_TOKEN", "INVALID_CURRENT_PASSWORD", "GOOGLE_NO_EMAIL",
+            "USER_EXISTS", "ENDPOINT_ALREADY_EXISTS", "TARGET_ALREADY_EXISTS",
+            "FEATURE_NOT_AVAILABLE", "NO_VALID_TARGETS"
+        ]:
+            return ValidationError(message, code, details, rid)
 
-            # 404 Not Found
-            if code in [
-                "NOT_FOUND", "NAMESPACE_NOT_FOUND", "SUBSCRIPTION_NOT_FOUND",
-                "USER_NOT_FOUND", "WORKSPACE_NOT_FOUND", "WEBHOOK_NOT_FOUND",
-                "PLAN_NOT_FOUND", "SESSION_NOT_FOUND"
-            ]:
-                raise NotFoundError(message, code)
+        if code in [
+            "NOT_FOUND", "NAMESPACE_NOT_FOUND", "SUBSCRIPTION_NOT_FOUND",
+            "USER_NOT_FOUND", "WORKSPACE_NOT_FOUND", "WEBHOOK_NOT_FOUND",
+            "PLAN_NOT_FOUND", "SESSION_NOT_FOUND"
+        ]:
+            return NotFoundError(message, code, rid)
 
-            # 409 Conflict
-            if code == "IDEMPOTENCY_CONFLICT":
-                raise ConflictError(message, code)
+        if code == "IDEMPOTENCY_CONFLICT":
+            return ConflictError(message, code, rid)
 
-            # 500 Internal Server Error / Functional Failures
-            if code == "INTERNAL_ERROR" or code.endswith("_FAILED"):
-                raise ServerError(message, code)
+        if code == "INTERNAL_ERROR" or code.endswith("_FAILED"):
+            return ServerError(message, code, rid)
 
-            # Fallback to status code mapping
-            if response.status_code == 400:
-                raise ValidationError(message, code, details)
-            elif response.status_code == 401:
-                raise AuthenticationError(message, code)
-            elif response.status_code == 403:
-                # Distinguish limits vs permissions based on code if generic
-                if code in ["LIMIT_EXCEEDED", "PLAN_LIMIT_EXCEEDED"]:
-                     retry_after, remaining = self._get_rate_limit_info(response, error_info)
-                     raise LimitExceededError(message, code, retry_after, remaining)
-                raise ForbiddenError(message, code)
-            elif response.status_code == 404:
-                raise NotFoundError(message, code)
-            elif response.status_code == 409:
-                raise ConflictError(message, code)
-            elif response.status_code == 429:
-                retry_after, remaining = self._get_rate_limit_info(response, error_info)
-                raise RateLimitError(message, retry_after, remaining)
-            elif response.status_code >= 500:
-                raise ServerError(message, code)
-            else:
-                raise KyrazoError(message, code)
+        # Fallback to status code
+        if response.status_code == 400:
+            return ValidationError(message, code, details, rid)
+        if response.status_code == 401:
+            return AuthenticationError(message, code, rid)
+        if response.status_code == 403:
+            return ForbiddenError(message, code, rid)
+        if response.status_code == 404:
+            return NotFoundError(message, code, rid)
+        if response.status_code == 409:
+            return ConflictError(message, code, rid)
+        if response.status_code == 429:
+            retry_after, remaining = self._get_rate_limit_info(response, error_data)
+            return RateLimitError(message, retry_after, remaining, rid)
+        if response.status_code >= 500:
+            return ServerError(message, code, rid)
 
-        except httpx.NetworkError as e:
-            raise NetworkError(f"Network error: {str(e)}")
+        return KyrazoError(message, code, response.status_code, rid)
 
     def request(
         self,
@@ -162,21 +141,50 @@ class HttpClient:
         params: Optional[Dict[str, Any]] = None,
         headers: Optional[Dict[str, str]] = None,
     ) -> Any:
-        # Generate a unique idempotency key for every request
+        # Initial request headers
         request_headers = {"Idempotency-Key": str(uuid.uuid4())}
         if headers:
             request_headers.update(headers)
 
-        try:
-            response = self._client.request(
-                method, path, json=data, params=params, headers=request_headers
-            )
-            return self._handle_response(response)
-        except Exception as e:
-            # Re-raise if it's already a KyrazoError, otherwise wrap it
-            if isinstance(e, KyrazoError):
+        last_error = None
+        for attempt in range(self.retries + 1):
+            if attempt > 0:
+                # Exponential backoff
+                time.sleep((2 ** (attempt - 1)) * 0.1)
+
+            try:
+                response = self._client.request(
+                    method, path, json=data, params=params, headers=request_headers
+                )
+                
+                if response.status_code >= 200 and response.status_code < 300:
+                    if response.status_code == 24:
+                        return None
+                    return response.json()
+
+                # Error response - determine if we should retry
+                error = self._map_error(response)
+                
+                # Retry on 5xx or 429
+                should_retry = response.status_code >= 500 or response.status_code == 429
+                if not should_retry or attempt >= self.retries:
+                    raise error
+                
+                last_error = error
+                
+            except httpx.RequestError as e:
+                if attempt >= self.retries:
+                    raise NetworkError(f"Network error: {str(e)}")
+                last_error = e
+                continue
+            except KyrazoError as e:
+                # If we've already raised it above (non-retryable or max retries), it continues here
                 raise e
-            raise NetworkError(f"Request failed: {str(e)}")
+
+        # All retries exhausted
+        if isinstance(last_error, KyrazoError):
+            raise last_error
+        raise NetworkError(f"Request failed after retries: {str(last_error)}")
 
     def get(self, path: str, params: Optional[Dict[str, Any]] = None) -> Any:
         return self.request("GET", path, params=params)

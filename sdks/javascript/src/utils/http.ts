@@ -152,19 +152,24 @@ export class HttpClient {
       } catch (error: any) {
         lastError = error;
 
-        // Don't retry on client errors (4xx) or abort
+        // Determine if we should retry
+        const statusCode = (error as { statusCode?: number }).statusCode;
+        const isRetryableStatus =
+          statusCode !== undefined && (statusCode >= 500 || statusCode === 429);
+
+        // Don't retry on client errors (except 429) or abort
         if (
           error instanceof Error &&
           (error.name === "AbortError" ||
-            ((error as { statusCode?: number }).statusCode !== undefined &&
-              (error as { statusCode?: number }).statusCode! < 500))
+            (statusCode !== undefined && !isRetryableStatus))
         ) {
           throw error;
         }
 
         // Add exponential backoff for retries
         if (attempt < this.maxRetries) {
-          await this.delay(Math.pow(2, attempt) * 100);
+          const backoff = Math.pow(2, attempt) * 100;
+          await this.delay(backoff);
         }
       }
     }
