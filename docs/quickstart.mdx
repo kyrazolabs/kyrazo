@@ -62,6 +62,40 @@ Now you're ready to send data. Use one of our official SDKs or a simple `curl` c
     )
     ```
   </Tab>
+  <Tab title="Go">
+    ```go
+    package main
+
+    import (
+    	"context"
+    	"fmt"
+    	"log"
+
+    	"github.com/kyrazolabs/sdks/go"
+    	"github.com/kyrazolabs/sdks/go/models"
+    )
+
+    func main() {
+    	client := kyrazo.New("{YOUR_API_KEY}")
+
+    	resp, err := client.Events.Single(context.Background(), "{NAMESPACE_ID}", models.PublishEvent{
+    		EventType: "user.signup",
+    		Payload: map[string]interface{}{
+    			"userId": "123",
+    			"email":  "user@example.com",
+    		},
+    		Targets: []models.EventTarget{
+    			{TargetId: "{YOUR_TARGET_ID}"},
+    		},
+    	})
+
+    	if err != nil {
+    		log.Fatalf("failed to dispatch: %v", err)
+    	}
+    	fmt.Printf("Dispatched: %s\n", resp.EventId)
+    }
+    ```
+  </Tab>
   <Tab title="cURL">
     ```bash
     curl -X POST "https://api.kyrazo.com/v1/namespaces/{NAMESPACE_ID}/publish" \
@@ -129,8 +163,34 @@ When Kyrazo delivers an event to your target, you should verify its signature to
   </Tab>
   <Tab title="Go">
     ```go
-    // See the Signature Verification guide for a full Go implementation
-    // using crypto/hmac and crypto/sha256.
+    package main
+
+    import (
+    	"crypto/hmac"
+    	"crypto/sha256"
+    	"encoding/hex"
+    	"io"
+    	"net/http"
+    )
+
+    func main() {
+    	http.HandleFunc("/webhook", func(w http.ResponseWriter, r *http.Request) {
+    		body, _ := io.ReadAll(r.Body)
+    		signature := r.Header.Get("X-Kyrazo-Signature")
+    		secret := []byte("YOUR_TARGET_SECRET")
+
+    		mac := hmac.New(sha256.New, secret)
+    		mac.Write(body)
+    		expected := hex.EncodeToString(mac.Sum(nil))
+
+    		if hmac.Equal([]byte(signature), []byte(expected)) {
+    			w.WriteHeader(http.StatusOK)
+    		} else {
+    			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+    		}
+    	})
+    	http.ListenAndServe(":8080", nil)
+    }
     ```
   </Tab>
 </Tabs>
