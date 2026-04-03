@@ -494,7 +494,7 @@ export function createErrorFromResponse(
     case 502:
     case 503:
     case 504:
-      return new ServerError(message, rid);
+      return new ServerError(message, code as string, rid);
     default:
       return new KyrazoError(message, code, status, rid);
   }
