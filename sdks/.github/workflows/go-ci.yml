@@ -2,12 +2,12 @@ name: Go SDK CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ develop ]
     paths:
       - 'go/**'
       - '.github/workflows/go-ci.yml'
   pull_request:
-    branches: [ main, develop ]
+    branches: [ develop ]
     paths:
       - 'go/**'
 
