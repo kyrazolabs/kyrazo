@@ -137,12 +137,12 @@ export class HeaderComponent {
                             this.activeDropdown.set(null);
                         },
                     },
-                    {
-                        label: 'Changelog',
-                        icon: 'pi pi-history',
-                        routerLink: '/changelogs',
-                        command: () => this.activeDropdown.set(null),
-                    },
+                    // {
+                    //     label: 'Changelog',
+                    //     icon: 'pi pi-history',
+                    //     routerLink: '/changelogs',
+                    //     command: () => this.activeDropdown.set(null),
+                    // },
                 ],
             },
             {

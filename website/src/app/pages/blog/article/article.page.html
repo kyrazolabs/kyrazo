@@ -1,29 +1,15 @@
-<div class="container mx-auto px-4 py-8 sm:py-12 mt-20 sm:mt-24 max-w-5xl">
-  <!-- Loading State -->
-  @if (isLoading$()) {
-      <div class="flex justify-center py-20">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-  }
-
-  <!-- Error State -->
-  @if (error$()) {
-      <div class="text-center py-20">
-          <p class="text-red-500 text-xl mb-4">Failed to load article</p>
-          <a routerLink="/blog" class="text-primary hover:text-primary-emphasis font-medium">&larr; Back to Blog</a>
-      </div>
-  }
-
+<div class="container bg-transparent! mx-auto px-4 py-8 sm:py-12 mt-20 sm:mt-24 max-w-5xl">
   <!-- Article Content -->
   @if (article$(); as article) {
-      <article class="bg-surface-0 dark:bg-surface-900 rounded-2xl shadow-sm overflow-hidden">
+      <article
+          class="bg-transparent! flex flex-col gap-6 overflow-hidden">
           <!-- Cover Image -->
           <div class="w-full aspect-video sm:h-[300px] md:h-[400px] relative bg-surface-100 dark:bg-surface-800">
               @if (article.cover) {
                   <img
                        [src]="cmsService.getImageUrl(article.cover!.url)"
                        [alt]="article.cover!.alternativeText || article.title"
-                       class="w-full h-full object-cover">
+                       class="w-full h-full rounded-2xl object-cover">
               } @else {
                   <div class="w-full h-full flex items-center justify-center text-surface-400">
                      <span class="text-4xl sm:text-6xl italic opacity-30 font-serif">Kyrazo</span>
@@ -31,7 +17,7 @@
               }
           </div>
 
-          <div class="p-5 sm:p-8 md:p-12 lg:px-16">
+          <div class="bg-surface-0 dark:bg-surface-900 rounded-2xl p-5">
               <!-- Meta -->
               <div class="flex flex-wrap items-center gap-x-3 gap-y-2 sm:gap-4 text-xs sm:text-sm text-surface-500 dark:text-surface-400 mb-6 sm:mb-10">
                   <a routerLink="/blog" class="text-primary hover:text-primary-emphasis font-bold transition-colors">&larr; Blog</a>
@@ -40,8 +26,8 @@
                       <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider">
                           {{ article.category!.name }}
                       </span>
+                      <span class="hidden sm:block w-1 h-1 bg-surface-300 dark:bg-surface-600 rounded-full"></span>
                   }
-                  <span class="hidden sm:block w-1 h-1 bg-surface-300 dark:bg-surface-600 rounded-full"></span>
                   <span>{{ article.publishedAt | date:'longDate' }}</span>
               </div>
 
