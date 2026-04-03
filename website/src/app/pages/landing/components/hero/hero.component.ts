@@ -33,7 +33,7 @@ interface BlobState {
 @Component({
     selector: 'app-landing-hero',
     standalone: true,
-    imports: [CommonModule, ButtonModule, RippleModule],
+    imports: [CommonModule, ButtonModule, RippleModule, RouterLink],
     templateUrl: './hero.component.html',
     styleUrl: './hero.component.scss',
 })

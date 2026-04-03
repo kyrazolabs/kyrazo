@@ -1,28 +1,25 @@
-import { Component, OnInit, signal } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CmsService } from '@core/services/cms.service';
 import { Article } from '@core/models/cms.models';
 import { map } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
+
+import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directive';
 
 @Component({
     selector: 'app-blog',
     standalone: true,
-    imports: [CommonModule, RouterLink],
+    imports: [CommonModule, RouterLink, ScrollRevealDirective],
     templateUrl: './blog.page.html',
     styleUrl: './blog.page.scss',
 })
 export class BlogPage {
-    articlesResource = rxResource({
-        stream: () =>
-            this.cmsService
-                .getArticles()
-                .pipe(map((response) => response.data)),
-    });
+    private route = inject(ActivatedRoute);
+    public cmsService = inject(CmsService);
 
-    articles$ = this.articlesResource.value;
-    isLoading$ = this.articlesResource.isLoading;
-
-    constructor(public cmsService: CmsService) {}
+    articles$ = toSignal(
+        this.route.data.pipe(map((data) => data['articles'] as Article[])),
+    );
 }

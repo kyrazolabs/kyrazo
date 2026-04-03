@@ -4,25 +4,14 @@
         <p class="text-lg sm:text-xl text-surface-600 dark:text-surface-300 leading-relaxed">Latest news, updates, and stories from our team.</p>
     </div>
 
-    <!-- Loading State -->
-    @if (isLoading$()) {
-        <div class="flex justify-center py-20">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        </div>
-    }
-
-    <!-- Error State -->
-    @if (articlesResource.error()) {
-        <div class="text-center py-20 text-red-500">
-            Failed to load articles. Please try again later.
-        </div>
-    }
-
     <!-- Blog Grid -->
     @if (articles$(); as articles) {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             @for (article of articles; track article.slug) {
-                <a [routerLink]="['/blog', article.slug]" class="group bg-surface-0 dark:bg-surface-900 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-surface-200 dark:border-surface-800 flex flex-col h-full ring-1 ring-black/5 click-effect no-underline">
+                <a [routerLink]="['/blog', article.slug]"
+                   appScrollReveal
+                   [delay]="'delay-' + ($index * 100 + 100)"
+                   class="group bg-surface-0 dark:bg-surface-900 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-surface-200 dark:border-surface-800 flex flex-col h-full ring-1 ring-black/5 click-effect no-underline">
                     <!-- Image -->
                     <div class="h-56 overflow-hidden bg-surface-100 dark:bg-surface-800 relative">
                          @if (article.cover) {

@@ -6,7 +6,7 @@
     <div class="z-10 max-w-4xl mx-auto">
         <div class="mb-6 inline-block animate-fade-in-up">
             <span
-                class="px-3 py-1 rounded-full bg-primary-500/10 text-primary-600 dark:text-primary-400 text-sm font-semibold border border-primary-500/20"
+                class="px-3 py-1 rounded-full bg-primary-500/10 text-primary-600 dark:text-primary-400 text-xs font-semibold border border-primary-500/20"
             >
                 Simplify Your Event Architecture
             </span>
@@ -14,7 +14,7 @@
 
         <!-- Background Keywords -->
         <div
-            class="absolute inset-0 max-w-8xl mx-auto z-0 pointer-events-none overflow-hidden select-none opacity-20 dark:opacity-10"
+            class="absolute inset-0 max-w-8xl mx-auto z-0 pointer-events-none overflow-hidden select-none opacity-20 dark:opacity-10 font-caveat"
         >
             <span
                 class="absolute top-[15%] left-[10%] text-4xl md:text-5xl font-black text-surface-400 dark:text-surface-300 -rotate-12 blur-[1px] md:blur-[2px] animate-floating"
@@ -47,31 +47,16 @@
         <h1
             class="relative z-10 text-3xl md:text-5xl lg:text-6xl font-bold mb-6 text-surface-900 dark:text-surface-0 tracking-tight leading-[1.1] max-w-5xl animate-fade-in-up delay-100 px-4"
         >
-            Reliable Webhooks as a Service with
-            <span class="text-primary-500 text-4xl md:text-6xl lg:text-7xl relative inline-block font-sansation!">
+            Reliable WaaS with
+            <span class="text-primary text-4xl md:text-6xl lg:text-7xl relative inline-block font-sansation!">
                 Dedicated Workers
-                <svg
-                    class="absolute -bottom-2 left-0 w-full h-2 md:h-3 pointer-events-none overflow-visible"
-                    viewBox="0 0 100 10"
-                    preserveAspectRatio="none"
-                    aria-hidden="true"
-                >
-                    <path
-                        d="M 0 5 Q 50 10 100 5"
-                        class="stroke-primary-500/30"
-                        stroke-width="2"
-                        fill="none"
-                    />
-                </svg>
             </span>
         </h1>
 
         <p
             class="text-lg md:text-xl text-surface-600 dark:text-surface-300 mb-10 max-w-2xl mx-auto leading-relaxed animate-fade-in-up delay-200 px-6"
         >
-            A managed webhook platform offering signature verification,
-            automatic retries, and dedicated workers for predictable
-            performance.
+            Secure infrastructure to dispatch, receive, process, and route your data anywhere.
         </p>
 
         <div
@@ -102,19 +87,19 @@
             class="flex flex-col items-center gap-3 mb-16 animate-fade-in-up delay-300"
         >
             <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 pt-6 border-t border-surface-200/10 max-w-2xl mx-auto px-4">
-                <div class="flex items-center gap-2 group cursor-pointer">
+                <div class="flex items-center gap-2 group/badges cursor-pointer" routerLink="legal/refund-policy">
                     <i class="icon-[hugeicons--shield-02] text-primary-500"></i>
-                    <span class="text-xs font-bold uppercase tracking-widest text-surface-500 group-hover:text-surface-300 transition-colors">30-Day Guarantee</span>
+                    <span class="text-xs font-bold uppercase tracking-widest text-surface-500 group-hover/badges:text-surface-400 transition-colors">30-Day Guarantee</span>
                 </div>
                 <div class="hidden sm:block w-1 h-1 rounded-full bg-surface-200/20"></div>
-                <div class="flex items-center gap-2 group cursor-pointer">
+                <div class="flex items-center gap-2 group/badges cursor-pointer" routerLink="/legal/gdpr">
                     <i class="icon-[hugeicons--finger-print] text-primary-500"></i>
-                    <span class="text-xs font-bold uppercase tracking-widest text-surface-500 group-hover:text-surface-300 transition-colors">GDPR Ready</span>
+                    <span class="text-xs font-bold uppercase tracking-widest text-surface-500 group-hover/badges:text-surface-400 transition-colors">GDPR Ready</span>
                 </div>
                 <div class="hidden sm:block w-1 h-1 rounded-full bg-surface-200/20"></div>
-                <div class="flex items-center gap-2 group cursor-pointer">
+                <div class="flex items-center gap-2 group/badges cursor-pointer" routerLink="/legal/dpa">
                     <i class="icon-[hugeicons--agreement-01] text-primary-500"></i>
-                    <span class="text-xs font-bold uppercase tracking-widest text-surface-500 group-hover:text-surface-300 transition-colors">DPA Available</span>
+                    <span class="text-xs font-bold uppercase tracking-widest text-surface-500 group-hover/badges:text-surface-400 transition-colors">DPA Available</span>
                 </div>
             </div>
         </div>
