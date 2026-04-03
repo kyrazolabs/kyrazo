@@ -12,7 +12,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
     standalone: true,
     imports: [CommonModule, RouterLink, MarkdownPipe],
     templateUrl: './article.page.html',
-    styles: [],
+    styleUrls: ['./article.page.scss'],
 })
 export class ArticlePage {
     private route = inject(ActivatedRoute);

@@ -11,9 +11,9 @@
                 <a [routerLink]="['/blog', article.slug]"
                    appScrollReveal
                    [delay]="'delay-' + ($index * 100 + 100)"
-                   class="group bg-surface-0 dark:bg-surface-900 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-surface-200 dark:border-surface-800 flex flex-col h-full ring-1 ring-black/5 click-effect no-underline">
+                   class="group bg-surface-0 dark:bg-surface-900 rounded-2xl shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden border border-surface-200 dark:border-surface-800 flex flex-col h-full ring-1 ring-black/5 click-effect no-underline">
                     <!-- Image -->
-                    <div class="h-56 overflow-hidden bg-surface-100 dark:bg-surface-800 relative">
+                    <div class="h-56 overflow-hidden bg-surface-0 rounded-2xl dark:bg-surface-800 relative">
                          @if (article.cover) {
                              <img
                                   [src]="cmsService.getImageUrl(article.cover!.url)"
@@ -28,7 +28,7 @@
                          <!-- Category Badge -->
                          @if (article.category) {
                              <div class="absolute top-4 left-4">
-                                <span class="bg-surface-0/90 dark:bg-surface-950/90 backdrop-blur-sm text-surface-900 dark:text-surface-0 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm">
+                                <span class="bg-surface-0/90 dark:bg-surface-950/90 backdrop-blur-sm text-surface-900 dark:text-surface-0 px-3 py-1 rounded-full text-xs font-bold font-sansation uppercase tracking-wider shadow-sm">
                                     {{ article.category!.name }}
                                 </span>
                              </div>
@@ -36,7 +36,7 @@
                     </div>
 
                     <!-- Content -->
-                    <div class="p-5 sm:p-6 md:p-8 flex-1 flex flex-col">
+                    <div class="p-5 sm:p-6 flex-1 flex flex-col">
                         <div class="flex items-center text-sm text-surface-500 dark:text-surface-400 mb-4">
                             <span>{{ article.publishedAt | date:'mediumDate' }}</span>
                         </div>
