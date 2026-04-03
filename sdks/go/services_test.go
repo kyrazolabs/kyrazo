@@ -19,7 +19,7 @@ func TestEventsModule_Single(t *testing.T) {
 		assert.Equal(t, "test-api-key", r.Header.Get("x-api-key"))
 
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(models.PublishEventResponse{
+		_ = json.NewEncoder(w).Encode(models.PublishEventResponse{
 			EventId: "evt_123",
 			Status:  "queued",
 		})
@@ -44,7 +44,7 @@ func TestTargetsModule_List(t *testing.T) {
 		assert.Equal(t, "10", r.URL.Query().Get("limit"))
 
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(models.ApiResponse[[]models.Target]{
+		_ = json.NewEncoder(w).Encode(models.ApiResponse[[]models.Target]{
 			Success: true,
 			Data: []models.Target{
 				{Id: "tgt_1", Name: "Webhook 1"},

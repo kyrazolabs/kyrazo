@@ -20,7 +20,7 @@ func TestHttpClient_RetryLogic(t *testing.T) {
 		if attempts < 3 {
 			// Simulate transient 500 error
 			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			_ = json.NewEncoder(w).Encode(map[string]interface{}{
 				"error": map[string]string{
 					"code":    "INTERNAL_ERROR",
 					"message": "Temporary failure",
@@ -30,7 +30,7 @@ func TestHttpClient_RetryLogic(t *testing.T) {
 		}
 		// Success on 3rd attempt
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+		_ = json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 	}))
 	defer server.Close()
 
@@ -72,7 +72,7 @@ func TestHttpClient_Idempotency(t *testing.T) {
 func TestHttpClient_ErrorParsing(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		_ = json.NewEncoder(w).Encode(map[string]interface{}{
 			"error": map[string]string{
 				"code":      "INVALID_API_KEY",
 				"message":   "Invalid or missing API key",
