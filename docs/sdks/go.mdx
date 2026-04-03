@@ -1,0 +1,109 @@
+---
+title: "Go"
+description: "Official Kyrazo SDK for Go"
+---
+
+The Kyrazo Go SDK provides a type-safe, developer-friendly client for interacting with the Kyrazo API. It is generated using Speakeasy to ensure full API coverage and reliable performance.
+
+## Installation
+
+Add the SDK to your project using `go get`:
+
+```bash
+go get github.com/kyrazolabs/sdks/go
+```
+
+## Quickstart
+
+Initialize the client with your **API Key** (configured as `APIKeyAuth` in the SDK).
+
+```go
+package main
+
+import (
+	"context"
+	kyrazo "github.com/kyrazolabs/sdks/go"
+	"github.com/kyrazolabs/sdks/go/models/components"
+	"log"
+	"os"
+)
+
+func main() {
+	ctx := context.Background()
+
+	// Initialize the SDK with security
+	s := kyrazo.New(
+		kyrazo.WithSecurity(os.Getenv("KYRAZO_API_KEY")),
+	)
+
+	// Publish a single event
+	res, err := s.Events.PublishEvent(ctx, "namespace_id", components.PublishEvent{
+		EventType: "user.signup",
+		Payload: components.Payload{
+			"userId": "123",
+			"email":  "user@example.com",
+		},
+		Targets: []components.Target{
+			{
+				TargetID: "target_id",
+			},
+		},
+	}, nil)
+	
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if res.Object != nil {
+		log.Printf("Event published successfully!")
+	}
+}
+```
+
+## Error Handling
+
+The SDK provides specialized error types for precise handling of API responses.
+
+```go
+package main
+
+import (
+	"context"
+	"errors"
+	kyrazo "github.com/kyrazolabs/sdks/go"
+	"github.com/kyrazolabs/sdks/go/models/apierrors"
+	"log"
+)
+
+func main() {
+	// ... initialization ...
+
+	res, err := s.Events.PublishEvent(ctx, "ns_123", payload, nil)
+	if err != nil {
+		var e *apierrors.ErrorResponse
+		if errors.As(err, &e) {
+			log.Printf("API Error: %s (Code: %s)", e.Error.Message, e.Error.Code)
+			return
+		}
+		
+		var apiErr *apierrors.APIError
+		if errors.As(err, &apiErr) {
+			log.Printf("Generic API Error: %s", apiErr.Error())
+			return
+		}
+		
+		log.Fatal(err)
+	}
+}
+```
+
+## Available Resources
+
+The SDK is organized into several resource groups:
+
+- **Events**: Publish single or batch events.
+- **Targets**: Manage webhook destinations.
+- **Endpoints**: Manage incoming webhook endpoints.
+- **Sources**: Manage third-party event sources.
+
+For full details on all available methods, refer to the [Go SDK Reference](https://github.com/kyrazolabs/sdks/tree/main/go).

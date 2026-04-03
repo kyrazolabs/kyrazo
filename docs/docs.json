@@ -33,14 +33,15 @@
             "group": "SDKs",
             "pages": [
               "sdks/typescript",
-              "sdks/python"
+              "sdks/python",
+              "sdks/go"
             ]
           },
           {
             "group": "Dispatch",
             "pages": [
               "essentials/dispatch-overview",
-              "essentials/target-management",
+              "essentials/target",
               "essentials/webhooks-verification"
             ]
           },

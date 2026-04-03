@@ -73,7 +73,7 @@
                                 },
                                 "example": {
                                     "status": "queued",
-                                    "eventId": "123e4567-e89b-12d3-a456-426614174000",
+                                    "eventId": "297608962985172992",
                                     "targetsCount": 1,
                                     "unfoundTargets": [],
                                     "queuedAt": "2024-01-20T12:00:00.000Z",
@@ -221,12 +221,12 @@
                                     "failedCount": 0,
                                     "results": [
                                         {
-                                            "eventId": "123e4567-e89b-12d3-a456-426614174000",
+                                            "eventId": "297609476191821824",
                                             "status": "queued",
                                             "targetsCount": 1
                                         },
                                         {
-                                            "eventId": "987e6543-e21b-12d3-a456-426614174001",
+                                            "eventId": "297608962985172992",
                                             "status": "queued",
                                             "targetsCount": 2
                                         }
