@@ -1,25 +1,72 @@
-<div class="relative w-full py-16 md:py-28 overflow-hidden bg-surface-950 rounded-2xl md:rounded-[3rem] border border-surface-800 shadow-2xl">
-    <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(#3b82f6 0.5px, transparent 0.5px); background-size: 30px 30px;"></div>
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 translate-y-2/3 w-[300px] md:w-[600px] h-[100px] md:h-[150px] bg-primary-500/20 blur-[60px] md:blur-[80px] rounded-full pointer-events-none"></div>
+<div class="relative w-full py-16 px-6 md:px-10 md:py-20 overflow-hidden bg-black border border-surface-800/50 shadow-2xl group">
+    <!-- Layered Background Glows -->
+    <div class="absolute inset-0 opacity-20 pointer-events-none sm:opacity-10" style="background-image: radial-gradient(#3b82f6 0.5px, transparent 0.5px); background-size: 30px 30px;"></div>
 
-    <div class="relative z-10 text-center max-w-3xl mx-auto px-4 md:px-6" appScrollReveal>
-        <h2 class="text-3xl md:text-6xl font-black text-white mb-6 md:mb-8 tracking-tighter leading-tight">
-            Ready to experience the future of <span class="text-primary-500 text-glow font-sansation!">webhooks?</span>
+    <!-- Top-Down Primary Glow -->
+    <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-[300px] md:w-[800px] h-[150px] md:h-[200px] bg-primary-500/20 blur-[80px] md:blur-[120px] rounded-full pointer-events-none opacity-50"></div>
+
+    <!-- Bottom-Up Purple Glow -->
+    <div class="absolute -bottom-24 left-1/2 -translate-x-1/2 w-[300px] md:w-[600px] h-[100px] md:h-[150px] bg-purple-500/10 blur-[60px] md:blur-[100px] rounded-full pointer-events-none"></div>
+
+    <div class="relative z-10 text-center max-w-4xl mx-auto px-4 md:px-6" appScrollReveal>
+        <!-- Social Proof Badge
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 mb-8 animate-bounce-subtle">
+            <div class="flex -space-x-2">
+                <div class="w-5 h-5 rounded-full border border-black bg-surface-800 flex items-center justify-center text-[8px] font-bold text-white">A</div>
+                <div class="w-5 h-5 rounded-full border border-black bg-primary-600 flex items-center justify-center text-[8px] font-bold text-white">K</div>
+                <div class="w-5 h-5 rounded-full border border-black bg-surface-700 flex items-center justify-center text-[8px] font-bold text-white">S</div>
+            </div>
+            <span class="text-[10px] font-black uppercase tracking-widest text-surface-400">Join 5,000+ developers</span>
+        </div> -->
+
+        <h2 class="text-3xl md:text-5xl font-black text-white mt-8 mb-6 md:mb-8 tracking-tighter leading-[1.1] md:leading-none">
+            Ready to experience the <br class="hidden md:block"> future of <span class="text-primary-500 text-glow font-sansation! italic underline decoration-primary-500/30 underline-offset-8">webhooks?</span>
         </h2>
-        <p class="text-lg md:text-xl text-surface-400 mb-8 md:mb-12 font-medium px-2 md:px-0">
-            Join thousands of developers who trust Kyrazo handling their critical events.
+
+        <p class="text-base md:text-lg text-surface-400 mb-8 md:mb-10 font-medium px-2 md:px-0 max-w-xl mx-auto leading-relaxed">
+            Stop polling and start building. Join the resilient event-driven revolution with <span class="text-white font-bold">Kyrazo</span>.
         </p>
 
-        <div class="flex flex-col items-center gap-4 justify-center">
-            <div class="flex flex-col sm:flex-row gap-4 justify-center w-full">
-                <a href="https://dash.kyrazo.com/auth/register" (click)="trackCta()" class="px-8 py-3 bg-white text-black font-black rounded-xl hover:bg-primary-800 hover:text-white transition-all duration-300 shadow-xl shadow-white/5 cursor-pointer no-underline flex items-center justify-center" aria-label="Get early access for Kyrazo">
-                    Get Early Access
-                </a>
+        <!-- Email Capture Form -->
+        <div class="flex flex-col items-center gap-4 justify-center w-full max-w-lg mx-auto">
+            <div class="flex flex-col sm:flex-row gap-2 w-full">
+                <input
+                    pInputText
+                    type="email"
+                    [(ngModel)]="email"
+                    (keyup.enter)="onSubmit()"
+                    placeholder="Enter your email address"
+                    class="flex-1 bg-white/5! border-white/10! text-white! rounded-xl! placeholder:text-surface-500! focus:border-primary-500/60! focus:ring-primary-500/20!"
+                    aria-label="Email address"
+                    id="cta-email-input"
+                />
+                <p-button
+                    label="Get start for free"
+                    icon="pi pi-arrow-right"
+                    iconPos="right"
+                    (onClick)="onSubmit()"
+                />
             </div>
-            <div class="flex items-center gap-2 text-surface-400 text-sm mt-2">
-                <i class="icon-[hugeicons--security-check] text-primary-500"></i>
-                <span>30-Day Money-Back Guarantee</span>
+
+            <!-- Trust Indicator -->
+            <div class="flex items-center gap-3 text-surface-500 text-[10px] uppercase tracking-[0.2em] font-black mt-1">
+                <div class="flex items-center gap-1.5">
+                    <i class="pi pi-shield text-primary-500"></i>
+                    <span>Bank-Grade Security</span>
+                </div>
+                <div class="w-1 h-1 rounded-full bg-surface-800"></div>
+                <div class="flex items-center gap-1.5">
+                    <i class="pi pi-lock text-primary-500"></i>
+                    <span>No Spam, Ever</span>
+                </div>
             </div>
+
+            <!-- Secondary Link -->
+            <a href="https://docs.kyrazo.com"
+               class="text-surface-500 hover:text-surface-300 text-sm font-medium transition-colors cursor-pointer no-underline"
+               aria-label="View documentation">
+                Or read the documentation →
+            </a>
         </div>
     </div>
 </div>

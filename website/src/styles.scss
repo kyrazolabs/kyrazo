@@ -109,7 +109,7 @@ body {
             color: var(--tooltip-text) !important;
             border: 1px solid var(--tooltip-border) !important;
 
-            @apply text-xs/3 px-3 py-1! rounded-lg! shadow-xl;
+            @apply text-xs/3 px-3 py-1! rounded-xl! shadow-xl;
         }
 
         .p-tooltip-arrow {

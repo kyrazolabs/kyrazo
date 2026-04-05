@@ -21,6 +21,17 @@ import { LayoutService } from '@components/service/layout.service';
             .animation-delay {
                 animation-duration: 1s;
             }
+            .pipeline-flow {
+                stroke-dasharray: 40 400; /* 40px comet, 400px gap */
+                stroke-dashoffset: 440;
+                animation: comet-move 3s linear infinite;
+                will-change: stroke-dashoffset;
+            }
+            @keyframes comet-move {
+                to {
+                    stroke-dashoffset: 0;
+                }
+            }
         `,
     ],
 })
@@ -36,8 +47,12 @@ export class DispatchDiagramComponent {
 
     // Paths from central K (at 200 on X axis) to targets on the right
     dispatchPaths = [
-        { d: 'M215,150 C400,150 290,30 540,30' }, // Top
+        {
+            d: 'M215,150 L368,150 A32,32 0 0 0 400,118 L400,62 A32,32 0 0 1 432,30 L540,30',
+        }, // Top
         { d: 'M215,150 L540,150' }, // Middle
-        { d: 'M215,150 C400,150 290,270 540,270' }, // Bottom
+        {
+            d: 'M215,150 L368,150 A32,32 0 0 1 400,182 L400,238 A32,32 0 0 0 432,270 L540,270',
+        }, // Bottom
     ];
 }

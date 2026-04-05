@@ -1,7 +1,7 @@
 <div
     appScrollReveal
     [delay]="delay"
-    [class]="'group relative p-8 rounded-2xl border transition-all duration-500 flex flex-col h-full ' +
+    [class]="'group relative p-8 rounded-xl border transition-all duration-500 flex flex-col h-full ' +
     (plan.highlighted ?
     'bg-surface-950 text-surface-0 border-surface-800 shadow-[0_20px_50px_rgba(0,0,0,0.3)] scale-105 z-10' :
     'bg-surface-0 dark:bg-surface-950/40 backdrop-blur-md! border-surface-200 dark:border-surface-800 hover:border-primary-500/50 hover:shadow-2xl hover:shadow-primary-500/5')">
@@ -33,14 +33,14 @@
                 <span class="text-sm opacity-60 font-medium">{{ intervalLabel }}</span>
             }
         </div>
-        @if (plan.priceCentsMonthly > 0) {
+        <!-- @if (plan.priceCentsMonthly > 0) {
             <div class="mt-3 flex justify-center">
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest leading-none animate-bounce-slow shadow-md border"
                     [class]="plan.highlighted ? 'bg-primary-500/10 border-primary-400/30 text-primary-400 shadow-primary-500/20' : 'bg-primary-500/10 border-primary-500/30 text-primary-600 shadow-primary-500/20'">
                     Get 2 months free by paying annually
                 </span>
             </div>
-        }
+        } -->
     </div>
 
     <a

@@ -10,7 +10,7 @@
                     @for (source of sources; track source.name) {
                         <div class="flex items-center gap-3">
                             <div
-                                class="w-8 h-8 md:w-9 md:h-9 p-1 md:p-1.5 rounded-lg md:rounded-xl bg-surface-50 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 shadow-sm flex items-center justify-center"
+                                class="w-8 h-8 md:w-9 md:h-9 p-1 md:p-1.5 rounded-lg md:rounded-xl bg-surface-50 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 shadow-2xs flex items-center justify-center"
                             >
                                 <span
                                     [class]="source.iconClass"
@@ -53,12 +53,18 @@
                     @for (path of sourcePaths; track $index) {
                         <path
                             [attr.d]="path.d"
-                            class="stroke-primary-500/10 fill-none stroke-2 md:stroke-3"
+                             stroke="currentColor"
+                            class="text-primary-500/10 fill-none stroke-2 md:stroke-3"
+                            pathLength="400"
                         />
                         <path
                             [attr.d]="path.d"
-                            class="stroke-primary-500/30 fill-none stroke-2 md:stroke-3 line-dash animation-delay"
-                            [style.animation-delay]="$index * 0.4 + 1.2 + 's'"
+                            class="stroke-primary-400 pipeline-flow animation-delay"
+                            fill="none"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            pathLength="400"
+                            [style.animation-delay]="$index * 1.0 + 's'"
                         />
                     }
 
@@ -66,12 +72,18 @@
                     @for (path of destPaths; track $index) {
                         <path
                             [attr.d]="path.d"
-                            class="stroke-primary-500/15 fill-none stroke-2 md:stroke-3"
+                             stroke="currentColor"
+                            class="text-primary-500/10 fill-none stroke-2 md:stroke-3"
+                            pathLength="400"
                         />
                         <path
                             [attr.d]="path.d"
-                            class="stroke-primary-500/40 fill-none stroke-2 md:stroke-3 line-dash animation-delay"
-                            [style.animation-delay]="$index * 0.4 + 1.5 + 's'"
+                            class="stroke-primary-400 pipeline-flow animation-delay"
+                            fill="none"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            pathLength="400"
+                            [style.animation-delay]="$index * 1.5 + 0.5 + 's'"
                         />
                     }
                 </svg>
@@ -89,19 +101,16 @@
                         height="48"
                         loading="lazy"
                         decoding="async"
-                        class="w-full h-full p-2 md:p-2.5 object-contain transition-transform duration-300"
+                        class="w-full h-full p-1 object-contain transition-transform duration-300"
                     />
 
-                    <div
-                        class="absolute inset-0 rounded-lg md:rounded-xl border border-primary-500 animate-ping opacity-20"
-                    ></div>
                 </div>
 
                 <!-- Destinations (Right) -->
                 <div class="flex flex-col gap-6 md:gap-10 z-20 items-end">
                     <div class="flex items-center gap-3 group">
                         <div
-                            class="px-2 md:px-3 py-1 md:py-1.5 rounded-lg md:rounded-xl bg-surface-50 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 shadow-sm flex items-center gap-2"
+                            class="px-2 md:px-3 py-1 md:py-1.5 rounded-lg md:rounded-xl bg-surface-50 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 shadow-2xs flex items-center gap-2"
                         >
                             <i
                                 class="pi pi-database text-primary-500 text-[8px] md:text-[10px]"
@@ -114,7 +123,7 @@
                     </div>
                     <div class="flex items-center gap-3 group">
                         <div
-                            class="px-2 md:px-3 py-1 md:py-1.5 rounded-lg md:rounded-xl bg-surface-50 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 shadow-sm flex items-center gap-2"
+                            class="px-2 md:px-3 py-1 md:py-1.5 rounded-lg md:rounded-xl bg-surface-50 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 shadow-2xs flex items-center gap-2"
                         >
                             <i
                                 class="pi pi-link text-primary-500 text-[8px] md:text-[10px]"
@@ -126,14 +135,5 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Background Glow -->
-            <div
-                class="absolute inset-0 flex items-center justify-center pointer-events-none -z-10"
-            >
-                <div
-                    class="w-32 h-32 bg-primary-500/5 blur-[60px] rounded-full"
-                ></div>
             </div>
         </div>
