@@ -1,5 +1,6 @@
 import {
     ChangeDetectionStrategy,
+    ChangeDetectorRef,
     Component,
     inject,
     OnInit,
@@ -60,6 +61,7 @@ export class LoginPage implements OnInit {
     private readonly messageService = inject(MessageService);
     private readonly authService = inject(AuthService);
     private readonly router = inject(Router);
+    private readonly cdr = inject(ChangeDetectorRef);
     public readonly layoutService = inject(LayoutService);
 
     private codeClient: any;
@@ -196,6 +198,10 @@ export class LoginPage implements OnInit {
                     passwordControl?.setErrors({ incorrectPassword: true });
                     passwordControl?.markAsTouched();
                 }
+
+                // Fix OnPush sync: re-read DOM values after error
+                this.form.updateValueAndValidity();
+                this.cdr.markForCheck();
             },
         });
     }

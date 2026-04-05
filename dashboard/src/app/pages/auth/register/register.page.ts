@@ -1,7 +1,9 @@
 import {
     ChangeDetectionStrategy,
+    ChangeDetectorRef,
     Component,
     inject,
+    OnInit,
     signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -48,12 +50,13 @@ import { AppConfig } from '@components/app.config';
     styleUrls: ['./register.page.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RegisterPage {
+export class RegisterPage implements OnInit {
     private readonly fb = inject(FormBuilder);
     private readonly route = inject(ActivatedRoute);
     private readonly messageService = inject(MessageService);
     private readonly authService = inject(AuthService);
     private readonly router = inject(Router);
+    private readonly cdr = inject(ChangeDetectorRef);
     public readonly layoutService = inject(LayoutService);
 
     readonly form = this.fb.nonNullable.group(
@@ -282,6 +285,10 @@ export class RegisterPage {
                         emailControl?.setErrors({ emailTaken: true });
                         emailControl?.markAsTouched();
                     }
+
+                    // Fix OnPush sync: re-read DOM values after error
+                    this.form.updateValueAndValidity();
+                    this.cdr.markForCheck();
                 },
             });
     }
@@ -296,6 +303,15 @@ export class RegisterPage {
                 this.router.navigate(['/launchpad'], { replaceUrl: true });
             }
         }, 1000);
+    }
+
+    ngOnInit(): void {
+        // Pre-fill email from query param (e.g. from CTA on landing page)
+        const emailParam = this.route.snapshot.queryParamMap.get('email');
+        if (emailParam) {
+            this.form.patchValue({ email: emailParam });
+            this.cdr.markForCheck();
+        }
     }
 
     verify2FA(): void {
