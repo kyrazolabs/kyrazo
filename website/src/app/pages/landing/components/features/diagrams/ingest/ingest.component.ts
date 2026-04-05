@@ -21,6 +21,17 @@ import { LayoutService } from '@components/service/layout.service';
             .animation-delay {
                 animation-duration: 1s;
             }
+            .pipeline-flow {
+                stroke-dasharray: 40 400; /* 40px comet, 400px gap */
+                stroke-dashoffset: 440;
+                animation: comet-move 3s linear infinite;
+                will-change: stroke-dashoffset;
+            }
+            @keyframes comet-move {
+                to {
+                    stroke-dashoffset: 0;
+                }
+            }
         `,
     ],
 })
@@ -36,18 +47,26 @@ export class IngestDiagramComponent {
 
     sourcePaths = [
         // Top
-        { d: 'M-230,40 C0,40 0,150 100,150' },
+        {
+            d: 'M-230,40 L-182,40 A32,32 0 0 1 -150,72 L-150,118 A32,32 0 0 0 -118,150 L100,150',
+        },
 
         // Middle
         { d: 'M-230,150 L100,150' },
 
         // Bottom
-        { d: 'M-230,260 C0,260 0,150 100,150' },
+        {
+            d: 'M-230,260 L-182,260 A32,32 0 0 0 -150,228 L-150,182 A32,32 0 0 1 -118,150 L100,150',
+        },
     ];
 
     // Center K to Destinations
     destPaths = [
-        { d: 'M180,150 C280,150 280,95 500,80' }, // Center to Storage
-        { d: 'M180,150 C280,150 280,205 500,225' }, // Center to Endpoint
+        {
+            d: 'M180,150 L388,150 A32,32 0 0 0 420,118 L420,112 A32,32 0 0 1 452,80 L500,80',
+        }, // Center to Storage
+        {
+            d: 'M180,150 L388,150 A32,32 0 0 1 420,182 L420,193 A32,32 0 0 0 452,225 L500,225',
+        }, // Center to Endpoint
     ];
 }

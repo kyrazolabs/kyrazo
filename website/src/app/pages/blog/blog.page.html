@@ -11,9 +11,9 @@
                 <a [routerLink]="['/blog', article.slug]"
                    appScrollReveal
                    [delay]="'delay-' + ($index * 100 + 100)"
-                   class="group bg-surface-0 dark:bg-surface-900 rounded-2xl shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden border border-surface-200 dark:border-surface-800 flex flex-col h-full ring-1 ring-black/5 click-effect no-underline">
+                   class="group bg-surface-0 dark:bg-surface-900 rounded-xl shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden border border-surface-200 dark:border-surface-800 flex flex-col h-full ring-1 ring-black/5 click-effect no-underline">
                     <!-- Image -->
-                    <div class="h-56 overflow-hidden bg-surface-0 rounded-2xl dark:bg-surface-800 relative">
+                    <div class="h-56 overflow-hidden bg-surface-0 rounded-xl dark:bg-surface-800 relative">
                          @if (article.cover) {
                              <img
                                   [src]="cmsService.getImageUrl(article.cover!.url)"
