@@ -274,7 +274,9 @@ export class PaymentService {
             await subscriptionService.revertToFreePlan(workspaceId, userId);
             logger.info(`Reverted workspace ${workspaceId} to free plan after Stripe deletion`);
         } else {
-            logger.warn(`Could not revert to free plan: Missing workspace/user for sub ${subscription.id}`);
+            logger.warn(
+                `Could not revert to free plan: Missing workspace/user for sub ${subscription.id}`
+            );
         }
     }
 
@@ -316,7 +318,9 @@ export class PaymentService {
                 existing.workspaceId.toString(),
                 existing.userId.toString()
             );
-            logger.info(`Reverted workspace ${existing.workspaceId} to free plan after cancellation update`);
+            logger.info(
+                `Reverted workspace ${existing.workspaceId} to free plan after cancellation update`
+            );
         }
 
         await limitService.invalidateWorkspaceLimits(existing.workspaceId.toString());

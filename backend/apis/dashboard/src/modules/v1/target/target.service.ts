@@ -32,8 +32,19 @@ export class TargetService {
         try {
             const created = await targetRepository.create(data);
             if (created) {
-                await redisConfig.del(RedisKeys.context.workspaceNamespaceTargets(workspaceId.toString(), namespaceId.toString()));
-                await redisConfig.del(RedisKeys.context.workspaceNamespaceTarget(workspaceId.toString(), namespaceId.toString(), created.id || created._id));
+                await redisConfig.del(
+                    RedisKeys.context.workspaceNamespaceTargets(
+                        workspaceId.toString(),
+                        namespaceId.toString()
+                    )
+                );
+                await redisConfig.del(
+                    RedisKeys.context.workspaceNamespaceTarget(
+                        workspaceId.toString(),
+                        namespaceId.toString(),
+                        created.id
+                    )
+                );
             }
             return created;
         } catch (error: any) {
@@ -119,8 +130,12 @@ export class TargetService {
             if (!updated) {
                 throw new Error('Failed to update target');
             }
-            await redisConfig.del(RedisKeys.context.workspaceNamespaceTargets(workspaceId, namespaceId));
-            await redisConfig.del(RedisKeys.context.workspaceNamespaceTarget(workspaceId, namespaceId, targetId));
+            await redisConfig.del(
+                RedisKeys.context.workspaceNamespaceTargets(workspaceId, namespaceId)
+            );
+            await redisConfig.del(
+                RedisKeys.context.workspaceNamespaceTarget(workspaceId, namespaceId, targetId)
+            );
             return updated;
         } catch (error: any) {
             logger.error('Failed to update target:', error);
@@ -138,8 +153,12 @@ export class TargetService {
             if (!deleted) {
                 throw new Error('Failed to delete target');
             }
-            await redisConfig.del(RedisKeys.context.workspaceNamespaceTargets(workspaceId, namespaceId));
-            await redisConfig.del(RedisKeys.context.workspaceNamespaceTarget(workspaceId, namespaceId, targetId));
+            await redisConfig.del(
+                RedisKeys.context.workspaceNamespaceTargets(workspaceId, namespaceId)
+            );
+            await redisConfig.del(
+                RedisKeys.context.workspaceNamespaceTarget(workspaceId, namespaceId, targetId)
+            );
             return deleted;
         } catch (error: any) {
             logger.error('Failed to delete target:', error);

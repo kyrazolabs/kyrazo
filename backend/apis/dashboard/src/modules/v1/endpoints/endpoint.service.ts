@@ -32,8 +32,19 @@ export class EndpointService {
         try {
             const created = await endpointRepository.create(data);
             if (created) {
-                await redisConfig.del(RedisKeys.context.workspaceNamespaceEndpoints(workspaceId.toString(), namespaceId.toString()));
-                await redisConfig.del(RedisKeys.context.workspaceNamespaceEndpoint(workspaceId.toString(), namespaceId.toString(), created.id || created._id));
+                await redisConfig.del(
+                    RedisKeys.context.workspaceNamespaceEndpoints(
+                        workspaceId.toString(),
+                        namespaceId.toString()
+                    )
+                );
+                await redisConfig.del(
+                    RedisKeys.context.workspaceNamespaceEndpoint(
+                        workspaceId.toString(),
+                        namespaceId.toString(),
+                        created.id
+                    )
+                );
             }
             return created;
         } catch (error: any) {
@@ -127,8 +138,12 @@ export class EndpointService {
             if (!updated) {
                 throw new Error('Failed to update endpoint');
             }
-            await redisConfig.del(RedisKeys.context.workspaceNamespaceEndpoints(workspaceId, namespaceId));
-            await redisConfig.del(RedisKeys.context.workspaceNamespaceEndpoint(workspaceId, namespaceId, endpointId));
+            await redisConfig.del(
+                RedisKeys.context.workspaceNamespaceEndpoints(workspaceId, namespaceId)
+            );
+            await redisConfig.del(
+                RedisKeys.context.workspaceNamespaceEndpoint(workspaceId, namespaceId, endpointId)
+            );
             return updated;
         } catch (error: any) {
             logger.error('Failed to update endpoint:', error);
@@ -150,8 +165,12 @@ export class EndpointService {
             if (!deleted) {
                 throw new Error('Failed to delete endpoint');
             }
-            await redisConfig.del(RedisKeys.context.workspaceNamespaceEndpoints(workspaceId, namespaceId));
-            await redisConfig.del(RedisKeys.context.workspaceNamespaceEndpoint(workspaceId, namespaceId, endpointId));
+            await redisConfig.del(
+                RedisKeys.context.workspaceNamespaceEndpoints(workspaceId, namespaceId)
+            );
+            await redisConfig.del(
+                RedisKeys.context.workspaceNamespaceEndpoint(workspaceId, namespaceId, endpointId)
+            );
             return deleted;
         } catch (error: any) {
             logger.error('Failed to delete endpoint:', error);
