@@ -2756,31 +2756,6 @@
                             }
                         },
                         "minItems": 1
-                    },
-                    "meta": {
-                        "type": "object",
-                        "properties": {
-                            "priority": {
-                                "type": "string",
-                                "enum": [
-                                    "low",
-                                    "normal",
-                                    "high",
-                                    "urgent"
-                                ],
-                                "default": "normal"
-                            },
-                            "maxRetries": {
-                                "type": "integer",
-                                "minimum": 0,
-                                "maximum": 10,
-                                "default": 3
-                            },
-                            "insertedAt": {
-                                "type": "string",
-                                "format": "date-time"
-                            }
-                        }
                     }
                 }
             },
