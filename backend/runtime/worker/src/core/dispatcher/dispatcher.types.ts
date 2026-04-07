@@ -49,17 +49,6 @@ export interface IDispatchedEvent {
     };
 
     targets: IDispatchedTarget[];
-
-    meta?: {
-        priority: 'low' | 'normal' | 'high' | 'urgent';
-        maxRetries: number;
-        insertedAt: Date;
-        nonce: string;
-        version: string;
-        source?: string;
-        ip?: string;
-        userAgent?: string;
-    };
 }
 
 export interface SignaturePayload {
@@ -80,7 +69,6 @@ export interface IConfiguredTarget {
     type: 'target' | 'endpoint';
     targetId: string;
     url: string;
-    priority: number;
     rateLimit?: number;
     rateLimitDuration?: number;
     retryCount?: number;

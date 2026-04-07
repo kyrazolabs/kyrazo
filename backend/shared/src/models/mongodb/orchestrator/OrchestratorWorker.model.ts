@@ -13,6 +13,7 @@ export interface IOrchestratorWorker extends Document {
     worker_id: string;
     client_id: string;
     server_id: string;
+    workers_count: number;
     status: WorkerStatus;
     created_at: Date;
     updated_at: Date;
@@ -23,6 +24,7 @@ const orchestratorWorkerSchema = new Schema<IOrchestratorWorker>(
         worker_id: { type: String, required: true, unique: true },
         client_id: { type: String, required: true, index: true },
         server_id: { type: String, required: true, index: true },
+        workers_count: { type: Number, default: 1 },
         status: { type: String, enum: Object.values(WorkerStatus), default: WorkerStatus.PENDING },
     },
     {

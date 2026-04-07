@@ -124,7 +124,7 @@ export class AutoScalerService {
             status: { $in: [WorkerStatus.PENDING, WorkerStatus.STARTING, WorkerStatus.RUNNING] }
         });
 
-        const actualWorkers = runningWorkerRecords.length;
+        const actualWorkers = runningWorkerRecords.reduce((acc, worker) => acc + (worker.workers_count || 1), 0);
 
         if (actualWorkers > 0 || desiredWorkers > 0) {
             console.log(
@@ -136,23 +136,22 @@ export class AutoScalerService {
         if (actualWorkers < desiredWorkers) {
             const toCreate = desiredWorkers - actualWorkers;
             console.log(`[AutoScaler] Scaling UP by ${toCreate}`);
-            for (let i = 0; i < toCreate; i++) {
-                await this.safeProvisionWorker(clientIdStr);
-            }
+            await this.safeProvisionWorker(clientIdStr, toCreate);
         }
 
         // 5. Scale DOWN
         if (actualWorkers > desiredWorkers) {
-            const toStop = actualWorkers - desiredWorkers;
+            let toStop = actualWorkers - desiredWorkers;
             console.log(`[AutoScaler] Scaling DOWN by ${toStop}`);
 
-            const extraWorkers = runningWorkerRecords
-                .sort((a, b) => (b.created_at?.getTime() || 0) - (a.created_at?.getTime() || 0))
-                .slice(0, toStop);
+            const sortedWorkers = runningWorkerRecords
+                .sort((a, b) => (b.created_at?.getTime() || 0) - (a.created_at?.getTime() || 0));
 
-            for (const worker of extraWorkers) {
+            for (const worker of sortedWorkers) {
+                if (toStop <= 0) break;
                 try {
                     await WorkerService.decommissionWorker(worker.worker_id, kyrazoApps);
+                    toStop -= (worker.workers_count || 1);
                 } catch (err: any) {
                     console.error('Failed to decommission worker:', err);
                 }
@@ -251,9 +250,9 @@ export class AutoScalerService {
         }
     }
 
-    private static async safeProvisionWorker(clientId: string) {
+    private static async safeProvisionWorker(clientId: string, count: number = 1) {
         try {
-            await WorkerService.provisionWorker(clientId);
+            await WorkerService.provisionWorker(clientId, count);
         } catch (err: any) {
             console.error(`[AutoScaler] Provisioning failed for client ${clientId}:`, err);
             console.warn(`[AutoScaler] Provisioning info: ${err.message}`);

@@ -44,15 +44,6 @@ export class DispatcherTransformer {
                 responseTimeMs: undefined,
                 errorMessage: undefined,
             })),
-
-            meta: {
-                priority: event.meta?.priority ?? 'normal',
-                maxRetries: event.meta?.maxRetries ?? 3,
-                insertedAt: event.meta?.insertedAt ?? new Date(),
-                nonce: event.meta?.nonce ?? crypto.randomUUID(),
-                version: '1.0.0',
-                source: event.meta?.source ?? 'internal',
-            },
         };
     }
 }

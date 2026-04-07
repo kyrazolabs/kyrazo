@@ -1,26 +1,32 @@
 import { EventEmitter } from 'events';
-import { Queue, Worker, Job, QueueEvents } from 'bullmq';
+import { Worker, Job, QueueEvents } from 'bullmq';
 import { redisConfig } from '@/config';
-import {
-    DeliveryStatus,
-    EventStatus,
-    logger,
-    type SQLDeliveryAttempt,
-    snowflake,
-} from '@kyrazo/shared';
+import { DeliveryStatus, logger, type SQLDeliveryAttempt, snowflake } from '@kyrazo/shared';
 import type {
     IConfiguredTarget,
     IDispatchedEvent,
-    IDispatchedTarget,
     IDispatchJobData,
     IWebhookHeaders,
 } from '@/core/dispatcher/dispatcher.types';
 import { httpRequester } from '@/services/http/http.requester';
 import { dispatchProducer } from '../batch/dispatch.producer';
 import { env } from '@/app/worker.env';
-import { config } from '@/config';
 import { dispatcherSignature } from '@/core/dispatcher/dispatcher.signature';
 import { dispatchAnalyticsProducer } from '@/services/analytics/dispatch.producer';
+
+/**
+ * Backoff schedule for webhook delivery retries
+ * 1m → 10m → 30m → 1h → 4h → 12h → 24h (max)
+ */
+const STEPPED_BACKOFF = [
+    60000, // 1m
+    600000, // 10m
+    1800000, // 30m
+    3600000, // 1h
+    14400000, // 4h
+    43200000, // 12h
+    86400000, // 24h
+];
 
 /**
  * Event Processor - Coordinates event processing and queue management
@@ -28,8 +34,6 @@ import { dispatchAnalyticsProducer } from '@/services/analytics/dispatch.produce
  */
 export class DispatchConsumer extends EventEmitter {
     private static instance: DispatchConsumer;
-
-    private dispatchQueue: Queue | undefined;
     private dispatchWorker: Worker | undefined;
     private queueEvents: QueueEvents | undefined;
 
@@ -38,29 +42,35 @@ export class DispatchConsumer extends EventEmitter {
     }
 
     public async initialize(): Promise<void> {
-        if (this.dispatchQueue) return;
+        if (this.dispatchWorker) return;
 
         logger.info('Initializing Dispatch Consumer...');
         const connection = redisConfig.getQueueClient();
-
-        // Initialize queues
-        this.dispatchQueue = new Queue(`{event-dispatch}`, {
-            connection,
-            defaultJobOptions: {
-                removeOnComplete: 100, // Keep last 100 completed jobs
-                removeOnFail: 50, // Keep last 50 failed jobs
-                attempts: 3, // Default attempts (will be overridden per job based on event.meta.maxRetries)
-                backoff: {
-                    type: 'exponential',
-                    delay: 2000, // Start with 2 seconds
-                },
-            },
-        });
 
         // Initialize workers
         this.dispatchWorker = new Worker(`{event-dispatch}`, this.process.bind(this), {
             connection,
             concurrency: env.worker.CONCURRENCY,
+            settings: {
+                backoffStrategy: (attemptsMade: number, type?: string) => {
+                    if (type === 'stepped') {
+                        const index = Math.min(attemptsMade - 1, STEPPED_BACKOFF.length - 1);
+                        const baseDelay = STEPPED_BACKOFF[index] ?? 60000;
+
+                        // Add ±20% jitter (e.g., 10m becomes 8m-12m)
+                        const jitter = 0.8 + Math.random() * 0.4;
+                        return Math.floor(baseDelay * jitter);
+                    }
+
+                    if (type === 'exponential') {
+                        // Standard BullMQ exponential formula (2s base)
+                        return Math.round(2000 * Math.pow(2, attemptsMade - 1));
+                    }
+
+                    // Fallback to 1 second
+                    return 1000;
+                },
+            },
         });
 
         // Initialize queue events for monitoring
@@ -79,59 +89,6 @@ export class DispatchConsumer extends EventEmitter {
         return DispatchConsumer.instance;
     }
 
-    public async enqueue(
-        event: IDispatchedEvent,
-        targets: IConfiguredTarget[],
-        headers: IWebhookHeaders
-    ): Promise<(string | undefined)[]> {
-        if (!this.dispatchQueue) {
-            throw new Error('DispatchConsumer not initialized');
-        }
-        try {
-            const jobData = {
-                event,
-                headers,
-            };
-
-            // Get maxRetries from event meta, default to 3
-            const maxRetries = event.meta?.maxRetries || 3;
-
-            const jobs = await this.dispatchQueue.addBulk(
-                targets.map(target => {
-                    const deliveryId = snowflake.generate();
-                    // Retry count is the number of *retries*, so total attempts = retries + 1
-                    const attempts = (target.retryCount || maxRetries) + 1;
-                    return {
-                        name: 'dispatch',
-                        data: { ...jobData, deliveryId, target },
-                        opts: {
-                            jobId: deliveryId,
-                            priority: target.priority,
-                            delay: 0, // Process immediately
-                            attempts: attempts, // Set total attempts
-                            backoff: {
-                                type: 'exponential',
-                                delay: 2000, // Start with 2 seconds
-                            },
-                        },
-                    };
-                })
-            );
-
-            const jobIds = jobs.map(job => job.id);
-            const deliveryIds = jobs.map(job => job.opts.jobId);
-
-            logger.info(
-                `📦 Added dispatch job to queue: ${jobIds.join(', ')} (maxRetries: ${maxRetries})`
-            );
-
-            return jobIds || deliveryIds;
-        } catch (error: any) {
-            console.error('Error adding job to dispatch queue:', error);
-            throw error;
-        }
-    }
-
     /**
      * Process dispatch job by delegating to delivery handler
      */
@@ -141,12 +98,15 @@ export class DispatchConsumer extends EventEmitter {
         const toCHDate = (date: Date | string | number) =>
             new Date(date).toISOString().slice(0, 23).replace('T', ' ');
 
+        const currentAttemptId = snowflake.generate();
         await job.log(
-            `🚀 Dispatch starting (Attempt ${job.attemptsMade + 1}/${job.opts.attempts})`
+            `🚀 Dispatch starting (Attempt ${job.attemptsMade + 1}/${
+                job.opts.attempts
+            }, Local ID: ${currentAttemptId})`
         );
 
         const deliveryAttempt: SQLDeliveryAttempt = {
-            delivery_id: deliveryId,
+            delivery_id: currentAttemptId,
             workspace_id: event.workspaceId,
             namespace_id: event.namespaceId,
 
@@ -202,14 +162,12 @@ export class DispatchConsumer extends EventEmitter {
                     object: event.data.object,
                     previous: event.data.previous,
                 },
-
-                meta: event.meta ?? {},
             };
             // Perform signing before dispatch
             logger.debug(`🔏 Signing message for target ${target.url}...`);
             await job.log(`🔏 Signing message...`);
             const signatureResult = await dispatcherSignature.sign(
-                event,
+                body,
                 event.workspaceId,
                 event.namespaceId,
                 target.targetId,
@@ -225,7 +183,7 @@ export class DispatchConsumer extends EventEmitter {
 
             Object.assign(headers, signatureHeaders);
 
-            // Update delivery attempt record with final headers
+            // Update delivery attempt record with final headers and body
             deliveryAttempt.request_header = JSON.stringify(headers);
             await job.log(`✅ Message signed`);
             const method = target.method || 'POST';
@@ -265,7 +223,7 @@ export class DispatchConsumer extends EventEmitter {
                 status: DeliveryStatus.DELIVERED,
                 latencyMs: response.duration,
                 timestamp: new Date(),
-                deliveryId: deliveryAttempt.delivery_id,
+                deliveryId: currentAttemptId,
             });
             logger.debug(
                 `✅ Delivery job completed and sent to sink: ${job.id} (${response.status})`
@@ -307,7 +265,7 @@ export class DispatchConsumer extends EventEmitter {
                     status: DeliveryStatus.FAILED,
                     latencyMs: 0,
                     timestamp: new Date(),
-                    deliveryId: deliveryAttempt.delivery_id,
+                    deliveryId: currentAttemptId,
                 });
             } else {
                 logger.debug(
@@ -321,7 +279,7 @@ export class DispatchConsumer extends EventEmitter {
                     .getQueues()
                     .DispatchsQueue.add(dispatchProducer.getQueueNames().DispatchProducer, {
                         ...deliveryAttempt,
-                        status: DeliveryStatus.PROCESSING,
+                        status: DeliveryStatus.FAILED,
                         attempt_number: job.attemptsMade + 1,
                         processed_at: toCHDate(new Date()),
                         error: error.message,
@@ -331,10 +289,10 @@ export class DispatchConsumer extends EventEmitter {
                     targetId: deliveryAttempt.target_id,
                     eventType: deliveryAttempt.event_type,
                     responseCode: deliveryAttempt.response_code ?? 0,
-                    status: DeliveryStatus.PROCESSING,
+                    status: DeliveryStatus.FAILED,
                     latencyMs: 0,
                     timestamp: new Date(),
-                    deliveryId: deliveryAttempt.delivery_id,
+                    deliveryId: currentAttemptId,
                 });
             }
 
@@ -355,14 +313,6 @@ export class DispatchConsumer extends EventEmitter {
                 console.error(`❌ Dispatch job failed: ${job.id}`, err.message);
             }
         });
-
-        this.queueEvents!.on('waiting', ({ jobId }: { jobId: string }) => {
-            console.log(`⏳ Job waiting: ${jobId}`);
-        });
-
-        this.queueEvents!.on('active', ({ jobId, prev }: { jobId: string; prev?: string }) => {
-            console.log(`🔄 Job active: ${jobId} (prev: ${prev})`);
-        });
     }
 
     public async shutdown(): Promise<void> {
@@ -370,7 +320,6 @@ export class DispatchConsumer extends EventEmitter {
 
         try {
             await this.dispatchWorker?.close();
-            await this.dispatchQueue?.close();
             await this.queueEvents?.close();
 
             console.log('✅ Event processor shutdown complete');
@@ -381,21 +330,9 @@ export class DispatchConsumer extends EventEmitter {
     }
 
     public async forceProcessAll(): Promise<void> {
-        if (!this.dispatchQueue) {
-            throw new Error('DispatchConsumer not initialized');
-        }
-        console.log('🚀 Force processing all waiting jobs...');
-
-        try {
-            const waitingJobs = await this.dispatchQueue.getWaiting();
-            for (const job of waitingJobs) {
-                await job.promote();
-            }
-            console.log(`✅ Promoted ${waitingJobs.length} jobs for immediate processing`);
-        } catch (error: any) {
-            console.error('❌ Error force processing jobs:', error);
-            throw error;
-        }
+        console.log(
+            '🚀 Force processing all waiting jobs... (Note: this is a consumer-only service)'
+        );
     }
 }
 

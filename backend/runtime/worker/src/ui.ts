@@ -9,7 +9,7 @@ import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { ExpressAdapter } from '@bull-board/express';
 import express, { type Request, type Response } from 'express';
 import { config, redisConfig } from '@/config';
-import { dispatchConsumer } from './consumers/queues/dispatch.consumer';
+import { dispatchProducer as dispatchQueue } from './consumers/queues/dispatch.producer';
 import { dispatchProducer } from './consumers/batch/dispatch.producer';
 import { ingestProducer } from './consumers/batch/ingest.producer';
 import { env } from './app/worker.env';
@@ -38,14 +38,14 @@ app.get('/health', (req: Request, res: Response) => {
 const startServer = async () => {
     try {
         await redisConfig.connect();
-        await dispatchConsumer.initialize();
+        await dispatchQueue.initialize();
         await dispatchProducer.initialize();
         await ingestProducer.initialize();
 
         // Create Bull Board with queue adapters
         createBullBoard({
             queues: [
-                new BullMQAdapter(dispatchConsumer['dispatchQueue']!),
+                new BullMQAdapter(dispatchQueue['dispatchQueue']!),
                 new BullMQAdapter(dispatchProducer.getQueues().DispatchsQueue),
                 new BullMQAdapter(ingestProducer.getQueues().IngestQueue),
             ],

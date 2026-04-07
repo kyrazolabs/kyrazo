@@ -59,15 +59,6 @@ export class SlackTransformer {
                 responseTimeMs: undefined,
                 errorMessage: undefined,
             })),
-
-            meta: {
-                priority: 'normal',
-                maxRetries: 3,
-                insertedAt: new Date(),
-                nonce: crypto.randomUUID(),
-                version: '1.0.0',
-                source: event.source,
-            },
         };
     }
 }

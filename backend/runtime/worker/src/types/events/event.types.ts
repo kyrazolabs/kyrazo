@@ -48,12 +48,6 @@ export interface IPublishEvent extends Document {
 
     status: TargetStatus;
     deliveredAll: boolean;
-
-    meta: {
-        priority: EventPriority;
-        maxRetries: number;
-        insertedAt: Date; // مفيد لمعرفة وقت إدخاله بالنظام
-    };
 }
 
 export interface IReceivedEvent<T = Record<string, string>> {

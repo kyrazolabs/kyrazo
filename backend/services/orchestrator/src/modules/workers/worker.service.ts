@@ -12,51 +12,72 @@ export class WorkerService {
     }
 
     /**
-     * Provision a new worker for a client.
+     * Provision new workers for a client.
      */
-    static async provisionWorker(clientId: string) {
-        const session = await mongoose.startSession();
-        let newWorkerRecord: any;
-        let serverId: string;
+    static async provisionWorker(clientId: string, count: number = 1) {
+        let arrayToProvision: any[] = [];
+        let remainingCount = count;
 
-        try {
-            await session.withTransaction(async () => {
-                // Lock client row to prevent concurrent over-provisioning
-                const client = await WorkerRepo.getClientForUpdate(clientId, session);
-                if (!client) throw new Error(`Client ${clientId} not found`);
+        while (remainingCount > 0) {
+            const session = await mongoose.startSession();
+            try {
+                await session.withTransaction(async () => {
+                    // Lock client row to prevent concurrent over-provisioning
+                    const client = await WorkerRepo.getClientForUpdate(clientId, session);
+                    if (!client) throw new Error(`Client ${clientId} not found`);
 
-                if (client.used_workers >= client.plan_max_workers) {
-                    throw new Error('Plan limit reached');
-                }
+                    if (client.used_workers >= client.plan_max_workers) {
+                        // Prevent infinite loop if capacity completely exhausted mid-loop
+                        remainingCount = 0;
+                        throw new Error('Plan limit reached');
+                    }
 
-                // Lock server row
-                const server = await WorkerRepo.findAvailableServerForUpdate(session);
-                if (!server) throw new Error('No available capacity');
+                    // Lock server row
+                    const server = await WorkerRepo.findAvailableServerForUpdate(session);
+                    if (!server) {
+                        remainingCount = 0;
+                        throw new Error('No available capacity on any servers');
+                    }
 
-                // Atomically increment counters
-                await WorkerRepo.lockCapacity(clientId, server.server_id, session);
+                    const availableCapacity = server.max_workers - server.active_workers;
+                    const toAllocate = Math.min(remainingCount, availableCapacity);
 
-                // Create the worker record
-                newWorkerRecord = await WorkerRepo.createPendingWorker(clientId, server.server_id, session);
-                if (!newWorkerRecord) throw new Error('Failed to create worker record');
-                serverId = server.server_id;
-            });
-        } finally {
-            await session.endSession();
+                    if (toAllocate <= 0) {
+                        remainingCount = 0;
+                        throw new Error('Selected server indicates no available capacity');
+                    }
+
+                    // Atomically increment counters
+                    await WorkerRepo.lockCapacity(clientId, server.server_id, toAllocate, session);
+
+                    // Create the worker record
+                    const newWorkerRecord = await WorkerRepo.createPendingWorker(clientId, server.server_id, toAllocate, session);
+                    if (!newWorkerRecord) throw new Error('Failed to create worker record');
+                    
+                    arrayToProvision.push(newWorkerRecord);
+                    remainingCount -= toAllocate;
+                });
+            } catch (error) {
+                console.error(`[WorkerService] loop stopped allocating: ${error}`);
+                break; // exit loop safely if no capacity or plan limit hit
+            } finally {
+                await session.endSession();
+            }
         }
 
         // Phase 2: Deploy on Coolify OUTSIDE the transaction
-        try {
-            await CommandDispatcher.dispatchStartWorker(serverId!, newWorkerRecord.worker_id, clientId);
-        } catch (err: any) {
-            console.error(
-                `[WorkerService] Coolify deploy failed for worker ${newWorkerRecord.worker_id}. Rolling back.`
-            );
-            await WorkerService.updateWorkerStatus(newWorkerRecord.worker_id, 'failed');
-            throw err;
+        for (const worker of arrayToProvision) {
+            try {
+                await CommandDispatcher.dispatchStartWorker(worker.server_id, worker.worker_id, clientId, worker.workers_count);
+            } catch (err: any) {
+                console.error(
+                    `[WorkerService] Coolify deploy failed for worker ${worker.worker_id}. Rolling back.`
+                );
+                await WorkerService.updateWorkerStatus(worker.worker_id, 'failed');
+            }
         }
 
-        return newWorkerRecord;
+        return arrayToProvision;
     }
 
     /**
@@ -110,6 +131,7 @@ export class WorkerService {
                     await WorkerRepo.releaseResources(
                         currentWorker.client_id,
                         currentWorker.server_id,
+                        currentWorker.workers_count,
                         session
                     );
                     console.log(`[WorkerService] Released resources for worker ${workerId}`);

@@ -10,22 +10,12 @@ const TargetSchema = z.object({
     targetId: objectIdSchema,
 });
 
-const MetaSchema = z.object({
-    priority: z.enum(['low', 'normal', 'high', 'urgent']).default('normal'),
-    maxRetries: z.number().int().min(0).max(10).default(3),
-    insertedAt: z.date().default(new Date()),
-});
 
 export const PublishEventSchema = z.object({
     eventType: z.string().min(1, 'Event type is required'),
     payload: z.any(),
     previous: z.any().optional(),
     targets: z.array(TargetSchema).min(1, 'At least one target is required'),
-    meta: MetaSchema.optional().default(() => ({
-        priority: 'normal' as const,
-        maxRetries: 3,
-        insertedAt: new Date(),
-    })),
 });
 
 export const BatchPublishEventsSchema = z.array(PublishEventSchema);

@@ -41,27 +41,28 @@ export class WorkerRepo {
     /**
      * Atomically increment capacity counters for a client and server.
      */
-    static async lockCapacity(clientId: string, serverId: string, session?: mongoose.ClientSession) {
+    static async lockCapacity(clientId: string, serverId: string, workersCount: number = 1, session?: mongoose.ClientSession) {
         await OrchestratorClient.updateOne(
             { client_id: clientId },
-            { $inc: { used_workers: 1 } },
+            { $inc: { used_workers: workersCount } },
             { session }
         );
 
         await OrchestratorServer.updateOne(
             { server_id: serverId },
-            { $inc: { active_workers: 1 } },
+            { $inc: { active_workers: workersCount } },
             { session }
         );
     }
 
-    static async createPendingWorker(clientId: string, serverId: string, session?: mongoose.ClientSession) {
+    static async createPendingWorker(clientId: string, serverId: string, workersCount: number = 1, session?: mongoose.ClientSession) {
         const [newWorker] = await OrchestratorWorker.create(
             [
                 {
                     worker_id: crypto.randomUUID(), // Or let Mongo generate if you want, but original used UUID
                     client_id: clientId,
                     server_id: serverId,
+                    workers_count: workersCount,
                     status: WorkerStatus.PENDING,
                 },
             ],
@@ -93,10 +94,10 @@ export class WorkerRepo {
     /**
      * Release resources with a floor of 0 to prevent negative counter drift.
      */
-    static async releaseResources(clientId: string, serverId: string, session?: mongoose.ClientSession) {
+    static async releaseResources(clientId: string, serverId: string, workersCount: number = 1, session?: mongoose.ClientSession) {
         await OrchestratorClient.updateOne(
             { client_id: clientId },
-            { $inc: { used_workers: -1 } },
+            { $inc: { used_workers: -workersCount } },
             { session }
         );
         // Ensure it doesn't go below 0 (Mongo doesn't have GREATEST in $inc directly easily without $cond/min/max)
@@ -109,7 +110,7 @@ export class WorkerRepo {
 
         await OrchestratorServer.updateOne(
             { server_id: serverId },
-            { $inc: { active_workers: -1 } },
+            { $inc: { active_workers: -workersCount } },
             { session }
         );
         await OrchestratorServer.updateOne(
@@ -143,10 +144,11 @@ export class WorkerRepo {
     static async reconcileServerCounts() {
         const servers = await OrchestratorServer.find({});
         for (const server of servers) {
-            const count = await OrchestratorWorker.countDocuments({
-                server_id: server.server_id,
-                status: { $in: [WorkerStatus.PENDING, WorkerStatus.STARTING, WorkerStatus.RUNNING, WorkerStatus.STOPPING] },
-            });
+            const result = await OrchestratorWorker.aggregate([
+                { $match: { server_id: server.server_id, status: { $in: [WorkerStatus.PENDING, WorkerStatus.STARTING, WorkerStatus.RUNNING, WorkerStatus.STOPPING] } } },
+                { $group: { _id: null, count: { $sum: '$workers_count' } } }
+            ]);
+            const count = result[0]?.count || 0;
             await OrchestratorServer.updateOne({ server_id: server.server_id }, { $set: { active_workers: count } });
         }
     }
@@ -157,10 +159,11 @@ export class WorkerRepo {
     static async reconcileClientCounts() {
         const clients = await OrchestratorClient.find({});
         for (const client of clients) {
-            const count = await OrchestratorWorker.countDocuments({
-                client_id: client.client_id,
-                status: { $in: [WorkerStatus.PENDING, WorkerStatus.STARTING, WorkerStatus.RUNNING, WorkerStatus.STOPPING] },
-            });
+            const result = await OrchestratorWorker.aggregate([
+                { $match: { client_id: client.client_id, status: { $in: [WorkerStatus.PENDING, WorkerStatus.STARTING, WorkerStatus.RUNNING, WorkerStatus.STOPPING] } } },
+                { $group: { _id: null, count: { $sum: '$workers_count' } } }
+            ]);
+            const count = result[0]?.count || 0;
             await OrchestratorClient.updateOne({ client_id: client.client_id }, { $set: { used_workers: count } });
         }
     }

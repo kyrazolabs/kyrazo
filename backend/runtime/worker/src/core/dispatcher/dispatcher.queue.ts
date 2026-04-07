@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { dispatchConsumer } from '@/consumers/queues/dispatch.consumer';
+import { dispatchProducer } from '@/consumers/queues/dispatch.producer';
 import type { IDispatchedEvent, IWebhookHeaders } from './dispatcher.types';
 import { redisConfig } from '@/config';
 import { targetRepository } from '@/services/mongo/target.repo';
@@ -50,7 +50,7 @@ export class DispatcherQueue extends EventEmitter {
             }
 
             const configuredTargets = await this.configureTargets(event, type);
-            const jobIds = await dispatchConsumer.enqueue(event, configuredTargets, headers);
+            const jobIds = await dispatchProducer.enqueue(event, configuredTargets, headers);
 
             logger.info(`✅ Queued ${jobIds.length} dispatch jobs for event ${event.id}`);
         } catch (error: any) {
@@ -95,21 +95,33 @@ export class DispatcherQueue extends EventEmitter {
                     if (!tar) {
                         continue;
                     }
-                    const targetCacheKey = RedisKeys.context.workspaceNamespaceTarget(event.workspaceId, event.namespaceId, tar.targetId);
+                    const targetCacheKey = RedisKeys.context.workspaceNamespaceTarget(
+                        event.workspaceId,
+                        event.namespaceId,
+                        tar.targetId
+                    );
                     const cachedTargetRaw = await redisConfig.get(targetCacheKey);
                     let target: any = cachedTargetRaw ? JSON.parse(cachedTargetRaw) : null;
 
                     if (!target) {
-                        logger.info(`🔍 Cache miss for target ${tar.targetId}, querying MongoDB...`);
+                        logger.info(
+                            `🔍 Cache miss for target ${tar.targetId}, querying MongoDB...`
+                        );
                         target = await targetRepository.getTargetById(
                             tar.targetId,
                             event.workspaceId,
                             event.namespaceId
                         );
-                        logger.info(`🔍 MongoDB result for target ${tar.targetId}: ${target ? 'FOUND' : 'NULL'}`);
+                        logger.info(
+                            `🔍 MongoDB result for target ${tar.targetId}: ${target ? 'FOUND' : 'NULL'}`
+                        );
                         // Only cache if the target actually exists — never cache null
                         if (target) {
-                            await redisConfig.set(targetCacheKey, JSON.stringify(target), 60 * 60 * 10);
+                            await redisConfig.set(
+                                targetCacheKey,
+                                JSON.stringify(target),
+                                60 * 60 * 10
+                            );
                         }
                     }
 
@@ -159,7 +171,7 @@ export class DispatcherQueue extends EventEmitter {
                                     : JOB_PRIORITIES.LOW,
                         rateLimit: target.config?.rateLimit,
                         rateLimitDuration: target.config?.rateLimitDuration,
-                        retryCount: target.config?.retryCount ?? event.meta?.maxRetries ?? 3,
+                        retryCount: target.config?.retryCount ?? 3,
                         customHeaders: target.customHeaders,
                         method: target.method,
                     });
@@ -170,7 +182,11 @@ export class DispatcherQueue extends EventEmitter {
                     if (!tar) {
                         continue;
                     }
-                    const endpointCacheKey = RedisKeys.context.workspaceNamespaceEndpoint(event.workspaceId, event.namespaceId, tar.targetId);
+                    const endpointCacheKey = RedisKeys.context.workspaceNamespaceEndpoint(
+                        event.workspaceId,
+                        event.namespaceId,
+                        tar.targetId
+                    );
                     const cachedEndpointRaw = await redisConfig.get(endpointCacheKey);
                     let endpoint: any = cachedEndpointRaw ? JSON.parse(cachedEndpointRaw) : null;
 
@@ -182,7 +198,11 @@ export class DispatcherQueue extends EventEmitter {
                         );
                         // Only cache if the endpoint actually exists — never cache null
                         if (endpoint) {
-                            await redisConfig.set(endpointCacheKey, JSON.stringify(endpoint), 60 * 60 * 10);
+                            await redisConfig.set(
+                                endpointCacheKey,
+                                JSON.stringify(endpoint),
+                                60 * 60 * 10
+                            );
                         }
                     }
 
