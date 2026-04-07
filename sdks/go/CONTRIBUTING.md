@@ -15,12 +15,12 @@ graph TD
     Client --> Targets[Targets Service]
     Client --> Endpoints[Endpoints Service]
     Client --> Sources[Sources Service]
-    
+
     Events --> Internal[Internal Request Client]
     Targets --> Internal
     Endpoints --> Internal
     Sources --> Internal
-    
+
     Internal --> ErrorMapping[Error Transformation]
     Internal --> Retry[Retry Logic/Backoff]
     Internal --> NetHTTP[net/http]
@@ -58,21 +58,24 @@ sdks/go/
 ## Development Workflow
 
 ### Prerequisites
+
 - Go 1.22+
 - `golangci-lint` (recommended)
 
 ### Testing
+
 We maintain a high bar for testing. All logic in `internal/request` and the service modules must be covered by `httptest`-based unit tests.
 
 ```bash
 # Run all tests
-go test ./...
+mise exec -- go test ./...
 
 # Run tests with coverage
-go test -v -cover ./...
+mise exec -- go test -v -cover ./...
 ```
 
 ### Code Style
+
 - Follow idiomatic Go conventions (`effective go`).
 - Use the functional options pattern for initialization.
 - All exported methods must have a `context.Context` parameter as the first argument.

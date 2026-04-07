@@ -8,6 +8,16 @@
  */
 
 /**
+ * Individual validation error detail
+ */
+export interface ValidationErrorDetail {
+  /** The field that failed validation (e.g., "name", "config.timeout") */
+  field: string;
+  /** Human-readable validation error message */
+  message: string;
+}
+
+/**
  * API error response structure from the backend
  * Matches the backend's `IErrorResponse` interface
  */
@@ -19,7 +29,7 @@ export interface APIErrorResponse {
     /** Human-readable error message */
     message: string;
     /** Additional error details (validation errors, etc.) */
-    details?: unknown;
+    details?: ValidationErrorDetail[];
     /** Unique request identifier for debugging */
     requestId?: string;
     /** Seconds to wait before retrying (rate limit errors) */
@@ -130,7 +140,7 @@ export class ValidationError extends KyrazoError {
   constructor(
     message: string,
     code: string = "INVALID_PAYLOAD",
-    public readonly details?: unknown,
+    public readonly details?: ValidationErrorDetail[],
     requestId?: string,
   ) {
     super(message, code, 400, requestId);

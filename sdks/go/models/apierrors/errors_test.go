@@ -28,7 +28,9 @@ func TestErrorHierarchy(t *testing.T) {
 	})
 
 	t.Run("ValidationError", func(t *testing.T) {
-		details := map[string]string{"field": "required"}
+		details := []apierrors.ValidationErrorDetail{
+			{Field: "field", Message: "required"},
+		}
 		err := apierrors.NewValidationError("Invalid payload", "VALIDATION_ERROR", "req_3", details)
 		var valErr *apierrors.ValidationError
 		assert.True(t, errors.As(err, &valErr))

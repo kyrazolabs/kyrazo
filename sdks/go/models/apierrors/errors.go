@@ -4,6 +4,12 @@ import (
 	"fmt"
 )
 
+// ValidationErrorDetail represents an individual validation error
+type ValidationErrorDetail struct {
+	Field   string `json:"field"`
+	Message string `json:"message"`
+}
+
 // KyrazoError is the base error type for all SDK errors
 type KyrazoError struct {
 	Message    string `json:"message"`
@@ -54,10 +60,36 @@ func NewForbiddenError(message string, code string, requestId string) *Forbidden
 // ValidationError - invalid request payload (400)
 type ValidationError struct {
 	KyrazoError
-	Details interface{} `json:"details,omitempty"`
+	Details []ValidationErrorDetail `json:"details,omitempty"`
 }
 
 func NewValidationError(message string, code string, requestId string, details interface{}) *ValidationError {
+	var typedDetails []ValidationErrorDetail
+
+	switch d := details.(type) {
+	case []ValidationErrorDetail:
+		typedDetails = d
+	case []interface{}:
+		for _, item := range d {
+			if m, ok := item.(map[string]interface{}); ok {
+				typedDetails = append(typedDetails, ValidationErrorDetail{
+					Field:   fmt.Sprintf("%v", m["field"]),
+					Message: fmt.Sprintf("%v", m["message"]),
+				})
+			}
+		}
+	case map[string]interface{}:
+		// Handle single map as a single detail entry if it has field/message
+		field, okF := d["field"].(string)
+		msg, okM := d["message"].(string)
+		if okF && okM {
+			typedDetails = append(typedDetails, ValidationErrorDetail{
+				Field:   field,
+				Message: msg,
+			})
+		}
+	}
+
 	return &ValidationError{
 		KyrazoError: KyrazoError{
 			Message:    message,
@@ -65,7 +97,7 @@ func NewValidationError(message string, code string, requestId string, details i
 			StatusCode: 400,
 			RequestId:  requestId,
 		},
-		Details: details,
+		Details: typedDetails,
 	}
 }
 

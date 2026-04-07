@@ -4,7 +4,6 @@ from .models import (
     PublishEventResponse,
     BatchPublishEventResponse,
     TargetInput,
-    EventMeta,
 )
 
 __all__ = [
@@ -13,5 +12,4 @@ __all__ = [
     "PublishEventResponse",
     "BatchPublishEventResponse",
     "TargetInput",
-    "EventMeta",
 ]

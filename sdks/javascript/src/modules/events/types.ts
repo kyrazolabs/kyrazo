@@ -3,7 +3,6 @@
  */
 
 export type {
-  EventPriority,
   EventStatus,
   PublishEventPayload,
   PublishEventResponse,

@@ -1,4 +1,10 @@
-from typing import Optional, Any
+from typing import Optional, Any, List, Dict, TypedDict
+
+
+class ValidationErrorDetail(TypedDict):
+    """Reflects an individual validation error detail."""
+    field: str
+    message: str
 
 
 class KyrazoError(Exception):
@@ -52,7 +58,7 @@ class ValidationError(KyrazoError):
         self,
         message: str,
         code: str = "INVALID_PAYLOAD",
-        details: Optional[Any] = None,
+        details: Optional[List[ValidationErrorDetail]] = None,
         request_id: Optional[str] = None,
     ):
         super().__init__(message, code=code, status_code=400, request_id=request_id)

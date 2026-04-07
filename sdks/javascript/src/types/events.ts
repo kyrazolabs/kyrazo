@@ -9,10 +9,6 @@
 
 import type { EventData, EventTarget, Timestamps } from "./common";
 
-/**
- * Priority levels for event processing
- */
-export type EventPriority = "low" | "normal" | "high" | "urgent";
 
 /**
  * Possible event status values
@@ -52,22 +48,6 @@ export interface PublishEventPayload {
    */
   targets: EventTarget[];
 
-  /**
-   * Optional event metadata for processing configuration
-   */
-  meta?: {
-    /**
-     * Event priority level
-     * @default "normal"
-     */
-    priority?: EventPriority;
-
-    /**
-     * Maximum retry attempts (0-10)
-     * @default 3
-     */
-    maxRetries?: number;
-  };
 }
 
 /**
@@ -203,13 +183,6 @@ export interface Event extends Timestamps {
 
   /** Target endpoints */
   targets: EventTargetWithStatus[];
-
-  /** Event metadata */
-  meta: {
-    priority: EventPriority;
-    maxRetries: number;
-    insertedAt: string;
-  };
 }
 
 /**

@@ -17,7 +17,6 @@ export type {
 
 // Dispatch types
 export type {
-  EventPriority,
   EventStatus,
   PublishEventPayload,
   PublishEventResponse,

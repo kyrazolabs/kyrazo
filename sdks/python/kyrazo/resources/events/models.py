@@ -9,19 +9,12 @@ class TargetInput(BaseModel):
     )
 
 
-class EventMeta(BaseModel):
-    model_config = ConfigDict(populate_by_name=True)
-    priority: Optional[str] = Field(None, pattern="^(low|normal|high|urgent)$")
-    max_retries: Optional[int] = Field(None, alias="maxRetries", ge=0, le=10)
-
-
 class PublishEventBody(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
     event_type: str = Field(..., alias="eventType", min_length=1)
     payload: Dict[str, Any] = Field(..., description="The event data payload.")
     previous: Optional[Any] = None
     targets: List[TargetInput] = Field(..., min_length=1)
-    meta: Optional[EventMeta] = None
 
 
 class PublishEventResponse(BaseModel):
