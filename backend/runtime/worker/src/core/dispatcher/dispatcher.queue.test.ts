@@ -21,8 +21,8 @@ const mockTargetRepo = {
     ),
 };
 
-mock.module('@/consumers/queues/dispatch.consumer', () => ({
-    dispatchConsumer: mockDispatchConsumer,
+mock.module('@/consumers/queues/dispatch.producer', () => ({
+    dispatchProducer: mockDispatchConsumer,
 }));
 
 mock.module('@/config', () => ({

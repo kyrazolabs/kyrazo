@@ -1,11 +1,11 @@
 import { redisConfig, natsConfig } from '@/config';
-import { clickhouseConfig, databaseConfig, logger, Source, Endpoint } from '@kyrazo/shared';
+import { databaseConfig, logger, Source, Endpoint } from '@kyrazo/shared';
 import { lifecycle } from './worker.lifecycle';
 import { WorkerConsumer } from '@/consumers/nats/nats.listener';
 import { env } from './worker.env';
 import { dispatchProducer } from '@/consumers/batch/dispatch.producer';
 import { ingestProducer } from '@/consumers/batch/ingest.producer';
-import { dispatchConsumer } from '@/consumers/queues/dispatch.consumer';
+import { dispatchProducer as dispatchQueue } from '@/consumers/queues/dispatch.producer';
 
 export const bootstrap = async () => {
     lifecycle();
@@ -21,16 +21,13 @@ export const bootstrap = async () => {
         await redisConfig.connect();
         logger.info('Redis connected successfully');
 
-        await clickhouseConfig.connect();
-        logger.info('ClickHouse connected successfully');
-
         await natsConfig.connect().then(() => {
             logger.info('NATS connected successfully');
         });
 
         // Initialize BullMQ Components after Redis is ready
-        await dispatchConsumer.initialize();
         await dispatchProducer.initialize();
+        await dispatchQueue.initialize();
         await ingestProducer.initialize();
         const workerConsumer = new WorkerConsumer(env.worker.WORKSPACE_ID!);
         workerConsumer.start().catch((err: any) => {

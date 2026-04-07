@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
+import { zValidator } from '@/core/middlewares/validator.middleware';
 import { authenticate } from '@/core/middlewares/auth.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
 import { requireNamespaceAccessParam } from '@/core/middlewares/namespace.middleware';
@@ -24,21 +24,7 @@ router.use(authenticate);
 router.post(
     '/',
     namespaceWriteRateLimiter,
-    zValidator('json', CreateNamespaceSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('json', CreateNamespaceSchema),
     requireWorkspaceMembership(['admin', 'owner']),
     checkWorkspaceLimits('maxNamespaces'),
     NamespaceController.createNamespace
@@ -48,21 +34,7 @@ router.post(
 router.get(
     '/workspace',
     namespaceReadRateLimiter,
-    zValidator('query', FilterNamespaceSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('query', FilterNamespaceSchema),
     requireWorkspaceMembership(),
     NamespaceController.listWorkspaceNamespaces
 );
@@ -70,78 +42,22 @@ router.get(
 // Routes requiring namespace ownership or workspace membership
 router.use(
     '/:namespaceId/*',
-    zValidator('param', GetNamespaceByIdSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }) as any,
+    zValidator('param', GetNamespaceByIdSchema) as any,
     requireWorkspaceMembership(['owner', 'admin', 'member'])
 ); // Assuming namespace access is tied to workspace membership
 
 router.get(
     '/:namespaceId',
     namespaceReadRateLimiter,
-    zValidator('param', GetNamespaceByIdSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('param', GetNamespaceByIdSchema),
     NamespaceController.getNamespaceById
 );
 
 router.patch(
     '/:namespaceId',
     namespaceWriteRateLimiter,
-    zValidator('param', GetNamespaceByIdSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
-    zValidator('json', CreateNamespaceSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('param', GetNamespaceByIdSchema),
+    zValidator('json', CreateNamespaceSchema),
     requireNamespaceAccessParam(['owner', 'admin']), // Namespace deletion requires ownership
     requireRecentOTP('update_namespace'),
     NamespaceController.updateNamespace
@@ -150,21 +66,7 @@ router.patch(
 router.delete(
     '/:namespaceId',
     namespaceWriteRateLimiter,
-    zValidator('param', GetNamespaceByIdSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('param', GetNamespaceByIdSchema),
     requireNamespaceAccessParam(['owner', 'admin']), // Namespace deletion requires ownership
     requireRecentOTP('delete_namespace'),
     NamespaceController.deleteNamespace
@@ -173,21 +75,7 @@ router.delete(
 router.post(
     '/:namespaceId/restore',
     namespaceWriteRateLimiter,
-    zValidator('param', GetNamespaceByIdSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('param', GetNamespaceByIdSchema),
     requireNamespaceAccessParam(['owner', 'admin'], { allowDeleted: true }), // Allow access to deleted namespaces for restore
     NamespaceController.restoreNamespace
 );

@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
+import { zValidator } from '@/core/middlewares/validator.middleware';
 
 import { AuthController } from '@/modules/v1/auth/auth.controller';
 import { authenticate } from '@/core/middlewares/auth.middleware';
@@ -42,103 +42,33 @@ const auth = new Hono();
 auth.post(
     '/register',
     registerRateLimiter,
-    zValidator('json', RegisterSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('json', RegisterSchema),
     AuthController.register
 );
 auth.post(
     '/login',
     loginRateLimiter,
-    zValidator('json', LoginSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('json', LoginSchema),
     AuthController.login
 );
 
 auth.post(
     '/google',
     loginRateLimiter,
-    zValidator('json', GoogleLoginSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('json', GoogleLoginSchema),
     AuthController.google
 );
 
 auth.post(
     '/refresh-token',
     refreshTokenRateLimiter,
-    zValidator('json', RefreshTokenSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('json', RefreshTokenSchema),
     AuthController.refreshToken
 );
 
 auth.post(
     '/forgot-password',
-    zValidator('json', ForgotPasswordSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('json', ForgotPasswordSchema),
     forgotPasswordRateLimiter,
     AuthController.forgotPassword
 );
@@ -146,41 +76,13 @@ auth.post(
 auth.post(
     '/reset-password',
     resetPasswordRateLimiter,
-    zValidator('json', ResetPasswordSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('json', ResetPasswordSchema),
     AuthController.resetPassword
 );
 
 auth.post(
     '/verify-email',
-    zValidator('json', VerifyEmailSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('json', VerifyEmailSchema),
     verifyEmailRateLimiter,
     AuthController.verifyEmail
 );
@@ -192,42 +94,14 @@ auth.use('/logout', authenticate);
 auth.post(
     '/change-password',
     changePasswordProtectedRateLimiter,
-    zValidator('json', ChangePasswordSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('json', ChangePasswordSchema),
     AuthController.changePassword
 );
 
 auth.post(
     '/logout',
     logoutProtectedRateLimiter,
-    zValidator('json', RefreshTokenSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('json', RefreshTokenSchema),
     AuthController.logout
 );
 
@@ -242,84 +116,28 @@ auth.post('/resend-verification', profileUpdateRateLimiter, AuthController.resen
 auth.post(
     '/2fa/setup',
     authenticate,
-    zValidator('json', Setup2FASchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('json', Setup2FASchema),
     AuthController.setup2FA
 );
 
 auth.post(
     '/2fa/verify-setup',
     authenticate,
-    zValidator('json', Verify2FASetupSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('json', Verify2FASetupSchema),
     AuthController.verify2FASetup
 );
 
 auth.post(
     '/2fa/login',
     loginRateLimiter,
-    zValidator('json', Login2FASchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('json', Login2FASchema),
     AuthController.login2FA
 );
 
 auth.post(
     '/2fa/resend',
     loginRateLimiter,
-    zValidator('json', Resend2FAOTPSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('json', Resend2FAOTPSchema),
     AuthController.resend2FAOTP
 );
 
@@ -329,42 +147,14 @@ auth.post('/2fa/disable', authenticate, requireRecentOTP('disable_2fa'), AuthCon
 auth.post(
     '/otp/request',
     authenticate,
-    zValidator('json', RequestSensitiveOTPSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('json', RequestSensitiveOTPSchema),
     AuthController.requestSensitiveOTP
 );
 
 auth.post(
     '/otp/verify',
     authenticate,
-    zValidator('json', VerifySensitiveOTPSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('json', VerifySensitiveOTPSchema),
     AuthController.verifySensitiveOTP
 );
 

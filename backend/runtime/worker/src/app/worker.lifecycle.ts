@@ -1,7 +1,7 @@
 import { redisConfig, natsConfig } from '@/config';
 import { dispatchProducer } from '@/consumers/batch/dispatch.producer';
 import { ingestProducer } from '@/consumers/batch/ingest.producer';
-import { dispatchConsumer } from '@/consumers/queues/dispatch.consumer';
+import { dispatchProducer as dispatchQueue } from '@/consumers/queues/dispatch.producer';
 import { databaseConfig, logger } from '@kyrazo/shared';
 
 // Graceful shutdown handler
@@ -15,7 +15,7 @@ const gracefulShutdown = async (signal: string) => {
 
     await dispatchProducer.close();
     await ingestProducer.close();
-    await dispatchConsumer.shutdown();
+    await dispatchQueue.shutdown();
 
     try {
         await databaseConfig.disconnect();
@@ -39,7 +39,6 @@ const gracefulShutdown = async (signal: string) => {
     } catch (error: any) {
         logger.error('Error closing NATS connection:', error);
     }
-
 
     // Force close after 30 seconds
     setTimeout(() => {

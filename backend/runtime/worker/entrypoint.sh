@@ -34,7 +34,7 @@ done
 
 # Drop down to the bun user and start the application if running as root
 if [ "$(id -u)" = "0" ]; then
-    exec su-exec bun bun run src/index.ts
+    exec su-exec bun bun run prod
 else
-    exec bun run src/index.ts
+    exec bun run prod
 fi

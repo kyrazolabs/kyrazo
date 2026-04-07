@@ -32,9 +32,6 @@ services:
       - MONGODB_MIN_POOL_SIZE=${MONGODB_MIN_POOL_SIZE}
       - MONGODB_SSL=${MONGODB_SSL}
 
-      # Clickhouse Configuration
-      - CLICKHOUSE_URL=${CLICKHOUSE_URL}
-
       # Redis Configuration
       - REDIS_URL=${REDIS_URL}
       - REDIS_TLS=${REDIS_TLS}

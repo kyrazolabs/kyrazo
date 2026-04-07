@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { SupportController } from './support.controller';
-import { zValidator } from '@hono/zod-validator';
+import { zValidator } from '@/core/middlewares/validator.middleware';
 import { SupportTicketSchema } from './support.schema';
 import { NamespaceHeadersSchema } from '@kyrazo/shared';
 import { authenticate } from '@/core/middlewares/auth.middleware';
@@ -10,21 +10,7 @@ import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middlew
 import { supportReadRateLimiter } from './support.ratelimiter';
 
 // Header validation using zValidator
-const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema, (result, c) => {
-    if (!result.success) {
-        return c.json(
-            {
-                success: false,
-                statusCode: 400,
-                errors: JSON.parse(result.error.message).map((e: any) => ({
-                    field: e.path.join('.') || 'unknown',
-                    message: e.message,
-                })),
-            },
-            400
-        );
-    }
-});
+const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema);
 
 const support = new Hono();
 

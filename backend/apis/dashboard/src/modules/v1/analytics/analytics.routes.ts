@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
+import { zValidator } from '@/core/middlewares/validator.middleware';
 import { AppContext, authenticate } from '@/core/middlewares/auth.middleware';
 import { sentryMiddleware } from '@/core/middlewares/sentry.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
@@ -19,21 +19,7 @@ import {
 const analytics = new Hono();
 
 // Header validation using zValidator
-const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema, (result, c) => {
-    if (!result.success) {
-        return c.json(
-            {
-                success: false,
-                statusCode: 400,
-                errors: JSON.parse(result.error.message).map((e: any) => ({
-                    field: e.path.join('.') || 'unknown',
-                    message: e.message,
-                })),
-            },
-            400
-        );
-    }
-});
+const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema);
 
 // Lazy wrapper for analytics routes rate limiter (user-based, normal level for read operations)
 const analyticsRateLimiter = async (c: AppContext, next: () => Promise<void>) => {
@@ -61,21 +47,7 @@ analytics.use('*', requireNamespaceAccess());
 analytics.get(
     '/dispatch/usage',
     analyticsRateLimiter,
-    zValidator('query', OverviewFilterSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('query', OverviewFilterSchema),
     AnalyticsController.getDispatchUsage
 );
 
@@ -85,21 +57,7 @@ analytics.get(
 analytics.get(
     '/ingest/usage',
     analyticsRateLimiter,
-    zValidator('query', OverviewFilterSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('query', OverviewFilterSchema),
     AnalyticsController.getIngestUsage
 );
 
@@ -109,36 +67,8 @@ analytics.get(
 analytics.get(
     '/targets/:targetId/overview',
     analyticsRateLimiter,
-    zValidator('param', TargetQuerySchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
-    zValidator('query', OverviewFilterSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('param', TargetQuerySchema),
+    zValidator('query', OverviewFilterSchema),
     AnalyticsController.getTargetOverview
 );
 

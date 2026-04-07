@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
+import { zValidator } from '@/core/middlewares/validator.middleware';
 
 import { profileController } from '@/modules/v1/profile/profile.controller';
 import { authenticate } from '@/core/middlewares/auth.middleware';
@@ -22,21 +22,7 @@ profile.patch(
     '/',
     profileUpdateRateLimiter,
     requireRecentOTP('update_profile'),
-    zValidator('json', UpdateProfileSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('json', UpdateProfileSchema),
     profileController.updateProfile
 );
 
@@ -44,21 +30,7 @@ profile.get('/preferences', preferencesReadRateLimiter, profileController.getPre
 profile.patch(
     '/preferences',
     preferencesUpdateRateLimiter,
-    zValidator('json', UpdatePreferencesSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('json', UpdatePreferencesSchema),
     profileController.updatePreferences
 );
 

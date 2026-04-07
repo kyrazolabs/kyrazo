@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
+import { zValidator } from '@/core/middlewares/validator.middleware';
 import { NamespaceHeadersSchema } from '@/core/utils/libs/zod';
 import { authenticate } from '@/core/middlewares/auth.middleware';
 import { sentryMiddleware } from '@/core/middlewares/sentry.middleware';
@@ -18,21 +18,7 @@ import { ingestRateLimiter } from './ingest.ratelimiter';
 const ingest = new Hono();
 
 // Header validation using zValidator
-const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema, (result, c) => {
-    if (!result.success) {
-        return c.json(
-            {
-                success: false,
-                statusCode: 400,
-                errors: JSON.parse(result.error.message).map((e: any) => ({
-                    field: e.path.join('.') || 'unknown',
-                    message: e.message,
-                })),
-            },
-            400
-        );
-    }
-});
+const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema);
 
 ingest.use('*', authenticate);
 ingest.use('*', sentryMiddleware);
@@ -46,36 +32,8 @@ ingest.use('*', requireNamespaceAccess());
 ingest.get(
     '/source/:sourceId',
     ingestRateLimiter,
-    zValidator('param', GetIngestEventsSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
-    zValidator('query', GetIngestsEventsBySourceSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('param', GetIngestEventsSchema),
+    zValidator('query', GetIngestsEventsBySourceSchema),
     IngestController.getIngestEventsBySource
 );
 
@@ -85,21 +43,7 @@ ingest.get(
 ingest.get(
     '/events',
     ingestRateLimiter,
-    zValidator('query', GetIngestEventsSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('query', GetIngestEventsSchema),
     IngestController.getIngestEvents
 );
 
@@ -109,21 +53,7 @@ ingest.get(
 ingest.get(
     '/events/:eventId',
     ingestRateLimiter,
-    zValidator('param', GetIngestsByEventIdSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('param', GetIngestsByEventIdSchema),
     IngestController.getIngestEventById
 );
 

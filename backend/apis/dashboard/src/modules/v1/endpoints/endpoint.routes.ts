@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
+import { zValidator } from '@/core/middlewares/validator.middleware';
 import { AppContext } from '@/core/middlewares/auth.middleware';
 
 import { authenticate } from '@/core/middlewares/auth.middleware';
@@ -24,21 +24,7 @@ import { NamespaceHeadersSchema } from '@/core/utils/libs/zod';
 const endpoint = new Hono();
 
 // Header validation using zValidator
-const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema, (result, c) => {
-    if (!result.success) {
-        return c.json(
-            {
-                success: false,
-                statusCode: 400,
-                errors: JSON.parse(result.error.message).map((e: any) => ({
-                    field: e.path.join('.') || 'unknown',
-                    message: e.message,
-                })),
-            },
-            400
-        );
-    }
-});
+const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema);
 
 // Lazy wrappers for endpoint routes rate limiters (user-based)
 const endpointReadRateLimiter = async (c: AppContext, next: () => Promise<void>) => {
@@ -76,162 +62,50 @@ endpoint.use('*', requireNamespaceAccess());
 endpoint.post(
     '/',
     endpointWriteRateLimiter,
-    zValidator('json', CreateEndpointSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('json', CreateEndpointSchema),
     EndpointController.createEndpoint
 );
 
 endpoint.get(
     '/',
     endpointReadRateLimiter,
-    zValidator('query', SearchEndpointSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('query', SearchEndpointSchema),
     EndpointController.getEndpoints
 );
 
 endpoint.get(
     '/:endpointId',
     endpointReadRateLimiter,
-    zValidator('param', GetEndpointByIdSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('param', GetEndpointByIdSchema),
     EndpointController.getEndpoint
 );
 
 endpoint.get(
     '/:endpointId/secret',
     endpointReadRateLimiter,
-    zValidator('param', GetEndpointByIdSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('param', GetEndpointByIdSchema),
     EndpointController.getEndpointSecret
 );
 
 endpoint.patch(
     '/:endpointId',
     endpointWriteRateLimiter,
-    zValidator('param', GetEndpointByIdSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
-    zValidator('json', UpdateEndpointSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('param', GetEndpointByIdSchema),
+    zValidator('json', UpdateEndpointSchema),
     EndpointController.updateEndpoint
 );
 
 endpoint.put(
     '/:endpointId/:status',
     endpointWriteRateLimiter,
-    zValidator('param', UpdateEndpointStatusSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('param', UpdateEndpointStatusSchema),
     EndpointController.updateEndpointStatus
 );
 
 endpoint.delete(
     '/:endpointId',
     endpointWriteRateLimiter,
-    zValidator('param', GetEndpointByIdSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('param', GetEndpointByIdSchema),
     EndpointController.deleteEndpoint
 );
 

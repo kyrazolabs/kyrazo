@@ -13,7 +13,12 @@ export class CommandDispatcher {
     /**
      * Dispatch a START_WORKER command via DB Queue and Coolify API (Auto-Scale Up)
      */
-    static async dispatchStartWorker(serverId: string, workerId: string, clientId: string) {
+    static async dispatchStartWorker(
+        serverId: string,
+        workerId: string,
+        clientId: string,
+        workersCount: number = 1
+    ) {
         // 1. Fetch Server from DB to get Coolify Target params
         const server = await OrchestratorServer.findOne({ server_id: serverId });
 
@@ -39,6 +44,7 @@ export class CommandDispatcher {
                 github_app_uuid: config.COOLIFY_GITHUB_APP_UUID,
                 name: appName,
                 description: `This worker ${workerId} is dedicated for client ${clientId}`,
+                limits_cpus: workersCount.toString(),
                 build_pack: 'dockercompose',
             };
 
@@ -57,6 +63,7 @@ export class CommandDispatcher {
                 WORKER_ID: workerId,
 
                 // ================ WORKER CONFIGURATION ================ //
+                WORKERS: workersCount.toString(),
                 NODE_ENV: '{{ environment.WORKER_NODE_ENV }}',
                 BATCH_SIZE: '{{ environment.BATCH_SIZE }}',
                 CONCURRENCY: '{{ environment.WORKER_CONCURRENCY }}',
@@ -82,9 +89,6 @@ export class CommandDispatcher {
                 MONGODB_MIN_POOL_SIZE: '{{ environment.MONGODB_MIN_POOL_SIZE}}',
                 MONGODB_SSL: '{{ project.MONGODB_SSL}}',
                 MONGODB_CA_FILE: '{{ environment.MONGODB_CA_FILE}}',
-
-                //  Clickhouse Configuration
-                CLICKHOUSE_URL: '{{ project.CLICKHOUSE_URL }}',
 
                 //  Redis Configuration
                 REDIS_URL: '{{ project.REDIS_URL }}',
