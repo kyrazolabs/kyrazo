@@ -31,7 +31,6 @@ type PublishEvent struct {
 	EventType string                 `json:"eventType"`
 	Payload   map[string]interface{} `json:"payload"`
 	Targets   []EventTarget          `json:"targets,omitempty"`
-	Priority  string                 `json:"priority,omitempty"`
 }
 
 type PublishEventResponse struct {

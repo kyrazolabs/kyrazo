@@ -86,7 +86,6 @@ export type {
 } from "./types/targets";
 
 export type {
-  EventPriority,
   EventStatus,
   PublishEventPayload,
   PublishEventResponse,

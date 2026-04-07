@@ -26,7 +26,6 @@ import { createPublishEvents } from "./publish-events";
 
 // Re-export types
 export type {
-  EventPriority,
   EventStatus,
   PublishEventPayload,
   PublishEventResponse,

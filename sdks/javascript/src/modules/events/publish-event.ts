@@ -58,12 +58,9 @@ export function createPublishEvent(httpClient: HttpClient) {
    *   payload: { orderId: "order_456", amount: 99.99 },
    *   targets: [
    *     { targetId: "65a1b2c3d4e5f67890123456" }
-   *   ],
-   *   meta: {
-   *     priority: "high",
-   *     maxRetries: 5
-   *   }
-   * });
+   *   ]
+  * });
+
    * ```
    */
   return async function publishEvent(
@@ -113,32 +110,6 @@ export function createPublishEvent(httpClient: HttpClient) {
         throw new ValidationError(
           `targets[${i}].targetId is required and must be a string`,
         );
-      }
-    }
-
-    // Validate optional meta fields
-    if (payload.meta !== undefined) {
-      if (typeof payload.meta !== "object") {
-        throw new ValidationError("meta must be an object");
-      }
-      if (payload.meta.priority !== undefined) {
-        const validPriorities = ["low", "normal", "high", "urgent"];
-        if (!validPriorities.includes(payload.meta.priority)) {
-          throw new ValidationError(
-            `meta.priority must be one of: ${validPriorities.join(", ")}`,
-          );
-        }
-      }
-      if (payload.meta.maxRetries !== undefined) {
-        if (
-          typeof payload.meta.maxRetries !== "number" ||
-          payload.meta.maxRetries < 0 ||
-          payload.meta.maxRetries > 10
-        ) {
-          throw new ValidationError(
-            "meta.maxRetries must be a number between 0 and 10",
-          );
-        }
       }
     }
 
