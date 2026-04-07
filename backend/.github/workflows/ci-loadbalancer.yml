@@ -4,13 +4,14 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - 'backend/runtime/loadbalancer/**'
-      - 'backend/shared/**'
+      - 'runtime/loadbalancer/**'
+      - 'shared/**'
+      - '.github/workflows/ci-loadbalancer.yml'
   pull_request:
     branches: [main, develop]
     paths:
-      - 'backend/runtime/loadbalancer/**'
-      - 'backend/shared/**'
+      - 'runtime/loadbalancer/**'
+      - 'shared/**'
 
 jobs:
   build:
@@ -27,24 +28,24 @@ jobs:
 
       - name: Install shared dependencies
         run: bun install
-        working-directory: backend/shared
+        working-directory: shared
 
       - name: Build shared library
         run: bun run build
-        working-directory: backend/shared
+        working-directory: shared
 
       - name: Install service dependencies
         run: bun install
-        working-directory: backend/runtime/loadbalancer
+        working-directory: runtime/loadbalancer
 
       - name: Typecheck
         run: bunx tsc --noEmit
-        working-directory: backend/runtime/loadbalancer
+        working-directory: runtime/loadbalancer
 
       - name: Test
         run: bun test
-        working-directory: backend/runtime/loadbalancer
+        working-directory: runtime/loadbalancer
 
       - name: Build
         run: bun run build
-        working-directory: backend/runtime/loadbalancer
+        working-directory: runtime/loadbalancer
