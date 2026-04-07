@@ -70,7 +70,6 @@ export class DispatcherQueue extends EventEmitter {
             type: 'target' | 'endpoint';
             targetId: string;
             url: string;
-            priority: number;
             rateLimit?: number;
             rateLimitDuration?: number;
             retryCount?: number;
@@ -82,7 +81,6 @@ export class DispatcherQueue extends EventEmitter {
             type: 'target' | 'endpoint';
             targetId: string;
             url: string;
-            priority: number;
             rateLimit?: number;
             rateLimitDuration?: number;
             retryCount?: number;
@@ -126,34 +124,10 @@ export class DispatcherQueue extends EventEmitter {
                     }
 
                     if (!target) {
-                        // Fallback: the event controller already verified this target exists
-                        // and embedded testUrl in the event payload. Use it to prevent
-                        // silent delivery loss when a transient DB/cache issue occurs.
-                        if (tar.targetUrl) {
-                            logger.warn(
-                                `⚠️ Target ${tar.targetId} not in DB/Cache — using event-embedded URL as fallback`
-                            );
-                            targets.push({
-                                type: 'target',
-                                targetId: tar.targetId,
-                                url: tar.targetUrl,
-                                priority:
-                                    event.meta?.priority === 'urgent'
-                                        ? JOB_PRIORITIES.CRITICAL
-                                        : event.meta?.priority === 'high'
-                                          ? JOB_PRIORITIES.HIGH
-                                          : event.meta?.priority === 'normal'
-                                            ? JOB_PRIORITIES.NORMAL
-                                            : JOB_PRIORITIES.LOW,
-                                retryCount: event.meta?.maxRetries ?? 3,
-                                method: 'POST',
-                            });
-                            continue;
-                        }
                         logger.warn(
                             `❌ Target not found in DB or Cache (no fallback URL): ${tar.targetId} (Workspace: ${event.workspaceId}, Namespace: ${event.namespaceId})`
                         );
-                        continue;
+                        throw Error;
                     }
                     logger.info(`✅ Target found: ${target.id || target._id} (${target.url})`);
 
@@ -161,14 +135,6 @@ export class DispatcherQueue extends EventEmitter {
                         type: 'target',
                         targetId: (target.id || target._id).toString(),
                         url: target.url,
-                        priority:
-                            event.meta?.priority === 'urgent'
-                                ? JOB_PRIORITIES.CRITICAL
-                                : event.meta?.priority === 'high'
-                                  ? JOB_PRIORITIES.HIGH
-                                  : event.meta?.priority === 'normal'
-                                    ? JOB_PRIORITIES.NORMAL
-                                    : JOB_PRIORITIES.LOW,
                         rateLimit: target.config?.rateLimit,
                         rateLimitDuration: target.config?.rateLimitDuration,
                         retryCount: target.config?.retryCount ?? 3,
@@ -220,14 +186,6 @@ export class DispatcherQueue extends EventEmitter {
                         type: 'endpoint',
                         targetId: (endpoint.id || endpoint._id).toString(),
                         url: endpoint.url,
-                        priority:
-                            event.meta?.priority === 'urgent'
-                                ? JOB_PRIORITIES.CRITICAL
-                                : event.meta?.priority === 'high'
-                                  ? JOB_PRIORITIES.HIGH
-                                  : event.meta?.priority === 'normal'
-                                    ? JOB_PRIORITIES.NORMAL
-                                    : JOB_PRIORITIES.LOW,
                         rateLimit: endpoint.config.rateLimit,
                         rateLimitDuration: endpoint.config.rateLimitDuration,
                         retryCount: endpoint.config.retryCount,
