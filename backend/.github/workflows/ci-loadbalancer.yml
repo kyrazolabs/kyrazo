@@ -1,0 +1,50 @@
+name: CI - Loadbalancer Runtime
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'backend/runtime/loadbalancer/**'
+      - 'backend/shared/**'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'backend/runtime/loadbalancer/**'
+      - 'backend/shared/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install shared dependencies
+        run: bun install
+        working-directory: backend/shared
+
+      - name: Build shared library
+        run: bun run build
+        working-directory: backend/shared
+
+      - name: Install service dependencies
+        run: bun install
+        working-directory: backend/runtime/loadbalancer
+
+      - name: Typecheck
+        run: bunx tsc --noEmit
+        working-directory: backend/runtime/loadbalancer
+
+      - name: Test
+        run: bun test
+        working-directory: backend/runtime/loadbalancer
+
+      - name: Build
+        run: bun run build
+        working-directory: backend/runtime/loadbalancer
