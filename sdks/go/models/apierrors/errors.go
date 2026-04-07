@@ -65,7 +65,11 @@ type ValidationError struct {
 
 func NewValidationError(message string, code string, requestId string, details interface{}) *ValidationError {
 	var typedDetails []ValidationErrorDetail
-	if d, ok := details.([]interface{}); ok {
+
+	switch d := details.(type) {
+	case []ValidationErrorDetail:
+		typedDetails = d
+	case []interface{}:
 		for _, item := range d {
 			if m, ok := item.(map[string]interface{}); ok {
 				typedDetails = append(typedDetails, ValidationErrorDetail{
@@ -73,6 +77,16 @@ func NewValidationError(message string, code string, requestId string, details i
 					Message: fmt.Sprintf("%v", m["message"]),
 				})
 			}
+		}
+	case map[string]interface{}:
+		// Handle single map as a single detail entry if it has field/message
+		field, okF := d["field"].(string)
+		msg, okM := d["message"].(string)
+		if okF && okM {
+			typedDetails = append(typedDetails, ValidationErrorDetail{
+				Field:   field,
+				Message: msg,
+			})
 		}
 	}
 
