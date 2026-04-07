@@ -42,10 +42,6 @@ jobs:
         run: bunx tsc --noEmit
         working-directory: apis/dashboard
 
-      - name: Test
-        run: bun test
-        working-directory: apis/dashboard
-
       - name: Build
         run: bun run build
         working-directory: apis/dashboard

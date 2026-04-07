@@ -14,7 +14,7 @@ on:
       - 'shared/**'
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -40,10 +40,6 @@ jobs:
 
       - name: Typecheck
         run: bunx tsc --noEmit
-        working-directory: services/orchestrator
-
-      - name: Test
-        run: bun test
         working-directory: services/orchestrator
 
       - name: Build

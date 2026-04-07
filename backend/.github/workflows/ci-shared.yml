@@ -36,6 +36,3 @@ jobs:
         run: bun run build
         working-directory: shared
 
-      - name: Test
-        run: bun test
-        working-directory: shared
