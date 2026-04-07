@@ -1,6 +1,6 @@
 import { Hono, type Context } from 'hono';
 import z from 'zod';
-import { zValidator } from '@hono/zod-validator';
+import { zValidator } from '@/core/middlewares/validator.middleware';
 import { ingestController } from './ingest.controller';
 import { redisConfig } from '@/configs';
 import {
@@ -49,22 +49,7 @@ ingest.post(
         z.object({
             service: z.string('Invalid service').min(5, 'Service is required'),
             IEId: z.string('Invalid Ingress Endpoint').min(5, 'Ingress Endpoint is required'),
-        }),
-        (result, c) => {
-            if (!result.success) {
-                return c.json(
-                    {
-                        success: false,
-                        statusCode: 400,
-                        errors: JSON.parse(result.error.message).map((e: any) => ({
-                            field: e.path.join('.') || 'unknown',
-                            message: e.message,
-                        })),
-                    },
-                    400
-                );
-            }
-        }
+        })
     ),
 
     createWorkspaceRateLimiter(resolveWorkspaceId),
@@ -77,22 +62,7 @@ ingest.post(
         'param',
         z.object({
             IEId: z.string('Invalid Ingress Endpoint').min(5, 'Ingress Endpoint is required'),
-        }),
-        (result, c) => {
-            if (!result.success) {
-                return c.json(
-                    {
-                        success: false,
-                        statusCode: 400,
-                        errors: JSON.parse(result.error.message).map((e: any) => ({
-                            field: e.path.join('.') || 'unknown',
-                            message: e.message,
-                        })),
-                    },
-                    400
-                );
-            }
-        }
+        })
     ),
 
     createWorkspaceRateLimiter(resolveWorkspaceId),

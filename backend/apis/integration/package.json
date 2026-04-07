@@ -21,9 +21,9 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@kyrazo/shared": "file:../../shared",
     "@clickhouse/client": "^1.18.2",
     "@hono/zod-validator": "^0.7.6",
+    "@kyrazo/shared": "file:../../shared",
     "@types/dotenv": "^8.2.3",
     "@types/mongoose": "^5.11.97",
     "@types/morgan": "^1.9.10",
@@ -33,6 +33,7 @@
     "hono": "^4.12.9",
     "hono-error-handler": "^1.0.0",
     "ioredis": "^5.10.1",
+    "jiti": "^2.6.1",
     "mongoose": "^9.3.3",
     "morgan": "^1.10.1",
     "nats": "^2.29.3",

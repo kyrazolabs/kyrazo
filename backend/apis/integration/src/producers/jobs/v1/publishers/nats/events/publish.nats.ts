@@ -85,7 +85,7 @@ export class PublishEventPublisher {
 
             const subject = `workspace.${data.workspaceId}.plan.${data.planSlug}.events.publish.${data.eventType?.toLowerCase() || 'unknown'}`;
 
-            const event: IPublishedEvent = {
+            const event: Omit<IPublishedEvent, 'meta'> = {
                 eventId: data.eventId,
                 workspaceId: data.workspaceId,
                 namespaceId: data.namespaceId,
@@ -97,8 +97,6 @@ export class PublishEventPublisher {
                 previous: data.previous ?? null,
 
                 targets: data.targets as any,
-
-                meta: data.meta,
             };
 
             const { signature, timestamp, nonce } = signatureCrypto.signMessage(
@@ -168,7 +166,7 @@ export class PublishEventPublisher {
                     try {
                         const subject = `workspace.${item.workspaceId}.plan.${planSlug}.events.publish.${item.eventType.toLowerCase()}`;
 
-                        const event: Omit<IPublishedEvent, 'producerId' | 'userId'> = {
+                        const event: Omit<IPublishedEvent, 'meta' | 'producerId' | 'userId'> = {
                             eventId: item.eventId,
                             workspaceId: item.workspaceId,
                             namespaceId: item.namespaceId,
@@ -180,8 +178,6 @@ export class PublishEventPublisher {
                             previous: item.previous ?? null,
 
                             targets: item.targets as any,
-
-                            meta: item.meta,
                         };
 
                         const { signature, timestamp, nonce } = signatureCrypto.signMessage(

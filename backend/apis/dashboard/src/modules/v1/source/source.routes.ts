@@ -3,7 +3,7 @@ import { authenticate } from '@/core/middlewares/auth.middleware';
 import { sentryMiddleware } from '@/core/middlewares/sentry.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
 import { requireNamespaceAccess } from '@/core/middlewares/namespace.middleware';
-import { zValidator } from '@hono/zod-validator';
+import { zValidator } from '@/core/middlewares/validator.middleware';
 
 import {
     CreateSourceSchema,
@@ -19,21 +19,7 @@ import { sourceWriteRateLimiter, sourceReadRateLimiter } from './source.ratelimi
 const source = new Hono();
 
 // Header validation using zValidator
-const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema, (result, c) => {
-    if (!result.success) {
-        return c.json(
-            {
-                success: false,
-                statusCode: 400,
-                errors: JSON.parse(result.error.message).map((e: any) => ({
-                    field: e.path.join('.') || 'unknown',
-                    message: e.message,
-                })),
-            },
-            400
-        );
-    }
-});
+const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema);
 
 source.use('*', authenticate);
 source.use('*', sentryMiddleware);
@@ -44,156 +30,44 @@ source.use('*', requireNamespaceAccess());
 source.post(
     '/',
     sourceWriteRateLimiter,
-    zValidator('json', CreateSourceSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('json', CreateSourceSchema),
     SourceController.createSource
 );
 
 source.get(
     '/',
     sourceReadRateLimiter,
-    zValidator('query', SearchSourceSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('query', SearchSourceSchema),
     SourceController.getSources
 );
 
 source.get(
     '/:sourceId',
     sourceReadRateLimiter,
-    zValidator('param', GetSourceByIdSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('param', GetSourceByIdSchema),
     SourceController.getSource
 );
 
 source.patch(
     '/:sourceId',
     sourceWriteRateLimiter,
-    zValidator('param', GetSourceByIdSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
-    zValidator('json', UpdateSourceSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('param', GetSourceByIdSchema),
+    zValidator('json', UpdateSourceSchema),
     SourceController.updateSource
 );
 
 source.put(
     '/:sourceId/auth',
     sourceWriteRateLimiter,
-    zValidator('param', GetSourceByIdSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
-    zValidator('json', UpdateSourceAuthSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('param', GetSourceByIdSchema),
+    zValidator('json', UpdateSourceAuthSchema),
     SourceController.updateSourceAuth
 );
 
 source.delete(
     '/:sourceId',
     sourceWriteRateLimiter,
-    zValidator('param', GetSourceByIdSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('param', GetSourceByIdSchema),
     SourceController.deleteSource
 );
 export default source;

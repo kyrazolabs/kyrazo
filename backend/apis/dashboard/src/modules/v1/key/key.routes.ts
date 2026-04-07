@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
+import { zValidator } from '@/core/middlewares/validator.middleware';
 import { authenticate } from '@/core/middlewares/auth.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
 import { requireRecentOTP } from '@/core/middlewares/otp.middleware';
@@ -17,21 +17,7 @@ key.use(requireWorkspaceMembership(['owner', 'admin', 'member']));
 key.post(
     '/',
     keyManagementRateLimiter,
-    zValidator('json', createAPIKeySchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('json', createAPIKeySchema),
     requireRecentOTP('manage_keys'),
     KeyController.createKey
 );
@@ -39,63 +25,21 @@ key.post(
 key.get(
     '/',
     keyManagementRateLimiter,
-    zValidator('query', getKeysSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('query', getKeysSchema),
     KeyController.getKeysSchema
 );
 
 key.get(
     '/check-scopes/:keyId',
     keyManagementRateLimiter,
-    zValidator('param', checkScopeSchema, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('param', checkScopeSchema),
     KeyController.checkScopes
 );
 
 key.delete(
     '/:keyId',
     keyManagementRateLimiter,
-    zValidator('param', revokeKeyById, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    zValidator('param', revokeKeyById),
     requireRecentOTP('manage_keys'),
     KeyController.deleteKey
 );
