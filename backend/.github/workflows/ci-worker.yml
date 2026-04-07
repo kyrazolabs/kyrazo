@@ -6,6 +6,7 @@ on:
     paths:
       - 'backend/runtime/worker/**'
       - 'backend/shared/**'
+      - '.github/workflows/ci-worker.yml'
   pull_request:
     branches: [main, develop]
     paths:
@@ -13,7 +14,7 @@ on:
       - 'backend/shared/**'
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
