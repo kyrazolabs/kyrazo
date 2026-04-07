@@ -6,7 +6,7 @@ services:
     restart: always
     environment:
       - NODE_ENV=${NODE_ENV}
-      - WORKERS=1
+      - WORKERS=${WORKERS}
       - WORKER_ID=${WORKER_ID}
       - WORKSPACE_ID=${WORKSPACE_ID}
       - BATCH_SIZE=${BATCH_SIZE}

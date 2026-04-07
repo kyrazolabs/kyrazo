@@ -6,12 +6,7 @@ services:
     restart: always
     environment:
       - NODE_ENV=${NODE_ENV}
-      - WORKERS=1
-      - WORKER_ID=${WORKER_ID}
-      - WORKSPACE_ID=${WORKSPACE_ID}
-      - BATCH_SIZE=${BATCH_SIZE}
-      - MAX_ACK_PENDING=${MAX_ACK_PENDING}
-      - FETCH_TIMEOUT_MS=${FETCH_TIMEOUT_MS}
+      - WORKERS=${WORKERS}
       - WORKER_CONCURRENCY=${WORKER_CONCURRENCY}
 
       - MONGODB_URI=${MONGODB_URI}
@@ -19,9 +14,6 @@ services:
       - MONGODB_MAX_POOL_SIZE=${MONGODB_MAX_POOL_SIZE}
       - MONGODB_MIN_POOL_SIZE=${MONGODB_MIN_POOL_SIZE}
       - MONGODB_SSL=${MONGODB_SSL}
-
-      # Clickhouse Configuration
-      - CLICKHOUSE_URL=${CLICKHOUSE_URL}
 
       # Redis Configuration
       - REDIS_URL=${REDIS_URL}
