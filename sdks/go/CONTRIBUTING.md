@@ -68,9 +68,12 @@ We maintain a high bar for testing. All logic in `internal/request` and the serv
 
 ```bash
 # Run all tests
-mise exec -- go test ./...
+go test ./...
 
 # Run tests with coverage
+go test -v -cover ./...
+
+# If using mise, use exec to ensure correct GOROOT
 mise exec -- go test -v -cover ./...
 ```
 
