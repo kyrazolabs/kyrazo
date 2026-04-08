@@ -33,7 +33,7 @@ A Target is where Kyrazo will deliver your events.
 Now you're ready to send data. Use one of our official SDKs or a simple `curl` command to dispatch your first event.
 
 <Tabs>
-  <Tab title="TypeScript">
+  <Tab title="Node.js">
     ```typescript
     import { Kyrazo } from "@kyrazo/sdk";
 
@@ -120,7 +120,7 @@ Now you're ready to send data. Use one of our official SDKs or a simple `curl` c
 When Kyrazo delivers an event to your target, you should verify its signature to ensure it's authentic.
 
 <Tabs>
-  <Tab title="Node.js (Express)">
+  <Tab title="Node.js">
     ```javascript
     const { Webhook } = require("@kyrazo/sdk");
     const express = require("express");
@@ -210,7 +210,7 @@ Once you send the request, you can verify the result:
 Now that you've sent your first event, explore more advanced features:
 
 <CardGroup cols={2}>
-  <Card title="SDKs" icon="rocket" href="/sdks/typescript">
+  <Card title="SDKs" icon="rocket" href="/sdks/nodejs">
     Get started quickly with our official client libraries.
   </Card>
   <Card title="Key Concepts" icon="book-open" href="/essentials/concepts">
