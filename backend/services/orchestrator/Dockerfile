@@ -21,8 +21,10 @@ COPY services/orchestrator/package.json services/orchestrator/bun.lock ./service
 WORKDIR /app/services/orchestrator
 RUN bun install --frozen-lockfile
 
-# 4. Copy orchestrator source
+# 4. Copy orchestrator source and build
 COPY services/orchestrator ./
+RUN bun run build
+
 
 # Stage 2: Production runner
 FROM oven/bun:${BUN_VERSION}-alpine AS runner
@@ -42,10 +44,10 @@ COPY --from=builder /app/shared /app/services/orchestrator/node_modules/@kyrazo/
 # ALSO Copy shared to /app/shared because tsconfig paths point to "../../shared"
 COPY --from=builder /app/shared /app/shared
 
-# Copy orchestrator package binaries and config
+# Copy orchestrator package config and compiled output
 COPY --from=builder /app/services/orchestrator/package.json /app/services/orchestrator/package.json
 COPY --from=builder /app/services/orchestrator/tsconfig.json /app/services/orchestrator/tsconfig.json
-COPY --from=builder /app/services/orchestrator/src /app/services/orchestrator/src
+COPY --from=builder /app/services/orchestrator/dist /app/services/orchestrator/dist
 
 # Set working directory to orchestrator package
 WORKDIR /app/services/orchestrator
