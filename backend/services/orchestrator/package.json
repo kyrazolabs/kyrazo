@@ -6,12 +6,9 @@
     "scripts": {
         "start": "bun run dist/index.js",
         "dev": "bunx --bun @dotenvx/dotenvx run -f .env.prod -- bun run --hot src/index.ts",
-        "migrations:generate": "drizzle-kit generate",
-        "migrations:push": "drizzle-kit push",
-        "migrate": "drizzle-kit push",
         "build": "tsc -p tsconfig.json",
         "build:watch": "bun run build && bun run watch",
-        "prod": "bun run build && bun run migrate",
+        "prod": "bun run build",
         "watch": "concurrently -k -n TSC -c blue \"tsc -p tsconfig.json -w\"",
         "rebuild": "rm -rf dist && bun run build",
         "clean": "rm -rf dist && echo 'Done.'",

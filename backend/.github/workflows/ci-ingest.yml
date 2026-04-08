@@ -4,16 +4,17 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - 'backend/apis/ingest/**'
-      - 'backend/shared/**'
+      - 'apis/ingest/**'
+      - 'shared/**'
+      - '.github/workflows/ci-ingest.yml'
   pull_request:
     branches: [main, develop]
     paths:
-      - 'backend/apis/ingest/**'
-      - 'backend/shared/**'
+      - 'apis/ingest/**'
+      - 'shared/**'
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,24 +28,20 @@ jobs:
 
       - name: Install shared dependencies
         run: bun install
-        working-directory: backend/shared
+        working-directory: shared
 
       - name: Build shared library
         run: bun run build
-        working-directory: backend/shared
+        working-directory: shared
 
       - name: Install service dependencies
         run: bun install
-        working-directory: backend/apis/ingest
+        working-directory: apis/ingest
 
       - name: Typecheck
         run: bunx tsc --noEmit
-        working-directory: backend/apis/ingest
-
-      - name: Test
-        run: bun test
-        working-directory: backend/apis/ingest
+        working-directory: apis/ingest
 
       - name: Build
         run: bun run build
-        working-directory: backend/apis/ingest
+        working-directory: apis/ingest

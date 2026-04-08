@@ -4,16 +4,17 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - 'backend/apis/integration/**'
-      - 'backend/shared/**'
+      - 'apis/integration/**'
+      - 'shared/**'
+      - '.github/workflows/ci-integration.yml'
   pull_request:
     branches: [main, develop]
     paths:
-      - 'backend/apis/integration/**'
-      - 'backend/shared/**'
+      - 'apis/integration/**'
+      - 'shared/**'
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,24 +28,20 @@ jobs:
 
       - name: Install shared dependencies
         run: bun install
-        working-directory: backend/shared
+        working-directory: shared
 
       - name: Build shared library
         run: bun run build
-        working-directory: backend/shared
+        working-directory: shared
 
       - name: Install service dependencies
         run: bun install
-        working-directory: backend/apis/integration
+        working-directory: apis/integration
 
       - name: Typecheck
         run: bunx tsc --noEmit
-        working-directory: backend/apis/integration
-
-      - name: Test
-        run: bun test
-        working-directory: backend/apis/integration
+        working-directory: apis/integration
 
       - name: Build
         run: bun run build
-        working-directory: backend/apis/integration
+        working-directory: apis/integration

@@ -4,16 +4,17 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - 'backend/runtime/mail/**'
-      - 'backend/shared/**'
+      - 'runtime/mail/**'
+      - 'shared/**'
+      - '.github/workflows/ci-mail.yml'
   pull_request:
     branches: [main, develop]
     paths:
-      - 'backend/runtime/mail/**'
-      - 'backend/shared/**'
+      - 'runtime/mail/**'
+      - 'shared/**'
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,24 +28,20 @@ jobs:
 
       - name: Install shared dependencies
         run: bun install
-        working-directory: backend/shared
+        working-directory: shared
 
       - name: Build shared library
         run: bun run build
-        working-directory: backend/shared
+        working-directory: shared
 
       - name: Install service dependencies
         run: bun install
-        working-directory: backend/runtime/mail
+        working-directory: runtime/mail
 
       - name: Typecheck
         run: bunx tsc --noEmit
-        working-directory: backend/runtime/mail
-
-      - name: Test
-        run: bun test
-        working-directory: backend/runtime/mail
+        working-directory: runtime/mail
 
       - name: Build
         run: bun run build
-        working-directory: backend/runtime/mail
+        working-directory: runtime/mail

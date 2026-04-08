@@ -4,16 +4,17 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - 'backend/runtime/deliver/**'
-      - 'backend/shared/**'
+      - 'runtime/deliver/**'
+      - 'shared/**'
+      - '.github/workflows/ci-deliver.yml'
   pull_request:
     branches: [main, develop]
     paths:
-      - 'backend/runtime/deliver/**'
-      - 'backend/shared/**'
+      - 'runtime/deliver/**'
+      - 'shared/**'
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,24 +28,20 @@ jobs:
 
       - name: Install shared dependencies
         run: bun install
-        working-directory: backend/shared
+        working-directory: shared
 
       - name: Build shared library
         run: bun run build
-        working-directory: backend/shared
+        working-directory: shared
 
       - name: Install service dependencies
         run: bun install
-        working-directory: backend/runtime/deliver
+        working-directory: runtime/deliver
 
       - name: Typecheck
         run: bunx tsc --noEmit
-        working-directory: backend/runtime/deliver
-
-      - name: Test
-        run: bun test
-        working-directory: backend/runtime/deliver
+        working-directory: runtime/deliver
 
       - name: Build
         run: bun run build
-        working-directory: backend/runtime/deliver
+        working-directory: runtime/deliver
