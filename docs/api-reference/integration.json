@@ -27,7 +27,7 @@
                 "operationId": "publishEvent",
                 "x-codeSamples": [
                     {
-                        "lang": "JavaScript",
+                        "lang": "Node.js",
                         "source": "await client.events.single('namespace_id', {\n  eventType: 'user.created',\n  payload: { id: 1 },\n  targets: [{ targetId: '65a1b2c3d4e5f67890123456' }]\n});"
                     },
                     {
@@ -172,7 +172,7 @@
                 "operationId": "publishEventsBatch",
                 "x-codeSamples": [
                     {
-                        "lang": "JavaScript",
+                        "lang": "Node.js",
                         "source": "await client.events.batch('namespace_id', [\n  {\n    eventType: 'user.created',\n    payload: { id: 1 },\n    targets: [{ targetId: '65a1b2c3d4e5f67890123456' }]\n  },\n  {\n    eventType: 'order.created',\n    payload: { id: 99 },\n    targets: [{ targetId: '65a1b2c3d4e5f67890123457' }]\n  }\n]);"
                     },
                     {
@@ -333,7 +333,7 @@
                 "operationId": "listTargets",
                 "x-codeSamples": [
                     {
-                        "lang": "JavaScript",
+                        "lang": "Node.js",
                         "source": "const targets = await client.targets.list('namespace_id', { limit: 10, page: 1 });"
                     },
                     {
@@ -507,7 +507,7 @@
                 "operationId": "createTarget",
                 "x-codeSamples": [
                     {
-                        "lang": "JavaScript",
+                        "lang": "Node.js",
                         "source": "const target = await client.targets.create('namespace_id', {\n  name: 'Production Webhook',\n  url: 'https://api.example.com/webhooks',\n  method: 'POST',\n  config: { timeout: 5000, retryCount: 3, rateLimitDuration: 60 }\n});"
                     },
                     {
@@ -661,7 +661,7 @@
                 "operationId": "getTarget",
                 "x-codeSamples": [
                     {
-                        "lang": "JavaScript",
+                        "lang": "Node.js",
                         "source": "const target = await client.targets.get('namespace_id', 'target_id');"
                     },
                     {
@@ -805,7 +805,7 @@
                 "operationId": "updateTarget",
                 "x-codeSamples": [
                     {
-                        "lang": "JavaScript",
+                        "lang": "Node.js",
                         "source": "const target = await client.targets.update('namespace_id', 'target_id', { name: 'Updated Name', url: 'https://new-url.com' });"
                     },
                     {
@@ -952,7 +952,7 @@
                 "operationId": "updateTargetStatus",
                 "x-codeSamples": [
                     {
-                        "lang": "JavaScript",
+                        "lang": "Node.js",
                         "source": "const target = await client.targets.updateStatus('namespace_id', 'target_id', false);"
                     },
                     {
@@ -1107,7 +1107,7 @@
                 "operationId": "deleteTarget",
                 "x-codeSamples": [
                     {
-                        "lang": "JavaScript",
+                        "lang": "Node.js",
                         "source": "await client.targets.delete('namespace_id', 'target_id');"
                     },
                     {
@@ -1236,7 +1236,7 @@
                 "operationId": "getTargetSecret",
                 "x-codeSamples": [
                     {
-                        "lang": "JavaScript",
+                        "lang": "Node.js",
                         "source": "const secret = await client.targets.getSecret('namespace_id', 'target_id');"
                     },
                     {
@@ -1364,7 +1364,7 @@
                 "operationId": "listEndpoints",
                 "x-codeSamples": [
                     {
-                        "lang": "JavaScript",
+                        "lang": "Node.js",
                         "source": "const endpoints = await client.endpoints.list('namespace_id', { limit: 10, page: 1 });"
                     },
                     {
@@ -1499,7 +1499,7 @@
                 "operationId": "createEndpoint",
                 "x-codeSamples": [
                     {
-                        "lang": "JavaScript",
+                        "lang": "Node.js",
                         "source": "const endpoint = await client.endpoints.create('namespace_id', {\n  name: 'Backend Service',\n  url: 'https://api.internal/webhook',\n  method: 'POST',\n  config: { timeout: 5000, retryCount: 3, rateLimitDuration: 60 }\n});"
                     },
                     {
@@ -1655,7 +1655,7 @@
                 "operationId": "getEndpoint",
                 "x-codeSamples": [
                     {
-                        "lang": "JavaScript",
+                        "lang": "Node.js",
                         "source": "const endpoint = await client.endpoints.get('namespace_id', 'endpoint_id');"
                     },
                     {
@@ -1775,7 +1775,7 @@
                 "operationId": "updateEndpoint",
                 "x-codeSamples": [
                     {
-                        "lang": "JavaScript",
+                        "lang": "Node.js",
                         "source": "const endpoint = await client.endpoints.update('namespace_id', 'endpoint_id', { name: 'Updated Name', status: 'inactive' });"
                     },
                     {
@@ -1920,7 +1920,7 @@
                 "operationId": "deleteEndpoint",
                 "x-codeSamples": [
                     {
-                        "lang": "JavaScript",
+                        "lang": "Node.js",
                         "source": "await client.endpoints.delete('namespace_id', 'endpoint_id');"
                     },
                     {
@@ -2030,7 +2030,7 @@
                 "operationId": "getEndpointSecret",
                 "x-codeSamples": [
                     {
-                        "lang": "JavaScript",
+                        "lang": "Node.js",
                         "source": "const secret = await client.endpoints.getSecret('namespace_id', 'endpoint_id');"
                     },
                     {
@@ -2140,7 +2140,7 @@
                 "operationId": "listSources",
                 "x-codeSamples": [
                     {
-                        "lang": "JavaScript",
+                        "lang": "Node.js",
                         "source": "const sources = await client.sources.list('namespace_id', { limit: 10, page: 1 });"
                     },
                     {
@@ -2280,7 +2280,7 @@
                 "operationId": "createSource",
                 "x-codeSamples": [
                     {
-                        "lang": "JavaScript",
+                        "lang": "Node.js",
                         "source": "const source = await client.sources.create('namespace_id', {\n  name: 'Stripe Ingest',\n  service: 'stripe',\n  type: 'receive',\n  eventTypes: ['charge.succeeded'],\n  authentication: { enabled: true, type: 'service', service: { secret: 'whsec_...' } }\n});"
                     },
                     {
@@ -2441,7 +2441,7 @@
                 "operationId": "getSource",
                 "x-codeSamples": [
                     {
-                        "lang": "JavaScript",
+                        "lang": "Node.js",
                         "source": "const source = await client.sources.get('namespace_id', 'source_id');"
                     },
                     {
@@ -2571,7 +2571,7 @@
                 "operationId": "updateSource",
                 "x-codeSamples": [
                     {
-                        "lang": "JavaScript",
+                        "lang": "Node.js",
                         "source": "const source = await client.sources.update('namespace_id', 'source_id', { name: 'New Name' });"
                     },
                     {
@@ -2734,7 +2734,7 @@
                 "operationId": "deleteSource",
                 "x-codeSamples": [
                     {
-                        "lang": "JavaScript",
+                        "lang": "Node.js",
                         "source": "const result = await client.sources.delete('namespace_id', 'source_id');"
                     },
                     {
