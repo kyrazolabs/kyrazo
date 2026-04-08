@@ -32,7 +32,7 @@
           {
             "group": "SDKs",
             "pages": [
-              "sdks/typescript",
+              "sdks/nodejs",
               "sdks/python",
               "sdks/go"
             ]

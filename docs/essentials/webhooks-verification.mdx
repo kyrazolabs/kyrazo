@@ -23,43 +23,35 @@ The signature is a `hex` encoded HMAC-SHA256 hash. The "signed payload" is const
 Select your preferred language to see a verification implementation.
 
 <Tabs>
-  <Tab title="TypeScript (SDK)">
+  <Tab title="Node.js">
+    ### Using SDK
+
     ```typescript
     import { Webhook } from "@kyrazo/sdk";
 
     // req.body should be the raw request body string
     // req.headers is the headers object from your framework (e.g. Express)
     try {
-      const isValid = Webhook.verify(
+      Webhook.verify(
         req.body, 
         req.headers, 
         process.env.KYRAZO_TARGET_SECRET
       );
-      
-      if (isValid) {
-        // Handle the verified webhook
-      }
+      // Handle the verified webhook
     } catch (error) {
       // Signature verification failed
       console.error(error.message);
     }
     ```
-  </Tab>
-  <Tab title="TypeScript (Manual)">
+
+    ### Manual (TypeScript)
+
     ```typescript
     import * as crypto from 'crypto';
 
-    interface WebhookHeaders {
-      'x-webhook-signature': string;
-      'x-webhook-timestamp': string;
-      'x-webhook-nonce': string;
-      'x-webhook-version': string;
-      [key: string]: string | string[] | undefined;
-    }
-
     function verifySignature(
       requestBody: string,
-      headers: WebhookHeaders,
+      headers: Record<string, string>,
       secret: string
     ): boolean {
       const signatureHeader = headers['x-webhook-signature'];
@@ -71,11 +63,7 @@ Select your preferred language to see a verification implementation.
         return false;
       }
 
-      // signature format is "v1={hash}"
       const signature = signatureHeader.split('=')[1];
-      if (!signature) return false;
-
-      // Construct payload: version.timestamp.nonce.body
       const payload = `${version}.${timestamp}.${nonce}.${requestBody}`;
 
       const expectedSignature = crypto
@@ -88,25 +76,6 @@ Select your preferred language to see a verification implementation.
         Buffer.from(expectedSignature)
       );
     }
-    ```
-  </Tab>
-  <Tab title="Node.js">
-    ```javascript
-    const { Webhook } = require('@kyrazo/sdk');
-
-    // Express example
-    app.post('/webhook', (req, res) => {
-      try {
-        Webhook.verify(
-          req.body, // Ensure this is the raw body string
-          req.headers, 
-          process.env.KYRAZO_TARGET_SECRET
-        );
-        res.status(200).send('OK');
-      } catch (error) {
-        res.status(401).send('Unauthorized');
-      }
-    });
     ```
   </Tab>
   <Tab title="Python (SDK)">
