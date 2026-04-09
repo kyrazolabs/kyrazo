@@ -4,7 +4,7 @@ import { logger } from 'hono/logger';
 import { config } from '@/common/config'; // Validation runs on import
 import { globalErrorHandler } from '@/common/error';
 import { subscriptionsJob } from './jobs/subscriptions.job';
-import { databaseConfig } from '@kyrazo/shared';
+import { databaseConfig, mongoose } from '@kyrazo/shared';
 import { connectDB } from '@/db';
 
 const app = new Hono();
@@ -50,15 +50,22 @@ console.log('⏱️ Starting Background Jobs...');
 const startServer = async () => {
     try {
         await connectDB();
-        // make sure db is connected
-        console.log('Database connected successfully');
-        // cron.schedule('*/1 * * * *', async () => {
-        //     try {
-        //         await subscriptionsJob();
-        //     } catch (err: any) {
-        //         console.error('Monitor Job Failed:', err);
-        //     }
-        // });
+
+        // Wait up to 5 seconds for full connectivity (readyState 1)
+        let retries = 5;
+        while (mongoose.connection.readyState !== 1 && retries > 0) {
+            console.log(`⏳ Waiting for MongoDB full connectivity... (${retries} retries left)`);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            retries--;
+        }
+
+        if (mongoose.connection.readyState !== 1) {
+            console.warn('⚠️ MongoDB connected but readyState is not 1. Background jobs might face buffering timeouts.');
+        } else {
+            console.log('✅ Database connected and ready for operations');
+        }
+
+        // Start background job loop
         setInterval(async () => {
             try {
                 await subscriptionsJob();

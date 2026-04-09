@@ -19,6 +19,9 @@ export class WorkerService {
         let remainingCount = count;
 
         while (remainingCount > 0) {
+            if (mongoose.connection.readyState !== 1) {
+                throw new Error('Database is not connected. Cannot start transaction session.');
+            }
             const session = await mongoose.startSession();
             try {
                 await session.withTransaction(async () => {
@@ -84,6 +87,9 @@ export class WorkerService {
      * Decommission a worker.
      */
     static async decommissionWorker(workerId: string, apps?: any[]) {
+        if (mongoose.connection.readyState !== 1) {
+            throw new Error('Database is not connected. Cannot start transaction session.');
+        }
         const session = await mongoose.startSession();
         try {
             await session.withTransaction(async () => {
@@ -113,6 +119,9 @@ export class WorkerService {
      * Update worker status.
      */
     static async updateWorkerStatus(workerId: string, status: string) {
+        if (mongoose.connection.readyState !== 1) {
+            throw new Error('Database is not connected. Cannot start transaction session.');
+        }
         const session = await mongoose.startSession();
         try {
             await session.withTransaction(async () => {
