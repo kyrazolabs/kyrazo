@@ -61,9 +61,9 @@ export const config = {
             password: process.env.STREAM_REDIS_PASSWORD || process.env.REDIS_PASSWORD,
             db: parseInt(process.env.STREAM_REDIS_DB || '2'),
             tls: process.env.NODE_ENV === 'production',
-            caFile: '/etc/ssl/redis/ca.crt',
-            certFile: '/etc/ssl/redis/client.crt',
-            keyFile: '/etc/ssl/redis/client.key',
+            caFile: process.env.STREAM_REDIS_CA_FILE || process.env.REDIS_CA_FILE || '/etc/ssl/redis/ca.crt',
+            certFile: process.env.STREAM_REDIS_CERT_FILE || process.env.REDIS_CERT_FILE || '/etc/ssl/redis/client.crt',
+            keyFile: process.env.STREAM_REDIS_KEY_FILE || process.env.REDIS_KEY_FILE || '/etc/ssl/redis/client.key',
         },
     },
 
