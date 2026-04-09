@@ -5,7 +5,6 @@ import { config } from '@/common/config'; // Validation runs on import
 import { globalErrorHandler } from '@/common/error';
 import { subscriptionsJob } from './jobs/subscriptions.job';
 import { databaseConfig, mongoose } from '@kyrazo/shared';
-import { connectDB } from '@/db';
 
 const app = new Hono();
 
@@ -49,7 +48,7 @@ console.log('⏱️ Starting Background Jobs...');
 
 const startServer = async () => {
     try {
-        await connectDB();
+        await databaseConfig.connect();
 
         // Wait up to 5 seconds for full connectivity (readyState 1)
         let retries = 5;

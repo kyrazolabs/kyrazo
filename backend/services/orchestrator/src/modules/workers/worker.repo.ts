@@ -1,5 +1,4 @@
-import { OrchestratorClient, OrchestratorServer, OrchestratorWorker, WorkerStatus } from '@/db';
-import mongoose from 'mongoose';
+import { OrchestratorClient, OrchestratorServer, OrchestratorWorker, WorkerStatus, mongoose } from '@kyrazo/shared';
 import crypto from 'crypto';
 
 export class WorkerRepo {

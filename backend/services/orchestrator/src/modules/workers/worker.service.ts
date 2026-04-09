@@ -1,5 +1,4 @@
-import { connectDB, OrchestratorWorker, WorkerStatus } from '@/db';
-import mongoose from 'mongoose';
+import { OrchestratorWorker, WorkerStatus, mongoose } from '@kyrazo/shared';
 import { CommandDispatcher } from '@/modules/commands/command.dispatcher';
 import { WorkerRepo } from './worker.repo';
 
