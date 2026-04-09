@@ -66,7 +66,7 @@ export class CommandDispatcher {
                 WORKERS: workersCount.toString(),
                 NODE_ENV: '{{ environment.WORKER_NODE_ENV }}',
                 BATCH_SIZE: '{{ environment.BATCH_SIZE }}',
-                CONCURRENCY: '{{ environment.WORKER_CONCURRENCY }}',
+                WORKER_CONCURRENCY: '{{ environment.WORKER_CONCURRENCY }}',
                 MAX_ACK_PENDING: '{{ environment.MAX_ACK_PENDING }}',
                 FETCH_TIMEOUT_MS: '{{ environment.FETCH_TIMEOUT_MS }}',
 
