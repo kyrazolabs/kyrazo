@@ -4,13 +4,13 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - 'runtime/mail/**'
+      - 'services/mail/**'
       - 'shared/**'
       - '.github/workflows/ci-mail.yml'
   pull_request:
     branches: [main, develop]
     paths:
-      - 'runtime/mail/**'
+      - 'services/mail/**'
       - 'shared/**'
 
 jobs:
@@ -36,12 +36,12 @@ jobs:
 
       - name: Install service dependencies
         run: bun install
-        working-directory: runtime/mail
+        working-directory: services/mail
 
       - name: Typecheck
         run: bunx tsc --noEmit
-        working-directory: runtime/mail
+        working-directory: services/mail
 
       - name: Build
         run: bun run build
-        working-directory: runtime/mail
+        working-directory: services/mail

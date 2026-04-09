@@ -1,47 +1,36 @@
-name: CI - Loadbalancer Runtime
+name: CI - Loadbalancer Service
 
 on:
   push:
     branches: [main, develop]
     paths:
-      - 'runtime/loadbalancer/**'
-      - 'shared/**'
+      - 'services/loadbalancer/**'
       - '.github/workflows/ci-loadbalancer.yml'
   pull_request:
     branches: [main, develop]
     paths:
-      - 'runtime/loadbalancer/**'
-      - 'shared/**'
+      - 'services/loadbalancer/**'
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
         with:
-          bun-version: latest
+          workspaces: services/loadbalancer
 
-      - name: Install shared dependencies
-        run: bun install
-        working-directory: shared
+      - name: Cargo Check
+        run: cargo check
+        working-directory: services/loadbalancer
 
-      - name: Build shared library
-        run: bun run build
-        working-directory: shared
-
-      - name: Install service dependencies
-        run: bun install
-        working-directory: runtime/loadbalancer
-
-      - name: Typecheck
-        run: bunx tsc --noEmit
-        working-directory: runtime/loadbalancer
-
-      - name: Build
-        run: bun run build
-        working-directory: runtime/loadbalancer
+      - name: Cargo Build
+        run: cargo build --release
+        working-directory: services/loadbalancer

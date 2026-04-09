@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { Worker, Job, QueueEvents } from 'bullmq';
+import { Worker, Job, QueueEvents, Queue } from 'bullmq';
 import { redisConfig } from '@/config';
 import { DeliveryStatus, logger, type SQLDeliveryAttempt, snowflake } from '@kyrazo/shared';
 import type {
@@ -36,6 +36,7 @@ export class DispatchConsumer extends EventEmitter {
     private static instance: DispatchConsumer;
     private dispatchWorker: Worker | undefined;
     private queueEvents: QueueEvents | undefined;
+    private dispatchQueue: Queue | undefined;
 
     private constructor() {
         super();
@@ -71,6 +72,11 @@ export class DispatchConsumer extends EventEmitter {
                     return 1000;
                 },
             },
+        });
+
+        // Initialize queues
+        this.dispatchQueue = new Queue(`{event-dispatch}`, {
+            connection,
         });
 
         // Initialize queue events for monitoring
