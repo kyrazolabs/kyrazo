@@ -1,19 +1,19 @@
 {
-  // "files" is an array of files to include in the root project.
-  // In a monorepo, we leave this empty because the root doesn't contain code directly.
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "types": ["bun-types"],
+    "strict": true,
+    "skipLibCheck": true,
+    "composite": true,
+    "declaration": true,
+    "sourceMap": true
+  },
   "files": [],
-  
-  "types": [
-      "bun-types" // add Bun global
-    ],
-  // "references" lists all the TypeScript projects (packages/apps) in the monorepo.
-  // This enables TypeScript Project References, which are crucial in a monorepo setup.
-  // Each reference points to a package or app that has its own tsconfig.json.
   "references": [
-    // Reference to the utils package (e.g., shared utility functions/types).
-    // This allows other packages/apps to depend on and use types from utils.
-    { "path": "./apps/mail" }, // For actual mail sending server
-    { "path": "./packages/bullmq" }, // Shared configs of bullmq
-    { "path": "./packages/utils" }, // Shared configs of utils
+    { "path": "./apps/mail" },
+    { "path": "./packages/bullmq" },
+    { "path": "./packages/utils" }
   ]
 }
