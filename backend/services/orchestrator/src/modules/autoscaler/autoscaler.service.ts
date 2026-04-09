@@ -1,9 +1,8 @@
-import { OrchestratorClient, OrchestratorWorker, WorkerStatus } from '@/db';
+import { OrchestratorWorker, WorkerStatus } from '@kyrazo/shared';
 import { WorkerService } from '@/modules/workers/worker.service';
 import { WorkerRepo } from '@/modules/workers/worker.repo';
 import { CommandDispatcher } from '@/modules/commands/command.dispatcher';
 import { Plan, Subscription, Workspace } from '@kyrazo/shared';
-import { config } from '@/common/config';
 
 import { getApplications, getDeployments } from '@/modules/coolify/actions';
 
@@ -41,7 +40,14 @@ export class AutoScalerService {
 
         // 3. Fetch ALL known clients that have workers in active state
         const activeClientsRes = await OrchestratorWorker.distinct('client_id', {
-            status: { $in: [WorkerStatus.PENDING, WorkerStatus.STARTING, WorkerStatus.RUNNING, WorkerStatus.STOPPING] }
+            status: {
+                $in: [
+                    WorkerStatus.PENDING,
+                    WorkerStatus.STARTING,
+                    WorkerStatus.RUNNING,
+                    WorkerStatus.STOPPING,
+                ],
+            },
         });
 
         const clientsWithWorkers = new Set(activeClientsRes);
@@ -121,10 +127,13 @@ export class AutoScalerService {
         // 3. Identify Actual ACTIVE Workers
         const runningWorkerRecords = await OrchestratorWorker.find({
             client_id: clientIdStr,
-            status: { $in: [WorkerStatus.PENDING, WorkerStatus.STARTING, WorkerStatus.RUNNING] }
+            status: { $in: [WorkerStatus.PENDING, WorkerStatus.STARTING, WorkerStatus.RUNNING] },
         });
 
-        const actualWorkers = runningWorkerRecords.reduce((acc, worker) => acc + (worker.workers_count || 1), 0);
+        const actualWorkers = runningWorkerRecords.reduce(
+            (acc, worker) => acc + (worker.workers_count || 1),
+            0
+        );
 
         if (actualWorkers > 0 || desiredWorkers > 0) {
             console.log(
@@ -144,14 +153,15 @@ export class AutoScalerService {
             let toStop = actualWorkers - desiredWorkers;
             console.log(`[AutoScaler] Scaling DOWN by ${toStop}`);
 
-            const sortedWorkers = runningWorkerRecords
-                .sort((a, b) => (b.created_at?.getTime() || 0) - (a.created_at?.getTime() || 0));
+            const sortedWorkers = runningWorkerRecords.sort(
+                (a, b) => (b.created_at?.getTime() || 0) - (a.created_at?.getTime() || 0)
+            );
 
             for (const worker of sortedWorkers) {
                 if (toStop <= 0) break;
                 try {
                     await WorkerService.decommissionWorker(worker.worker_id, kyrazoApps);
-                    toStop -= (worker.workers_count || 1);
+                    toStop -= worker.workers_count || 1;
                 } catch (err: any) {
                     console.error('Failed to decommission worker:', err);
                 }
@@ -168,7 +178,14 @@ export class AutoScalerService {
 
         const activeWorkers = await OrchestratorWorker.find({
             client_id: clientId,
-            status: { $in: [WorkerStatus.PENDING, WorkerStatus.STARTING, WorkerStatus.RUNNING, WorkerStatus.STOPPING] }
+            status: {
+                $in: [
+                    WorkerStatus.PENDING,
+                    WorkerStatus.STARTING,
+                    WorkerStatus.RUNNING,
+                    WorkerStatus.STOPPING,
+                ],
+            },
         });
 
         for (const w of activeWorkers) {
@@ -233,7 +250,12 @@ export class AutoScalerService {
                     }
                 }
             } else {
-                if (isStale && [WorkerStatus.PENDING, WorkerStatus.STARTING, WorkerStatus.RUNNING].includes(w.status as any)) {
+                if (
+                    isStale &&
+                    [WorkerStatus.PENDING, WorkerStatus.STARTING, WorkerStatus.RUNNING].includes(
+                        w.status as any
+                    )
+                ) {
                     console.log(
                         `[AutoScaler] Confirming zombie: ${w.worker_id} missing from Coolify after grace period. Marking as failed.`
                     );
