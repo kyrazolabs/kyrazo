@@ -71,9 +71,18 @@ export const config = {
             port: parseInt(process.env.QUEUE_REDIS_PORT || process.env.REDIS_PORT!),
             password: process.env.QUEUE_REDIS_PASSWORD || process.env.REDIS_PASSWORD || '',
             db: parseInt(process.env.QUEUE_REDIS_DB || '1'),
-            caFile: process.env.QUEUE_REDIS_CA_FILE || process.env.REDIS_CA_FILE || '/etc/ssl/redis/ca.crt',
-            certFile: process.env.QUEUE_REDIS_CERT_FILE || process.env.REDIS_CERT_FILE || '/etc/ssl/redis/client.crt',
-            keyFile: process.env.QUEUE_REDIS_KEY_FILE || process.env.REDIS_KEY_FILE || '/etc/ssl/redis/client.key',
+            caFile:
+                process.env.QUEUE_REDIS_CA_FILE ||
+                process.env.REDIS_CA_FILE ||
+                '/etc/ssl/redis/ca.crt',
+            certFile:
+                process.env.QUEUE_REDIS_CERT_FILE ||
+                process.env.REDIS_CERT_FILE ||
+                '/etc/ssl/redis/client.crt',
+            keyFile:
+                process.env.QUEUE_REDIS_KEY_FILE ||
+                process.env.REDIS_KEY_FILE ||
+                '/etc/ssl/redis/client.key',
         },
     },
 
