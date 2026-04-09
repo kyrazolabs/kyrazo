@@ -93,10 +93,21 @@ export class CommandDispatcher {
                 //  Redis Configuration
                 REDIS_URL: '{{ project.REDIS_URL }}',
                 REDIS_TLS: '{{ project.REDIS_TLS }}',
+                REDIS_CA_FILE: '{{ environment.REDIS_CA_FILE }}',
+                REDIS_CERT_FILE: '{{ environment.REDIS_CERT_FILE }}',
+                REDIS_KEY_FILE: '{{ environment.REDIS_KEY_FILE }}',
+
                 QUEUE_REDIS_URL: '{{ project.QUEUE_REDIS_URL }}',
                 QUEUE_REDIS_TLS: '{{ project.QUEUE_REDIS_TLS }}',
+                QUEUE_REDIS_CA_FILE: '{{ environment.QUEUE_REDIS_CA_FILE }}',
+                QUEUE_REDIS_CERT_FILE: '{{ environment.QUEUE_REDIS_CERT_FILE }}',
+                QUEUE_REDIS_KEY_FILE: '{{ environment.QUEUE_REDIS_KEY_FILE }}',
+
                 STREAM_REDIS_URL: '{{ project.STREAM_REDIS_URL }}',
                 STREAM_REDIS_TLS: '{{ project.STREAM_REDIS_TLS }}',
+                STREAM_REDIS_CA_FILE: '{{ environment.STREAM_REDIS_CA_FILE }}',
+                STREAM_REDIS_CERT_FILE: '{{ environment.STREAM_REDIS_CERT_FILE }}',
+                STREAM_REDIS_KEY_FILE: '{{ environment.STREAM_REDIS_KEY_FILE }}',
 
                 ENCRYPTION_KEY: '{{ project.ENCRYPTION_KEY }}',
             };
