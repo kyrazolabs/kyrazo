@@ -34,7 +34,7 @@ export class WorkerRepo {
         await OrchestratorClient.findOneAndUpdate(
             { client_id: clientId },
             { $set: { plan_max_workers: maxWorkers } },
-            { upsert: true, new: true, session }
+            { upsert: true, returnDocument: 'after', session }
         );
     }
 

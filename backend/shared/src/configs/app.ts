@@ -26,7 +26,9 @@ export const config = {
         heartbeatFrequencyMS: parseInt(process.env.MONGODB_HEARTBEAT_FREQUENCY_MS || '10000'),
         retryWrites: process.env.MONGODB_RETRY_WRITES !== 'false',
         retryReads: process.env.MONGODB_RETRY_READS !== 'false',
-        ssl: process.env.NODE_ENV === 'production',
+        // Explicitly controlled via MONGODB_SSL — do NOT tie to NODE_ENV.
+        // MongoDB requireTLS will actively close non-TLS connections regardless of environment.
+        ssl: process.env.MONGODB_SSL === 'true' || process.env.NODE_ENV === 'production',
         caFile: '/etc/ssl/mongodb/ca.crt',
         tlsCertificateKeyFile: '/etc/ssl/mongodb/mongodb.pem',
     },
@@ -47,7 +49,7 @@ export const config = {
         max: parseInt(process.env.POSTGRES_MAX_POOL || '20'),
         idleTimeoutMillis: parseInt(process.env.POSTGRES_IDLE_TIMEOUT || '30000'),
         connectionTimeoutMillis: parseInt(process.env.POSTGRES_CONNECTION_TIMEOUT || '2000'),
-        ssl: process.env.NODE_ENV === 'production',
+        ssl: process.env.POSTGRES_SSL === 'true' || process.env.NODE_ENV === 'production',
         sslMode: process.env.POSTGRES_SSL_MODE || 'require',
         caFile: process.env.POSTGRES_CA_FILE || '/etc/ssl/postgres/ca.crt',
     },
@@ -59,7 +61,7 @@ export const config = {
         port: parseInt(process.env.REDIS_PORT!),
         password: process.env.REDIS_PASSWORD,
         db: parseInt(process.env.REDIS_DB || '0'),
-        tls: process.env.NODE_ENV === 'production',
+        tls: process.env.REDIS_TLS === 'true' || process.env.NODE_ENV === 'production',
         caFile: '/etc/ssl/redis/ca.crt',
         certFile: '/etc/ssl/redis/client.crt',
         keyFile: '/etc/ssl/redis/client.key',
