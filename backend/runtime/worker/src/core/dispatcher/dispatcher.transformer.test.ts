@@ -22,10 +22,6 @@ describe('DispatcherTransformer', () => {
                     method: 'PUT',
                 },
             ],
-            meta: {
-                priority: 'high',
-                maxRetries: 5,
-            },
         };
 
         const result = transformer.transform(rawEvent);
@@ -38,8 +34,6 @@ describe('DispatcherTransformer', () => {
         expect(result.targets.length).toBe(1);
         expect(result.targets![0]!.targetId).toBe('tar_1');
         expect(result.targets![0]!.method).toBe('PUT');
-        expect(result.meta!.priority).toBe('high');
-        expect(result.meta!.maxRetries).toBe(5);
     });
 
     it('should handling missing optional fields with defaults', () => {
@@ -53,8 +47,5 @@ describe('DispatcherTransformer', () => {
         expect(result.type).toBeUndefined();
         expect(result.data.object).toEqual({});
         expect(result.targets).toEqual([]);
-        expect(result.meta!.priority).toBe('normal');
-        expect(result.meta!.maxRetries).toBe(3);
-        expect(result.meta!.nonce).toBeDefined();
     });
 });

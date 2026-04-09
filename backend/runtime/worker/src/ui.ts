@@ -46,8 +46,6 @@ const startServer = async () => {
         createBullBoard({
             queues: [
                 new BullMQAdapter(dispatchQueue['dispatchQueue']!),
-                new BullMQAdapter(dispatchProducer.getQueues().DispatchsQueue),
-                new BullMQAdapter(ingestProducer.getQueues().IngestQueue),
             ],
             serverAdapter: serverAdapter,
         });
