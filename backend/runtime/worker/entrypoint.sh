@@ -30,37 +30,42 @@ for service in redis mongodb; do
     if [ -d "$SOURCE_DIR" ]; then
         echo "🔧 Checking permissions for $SOURCE_DIR..."
         
-        # Test if bun user can read the private keys
-        # We perform a trial read check on any .key or .pem file
-        UNREADABLE=false
-        for f in "$SOURCE_DIR"/*.key "$SOURCE_DIR"/*.pem; do
-            if [ -f "$f" ] && ! su-exec bun cat "$f" >/dev/null 2>&1; then
-                UNREADABLE=true
-                break
-            fi
-        done
+        # Test if the directory contains any certificate files and if they are readable
+        FILES_PRESENT=$(ls "$SOURCE_DIR"/*.crt "$SOURCE_DIR"/*.key "$SOURCE_DIR"/*.pem 2>/dev/null | wc -l)
+        
+        if [ "$FILES_PRESENT" -gt 0 ]; then
+            UNREADABLE=false
+            for f in "$SOURCE_DIR"/*.key "$SOURCE_DIR"/*.pem; do
+                if [ -f "$f" ] && ! su-exec bun cat "$f" >/dev/null 2>&1; then
+                    UNREADABLE=true
+                    break
+                fi
+            done
 
-        if [ "$UNREADABLE" = "true" ]; then
-            echo "⚠️  $SOURCE_DIR certificates are unreadable by 'bun' user. Relocating to $TARGET_DIR..."
-            mkdir -p "$TARGET_DIR"
-            cp -L "$SOURCE_DIR"/* "$TARGET_DIR/" 2>/dev/null || true
-            chown -R bun:bun "$TARGET_DIR"
-            chmod -R 700 "$TARGET_DIR"
-            
-            # Export environment variables to point to the new locations
-            if [ "$service" = "redis" ]; then
-                export REDIS_CA_FILE="$TARGET_DIR/ca.crt"
-                export REDIS_CERT_FILE="$TARGET_DIR/client.crt"
-                export REDIS_KEY_FILE="$TARGET_DIR/client.key"
-                export QUEUE_REDIS_CA_FILE="$TARGET_DIR/ca.crt"
-                export QUEUE_REDIS_CERT_FILE="$TARGET_DIR/client.crt"
-                export QUEUE_REDIS_KEY_FILE="$TARGET_DIR/client.key"
-            elif [ "$service" = "mongodb" ]; then
-                export MONGODB_CA_FILE="$TARGET_DIR/ca.crt"
-                export MONGODB_CERT_KEY_FILE="$TARGET_DIR/mongodb.pem"
+            if [ "$UNREADABLE" = "true" ]; then
+                echo "⚠️  $SOURCE_DIR certificates are unreadable by 'bun' user. Relocating to $TARGET_DIR..."
+                mkdir -p "$TARGET_DIR"
+                cp -L "$SOURCE_DIR"/* "$TARGET_DIR/" 2>/dev/null || true
+                chown -R bun:bun "$TARGET_DIR"
+                chmod -R 700 "$TARGET_DIR"
+                
+                # Export environment variables to point to the new locations
+                if [ "$service" = "redis" ]; then
+                    export REDIS_CA_FILE="$TARGET_DIR/ca.crt"
+                    export REDIS_CERT_FILE="$TARGET_DIR/client.crt"
+                    export REDIS_KEY_FILE="$TARGET_DIR/client.key"
+                    export QUEUE_REDIS_CA_FILE="$TARGET_DIR/ca.crt"
+                    export QUEUE_REDIS_CERT_FILE="$TARGET_DIR/client.crt"
+                    export QUEUE_REDIS_KEY_FILE="$TARGET_DIR/client.key"
+                elif [ "$service" = "mongodb" ]; then
+                    export MONGODB_CA_FILE="$TARGET_DIR/ca.crt"
+                    export MONGODB_CERT_KEY_FILE="$TARGET_DIR/mongodb.pem"
+                fi
+            else
+                echo "✅ $SOURCE_DIR certificates are readable and verified."
             fi
         else
-            echo "✅ $SOURCE_DIR certificates are readable."
+            echo "ℹ️  No certificate files found in $SOURCE_DIR, skipping relocation."
         fi
     fi
 done
