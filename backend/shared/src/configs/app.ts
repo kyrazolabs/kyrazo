@@ -29,8 +29,8 @@ export const config = {
         // Explicitly controlled via MONGODB_SSL — do NOT tie to NODE_ENV.
         // MongoDB requireTLS will actively close non-TLS connections regardless of environment.
         ssl: process.env.MONGODB_SSL === 'true' || process.env.NODE_ENV === 'production',
-        caFile: '/etc/ssl/mongodb/ca.crt',
-        tlsCertificateKeyFile: '/etc/ssl/mongodb/mongodb.pem',
+        caFile: process.env.MONGODB_CA_FILE || '/etc/ssl/mongodb/ca.crt',
+        tlsCertificateKeyFile: process.env.MONGODB_CERT_KEY_FILE || '/etc/ssl/mongodb/mongodb.pem',
     },
 
     clickhouse: {
@@ -39,7 +39,7 @@ export const config = {
         password: process.env.CLICKHOUSE_PASSWORD || '',
         database: process.env.CLICKHOUSE_DATABASE || 'default',
         ssl: process.env.CLICKHOUSE_URL?.startsWith('https') || false,
-        caFile: '/etc/ssl/clickhouse/ca.crt',
+        caFile: process.env.CLICKHOUSE_CA_FILE || '/etc/ssl/clickhouse/ca.crt',
         rejectUnauthorized: true,
     },
 
@@ -62,18 +62,18 @@ export const config = {
         password: process.env.REDIS_PASSWORD,
         db: parseInt(process.env.REDIS_DB || '0'),
         tls: process.env.REDIS_TLS === 'true' || process.env.NODE_ENV === 'production',
-        caFile: '/etc/ssl/redis/ca.crt',
-        certFile: '/etc/ssl/redis/client.crt',
-        keyFile: '/etc/ssl/redis/client.key',
+        caFile: process.env.REDIS_CA_FILE || '/etc/ssl/redis/ca.crt',
+        certFile: process.env.REDIS_CERT_FILE || '/etc/ssl/redis/client.crt',
+        keyFile: process.env.REDIS_KEY_FILE || '/etc/ssl/redis/client.key',
         queue: {
             url: process.env.QUEUE_REDIS_URL!,
             host: process.env.QUEUE_REDIS_HOST || process.env.REDIS_HOST!,
             port: parseInt(process.env.QUEUE_REDIS_PORT || process.env.REDIS_PORT!),
             password: process.env.QUEUE_REDIS_PASSWORD || process.env.REDIS_PASSWORD || '',
             db: parseInt(process.env.QUEUE_REDIS_DB || '1'),
-            caFile: '/etc/ssl/redis/ca.crt',
-            certFile: '/etc/ssl/redis/client.crt',
-            keyFile: '/etc/ssl/redis/client.key',
+            caFile: process.env.QUEUE_REDIS_CA_FILE || process.env.REDIS_CA_FILE || '/etc/ssl/redis/ca.crt',
+            certFile: process.env.QUEUE_REDIS_CERT_FILE || process.env.REDIS_CERT_FILE || '/etc/ssl/redis/client.crt',
+            keyFile: process.env.QUEUE_REDIS_KEY_FILE || process.env.REDIS_KEY_FILE || '/etc/ssl/redis/client.key',
         },
     },
 
