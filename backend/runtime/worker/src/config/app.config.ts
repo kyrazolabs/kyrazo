@@ -31,9 +31,9 @@ export const config = {
         password: process.env.REDIS_PASSWORD,
         db: parseInt(process.env.REDIS_DB || '0'),
         tls: process.env.NODE_ENV === 'production',
-        caFile: '/etc/ssl/redis/ca.crt',
-        certFile: '/etc/ssl/redis/client.crt',
-        keyFile: '/etc/ssl/redis/client.key',
+        caFile: process.env.REDIS_CA_FILE || '/etc/ssl/redis/ca.crt',
+        certFile: process.env.REDIS_CERT_FILE || '/etc/ssl/redis/client.crt',
+        keyFile: process.env.REDIS_KEY_FILE || '/etc/ssl/redis/client.key',
         queue: {
             url: process.env.QUEUE_REDIS_URL || process.env.REDIS_URL!,
             host: process.env.QUEUE_REDIS_HOST || process.env.REDIS_HOST!,
@@ -41,9 +41,18 @@ export const config = {
             password: process.env.QUEUE_REDIS_PASSWORD || process.env.REDIS_PASSWORD,
             db: parseInt(process.env.QUEUE_REDIS_DB || '1'),
             tls: process.env.NODE_ENV === 'production',
-            caFile: '/etc/ssl/redis/ca.crt',
-            certFile: '/etc/ssl/redis/client.crt',
-            keyFile: '/etc/ssl/redis/client.key',
+            caFile:
+                process.env.QUEUE_REDIS_CA_FILE ||
+                process.env.REDIS_CA_FILE ||
+                '/etc/ssl/redis/ca.crt',
+            certFile:
+                process.env.QUEUE_REDIS_CERT_FILE ||
+                process.env.REDIS_CERT_FILE ||
+                '/etc/ssl/redis/client.crt',
+            keyFile:
+                process.env.QUEUE_REDIS_KEY_FILE ||
+                process.env.REDIS_KEY_FILE ||
+                '/etc/ssl/redis/client.key',
         },
         stream: {
             url: process.env.STREAM_REDIS_URL || process.env.REDIS_URL!,
