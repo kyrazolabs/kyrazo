@@ -1,4 +1,4 @@
-import { OrchestratorServer, WorkerStatus } from '@/db';
+import { OrchestratorServer, WorkerStatus } from '@kyrazo/shared';
 import { config } from '@/common/config';
 
 import {

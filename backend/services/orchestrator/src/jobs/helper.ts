@@ -1,4 +1,4 @@
-import { OrchestratorServer, ServerStatus } from '@/db';
+import { OrchestratorServer, ServerStatus } from '@kyrazo/shared';
 
 export async function findAvailableServer() {
     return await OrchestratorServer.findOne({
