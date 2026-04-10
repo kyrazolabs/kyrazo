@@ -4,3 +4,4 @@ export * from './performance';
 export * from './id';
 export * from './constants';
 export * from './redis-keys';
+export * from './nats';

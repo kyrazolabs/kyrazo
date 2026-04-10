@@ -1,4 +1,4 @@
-import { OrchestratorWorker, WorkerStatus, mongoose } from '@kyrazo/shared';
+import { OrchestratorWorker, WorkerStatus, mongoose, Subscription, DEFAULT_FREE_SUBSCRIPTION, unprefixId } from '@kyrazo/shared';
 import { CommandDispatcher } from '@/modules/commands/command.dispatcher';
 import { WorkerRepo } from './worker.repo';
 
@@ -68,9 +68,12 @@ export class WorkerService {
         }
 
         // Phase 2: Deploy on Coolify OUTSIDE the transaction
+        const sub = await Subscription.findActiveByWorkspace(unprefixId(clientId)!);
+        const planSlug = sub?.planSnapshot?.slug || DEFAULT_FREE_SUBSCRIPTION.planSnapshot.slug;
+
         for (const worker of arrayToProvision) {
             try {
-                await CommandDispatcher.dispatchStartWorker(worker.server_id, worker.worker_id, clientId, worker.workers_count);
+                await CommandDispatcher.dispatchStartWorker(worker.server_id, worker.worker_id, clientId, planSlug, worker.workers_count);
             } catch (err: any) {
                 console.error(
                     `[WorkerService] Coolify deploy failed for worker ${worker.worker_id}. Rolling back.`

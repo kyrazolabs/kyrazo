@@ -17,6 +17,7 @@ export class CommandDispatcher {
         serverId: string,
         workerId: string,
         clientId: string,
+        planSlug: string = 'free',
         workersCount: number = 1
     ) {
         // 1. Fetch Server from DB to get Coolify Target params
@@ -61,6 +62,7 @@ export class CommandDispatcher {
             const envsToInject = {
                 WORKSPACE_ID: clientId,
                 WORKER_ID: workerId,
+                PLAN_SLUG: planSlug,
 
                 // ================ WORKER CONFIGURATION ================ //
                 WORKERS: workersCount.toString(),
@@ -81,6 +83,7 @@ export class CommandDispatcher {
                 NATS_KEY_FILE: '{{ environment.NATS_KEY_FILE }}',
                 NATS_CA_FILE: '{{ environment.NATS_CA_FILE }}',
                 NATS_TLS: '{{ environment.NATS_TLS }}',
+                NATS_PURGE_CONFLICTS: 'true',
 
                 //  Database Configuration
                 MONGODB_URI: '{{ project.MONGODB_URI }}',

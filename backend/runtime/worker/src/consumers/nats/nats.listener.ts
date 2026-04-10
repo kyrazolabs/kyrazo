@@ -10,7 +10,7 @@ import {
     type JetStreamManager,
     type NatsConnection,
 } from 'nats';
-import { logger, signatureCrypto } from '@kyrazo/shared';
+import { logger, signatureCrypto, getNatsDurableName, getNatsSubject } from '@kyrazo/shared';
 import { SubscriptionService } from '@/services/mongo/subscription';
 import { env } from '@/app/worker.env';
 
@@ -52,8 +52,9 @@ export class WorkerConsumer {
 
     async start(): Promise<void> {
         const streamName = 'EVENTS';
-        const subject = `workspace.${this.workspaceId}.plan.${this.workspaceId === '*' ? 'free' : '*'}.events.>`;
-        const durableName = `worker_${this.workspaceId === '*' ? 'shared' : this.workspaceId}`;
+        const subject = getNatsSubject(this.workspaceId, env.worker.PLAN_SLUG, 'publish', '>')
+            .replace('.publish.>', '.>'); // Adjust for wildcard match in listener
+        const durableName = getNatsDurableName(this.workspaceId, env.worker.PLAN_SLUG);
 
         try {
             await this.jsm.consumers.add(streamName, {
@@ -81,17 +82,53 @@ export class WorkerConsumer {
                     streamName,
                     subject,
                     durableName,
-                    tip: 'Ensure no other services (like deliver or old workers) are subscribed to these subjects with different durable names.'
                 });
                 
-                // Try to find the existing consumer for diagnostics
+                // Try to find and PURGE existing consumers if enabled
                 try {
                     const consumers = await this.jsm.consumers.list(streamName).next();
-                    logger.info('Existing consumers on stream:', {
-                        consumerNames: consumers.map((c: any) => c.name)
-                    });
-                } catch (listErr) {
-                    logger.warn('Could not list existing consumers for diagnostics', listErr);
+                    const names = consumers.map((c: any) => c.name);
+                    logger.info('Existing consumers on stream:', { consumerNames: names });
+
+                    if (env.worker.PURGE_CONFLICTS) {
+                        logger.warn('NATS_PURGE_CONFLICTS is enabled. Attempting to clear conflicting consumers...', { names });
+                        for (const name of names) {
+                            if (name !== durableName) {
+                                try {
+                                    await this.jsm.consumers.delete(streamName, name);
+                                    logger.info(`Successfully purged conflicting consumer: ${name}`);
+                                } catch (delErr) {
+                                    logger.error(`Failed to purge consumer ${name}. This may block initialization.`, delErr);
+                                }
+                            }
+                        }
+                        
+                        // Retry adding the consumer once after purge
+                        logger.info(`Retrying consumer creation: ${durableName}`);
+                        await this.jsm.consumers.add(streamName, {
+                            durable_name: durableName,
+                            description: `Pod ID: ${env.worker.WORKER_ID || 'standalone'}`,
+                            ack_policy: AckPolicy.Explicit,
+                            max_ack_pending: env.worker.MAX_ACK_PENDING,
+                            max_deliver: 5,
+                            backoff: [
+                                1000 * 1000 * 1000,
+                                2000 * 1000 * 1000,
+                                5000 * 1000 * 1000,
+                                10000 * 1000 * 1000,
+                                30000 * 1000 * 1000,
+                            ],
+                            ack_wait: 30 * 1000 * 1000 * 1000,
+                            deliver_policy: DeliverPolicy.All,
+                            filter_subject: subject,
+                        });
+                        logger.info(`Consumer ${durableName} successfully created after purge.`);
+                        return; // Exit successfully
+                    } else {
+                        logger.info('Purge is disabled. Please manually remove conflicting consumers or enable NATS_PURGE_CONFLICTS.');
+                    }
+                } catch (diagErr) {
+                    logger.warn('Diagnostic cleanup failed', diagErr);
                 }
             }
 
