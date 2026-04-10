@@ -145,19 +145,7 @@ const gracefulShutdown = async (signal: string) => {
 // Start server
 const startServer = async () => {
     try {
-        // Initialize connections
-        const connectionsReady = await initializeConnections();
-        if (!connectionsReady) {
-            logger.error('Failed to initialize connections. Exiting...');
-            process.exit(1);
-        }
-
-        // Start event workers
-        // workers();
-
-        // redisMongoSynchronizer.start()
-
-        // Start HTTP server
+        // Start HTTP server immediately
         const server = Bun.serve({
             port: config.server.port,
             hostname: '0.0.0.0',
@@ -165,12 +153,16 @@ const startServer = async () => {
         });
 
         logger.info(`Server running on port ${config.server.port} in ${config.server.env} mode`);
-        logger.info(`API documentation available at http://localhost:${config.server.port}/api/v1`);
-        logger.info(`Health check available at http://localhost:${config.server.port}/health`);
+        logger.info(`Health check available at http://localhost:${config.server.port}/v1/health`);
 
-        // Bun.serve() doesn't return a server object like Node.js
-        // It starts the server immediately and throws if there's an error
-        logger.info('Server started successfully');
+        // Initialize connections in the background
+        initializeConnections().then(ready => {
+            if (ready) {
+                logger.info('Background initialization complete');
+            } else {
+                logger.error('Background initialization failed');
+            }
+        });
 
         return server;
     } catch (error: any) {
