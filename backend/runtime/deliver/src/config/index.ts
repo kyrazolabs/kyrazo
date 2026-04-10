@@ -4,7 +4,6 @@
  * @example
  * import { config, databaseConfig, redisConfig, natsConfig } from './configs';
  */
-export { config, validateConfig } from "./app.config";
-export { databaseConfig } from "@kyrazo/shared";
-export { redisConfig } from "./redis.config";
-export { natsConfig } from "./nats.config";
+export { config, validateConfig } from './app.config';
+export { databaseConfig } from '@kyrazo/shared';
+export { redisConfig } from './redis.config';

@@ -5,7 +5,7 @@ import { natsConfig } from '@/configs/nats';
 import { redisConfig, REDIS_KEYS } from '@/configs/redis';
 import { config } from '@/configs';
 import type { IPublishedEvent } from '@kyrazo/shared';
-import { signatureCrypto, logger, prefixId, snowflake } from '@kyrazo/shared';
+import { signatureCrypto, logger, prefixId, snowflake, getNatsSubject } from '@kyrazo/shared';
 import type {
     BatchCreatePublishedEvent,
     CreatePublishedEvent,
@@ -83,7 +83,12 @@ export class PublishEventPublisher {
         try {
             const js = natsConfig.getJetStreamClient();
 
-            const subject = `workspace.${data.workspaceId}.plan.${data.planSlug}.events.publish.${data.eventType?.toLowerCase() || 'unknown'}`;
+            const subject = getNatsSubject(
+                data.workspaceId,
+                data.planSlug,
+                'publish',
+                data.eventType?.toLowerCase() || 'unknown'
+            );
 
             const event: Omit<IPublishedEvent, 'meta'> = {
                 eventId: data.eventId,
@@ -164,7 +169,12 @@ export class PublishEventPublisher {
             const publishPromises = data.map(item =>
                 limit(async () => {
                     try {
-                        const subject = `workspace.${item.workspaceId}.plan.${planSlug}.events.publish.${item.eventType.toLowerCase()}`;
+                        const subject = getNatsSubject(
+                            item.workspaceId,
+                            planSlug,
+                            'publish',
+                            item.eventType.toLowerCase()
+                        );
 
                         const event: Omit<IPublishedEvent, 'meta' | 'producerId' | 'userId'> = {
                             eventId: item.eventId,

@@ -1,7 +1,7 @@
 import { natsConfig } from '@/configs/nats';
 import { config } from '@/configs';
 import type { IReceivedEvent } from '@kyrazo/shared';
-import { logger, signatureCrypto } from '@kyrazo/shared';
+import { logger, signatureCrypto, getNatsSubject } from '@kyrazo/shared';
 import { DiscardPolicy, RetentionPolicy, StorageType, StringCodec } from 'nats';
 
 /**
@@ -68,7 +68,12 @@ export class ReceiveEventPublisher {
 
         try {
             const js = natsConfig.getJetStreamClient();
-            const subject = `workspace.${data.workspaceId}.plan.${data.planSlug}.events.receive.${data.source?.toLowerCase() || 'unknown'}`;
+            const subject = getNatsSubject(
+                data.workspaceId,
+                data.planSlug,
+                'receive',
+                data.source?.toLowerCase() || 'unknown'
+            );
 
             const event: Omit<IReceivedEvent, 'processingStatus'> = {
                 eventId: data.eventId,
