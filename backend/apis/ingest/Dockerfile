@@ -65,8 +65,7 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 # Ensure everything is owned by the bun user before switching
 RUN chown -R bun:bun /app
 
-# Run as non-root user for security
-USER bun
+
 
 ENV NODE_ENV=production
 
