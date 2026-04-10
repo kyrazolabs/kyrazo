@@ -10,11 +10,8 @@ import {
     createRateLimitMiddleware,
 } from '@/core/middlewares/rate-limiter.middleware';
 import { AnalyticsController } from '@/modules/v1/analytics/analytics.controller';
-import {
-    OverviewFilterSchema,
-    NamespaceHeadersSchema,
-    TargetQuerySchema,
-} from '@/core/utils/libs/zod';
+import { OverviewFilterSchema, TargetQuerySchema } from './analytics.schema';
+import { NamespaceHeadersSchema } from '@/core/utils/libs/zod';
 
 const analytics = new Hono();
 

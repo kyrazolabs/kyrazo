@@ -4,6 +4,7 @@
         "start": "bun run dist/index.js",
         "dev": "bun run --hot src/index.ts",
         "tunnel": "bun run src/tunnel.ts",
+        "typecheck": "bunx tsc --noEmit",
         "test": "bun test",
         "clean": "rm -rf dist && echo 'Done.'",
         "build": "tsc -p tsconfig.json && bunx tsc-alias -p tsconfig.json && mkdir -p dist/templates/emails && cp src/templates/emails/*.html dist/templates/emails/",

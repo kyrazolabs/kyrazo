@@ -39,7 +39,7 @@ jobs:
         working-directory: apis/dashboard
 
       - name: Typecheck
-        run: bunx tsc --noEmit
+        run: bun run typecheck
         working-directory: apis/dashboard
 
       - name: Build
