@@ -145,14 +145,7 @@ const gracefulShutdown = async (signal: string) => {
 // Start server
 const startServer = async () => {
     try {
-        // Initialize connections
-        const connectionsReady = await initializeConnections();
-        if (!connectionsReady) {
-            logger.error('Failed to initialize connections. Exiting...');
-            process.exit(1);
-        }
-
-        // Start HTTP server
+        // Start HTTP server immediately
         const server = Bun.serve({
             port: config.server.port,
             hostname: config.server.host,
@@ -160,10 +153,16 @@ const startServer = async () => {
         });
 
         logger.info(`Server running on port ${config.server.port} in ${config.server.env} mode`);
-        logger.info(`API documentation available at http://localhost:${config.server.port}/api/v1`);
-        logger.info(`Health check available at http://localhost:${config.server.port}/health`);
+        logger.info(`Health check available at http://localhost:${config.server.port}/v1/health`);
 
-        logger.info('Server started successfully');
+        // Initialize connections in the background
+        initializeConnections().then(ready => {
+            if (ready) {
+                logger.info('Background initialization complete');
+            } else {
+                logger.error('Background initialization failed');
+            }
+        });
 
         return server;
     } catch (error: any) {

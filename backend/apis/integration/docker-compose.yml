@@ -9,7 +9,7 @@ services:
     environment:
       - PORT=${PORT}
       - HOST=${HOST}
-      - NODE_ENV=${NODE_ENV}
+      - NODE_ENV=${NODE_ENV:-production}
       - APP_NAME=${APP_NAME}
 
       # Databases Configuration
