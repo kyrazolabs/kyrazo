@@ -84,51 +84,12 @@ export class WorkerConsumer {
                     durableName,
                 });
                 
-                // Try to find and PURGE existing consumers if enabled
                 try {
-                    const consumers = await this.jsm.consumers.list(streamName).next();
-                    const names = consumers.map((c: any) => c.name);
+                    const list = await this.jsm.consumers.list(streamName).next();
+                    const names = list.map((c: any) => c.name);
                     logger.info('Existing consumers on stream:', { consumerNames: names });
-
-                    if (env.worker.PURGE_CONFLICTS) {
-                        logger.warn('NATS_PURGE_CONFLICTS is enabled. Attempting to clear conflicting consumers...', { names });
-                        for (const name of names) {
-                            if (name !== durableName) {
-                                try {
-                                    await this.jsm.consumers.delete(streamName, name);
-                                    logger.info(`Successfully purged conflicting consumer: ${name}`);
-                                } catch (delErr) {
-                                    logger.error(`Failed to purge consumer ${name}. This may block initialization.`, delErr);
-                                }
-                            }
-                        }
-                        
-                        // Retry adding the consumer once after purge
-                        logger.info(`Retrying consumer creation: ${durableName}`);
-                        await this.jsm.consumers.add(streamName, {
-                            durable_name: durableName,
-                            description: `Pod ID: ${env.worker.WORKER_ID || 'standalone'}`,
-                            ack_policy: AckPolicy.Explicit,
-                            max_ack_pending: env.worker.MAX_ACK_PENDING,
-                            max_deliver: 5,
-                            backoff: [
-                                1000 * 1000 * 1000,
-                                2000 * 1000 * 1000,
-                                5000 * 1000 * 1000,
-                                10000 * 1000 * 1000,
-                                30000 * 1000 * 1000,
-                            ],
-                            ack_wait: 30 * 1000 * 1000 * 1000,
-                            deliver_policy: DeliverPolicy.All,
-                            filter_subject: subject,
-                        });
-                        logger.info(`Consumer ${durableName} successfully created after purge.`);
-                        return; // Exit successfully
-                    } else {
-                        logger.info('Purge is disabled. Please manually remove conflicting consumers or enable NATS_PURGE_CONFLICTS.');
-                    }
                 } catch (diagErr) {
-                    logger.warn('Diagnostic cleanup failed', diagErr);
+                    logger.warn('Diagnostic check failed', diagErr);
                 }
             }
 
