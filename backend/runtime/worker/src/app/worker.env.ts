@@ -25,7 +25,6 @@ const worker = {
     PLAN_SLUG: process.env.PLAN_SLUG || 'free',
     WORKER_ID: process.env.WORKER_ID || process.env.COOLIFY_RESOURCE_UUID,
     VERSION: process.env.APP_VERSION,
-    PURGE_CONFLICTS: process.env.NATS_PURGE_CONFLICTS === 'true',
 };
 
 export const env = { worker };
