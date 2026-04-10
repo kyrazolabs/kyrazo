@@ -31,7 +31,12 @@ export const bootstrap = async () => {
         await ingestProducer.initialize();
         const workerConsumer = new WorkerConsumer(env.worker.WORKSPACE_ID!);
         await workerConsumer.start().catch((err: any) => {
-            logger.error('WorkerConsumer failed:', err);
+            logger.error('WorkerConsumer initialization failed:', err);
+        });
+        
+        // Start consumption loop in the background to allow health check server to start
+        workerConsumer.consume().catch((err: any) => {
+            logger.error('WorkerConsumer consumption failed:', err);
         });
 
         return true;

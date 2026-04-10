@@ -99,8 +99,16 @@ export class WorkerConsumer {
             }
             logger.info('Consumer already exists, continuing');
         }
+    }
+
+    async consume(): Promise<void> {
+        const streamName = 'EVENTS';
+        const durableName = getNatsDurableName(this.workspaceId, env.worker.PLAN_SLUG);
+
         // Consume messages
         const consumer = await this.js.consumers.get(streamName, durableName);
+
+        logger.info(`Started consumption loop for ${durableName}`);
 
         while (true) {
             try {
