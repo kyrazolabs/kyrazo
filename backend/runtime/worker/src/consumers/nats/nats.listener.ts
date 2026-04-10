@@ -58,6 +58,7 @@ export class WorkerConsumer {
         try {
             await this.jsm.consumers.add(streamName, {
                 durable_name: durableName,
+                description: `Pod ID: ${env.worker.WORKER_ID || 'standalone'}`,
                 ack_policy: AckPolicy.Explicit,
                 max_ack_pending: env.worker.MAX_ACK_PENDING,
                 max_deliver: 5, // retry 5 times
@@ -75,6 +76,25 @@ export class WorkerConsumer {
 
             logger.info(`Consumer ${durableName} ready`);
         } catch (err: any) {
+            if (err.message.includes('filtered consumer not unique') || err.message.includes('10100')) {
+                logger.error('NATS Conflict: Another consumer is already using these subjects on this WorkQueue stream.', {
+                    streamName,
+                    subject,
+                    durableName,
+                    tip: 'Ensure no other services (like deliver or old workers) are subscribed to these subjects with different durable names.'
+                });
+                
+                // Try to find the existing consumer for diagnostics
+                try {
+                    const consumers = await this.jsm.consumers.list(streamName).next();
+                    logger.info('Existing consumers on stream:', {
+                        consumerNames: consumers.map((c: any) => c.name)
+                    });
+                } catch (listErr) {
+                    logger.warn('Could not list existing consumers for diagnostics', listErr);
+                }
+            }
+
             if (!err.message.includes('already exists')) {
                 logger.error('Failed to create consumer', err);
                 throw err;

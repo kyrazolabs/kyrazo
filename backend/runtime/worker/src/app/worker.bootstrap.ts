@@ -30,7 +30,7 @@ export const bootstrap = async () => {
         await dispatchQueue.initialize();
         await ingestProducer.initialize();
         const workerConsumer = new WorkerConsumer(env.worker.WORKSPACE_ID!);
-        workerConsumer.start().catch((err: any) => {
+        await workerConsumer.start().catch((err: any) => {
             logger.error('WorkerConsumer failed:', err);
         });
 

@@ -22,6 +22,7 @@ const worker = {
     BATCH_SIZE: parseInt(process.env.BATCH_SIZE!),
     MAX_ACK_PENDING: parseInt(process.env.MAX_ACK_PENDING!),
     FETCH_TIMEOUT_MS: parseInt(process.env.FETCH_TIMEOUT_MS!),
+    WORKER_ID: process.env.WORKER_ID || process.env.COOLIFY_RESOURCE_UUID,
     VERSION: process.env.APP_VERSION,
 };
 
