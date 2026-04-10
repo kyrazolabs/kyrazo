@@ -44,18 +44,21 @@ router.get('/health', async (c: Context) => {
             service => service.status === 'healthy'
         );
 
-        return c.json({
-            success: allHealthy,
-            message: allHealthy ? 'All services are healthy' : 'Some services are unhealthy',
-            services: {
-                mongo,
-                redis,
-                redisQueue,
-                nats,
+        return c.json(
+            {
+                success: allHealthy,
+                message: allHealthy ? 'All services are healthy' : 'Some services are unhealthy',
+                services: {
+                    mongo,
+                    redis,
+                    redisQueue,
+                    nats,
+                },
+                timestamp: new Date().toISOString(),
+                version: '1.0.0',
             },
-            timestamp: new Date().toISOString(),
-            version: '1.0.0',
-        });
+            allHealthy ? 200 : 503
+        );
     } catch (error: any) {
         return c.json(
             {
