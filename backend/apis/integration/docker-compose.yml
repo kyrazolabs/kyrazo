@@ -18,11 +18,21 @@ services:
       - MONGODB_MAX_POOL_SIZE=${MONGODB_MAX_POOL_SIZE}
       - MONGODB_MIN_POOL_SIZE=${MONGODB_MIN_POOL_SIZE}
       - MONGODB_SSL=${MONGODB_SSL}
+      - MONGODB_CA_FILE=${MONGODB_CA_FILE:-/etc/ssl/mongodb/ca.crt}
+      - MONGODB_CERT_KEY_FILE=${MONGODB_CERT_KEY_FILE:-/etc/ssl/mongodb/mongodb.pem}
 
+      # Redis Configuration
       - REDIS_URL=${REDIS_URL}
       - REDIS_TLS=${REDIS_TLS}
+      - REDIS_CA_FILE=${REDIS_CA_FILE:-/etc/ssl/redis/ca.crt}
+      - REDIS_CERT_FILE=${REDIS_CERT_FILE:-/etc/ssl/redis/client.crt}
+      - REDIS_KEY_FILE=${REDIS_KEY_FILE:-/etc/ssl/redis/client.key}
+
       - QUEUE_REDIS_URL=${QUEUE_REDIS_URL}
       - QUEUE_REDIS_TLS=${QUEUE_REDIS_TLS}
+      - QUEUE_REDIS_CA_FILE=${QUEUE_REDIS_CA_FILE:-/etc/ssl/redis/ca.crt}
+      - QUEUE_REDIS_CERT_FILE=${QUEUE_REDIS_CERT_FILE:-/etc/ssl/redis/client.crt}
+      - QUEUE_REDIS_KEY_FILE=${QUEUE_REDIS_KEY_FILE:-/etc/ssl/redis/client.key}
 
       # NATS Configuration
       - NATS_SERVERS=${NATS_SERVERS}

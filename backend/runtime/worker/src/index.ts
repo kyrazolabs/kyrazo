@@ -31,13 +31,16 @@ app.get('/v1/health', async c => {
 
         const allHealthy = [mongo, redis, nats].every(s => s.status === 'healthy');
 
-        return c.json({
-            success: allHealthy,
-            message: allHealthy ? 'All services are healthy' : 'Some services are unhealthy',
-            services: { mongo, redis, nats },
-            timestamp: new Date().toISOString(),
-            version: env.worker.VERSION || '1.0.0',
-        });
+        return c.json(
+            {
+                success: allHealthy,
+                message: allHealthy ? 'All services are healthy' : 'Some services are unhealthy',
+                services: { mongo, redis, nats },
+                timestamp: new Date().toISOString(),
+                version: env.worker.VERSION || '1.0.0',
+            },
+            allHealthy ? 200 : 503
+        );
     } catch (error: any) {
         return c.json(
             {
