@@ -1,7 +1,7 @@
-import { subscriptionRepository } from '@/modules/billing/subscriptions/subscription.repo';
-import { subscriptionService } from '@/modules/billing/subscriptions/subscription.service';
-import { paymentService } from '@/modules/billing/payments/payment.service';
-import { planService } from '@/modules/billing/plans/plan.service';
+import { subscriptionRepository } from '@/modules/v1/billing/subscriptions/subscription.repo';
+import { subscriptionService } from '@/modules/v1/billing/subscriptions/subscription.service';
+import { paymentService } from '@/modules/v1/billing/payments/payment.service';
+import { planService } from '@/modules/v1/billing/plans/plan.service';
 import { usageService } from '@/shared/services/usage.service';
 import { logger } from '@kyrazo/shared';
 

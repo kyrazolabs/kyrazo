@@ -17,7 +17,7 @@ import {
     ISubscription,
 } from '@kyrazo/shared';
 import { subscriptionCacheService } from '@/shared/services/subscription-cache.service';
-import { subscriptionService } from '@/modules/billing/subscriptions/subscription.service';
+import { subscriptionService } from '@/modules/v1/billing/subscriptions/subscription.service';
 import { redisConfig } from '@/configs';
 import {
     CreateNamespaceInput,

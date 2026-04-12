@@ -3,10 +3,10 @@ import { Types } from 'mongoose';
 import { stripe, stripeConfig } from '@/configs/stripe';
 import { redisConfig } from '@/configs';
 import { paymentRepository } from './payment.repo';
-import { subscriptionService } from '@/modules/billing/subscriptions/subscription.service';
+import { subscriptionService } from '@/modules/v1/billing/subscriptions/subscription.service';
 import { Invoice, logger, unprefixId, RedisKeys } from '@kyrazo/shared';
-import { subscriptionRepository } from '@/modules/billing/subscriptions/subscription.repo';
-import { planRepository } from '@/modules/billing/plans/plan.repo';
+import { subscriptionRepository } from '@/modules/v1/billing/subscriptions/subscription.repo';
+import { planRepository } from '@/modules/v1/billing/plans/plan.repo';
 import { snapshot } from '@/core/utils/transformers';
 import { limitService } from '@/shared/services/limit.service';
 

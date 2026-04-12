@@ -1,4 +1,4 @@
-import { SubscriptionResponse } from '@/modules/billing/subscriptions/subscription.dto';
+import { SubscriptionResponse } from '@/modules/v1/billing/subscriptions/subscription.dto';
 
 import { IPlan, IPlanSnapshot, transformWithId } from '@kyrazo/shared';
 

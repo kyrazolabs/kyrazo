@@ -1,6 +1,6 @@
 import { redisConfig } from '@/config';
-import { dispatchProducer } from '@/consumers/batch/dispatch.producer';
-import { dispatchConsumer } from '@/consumers/queues/dispatch.consumer';
+import { dispatchProducer } from '@/transports/batch/dispatch.producer';
+import { dispatchConsumer } from '@/transports/queues/dispatch.consumer';
 import { databaseConfig, logger } from '@kyrazo/shared';
 
 // Graceful shutdown handler

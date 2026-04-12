@@ -29,7 +29,7 @@ import { HonoAdapter } from '@bull-board/hono';
 import { usageService } from '@/shared/services/usage.service';
 import { serveStatic } from 'hono/bun';
 
-import v1Router from './modules';
+import Router from './modules';
 
 const app = new Hono();
 
@@ -54,8 +54,8 @@ app.use(
 );
 app.use('*', zodErrorHandler); // قبل errorHandler
 
-// Mount V1 Router
-app.route('/v1', v1Router);
+// Mount Router
+app.route('/', Router);
 
 // Security middleware
 // app.use('*', arcjetMiddleware)
