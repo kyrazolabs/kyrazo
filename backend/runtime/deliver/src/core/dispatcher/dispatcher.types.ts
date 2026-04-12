@@ -92,4 +92,8 @@ export interface IDispatchJobData {
     target: IConfiguredTarget;
     headers: IWebhookHeaders;
     deliveryId: string;
+    transform?: {
+        id: string;
+        code: string;
+    };
 }
