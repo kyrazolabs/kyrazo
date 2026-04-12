@@ -33,7 +33,9 @@ export const appConfig: ApplicationConfig = {
                 options: { darkModeSelector: false || '.p-dark' },
             },
         }),
-        provideMonacoEditor(),
+        provideMonacoEditor({
+            baseUrl: 'assets/monaco'
+        }),
         provideZoneChangeDetection({ eventCoalescing: true }),
         provideRouter(
             routes,

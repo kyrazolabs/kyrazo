@@ -29,6 +29,11 @@
                             {
                                 "glob": "**/*",
                                 "input": "public"
+                            },
+                            {
+                                "glob": "**/*",
+                                "input": "node_modules/monaco-editor/min/vs",
+                                "output": "assets/monaco/vs"
                             }
                         ],
                         "styles": [
@@ -100,6 +105,11 @@
                             {
                                 "glob": "**/*",
                                 "input": "public"
+                            },
+                            {
+                                "glob": "**/*",
+                                "input": "node_modules/monaco-editor/min/vs",
+                                "output": "assets/monaco/vs"
                             }
                         ],
                         "styles": [
