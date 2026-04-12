@@ -29,14 +29,23 @@ services:
       - MONGODB_RETRY_WRITES=${MONGODB_RETRY_WRITES}
       - MONGODB_RETRY_READS=${MONGODB_RETRY_READS}
       - MONGODB_SSL=${MONGODB_SSL}
+      - MONGODB_CA_FILE=${MONGODB_CA_FILE:-/etc/ssl/mongodb/ca.crt}
+      - MONGODB_CERT_KEY_FILE=${MONGODB_CERT_KEY_FILE:-/etc/ssl/mongodb/mongodb.pem}
 
       - CLICKHOUSE_URL=${CLICKHOUSE_URL}
-      - CLICKHOUSE_CA_FILE=/etc/ssl/clickhouse/ca.crt
-      - NODE_EXTRA_CA_CERTS=/etc/ssl/clickhouse/ca.crt
+      - CLICKHOUSE_CA_FILE=${CLICKHOUSE_CA_FILE:-/etc/ssl/clickhouse/ca.crt}
+      - NODE_EXTRA_CA_CERTS=${NODE_EXTRA_CA_CERTS:-/etc/ssl/clickhouse/ca.crt}
       - REDIS_URL=${REDIS_URL}
       - REDIS_TLS=${REDIS_TLS}
+      - REDIS_CA_FILE=${REDIS_CA_FILE:-/etc/ssl/redis/ca.crt}
+      - REDIS_CERT_FILE=${REDIS_CERT_FILE:-/etc/ssl/redis/client.crt}
+      - REDIS_KEY_FILE=${REDIS_KEY_FILE:-/etc/ssl/redis/client.key}
+
       - QUEUE_REDIS_URL=${QUEUE_REDIS_URL}
       - QUEUE_REDIS_TLS=${QUEUE_REDIS_TLS}
+      - QUEUE_REDIS_CA_FILE=${QUEUE_REDIS_CA_FILE:-/etc/ssl/redis/ca.crt}
+      - QUEUE_REDIS_CERT_FILE=${QUEUE_REDIS_CERT_FILE:-/etc/ssl/redis/client.crt}
+      - QUEUE_REDIS_KEY_FILE=${QUEUE_REDIS_KEY_FILE:-/etc/ssl/redis/client.key}
 
       # Security Configuration
       - TWO_FA_ISSUER=${TWO_FA_ISSUER}
