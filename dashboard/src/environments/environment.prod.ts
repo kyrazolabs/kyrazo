@@ -142,4 +142,16 @@ export const environment = {
     worker: {
         status: `${baseUrl}/v1/workers/status`,
     },
+    transform: {
+        gets: `${baseUrl}/v2/transforms`,
+        get: (id: string) => `${baseUrl}/v2/transforms/${id}`,
+        create: `${baseUrl}/v2/transforms`,
+        update: (id: string) => `${baseUrl}/v2/transforms/${id}`,
+        delete: (id: string) => `${baseUrl}/v2/transforms/${id}`,
+        test: (id?: string) => id 
+            ? `${baseUrl}/v2/transforms/${id}/test` 
+            : `${baseUrl}/v2/transforms/test`,
+        versions: (id: string) => `${baseUrl}/v2/transforms/${id}/versions`,
+        rollback: (id: string, version: number) => `${baseUrl}/v2/transforms/${id}/rollback/${version}`,
+    },
 };

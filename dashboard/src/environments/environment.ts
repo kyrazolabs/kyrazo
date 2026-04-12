@@ -175,4 +175,16 @@ export const environment = {
     worker: {
         status: `https://api.kyrazo.com/dashboard/v1/workers/status`,
     },
+    transform: {
+        gets: `https://api.kyrazo.com/dashboard/v2/transforms`,
+        get: (id: string) => `https://api.kyrazo.com/dashboard/v2/transforms/${id}`,
+        create: `https://api.kyrazo.com/dashboard/v2/transforms`,
+        update: (id: string) => `https://api.kyrazo.com/dashboard/v2/transforms/${id}`,
+        delete: (id: string) => `https://api.kyrazo.com/dashboard/v2/transforms/${id}`,
+        test: (id?: string) => id 
+            ? `https://api.kyrazo.com/dashboard/v2/transforms/${id}/test` 
+            : `https://api.kyrazo.com/dashboard/v2/transforms/test`,
+        versions: (id: string) => `https://api.kyrazo.com/dashboard/v2/transforms/${id}/versions`,
+        rollback: (id: string, version: number) => `https://api.kyrazo.com/dashboard/v2/transforms/${id}/rollback/${version}`,
+    },
 };

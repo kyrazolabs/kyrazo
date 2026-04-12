@@ -30,6 +30,7 @@ import { InviteMemberFormComponent } from '@shared/components/invite-member-form
 import { NamespaceFormComponent } from '@shared/components/namespace-form/namespace-form.component';
 import { SupportDialogComponent } from '@shared/components/support-dialog/support-dialog.component';
 import { AvatarSelectionDialogComponent } from '@shared/components/avatar-selection-dialog/avatar-selection-dialog.component';
+import { TransformFormComponent } from '../transforms/components/transform-form/transform-form.component';
 
 @Component({
     selector: 'app-shell',
@@ -49,6 +50,7 @@ import { AvatarSelectionDialogComponent } from '@shared/components/avatar-select
         NamespaceFormComponent,
         SupportDialogComponent,
         AvatarSelectionDialogComponent,
+        TransformFormComponent,
     ],
     templateUrl: './app-shell.html',
     styleUrl: './app-shell.scss',
@@ -107,6 +109,11 @@ export class AppShell implements OnInit, AfterViewInit {
 
     // Support Dialog
     supportDialogVisible = false;
+
+    // Transform Dialog
+    transformDialogVisible = false;
+    transformDialogId: string | null = null;
+    transformDialogHeader = 'Create Transform';
 
     // Avatar Dialog
     avatarDialogVisible = false;
@@ -203,6 +210,17 @@ export class AppShell implements OnInit, AfterViewInit {
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe((state) => {
                 this.supportDialogVisible = state.visible;
+            });
+
+        // Listen for Transform Dialog State
+        this.dialogService.transformDialogState$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe((state) => {
+                this.transformDialogVisible = state.visible;
+                this.transformDialogId = state.transformId;
+                this.transformDialogHeader = state.transformId
+                    ? 'Edit Transform'
+                    : 'Create Transform';
             });
 
         // Listen for Avatar Dialog State
@@ -320,5 +338,14 @@ export class AppShell implements OnInit, AfterViewInit {
 
     onAvatarDialogHide() {
         this.dialogService.closeAvatarDialog();
+    }
+
+    onTransformFormSuccess(data?: any) {
+        this.dialogService.notifyTransformSaved(data);
+        this.dialogService.closeTransformDialog();
+    }
+
+    onTransformDialogHide() {
+        this.dialogService.closeTransformDialog();
     }
 }

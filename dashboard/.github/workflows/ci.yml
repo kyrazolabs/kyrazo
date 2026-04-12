@@ -1,0 +1,32 @@
+name: CI - Dashboard
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Typecheck
+        run: bun run typecheck
+
+    #   - name: Test
+    #     run: bun run test -- --no-watch --no-progress --browsers=ChromeHeadless
+
+      - name: Build
+        run: bun run build

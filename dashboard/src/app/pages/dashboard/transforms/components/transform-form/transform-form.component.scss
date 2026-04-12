@@ -1,0 +1,27 @@
+/* Transform Form Dialog Styles */
+:host {
+    display: block;
+
+    ::ng-deep {
+        .ngx-monaco-editor-container {
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+
+        .p-tablist {
+            border-bottom: 1px solid var(--p-surface-200);
+        }
+
+        .p-tablist-tab-list {
+            padding: 0 1rem;
+        }
+    }
+}
+
+.dark {
+    ::ng-deep {
+        .p-tablist {
+            border-bottom-color: var(--p-surface-800);
+        }
+    }
+}
