@@ -33,6 +33,13 @@ export class DialogService {
     }>({ visible: false, targetId: null });
     targetDialogState$ = this.targetDialogStateSubject.asObservable();
 
+    // Transform Dialog State
+    private transformDialogStateSubject = new BehaviorSubject<{
+        visible: boolean;
+        transformId: string | null;
+    }>({ visible: false, transformId: null });
+    transformDialogState$ = this.transformDialogStateSubject.asObservable();
+
     // Billing Dialog State
     private billingDialogStateSubject = new BehaviorSubject<{
         visible: boolean;
@@ -83,6 +90,9 @@ export class DialogService {
 
     private targetSavedSource = new Subject<any>();
     targetSaved$ = this.targetSavedSource.asObservable();
+
+    private transformSavedSource = new Subject<any>();
+    transformSaved$ = this.transformSavedSource.asObservable();
 
     private twofaEnabledSource = new Subject<void>();
     twofaEnabled$ = this.twofaEnabledSource.asObservable();
@@ -150,6 +160,22 @@ export class DialogService {
 
     notifyTargetSaved(data?: any) {
         this.targetSavedSource.next(data);
+    }
+
+    // Transform Dialog Methods
+    openTransformDialog(transformId: string | null = null) {
+        this.transformDialogStateSubject.next({ visible: true, transformId });
+    }
+
+    closeTransformDialog() {
+        this.transformDialogStateSubject.next({
+            visible: false,
+            transformId: null,
+        });
+    }
+
+    notifyTransformSaved(data?: any) {
+        this.transformSavedSource.next(data);
     }
 
     // Billing Dialog Methods

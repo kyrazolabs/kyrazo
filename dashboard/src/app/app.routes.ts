@@ -43,6 +43,13 @@ export const routes: Routes = [
                 data: { title: 'Namespaces', animation: 'namespaces' },
             },
             {
+                path: 'transforms',
+                loadChildren: () =>
+                    import('@pages/dashboard/transforms/transforms.routes').then(
+                        (p) => p.transformsRoutes,
+                    ),
+            },
+            {
                 path: 'connectors',
                 loadComponent: () =>
                     import('@pages/dashboard/connectors/connectors.page').then(

@@ -15,6 +15,7 @@ import { environment } from '../environments/environment';
 import Aura from '@primeuix/themes/aura';
 import { providePrimeNG } from 'primeng/config';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { provideMonacoEditor } from 'ngx-monaco-editor-v2';
 
 import { authInterceptor } from '@core/interceptors/auth.interceptor';
 // import { errorInterceptor } from '@core/interceptors/error.interceptor';
@@ -32,6 +33,7 @@ export const appConfig: ApplicationConfig = {
                 options: { darkModeSelector: false || '.p-dark' },
             },
         }),
+        provideMonacoEditor(),
         provideZoneChangeDetection({ eventCoalescing: true }),
         provideRouter(
             routes,
