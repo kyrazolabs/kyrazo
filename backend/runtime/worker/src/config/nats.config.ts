@@ -1,4 +1,4 @@
-import { connect, StringCodec } from 'nats';
+import { connect, StringCodec, RetentionPolicy, StorageType, DiscardPolicy } from 'nats';
 import type { NatsConnection, JetStreamManager, JetStreamClient } from 'nats';
 import * as dotenv from 'dotenv';
 
@@ -87,6 +87,9 @@ export class NatsConfig {
             this.isConnected = true;
             logger.info('Connected to NATS successfully');
 
+            // Ensure EVENTS stream exists (idempotent)
+            await this.ensureEventsStream();
+
             // Test JetStream with a ping
             try {
                 await this.nc.request('$JS.API.INFO', '', { timeout: 5000 });
@@ -110,6 +113,44 @@ export class NatsConfig {
             logger.error('Failed to connect to NATS:', error);
             this.isConnected = false;
             throw error;
+        }
+    }
+
+    /**
+     * Ensure the EVENTS JetStream stream exists.
+     * Safe to call multiple times — does nothing if already created.
+     */
+    private async ensureEventsStream(): Promise<void> {
+        if (!this.jsm) return;
+        const STREAM_NAME = 'EVENTS';
+        const STREAM_SUBJECTS = ['workspace.>'];
+        try {
+            await this.jsm.streams.info(STREAM_NAME);
+            logger.info(`NATS stream '${STREAM_NAME}' already exists`);
+        } catch (err: any) {
+            // err_code 10059 = stream not found
+            if (err?.api_error?.err_code === 10059 || err?.code === 404) {
+                logger.info(`Creating NATS stream '${STREAM_NAME}'...`);
+                await this.jsm.streams.add({
+                    name: STREAM_NAME,
+                    subjects: STREAM_SUBJECTS,
+                    retention: RetentionPolicy.Workqueue,
+                    storage: StorageType.File,
+                    num_replicas: 1, // config.isDevelopment ? 1 : 2,
+                    max_age: 168 * 60 * 60 * 1e9, // 168H ~ 7 days
+                    max_bytes: 1024 * 1024 * 1024 * 10, // 10GB
+                    max_msg_size: 1024 * 512, // 512KB
+                    discard: DiscardPolicy.Old,
+                    duplicate_window: 10 * 60 * 1e9, // 10 minute dedup window
+                    allow_rollup_hdrs: false,
+                    deny_delete: false,
+                    deny_purge: false,
+                });
+                logger.info(`NATS stream '${STREAM_NAME}' created successfully`);
+            } else {
+                logger.error(`Failed to ensure stream '${STREAM_NAME}':`, err);
+                throw err;
+            }
         }
     }
 

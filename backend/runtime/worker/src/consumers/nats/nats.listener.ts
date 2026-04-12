@@ -75,29 +75,28 @@ export class WorkerConsumer {
                 filter_subject: subject,
             });
 
-            logger.info(`Consumer ${durableName} ready`);
+            logger.info(`Consumer ${durableName} ready on stream ${streamName} with subject ${subject}`);
         } catch (err: any) {
-            if (err.message.includes('filtered consumer not unique') || err.message.includes('10100')) {
-                logger.error('NATS Conflict: Another consumer is already using these subjects on this WorkQueue stream.', {
-                    streamName,
-                    subject,
-                    durableName,
-                });
-                
-                try {
-                    const list = await this.jsm.consumers.list(streamName).next();
-                    const names = list.map((c: any) => c.name);
-                    logger.info('Existing consumers on stream:', { consumerNames: names });
-                } catch (diagErr) {
-                    logger.warn('Diagnostic check failed', diagErr);
-                }
-            }
+            const errDetails = {
+                message: err.message,
+                code: err.code,
+                api_error: err.api_error,
+                status: err.status,
+                streamName,
+                subject,
+                durableName
+            };
 
-            if (!err.message.includes('already exists')) {
-                logger.error('Failed to create consumer', err);
+            if (err.message?.includes('filtered consumer not unique') || err.api_error?.err_code === 10100) {
+                logger.error('NATS Conflict: Another consumer is already using these subjects on this WorkQueue stream.', errDetails);
+            } else if (err.message?.includes('stream not found') || err.api_error?.err_code === 10059) {
+                logger.error('NATS Error: Stream "EVENTS" not found. Please ensure it is created before starting the worker.', errDetails);
+            } else if (!err.message?.includes('already exists')) {
+                logger.error('Failed to create consumer', errDetails);
                 throw err;
+            } else {
+                logger.info('Consumer already exists, continuing', { durableName });
             }
-            logger.info('Consumer already exists, continuing');
         }
     }
 
