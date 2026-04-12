@@ -13,6 +13,8 @@ export const ID_PREFIXES = {
     event: 'evt',
     delivery: 'del',
     apiKey: 'key',
+    transformer: 'trf',
+    transformerVersion: 'trv',
 } as const;
 
 export type IdType = keyof typeof ID_PREFIXES;
@@ -139,6 +141,9 @@ export function transformWithId<T>(data: T, type: IdType): TransformedWithId<T> 
             namespace: 'namespace',
             workspace: 'workspace',
             id: type, // Fallback for 'id' field
+            transformId: 'transformer',
+            transform_id: 'transformer',
+            createdBy: 'user',
         };
 
         for (const [field, idType] of Object.entries(idFields)) {

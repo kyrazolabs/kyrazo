@@ -53,7 +53,8 @@ export class DispatchProducer {
     public async enqueue(
         event: IDispatchedEvent,
         targets: IConfiguredTarget[],
-        headers: IWebhookHeaders
+        headers: IWebhookHeaders,
+        transform?: { id: string; code: string }
     ): Promise<(string | undefined)[]> {
         if (!this.dispatchQueue) {
             throw new Error('DispatchProducer not initialized');
@@ -62,6 +63,7 @@ export class DispatchProducer {
             const jobData = {
                 event,
                 headers,
+                transform,
             };
 
             const jobs = await this.dispatchQueue.addBulk(

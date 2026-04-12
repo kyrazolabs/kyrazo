@@ -13,6 +13,7 @@ import { dispatchProducer } from '../batch/dispatch.producer';
 import { env } from '@/app/worker.env';
 import { dispatcherSignature } from '@/core/dispatcher/dispatcher.signature';
 import { dispatchAnalyticsProducer } from '@/services/analytics/dispatch.producer';
+import { sandboxExecutor } from '@/services/sandbox/sandbox.executor';
 
 /**
  * Backoff schedule for webhook delivery retries
@@ -169,11 +170,38 @@ export class DispatchConsumer extends EventEmitter {
                     previous: event.data.previous,
                 },
             };
+
+            // 🛠️ APPLY CUSTOM TRANSFORMER
+            let finalBody = { ...body };
+            if (job.data.transform) {
+                const { code, id } = job.data.transform;
+                logger.debug(
+                    `[Consumer] Applying custom transformer ${id} for delivery ${deliveryId}`
+                );
+                await job.log(`🛠️ Applying custom transformer (${id})...`);
+
+                const sandboxResult = await sandboxExecutor.execute(code, body);
+
+                if (sandboxResult.success) {
+                    finalBody = sandboxResult.result;
+                    await job.log(`✅ Transformation complete`);
+                } else {
+                    logger.error(
+                        `[Consumer] Transformer ${id} failed: ${sandboxResult.error}. Falling back to original payload.`
+                    );
+                    await job.log(
+                        `⚠️ Transformer failed: ${sandboxResult.error}. Falling back to original payload.`
+                    );
+                    // TRIGGER CUSTOMER ALERT
+                    logger.warn(`[ALERT] Custom Transformer Failure for workspace ${event.workspaceId}`);
+                }
+            }
+
             // Perform signing before dispatch
             logger.debug(`🔏 Signing message for target ${target.url}...`);
             await job.log(`🔏 Signing message...`);
             const signatureResult = await dispatcherSignature.sign(
-                body,
+                finalBody,
                 event.workspaceId,
                 event.namespaceId,
                 target.targetId,
@@ -194,7 +222,7 @@ export class DispatchConsumer extends EventEmitter {
             await job.log(`✅ Message signed`);
             const method = target.method || 'POST';
             await job.log(`📤 Sending ${method} request to ${target.url}`);
-            const response = await httpRequester.request(method, target.url, body, {
+            const response = await httpRequester.request(method, target.url, finalBody, {
                 headers: headers,
             });
             await job.log(`📥 Received response: ${response.status}`);

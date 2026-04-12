@@ -9,8 +9,8 @@ import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { ExpressAdapter } from '@bull-board/express';
 import express, { type Request, type Response } from 'express';
 import { config, redisConfig } from '@/config';
-import { dispatchConsumer } from './consumers/queues/dispatch.consumer';
-import { dispatchProducer } from './consumers/batch/dispatch.producer';
+import { dispatchConsumer } from './transports/queues/dispatch.consumer';
+import { dispatchProducer } from './transports/batch/dispatch.producer';
 import { env } from './app/worker.env';
 
 const app = express();

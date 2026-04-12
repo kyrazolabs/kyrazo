@@ -37,7 +37,8 @@ export class DispatcherQueue extends EventEmitter {
         event: IDispatchedEvent,
         headers: IWebhookHeaders,
         targets: any[],
-        type: 'target' | 'endpoint' = 'target'
+        type: 'target' | 'endpoint' = 'target',
+        transform?: { id: string; code: string }
     ): Promise<void> {
         try {
             logger.info(
@@ -50,7 +51,7 @@ export class DispatcherQueue extends EventEmitter {
             }
 
             const configuredTargets = await this.configureTargets(event, type);
-            const jobIds = await dispatchProducer.enqueue(event, configuredTargets, headers);
+            const jobIds = await dispatchProducer.enqueue(event, configuredTargets, headers, transform);
 
             logger.info(`✅ Queued ${jobIds.length} dispatch jobs for event ${event.id}`);
         } catch (error: any) {

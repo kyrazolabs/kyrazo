@@ -4,10 +4,10 @@ import { config } from '@/configs';
 import { limitService } from '@/shared/services/limit.service';
 import { mailQueues } from '@/producers/jobs/v1/publishers';
 import { renderWorkspaceInvitationEmail } from '@/templates/emails';
-import { subscriptionRepository } from '@/modules/billing/subscriptions/subscription.repo';
+import { subscriptionRepository } from '@/modules/v1/billing/subscriptions/subscription.repo';
 import { Types, unprefixId, mongoose } from '@kyrazo/shared';
 import { snapshot } from '@/core/utils/transformers';
-import { planRepository } from '@/modules/billing/plans/plan.repo';
+import { planRepository } from '@/modules/v1/billing/plans/plan.repo';
 
 export class WorkspaceService {
     async createWorkspace(userId: string, data: any): Promise<IWorkspace> {

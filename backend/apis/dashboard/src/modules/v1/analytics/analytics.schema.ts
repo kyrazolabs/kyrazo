@@ -1,55 +1,23 @@
-export interface IAnalyticsDispatchResponse {
-    stats: {
-        total_targets: number;
-        active_targets?: number; // Optional as older clients might not assume it
-        total_deliveries: number;
-        successful_deliveries: number;
-        failed_deliveries: number;
-        pending_deliveries: number;
-        average_delivery_time: number | null;
-        success_rate: number;
-    };
-    deliveryTrends: {
-        day: string;
-        target: string;
-        successful: number;
-        failed: number;
-    }[];
-    topEventTypes: {
-        target: string;
-        event_type: string;
-        total: number;
-    }[];
-    statusCodeDistribution: {
-        target: string;
-        response_code: number;
-        total: number;
-    }[];
-}
+import z from 'zod';
 
-export interface IAnalyticsIngestResponse {
-    stats: {
-        ingests: number;
-        total_events: number;
-        successful_events: number;
-        failed_events: number;
-        pending_events: number;
-        success_rate: number;
-    };
-    receiveTrends: {
-        day: string;
-        events: number;
-    }[];
-    topSources: {
-        source: string;
-        total: number;
-    }[];
-    processStatusDistribution: {
-        processing_status: string;
-        total: number;
-    }[];
-    failureTrends: {
-        day: string;
-        total: number;
-    }[];
-}
+const objectIdSchema = z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid ID format');
+
+export const TargetQuerySchema = z.object({
+    targetId: objectIdSchema,
+});
+
+export const OverviewFilterSchema = z.object({
+    days: z.enum(['last7days', 'last30days', 'last90days', 'last180days', 'last360days']),
+});
+export const GetDeliveryByIdSchema = z.object({
+    deliveryId: z.string().regex(/^del_[0-9]+$/),
+});
+export const GetDeliveriesBySourceIdSchema = z.object({
+    sourceId: objectIdSchema,
+});
+
+export type GetDeliveryByIdInput = z.infer<typeof GetDeliveryByIdSchema>;
+export type GetDeliveriesBySourceIdInput = z.infer<typeof GetDeliveriesBySourceIdSchema>;
+
+export type TargetQueryInput = z.infer<typeof TargetQuerySchema>;
+export type OverviewFilterInput = z.infer<typeof OverviewFilterSchema>;

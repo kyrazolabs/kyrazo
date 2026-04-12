@@ -1,5 +1,5 @@
 import { redisConfig } from '@/configs/redis';
-import { subscriptionRepository } from '@/modules/billing/subscriptions/subscription.repo';
+import { subscriptionRepository } from '@/modules/v1/billing/subscriptions/subscription.repo';
 import { IPlanLimits, logger, unprefixId, FREE_PLAN_LIMITS, RedisKeys } from '@kyrazo/shared';
 import { subscriptionCacheService } from './subscription-cache.service';
 

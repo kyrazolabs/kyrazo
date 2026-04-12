@@ -1,7 +1,7 @@
 import { AppContext } from '@/core/middlewares/auth.middleware';
 import { IErrorResponse, logger } from '@kyrazo/shared';
 import { paymentService } from './payment.service';
-import { subscriptionService } from '@/modules/billing/subscriptions/subscription.service';
+import { subscriptionService } from '@/modules/v1/billing/subscriptions/subscription.service';
 import { CreateBillingPortalInput } from './payment.dto';
 
 export class PaymentController {

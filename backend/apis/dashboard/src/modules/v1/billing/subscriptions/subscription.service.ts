@@ -1,6 +1,14 @@
 import { subscriptionRepository } from './subscription.repo';
-import { planService } from '@/modules/billing/plans/plan.service';
-import { ISubscription, IPlanSnapshot, User, Customer, unprefixId, Invoice, RedisKeys } from '@kyrazo/shared';
+import { planService } from '@/modules/v1/billing/plans/plan.service';
+import {
+    ISubscription,
+    IPlanSnapshot,
+    User,
+    Customer,
+    unprefixId,
+    Invoice,
+    RedisKeys,
+} from '@kyrazo/shared';
 import {
     CreateSubscriptionInput,
     ChangePlanInput,

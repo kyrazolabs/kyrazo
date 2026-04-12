@@ -57,6 +57,9 @@ export const RedisKeys = {
         source: (id: string) => `context:source:${unprefixId(id)}`,
         target: (id: string) => `context:target:${unprefixId(id)}`,
         endpoint: (id: string) => `context:endpoint:${unprefixId(id)}`,
+        activeTransform: (workspaceId: string, namespaceId: string) =>
+            `context:transform:active:${unprefixId(workspaceId)}:${unprefixId(namespaceId)}`,
+        transformCode: (id: string) => `context:transform:code:${unprefixId(id)}`,
     },
     ingest: {
         endpoint: (id: string) => `ingest:endpoint:${unprefixId(id)}`,

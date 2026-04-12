@@ -55,13 +55,16 @@ export class DatabaseConfig {
                 throw new Error('MONGODB_URI environment variable is not defined');
             }
 
+            const isSslEnabled = config.database.ssl;
+
             logger.info('Connecting to MongoDB...', {
                 uri: mongoUri.replace(/:([^@]+)@/, ':****@'), // Mask password
                 dbName: config.database.dbName,
-                caFile: config.database.caFile,
+                ssl: isSslEnabled ? 'enabled' : 'disabled',
+                ...(isSslEnabled && { caFile: (config.database as any).caFile })
             });
 
-            await mongoose.connect(mongoUri, {
+            const mongooseOptions: any = {
                 dbName: config.database.dbName!,
                 maxPoolSize: config.database.maxPoolSize,
                 minPoolSize: config.database.minPoolSize,
@@ -72,21 +75,26 @@ export class DatabaseConfig {
                 retryWrites: config.database.retryWrites,
                 retryReads: config.database.retryReads,
                 bufferCommands: false,
-                ssl: (config.database as any).ssl,
-                tls: (config.database as any).ssl,
-                tlsInsecure: !(config.database as any).ssl, // If not SSL, it's insecure
-                rejectUnauthorized: (config.database as any).ssl,
-                ca:
-                    (config.database as any).caFile &&
-                    fs.existsSync((config.database as any).caFile)
-                        ? fs.readFileSync((config.database as any).caFile)
-                        : undefined,
-                tlsCertificateKeyFile:
-                    (config.database as any).tlsCertificateKeyFile &&
-                    fs.existsSync((config.database as any).tlsCertificateKeyFile)
-                        ? (config.database as any).tlsCertificateKeyFile
-                        : undefined,
-            } as any);
+                ssl: isSslEnabled,
+                tls: isSslEnabled,
+            };
+
+            if (isSslEnabled) {
+                mongooseOptions.rejectUnauthorized = true;
+                
+                if ((config.database as any).caFile && fs.existsSync((config.database as any).caFile)) {
+                    mongooseOptions.ca = fs.readFileSync((config.database as any).caFile);
+                }
+                
+                if ((config.database as any).tlsCertificateKeyFile && fs.existsSync((config.database as any).tlsCertificateKeyFile)) {
+                    mongooseOptions.tlsCertificateKeyFile = (config.database as any).tlsCertificateKeyFile;
+                }
+            } else {
+                mongooseOptions.tlsInsecure = true;
+                mongooseOptions.rejectUnauthorized = false;
+            }
+
+            await mongoose.connect(mongoUri, mongooseOptions);
 
             this.isConnected = true;
             logger.info('Mongoose connected to MongoDB successfully');

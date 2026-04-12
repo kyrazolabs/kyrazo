@@ -1,8 +1,8 @@
 import { redisConfig } from '@/config';
 import { databaseConfig, logger } from '@kyrazo/shared';
 import { lifecycle } from './worker.lifecycle';
-import { dispatchProducer } from '@/consumers/batch/dispatch.producer';
-import { dispatchConsumer } from '@/consumers/queues/dispatch.consumer';
+import { dispatchProducer } from '@/transports/batch/dispatch.producer';
+import { dispatchConsumer } from '@/transports/queues/dispatch.consumer';
 
 export const bootstrap = async () => {
     lifecycle();
