@@ -23,9 +23,13 @@ export function getNatsSubject(
 /**
  * Generates a deterministic durable name for NATS consumers.
  * Format: worker_w_<ID>_p_<PLAN>
+ * Sanitizes wildcard characters (*, >) with 'all' to ensure NATS compatibility.
  */
 export function getNatsDurableName(workspaceId: string, planSlug: string): string {
-    const sanitizedWorkspaceId = workspaceId.replace(/\./g, '_');
+    const sanitizedWorkspaceId = workspaceId
+        .replace(/\*/g, 'all')
+        .replace(/>/g, 'all')
+        .replace(/\./g, '_');
     const sanitizedPlan = planSlug.toLowerCase().replace(/\./g, '_');
 
     return `worker_w_${sanitizedWorkspaceId}_p_${sanitizedPlan}`;
