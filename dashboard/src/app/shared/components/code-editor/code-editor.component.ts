@@ -230,10 +230,14 @@ export class CodeEditorComponent
     }
 
     private getReadonlyExtensions(): Extension[] {
-        return [
-            EditorState.readOnly.of(this.readonly),
-            EditorView.editable.of(!this.readonly),
-        ];
+        if (this.readonly) {
+            return [
+                EditorState.readOnly.of(true),
+                EditorView.editable.of(false),
+                EditorView.contentAttributes.of({ tabindex: '0' })
+            ];
+        }
+        return [];
     }
 
     private destroyEditor(): void {
