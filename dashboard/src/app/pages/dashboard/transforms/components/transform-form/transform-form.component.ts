@@ -76,6 +76,13 @@ export class TransformFormComponent implements OnInit, OnChanges {
     initialLoading = signal(false);
     isEditing = signal(false);
     versions = signal<ITransformVersion[]>([]);
+    expandedVersionIndex = signal<number | null>(null);
+
+    toggleVersion(index: number): void {
+        this.expandedVersionIndex.set(
+            this.expandedVersionIndex() === index ? null : index,
+        );
+    }
 
     get jsonEditorOptions(): 'json' { return 'json'; }
 

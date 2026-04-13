@@ -1,13 +1,5 @@
-/* Transform Form Dialog Styles */
 :host {
     display: block;
-
-    ::ng-deep {
-        .ngx-monaco-editor-container {
-            border-radius: 0.75rem;
-            overflow: hidden;
-        }
-    }
 }
 
 @layer components {
