@@ -89,6 +89,20 @@ export class WorkerConsumer {
 
             if (err.message?.includes('filtered consumer not unique') || err.api_error?.err_code === 10100) {
                 logger.error('NATS Conflict: Another consumer is already using these subjects on this WorkQueue stream.', errDetails);
+                
+                // Diagnostic sweep: List existing consumers to identify the conflict
+                try {
+                    logger.info(`🔍 Diagnosing NATS conflict on stream ${streamName}...`);
+                    const consumers = await this.jsm.consumers.list(streamName).next();
+                    const groupDetails = consumers.map(c => ({
+                        name: c.name,
+                        filter: c.config.filter_subject,
+                        created: c.created
+                    }));
+                    logger.info('Existing consumers on stream:', { count: groupDetails.length, groups: groupDetails });
+                } catch (diagErr) {
+                    logger.warn('Diagnostic check failed', diagErr);
+                }
             } else if (err.message?.includes('stream not found') || err.api_error?.err_code === 10059) {
                 logger.error('NATS Error: Stream "EVENTS" not found. Please ensure it is created before starting the worker.', errDetails);
             } else if (!err.message?.includes('already exists')) {

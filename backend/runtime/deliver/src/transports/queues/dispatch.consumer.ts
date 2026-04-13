@@ -162,8 +162,6 @@ export class DispatchConsumer extends EventEmitter {
                 id: event.id,
                 type: event.type,
                 timestamp: event.timestamp,
-                workspaceId: event.workspaceId,
-                namespaceId: event.namespaceId,
 
                 data: {
                     object: event.data.object,
@@ -193,7 +191,9 @@ export class DispatchConsumer extends EventEmitter {
                         `⚠️ Transformer failed: ${sandboxResult.error}. Falling back to original payload.`
                     );
                     // TRIGGER CUSTOMER ALERT
-                    logger.warn(`[ALERT] Custom Transformer Failure for workspace ${event.workspaceId}`);
+                    logger.warn(
+                        `[ALERT] Custom Transformer Failure for workspace ${event.workspaceId}`
+                    );
                 }
             }
 
@@ -219,6 +219,7 @@ export class DispatchConsumer extends EventEmitter {
 
             // Update delivery attempt record with final headers and body
             deliveryAttempt.request_header = JSON.stringify(headers);
+            deliveryAttempt.request_body = JSON.stringify(finalBody);
             await job.log(`✅ Message signed`);
             const method = target.method || 'POST';
             await job.log(`📤 Sending ${method} request to ${target.url}`);
