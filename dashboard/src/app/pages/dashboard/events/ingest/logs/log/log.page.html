@@ -206,7 +206,7 @@
                             [disabled]="!ingestEvent.headers || ingestEvent.headers === '{}'"
                         />
                     </div>
-                    <div class="card-panel h-[160px] overflow-hidden border border-surface-200 dark:border-surface-800 rounded-xl">
+                    <div class="card-panel h-[300px] overflow-hidden border border-surface-200 dark:border-surface-800 rounded-xl">
                         @if (ingestEvent.headers && ingestEvent.headers !== '{}') {
                             <app-code-editor
                                 [ngModel]="stringifyData(ingestEvent.headers)"
@@ -234,7 +234,7 @@
                             [disabled]="!ingestEvent.body || ingestEvent.body === '{}'"
                         />
                     </div>
-                    <div class="card-panel h-[160px] overflow-hidden border border-surface-200 dark:border-surface-800 rounded-xl">
+                    <div class="card-panel h-[300px] overflow-hidden border border-surface-200 dark:border-surface-800 rounded-xl">
                         @if (ingestEvent.body && ingestEvent.body !== '{}') {
                             <app-code-editor
                                 [ngModel]="stringifyData(ingestEvent.body)"

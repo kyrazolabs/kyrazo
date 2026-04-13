@@ -35,8 +35,8 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { TagModule } from 'primeng/tag';
 import { TabsModule } from 'primeng/tabs';
+import { TooltipModule } from 'primeng/tooltip';
 import { CodeEditorComponent } from '@shared/components/code-editor/code-editor.component';
-import { NgxJsonViewerModule } from 'ngx-json-viewer';
 
 @Component({
     selector: 'app-transform-form',
@@ -56,6 +56,7 @@ import { NgxJsonViewerModule } from 'ngx-json-viewer';
         TabsModule,
         CodeEditorComponent,
         TagModule,
+        TooltipModule,
     ],
     templateUrl: './transform-form.component.html',
     styleUrls: ['./transform-form.component.scss'],

@@ -102,6 +102,7 @@ export class CodeEditorComponent
         if (this.readonly) {
             extensions.push(EditorState.readOnly.of(true));
             extensions.push(EditorView.editable.of(false));
+            extensions.push(EditorView.contentAttributes.of({ tabindex: '0' }));
         }
 
         const state = EditorState.create({

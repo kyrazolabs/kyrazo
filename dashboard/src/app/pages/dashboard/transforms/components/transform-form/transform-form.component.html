@@ -50,8 +50,8 @@
             </div>
 
             <div class="flex justify-end gap-3 pt-4">
-              <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="cancel()" [disabled]="loading()" styleClass="rounded-xl!" size="small" />
-              <p-button [label]="isEditing() ? 'Update' : 'Create'" (onClick)="onSubmit()" [loading]="loading()" styleClass="rounded-xl!" size="small" />
+              <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="cancel()" [disabled]="loading()" styleClass="rounded-xl!" />
+              <p-button [label]="isEditing() ? 'Update' : 'Create'" (onClick)="onSubmit()" [loading]="loading()" styleClass="rounded-xl!" />
             </div>
           </form>
         </p-tabpanel>
@@ -63,7 +63,14 @@
               <!-- Input Section -->
               <div class="flex flex-col gap-2">
                 <div class="flex items-center justify-between">
-                  <label class="font-semibold">Input Test Payload (JSON)</label>
+                  <div class="flex items-center gap-2">
+                    <label class="font-semibold">Input Test Payload (JSON)</label>
+                    <i
+                        class="pi pi-info-circle text-surface-400 dark:text-surface-500 cursor-help text-sm"
+                        pTooltip="You can test the Transformer without saving it"
+                        tooltipPosition="top"
+                    ></i>
+                  </div>
                   <p-button label="Run Test" (onClick)="onTest()" [loading]="isTesting()" severity="primary" [outlined]="true" size="small" styleClass="rounded-xl! py-1!" />
                 </div>
                 <div class="border border-surface-200 dark:border-surface-800 rounded-xl overflow-hidden h-[300px]">
