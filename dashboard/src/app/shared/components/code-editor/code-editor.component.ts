@@ -5,7 +5,7 @@ import {
     Input,
     OnChanges,
     OnDestroy,
-    OnInit,
+    AfterViewInit,
     SimpleChanges,
     ViewChild,
 } from '@angular/core';
@@ -126,7 +126,7 @@ function transformerCompletionSource(
     ],
 })
 export class CodeEditorComponent
-    implements OnInit, OnDestroy, OnChanges, ControlValueAccessor
+    implements AfterViewInit, OnDestroy, OnChanges, ControlValueAccessor
 {
     @ViewChild('editorHost', { static: true })
     editorHost!: ElementRef<HTMLDivElement>;
@@ -145,7 +145,7 @@ export class CodeEditorComponent
     private themeCompartment = new Compartment();
     private readonlyCompartment = new Compartment();
 
-    ngOnInit(): void {
+    ngAfterViewInit(): void {
         this.initEditor();
     }
 
@@ -197,6 +197,8 @@ export class CodeEditorComponent
             }),
         ];
 
+        // Create the editor with the current buffered value (may have been set
+        // by writeValue before the editor existed)
         const state = EditorState.create({
             doc: this.value,
             extensions,
