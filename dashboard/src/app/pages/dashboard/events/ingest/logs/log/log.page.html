@@ -1,4 +1,4 @@
-<div class="space-y-6 mb-4">
+<div class="space-y-6 mb-4 min-w-0 overflow-hidden">
     <!-- Header -->
     <div
         class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6"
@@ -27,6 +27,7 @@
     <!-- Event Information Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Basic Event Info -->
+        <div class="min-w-0 overflow-hidden">
         <p-card
             header="Event Information"
             class="card-panel h-full"
@@ -186,8 +187,10 @@
                 </div>
             </div>
         </p-card>
+        </div>
 
         <!-- Request Details -->
+        <div class="min-w-0 overflow-hidden">
         <p-card
             header="Request Details"
             class="card-panel h-full!"
@@ -250,5 +253,6 @@
                 </div>
             </div>
         </p-card>
+        </div>
     </div>
 </div>
