@@ -34,7 +34,7 @@ export const appConfig: ApplicationConfig = {
             },
         }),
         provideMonacoEditor({
-            baseUrl: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.55.1/min',
+            baseUrl: 'assets',
             defaultOptions: { scrollBeyondLastLine: false },
             requireConfig: { preferScriptTags: true }
         }),
