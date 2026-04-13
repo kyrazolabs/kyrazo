@@ -134,7 +134,7 @@
                     <!-- Header/Toggle -->
                     <div class="flex items-center justify-between p-4 cursor-pointer" (click)="toggleVersion($index)">
                         <div class="flex flex-col">
-                            <div class="flex items-center gap-2 text-sm">
+                            <div class="flex items-center gap-2 text-base">
                                 <span class="font-bold">Version {{ v.version }}</span>
                                 @if (v.version === currentVersion()) {
                                     <p-tag value="Current" severity="success" class="text-xs! rounded-xl!" />
@@ -147,7 +147,7 @@
                                     <i class="pi pi-chevron-down text-[10px]!"></i>
                                 </div>
                             </div>
-                            <span class="text-[11px] opacity-60">Created at {{ v.createdAt | date:'medium' }}</span>
+                            <span class="text-sm opacity-60">Created at {{ v.createdAt | date:'medium' }}</span>
                         </div>
                         <div class="flex gap-2" (click)="$event.stopPropagation()">
                             <p-button label="Rollback" icon="pi pi-undo" severity="warn" [outlined]="true" size="small" (onClick)="rollback(v.version)" styleClass="rounded-xl!" />
