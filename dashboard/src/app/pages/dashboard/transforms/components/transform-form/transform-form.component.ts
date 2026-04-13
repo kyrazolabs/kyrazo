@@ -34,7 +34,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { TagModule } from 'primeng/tag';
 import { TabsModule } from 'primeng/tabs';
-import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
+import { CodeEditorComponent } from '@shared/components/code-editor/code-editor.component';
 import { NgxJsonViewerModule } from 'ngx-json-viewer';
 
 @Component({
@@ -53,7 +53,7 @@ import { NgxJsonViewerModule } from 'ngx-json-viewer';
         SkeletonModule,
         ProgressBarModule,
         TabsModule,
-        MonacoEditorModule,
+        CodeEditorComponent,
         NgxJsonViewerModule,
         TagModule,
     ],
@@ -77,16 +77,7 @@ export class TransformFormComponent implements OnInit, OnChanges {
     isEditing = signal(false);
     versions = signal<ITransformVersion[]>([]);
 
-    // Monaco Editor Config
-    editorOptions = {
-        theme: 'vs-dark',
-        language: 'javascript',
-        automaticLayout: true,
-        minimap: { enabled: false },
-        fontSize: 14,
-        lineNumbers: 'on',
-        scrollBeyondLastLine: false,
-    };
+    get jsonEditorOptions(): 'json' { return 'json'; }
 
     // Testing State
     testPayload = signal<string>(
@@ -96,10 +87,6 @@ export class TransformFormComponent implements OnInit, OnChanges {
     testLogs = signal<string[]>([]);
     testExecutionTime = signal<number>(0);
     isTesting = signal(false);
-
-    get jsonEditorOptions() {
-        return { ...this.editorOptions, language: 'json' };
-    }
 
     constructor() {
         this.transformForm = this.fb.group({
@@ -113,9 +100,7 @@ export class TransformFormComponent implements OnInit, OnChanges {
         });
     }
 
-    ngOnInit() {
-        // Monaco initialization for custom types would ideally happen here or via a dedicated service
-    }
+    ngOnInit() {}
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes['transformId']) {

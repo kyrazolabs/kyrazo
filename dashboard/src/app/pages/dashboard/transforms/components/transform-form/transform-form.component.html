@@ -41,11 +41,11 @@
             <div class="flex flex-col gap-2 h-[400px]">
               <label class="font-semibold text-sm">Code Logic (JavaScript)</label>
               <div class="border border-surface-200 dark:border-surface-800 rounded-xl overflow-hidden h-full">
-                <ngx-monaco-editor
+                <app-code-editor
                   style="height: 100%"
-                  [options]="editorOptions"
+                  language="javascript"
                   formControlName="code"
-                ></ngx-monaco-editor>
+                ></app-code-editor>
               </div>
             </div>
 
@@ -64,12 +64,12 @@
               <div class="flex flex-col gap-2">
                 <label class="font-semibold text-sm">Input Test Payload (JSON)</label>
                 <div class="border border-surface-200 dark:border-surface-800 rounded-xl overflow-hidden h-[300px]">
-                    <ngx-monaco-editor
+                    <app-code-editor
                         style="height: 100%"
-                        [options]="jsonEditorOptions"
+                        language="json"
                         [ngModel]="testPayload()"
                         (ngModelChange)="testPayload.set($event)"
-                    ></ngx-monaco-editor>
+                    ></app-code-editor>
                 </div>
                 <p-button label="Run Test" icon="pi pi-play" (onClick)="onTest()" [loading]="isTesting()" severity="success" class="mt-2" styleClass="w-full rounded-xl!" />
               </div>
