@@ -1,13 +1,5 @@
-import { connect } from 'nats';
-import * as dotenv from 'dotenv';
+import { natsConfig } from './config/nats.config';
 import { logger } from '@kyrazo/shared';
-
-// Load environment variables
-dotenv.config();
-
-const NATS_SERVERS = process.env.NATS_SERVERS || 'nats://192.168.8.2:4222';
-const NATS_USER = process.env.NATS_USER;
-const NATS_PASSWORD = process.env.NATS_PASSWORD;
 
 /**
  * NATS Cleanup Script
@@ -15,17 +7,11 @@ const NATS_PASSWORD = process.env.NATS_PASSWORD;
  * Usage: bun run clean:nats
  */
 async function runCleanup() {
-    logger.info(`🔌 Connecting to NATS at ${NATS_SERVERS}...`);
+    logger.info('🧹 Starting NATS consumer cleanup...');
     
     try {
-        const nc = await connect({ 
-            servers: NATS_SERVERS, 
-            user: NATS_USER, 
-            pass: NATS_PASSWORD 
-        });
-        
-        logger.info('✅ Connected to NATS successfully.');
-        const jsm = await nc.jetstreamManager();
+        await natsConfig.connect();
+        const jsm = natsConfig.getJetStreamManager();
         const streamName = 'EVENTS';
 
         // Add any known legacy or conflicting durable names here
@@ -49,7 +35,6 @@ async function runCleanup() {
             }
         }
 
-        // Optional: List remaining consumers for visibility
         try {
             logger.info('📊 Remaining consumers on stream:');
             const remaining = await jsm.consumers.list(streamName).next();
@@ -64,8 +49,8 @@ async function runCleanup() {
             logger.warn(`Could not list remaining consumers: ${listErr.message}`);
         }
 
-        await nc.close();
-        logger.info('👋 Disconnected from NATS. Cleanup complete.');
+        await natsConfig.disconnect();
+        logger.info('👋 Cleanup complete.');
         process.exit(0);
     } catch (e: any) {
         logger.error(`💥 Fatal Error during NATS connection/cleanup: ${e.message}`);
