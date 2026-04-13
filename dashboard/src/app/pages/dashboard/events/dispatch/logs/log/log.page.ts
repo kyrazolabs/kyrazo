@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 
 import { CardModule } from 'primeng/card';
@@ -8,12 +9,12 @@ import { TagModule } from 'primeng/tag';
 import { DividerModule } from 'primeng/divider';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { InputTextModule } from 'primeng/inputtext';
+import { CodeEditorComponent } from '@shared/components/code-editor/code-editor.component';
 import { CopyIdComponent } from '@shared/components/copy-id/copy-id.component';
 
 import { LoaderService } from '@core/services/loader.service';
 import { DeliveryService } from '@core/services/delivery.service';
 import { IDeliveryAttempt } from '@models/delivery.types';
-import { NgxJsonViewerModule } from 'ngx-json-viewer';
 
 @Component({
     selector: 'app-log.page',
@@ -26,7 +27,8 @@ import { NgxJsonViewerModule } from 'ngx-json-viewer';
         DividerModule,
         ScrollPanelModule,
         InputTextModule,
-        NgxJsonViewerModule,
+        CodeEditorComponent,
+        FormsModule,
         CopyIdComponent,
     ],
     templateUrl: './log.page.html',
@@ -106,6 +108,18 @@ export class LogPage {
         }
 
         return 'info';
+    }
+
+    stringifyData(data: any): string {
+        if (!data) return '';
+        if (typeof data === 'string') {
+            try {
+                return JSON.stringify(JSON.parse(data), null, 2);
+            } catch {
+                return data;
+            }
+        }
+        return JSON.stringify(data, null, 2);
     }
 
     toggleRawView() {
