@@ -17,6 +17,7 @@
         "watch": "concurrently -k -n TSC -c blue \"tsc -p tsconfig.json -w\"",
         "rebuild": "rm -rf dist && bun run build",
         "clean": "rm -rf dist && echo 'Done.'",
+        "clean:nats": "bun run src/nats-cleanup.ts",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "format": "prettier --write .",
