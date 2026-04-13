@@ -122,7 +122,7 @@ export class CodeEditorComponent
                 return json();
             case 'javascript':
             default:
-                return javascript();
+                return javascript({ typescript: true });
         }
     }
 
