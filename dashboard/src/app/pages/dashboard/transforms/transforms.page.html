@@ -88,6 +88,7 @@
       (onLazyLoad)="loadTransformsLazy($event)"
       dataKey="id"
       responsiveLayout="scroll"
+      styleClass="p-datatable-sm lg:p-datatable-md"
     >
       <ng-template pTemplate="header">
         <tr>
@@ -116,14 +117,14 @@
       </ng-template>
 
       <ng-template pTemplate="body" let-transform>
-        <tr>
-          <td>
-            <div class="flex flex-col max-w-56">
-              <span class="font-semibold text-surface-900 dark:text-surface-0">
+        <tr class="hover:bg-surface-50! dark:hover:bg-surface-900/50!">
+          <td class="cursor-pointer" (click)="openEditDialog(transform)">
+            <div class="flex flex-col min-w-0">
+              <span class="font-semibold text-surface-900 dark:text-surface-0 truncate" [pTooltip]="transform.name">
                 {{ transform.name }}
               </span>
               @if (transform.description) {
-                <span class="text-sm truncate text-surface-600 dark:text-surface-400">
+                <span class="text-xs text-surface-500 dark:text-surface-400 truncate max-w-[150px]" [pTooltip]="transform.description">
                   {{ transform.description }}
                 </span>
               }
@@ -133,13 +134,14 @@
             <app-copy-id [id]="transform.id" />
           </td>
           <td>
-            <p-tag [value]="'v' + transform.currentVersion" severity="info" [rounded]="true" />
+            <p-tag [value]="'v' + transform.currentVersion" severity="info" [rounded]="true" class="text-xs!" />
           </td>
           <td>
             <p-tag
               [value]="transform.isActive ? 'Active' : 'Inactive'"
-              [severity]="getStatusSeverity(transform.isActive)"
+              [severity]="transform.isActive ? 'success' : 'danger'"
               [rounded]="true"
+              class="uppercase text-xs! font-bold"
             />
           </td>
           <td>

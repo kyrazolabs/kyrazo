@@ -140,6 +140,7 @@ export class CodeEditorComponent
 
     private view: EditorView | null = null;
     private value = '';
+    private formDisabled = false;
     private onChange: (v: string) => void = () => {};
     private onTouched: () => void = () => {};
     private updatingFromOutside = false;
@@ -229,11 +230,15 @@ export class CodeEditorComponent
         return extensions;
     }
 
+    private isEffectivelyReadonly(): boolean {
+        return this.readonly || this.formDisabled;
+    }
+
     private getReadonlyExtensions(): Extension[] {
-        if (this.readonly) {
+        if (this.isEffectivelyReadonly()) {
             return [
-                EditorState.readOnly.of(true),
-                EditorView.editable.of(false),
+                Prec.highest(EditorState.readOnly.of(true)),
+                Prec.highest(EditorView.editable.of(false)),
                 EditorView.contentAttributes.of({ tabindex: '0' })
             ];
         }
@@ -270,7 +275,7 @@ export class CodeEditorComponent
     }
 
     setDisabledState(isDisabled: boolean): void {
-        this.readonly = isDisabled;
+        this.formDisabled = isDisabled;
         if (this.view) {
             this.view.dispatch({
                 effects: this.readonlyCompartment.reconfigure(
