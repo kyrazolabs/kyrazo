@@ -7,21 +7,24 @@
             border-radius: 0.75rem;
             overflow: hidden;
         }
-
-        .p-tablist {
-            border-bottom: 1px solid var(--p-surface-200);
-        }
-
-        .p-tablist-tab-list {
-            padding: 0 1rem;
-        }
     }
 }
 
-.dark {
-    ::ng-deep {
-        .p-tablist {
-            border-bottom-color: var(--p-surface-800);
-        }
+@layer components {
+    :host {
+        --p-tabs-tab-border-width: 0 0 0px 0 !important;
+        --p-tabs-tablist-border-width: 0 0 1px 0 !important;
+        --p-tabs-tabpanel-background: transparent !important;
+        --p-tabs-tablist-background: transparent !important;
+        --p-tabs-tab-padding: 0.525rem 1rem !important;
+
+        --p-tabs-tablist-border-color: transparent !important;
+        --p-tabs-tab-border-color: transparent !important;
+        --p-tabs-tablist-hover-border-color: transparent !important;
+        --p-tabs-tab-hover-border-color: transparent !important;
+    }
+    .p-tab {
+        border-radius: var(--radius-xl) !important;
     }
 }
+
