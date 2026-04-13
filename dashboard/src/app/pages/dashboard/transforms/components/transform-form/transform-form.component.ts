@@ -110,7 +110,9 @@ export class TransformFormComponent implements OnInit, OnChanges {
         ),
     );
     testResult = signal<any>(null);
-    testResultFormatted = computed(() => this.testResult() ? JSON.stringify(this.testResult(), null, 2) : '');
+    testResultFormatted = computed(() =>
+        this.testResult() ? JSON.stringify(this.testResult(), null, 2) : '',
+    );
     testLogs = signal<string[]>([]);
     testExecutionTime = signal<number>(0);
     isTesting = signal(false);
@@ -273,7 +275,9 @@ return {
                 next: (response) => {
                     this.testResult.set(response.data.result);
                     this.testLogs.set(response.data.logs);
-                    this.testExecutionTime.set(response.data.executionTimeMs);
+                    this.testExecutionTime.set(
+                        Number(response.data.executionTimeMs.toFixed(4)),
+                    );
                     this.isTesting.set(false);
                 },
                 error: (err) => {

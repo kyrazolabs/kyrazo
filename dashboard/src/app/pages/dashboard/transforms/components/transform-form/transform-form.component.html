@@ -60,9 +60,12 @@
         <p-tabpanel [value]="1">
           <div class="flex flex-col gap-6 mt-4">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <!-- Result Section -->
+              <!-- Input Section -->
               <div class="flex flex-col gap-2">
-                <label class="font-semibold text-sm">Input Test Payload (JSON)</label>
+                <div class="flex items-center justify-between">
+                  <label class="font-semibold text-sm">Input Test Payload (JSON)</label>
+                  <p-button label="Run Test" icon="pi pi-play" (onClick)="onTest()" [loading]="isTesting()" severity="success" [outlined]="true" size="small" styleClass="rounded-lg! py-1!" />
+                </div>
                 <div class="border border-surface-200 dark:border-surface-800 rounded-xl overflow-hidden h-[300px]">
                     <app-code-editor
                         style="height: 100%"
@@ -71,9 +74,9 @@
                         (ngModelChange)="testPayload.set($event)"
                     ></app-code-editor>
                 </div>
-                <p-button label="Run Test" icon="pi pi-play" (onClick)="onTest()" [loading]="isTesting()" severity="success" class="mt-2" styleClass="w-full rounded-xl!" />
               </div>
 
+              <!-- Output Section -->
               <div class="flex flex-col gap-2">
                 <label class="font-semibold text-sm">Transformed Output</label>
                 <div class="border border-surface-200 dark:border-surface-800 rounded-xl overflow-hidden h-[300px]">
@@ -96,30 +99,32 @@
             <p-divider />
 
             <!-- Logs & Timing -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div class="flex flex-col gap-2">
-                    <div class="flex items-center justify-between">
+            <div class="flex flex-col gap-2 w-full">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
                         <label class="font-semibold text-sm">Execution Logs</label>
-                        <span class="text-[10px] opacity-60 bg-surface-100 dark:bg-surface-800 px-2 py-0.5 rounded-full">console.log output</span>
+                        <span class="text-[10px] uppercase font-black tracking-widest opacity-40">console.log output</span>
                     </div>
-                    <div class="bg-black text-green-400 font-mono text-[11px] p-4 rounded-xl h-[150px] overflow-y-auto border border-surface-800">
-                        @for (log of testLogs(); track $index) {
-                            <div>> {{ log }}</div>
-                        } @empty {
-                            <div class="opacity-50 italic">Empty logs</div>
-                        }
-                    </div>
-                </div>
-
-                <div class="flex flex-col gap-4">
-                    <label class="font-semibold text-sm">Performance</label>
-                    <div class="flex items-center justify-center p-6 bg-surface-50 dark:bg-surface-900 border border-surface-200 dark:border-surface-800 rounded-2xl">
-                        <div class="text-center">
-                            <i class="pi pi-clock text-2xl text-primary mb-2"></i>
-                            <div class="text-3xl font-bold font-mono">{{ testExecutionTime() }}ms</div>
-                            <div class="text-xs opacity-50">Execution Time</div>
+                    @if (testExecutionTime() > 0) {
+                        <div class="flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">
+                            <i class="pi pi-bolt text-primary text-[10px]"></i>
+                            <span class="text-[11px] font-bold text-primary">{{ testExecutionTime() }}ms</span>
+                            <span class="text-[10px] opacity-60">execution time</span>
                         </div>
-                    </div>
+                    }
+                </div>
+                <div class="bg-surface-950 text-green-500 font-mono text-[11px] p-4 rounded-xl h-[180px] overflow-y-auto border border-surface-800 shadow-inner">
+                    @for (log of testLogs(); track $index) {
+                        <div class="flex gap-2">
+                            <span class="opacity-30 select-none">[{{ $index + 1 }}]</span>
+                            <span>{{ log }}</span>
+                        </div>
+                    } @empty {
+                        <div class="opacity-50 italic flex flex-col items-center justify-center h-full gap-2">
+                            <i class="pi pi-info-circle"></i>
+                            <span>No logs generated during execution</span>
+                        </div>
+                    }
                 </div>
             </div>
           </div>
