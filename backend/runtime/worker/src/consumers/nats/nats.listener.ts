@@ -57,59 +57,65 @@ export class WorkerConsumer {
         const durableName = getNatsDurableName(this.workspaceId, env.worker.PLAN_SLUG);
 
         try {
-            await this.jsm.consumers.add(streamName, {
-                durable_name: durableName,
-                description: `Pod ID: ${env.worker.WORKER_ID || 'standalone'}`,
-                ack_policy: AckPolicy.Explicit,
-                max_ack_pending: env.worker.MAX_ACK_PENDING,
-                max_deliver: 5, // retry 5 times
-                backoff: [
-                    1000 * 1000 * 1000, // 1s
-                    2000 * 1000 * 1000, // 2s
-                    5000 * 1000 * 1000, // 5s
-                    10000 * 1000 * 1000, // 10s
-                    30000 * 1000 * 1000, // 50s
-                ],
-                ack_wait: 30 * 1000 * 1000 * 1000, // 30 seconds
-                deliver_policy: DeliverPolicy.All,
-                filter_subject: subject,
-            });
-
-            logger.info(`Consumer ${durableName} ready on stream ${streamName} with subject ${subject}`);
-        } catch (err: any) {
-            const errDetails = {
-                message: err.message,
-                code: err.code,
-                api_error: err.api_error,
-                status: err.status,
-                streamName,
-                subject,
-                durableName
-            };
-
-            if (err.message?.includes('filtered consumer not unique') || err.api_error?.err_code === 10100) {
-                logger.error('NATS Conflict: Another consumer is already using these subjects on this WorkQueue stream.', errDetails);
+            // Step 1: Attempt to fetch existing consumer (Binding)
+            logger.info(`Checking for existing consumer group ${durableName}...`);
+            await this.js.consumers.get(streamName, durableName);
+            logger.info(`Consumer group ${durableName} already exists. Binding successful.`);
+        } catch (getErr: any) {
+            // Step 2: If not found, attempt to create it
+            // error 10014 = consumer not found
+            if (getErr?.api_error?.err_code === 10014 || getErr?.code === 404 || getErr?.message?.includes('not found')) {
+                logger.info(`Consumer group ${durableName} not found. Attempting to create...`);
                 
-                // Diagnostic sweep: List existing consumers to identify the conflict
                 try {
-                    logger.info(`🔍 Diagnosing NATS conflict on stream ${streamName}...`);
-                    const consumers = await this.jsm.consumers.list(streamName).next();
-                    const groupDetails = consumers.map(c => ({
-                        name: c.name,
-                        filter: c.config.filter_subject,
-                        created: c.created
-                    }));
-                    logger.info('Existing consumers on stream:', { count: groupDetails.length, groups: groupDetails });
-                } catch (diagErr) {
-                    logger.warn('Diagnostic check failed', diagErr);
+                    await this.jsm.consumers.add(streamName, {
+                        durable_name: durableName,
+                        description: `Pod ID: ${env.worker.WORKER_ID || 'standalone'}`,
+                        ack_policy: AckPolicy.Explicit,
+                        max_ack_pending: env.worker.MAX_ACK_PENDING,
+                        max_deliver: 5, // retry 5 times
+                        backoff: [
+                            1000 * 1000 * 1000, // 1s
+                            2000 * 1000 * 1000, // 2s
+                            5000 * 1000 * 1000, // 5s
+                            10000 * 1000 * 1000, // 10s
+                            30000 * 1000 * 1000, // 50s
+                        ],
+                        ack_wait: 30 * 1000 * 1000 * 1000, // 30 seconds
+                        deliver_policy: DeliverPolicy.All,
+                        filter_subject: subject,
+                    });
+
+                    logger.info(`Consumer ${durableName} created and ready on stream ${streamName}`);
+                } catch (addErr: any) {
+                    // Step 3: Handle race conditions: if another pod created it in the meantime, just continue
+                    if (addErr.message?.includes('already exists') || addErr.api_error?.err_code === 10015) {
+                        logger.info(`Consumer ${durableName} was created by another pod, binding successful.`);
+                    } else if (addErr.message?.includes('filtered consumer not unique') || addErr.api_error?.err_code === 10100) {
+                        logger.error('NATS Conflict: Overlapping filtered consumer on WorkQueue stream.', { 
+                            durableName, 
+                            subject,
+                            message: 'Ensure no other durable groups are using subjects that overlap with this filter.'
+                        });
+                        
+                        // Diagnostic sweep
+                        try {
+                            const consumers = await this.jsm.consumers.list(streamName).next();
+                            const groupDetails = consumers.map(c => ({
+                                name: c.name,
+                                filter: c.config.filter_subject,
+                            }));
+                            logger.info('Existing consumers on stream:', { groups: groupDetails });
+                        } catch {}
+                        throw addErr;
+                    } else {
+                        logger.error('Failed to create consumer', { message: addErr.message, durableName, subject });
+                        throw addErr;
+                    }
                 }
-            } else if (err.message?.includes('stream not found') || err.api_error?.err_code === 10059) {
-                logger.error('NATS Error: Stream "EVENTS" not found. Please ensure it is created before starting the worker.', errDetails);
-            } else if (!err.message?.includes('already exists')) {
-                logger.error('Failed to create consumer', errDetails);
-                throw err;
             } else {
-                logger.info('Consumer already exists, continuing', { durableName });
+                logger.error('Unexpected error while fetching consumer', { message: getErr.message, durableName });
+                throw getErr;
             }
         }
     }
