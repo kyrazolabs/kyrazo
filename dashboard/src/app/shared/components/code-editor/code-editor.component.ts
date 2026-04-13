@@ -11,7 +11,8 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { EditorState, Extension, Compartment, Prec } from '@codemirror/state';
-import { EditorView, basicSetup } from 'codemirror';
+import { EditorView } from '@codemirror/view';
+import { basicSetup } from 'codemirror';
 import { javascript, javascriptLanguage } from '@codemirror/lang-javascript';
 import { json } from '@codemirror/lang-json';
 import { oneDark } from '@codemirror/theme-one-dark';
@@ -186,7 +187,7 @@ export class CodeEditorComponent
 
     private initEditor(): void {
         const extensions: Extension[] = [
-            basicSetup,
+            // basicSetup,
             this.languageCompartment.of(this.getLanguageExtensions()),
             this.themeCompartment.of(this.theme === 'dark' ? oneDark : []),
             this.readonlyCompartment.of(this.getReadonlyExtensions()),
@@ -229,23 +230,10 @@ export class CodeEditorComponent
     }
 
     private getReadonlyExtensions(): Extension[] {
-        if (this.readonly) {
-            return [
-                Prec.highest(EditorState.readOnly.of(true)),
-                Prec.highest(EditorView.editable.of(false)),
-                Prec.highest(
-                    EditorState.transactionFilter.of((tr) =>
-                        tr.docChanged ? [] : tr,
-                    ),
-                ),
-                EditorView.theme({
-                    '.cm-content': { caretColor: 'transparent !important' },
-                    '.cm-cursor': { display: 'none !important' },
-                }),
-                EditorView.contentAttributes.of({ tabindex: '0' }),
-            ];
-        }
-        return [];
+        return [
+            EditorState.readOnly.of(this.readonly),
+            EditorView.editable.of(!this.readonly),
+        ];
     }
 
     private destroyEditor(): void {
