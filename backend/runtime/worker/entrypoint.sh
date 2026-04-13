@@ -87,7 +87,11 @@ fi
 
 # Drop down to the bun user and start the application if running as root
 if [ "$(id -u)" = "0" ]; then
+    echo "🧹 Running NATS cleanup script..."
+    su-exec bun bun run clean:nats || echo "⚠️  NATS cleanup script failed, continuing anyway..."
     exec su-exec bun bun run prod
 else
+    echo "🧹 Running NATS cleanup script..."
+    bun run clean:nats || echo "⚠️  NATS cleanup script failed, continuing anyway..."
     exec bun run prod
 fi
