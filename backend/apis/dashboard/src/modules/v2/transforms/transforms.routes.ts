@@ -103,12 +103,15 @@ transforms.put(
     '/:id/test',
     transformTestRateLimiter,
     zValidator('param', TransformIdParamSchema),
-    zValidator('json', z.object({ payload: z.any().default({}) })),
+    zValidator('json', z.object({ 
+        code: z.string().optional(),
+        payload: z.any().default({}) 
+    })),
     async (c: AppContext) => {
         // @ts-ignore
         const { id } = c.req.valid('param');
         // @ts-ignore
-        const { payload } = c.req.valid('json');
+        const { code, payload } = c.req.valid('json');
         const workspaceId = c.workspace?.workspaceId;
         const namespaceId = c.namespace?.namespaceId;
 
@@ -126,12 +129,17 @@ transforms.put(
             );
         }
 
-        const transform = await transformService.getTransformById(
-            id,
-            workspaceId.toString(),
-            namespaceId.toString()
-        );
-        const result = await transformService.testTransform(transform.code, payload);
+        let transformCode = code;
+        if (!transformCode) {
+            const transform = await transformService.getTransformById(
+                id,
+                workspaceId.toString(),
+                namespaceId.toString()
+            );
+            transformCode = transform.code;
+        }
+
+        const result = await transformService.testTransform(transformCode, payload);
         return c.json({ success: true, message: 'Test completed', data: result });
     }
 );
