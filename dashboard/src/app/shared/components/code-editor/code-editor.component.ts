@@ -12,9 +12,82 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { EditorState, Extension } from '@codemirror/state';
 import { EditorView, basicSetup } from 'codemirror';
-import { javascript } from '@codemirror/lang-javascript';
+import { javascript, javascriptLanguage } from '@codemirror/lang-javascript';
 import { json } from '@codemirror/lang-json';
 import { oneDark } from '@codemirror/theme-one-dark';
+import {
+    autocompletion,
+    CompletionContext,
+    CompletionResult,
+} from '@codemirror/autocomplete';
+
+const GLOBALS = [
+    { label: 'payload', type: 'variable', info: 'The incoming event payload' },
+    {
+        label: '_',
+        type: 'variable',
+        info: 'Lodash utility for data manipulation',
+    },
+    { label: 'dayjs', type: 'variable', info: 'Date/time utility' },
+    { label: 'crypto', type: 'variable', info: 'Cryptographic utilities' },
+];
+
+const PAYLOAD_PROPS = [
+    { label: 'id', type: 'property', info: 'Unique event ID (Static)' },
+    { label: 'type', type: 'property', info: 'Event type string (Static)' },
+    { label: 'timestamp', type: 'property', info: 'Event timestamp (Static)' },
+    { label: 'data', type: 'property', info: 'Event data (Customizable)' },
+];
+
+const DATA_PROPS = [
+    { label: 'object', type: 'property', info: 'Main event object' },
+    { label: 'previous', type: 'property', info: 'Previous state of the object' },
+];
+
+const CRYPTO_PROPS = [
+    { label: 'createHmac', type: 'function' },
+    { label: 'createHash', type: 'function' },
+];
+
+function transformerCompletionSource(
+    context: CompletionContext,
+): CompletionResult | null {
+    // 1. Check for specific property access (context-aware)
+    const dataMatch = context.matchBefore(/payload\.data\.\w*/);
+    if (dataMatch) {
+        return {
+            from: dataMatch.from + 'payload.data.'.length,
+            options: DATA_PROPS,
+        };
+    }
+
+    const payloadMatch = context.matchBefore(/payload\.\w*/);
+    if (payloadMatch) {
+        return {
+            from: payloadMatch.from + 'payload.'.length,
+            options: PAYLOAD_PROPS,
+        };
+    }
+
+    const cryptoMatch = context.matchBefore(/crypto\.\w*/);
+    if (cryptoMatch) {
+        return {
+            from: cryptoMatch.from + 'crypto.'.length,
+            options: CRYPTO_PROPS,
+        };
+    }
+
+    // 2. Global variable completions
+    const word = context.matchBefore(/\w*/);
+    if (!word || (word.from === word.to && !context.explicit)) {
+        return null;
+    }
+
+    return {
+        from: word.from,
+        options: GLOBALS,
+    };
+}
 
 @Component({
     selector: 'app-code-editor',
@@ -94,6 +167,15 @@ export class CodeEditorComponent
                 }
             }),
         ];
+
+        // Add transformer completions for JS/TS
+        if (this.language === 'javascript') {
+            extensions.push(
+                javascriptLanguage.data.of({
+                    autocomplete: transformerCompletionSource,
+                }),
+            );
+        }
 
         if (this.theme === 'dark') {
             extensions.push(oneDark);
