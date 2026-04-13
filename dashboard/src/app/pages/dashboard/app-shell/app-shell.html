@@ -29,7 +29,7 @@
 
     <!-- Main content wrapper (with dynamic left margin based on sidebar state) -->
     <div
-        class="flex flex-col gap-6 w-full! transition-all duration-300 ease-in-out"
+        class="flex flex-col gap-6 w-full! min-w-0 transition-all duration-300 ease-in-out"
         [class.lg:ml-72]="layoutService.appState().openSidebar"
         [class.ml-0]="!layoutService.appState().openSidebar || layoutService.isMobile()"
     >
