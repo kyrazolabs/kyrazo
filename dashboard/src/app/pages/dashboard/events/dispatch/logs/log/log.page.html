@@ -132,7 +132,7 @@
                             [disabled]="delivery.request_header === '{}'"
                         />
                     </div>
-                    <div class="card-panel h-[160px] overflow-hidden border border-surface-200 dark:border-surface-800 rounded-xl">
+                    <div class="card-panel h-[300px] overflow-hidden border border-surface-200 dark:border-surface-800 rounded-xl">
                         @if (delivery.request_header && delivery.request_header !== '{}') {
                             <app-code-editor
                                 [ngModel]="stringifyData(delivery.request_header)"
@@ -160,7 +160,7 @@
                             [disabled]="delivery.request_body === '{}'"
                         />
                     </div>
-                    <div class="card-panel h-[160px] overflow-hidden border border-surface-200 dark:border-surface-800 rounded-xl">
+                    <div class="card-panel h-[300px] overflow-hidden border border-surface-200 dark:border-surface-800 rounded-xl">
                         @if (delivery.request_body && delivery.request_body !== '{}') {
                             <app-code-editor
                                 [ngModel]="stringifyData(delivery.request_body)"
@@ -197,7 +197,7 @@
                         [disabled]="delivery.response_header === '{}'"
                     />
                 </div>
-                <div class="card-panel h-64 overflow-hidden border border-surface-200 dark:border-surface-800 rounded-xl">
+                <div class="card-panel h-[300px] overflow-hidden border border-surface-200 dark:border-surface-800 rounded-xl">
                     @if (delivery.response_header && delivery.response_header !== '{}') {
                         <app-code-editor
                             [ngModel]="stringifyData(delivery.response_header)"
@@ -225,7 +225,7 @@
                         [disabled]="delivery.response_body === '{}'"
                     />
                 </div>
-                <div class="card-panel h-64 overflow-hidden border border-surface-200 dark:border-surface-800 rounded-xl">
+                <div class="card-panel h-[300px] overflow-hidden border border-surface-200 dark:border-surface-800 rounded-xl">
                     @if (delivery.response_body && delivery.response_body !== '{}') {
                         <app-code-editor
                             [ngModel]="stringifyData(delivery.response_body)"

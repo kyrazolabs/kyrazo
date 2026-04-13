@@ -50,8 +50,8 @@
             </div>
 
             <div class="flex justify-end gap-3 pt-4">
-              <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="cancel()" [disabled]="loading()" styleClass="rounded-xl!" size="small" />
-              <p-button [label]="isEditing() ? 'Update' : 'Create'" (onClick)="onSubmit()" [loading]="loading()" styleClass="rounded-xl!" size="small" />
+              <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="cancel()" [disabled]="loading()" styleClass="rounded-xl!" />
+              <p-button [label]="isEditing() ? 'Update' : 'Create'" (onClick)="onSubmit()" [loading]="loading()" styleClass="rounded-xl!" />
             </div>
           </form>
         </p-tabpanel>
