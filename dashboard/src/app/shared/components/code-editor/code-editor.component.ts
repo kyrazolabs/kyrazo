@@ -10,7 +10,7 @@ import {
     ViewChild,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { EditorState, Extension } from '@codemirror/state';
+import { EditorState, Extension, Compartment } from '@codemirror/state';
 import { EditorView, basicSetup } from 'codemirror';
 import { javascript, javascriptLanguage } from '@codemirror/lang-javascript';
 import { json } from '@codemirror/lang-json';
@@ -41,7 +41,11 @@ const PAYLOAD_PROPS = [
 
 const DATA_PROPS = [
     { label: 'object', type: 'property', info: 'Main event object' },
-    { label: 'previous', type: 'property', info: 'Previous state of the object' },
+    {
+        label: 'previous',
+        type: 'property',
+        info: 'Previous state of the object',
+    },
 ];
 
 const CRYPTO_PROPS = [
@@ -136,17 +140,40 @@ export class CodeEditorComponent
     private onTouched: () => void = () => {};
     private updatingFromOutside = false;
 
+    // Compartments for dynamic updates
+    private languageCompartment = new Compartment();
+    private themeCompartment = new Compartment();
+    private readonlyCompartment = new Compartment();
+
     ngOnInit(): void {
         this.initEditor();
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        if (
-            (changes['language'] || changes['theme'] || changes['readonly']) &&
-            this.view
-        ) {
-            this.destroyEditor();
-            this.initEditor();
+        if (!this.view) return;
+
+        if (changes['language']) {
+            this.view.dispatch({
+                effects: this.languageCompartment.reconfigure(
+                    this.getLanguageExtensions(),
+                ),
+            });
+        }
+
+        if (changes['theme']) {
+            this.view.dispatch({
+                effects: this.themeCompartment.reconfigure(
+                    this.theme === 'dark' ? oneDark : [],
+                ),
+            });
+        }
+
+        if (changes['readonly']) {
+            this.view.dispatch({
+                effects: this.readonlyCompartment.reconfigure(
+                    this.getReadonlyExtensions(),
+                ),
+            });
         }
     }
 
@@ -157,7 +184,9 @@ export class CodeEditorComponent
     private initEditor(): void {
         const extensions: Extension[] = [
             basicSetup,
-            this.getLanguageExtension(),
+            this.languageCompartment.of(this.getLanguageExtensions()),
+            this.themeCompartment.of(this.theme === 'dark' ? oneDark : []),
+            this.readonlyCompartment.of(this.getReadonlyExtensions()),
             EditorView.updateListener.of((update) => {
                 if (update.docChanged && !this.updatingFromOutside) {
                     const val = update.state.doc.toString();
@@ -167,25 +196,6 @@ export class CodeEditorComponent
                 }
             }),
         ];
-
-        // Add transformer completions for JS/TS
-        if (this.language === 'javascript') {
-            extensions.push(
-                javascriptLanguage.data.of({
-                    autocomplete: transformerCompletionSource,
-                }),
-            );
-        }
-
-        if (this.theme === 'dark') {
-            extensions.push(oneDark);
-        }
-
-        if (this.readonly) {
-            extensions.push(EditorState.readOnly.of(true));
-            extensions.push(EditorView.editable.of(false));
-            extensions.push(EditorView.contentAttributes.of({ tabindex: '0' }));
-        }
 
         const state = EditorState.create({
             doc: this.value,
@@ -198,14 +208,30 @@ export class CodeEditorComponent
         });
     }
 
-    private getLanguageExtension(): Extension {
-        switch (this.language) {
-            case 'json':
-                return json();
-            case 'javascript':
-            default:
-                return javascript({ typescript: true });
+    private getLanguageExtensions(): Extension[] {
+        const extensions: Extension[] = [];
+        if (this.language === 'json') {
+            extensions.push(json());
+        } else {
+            extensions.push(javascript({ typescript: true }));
+            extensions.push(
+                javascriptLanguage.data.of({
+                    autocomplete: transformerCompletionSource,
+                }),
+            );
         }
+        return extensions;
+    }
+
+    private getReadonlyExtensions(): Extension[] {
+        if (this.readonly) {
+            return [
+                EditorState.readOnly.of(true),
+                EditorView.editable.of(false),
+                EditorView.contentAttributes.of({ tabindex: '0' }),
+            ];
+        }
+        return [];
     }
 
     private destroyEditor(): void {
@@ -240,8 +266,11 @@ export class CodeEditorComponent
     setDisabledState(isDisabled: boolean): void {
         this.readonly = isDisabled;
         if (this.view) {
-            this.destroyEditor();
-            this.initEditor();
+            this.view.dispatch({
+                effects: this.readonlyCompartment.reconfigure(
+                    this.getReadonlyExtensions(),
+                ),
+            });
         }
     }
 }
