@@ -8,6 +8,7 @@ import {
     EventEmitter,
     OnChanges,
     SimpleChanges,
+    computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -54,7 +55,6 @@ import { NgxJsonViewerModule } from 'ngx-json-viewer';
         ProgressBarModule,
         TabsModule,
         CodeEditorComponent,
-        NgxJsonViewerModule,
         TagModule,
     ],
     templateUrl: './transform-form.component.html',
@@ -110,6 +110,9 @@ export class TransformFormComponent implements OnInit, OnChanges {
         ),
     );
     testResult = signal<any>(null);
+    testResultFormatted = computed(() =>
+        this.testResult() ? JSON.stringify(this.testResult(), null, 2) : '',
+    );
     testLogs = signal<string[]>([]);
     testExecutionTime = signal<number>(0);
     isTesting = signal(false);
@@ -120,7 +123,7 @@ export class TransformFormComponent implements OnInit, OnChanges {
             description: [''],
             code: [
                 `/**
- * 🛠️ Kyrazo Custom Transformer
+ * Kyrazo Transformer
  *
  * Available Utilities:
  * - _ (lodash): Advanced data manipulation
@@ -211,7 +214,7 @@ return {
             name: '',
             description: '',
             code: `/**
- * 🛠️ Kyrazo Custom Transformer
+ * Kyrazo Transformer
  *
  * Available Utilities:
  * - _ (lodash): Advanced data manipulation
@@ -272,7 +275,9 @@ return {
                 next: (response) => {
                     this.testResult.set(response.data.result);
                     this.testLogs.set(response.data.logs);
-                    this.testExecutionTime.set(response.data.executionTimeMs);
+                    this.testExecutionTime.set(
+                        Number(response.data.executionTimeMs.toFixed(4)),
+                    );
                     this.isTesting.set(false);
                 },
                 error: (err) => {
