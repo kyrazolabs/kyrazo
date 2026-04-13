@@ -239,7 +239,16 @@ export class CodeEditorComponent
             return [
                 Prec.highest(EditorState.readOnly.of(true)),
                 Prec.highest(EditorView.editable.of(false)),
-                EditorView.contentAttributes.of({ tabindex: '0' })
+                EditorView.contentAttributes.of({ tabindex: '0' }),
+                Prec.highest(
+                    EditorState.transactionFilter.of((tr) => {
+                        // Drop any document changes that aren't programmatic
+                        if (tr.docChanged && !this.updatingFromOutside) {
+                            return [];
+                        }
+                        return tr;
+                    }),
+                ),
             ];
         }
         return [];
