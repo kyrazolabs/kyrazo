@@ -187,7 +187,7 @@ export class CodeEditorComponent
 
     private initEditor(): void {
         const extensions: Extension[] = [
-            // basicSetup,
+            basicSetup,
             this.languageCompartment.of(this.getLanguageExtensions()),
             this.themeCompartment.of(this.theme === 'dark' ? oneDark : []),
             this.readonlyCompartment.of(this.getReadonlyExtensions()),
