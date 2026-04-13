@@ -28,10 +28,10 @@ import { oneDark } from '@codemirror/theme-one-dark';
         .code-editor-host {
             height: 100%;
         }
-        .code-editor-host :global(.cm-editor) {
+        ::ng-deep .cm-editor {
             height: 100%;
         }
-        .code-editor-host :global(.cm-scroller) {
+        ::ng-deep .cm-scroller {
             overflow: auto;
             font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
             font-size: 13px;
