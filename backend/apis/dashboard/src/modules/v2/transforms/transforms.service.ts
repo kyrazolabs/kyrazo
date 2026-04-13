@@ -2,6 +2,22 @@ import { ITransform, ITransformVersion } from '@kyrazo/shared';
 import { transformRepository } from './transforms.repo';
 import { CreateTransformInput, UpdateTransformInput } from './transforms.schema';
 
+import lo from 'lodash';
+import dayjs from 'dayjs';
+import crypto from 'crypto';
+
+const safeCrypto = {
+    hmac: (key: string, data: string, algorithm = 'sha256') => {
+        return crypto.createHmac(algorithm, key).update(data).digest('hex');
+    },
+    sha256: (data: string) => {
+        return crypto.createHash('sha256').update(data).digest('hex');
+    },
+    sha512: (data: string) => {
+        return crypto.createHash('sha512').update(data).digest('hex');
+    },
+};
+
 export class TransformService {
     private readonly DANGEROUS_PATTERNS = [
         /eval\s*\(/,
@@ -116,7 +132,11 @@ export class TransformService {
 
         try {
             // Context for the transformer
-            const context = {
+            const utils = {
+                lodash: lo,
+                _: lo,
+                dayjs,
+                crypto: safeCrypto,
                 console: {
                     log: (...args: any[]) => logs.push(args.map(a => String(a)).join(' ')),
                     error: (...args: any[]) => logs.push(`ERROR: ${args.map(a => String(a)).join(' ')}`),
@@ -124,18 +144,19 @@ export class TransformService {
                 },
             };
 
-            // Wrap code in a function
-            // Expecting: (event) => { ... return result; }
-            // Or just a block that returns
             const script = `
                 return (function(event) {
-                    const console = this.console;
-                    ${code}
+                    const { lodash, _, dayjs, crypto, console } = this;
+                    try {
+                        ${code}
+                    } catch (e) {
+                        throw new Error("Runtime Error: " + e.message);
+                    }
                 }).call(this, payload);
             `;
 
             const fn = new Function('payload', script);
-            const result = fn.call(context, payload);
+            const result = fn.call(utils, payload);
             
             const executionTimeMs = performance.now() - startTime;
 
