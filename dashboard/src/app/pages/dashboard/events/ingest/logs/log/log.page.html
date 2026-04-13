@@ -206,19 +206,18 @@
                             [disabled]="!ingestEvent.headers || ingestEvent.headers === '{}'"
                         />
                     </div>
-                    <div class="card-panel min-h-[132px] max-h-[132px] overflow-y-auto scrollbar-thin scrollbar-thumb-surface-300 dark:scrollbar-thumb-surface-600 scrollbar-track-surface-100 dark:scrollbar-track-surface-800 scroll-smooth">
-                        <ngx-json-viewer
-                            *ngIf="!rawView && ingestEvent.headers && ingestEvent.headers !== '{}'"
-                            [json]="parseJson(ingestEvent.headers)"
-                        ></ngx-json-viewer>
-                        <pre
-                            *ngIf="rawView && ingestEvent.headers && ingestEvent.headers !== '{}'"
-                            class="text-sm text-surface-900 dark:text-surface-0 whitespace-pre-wrap"
-                        >{{ ingestEvent.headers }}</pre>
-                        <p
-                            *ngIf="!ingestEvent.headers || ingestEvent.headers === '{}'"
-                            class="text-surface-500 dark:text-surface-400 italic"
-                        >No request headers</p>
+                    <div class="card-panel h-[160px] overflow-hidden border border-surface-200 dark:border-surface-800 rounded-xl">
+                        @if (ingestEvent.headers && ingestEvent.headers !== '{}') {
+                            <app-code-editor
+                                [ngModel]="stringifyData(ingestEvent.headers)"
+                                [readonly]="true"
+                                [language]="'json'"
+                            ></app-code-editor>
+                        } @else {
+                            <div class="flex items-center justify-center h-full text-surface-500 dark:text-surface-400 italic bg-surface-50/50 dark:bg-surface-900/50">
+                                No request headers
+                            </div>
+                        }
                     </div>
                 </div>
 
@@ -235,34 +234,21 @@
                             [disabled]="!ingestEvent.body || ingestEvent.body === '{}'"
                         />
                     </div>
-                    <div class="card-panel min-h-[132px] max-h-[132px] overflow-y-auto scrollbar-thin scrollbar-thumb-surface-300 dark:scrollbar-thumb-surface-600 scrollbar-track-surface-100 dark:scrollbar-track-surface-800 scroll-smooth">
-                        <ngx-json-viewer
-                            *ngIf="!rawView && ingestEvent.body && ingestEvent.body !== '{}'"
-                            [json]="parseJson(ingestEvent.body)"
-                        ></ngx-json-viewer>
-                        <pre
-                            *ngIf="rawView && ingestEvent.body && ingestEvent.body !== '{}'"
-                            class="text-sm text-surface-900 dark:text-surface-0 whitespace-pre-wrap"
-                        >{{ ingestEvent.body }}</pre>
-                        <p
-                            *ngIf="!ingestEvent.body || ingestEvent.body === '{}'"
-                            class="text-surface-500 dark:text-surface-400 italic"
-                        >No request body</p>
+                    <div class="card-panel h-[160px] overflow-hidden border border-surface-200 dark:border-surface-800 rounded-xl">
+                        @if (ingestEvent.body && ingestEvent.body !== '{}') {
+                            <app-code-editor
+                                [ngModel]="stringifyData(ingestEvent.body)"
+                                [readonly]="true"
+                                [language]="'json'"
+                            ></app-code-editor>
+                        } @else {
+                            <div class="flex items-center justify-center h-full text-surface-500 dark:text-surface-400 italic bg-surface-50/50 dark:bg-surface-900/50">
+                                No request body
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
         </p-card>
-    </div>
-
-    <!-- Additional Actions -->
-    <div class="flex flex-col sm:flex-row items-center justify-end gap-3">
-        <p-button
-            [label]="rawView ? 'View Tree Data' : 'View Raw Data'"
-            [icon]="rawView ? 'pi pi-sitemap' : 'pi pi-file-o'"
-            [outlined]="!rawView"
-            [severity]="rawView ? 'primary' : 'secondary'"
-            [styleClass]="'w-full sm:w-auto rounded-xl!'"
-            (onClick)="toggleRawView()"
-        />
     </div>
 </div>
