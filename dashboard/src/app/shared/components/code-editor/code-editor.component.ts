@@ -10,7 +10,7 @@ import {
     ViewChild,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { EditorState, Extension, Compartment } from '@codemirror/state';
+import { EditorState, Extension, Compartment, Prec } from '@codemirror/state';
 import { EditorView, basicSetup } from 'codemirror';
 import { javascript, javascriptLanguage } from '@codemirror/lang-javascript';
 import { json } from '@codemirror/lang-json';
@@ -226,8 +226,17 @@ export class CodeEditorComponent
     private getReadonlyExtensions(): Extension[] {
         if (this.readonly) {
             return [
-                EditorState.readOnly.of(true),
-                EditorView.editable.of(false),
+                Prec.highest(EditorState.readOnly.of(true)),
+                Prec.highest(EditorView.editable.of(false)),
+                Prec.highest(
+                    EditorState.transactionFilter.of((tr) =>
+                        tr.docChanged ? [] : tr,
+                    ),
+                ),
+                EditorView.theme({
+                    '.cm-content': { caretColor: 'transparent !important' },
+                    '.cm-cursor': { display: 'none !important' },
+                }),
                 EditorView.contentAttributes.of({ tabindex: '0' }),
             ];
         }
