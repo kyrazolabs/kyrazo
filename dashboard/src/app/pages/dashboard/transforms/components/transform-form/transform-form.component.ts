@@ -77,6 +77,7 @@ export class TransformFormComponent implements OnInit, OnChanges {
     isEditing = signal(false);
     versions = signal<ITransformVersion[]>([]);
     expandedVersionIndex = signal<number | null>(null);
+    currentVersion = signal<number | null>(null);
 
     toggleVersion(index: number): void {
         this.expandedVersionIndex.set(
@@ -127,6 +128,7 @@ export class TransformFormComponent implements OnInit, OnChanges {
         this.transformService.get(this.transformId).subscribe({
             next: (response) => {
                 const transform = response.data;
+                this.currentVersion.set(transform.currentVersion);
                 this.transformForm.patchValue({
                     name: transform.name,
                     description: transform.description || '',
@@ -163,6 +165,7 @@ export class TransformFormComponent implements OnInit, OnChanges {
             code: '// Write your transformation logic here\nfunction transform(event) {\n  return {\n    ...event.data,\n    processedAt: new Date().toISOString()\n  };\n}',
             isActive: true,
         });
+        this.currentVersion.set(null);
         this.testResult.set(null);
         this.testLogs.set([]);
     }
