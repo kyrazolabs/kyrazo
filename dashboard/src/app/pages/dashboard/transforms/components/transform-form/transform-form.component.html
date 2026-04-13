@@ -134,22 +134,20 @@
                     <!-- Header/Toggle -->
                     <div class="flex items-center justify-between p-4 cursor-pointer" (click)="toggleVersion($index)">
                         <div class="flex flex-col">
-                            <div class="flex items-center gap-2 text-sm">
+                            <div class="flex items-center gap-2 text-base">
                                 <span class="font-bold">Version {{ v.version }}</span>
                                 @if (v.version === currentVersion()) {
-                                    <p-tag value="Current" severity="success" class="text-xs!" />
+                                    <p-tag value="Current" severity="success" class="text-xs! rounded-xl!" />
                                 }
                                 <div
                                     class="w-5 h-5 rounded-full flex items-center justify-center transition-all duration-300 shrink-0"
                                     [class.rotate-180]="expandedVersionIndex() === $index"
-                                    [class.bg-primary-500]="expandedVersionIndex() === $index"
-                                    [class.border-primary-500]="expandedVersionIndex() === $index"
-                                    [class.text-white]="expandedVersionIndex() === $index"
+                                    [class.text-primary]="expandedVersionIndex() === $index"
                                 >
                                     <i class="pi pi-chevron-down text-[10px]!"></i>
                                 </div>
                             </div>
-                            <span class="text-[11px] opacity-60">Created at {{ v.createdAt | date:'medium' }}</span>
+                            <span class="text-sm opacity-60">Created at {{ v.createdAt | date:'medium' }}</span>
                         </div>
                         <div class="flex gap-2" (click)="$event.stopPropagation()">
                             <p-button label="Rollback" icon="pi pi-undo" severity="warn" [outlined]="true" size="small" (onClick)="rollback(v.version)" styleClass="rounded-xl!" />
