@@ -6,26 +6,25 @@
  * The incoming event payload.
  */
 declare interface EventPayload {
-    /** Unique event ID */
-    eventId: string;
-    /** The actual data payload from the source */
-    data: any;
-    /** The event type string */
-    eventType: string;
-    /** Timestamp of the event in milliseconds */
+    /** Unique event ID (Static) */
+    id: string;
+    /** The event type string (Static) */
+    type: string;
+    /** Timestamp of the event in milliseconds (Static) */
     timestamp: number;
-    /** Metadata about the event */
-    meta: {
-        priority: 'low' | 'normal' | 'high' | 'urgent';
-        insertedAt: string;
+    /** The actual data payload (Customizable) */
+    data: {
+        /** The main object being delivered */
+        object: any;
+        /** The previous state of the object, if available */
+        previous: any;
     };
 }
 
 /**
- * The transformer function signature.
- * Your code should return an object which will be the new payload.
+ * The incoming event payload available in the global scope.
  */
-declare function transform(event: EventPayload): any;
+declare const payload: EventPayload;
 
 /**
  * Helper Libraries available in the sandbox:

@@ -85,11 +85,29 @@ export class TransformFormComponent implements OnInit, OnChanges {
         );
     }
 
-    get jsonEditorOptions(): 'json' { return 'json'; }
+    get jsonEditorOptions(): 'json' {
+        return 'json';
+    }
 
     // Testing State
     testPayload = signal<string>(
-        '{\n  "eventId": "evt_123",\n  "eventType": "user.created",\n  "data": {\n    "id": "1",\n    "name": "John Doe"\n  },\n  "timestamp": 1678888888,\n  "meta": {\n    "priority": "normal",\n    "insertedAt": "2023-01-01T00:00:00Z"\n  }\n}',
+        JSON.stringify(
+            {
+                id: 'evt_01j7p3v9qf8z7x4m',
+                type: 'user.created',
+                timestamp: 1711564800,
+                data: {
+                    object: {
+                        id: 'usr_99',
+                        email: 'alex@example.com',
+                        plan: 'pro',
+                    },
+                    previous: null,
+                },
+            },
+            null,
+            2,
+        ),
     );
     testResult = signal<any>(null);
     testLogs = signal<string[]>([]);
@@ -101,7 +119,37 @@ export class TransformFormComponent implements OnInit, OnChanges {
             name: ['', [Validators.required]],
             description: [''],
             code: [
-                '// Write your transformation logic here\nfunction transform(event) {\n  return {\n    ...event.data,\n    processedAt: new Date().toISOString()\n  };\n}',
+                `/**
+ * 🛠️ Kyrazo Custom Transformer
+ *
+ * Available Utilities:
+ * - _ (lodash): Advanced data manipulation
+ * - dayjs: Comprehensive date/time management
+ * - crypto: secure hashing via crypto.hmac(key, data) or crypto.sha256(data)
+ * - console: Debug using console.log() in the "Test & Debug" tab
+ *
+ * @param {Object} payload - The incoming event
+ * @param {string} payload.id - Unique event identifier (Static)
+ * @param {string} payload.type - Human-readable event name (Static)
+ * @param {number} payload.timestamp - Epoch timestamp (Static)
+ * @param {Object} payload.data - The actual event payload (Customizable)
+ */
+
+// 1. Extract and transform your data
+const originalData = payload.data;
+const transformedData = {
+    ...originalData,
+    // Add custom fields or modify existing ones here
+    processed_at: dayjs().toISOString(),
+    env: 'production'
+};
+
+// 2. Return the final payload
+// Note: id, type, and timestamp are typically kept as-is
+return {
+    ...payload,
+    data: transformedData
+};`,
                 [Validators.required],
             ],
             isActive: [true],
