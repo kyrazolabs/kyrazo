@@ -102,12 +102,15 @@ function transformerCompletionSource(
             :host {
                 display: block;
                 height: 100%;
+                overflow: hidden;
             }
             .code-editor-host {
                 height: 100%;
+                overflow: hidden;
             }
             ::ng-deep .cm-editor {
                 height: 100%;
+                overflow: hidden;
             }
             ::ng-deep .cm-scroller {
                 overflow: auto;
