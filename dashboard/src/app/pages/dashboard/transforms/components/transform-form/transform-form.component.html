@@ -63,8 +63,8 @@
               <!-- Input Section -->
               <div class="flex flex-col gap-2">
                 <div class="flex items-center justify-between">
-                  <label class="font-semibold text-sm">Input Test Payload (JSON)</label>
-                  <p-button label="Run Test" icon="pi pi-play" (onClick)="onTest()" [loading]="isTesting()" severity="success" [outlined]="true" size="small" styleClass="rounded-lg! py-1!" />
+                  <label class="font-semibold">Input Test Payload (JSON)</label>
+                  <p-button label="Run Test" (onClick)="onTest()" [loading]="isTesting()" severity="primary" [outlined]="true" size="small" styleClass="rounded-xl!" />
                 </div>
                 <div class="border border-surface-200 dark:border-surface-800 rounded-xl overflow-hidden h-[300px]">
                     <app-code-editor
@@ -78,7 +78,7 @@
 
               <!-- Output Section -->
               <div class="flex flex-col gap-2">
-                <label class="font-semibold text-sm">Transformed Output</label>
+                <label class="font-semibold">Transformed Output</label>
                 <div class="border border-surface-200 dark:border-surface-800 rounded-xl overflow-hidden h-[300px]">
                   @if (testResult()) {
                     <app-code-editor
@@ -101,19 +101,19 @@
             <!-- Logs & Timing -->
             <div class="flex flex-col gap-2 w-full">
                 <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <label class="font-semibold text-sm">Execution Logs</label>
-                        <span class="text-[10px] uppercase font-black tracking-widest opacity-40">console.log output</span>
+                    <div class="flex items-center justify-center gap-3">
+                        <label class="font-semibold">Execution Logs</label>
+                        <span class="text-xs uppercase font-black tracking-widest opacity-60">console.log output</span>
                     </div>
                     @if (testExecutionTime() > 0) {
                         <div class="flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">
-                            <i class="pi pi-bolt text-primary text-[10px]"></i>
-                            <span class="text-[11px] font-bold text-primary">{{ testExecutionTime() }}ms</span>
-                            <span class="text-[10px] opacity-60">execution time</span>
+                            <i class="icon-[hugeicons--zap] text-primary text-sm!"></i>
+                            <span class="text-sm font-bold text-primary">{{ testExecutionTime() }}ms</span>
+                            <span class="text-xs opacity-60">execution time</span>
                         </div>
                     }
                 </div>
-                <div class="bg-surface-950 text-green-500 font-mono text-[11px] p-4 rounded-xl h-[180px] overflow-y-auto border border-surface-800 shadow-inner">
+                <div class="bg-surface-950 text-green-500 font-mono text-xs font-medium p-4 rounded-xl h-[180px] overflow-y-auto border border-surface-800 shadow-inner">
                     @for (log of testLogs(); track $index) {
                         <div class="flex gap-2">
                             <span class="opacity-30 select-none">[{{ $index + 1 }}]</span>
