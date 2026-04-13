@@ -20,23 +20,26 @@ import { oneDark } from '@codemirror/theme-one-dark';
     selector: 'app-code-editor',
     standalone: true,
     template: `<div #editorHost class="code-editor-host"></div>`,
-    styles: [`
-        :host {
-            display: block;
-            height: 100%;
-        }
-        .code-editor-host {
-            height: 100%;
-        }
-        ::ng-deep .cm-editor {
-            height: 100%;
-        }
-        ::ng-deep .cm-scroller {
-            overflow: auto;
-            font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-            font-size: 13px;
-        }
-    `],
+    styles: [
+        `
+            :host {
+                display: block;
+                height: 100%;
+            }
+            .code-editor-host {
+                height: 100%;
+            }
+            ::ng-deep .cm-editor {
+                height: 100%;
+            }
+            ::ng-deep .cm-scroller {
+                overflow: auto;
+                font-family:
+                    'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+                font-size: 16px;
+            }
+        `,
+    ],
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -48,7 +51,8 @@ import { oneDark } from '@codemirror/theme-one-dark';
 export class CodeEditorComponent
     implements OnInit, OnDestroy, OnChanges, ControlValueAccessor
 {
-    @ViewChild('editorHost', { static: true }) editorHost!: ElementRef<HTMLDivElement>;
+    @ViewChild('editorHost', { static: true })
+    editorHost!: ElementRef<HTMLDivElement>;
     @Input() language: 'javascript' | 'json' = 'javascript';
     @Input() theme: 'dark' | 'light' = 'dark';
     @Input() readonly = false;
@@ -64,7 +68,10 @@ export class CodeEditorComponent
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        if ((changes['language'] || changes['theme'] || changes['readonly']) && this.view) {
+        if (
+            (changes['language'] || changes['theme'] || changes['readonly']) &&
+            this.view
+        ) {
             this.destroyEditor();
             this.initEditor();
         }
@@ -109,9 +116,11 @@ export class CodeEditorComponent
 
     private getLanguageExtension(): Extension {
         switch (this.language) {
-            case 'json': return json();
+            case 'json':
+                return json();
             case 'javascript':
-            default: return javascript();
+            default:
+                return javascript();
         }
     }
 

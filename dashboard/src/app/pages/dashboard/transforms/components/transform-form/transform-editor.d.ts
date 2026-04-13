@@ -37,7 +37,10 @@ declare function transform(event: EventPayload): any;
 declare const _: any;
 declare const dayjs: any;
 declare const crypto: {
-    createHmac(algo: string, key: string): {
+    createHmac(
+        algo: string,
+        key: string,
+    ): {
         update(data: string): {
             digest(encoding: string): string;
         };
