@@ -36,7 +36,7 @@ import { oneDark } from '@codemirror/theme-one-dark';
                 overflow: auto;
                 font-family:
                     'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-                font-size: 16px;
+                font-size: 14px;
             }
         `,
     ],

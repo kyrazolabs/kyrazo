@@ -123,21 +123,56 @@
         <!-- Version History Tab -->
         @if (isEditing()) {
           <p-tabpanel [value]="2">
-            <div class="py-4 space-y-4">
+            <div class="py-4 space-y-3">
               @for (v of versions(); track v.id) {
-                <div class="flex items-center justify-between p-4 bg-surface-50 dark:bg-surface-900 border border-surface-200 dark:border-surface-800 rounded-xl transition-all hover:border-primary/50">
-                  <div class="flex flex-col">
-                    <div class="flex items-center gap-2">
-                        <span class="font-bold">Version {{ v.version }}</span>
-                        @if (v.version === transformForm.get('currentVersion')?.value) {
-                            <p-tag value="Current" severity="success" class="text-[10px]!" />
-                        }
+                <div
+                    class="group rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-0/40 dark:bg-surface-900/40 transition-all duration-300 overflow-hidden"
+                    [class.border-primary-500/30]="expandedVersionIndex() === $index"
+                    [class.bg-surface-50/50]="expandedVersionIndex() === $index"
+                    [class.dark:bg-surface-900/60]="expandedVersionIndex() === $index"
+                >
+                    <!-- Header/Toggle -->
+                    <div class="flex items-center justify-between p-4 cursor-pointer" (click)="toggleVersion($index)">
+                        <div class="flex flex-col">
+                            <div class="flex items-center gap-2 text-sm">
+                                <span class="font-bold">Version {{ v.version }}</span>
+                                @if (v.version === transformForm.get('currentVersion')?.value) {
+                                    <p-tag value="Current" severity="success" class="text-xs!" />
+                                }
+                                <div
+                                    class="w-5 h-5 rounded-full border border-surface-200 dark:border-surface-800 flex items-center justify-center transition-all duration-300 shrink-0"
+                                    [class.rotate-180]="expandedVersionIndex() === $index"
+                                    [class.bg-primary-500]="expandedVersionIndex() === $index"
+                                    [class.border-primary-500]="expandedVersionIndex() === $index"
+                                    [class.text-white]="expandedVersionIndex() === $index"
+                                >
+                                    <i class="pi pi-chevron-down text-[10px]"></i>
+                                </div>
+                            </div>
+                            <span class="text-[11px] opacity-60">Created at {{ v.createdAt | date:'medium' }}</span>
+                        </div>
+                        <div class="flex gap-2" (click)="$event.stopPropagation()">
+                            <p-button label="Rollback" icon="pi pi-undo" severity="warn" [outlined]="true" size="small" (onClick)="rollback(v.version)" styleClass="rounded-xl!" />
+                        </div>
                     </div>
-                    <span class="text-xs opacity-60">Created at {{ v.createdAt | date:'medium' }}</span>
-                  </div>
-                  <div class="flex gap-2">
-                      <p-button label="Rollback" icon="pi pi-undo" severity="warn" [outlined]="true" size="small" (onClick)="rollback(v.version)" styleClass="rounded-xl!" />
-                  </div>
+
+                    <!-- Content (Code Preview) -->
+                    <div
+                        class="grid transition-all duration-300 ease-in-out"
+                        [style.grid-template-rows]="expandedVersionIndex() === $index ? '1fr' : '0fr'"
+                    >
+                        <div class="overflow-hidden">
+                            <div class="px-4 pb-4">
+                                <div class="border border-surface-200 dark:border-surface-800 rounded-lg overflow-hidden h-[250px]">
+                                    <app-code-editor
+                                        [language]="'javascript'"
+                                        [readonly]="true"
+                                        [ngModel]="v.code"
+                                    ></app-code-editor>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
               } @empty {
                 <div class="text-center py-8 opacity-50 italic">No history available yet.</div>
