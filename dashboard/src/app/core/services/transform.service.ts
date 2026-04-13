@@ -67,6 +67,7 @@ export class TransformService {
         const url = environment.transform.test(data.transformId || undefined);
         if (data.transformId) {
             return this.http.put<TestTransformResponse>(url, {
+                code: data.code,
                 payload: data.payload,
             });
         }
