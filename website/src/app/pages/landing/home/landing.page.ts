@@ -11,6 +11,8 @@ import { DedicatedWorkersComponent } from '@pages/landing/components/dedicated-w
 import { PricingComponent } from '@pages/landing/components/pricing/pricing.component';
 import { IntegrationsComponent } from '@pages/landing/components/integrations/integrations.component';
 import { ComparisonComponent } from '@pages/landing/components/comparison/comparison.component';
+import { HeaderThemeDirective } from '@shared/directives/header-theme.directive';
+import { HeaderService } from '@shared/services/header.service';
 
 import { PostHogService } from '@core/3rd-party/posthog';
 import { SeoService } from '@core/services/seo.service';
@@ -31,6 +33,7 @@ import { SeoService } from '@core/services/seo.service';
         PricingComponent,
         IntegrationsComponent,
         ComparisonComponent,
+        HeaderThemeDirective,
     ],
     templateUrl: './landing.page.html',
     styleUrl: './landing.page.scss',

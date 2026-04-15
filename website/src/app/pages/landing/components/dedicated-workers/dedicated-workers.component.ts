@@ -8,6 +8,7 @@ import { RouterModule } from '@angular/router';
     standalone: true,
     imports: [CommonModule, ButtonModule, RouterModule],
     templateUrl: './dedicated-workers.component.html',
+    styleUrls: ['./dedicated-workers.component.scss'],
 })
 export class DedicatedWorkersComponent {
     features = [

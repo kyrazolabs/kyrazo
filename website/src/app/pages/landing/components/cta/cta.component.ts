@@ -1,8 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
-import { FormsModule } from '@angular/forms';
 
 import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directive';
 import { PostHogService } from '@core/3rd-party/posthog';
@@ -16,6 +17,7 @@ import { PostHogService } from '@core/3rd-party/posthog';
         InputTextModule,
         FormsModule,
         ScrollRevealDirective,
+        RouterModule,
     ],
     templateUrl: './cta.component.html',
     styleUrl: './cta.component.scss',

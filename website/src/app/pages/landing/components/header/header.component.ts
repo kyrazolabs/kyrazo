@@ -17,6 +17,7 @@ import { AvatarModule } from 'primeng/avatar';
 import { BadgeModule } from 'primeng/badge';
 import { RouterLink } from '@angular/router';
 import { DrawerModule } from 'primeng/drawer';
+import { HeaderService } from '@shared/services/header.service';
 
 import { PostHogService } from '@core/3rd-party/posthog';
 
@@ -39,6 +40,7 @@ import { PostHogService } from '@core/3rd-party/posthog';
 export class HeaderComponent {
     private posthog = inject(PostHogService);
     layoutService: LayoutService = inject(LayoutService);
+    headerService = inject(HeaderService);
 
     items: MenuItem[] | undefined;
     activeDropdown = signal<string | null>(null);
@@ -46,12 +48,28 @@ export class HeaderComponent {
     private dropdownTimeout: any;
 
     isScrolled = false;
+    isHeaderHidden = signal(false);
+    private lastScrollTop = 0;
 
     isDarkMode = computed(() => this.layoutService.appState().darkMode);
 
     @HostListener('window:scroll', [])
     onWindowScroll() {
-        this.isScrolled = window.scrollY > 20;
+        const scrollTop = window.scrollY;
+
+        // Logic for translucent/compact header (original logic)
+        this.isScrolled = scrollTop > 20;
+
+        // Logic for hide/show on scroll direction
+        if (scrollTop > this.lastScrollTop && scrollTop > 100) {
+            // Scrolling down
+            this.isHeaderHidden.set(true);
+        } else {
+            // Scrolling up or at the top
+            this.isHeaderHidden.set(false);
+        }
+
+        this.lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // For Mobile or negative scrolling
     }
 
     @HostListener('document:click', ['$event'])

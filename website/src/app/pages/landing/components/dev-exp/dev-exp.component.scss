@@ -1,3 +1,87 @@
 :host {
     display: block;
 }
+
+@keyframes comet-anim {
+    0% {
+        left: -300px;
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        left: 100%;
+        opacity: 0;
+    }
+}
+
+.comet {
+    position: absolute;
+    height: 2px;
+    border-radius: 9999px;
+    animation: comet-anim linear infinite;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0; /* Starts hidden */
+}
+
+.comet-1 {
+    width: 250px;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.8), #fff);
+    box-shadow: 0 0 10px 2px rgba(59, 130, 246, 0.4);
+    top: 25%;
+    animation-duration: 5s;
+    animation-delay: 0.5s;
+}
+
+.comet-2 {
+    width: 180px;
+    background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.8), #fff);
+    box-shadow: 0 0 10px 2px rgba(168, 85, 247, 0.4);
+    top: 60%;
+    animation-duration: 7s;
+    animation-delay: 2s;
+}
+
+.comet-3 {
+    width: 300px;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.6), #fff);
+    box-shadow: 0 0 8px 1px rgba(59, 130, 246, 0.3);
+    top: 85%;
+    animation-duration: 9s;
+    animation-delay: 4s;
+}
+
+.comet-4 {
+    width: 150px;
+    background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.6), #fff);
+    box-shadow: 0 0 8px 1px rgba(168, 85, 247, 0.3);
+    top: 15%;
+    animation-duration: 6s;
+    animation-delay: 5.5s;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.4); }
+}
+
+.star-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 0 4px rgba(255,255,255,0.8);
+    animation: twinkle var(--duration, 3s) ease-in-out infinite var(--delay, 0s);
+}

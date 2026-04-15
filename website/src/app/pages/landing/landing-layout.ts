@@ -2,13 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { HeaderComponent } from './components/header/header.component';
-import { FooterComponent } from './components/footer/footer.component';
 import { filter } from 'rxjs/operators';
 
 @Component({
     selector: 'app-landing-layout',
     standalone: true,
-    imports: [CommonModule, RouterOutlet, HeaderComponent, FooterComponent],
+    imports: [CommonModule, RouterOutlet, HeaderComponent],
     template: `
         <main class="min-h-screen min-w-screen relative overflow-x-hidden">
             <app-landing-header></app-landing-header>
@@ -22,8 +21,6 @@ import { filter } from 'rxjs/operators';
             ></div>
 
             <router-outlet></router-outlet>
-
-            <app-landing-footer></app-landing-footer>
         </main>
     `,
     styles: [

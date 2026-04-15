@@ -6,11 +6,12 @@ import { Article } from '@core/models/cms.models';
 import { MarkdownPipe } from '@shared/pipes/markdown.pipe';
 import { map } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { CtaComponent } from '@pages/landing/components/cta/cta.component';
 
 @Component({
     selector: 'app-article',
     standalone: true,
-    imports: [CommonModule, RouterLink, MarkdownPipe],
+    imports: [CommonModule, RouterLink, MarkdownPipe, CtaComponent],
     templateUrl: './article.page.html',
     styleUrls: ['./article.page.scss'],
 })

@@ -16,7 +16,37 @@ import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directiv
     standalone: true,
     imports: [CommonModule, ScrollRevealDirective],
     templateUrl: './trust.component.html',
-    styles: [],
+    styles: [
+        `
+            @keyframes twinkle {
+                0%,
+                100% {
+                    opacity: 0.2;
+                    transform: scale(0.8);
+                }
+                50% {
+                    opacity: 1;
+                    transform: scale(1.2);
+                    box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.4);
+                }
+            }
+            .star-layer {
+                position: absolute;
+                inset: 0;
+                pointer-events: none;
+            }
+            .star {
+                position: absolute;
+                width: 2px;
+                height: 2px;
+                background: white;
+                border-radius: 50%;
+                box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+                animation: twinkle var(--duration, 3s) ease-in-out infinite
+                    var(--delay, 0s);
+            }
+        `,
+    ],
 })
 export class TrustComponent {
     items: TrustItem[] = [

@@ -5,13 +5,14 @@ import { CmsService } from '@core/services/cms.service';
 import { Article } from '@core/models/cms.models';
 import { map } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { CtaComponent } from '@pages/landing/components/cta/cta.component';
 
 import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directive';
 
 @Component({
     selector: 'app-blog',
     standalone: true,
-    imports: [CommonModule, RouterLink, ScrollRevealDirective],
+    imports: [CommonModule, RouterLink, ScrollRevealDirective, CtaComponent],
     templateUrl: './blog.page.html',
     styleUrl: './blog.page.scss',
 })
