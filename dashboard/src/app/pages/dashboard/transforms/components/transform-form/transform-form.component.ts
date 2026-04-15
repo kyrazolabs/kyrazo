@@ -94,16 +94,24 @@ export class TransformFormComponent implements OnInit, OnChanges {
     testPayload = signal<string>(
         JSON.stringify(
             {
-                id: 'evt_01j7p3v9qf8z7x4m',
-                type: 'user.created',
+                id: 'evt_01hx8z9k2abc123',
+                type: 'user.updated.profile',
                 timestamp: 1711564800,
                 data: {
                     object: {
-                        id: 'usr_99',
+                        id: 'usr_42',
+                        user_id: 'usr_42',
                         email: 'alex@example.com',
+                        status: 'active',
                         plan: 'pro',
                     },
-                    previous: null,
+                    previous: {
+                        id: 'usr_42',
+                        user_id: 'usr_42',
+                        email: 'alex_old@example.com',
+                        status: 'inactive',
+                        plan: 'free',
+                    },
                 },
             },
             null,
@@ -124,36 +132,28 @@ export class TransformFormComponent implements OnInit, OnChanges {
             description: [''],
             code: [
                 `/**
- * Kyrazo Transformer
+ * Available Utilities (no import needed):
+ *  _       → Lodash for data manipulation
+ *  dayjs   → Date/time formatting and arithmetic
+ *  crypto  → crypto.sha256(data) / crypto.hmac(key, data)
+ *  console → console.log() output visible in "Test & Debug" tab
  *
- * Available Utilities:
- * - _ (lodash): Advanced data manipulation
- * - dayjs: Comprehensive date/time management
- * - crypto: secure hashing via crypto.hmac(key, data) or crypto.sha256(data)
- * - console: Debug using console.log() in the "Test & Debug" tab
+ * @param {Object} payload           - The incoming event
+ * @param {string} payload.id        - Unique event identifier (read-only)
+ * @param {string} payload.type      - Event name, e.g. "order.created" (read-only)
+ * @param {number} payload.timestamp - Unix epoch in ms (read-only)
+ * @param {Object} payload.data      - Event data — shape it however you need
  *
- * @param {Object} payload - The incoming event
- * @param {string} payload.id - Unique event identifier (Static)
- * @param {string} payload.type - Human-readable event name (Static)
- * @param {number} payload.timestamp - Epoch timestamp (Static)
- * @param {Object} payload.data - The actual event payload (Customizable)
+ * @note The function name does not matter. You can call it anything.
+ *       What matters is that you "return" before the function definition
+ *       so the runtime receives the result.
  */
+return function transform(payload) {
+    // modify it...
 
-// 1. Extract and transform your data
-const originalData = payload.data;
-const transformedData = {
-    ...originalData,
-    // Add custom fields or modify existing ones here
-    processed_at: dayjs().toISOString(),
-    env: 'production'
-};
-
-// 2. Return the final payload
-// Note: id, type, and timestamp are typically kept as-is
-return {
-    ...payload,
-    data: transformedData
-};`,
+    // then return it
+    return payload;
+}(payload);`,
                 [Validators.required],
             ],
             isActive: [true],
