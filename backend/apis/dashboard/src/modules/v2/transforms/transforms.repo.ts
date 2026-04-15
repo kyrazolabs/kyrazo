@@ -1,5 +1,6 @@
-import { ITransform, ITransformVersion, Transform, TransformVersion, transformWithId, unprefixId } from '@kyrazo/shared';
+import { ITransform, ITransformVersion, Transform, TransformVersion, transformWithId, unprefixId, RedisKeys } from '@kyrazo/shared';
 import { Types } from 'mongoose';
+import { redisConfig } from '@/configs';
 
 export class TransformRepository {
     async create(data: Partial<ITransform>, userId: string): Promise<ITransform> {
@@ -105,6 +106,9 @@ export class TransformRepository {
         });
 
         await session.endSession();
+        if (updatedTransform) {
+            await redisConfig.del(RedisKeys.context.activeTransform(workspaceId, namespaceId));
+        }
         return updatedTransform ? (transformWithId(updatedTransform.toJSON(), 'transformer') as any) : null;
     }
 
@@ -119,6 +123,9 @@ export class TransformRepository {
             { isActive: false },
             { new: true }
         );
+        if (result) {
+            await redisConfig.del(RedisKeys.context.activeTransform(workspaceId, namespaceId));
+        }
         return result !== null;
     }
 
@@ -176,6 +183,9 @@ export class TransformRepository {
         });
 
         await session.endSession();
+        if (updatedTransform) {
+            await redisConfig.del(RedisKeys.context.activeTransform(workspaceId, namespaceId));
+        }
         return updatedTransform ? (transformWithId(updatedTransform.toJSON(), 'transformer') as any) : null;
     }
 }
