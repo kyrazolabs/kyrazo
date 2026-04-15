@@ -33,3 +33,67 @@
     opacity: 0;
   }
 }
+
+/* Vertical Comets for Code Background */
+@keyframes comet-fall-anim {
+    0% {
+        top: -300px;
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        top: 100%;
+        opacity: 0;
+    }
+}
+
+.comet-fall {
+    position: absolute;
+    width: 2px;
+    border-radius: 9999px;
+    animation: comet-fall-anim linear infinite;
+    pointer-events: none;
+    z-index: 10; /* Behind the code but visible */
+    opacity: 0;
+}
+
+.comet-f-1 {
+    height: 150px;
+    background: linear-gradient(180deg, transparent, rgba(59, 130, 246, 0.8), #fff);
+    box-shadow: 0 0 10px 2px rgba(59, 130, 246, 0.4);
+    left: 25%;
+    animation-duration: 4s;
+    animation-delay: 0.2s;
+}
+
+.comet-f-2 {
+    height: 200px;
+    background: linear-gradient(180deg, transparent, rgba(168, 85, 247, 0.8), #fff);
+    box-shadow: 0 0 10px 2px rgba(168, 85, 247, 0.4);
+    left: 50%;
+    animation-duration: 5.5s;
+    animation-delay: 1.5s;
+}
+
+.comet-f-3 {
+    height: 120px;
+    background: linear-gradient(180deg, transparent, rgba(59, 130, 246, 0.6), #fff);
+    box-shadow: 0 0 8px 1px rgba(59, 130, 246, 0.3);
+    left: 75%;
+    animation-duration: 6s;
+    animation-delay: 3s;
+}
+
+.comet-f-4 {
+    height: 250px;
+    background: linear-gradient(180deg, transparent, rgba(168, 85, 247, 0.6), #fff);
+    box-shadow: 0 0 8px 1px rgba(168, 85, 247, 0.3);
+    left: 85%;
+    animation-duration: 7s;
+    animation-delay: 4.5s;
+}

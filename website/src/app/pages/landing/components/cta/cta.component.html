@@ -8,7 +8,28 @@
     <!-- Bottom-Up Purple Glow -->
     <div class="absolute -bottom-24 left-1/2 -translate-x-1/2 w-[300px] md:w-[600px] h-[100px] md:h-[150px] bg-purple-500/10 blur-[60px] md:blur-[100px] rounded-full pointer-events-none"></div>
 
-    <div class="relative z-10 text-center max-w-4xl mx-auto px-4 md:px-6" appScrollReveal>
+    <!-- Twinkling Stars -->
+    <div class="star-layer z-0">
+        <div class="star" style="top: 15%; left: 20%; --duration: 3s; --delay: 0s;"></div>
+        <div class="star" style="top: 35%; left: 85%; --duration: 4s; --delay: 1s;"></div>
+        <div class="star" style="top: 65%; left: 15%; --duration: 2.5s; --delay: 2s;"></div>
+        <div class="star" style="top: 80%; left: 80%; --duration: 3.5s; --delay: 0.5s;"></div>
+        <div class="star" style="top: 25%; left: 60%; --duration: 4.5s; --delay: 1.5s;"></div>
+        <div class="star" style="top: 75%; left: 45%; --duration: 5s; --delay: 0.2s;"></div>
+    </div>
+
+    <!-- Orbital Rings (Planet Belt Effect) -->
+    <div class="absolute -top-[120%] left-1/2 -translate-x-1/2 w-[180%] md:w-[130%] h-[250%] border-[2px] border-surface-700/20 rounded-[50%] pointer-events-none rotate-12 z-0"></div>
+    <div class="absolute -top-[110%] left-1/2 -translate-x-1/2 w-[170%] md:w-[120%] h-[230%] border-[1px] border-primary-500/10 rounded-[50%] pointer-events-none rotate-12 z-0"></div>
+    <div class="absolute -top-[100%] left-1/2 -translate-x-1/2 w-[160%] md:w-[110%] h-[210%] border-[1px] border-purple-500/10 rounded-[50%] pointer-events-none rotate-12 z-0"></div>
+
+    <!-- Animated Comets -->
+    <div class="comet comet-1"></div>
+    <div class="comet comet-2"></div>
+    <div class="comet comet-3"></div>
+    <div class="comet comet-4"></div>
+
+    <div class="relative z-10 text-center max-w-5xl mx-auto px-4 md:px-6" appScrollReveal>
         <!-- Social Proof Badge
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 mb-8 animate-bounce-subtle">
             <div class="flex -space-x-2">
@@ -19,8 +40,8 @@
             <span class="text-[10px] font-black uppercase tracking-widest text-surface-400">Join 5,000+ developers</span>
         </div> -->
 
-        <h2 class="text-3xl md:text-5xl font-black text-white mt-8 mb-6 md:mb-8 tracking-tighter leading-[1.1] md:leading-none">
-            Ready to experience the <br class="hidden md:block"> future of <span class="text-primary-500 text-glow font-sansation! italic underline decoration-primary-500/30 underline-offset-8">webhooks?</span>
+        <h2 class="text-3xl md:text-6xl font-black mt-8 mb-6 md:mb-8 tracking-tighter leading-[1.1] md:leading-none">
+            <span class="bg-linear-to-b from-white to-surface-400 bg-clip-text font-sansation! text-transparent">Ready to experience the <br class="hidden md:block"> future of </span> <span class="text-primary-500 text-glow font-sansation! italic decoration-primary-500/30 underline-offset-8">webhooks?</span>
         </h2>
 
         <p class="text-base md:text-lg text-surface-400 mb-8 md:mb-10 font-medium px-2 md:px-0 max-w-xl mx-auto leading-relaxed">
@@ -63,10 +84,70 @@
 
             <!-- Secondary Link -->
             <a href="https://docs.kyrazo.com"
-               class="text-surface-500 hover:text-surface-300 text-sm font-medium transition-colors cursor-pointer no-underline"
+               class="text-surface-500 hover:text-surface-300 text-sm font-medium transition-colors cursor-pointer no-underline mb-12"
                aria-label="View documentation">
                 Or read the documentation →
             </a>
+        </div>
+
+        <!-- Integrated Footer Section -->
+        <div class="mt-20 pt-16 border-t border-surface-800/50 flex flex-col gap-16">
+            <!-- Grid Links -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-12 text-left px-4">
+                <!-- Brand -->
+                <div class="col-span-2 md:col-span-2">
+                    <div class="flex items-center gap-3 mb-6">
+                        <img src="logo-light.png" alt="Kyrazo" width="40" height="40" class="h-10 w-10 rounded-xl bg-primary p-1 shadow-lg shadow-primary-500/20">
+                        <span class="text-3xl bg-linear-to-b from-white to-surface-400 bg-clip-text text-transparent font-black tracking-tighter">Kyrazo</span>
+                    </div>
+                    <p class="text-sm text-surface-500 leading-relaxed max-w-[340px]">
+                        The next generation of event-driven infrastructure. Built for reliability and performance.
+                    </p>
+                </div>
+
+                <!-- Platform -->
+                <div>
+                    <h4 class="text-xs font-black uppercase tracking-widest text-surface-300 mb-6 font-sansation!">Platform</h4>
+                    <ul class="space-y-4">
+                        <li><a href="https://docs.kyrazo.com" target="_blank" class="text-sm text-surface-500 hover:text-primary-400 font-medium no-underline transition-colors">Documentation</a></li>
+                        <li><a href="https://docs.kyrazo.com/api-reference" target="_blank" class="text-sm text-surface-500 hover:text-primary-400 font-medium no-underline transition-colors">API Reference</a></li>
+                        <li><a routerLink="/changelogs" class="text-sm text-surface-500 hover:text-primary-400 font-medium no-underline transition-colors">Changelog</a></li>
+                    </ul>
+                </div>
+
+                <!-- Resources -->
+                <div>
+                    <h4 class="text-xs font-black uppercase tracking-widest text-surface-300 mb-6 font-sansation!">Resources</h4>
+                    <ul class="space-y-4">
+                        <li><a routerLink="/blog" class="text-sm text-surface-500 hover:text-primary-400 font-medium no-underline transition-colors">Blog</a></li>
+                        <li><a href="https://status.kyrazo.com" target="_blank" class="text-sm text-surface-500 hover:text-primary-400 font-medium no-underline transition-colors">Status</a></li>
+                        <li><a href="mailto:support@kyrazo.com" class="text-sm text-surface-500 hover:text-primary-400 font-medium no-underline transition-colors">Support</a></li>
+                    </ul>
+                </div>
+
+                <!-- Legal -->
+                <div>
+                    <h4 class="text-xs font-black uppercase tracking-widest text-surface-300 mb-6 font-sansation!">Legal</h4>
+                    <ul class="space-y-4">
+                        <li><a routerLink="/legal/privacy-policy" class="text-sm text-surface-500 hover:text-primary-400 font-medium no-underline transition-colors">Privacy Policy</a></li>
+                        <li><a routerLink="/legal/terms-of-service" class="text-sm text-surface-500 hover:text-primary-400 font-medium no-underline transition-colors">Terms of Service</a></li>
+                        <li><a routerLink="/legal/gdpr" class="text-sm text-surface-500 hover:text-primary-400 font-medium no-underline transition-colors">GDPR Compliance</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Line -->
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 pt-8 border-t border-surface-800/20 px-4">
+                <p class="text-sm text-surface-500 font-medium tracking-tight">
+                    © 2026 Kyrazo LLC. All rights <span class="text-primary-500 font-black font-sansation!">reserved</span>.
+                </p>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/5">
+                        <div class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></div>
+                        <span class="text-[10px] uppercase font-black tracking-widest text-surface-400">Secure Payments via Stripe</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

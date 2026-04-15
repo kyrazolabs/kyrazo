@@ -1,77 +1,110 @@
-<section class="py-16 md:py-24 px-4 md:px-6" id="dev-exp">
-  <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12 lg:gap-16 px-2 md:px-0">
-    <div class="flex-1" appScrollReveal>
-      <h2 class="text-3xl md:text-5xl font-bold mb-6 text-surface-900 dark:text-surface-0">
-        Get started in minutes.
-      </h2>
+<section class="relative overflow-hidden" id="dev-exp">
+  <!-- Sophisticated Background Decor -->
+  <!-- <div class="absolute top-0 right-0 w-[400px] h-[400px] bg-primary-500/10 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2"></div> -->
+  <!-- <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-primary-500/10 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/2"></div> -->
 
-      <p class="text-base md:text-lg text-surface-600 dark:text-surface-300 mb-8 leading-relaxed">
-        Kyrazo is designed with developers in mind. We focus on reducing setup complexity
-        and helping you integrate quickly using well-documented APIs and SDKs.
-      </p>
+  <div class="px-6 max-w-7xl mx-auto relative z-10">
+    <!-- Main Redesigned Card -->
+    <div class="relative bg-surface-950 dark:bg-surface-900 rounded-2xl p-10 md:p-16 border border-surface-200 dark:border-surface-800 shadow-2xl shadow-primary-500/5 overflow-hidden ring-1 ring-white/10" appScrollReveal>
 
-      <div class="space-y-6 mb-8">
-        <div class="flex items-start gap-4">
-          <div class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-500/20 flex items-center justify-center text-primary-600 dark:text-primary-400 shrink-0">
-            <i class="pi pi-box"></i>
+      <!-- Star Layer -->
+      <div class="star-layer z-0">
+        <div class="star opacity-80!" style="top: 15%; left: 10%; --duration: 3s; --delay: 0.5s;"></div>
+        <div class="star opacity-80!" style="top: 35%; left: 85%; --duration: 4s; --delay: 1s;"></div>
+        <div class="star opacity-80!" style="top: 65%; left: 20%; --duration: 2.5s; --delay: 0s;"></div>
+        <div class="star opacity-80!" style="top: 80%; left: 70%; --duration: 3.5s; --delay: 2s;"></div>
+        <div class="star opacity-80!" style="top: 25%; left: 50%; --duration: 4.5s; --delay: 1.5s;"></div>
+      </div>
+
+      <!-- Orbital Rings (Planet Belt Effect) -->
+      <div class="absolute -top-40 -left-40 w-[600px] h-[600px] md:w-[600px] md:h-[600px] border-2 border-surface-700/60 rounded-full pointer-events-none -rotate-12 z-0 shadow-[0_0_100px_rgba(59,130,246,0.05)]"></div>
+      <div class="absolute -top-20 -left-20 w-[500px] h-[500px] md:w-[400px] md:h-[400px] border-2 border-primary-500/30 rounded-full pointer-events-none -rotate-12 z-0 shadow-[0_0_50px_rgba(59,130,246,0.2)] glow-primary"></div>
+
+      <!-- Falling Comets -->
+      <div class="comet comet-1 opacity-80!"></div>
+      <div class="comet comet-2 opacity-80!"></div>
+      <div class="comet comet-3 opacity-80!"></div>
+      <div class="comet comet-4 opacity-80!"></div>
+
+      <!-- Background Decor -->
+      <div class="absolute top-0 right-0 w-[300px] h-[300px] bg-primary-500/50 blur-[120px] rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+
+      <div class="relative z-10 flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+        <!-- Content Side -->
+        <div class="flex-1 text-center lg:text-left">
+          <div class="flex items-center justify-center lg:justify-start gap-3 mb-6">
+            <span class="text-primary-400 font-bold uppercase tracking-widest text-[10px] px-3 py-1 bg-primary-500/10 rounded-full border border-primary-500/20">
+              Developer Experience
+            </span>
           </div>
-          <div>
-            <h4 class="font-bold text-surface-900 dark:text-surface-0 mb-1">
-              Official SDKs
-            </h4>
-            <p class="text-sm text-surface-600 dark:text-surface-400">
-              SDKs are available for Python, Node.js etc...
-            </p>
+
+          <h2 class="text-3xl md:text-5xl font-black tracking-tighter leading-[1.1] mb-6">
+            <span class="bg-linear-to-b from-white to-surface-400 bg-clip-text font-sansation! text-transparent tracking-tighter">Get started </span>
+            <span class="text-primary-500 font-sansation! tracking-tighter">in minutes.</span>
+          </h2>
+
+          <p class="text-lg text-surface-400 font-medium leading-relaxed mb-10">
+            Kyrazo is designed with developers in mind. We focus on reducing setup complexity
+            and helping you integrate quickly using well-documented APIs and SDKs.
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8 text-left">
+            <div class="flex items-start gap-4 p-4 rounded-xl bg-surface-900/5 border border-surface-500/30 backdrop-blur-xs transition-colors duration-300 hover:bg-surface-950/10 hover:border-primary-500/50">
+              <div class="w-10 h-10 rounded-full bg-primary-500/20 flex items-center justify-center text-primary-400 shrink-0">
+                <i class="pi pi-box"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-white mb-1">Official SDKs</h4>
+                <p class="text-xs text-surface-400 leading-tight">Available for Python, Node.js and more.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-4 p-4 rounded-xl bg-surface-900/5 border border-surface-500/30 backdrop-blur-xs transition-colors duration-300 hover:bg-surface-950/10 hover:border-primary-500/50">
+              <div class="w-10 h-10 rounded-full bg-primary-500/20 flex items-center justify-center text-primary-400 shrink-0">
+                <i class="pi pi-code"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-white mb-1">Copy-Paste Ready</h4>
+                <p class="text-xs text-surface-400 leading-tight">Practical examples for every workflow.</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="flex items-start gap-4">
-          <div class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-500/20 flex items-center justify-center text-primary-600 dark:text-primary-400 shrink-0">
-            <i class="pi pi-code"></i>
-          </div>
-          <div>
-            <h4 class="font-bold text-surface-900 dark:text-surface-0 mb-1">
-              Practical Examples
-            </h4>
-            <p class="text-sm text-surface-600 dark:text-surface-400">
-              Clear, copy-friendly examples to help you implement common workflows.
-            </p>
+        <!-- Code block Side -->
+        <div class="flex-1 w-full max-w-2xl" appScrollReveal delay="delay-200">
+          <div class="rounded-xl overflow-hidden shadow-2xl bg-surface-950/80 border border-white/10 backdrop-blur-md flex flex-col min-h-80">
+            <div class="bg-surface-950/80 grow relative min-h-72">
+              <app-code-editor [ngModel]="codeSnippet" theme="coolglow" [showLineNumbers]="false" [readonly]="true" [disabled]="true" class="absolute inset-0 block"></app-code-editor>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- <p-button
-        label="Explore Documentation"
-        class="group/docs"
-        icon="pi pi-arrow-right group:transition-transform group-hover/docs:ml-2"
-        iconPos="right"
-        [text]="true"
-        styleClass="font-bold! rounded-2xl!"
-      ></p-button> -->
-    </div>
-
-    <div class="flex-1 w-full max-w-2xl" appScrollReveal delay="delay-200">
-      <div class="rounded-2xl overflow-hidden shadow-2xl bg-surface-950 border border-surface-700">
-        <div class="flex items-center gap-2 p-4">
-          <span class="ml-2 text-xs text-gray-400 font-mono">Node.js</span>
+      <!-- Decorative Metric/Tech Stack Footer (Small version of Workers footer) -->
+      <!-- <div class="mt-2 pt-10 border-t border-white/20 flex flex-wrap justify-between items-center gap-8 opacity-80">
+        <div class="flex items-center gap-3">
+          <i class="icon-[hugeicons--node-js] text-2xl text-white"></i>
+          <span class="text-xs font-bold uppercase tracking-widest text-white">Node.js</span>
         </div>
-        <div class="p-6 overflow-x-auto">
-          <pre class="font-mono text-sm leading-relaxed text-gray-300"><code><span class="text-purple-400">import</span> {{ '{' }} Kyrazo {{ '}' }} <span class="text-purple-400">from</span> <span class="text-green-400">"@kyrazo/sdk"</span>;
-
-<span class="text-purple-400">const</span> kyrazo = <span class="text-purple-400">new</span> <span class="text-blue-400">Kyrazo</span>(<span class="text-green-400">"kz_live_..."</span>);
-
-<span class="text-purple-400">await</span> kyrazo.dispatch.<span class="text-blue-400">single</span>(<span class="text-green-400">"ns_4863w..."</span>, {{ '{' }}
-  name: <span class="text-green-400">"user.created"</span>,
-  data: {{ '{' }}
-    id: <span class="text-green-400">"usr_123"</span>,
-    email: <span class="text-green-400">"alice@example.com"</span>
-  {{ '}' }},
-  targets: {{ '[' }}
-    {{ '{' }} targetId: <span class="text-green-400">"trg_2176c..."</span> {{ '}' }}
-  {{ ']' }}
-{{ '}' }});</code></pre>
+        <div class="flex items-center gap-3">
+          <i class="icon-[hugeicons--python] text-2xl text-white"></i>
+          <span class="text-xs font-bold uppercase tracking-widest text-white">Python</span>
         </div>
-      </div>
+        <div class="flex items-center gap-3">
+          <i class="icon-[hugeicons--go-lang] text-2xl text-white"></i>
+          <span class="text-xs font-bold uppercase tracking-widest text-white">Go Lang</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <i class="icon-[hugeicons--java] text-2xl text-white"></i>
+          <span class="text-xs font-bold uppercase tracking-widest text-white">Java</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <i class="icon-[hugeicons--ruby] text-2xl text-white"></i>
+          <span class="text-xs font-bold uppercase tracking-widest text-white">Ruby</span>
+        </div>
+      </div> -->
+
     </div>
   </div>
 </section>

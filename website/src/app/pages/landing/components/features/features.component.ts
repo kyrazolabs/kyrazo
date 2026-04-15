@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 
 import { IngestDiagramComponent } from './diagrams/ingest/ingest.component';
 import { DispatchDiagramComponent } from './diagrams/dispatch/dispatch.component';
 
 import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directive';
+import { CodeEditorComponent } from '@shared/components/code-editor/code-editor.component';
 
 interface TrustItem {
     title: string;
@@ -20,15 +22,46 @@ interface TrustItem {
     standalone: true,
     imports: [
         CommonModule,
+        FormsModule,
         ButtonModule,
         IngestDiagramComponent,
         DispatchDiagramComponent,
         ScrollRevealDirective,
+        CodeEditorComponent,
     ],
     templateUrl: './features.component.html',
     styleUrl: './features.component.scss',
 })
 export class FeaturesComponent {
+    transformerCode = `return function transform(payload) {
+    const { id, type, timestamp, data } = payload;
+    const [entity, action, sub] = type.split('.');
+    const obj = data?.object ?? {};
+    const prev = data?.previous ?? null;
+
+    const diff = prev
+        ? Object.keys({ ...prev, ...obj }).filter(k => !_.isEqual(prev[k], obj[k]))
+        : [];
+
+    return {
+        event: \`$\{entity\}.$\{action\}\`,
+        source: 'internal',
+        actor: obj.user_id ?? obj.id,
+        metadata: {
+            event_id: id,
+            sub_action: sub ?? null,
+            processed_at: dayjs().toISOString(),
+            signature: crypto.hmac('kz_secret', id),
+        },
+        data: {
+            id: obj.id,
+            state: obj.status ?? null,
+            plan: obj.plan ?? null,
+        },
+        changes: diff,
+    };
+}(payload);`;
+
     // Speed Visualizer Data
     speedBars = Array(20).fill(0);
     speedMetric = { value: '1.04s', change: '-22%' };
@@ -109,18 +142,18 @@ export class FeaturesComponent {
             features: [],
         },
         {
-            title: 'Automate Workflows',
-            subtitle: 'Smart Connectors',
+            title: 'Transformers',
+            subtitle: 'Code Execution',
             description:
-                'Chain actions and transform payloads without writing glue code. Filter events, fan-out to multiple destinations, and connect your entire stack with smart logic.',
-            icon: 'icon-[hugeicons--node-view]',
+                'Write custom JavaScript or TypeScript to transform your events right before they are dispatched. Shape the payload to match any destination format exactly as needed.',
+            icon: 'icon-[hugeicons--code]',
             color: 'text-purple-700 dark:text-purple-500',
             bg: 'bg-purple-500/15 dark:bg-purple-500/10',
-            diagram: 'workflow',
+            diagram: 'transformer',
             features: [
-                'Fan-out Architecture',
-                'Payload Transformations',
-                'Conditional Logic',
+                'JavaScript & TypeScript',
+                'Payload Modifications',
+                'Sandboxed Execution',
             ],
         },
     ];

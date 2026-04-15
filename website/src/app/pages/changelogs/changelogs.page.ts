@@ -5,6 +5,7 @@ import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
+import { CtaComponent } from '@pages/landing/components/cta/cta.component';
 
 interface ChangelogEvent {
     status?: string;
@@ -29,6 +30,7 @@ interface ChangelogEvent {
         TagModule,
         ButtonModule,
         TooltipModule,
+        CtaComponent,
     ],
     templateUrl: './changelogs.page.html',
     styleUrl: './changelogs.page.scss',

@@ -1,22 +1,28 @@
 <!-- Problem / Solution Header -->
 <section
-  id="trust"
-  class="relative w-full overflow-hidden rounded-2xl border border-surface-800 bg-surface-950 py-16 px-6 md:px-10 md:py-28 shadow-lg"
+  id="motivation"
+  class="relative w-full min-h-screen! rounded-3xl overflow-hidden border border-surface-800 bg-surface-950 py-16 px-6 md:px-10 md:py-28 shadow-lg"
 >
-  <!-- Background Mesh -->
-  <div
-    aria-hidden="true"
-    class="pointer-events-none absolute inset-0 opacity-10"
-    style="background-image: radial-gradient(#3b82f6 2px, transparent 2px); background-size: 30px 30px;"
-  ></div>
+
+  <!-- Twinkling Stars -->
+  <div class="star-layer z-0">
+    <div class="star" style="top: 20%; left: 10%; --duration: 3s; --delay: 0s;"></div>
+    <div class="star" style="top: 40%; left: 80%; --duration: 4s; --delay: 1.5s;"></div>
+    <div class="star" style="top: 60%; left: 15%; --duration: 2.5s; --delay: 0.5s;"></div>
+    <div class="star" style="top: 85%; left: 90%; --duration: 3.5s; --delay: 2s;"></div>
+    <div class="star" style="top: 30%; left: 50%; --duration: 4.5s; --delay: 1s;"></div>
+  </div>
+
+  <!-- Orbital Rings (Planet Belt Effect) -->
+  <div class="absolute -top-50 -right-60 w-[600px] h-[600px] md:w-[900px] md:h-[900px] border-2 border-surface-700/60 rounded-full pointer-events-none -rotate-12 z-0 shadow-[0_0_100px_rgba(59,130,246,0.05)]"></div>
+  <div class="absolute -top-30 -right-40 w-[500px] h-[500px] md:w-[700px] md:h-[700px] border-2 border-primary-500/30 rounded-full pointer-events-none -rotate-12 z-0 shadow-[0_0_50px_rgba(59,130,246,0.2)] glow-primary"></div>
 
   <div class="relative z-10 mx-auto max-w-7xl px-4 md:px-6">
     <!-- Header -->
     <div class="mb-12 md:mb-20 flex justify-center px-4 md:px-0">
       <div class="max-w-4xl text-center" appScrollReveal>
-        <h2 class="mb-6 text-2xl font-bold text-surface-0 md:text-5xl">
-          Building Webhook Infrastructure is
-          <span class="text-primary-400 font-sansation!">PAINFUL</span>
+        <h2 class="mb-6 text-2xl font-bold md:text-6xl">
+          <span class="bg-linear-to-b from-white to-surface-400 bg-clip-text font-sansation! text-transparent">Building Webhook Infrastructure is Painful</span>
         </h2>
 
         <p
@@ -36,16 +42,16 @@
         <div
           appScrollReveal
           [delay]="'delay-' + ($index * 100 + 100)"
-          class="group relative overflow-hidden rounded-2xl border border-surface-800/50 bg-surface-900/30 p-6 transition-all duration-500 hover:border-primary-500/50 hover:bg-surface-900/35"
+          class="group relative overflow-hidden rounded-2xl border border-surface-800/50 bg-surface-950/40 backdrop-blur-xs p-6 transition-all duration-300 hover:border-primary-500/50 hover:bg-surface-950/45"
         >
-          <!-- Glow -->
+          <!-- Glow Effect -->
           <div
-            class="absolute -top-24 -right-24 h-24 w-24 rounded-full bg-primary-500/0 blur-[60px] transition-all duration-700 group-hover:bg-primary-500/5"
+            class="absolute -top-24 -right-24 w-48 h-48 rounded-full blur-[60px] transition-all duration-700 bg-primary-500/0 group-hover:bg-primary-500/10"
           ></div>
 
           <div class="relative z-10">
             <div class="mb-8 flex items-center gap-4">
-              <div class="flex h-10 w-10 aspect-square items-center justify-center rounded-xl border border-surface-700 bg-surface-800 text-primary-500 transition-all duration-500 group-hover:border-primary-500/20 group-hover:bg-primary-500/10">
+              <div class="flex h-12 w-12 aspect-square items-center justify-center rounded-xl border border-surface-700 bg-surface-900/35 text-primary-500 transition-all duration-500 group-hover:border-primary-500/20 group-hover:bg-primary-500/5">
                 <span class="text-2xl" [class]="item.icon"></span>
               </div>
               <h3
