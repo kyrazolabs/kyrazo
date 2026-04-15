@@ -5,9 +5,9 @@ from kyrazo.resources.events import PublishEventBody
 def test_publish_event_success(client, mock_api):
     namespace_id = "proj_123"
     payload = {
-        "eventType": "test.event",
+        "event": "test.event",
         "payload": {"hello": "world"},
-        "targets": [{"targetId": "target_123"}],
+        "targets": ["target_123"],
     }
 
     response_data = {
@@ -35,9 +35,9 @@ def test_publish_event_idempotency(client, mock_api):
     namespace_id = "proj_123"
     key = "unique_key"
     payload = {
-        "eventType": "test.event",
+        "event": "test.event",
         "payload": {},
-        "targets": [{"targetId": "target_123"}],
+        "targets": ["target_123"],
     }
 
     route = mock_api.post(f"/v1/events/{namespace_id}/publish").mock(
@@ -63,9 +63,9 @@ def test_publish_event_idempotency(client, mock_api):
 def test_publish_event_automatic_idempotency(client, mock_api):
     namespace_id = "proj_123"
     payload = {
-        "eventType": "test.event",
+        "event": "test.event",
         "payload": {},
-        "targets": [{"targetId": "target_123"}],
+        "targets": ["target_123"],
     }
 
     route = mock_api.post(f"/v1/events/{namespace_id}/publish").mock(

@@ -3,7 +3,6 @@ from .models import (
     PublishEventBody,
     PublishEventResponse,
     BatchPublishEventResponse,
-    TargetInput,
 )
 
 __all__ = [
@@ -11,5 +10,4 @@ __all__ = [
     "PublishEventBody",
     "PublishEventResponse",
     "BatchPublishEventResponse",
-    "TargetInput",
 ]

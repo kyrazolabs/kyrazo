@@ -29,8 +29,9 @@ func TestEventsModule_Single(t *testing.T) {
 	client := kyrazo.New("test-api-key", kyrazo.WithBaseURL(server.URL))
 	
 	resp, err := client.Events.Single(context.Background(), "ns_123", models.PublishEvent{
-		EventType: "user.created",
-		Payload:   map[string]interface{}{"id": "u_1"},
+		Event:   "user.created",
+		Payload: map[string]interface{}{"id": "u_1"},
+		Targets: []string{"target-123"},
 	})
 
 	assert.NoError(t, err)

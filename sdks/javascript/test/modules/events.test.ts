@@ -23,9 +23,9 @@ describe("EventsModule", () => {
 
   describe("single()", () => {
     const validEvent = {
-      eventType: "user.created",
+      event: "user.created",
       payload: { id: "u_1" },
-      targets: [{ targetId: "target-123" }],
+      targets: ["target-123"],
     };
 
     it("should publish a single event successfully", async () => {
@@ -85,14 +85,14 @@ describe("EventsModule", () => {
   describe("batch()", () => {
     const validEvents = [
       {
-        eventType: "e1",
+        event: "e1",
         payload: { id: 1 },
-        targets: [{ targetId: "target-1" }],
+        targets: ["target-1"],
       },
       {
-        eventType: "e2",
+        event: "e2",
         payload: { id: 2 },
-        targets: [{ targetId: "target-2" }],
+        targets: ["target-2"],
       },
     ];
 
