@@ -9,9 +9,9 @@ We officially support the following languages and runtimes:
 - 🟨 **[JavaScript / TypeScript](./javascript/)**
 
   ```bash
-  npm install @kyrazolabs/kyrazo
+  npm install @kyrazo/sdk
   # or
-  bun add @kyrazolabs/kyrazo
+  bun add @kyrazo/sdk
   ```
 
 - 🟦 **[Python](./python/)**
