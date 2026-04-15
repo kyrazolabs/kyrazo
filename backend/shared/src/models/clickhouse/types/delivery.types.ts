@@ -14,7 +14,7 @@ export interface SQLDeliveryAttempt {
     namespace_id: string;
 
     event_id: string; // UInt64
-    event: string;
+    event_type: string;
 
     source_id: string | null;
     source_type: string | null;

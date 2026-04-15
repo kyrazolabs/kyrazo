@@ -95,7 +95,7 @@ export class PublishEventPublisher {
                 workspaceId: data.workspaceId,
                 namespaceId: data.namespaceId,
                 sourceType: data.sourceType,
-                event: data.event,
+                eventType: data.event,
                 timestamp: data.timestamp,
 
                 data: data.payload,
@@ -181,7 +181,7 @@ export class PublishEventPublisher {
                             workspaceId: item.workspaceId,
                             namespaceId: item.namespaceId,
                             sourceType: item.sourceType,
-                            event: item.event,
+                            eventType: item.event,
                             timestamp: item.timestamp,
 
                             data: item.payload,

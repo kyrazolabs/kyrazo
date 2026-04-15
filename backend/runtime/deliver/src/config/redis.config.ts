@@ -95,7 +95,9 @@ export class RedisConfig {
                 (redisClientOptions.tls as any).checkServerIdentity = () => undefined;
             }
 
-            this.client = config.redis.url ? new Redis(config.redis.url, redisClientOptions) : new Redis(redisClientOptions);
+            this.client = config.redis.url
+                ? new Redis(config.redis.url, redisClientOptions)
+                : new Redis(redisClientOptions);
 
             let queueRedisClientOptions: RedisOptions = {};
             if (!config.redis.queue.url) {
@@ -126,7 +128,9 @@ export class RedisConfig {
                 // Skip hostname identity check for IP-based certificates
                 (queueRedisClientOptions.tls as any).checkServerIdentity = () => undefined;
             }
-            this.queueClient = config.redis.queue.url ? new Redis(config.redis.queue.url, queueRedisClientOptions) : new Redis(queueRedisClientOptions);
+            this.queueClient = config.redis.queue.url
+                ? new Redis(config.redis.queue.url, queueRedisClientOptions)
+                : new Redis(queueRedisClientOptions);
 
             let streamRedisClientOptions: RedisOptions = {};
             if (!config.redis.stream.url) {
@@ -149,7 +153,9 @@ export class RedisConfig {
                     streamRedisClientOptions.tls.ca = fs.readFileSync(config.redis.stream.caFile);
                 }
                 if (config.redis.stream.certFile && fs.existsSync(config.redis.stream.certFile)) {
-                    streamRedisClientOptions.tls.cert = fs.readFileSync(config.redis.stream.certFile);
+                    streamRedisClientOptions.tls.cert = fs.readFileSync(
+                        config.redis.stream.certFile
+                    );
                 }
                 if (config.redis.stream.keyFile && fs.existsSync(config.redis.stream.keyFile)) {
                     streamRedisClientOptions.tls.key = fs.readFileSync(config.redis.stream.keyFile);
@@ -157,7 +163,9 @@ export class RedisConfig {
                 // Skip hostname identity check for IP-based certificates
                 (streamRedisClientOptions.tls as any).checkServerIdentity = () => undefined;
             }
-            this.streamClient = config.redis.stream.url ? new Redis(config.redis.stream.url, streamRedisClientOptions) : new Redis(streamRedisClientOptions);
+            this.streamClient = config.redis.stream.url
+                ? new Redis(config.redis.stream.url, streamRedisClientOptions)
+                : new Redis(streamRedisClientOptions);
 
             // Set up error handlers
             this.client.on('error', (error: Error) => {
@@ -429,7 +437,7 @@ export class RedisConfig {
     public async cache<T>(key: string, cb: () => Promise<T>, ttl?: number): Promise<T> {
         const client = this.getClient();
         const value = await client.get(key);
-        
+
         if (value !== null && value !== 'null') {
             try {
                 return JSON.parse(value) as T;
@@ -437,13 +445,13 @@ export class RedisConfig {
                 // If parsing fails, ignore and fetch fresh data
             }
         }
-        
+
         const freshData = await cb();
-        
+
         if (freshData !== null && freshData !== undefined) {
             await client.setex(key, ttl ?? 3600, JSON.stringify(freshData));
         }
-        
+
         return freshData;
     }
 
@@ -489,8 +497,8 @@ export class RedisConfig {
 }
 
 export const REDIS_KEYS = {
-    targetHash: (eventId: string, event: string, targetId: string) =>
-        `wh:evt:${eventId}:et:${event}:tg:${targetId}`,
+    targetHash: (eventId: string, eventType: string, targetId: string) =>
+        `wh:evt:${eventId}:et:${eventType}:tg:${targetId}`,
     eventDeliveredCount: (eventId: string) => `wh:evt:${eventId}:deliv_count`,
     eventTotal: (eventId: string) => `wh:evt:${eventId}:total`,
     dirtyZset: 'wh:dirty', // لتتبع التحديثات

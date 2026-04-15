@@ -119,7 +119,7 @@ export class DispatchConsumer extends EventEmitter {
 
             // Links to other collections
             event_id: event.id,
-            event: event.type,
+            event_type: event.type,
 
             source_id: event.sourceId,
             source_type: event.sourceType,
@@ -253,7 +253,7 @@ export class DispatchConsumer extends EventEmitter {
             await dispatchAnalyticsProducer.record({
                 namespaceId: deliveryAttempt.namespace_id,
                 targetId: deliveryAttempt.target_id,
-                event: deliveryAttempt.event,
+                eventType: deliveryAttempt.event_type,
                 responseCode: response.status,
                 status: DeliveryStatus.DELIVERED,
                 latencyMs: response.duration,
@@ -295,7 +295,7 @@ export class DispatchConsumer extends EventEmitter {
                 await dispatchAnalyticsProducer.record({
                     namespaceId: deliveryAttempt.namespace_id,
                     targetId: deliveryAttempt.target_id,
-                    event: deliveryAttempt.event,
+                    eventType: deliveryAttempt.event_type,
                     responseCode: deliveryAttempt.response_code ?? 500,
                     status: DeliveryStatus.FAILED,
                     latencyMs: 0,

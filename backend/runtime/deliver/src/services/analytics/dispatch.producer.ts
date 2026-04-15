@@ -5,7 +5,7 @@ import type { DispatchEventInput } from './producer.type';
 class DispatchProducer extends BaseProducer {
     async record(event: DispatchEventInput): Promise<void> {
         const minute = this.getMinuteBucket(event.timestamp);
-        const key = `analytics:rt:${event.namespaceId}:dispatch:${minute}:${event.targetId}:${event.event}:${event.responseCode}`;
+        const key = `analytics:rt:${event.namespaceId}:dispatch:${minute}:${event.targetId}:${event.eventType}:${event.responseCode}`;
 
         // Idempotency check
         if (event.deliveryId) {

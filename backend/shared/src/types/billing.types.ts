@@ -173,7 +173,7 @@ export interface IUsage {
     subscriptionId: Types.ObjectId;
     meteredSubscriptionItemId: string;
     stripeMeterEventName: string;
-    event: string;
+    eventType: string;
     count: number;
     periodStart: Date;
     periodEnd: Date;
@@ -192,7 +192,7 @@ export interface IUsageModel extends Model<IUsage> {
 export interface IWebhookEventProcessed {
     _id: Types.ObjectId;
     eventId: string;
-    event: string;
+    eventType: string;
     processedAt: Date;
     createdAt: Date;
 }
