@@ -215,8 +215,6 @@ return {
             name: '',
             description: '',
             code: `/**
- * Kyrazo Transformer
- *
  * Available Utilities (no import needed):
  *  _       → Lodash for data manipulation
  *  dayjs   → Date/time formatting and arithmetic
@@ -234,19 +232,10 @@ return {
  *       so the runtime receives the result.
  */
 return function transform(payload) {
-    // 1. Extract and transform your data
-    const transformedData = {
-        ...payload.data,
-        // Add or override fields here
-        processed_at: dayjs().toISOString(),
-        env: 'production',
-    };
+    // modify it...
 
-    // 2. Return the final payload
-    return {
-        ...payload,
-        data: transformedData,
-    };
+    // then return it
+    return payload;
 }(payload);`,
             isActive: true,
         });
