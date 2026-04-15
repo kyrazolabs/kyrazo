@@ -32,15 +32,15 @@ Select your preferred language to see a verification implementation.
     // req.body should be the raw request body string
     // req.headers is the headers object from your framework (e.g. Express)
     try {
-      Webhook.verify(
-        req.body, 
-        req.headers, 
-        process.env.KYRAZO_TARGET_SECRET
-      );
-      // Handle the verified webhook
+        Webhook.verify(
+            req.body,
+            req.headers,
+            process.env.KYRAZO_TARGET_SECRET
+        );
+        // Handle the verified webhook
     } catch (error) {
-      // Signature verification failed
-      console.error(error.message);
+        // Signature verification failed
+        console.error(error.message);
     }
     ```
 
@@ -50,35 +50,37 @@ Select your preferred language to see a verification implementation.
     import * as crypto from 'crypto';
 
     function verifySignature(
-      requestBody: string,
-      headers: Record<string, string>,
-      secret: string
+        requestBody: string,
+        headers: Record<string, string>,
+        secret: string
     ): boolean {
-      const signatureHeader = headers['x-webhook-signature'];
-      const timestamp = headers['x-webhook-timestamp'];
-      const nonce = headers['x-webhook-nonce'];
-      const version = headers['x-webhook-version'];
+        const signatureHeader = headers['x-webhook-signature'];
+        const timestamp = headers['x-webhook-timestamp'];
+        const nonce = headers['x-webhook-nonce'];
+        const version = headers['x-webhook-version'];
 
-      if (!signatureHeader || !timestamp || !nonce || !version) {
-        return false;
-      }
+        if (!signatureHeader || !timestamp || !nonce || !version) {
+            return false;
+        }
 
-      const signature = signatureHeader.split('=')[1];
-      const payload = `${version}.${timestamp}.${nonce}.${requestBody}`;
+        const signature = signatureHeader.split('=')[1];
+        const payload = `${version}.${timestamp}.${nonce}.${requestBody}`;
 
-      const expectedSignature = crypto
-        .createHmac('sha256', secret)
-        .update(payload)
-        .digest('hex');
+        const expectedSignature = crypto
+            .createHmac('sha256', secret)
+            .update(payload)
+            .digest('hex');
 
-      return crypto.timingSafeEqual(
-        Buffer.from(signature),
-        Buffer.from(expectedSignature)
-      );
+        return crypto.timingSafeEqual(
+            Buffer.from(signature),
+            Buffer.from(expectedSignature)
+        );
     }
     ```
   </Tab>
-  <Tab title="Python (SDK)">
+  <Tab title="Python">
+    ### Using SDK
+
     ```python
     from kyrazo import Webhook, ValidationError
 
@@ -94,8 +96,9 @@ Select your preferred language to see a verification implementation.
     except ValidationError as e:
         print(f"Verification failed: {e}")
     ```
-  </Tab>
-  <Tab title="Python (Manual)">
+
+    ### Manual
+
     ```python
     import hmac
     import hashlib
@@ -103,7 +106,7 @@ Select your preferred language to see a verification implementation.
     def verify_signature(request_body, headers, secret):
         # Header keys are case-insensitive
         headers = {k.lower(): v for k, v in headers.items()}
-        
+
         signature_header = headers.get('x-webhook-signature')
         timestamp = headers.get('x-webhook-timestamp')
         nonce = headers.get('x-webhook-nonce')
@@ -125,7 +128,7 @@ Select your preferred language to see a verification implementation.
             hashlib.sha256
         ).hexdigest()
 
-        # Timing safe comparison
+        # Timing-safe comparison
         return hmac.compare_digest(signature, expected_signature)
     ```
   </Tab>

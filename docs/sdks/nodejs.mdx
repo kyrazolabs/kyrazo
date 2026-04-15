@@ -35,17 +35,17 @@ To get started, you'll need an **API Key** from the [Kyrazo Dashboard](https://k
 import { Kyrazo } from "@kyrazo/sdk";
 
 const kyrazo = new Kyrazo({
-  apiKey: "your_api_key_here",
+    apiKey: "your_api_key_here",
 });
 
 // Publish a single event
 const response = await kyrazo.events.single("namespace_id", {
-  eventType: "user.signup",
-  payload: {
-    userId: "123",
-    email: "user@example.com",
-  },
-  targets: [{ targetId: "target_id" }],
+    event: "user.signup",
+    payload: {
+        userId: "123",
+        email: "user@example.com",
+    },
+    targets: ["target_id"],
 });
 
 console.log("Event dispatched:", response.id);
@@ -56,23 +56,23 @@ console.log("Event dispatched:", response.id);
 The SDK provides specific error classes to help you handle different failure scenarios gracefully.
 
 ```typescript
-import { 
-  Kyrazo, 
-  RateLimitError, 
-  ValidationError, 
-  AuthenticationError 
+import {
+    Kyrazo,
+    RateLimitError,
+    ValidationError,
+    AuthenticationError,
 } from "@kyrazo/sdk";
 
 try {
-  await kyrazo.events.single(...);
+    await kyrazo.events.single(...);
 } catch (error) {
-  if (error instanceof RateLimitError) {
-    console.log(`Rate limited! Retry after ${error.retryAfter}s`);
-  } else if (error instanceof ValidationError) {
-    console.log("Invalid request data:", error.message);
-  } else if (error instanceof AuthenticationError) {
-    console.log("Invalid API Key");
-  }
+    if (error instanceof RateLimitError) {
+        console.log(`Rate limited! Retry after ${error.retryAfter}s`);
+    } else if (error instanceof ValidationError) {
+        console.log("Invalid request data:", error.message);
+    } else if (error instanceof AuthenticationError) {
+        console.log("Invalid API Key");
+    }
 }
 ```
 
@@ -82,16 +82,16 @@ You can send up to 100 events in a single request to improve performance.
 
 ```typescript
 const batchResponse = await kyrazo.events.batch("namespace_id", [
-  {
-    eventType: "user.login",
-    payload: { userId: "1" },
-    targets: [{ targetId: "target_A" }],
-  },
-  {
-    eventType: "user.login",
-    payload: { userId: "2" },
-    targets: [{ targetId: "target_A" }],
-  }
+    {
+        event: "user.login",
+        payload: { userId: "1" },
+        targets: ["target_A"],
+    },
+    {
+        event: "user.login",
+        payload: { userId: "2" },
+        targets: ["target_A"],
+    },
 ]);
 
 console.log(`Sent ${batchResponse.length} events`);
@@ -106,9 +106,9 @@ import { Webhook } from "@kyrazo/sdk";
 
 // In your Express handler (or similar)
 const isValid = Webhook.verify(
-  rawRequestBody,
-  req.headers,
-  "your_target_secret"
+    rawRequestBody,
+    req.headers,
+    "your_target_secret"
 );
 ```
 

@@ -38,15 +38,13 @@ func main() {
 
 	// Publish a single event
 	res, err := s.Events.PublishEvent(ctx, "namespace_id", components.PublishEvent{
-		EventType: "user.signup",
+		Event: "user.signup",
 		Payload: components.Payload{
 			"userId": "123",
 			"email":  "user@example.com",
 		},
-		Targets: []components.Target{
-			{
-				TargetID: "target_id",
-			},
+		Targets: []string{
+			"target_id",
 		},
 	}, nil)
 	

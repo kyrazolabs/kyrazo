@@ -84,7 +84,7 @@ const client = new Kyrazo({
 
 try {
   // Create a webhook target
-  const target = await client.targets.create("pro_69674fad7590d01406e98126", {
+  const target = await client.targets.create("ns_69674fad7590d01406e98126", {
     name: "Production Webhook",
     url: "https://api.example.com/webhooks",
     method: "POST",
@@ -93,13 +93,13 @@ try {
 
   // Publish an event
   await client.events.single("pro_696...", {
-    eventType: "user.created",
+    event: "user.created",
     payload: {
       user_id: "u_334",
       email: "user@example.com",
       plan: "pro",
     },
-    targets: [{ targetId: target.data.id }],
+    targets: [target.data.id],
   });
 } catch (error) {
   if (error instanceof RateLimitError) {
@@ -123,9 +123,9 @@ client = Kyrazo(api_key="your_api_key")
 response = client.events.publish(
     namespace_id="proj_123",
     body={
-        "eventType": "user.created",
+        "event": "user.created",
         "payload": {"id": 1, "name": "Alice"},
-        "targets": [{"targetId": "target_123"}]
+        "targets": ["target_123"]
     }
 )
 print(response.event_id)

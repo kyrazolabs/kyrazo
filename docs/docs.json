@@ -42,7 +42,8 @@
             "pages": [
               "essentials/dispatch-overview",
               "essentials/target",
-              "essentials/webhooks-verification"
+              "essentials/webhooks-verification",
+              "essentials/transformers"
             ]
           },
           {

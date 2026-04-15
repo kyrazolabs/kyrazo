@@ -32,12 +32,12 @@ client = Kyrazo(api_key="your_api_key_here")
 event = client.events.publish(
     namespace_id="namespace_id",
     body={
-        "eventType": "user.signup",
+        "event": "user.signup",
         "payload": {
             "userId": "123",
-            "email": "user@example.com"
+            "email": "user@example.com",
         },
-        "targets": [{"targetId": "target_id"}]
+        "targets": ["target_id"],
     }
 )
 
