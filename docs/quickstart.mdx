@@ -40,9 +40,9 @@ Now you're ready to send data. Use one of our official SDKs or a simple `curl` c
     const kyrazo = new Kyrazo({ apiKey: "{YOUR_API_KEY}" });
 
     await kyrazo.events.single("{NAMESPACE_ID}", {
-      eventType: "user.signup",
-      payload: { userId: "123", email: "user@example.com" },
-      targets: [{ targetId: "{YOUR_TARGET_ID}" }]
+        event: "user.signup",
+        payload: { userId: "123", email: "user@example.com" },
+        targets: ["{YOUR_TARGET_ID}"],
     });
     ```
   </Tab>
@@ -55,9 +55,9 @@ Now you're ready to send data. Use one of our official SDKs or a simple `curl` c
     client.events.publish(
         namespace_id="{NAMESPACE_ID}",
         body={
-            "eventType": "user.signup",
+            "event": "user.signup",
             "payload": {"userId": "123", "email": "user@example.com"},
-            "targets": [{"targetId": "{YOUR_TARGET_ID}"}]
+            "targets": ["{YOUR_TARGET_ID}"],
         }
     )
     ```
@@ -79,13 +79,13 @@ Now you're ready to send data. Use one of our official SDKs or a simple `curl` c
     	client := kyrazo.New("{YOUR_API_KEY}")
 
     	resp, err := client.Events.Single(context.Background(), "{NAMESPACE_ID}", models.PublishEvent{
-    		EventType: "user.signup",
+    		Event: "user.signup",
     		Payload: map[string]interface{}{
     			"userId": "123",
     			"email":  "user@example.com",
     		},
-    		Targets: []models.EventTarget{
-    			{TargetId: "{YOUR_TARGET_ID}"},
+    		Targets: []string{
+    			"{YOUR_TARGET_ID}",
     		},
     	})
 
@@ -102,15 +102,13 @@ Now you're ready to send data. Use one of our official SDKs or a simple `curl` c
          -H "x-api-key: {YOUR_API_KEY}" \
          -H "Content-Type: application/json" \
          -d '{
-           "eventType": "user.signup",
-           "data": {
-             "userId": "123",
-             "email": "user@example.com"
-           },
-           "targets": [
-             { "targetId": "{YOUR_TARGET_ID}" }
-           ]
-         }'
+               "event": "user.signup",
+               "data": {
+                   "userId": "123",
+                   "email": "user@example.com"
+               },
+               "targets": ["{YOUR_TARGET_ID}"]
+             }'
     ```
   </Tab>
 </Tabs>
@@ -128,17 +126,17 @@ When Kyrazo delivers an event to your target, you should verify its signature to
 
     // Kyrazo sends the raw request body for signature verification
     app.post("/webhook", express.text({ type: "application/json" }), (req, res) => {
-      try {
-        Webhook.verify(
-          req.body, 
-          req.headers, 
-          "YOUR_TARGET_SECRET"
-        );
-        console.log("Verified webhook:", JSON.parse(req.body));
-        res.status(200).send("OK");
-      } catch (err) {
-        res.status(401).send("Unauthorized");
-      }
+        try {
+            Webhook.verify(
+                req.body,
+                req.headers,
+                "YOUR_TARGET_SECRET"
+            );
+            console.log("Verified webhook:", JSON.parse(req.body));
+            res.status(200).send("OK");
+        } catch (err) {
+            res.status(401).send("Unauthorized");
+        }
     });
     ```
   </Tab>
@@ -153,7 +151,7 @@ When Kyrazo delivers an event to your target, you should verify its signature to
     def webhook():
         payload = request.get_data(as_text=True)
         headers = dict(request.headers)
-        
+
         try:
             Webhook.verify(payload, headers, "YOUR_TARGET_SECRET")
             return "OK", 200

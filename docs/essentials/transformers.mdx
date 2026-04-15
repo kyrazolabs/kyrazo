@@ -1,0 +1,406 @@
+---
+title: "Transformers"
+description: "Reshape, enrich, and sign event payloads before they reach your targets — using plain JavaScript."
+---
+
+**Transformers** let you apply custom JavaScript logic to every event before it is delivered to any of your targets. Instead of receiving raw platform payloads, your endpoints receive exactly the shape you define — normalized, enriched, and ready to use.
+
+<Note>
+  Transformers are scoped to a **Namespace**. Every active transformer in a namespace runs on every outgoing event before delivery.
+</Note>
+
+---
+
+## How Transformers Work
+
+When Kyrazo is about to deliver an event to a target, it checks whether the namespace has an active transformer. If one exists, the event payload is passed through your transformer code. The return value becomes the new payload that is delivered to the target.
+
+```
+Ingest → Queue → [Transformer Sandbox] → Delivery → Target
+```
+
+This happens **out-of-band** from ingestion — your source webhook is acknowledged immediately. The transformer only runs at delivery time, so it never adds latency to your upstream system.
+
+---
+
+## The Sandbox Environment
+
+Your transformer code runs inside a **secure, isolated Bun.Worker sandbox** with strict constraints:
+
+| Constraint | Value |
+| :--- | :--- |
+| **Language** | JavaScript (ES2020+) |
+| **Runtime** | Bun |
+| **Execution timeout** | 2 seconds |
+| **Network access** | ❌ Disabled |
+| **File system access** | ❌ Disabled |
+| **Process access** | ❌ Disabled |
+
+If your transformer throws an error or exceeds the 2-second timeout, Kyrazo **falls back to the original, unmodified payload** and delivers it as-is. The failure is logged in your dashboard.
+
+<Warning>
+  Transformers cannot make outbound HTTP requests, read files, or access environment variables. They are intentionally sandboxed for security and reproducibility.
+</Warning>
+
+---
+
+## The `transform` Function
+
+### How Your Code Actually Runs
+
+Kyrazo does **not** look for a specific exported function by name. Instead, your code is injected directly as the body of a runtime function, with `payload` available as a variable. This means:
+
+- **Any function name works** — `transform`, `processEvent`, `normalize`, whatever you prefer.
+- **`return` before the call is required** — the runtime needs an explicit `return` to receive your result.
+
+The recommended pattern is a **named self-invoking function**:
+
+```javascript
+return function transform(payload) {
+    // Your logic here
+    return { ...payload };
+}(payload);
+```
+
+The `return` before `function` hands the result back to the delivery engine. The `(payload)` at the end immediately calls the function with the event. The name (`transform`) is just for readability — you can call it anything.
+
+<Note>
+  You can also use flat top-level statements with a bare `return` at the end — both styles work. The named function pattern is recommended because it gives you a clear scope boundary and makes the function reusable inside itself (e.g. for recursion).
+</Note>
+
+```javascript
+// Flat style — also valid
+const result = { ...payload, processed_at: dayjs().toISOString() };
+return result;
+```
+
+### The `payload` Object
+
+The payload your function receives always follows this structure:
+
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `payload.id` | `string` | Unique event identifier. **Read-only.** |
+| `payload.type` | `string` | Human-readable event name (e.g. `order.shipped`). **Read-only.** |
+| `payload.timestamp` | `number` | Unix epoch timestamp in milliseconds. **Read-only.** |
+| `payload.data` | `object` | The actual event data. **Fully customizable.** |
+| `payload.data.object` | `object` | The current state of the resource. |
+| `payload.data.previous` | `object \| null` | The previous state, if a change event. |
+
+While `id`, `type`, and `timestamp` should generally be preserved, you have full control over what you return. Kyrazo delivers whatever your function returns.
+
+---
+
+## Pre-injected Utilities
+
+The following utilities are available globally inside every transformer — no `import` needed:
+
+### `_` — Lodash
+
+A comprehensive utility library for data manipulation.
+
+```javascript
+const name = _.get(payload.data.object, 'user.name', 'Unknown');
+const normalized = _.mapValues(payload.data.object, (v) =>
+    _.isString(v) ? v.trim() : v
+);
+```
+
+### `dayjs` — Date & Time
+
+Full-featured date/time parsing and formatting.
+
+```javascript
+const ts = _.isNumber(payload.timestamp) && payload.timestamp < 1e12
+    ? payload.timestamp * 1000
+    : payload.timestamp;
+
+const eventTime = dayjs(ts);
+const age = dayjs().diff(eventTime, 'minute');
+```
+
+### `crypto` — Hashing & Signing
+
+Cryptographic utilities for integrity verification and HMAC signing.
+
+```javascript
+// SHA-256 hash
+const hash = crypto.sha256(JSON.stringify(payload.data.object));
+
+// HMAC signature (e.g. for webhook verification)
+const signature = crypto.hmac('your-secret-key', `${payload.id}:${hash}`);
+```
+
+### `console` — Debug Logging
+
+Use `console.log()` to emit logs visible in the **Test & Debug** tab. These logs are never included in the delivered payload.
+
+```javascript
+console.log('Processing event:', payload.type);
+console.log('Object ID:', payload.data?.object?.id);
+```
+
+<Note>
+  `console.log` output is only visible when using the **Test & Debug** panel in the dashboard. It does not appear in production delivery logs.
+</Note>
+
+---
+
+## Patterns & Examples
+
+### Simple Payload Extension
+
+The most common use case: keep the event structure intact but add extra fields to `data`.
+
+```javascript
+return function transform(payload) {
+    return {
+        ...payload,
+        data: {
+            ...payload.data,
+            processed_at: dayjs().toISOString(),
+            env: 'production',
+        },
+    };
+}(payload);
+```
+
+---
+
+### Renaming & Remapping Fields
+
+Reshape the payload to match your target's expected schema.
+
+```javascript
+return function normalize(payload) {
+    const obj = payload.data?.object || {};
+
+    return {
+        ...payload,
+        data: {
+            customerId: obj.customer_id,
+            totalAmount: obj.amount / 100, // Convert cents to dollars
+            currency: obj.currency?.toUpperCase() ?? 'USD',
+            status: 'DELIVERED',
+        },
+    };
+}(payload);
+```
+
+---
+
+### Change Detection (Diff Engine)
+
+Automatically detect which fields changed between the current and previous state.
+
+```javascript
+return function diffTransform(payload) {
+    const obj = _.cloneDeep(payload.data?.object || {});
+    const prev = _.cloneDeep(payload.data?.previous || null);
+
+    const diff = [];
+
+    if (prev) {
+        const allKeys = _.uniq([...Object.keys(obj), ...Object.keys(prev)]);
+        _.forEach(allKeys, (key) => {
+            if (!_.isEqual(obj[key], prev[key])) {
+                diff.push({ field: key, before: prev[key], after: obj[key] });
+            }
+        });
+    }
+
+    return {
+        ...payload,
+        data: { object: obj, previous: prev },
+        changes: {
+            total: diff.length,
+            added: diff.filter((d) => _.isNil(d.before)).map((d) => d.field),
+            removed: diff.filter((d) => _.isNil(d.after)).map((d) => d.field),
+            updated: diff
+                .filter((d) => !_.isNil(d.before) && !_.isNil(d.after))
+                .map((d) => d.field),
+            fields: diff,
+        },
+    };
+}(payload);
+```
+
+---
+
+### Integrity Signing
+
+Add cryptographic hashes and an HMAC signature to every event so your receiver can verify authenticity.
+
+```javascript
+return function sign(payload) {
+    const eventHash = crypto.sha256(JSON.stringify(payload));
+    const signature = crypto.hmac('kyrazo-secret', `${payload.id}:${eventHash}`);
+
+    return {
+        ...payload,
+        integrity: {
+            hash: eventHash,
+            signature,
+        },
+    };
+}(payload);
+```
+
+Your receiving server can then re-compute the HMAC with the same secret and compare it against the `integrity.signature` field to confirm the payload hasn't been tampered with.
+
+---
+
+### Full Production-Grade Example
+
+This example combines timestamp normalization, deep string cleaning, field-level diffing, entity metadata extraction, and HMAC signing into a single production-ready transformer.
+
+```javascript
+/**
+ * Kyrazo Transformer — Full Example
+ *
+ * Available utilities (no import needed):
+ *  _       → Lodash
+ *  dayjs   → Date/time
+ *  crypto  → crypto.sha256(data), crypto.hmac(key, data)
+ *  console → Visible in Test & Debug tab only
+ */
+return function transform(payload) {
+    const { id: eventId, type: eventType, timestamp: rawTs } = payload;
+
+    const current = _.cloneDeep(payload.data?.object || {});
+    const previous = _.cloneDeep(payload.data?.previous || null);
+
+    // Normalize the timestamp to milliseconds
+    const ts = _.isNumber(rawTs) && rawTs < 1e12 ? rawTs * 1000 : rawTs;
+    const eventTime = dayjs(ts);
+    const now = dayjs();
+
+    // Deep-clean all string values
+    const normalize = (val) => {
+        if (_.isArray(val)) return val.map(normalize);
+        if (_.isPlainObject(val)) return _.mapValues(val, normalize);
+        if (_.isString(val)) return val.trim();
+        return val;
+    };
+
+    const obj = normalize(current);
+    const prev = previous ? normalize(previous) : null;
+
+    // Field-level diff
+    const allKeys = _.uniq([
+        ...Object.keys(obj),
+        ...Object.keys(prev || {}),
+    ]);
+
+    const diff = [];
+    _.forEach(allKeys, (key) => {
+        const before = _.get(prev, key);
+        const after = _.get(obj, key);
+        if (!_.isEqual(before, after)) {
+            diff.push({ field: key, before, after });
+        }
+    });
+
+    // Determine change type
+    const changeType =
+        diff.length === 0 ? 'none'
+        : prev === null   ? 'created'
+        : obj === null    ? 'deleted'
+        :                   'updated';
+
+    // Parse entity and action from event type (e.g. "order.item.shipped")
+    const [entity, action, ...rest] = eventType.split('.');
+
+    // Integrity
+    const rawString = JSON.stringify({ eventId, eventType, ts, obj, prev });
+    const eventHash = crypto.sha256(rawString);
+    const signature = crypto.hmac('kyrazo-secret', `${eventId}:${eventHash}`);
+
+    return {
+        id: eventId,
+        type: eventType,
+        timestamp: ts,
+
+        meta: {
+            entity,
+            action,
+            sub_action: rest.join('.') || null,
+            event_time: eventTime.toISOString(),
+            processed_at: now.toISOString(),
+            latency_ms: now.diff(eventTime),
+        },
+
+        data: { object: obj, previous: prev },
+
+        changes: {
+            total: diff.length,
+            type: changeType,
+            added: diff.filter((d) => _.isNil(d.before)).map((d) => d.field),
+            removed: diff.filter((d) => _.isNil(d.after)).map((d) => d.field),
+            updated: diff
+                .filter((d) => !_.isNil(d.before) && !_.isNil(d.after))
+                .map((d) => d.field),
+            fields: diff,
+        },
+
+        summary: {
+            object_id: _.get(obj, 'id'),
+            object_type: entity,
+            change_type: changeType,
+        },
+
+        integrity: {
+            hash: eventHash,
+            signature,
+        },
+    };
+}(payload);
+```
+
+---
+
+## Testing Your Transformer
+
+Before activating a transformer in production, use the **Test & Debug** tab in the dashboard to validate it against a real or synthetic payload.
+
+1. Navigate to **Transformers** in your dashboard.
+2. Open the transformer you want to test, then click the **Test & Debug** tab.
+3. Paste a sample JSON payload in the **Test Payload** editor.
+4. Click **Run Test**.
+
+The panel will show:
+- **Transformed Output** — the exact payload your targets will receive.
+- **Execution Logs** — any `console.log()` calls from your code.
+- **Execution Time** — how long the transformer took to run (2s limit).
+
+<Tip>
+  You can run tests without saving the transformer. Changes in the editor are tested live against your current unsaved code, so you can iterate freely before committing.
+</Tip>
+
+---
+
+## Versioning
+
+Every time you **Save** a transformer, a new immutable version is created. You can browse previous versions in the **Version History** tab and restore any of them at any time. The **Current** tag always marks the active version being applied to live events.
+
+---
+
+## Activation & Deactivation
+
+A transformer only runs when its status is **Active**. You can toggle a transformer on or off at any time from the Transformers list or the transformer detail page. Toggling does not delete the transformer or its version history.
+
+| Status | Behavior |
+| :--- | :--- |
+| **Active** | Applied to every outgoing event in the namespace. |
+| **Inactive** | Bypassed entirely — the original payload is delivered. |
+
+---
+
+## Error Handling & Fallback
+
+If your transformer throws a runtime error or exceeds the 2-second execution timeout, Kyrazo:
+
+1. Logs the failure in the delivery record.
+2. **Falls back to the original, unmodified payload** and delivers it as-is.
+
+This means your deliveries are never blocked by a broken transformer. However, the target will receive the unmodified payload rather than your intended shape — so monitor the **Dispatch Logs** after deploying a new transformer.
