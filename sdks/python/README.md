@@ -31,9 +31,9 @@ try:
     event = client.events.publish(
         namespace_id="ns_123",
         body={
-            "eventType": "user.signup",
+            "event": "user.signup",
             "payload": {"userId": "user_01", "email": "alice@example.com"},
-            "targets": [{"targetId": "tg_987"}]
+            "targets": ["tg_987"]
         }
     )
     print(f"Event published! ID: {event.event_id}")
@@ -60,17 +60,17 @@ Used for publishing events to webhook targets. Supports single and batch operati
 #### Publish Single Event
 ```python
 response = client.events.publish(namespace_id, body={
-    "eventType": "order.placed",
+    "event": "order.placed",
     "payload": {"order_id": "ord_1"},
-    "targets": [{"targetId": "tgt_abc"}]
+    "targets": ["tgt_abc"]
 })
 ```
 
 #### Batch Publish Events
 ```python
 response = client.events.publish_batch(namespace_id, body=[
-    {"eventType": "user.signup", "payload": {"id": "u_1"}},
-    {"eventType": "user.signup", "payload": {"id": "u_2"}},
+    {"event": "user.signup", "payload": {"id": "u_1"}},
+    {"event": "user.signup", "payload": {"id": "u_2"}},
 ])
 ```
 

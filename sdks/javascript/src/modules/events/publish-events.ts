@@ -43,14 +43,14 @@ export function createPublishEvents(httpClient: HttpClient) {
    * ```typescript
    * const response = await kyrazo.events.batch("namespace-123", [
    *   {
-   *     eventType: "user.created",
+   *     event: "user.created",
    *     payload: { userId: "u_1" },
-   *     targets: [{ targetId: "target-1" }]
+   *     targets: ["target-1"]
    *   },
    *   {
-   *     eventType: "user.created",
+   *     event: "user.created",
    *     payload: { userId: "u_2" },
-   *     targets: [{ targetId: "target-2" }]
+   *     targets: ["target-2"]
    *   }
    * ]);
    *
@@ -96,8 +96,10 @@ export function createPublishEvents(httpClient: HttpClient) {
         throw new ValidationError(`events[${i}] must be an object`);
       }
 
-      if (!event.eventType || typeof event.eventType !== "string") {
-        throw new ValidationError(`events[${i}].eventType is required`);
+      const { event: eventName } = event as any;
+
+      if (!eventName || typeof eventName !== "string") {
+        throw new ValidationError(`events[${i}].event is required`);
       }
 
       if (event.payload === undefined || event.payload === null) {
@@ -113,9 +115,9 @@ export function createPublishEvents(httpClient: HttpClient) {
       // Validate targets
       for (let j = 0; j < event.targets.length; j++) {
         const target = event.targets[j];
-        if (!target?.targetId || typeof target.targetId !== "string") {
+        if (!target || typeof target !== "string") {
           throw new ValidationError(
-            `events[${i}].targets[${j}].targetId is required and must be a string`,
+            `events[${i}].targets[${j}] must be a string (target ID)`,
           );
         }
       }

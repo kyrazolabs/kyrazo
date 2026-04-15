@@ -28,7 +28,7 @@ export interface PublishEventPayload {
    * Should follow the format "resource.action"
    * @required
    */
-  eventType: string;
+  event: string;
 
   /**
    * Event payload data - can be any JSON-serializable object
@@ -42,11 +42,11 @@ export interface PublishEventPayload {
   previous?: any;
 
   /**
-   * Target endpoints to deliver the event to
+   * Target identifiers to deliver the event to
    * At least one target is required
    * @required
    */
-  targets: EventTarget[];
+  targets: string[];
 
 }
 
@@ -173,7 +173,7 @@ export interface Event extends Timestamps {
   producerId: string;
 
   /** Event type (e.g., "user.created") */
-  eventType: string;
+  event: string;
 
   /** Event timestamp as Unix milliseconds */
   timestamp: number;
@@ -240,8 +240,8 @@ export interface ListEventsParams {
   /** Filter by event status */
   status?: EventStatus;
 
-  /** Filter by event type */
-  eventType?: string;
+  /** Filter by event name */
+  event?: string;
 
   /** Filter events from this date (ISO 8601) */
   from?: string;

@@ -7,10 +7,10 @@ import (
 )
 
 const (
-	DefaultBaseURL   = "https://api.kyrazo.com"
-	DefaultTimeout   = 30 * time.Second
+	DefaultBaseURL    = "https://api.kyrazo.com"
+	DefaultTimeout    = 30 * time.Second
 	DefaultMaxRetries = 3
-	SDKVersion       = "1.4.0"
+	SDKVersion        = "1.5.0"
 )
 
 // Client is the main Kyrazo SDK client

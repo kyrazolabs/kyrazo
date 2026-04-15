@@ -39,13 +39,13 @@ export function createPublishEvent(httpClient: HttpClient) {
    * @example Basic usage
    * ```typescript
    * const response = await kyrazo.events.single("namespace-123", {
-   *   eventType: "user.created",
+   *   event: "user.created",
    *   payload: {
    *     userId: "u_123",
    *     email: "user@example.com",
    *     plan: "pro"
    *   },
-   *   targets: [{ targetId: "65a1b2c3d4e5f67890123456" }]
+   *   targets: ["65a1b2c3d4e5f67890123456"]
    * });
    *
    * console.log(`Event ${response.eventId} queued at ${response.queuedAt}`);
@@ -84,10 +84,10 @@ export function createPublishEvent(httpClient: HttpClient) {
       throw new ValidationError("payload is required and must be an object");
     }
 
-    const { eventType, payload: eventData, targets } = payload;
+    const { event, payload: eventData, targets } = payload as any;
 
-    if (!eventType || typeof eventType !== "string") {
-      throw new ValidationError("eventType is required and must be a string");
+    if (!event || typeof event !== "string") {
+      throw new ValidationError("event is required and must be a string");
     }
 
     if (eventData === undefined || eventData === null) {
@@ -100,16 +100,11 @@ export function createPublishEvent(httpClient: HttpClient) {
       );
     }
 
-    // Validate each target
+    // Validate each target (must be a string ID)
     for (let i = 0; i < targets.length; i++) {
       const target = targets[i];
-      if (!target || typeof target !== "object") {
-        throw new ValidationError(`targets[${i}] must be an object`);
-      }
-      if (!target.targetId || typeof target.targetId !== "string") {
-        throw new ValidationError(
-          `targets[${i}].targetId is required and must be a string`,
-        );
+      if (!target || typeof target !== "string") {
+        throw new ValidationError(`targets[${i}] must be a string (target ID)`);
       }
     }
 

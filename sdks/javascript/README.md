@@ -28,7 +28,7 @@ const kyrazo = new Kyrazo({
 // Publish an event
 try {
   const response = await kyrazo.events.single("namespace-id", {
-    eventType: "user.created",
+    event: "user.created",
     payload: {
       user_id: "u_334",
       email: "user@example.com",
@@ -61,17 +61,17 @@ Used for publishing events to webhook targets. Supports single and batch operati
 #### Publish Single Event
 ```typescript
 const response = await kyrazo.events.single(namespaceId, {
-  eventType: "order.placed",
+  event: "order.placed",
   payload: { order_id: "ord_1" },
-  targets: [{ targetId: "tgt_abc" }] // Optional
+  targets: ["tgt_abc"] // Optional
 });
 ```
 
 #### Batch Publish Events
 ```typescript
 const response = await kyrazo.events.batch(namespaceId, [
-  { eventType: "user.signup", payload: { id: "u_1" } },
-  { eventType: "user.signup", payload: { id: "u_2" } },
+  { event: "user.signup", payload: { id: "u_1" } },
+  { event: "user.signup", payload: { id: "u_2" } },
 ]);
 ```
 

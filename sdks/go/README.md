@@ -32,15 +32,13 @@ func main() {
     // Publish an event
     ctx := context.Background()
     resp, err := client.Events.Single(ctx, "namespace-id", models.PublishEvent{
-        EventType: "user.created",
+        Event: "user.created",
         Payload: map[string]interface{}{
             "user_id": "u_334",
             "email":   "user@example.com",
             "plan":    "pro",
         },
-        Targets: []models.EventTarget{
-            {TargetId: "65a1b2c3d4e5f67890123456"},
-        },
+        Targets: []string{"65a1b2c3d4e5f67890123456"},
     })
     if err != nil {
         log.Fatalf("Failed to publish event: %v", err)
@@ -80,16 +78,16 @@ Used for publishing events to webhook targets. Supports single and batch operati
 #### Publish Single Event
 ```go
 resp, err := client.Events.Single(ctx, "ns_123", models.PublishEvent{
-    EventType: "order.placed",
-    Payload:   map[string]interface{}{"order_id": "ord_1"},
+    Event:   "order.placed",
+    Payload: map[string]interface{}{"order_id": "ord_1"},
 })
 ```
 
 #### Batch Publish Events
 ```go
 resp, err := client.Events.Batch(ctx, "ns_123", []models.PublishEvent{
-    {EventType: "user.signup", Payload: map[string]interface{}{"id": "u_1"}},
-    {EventType: "user.signup", Payload: map[string]interface{}{"id": "u_2"}},
+    {Event: "user.signup", Payload: map[string]interface{}{"id": "u_1"}},
+    {Event: "user.signup", Payload: map[string]interface{}{"id": "u_2"}},
 })
 ```
 
