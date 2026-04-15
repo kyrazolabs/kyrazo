@@ -47,7 +47,7 @@ export class DispatcherPipeline {
             }
 
             logger.info(`📨 Processing publish event: ${messageData.eventId}`);
-            logger.info(`DEBUG: Raw messageData: ${JSON.stringify(messageData, null, 2)}`);
+            logger.info(`DEBUG: Raw messageData: ${JSON.stringify(messageData, null, 4)}`);
 
             logger.debug(`[Pipeline] Step 2: Transform`);
             const envelope = dispatcherTransformer.transform(messageData);

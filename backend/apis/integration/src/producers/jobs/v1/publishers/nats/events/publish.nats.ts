@@ -87,7 +87,7 @@ export class PublishEventPublisher {
                 data.workspaceId,
                 data.planSlug,
                 'publish',
-                data.eventType?.toLowerCase() || 'unknown'
+                data.event?.toLowerCase() || 'unknown'
             );
 
             const event: Omit<IPublishedEvent, 'meta'> = {
@@ -95,7 +95,7 @@ export class PublishEventPublisher {
                 workspaceId: data.workspaceId,
                 namespaceId: data.namespaceId,
                 sourceType: data.sourceType,
-                eventType: data.eventType,
+                eventType: data.event,
                 timestamp: data.timestamp,
 
                 data: data.payload,
@@ -173,7 +173,7 @@ export class PublishEventPublisher {
                             item.workspaceId,
                             planSlug,
                             'publish',
-                            item.eventType.toLowerCase()
+                            item.event.toLowerCase()
                         );
 
                         const event: Omit<IPublishedEvent, 'meta' | 'producerId' | 'userId'> = {
@@ -181,7 +181,7 @@ export class PublishEventPublisher {
                             workspaceId: item.workspaceId,
                             namespaceId: item.namespaceId,
                             sourceType: item.sourceType,
-                            eventType: item.eventType,
+                            eventType: item.event,
                             timestamp: item.timestamp,
 
                             data: item.payload,

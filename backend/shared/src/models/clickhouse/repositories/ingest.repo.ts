@@ -13,7 +13,7 @@ export class IngestRepo {
                 logger.warn(
                     `ClickHouse client not available, skipping insert into delivery_attempts`
                 );
-                logger.debug(`Data that would be inserted:`, JSON.stringify(data, null, 2));
+                logger.debug(`Data that would be inserted:`, JSON.stringify(data, null, 4));
                 return;
             }
 
@@ -81,7 +81,7 @@ export class IngestRepo {
             if (data.length > 0) {
                 const event = data[0];
                 const dispatchQuery = `
-                    SELECT 
+                    SELECT
                         target_url AS route_to,
                         meta_priority AS route_priority,
                         meta_max_retries AS route_max_retries,

@@ -489,8 +489,8 @@ export class RedisConfig {
 }
 
 export const REDIS_KEYS = {
-    targetHash: (eventId: string, eventType: string, targetId: string) =>
-        `wh:evt:${eventId}:et:${eventType}:tg:${targetId}`,
+    targetHash: (eventId: string, event: string, targetId: string) =>
+        `wh:evt:${eventId}:et:${event}:tg:${targetId}`,
     eventDeliveredCount: (eventId: string) => `wh:evt:${eventId}:deliv_count`,
     eventTotal: (eventId: string) => `wh:evt:${eventId}:total`,
     dirtyZset: 'wh:dirty', // لتتبع التحديثات
