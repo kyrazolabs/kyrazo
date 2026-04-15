@@ -99,9 +99,9 @@
             </div>
           </th>
           <th class="rounded-xl! border-none!" style="width: 130px">ID</th>
-          <th class="rounded-xl! border-none!" style="min-width: 100px">Version</th>
-          <th pSortableColumn="isActive" class="rounded-xl! border-none!" style="min-width: 100px">
-            <div class="flex items-center gap-2">
+          <th class="rounded-xl! border-none! text-center!" style="min-width: 100px">Version</th>
+          <th pSortableColumn="isActive" class="rounded-xl! border-none! text-center!" style="min-width: 100px">
+            <div class="flex items-center justify-center gap-2">
               Status
               <p-sortIcon field="isActive" />
             </div>
@@ -112,7 +112,7 @@
               <p-sortIcon field="updatedAt" />
             </div>
           </th>
-          <th class="rounded-xl! border-none! text-center" style="min-width: 180px">Actions</th>
+          <th class="rounded-xl! border-none! text-center!" style="min-width: 180px">Actions</th>
         </tr>
       </ng-template>
 
@@ -133,10 +133,10 @@
           <td>
             <app-copy-id [id]="transform.id" />
           </td>
-          <td>
+          <td class="text-center!">
             <p-tag [value]="'v' + transform.currentVersion" severity="info" [rounded]="true" class="text-xs!" />
           </td>
-          <td>
+          <td class="text-center!">
             <p-tag
               [value]="transform.isActive ? 'Active' : 'Inactive'"
               [severity]="transform.isActive ? 'success' : 'danger'"
@@ -149,7 +149,7 @@
               {{ transform.updatedAt | date:'short' }}
             </span>
           </td>
-          <td>
+          <td class="text-center!">
             <div class="flex justify-center gap-2">
               <p-button
                 icon="pi pi-pencil"
