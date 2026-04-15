@@ -5,13 +5,7 @@ const objectIdSchema = z
     .string()
     .regex(/^[0-9a-fA-F]{24}$/, 'Invalid ID format');
 
-const TargetSchema = z.object({
-    targetId: z
-        .string()
-        .min(4, 'Target ID must be more than 4 character ')
-        .optional(),
-    targetUrl: z.string().url('Invalid source URL'),
-});
+
 
 const MetaSchema = z.object({
     priority: z.enum(['low', 'normal', 'high', 'urgent']).default('normal'),
@@ -23,9 +17,9 @@ const EventDataSchema = z.any();
 
 export const PublishEventSchema = z.object({
     sourceId: objectIdSchema.min(1, 'Source ID is required'),
-    eventType: z.string().min(1, 'Event type is required'),
+    event: z.string().min(1, 'Event description is required'),
     payload: EventDataSchema,
-    targets: z.array(TargetSchema).min(1, 'At least one target is required'),
+    targets: z.array(z.string()).min(1, 'At least one target is required'),
     meta: MetaSchema.optional().default(() => ({
         priority: 'normal' as const,
         maxRetries: 3,

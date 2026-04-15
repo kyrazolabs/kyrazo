@@ -22,7 +22,7 @@ export interface IPublishedEvent {
     workspaceId: string;
     sourceType: 'publish' | 'receive';
     namespaceId: string;
-    eventType: string;
+    event: string;
     timestamp: number;
     data: Record<string, any>;
     previous: Record<string, any> | null;
@@ -99,7 +99,7 @@ export interface SQLPublishedEvent {
     namespace_id: string;
     source_id: string;
     producer_id: string;
-    event_type: string;
+    event: string;
 
     timestamp: number;
     data: string; // JSON string

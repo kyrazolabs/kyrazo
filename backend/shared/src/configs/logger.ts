@@ -51,13 +51,13 @@ const devFormat = winston.format.combine(
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
     winston.format.printf(info => {
         const { timestamp, level, message, error, metadata, ...rest } = info;
-        const meta = metadata ? JSON.stringify(metadata, null, 2) : '';
+        const meta = metadata ? JSON.stringify(metadata, null, 4) : '';
         const errorDetails = error
-            ? (error as any).stack || (error as any).message || JSON.stringify(error, null, 2)
+            ? (error as any).stack || (error as any).message || JSON.stringify(error, null, 4)
             : '';
 
         // Include any other properties from rest if they exist
-        const extra = Object.keys(rest).length > 0 ? JSON.stringify(rest, null, 2) : '';
+        const extra = Object.keys(rest).length > 0 ? JSON.stringify(rest, null, 4) : '';
 
         return `${timestamp} ${level}: ${message}${errorDetails ? `\n${errorDetails}` : ''}${meta ? `\nMeta: ${meta}` : ''}${extra ? `\nExtra: ${extra}` : ''}`;
     })

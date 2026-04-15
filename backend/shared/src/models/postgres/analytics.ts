@@ -16,7 +16,7 @@ export const analyticsDispatchDay = pgTable(
 
         // nullable للتوسعة
         targetId: varchar('target_id', { length: 50 }),
-        eventType: varchar('event_type', { length: 100 }),
+        event: varchar('event', { length: 100 }),
         responseCode: integer('response_code'),
 
         bucketDay: date('bucket_day').notNull(),
@@ -38,7 +38,7 @@ export const analyticsDispatchDay = pgTable(
     },
     t => ({
         pk: primaryKey({
-            columns: [t.namespaceId, t.bucketDay, t.targetId, t.eventType, t.responseCode],
+            columns: [t.namespaceId, t.bucketDay, t.targetId, t.event, t.responseCode],
         }),
         namespaceDayIdx: index('dispatch_day_namespace_idx').on(t.namespaceId, t.bucketDay),
     })

@@ -154,7 +154,7 @@ export class EventController {
             const { foundTargets, unfoundTargets } = await EventController.checkTargetsExsisting(
                 workspaceId.toString(),
                 namespaceId,
-                valid.targets.map(t => t.targetId!)
+                valid.targets
             );
 
             if (foundTargets.length === 0) {
@@ -391,7 +391,7 @@ export class EventController {
             const targetIdsSet = new Set<string>();
             valid.forEach(eventData => {
                 eventData.targets.forEach(t => {
-                    if (t.targetId) targetIdsSet.add(t.targetId);
+                    targetIdsSet.add(t);
                 });
             });
 
@@ -411,11 +411,11 @@ export class EventController {
                 const eventUnfoundTargets: string[] = [];
 
                 eventData.targets.forEach(t => {
-                    const found = foundTargetsMap.get(unprefixId(t.targetId!));
+                    const found = foundTargetsMap.get(unprefixId(t));
                     if (found) {
                         eventFoundTargets.push(found);
                     } else {
-                        eventUnfoundTargets.push(t.targetId!);
+                        eventUnfoundTargets.push(t);
                     }
                 });
 

@@ -22,7 +22,7 @@ export interface ISource extends Document {
     forwarding: boolean;
     endpoints: Types.ObjectId[];
 
-    eventTypes?: string[];
+    events?: string[];
 
     // Authentication
     authentication?: ISourceAuthentication;

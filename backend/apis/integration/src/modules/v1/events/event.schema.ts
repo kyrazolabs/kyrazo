@@ -12,10 +12,10 @@ const TargetSchema = z.object({
 
 
 export const PublishEventSchema = z.object({
-    eventType: z.string().min(1, 'Event type is required'),
+    event: z.string().min(1, 'Event description is required'),
     payload: z.any(),
     previous: z.any().optional(),
-    targets: z.array(TargetSchema).min(1, 'At least one target is required'),
+    targets: z.array(z.string()).min(1, 'At least one target is required'),
 });
 
 export const BatchPublishEventsSchema = z.array(PublishEventSchema);
@@ -41,7 +41,8 @@ export const ReceivedEventSchema = z.object({
     associatedEventId: z.string().optional(),
 });
 
-export type TargetInput = z.infer<typeof TargetSchema> & {
+export type TargetInput = {
+    targetId: string;
     targetUrl: string;
 };
 export type PublishedEventInput = z.infer<typeof PublishEventSchema>;

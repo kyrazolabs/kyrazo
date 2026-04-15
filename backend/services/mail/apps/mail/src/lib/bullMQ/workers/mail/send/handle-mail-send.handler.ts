@@ -7,7 +7,7 @@ export class HandleMailSend {
   static send = async (
     job: Omit<z.infer<typeof MailPayloadSchema>, "priority">,
   ): Promise<nodemailer.SentMessageInfo> => {
-    console.log("Processing mail job:", JSON.stringify(job, null, 2));
+    console.log("Processing mail job:", JSON.stringify(job, null, 4));
     const info = await transporter.sendMail({
       from: process.env.SENDER_MAIL!,
       to: job.to,

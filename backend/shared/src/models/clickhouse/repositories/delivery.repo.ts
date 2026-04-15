@@ -15,7 +15,7 @@ export class DeliveryRepo {
                 logger.warn(
                     `ClickHouse client not available, skipping insert into delivery_attempts`
                 );
-                logger.debug(`Data that would be inserted:`, JSON.stringify(data, null, 2));
+                logger.debug(`Data that would be inserted:`, JSON.stringify(data, null, 4));
                 return;
             }
 

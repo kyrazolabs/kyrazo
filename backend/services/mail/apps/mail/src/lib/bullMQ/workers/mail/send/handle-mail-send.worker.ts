@@ -15,7 +15,7 @@ const worker = new Worker<
   queuesName.sendMailQueueName,
   async (job) => {
     console.log("Worker processing job.id:", job.id);
-    console.log("Worker job.data:", JSON.stringify(job.data, null, 2));
+    console.log("Worker job.data:", JSON.stringify(job.data, null, 4));
     try {
       const result = await HandleMailSend.send(job.data);
       console.log("HandleMailSend.send result:", result);
