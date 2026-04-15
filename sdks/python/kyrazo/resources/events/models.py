@@ -2,19 +2,15 @@ from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field, ConfigDict
 
 
-class TargetInput(BaseModel):
-    model_config = ConfigDict(populate_by_name=True)
-    target_id: str = Field(
-        ..., alias="targetId", description="The ID of the target to send the event to."
-    )
+
 
 
 class PublishEventBody(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
-    event_type: str = Field(..., alias="eventType", min_length=1)
+    event: str = Field(..., min_length=1)
     payload: Dict[str, Any] = Field(..., description="The event data payload.")
     previous: Optional[Any] = None
-    targets: List[TargetInput] = Field(..., min_length=1)
+    targets: List[str] = Field(..., min_length=1)
 
 
 class PublishEventResponse(BaseModel):
