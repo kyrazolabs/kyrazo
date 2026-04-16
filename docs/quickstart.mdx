@@ -37,7 +37,7 @@ Now you're ready to send data. Use one of our official SDKs or a simple `curl` c
     ```typescript
     import { Kyrazo } from "@kyrazo/sdk";
 
-    const kyrazo = new Kyrazo({ apiKey: "{YOUR_API_KEY}" });
+    const kyrazo = new Kyrazo("{YOUR_API_KEY}");
 
     await kyrazo.events.single("{NAMESPACE_ID}", {
         event: "user.signup",
@@ -50,7 +50,7 @@ Now you're ready to send data. Use one of our official SDKs or a simple `curl` c
     ```python
     from kyrazo import Kyrazo
 
-    client = Kyrazo(api_key="{YOUR_API_KEY}")
+    client = Kyrazo("{YOUR_API_KEY}")
 
     client.events.publish(
         namespace_id="{NAMESPACE_ID}",
