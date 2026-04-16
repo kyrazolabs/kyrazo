@@ -20,9 +20,13 @@ pnpm add @kyrazo/sdk
 ```typescript
 import { Kyrazo } from "@kyrazo/sdk";
 
-const kyrazo = new Kyrazo({
-  apiKey: "your-api-key",
-  baseURL: "https://api.kyrazo.com", // defaults to production
+// Initialize with only your API key
+const kyrazo = new Kyrazo("your-api-key");
+
+// Or with advanced configuration
+const kyrazo = new Kyrazo("your-api-key", {
+  timeout: 45000,
+  maxRetries: 5,
 });
 
 // Publish an event
@@ -32,7 +36,8 @@ try {
     payload: {
       user_id: "u_334",
       email: "user@example.com",
-    }
+    },
+    targets: ["target-id"],
   });
   console.log("Event queued:", response.eventId);
 } catch (error) {
@@ -42,13 +47,21 @@ try {
 
 ## Configuration
 
-| Option       | Type     | Default                  | Description                            |
-| ------------ | -------- | ------------------------ | -------------------------------------- |
-| `apiKey`     | `string` | **required**             | Your Kyrazo API key                    |
-| `baseURL`    | `string` | `https://api.kyrazo.com` | API base URL                           |
-| `timeout`    | `number` | `30000`                  | Request timeout in milliseconds        |
-| `maxRetries` | `number` | `3`                      | Max retry attempts (exponential backoff)|
-| `headers`    | `object` | `{}`                     | Custom headers to include with requests|
+The `Kyrazo` constructor takes your API key as the first argument and an optional configuration object as the second.
+
+### Constructor Signature
+
+`new Kyrazo(apiKey: string, config?: KyrazoConfig)`
+
+### KyrazoConfig Options
+
+| Option       | Type                     | Default                  | Description                               |
+| ------------ | ------------------------ | ------------------------ | ----------------------------------------- |
+| `apiKey`     | `string`                 | **required**             | Your Kyrazo API key (Passed positionally) |
+| `baseURL`    | `string`                 | `https://api.kyrazo.com` | API base URL                              |
+| `timeout`    | `number`                 | `30000`                  | Request timeout in milliseconds           |
+| `maxRetries` | `number`                 | `3`                      | Max retry attempts (exponential backoff)  |
+| `headers`    | `Record<string, string>` | `{}`                     | Custom headers to include with requests   |
 
 ---
 
@@ -59,15 +72,17 @@ try {
 Used for publishing events to webhook targets. Supports single and batch operations.
 
 #### Publish Single Event
+
 ```typescript
 const response = await kyrazo.events.single(namespaceId, {
   event: "order.placed",
   payload: { order_id: "ord_1" },
-  targets: ["tgt_abc"] // Optional
+  targets: ["tgt_abc"],
 });
 ```
 
 #### Batch Publish Events
+
 ```typescript
 const response = await kyrazo.events.batch(namespaceId, [
   { event: "user.signup", payload: { id: "u_1" } },
@@ -98,11 +113,11 @@ const target = await kyrazo.targets.create(namespaceId, {
 The SDK provides a rich error hierarchy. Each error includes a `code`, `statusCode`, and `requestId`.
 
 ```typescript
-import { 
-  Kyrazo, 
-  RateLimitError, 
-  ValidationError, 
-  AuthenticationError 
+import {
+  Kyrazo,
+  RateLimitError,
+  ValidationError,
+  AuthenticationError,
 } from "@kyrazo/sdk";
 
 try {
@@ -118,17 +133,17 @@ try {
 
 ### Error Code Reference
 
-| Error Class | HTTP Status | Code Example | Description |
-| :--- | :--- | :--- | :--- |
-| `AuthenticationError` | 401 | `UNAUTHORIZED`, `INVALID_API_KEY` | Invalid or missing API key |
-| `ValidationError` | 400 | `VALIDATION_ERROR`, `INVALID_PAYLOAD` | Request failed validation |
-| `ForbiddenError` | 403 | `ACCESS_DENIED`, `INSUFFICIENT_PERMISSIONS` | Insufficient permissions |
-| `LimitExceededError` | 403 | `LIMIT_EXCEEDED` | Monthly event limit exceeded |
-| `RateLimitError` | 429 | `RATE_LIMIT_EXCEEDED` | Too many requests |
-| `ConflictError` | 409 | `CONFLICT`, `IDEMPOTENCY_CONFLICT` | Resource already exists or conflict |
-| `NotFoundError` | 404 | `NOT_FOUND`, `NAMESPACE_NOT_FOUND` | Resource does not exist |
-| `ServerError` | 500+ | `INTERNAL_ERROR`, `PUBLISH_EVENT_FAILED` | Internal server error |
-| `NetworkError` | - | `NETWORK_ERROR` | Connection timeout or fail |
+| Error Class           | HTTP Status | Code Example                                | Description                         |
+| :-------------------- | :---------- | :------------------------------------------ | :---------------------------------- |
+| `AuthenticationError` | 401         | `UNAUTHORIZED`, `INVALID_API_KEY`           | Invalid or missing API key          |
+| `ValidationError`     | 400         | `VALIDATION_ERROR`, `INVALID_PAYLOAD`       | Request failed validation           |
+| `ForbiddenError`      | 403         | `ACCESS_DENIED`, `INSUFFICIENT_PERMISSIONS` | Insufficient permissions            |
+| `LimitExceededError`  | 403         | `LIMIT_EXCEEDED`                            | Monthly event limit exceeded        |
+| `RateLimitError`      | 429         | `RATE_LIMIT_EXCEEDED`                       | Too many requests                   |
+| `ConflictError`       | 409         | `CONFLICT`, `IDEMPOTENCY_CONFLICT`          | Resource already exists or conflict |
+| `NotFoundError`       | 404         | `NOT_FOUND`, `NAMESPACE_NOT_FOUND`          | Resource does not exist             |
+| `ServerError`         | 500+        | `INTERNAL_ERROR`, `PUBLISH_EVENT_FAILED`    | Internal server error               |
+| `NetworkError`        | -           | `NETWORK_ERROR`                             | Connection timeout or fail          |
 
 ---
 

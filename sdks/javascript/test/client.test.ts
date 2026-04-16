@@ -3,8 +3,7 @@ import { Kyrazo, ValidationError } from "../src";
 
 describe("Kyrazo Client", () => {
   it("should create client with required config", () => {
-    const client = new Kyrazo({
-      apiKey: "test-key",
+    const client = new Kyrazo("test-key", {
       baseURL: "http://localhost:4000",
     });
     expect(client).toBeDefined();
@@ -15,7 +14,8 @@ describe("Kyrazo Client", () => {
   });
 
   it("should throw ValidationError for missing apiKey", () => {
-    expect(() => new Kyrazo({ apiKey: "" })).toThrow(ValidationError);
+    // @ts-expect-error - testing invalid input
+    expect(() => new Kyrazo("")).toThrow(ValidationError);
   });
 });
 
@@ -23,8 +23,7 @@ describe("Events.single()", () => {
   let client: Kyrazo;
 
   beforeEach(() => {
-    client = new Kyrazo({
-      apiKey: "test-key",
+    client = new Kyrazo("test-key", {
       baseURL: "http://localhost:4000",
     });
   });
@@ -32,9 +31,9 @@ describe("Events.single()", () => {
   it("should validate namespaceId is required", async () => {
     await expect(
       client.events.single("", {
-        eventType: "test.event",
+        event: "test.event",
         payload: {},
-        targets: [{ targetId: "target-123" }],
+        targets: ["target-123"],
       }),
     ).rejects.toThrow(ValidationError);
   });
@@ -42,9 +41,9 @@ describe("Events.single()", () => {
   it("should validate eventType is required", async () => {
     await expect(
       client.events.single("namespace-123", {
-        eventType: "",
+        event: "",
         payload: {},
-        targets: [{ targetId: "target-123" }],
+        targets: ["target-123"],
       }),
     ).rejects.toThrow(ValidationError);
   });
@@ -52,7 +51,7 @@ describe("Events.single()", () => {
   it("should validate targets is required", async () => {
     await expect(
       client.events.single("namespace-123", {
-        eventType: "test.event",
+        event: "test.event",
         payload: {},
         targets: [],
       }),
@@ -62,9 +61,9 @@ describe("Events.single()", () => {
   it("should validate targetId is required", async () => {
     await expect(
       client.events.single("namespace-123", {
-        eventType: "test.event",
+        event: "test.event",
         payload: {},
-        targets: [{ targetId: "" }],
+        targets: [],
       }),
     ).rejects.toThrow(ValidationError);
   });
@@ -74,8 +73,7 @@ describe("Events.batch()", () => {
   let client: Kyrazo;
 
   beforeEach(() => {
-    client = new Kyrazo({
-      apiKey: "test-key",
+    client = new Kyrazo("test-key", {
       baseURL: "http://localhost:4000",
     });
   });

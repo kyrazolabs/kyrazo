@@ -5,13 +5,13 @@ from kyrazo.core.http_client import HttpClient
 
 
 def test_client_init():
-    client = Kyrazo(api_key="test")
+    client = Kyrazo("test")
     assert isinstance(client._http_client, HttpClient)
     assert client.events is not None
 
 
 def test_context_manager():
-    with Kyrazo(api_key="test") as client:
+    with Kyrazo("test") as client:
         assert isinstance(client, Kyrazo)
     # Underlying client should be closed (though httpx client usage check is internal)
 

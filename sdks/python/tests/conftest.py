@@ -15,7 +15,7 @@ def base_url():
 
 @pytest.fixture
 def client(api_key, base_url):
-    return Kyrazo(api_key=api_key, base_url=base_url)
+    return Kyrazo(api_key, base_url=base_url)
 
 
 @pytest.fixture
