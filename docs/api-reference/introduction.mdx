@@ -78,9 +78,7 @@ import {
   ValidationError,
 } from "@kyrazo/sdk";
 
-const client = new Kyrazo({
-  apiKey: "kz_live.v2.hSuq...",
-});
+const client = new Kyrazo("kz_live.v2.hSuq...");
 
 try {
   // Create a webhook target
@@ -117,7 +115,7 @@ try {
 ```python Python
 from kyrazo import Kyrazo
 
-client = Kyrazo(api_key="your_api_key")
+client = Kyrazo("your_api_key")
 
 # Publish an event
 response = client.events.publish(

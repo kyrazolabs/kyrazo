@@ -26,7 +26,29 @@ Initialize the client with your **API Key** from the [Kyrazo Dashboard](https://
 ```python
 from kyrazo import Kyrazo
 
-client = Kyrazo(api_key="your_api_key_here")
+# Initialize with only your API key (positional)
+client = Kyrazo("your_api_key_here")
+```
+
+## Configuration
+
+The `Kyrazo` constructor accepts the following parameters:
+
+| Parameter | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `api_key` | `str` | Yes | Your Kyrazo API key passed as the first argument. |
+| `base_url` | `str` | No | Custom API base URL as a keyword argument. |
+| `timeout` | `int` | No | Request timeout in seconds. |
+| `retries` | `int` | No | Maximum number of retry attempts. |
+
+### Example with Config
+
+```python
+client = Kyrazo(
+    "your_api_key",
+    timeout=60,
+    retries=5
+)
 
 # Publish a single event
 event = client.events.publish(

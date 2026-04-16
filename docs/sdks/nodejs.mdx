@@ -34,8 +34,34 @@ To get started, you'll need an **API Key** from the [Kyrazo Dashboard](https://k
 ```typescript
 import { Kyrazo } from "@kyrazo/sdk";
 
-const kyrazo = new Kyrazo({
-    apiKey: "your_api_key_here",
+// Initialize with your API key
+const kyrazo = new Kyrazo("your_api_key_here");
+```
+
+## Configuration
+
+The `Kyrazo` constructor accepts the following parameters:
+
+| Parameter | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `apiKey` | `string` | Yes | Your Kyrazo API key passed as the first argument. |
+| `config` | `object` | No | Optional configuration object for advanced settings. |
+
+### Configuration Object (`config`)
+
+| Property | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `baseURL` | `string` | `https://api.kyrazo.com` | Custom API base URL. |
+| `timeout` | `number` | `30000` | Request timeout in milliseconds. |
+| `maxRetries` | `number` | `3` | Maximum number of retry attempts for failed requests. |
+| `headers` | `Record<string, string>` | `{}` | Custom headers to include in every request. |
+
+### Example with Config
+
+```typescript
+const kyrazo = new Kyrazo("your_api_key", {
+    timeout: 60000,
+    maxRetries: 5,
 });
 
 // Publish a single event
