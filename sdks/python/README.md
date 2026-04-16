@@ -23,8 +23,11 @@ poetry add kyrazo
 ```python
 from kyrazo import Kyrazo, KyrazoError
 
-# Initialize the client
-client = Kyrazo(api_key="your_api_key")
+# Initialize with only your API key (positional)
+client = Kyrazo("your_api_key")
+
+# Or with advanced configuration
+client = Kyrazo("your_api_key", timeout=45, retries=5)
 
 try:
     # Publish an event
@@ -44,9 +47,16 @@ except KyrazoError as e:
 
 ## ⚙️ Configuration
 
+The `Kyrazo` constructor takes your API key as the first argument, followed by optional keyword arguments for further configuration.
+
+### Constructor Signature
+`Kyrazo(api_key: str, base_url: str = "...", timeout: int = 30, retries: int = 3)`
+
+### Arguments
+
 | Argument | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `api_key` | `str` | **Required** | Your Kyrazo API key |
+| `api_key` | `str` | **Required** | Your Kyrazo API key (Passed positionally) |
 | `base_url` | `str` | `https://api.kyrazo.com` | API base URL |
 | `timeout` | `int` | `30` | Request timeout in seconds |
 | `retries` | `int` | `3` | Max retry attempts with exponential backoff |

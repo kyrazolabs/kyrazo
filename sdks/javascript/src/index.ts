@@ -11,10 +11,7 @@
  * ```typescript
  * import { Kyrazo } from "@kyrazo/sdk";
  *
- * const kyrazo = new Kyrazo({
- *   apiKey: "your-api-key",
- *   baseURL: "https://api.kyrazo.com"
- * });
+ * const kyrazo = new Kyrazo("your-api-key");
  * ```
  */
 

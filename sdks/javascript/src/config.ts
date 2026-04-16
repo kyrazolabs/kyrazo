@@ -40,9 +40,9 @@ export const DEFAULT_CONFIG = {
 /**
  * Resolves user config with defaults
  */
-export function resolveConfig(config: KyrazoConfig): Required<Omit<KyrazoConfig, "headers">> & Pick<KyrazoConfig, "headers"> {
+export function resolveConfig(apiKey: string, config: Omit<KyrazoConfig, "apiKey"> = {}): Required<Omit<KyrazoConfig, "headers">> & Pick<KyrazoConfig, "headers"> {
     return {
-        apiKey: config.apiKey,
+        apiKey: apiKey,
         baseURL: config.baseURL ?? DEFAULT_CONFIG.baseURL,
         timeout: config.timeout ?? DEFAULT_CONFIG.timeout,
         maxRetries: config.maxRetries ?? DEFAULT_CONFIG.maxRetries,

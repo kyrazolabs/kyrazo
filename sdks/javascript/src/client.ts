@@ -24,8 +24,7 @@ import {
  *
  * @example
  * ```ts
- * const kyrazo = new Kyrazo({
- *   apiKey: "your-api-key",
+ * const kyrazo = new Kyrazo("your-api-key", {
  *   baseURL: "http://localhost:4000"
  * });
  *
@@ -72,18 +71,19 @@ export class Kyrazo {
   /**
    * Create a new Kyrazo SDK instance
    *
-   * @param config - SDK configuration options
+   * @param apiKey - Your Kyrazo API key (positional)
+   * @param config - Optional configuration options
    */
-  constructor(config: KyrazoConfig) {
+  constructor(apiKey: string, config?: Omit<KyrazoConfig, "apiKey">) {
     // Validate API key
-    if (!config.apiKey || typeof config.apiKey !== "string") {
+    if (!apiKey || typeof apiKey !== "string") {
       throw new ValidationError(
         "apiKey is required and must be a non-empty string",
       );
     }
 
     // Resolve configuration with defaults
-    this.config = resolveConfig(config);
+    this.config = resolveConfig(apiKey, config);
 
     // Create HTTP client
     this.httpClient = new HttpClient(this.config);

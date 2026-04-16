@@ -10,7 +10,7 @@
  * @example
  * ```typescript
  * // Access via the Kyrazo client
- * const kyrazo = new Kyrazo({ apiKey: "your-key" });
+ * const kyrazo = new Kyrazo("your-key");
  *
  * // Publish a single event
  * await kyrazo.events.single(namespaceId, payload);
