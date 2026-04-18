@@ -150,7 +150,7 @@ export class TransformService {
                     try {
                         ${code}
                     } catch (e) {
-                        throw new Error("Runtime Error: " + e.message);
+                        throw e;
                     }
                 }).call(this, payload);
             `;

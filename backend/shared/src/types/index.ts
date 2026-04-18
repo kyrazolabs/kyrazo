@@ -34,6 +34,12 @@ export interface IErrorResponse {
     };
 }
 
+export interface ISuccessResponse<D> {
+    success: true;
+    message: string;
+    data: D;
+}
+
 // Re-export common types that might be used across the application
 export interface BaseDocument extends Document {
     _id: Types.ObjectId;
