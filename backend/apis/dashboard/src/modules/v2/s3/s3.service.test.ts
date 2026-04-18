@@ -62,7 +62,7 @@ describe('S3Service', () => {
         // Manual instantiation for DI
         s3Service = new S3ServiceClass(class {
             constructor() { return mockS3ClientInstance; }
-        });
+        } as any);
         
         const repoModule = await import('./s3.repo');
         s3Repo = repoModule.s3Repo;

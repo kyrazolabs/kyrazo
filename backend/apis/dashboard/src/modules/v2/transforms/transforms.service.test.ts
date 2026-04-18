@@ -80,7 +80,7 @@ describe('TransformService', () => {
             const input = { name: 'Bad', code: 'eval("x")' };
             try {
                 await transformService.createTransform(input as any, 'u1', 'w1', 'n1');
-                expect().unreachable();
+                throw new Error('Expected code validation to fail but it passed');
             } catch (e: any) {
                 expect(e.message).toContain('Dangerous code');
             }

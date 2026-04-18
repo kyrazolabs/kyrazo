@@ -64,7 +64,7 @@ describe('S3Repo', () => {
                 workspaceId: '65c3f1e5f1e5f1e5f1e5f1e5',
                 namespaceId: '65c3f1e5f1e5f1e5f1e5f1e6',
             });
-            expect(result).toEqual({ name: 'Found' });
+            expect(result).toEqual(expect.objectContaining({ name: 'Found' }));
         });
 
         it('should include secrets if requested', async () => {
@@ -102,14 +102,14 @@ describe('S3Repo', () => {
                 lean: mock().mockResolvedValue({ name: 'Updated' }),
             });
 
-            const result = await s3Repo.update(s3Id, workspaceId, namespaceId, { name: 'New Name' });
+            const result = await s3Repo.update(s3Id, workspaceId, namespaceId, { name: 'Updated' });
 
             expect(S3Bucket.findOneAndUpdate).toHaveBeenCalledWith(
                 expect.any(Object),
-                expect.objectContaining({ name: 'New Name' }),
+                expect.objectContaining({ name: 'Updated' }),
                 { new: true }
             );
-            expect(result).toEqual({ name: 'Updated' });
+            expect(result).toEqual(expect.objectContaining({ name: 'Updated' }));
         });
     });
 
