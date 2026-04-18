@@ -1,4 +1,5 @@
-import { S3Client } from 'bun';
+import * as bun from 'bun';
+const { S3Client } = bun;
 import { logger } from '@kyrazo/shared';
 
 export interface S3UploadOptions {
@@ -21,6 +22,19 @@ export class S3Service {
     }
 
     /**
+     * Internal factory for S3Client to allow easier mocking in tests
+     */
+    protected getClient(options: S3UploadOptions) {
+        return new S3Client({
+            accessKeyId: options.accessKeyId,
+            secretAccessKey: options.secretAccessKey,
+            bucket: options.bucket,
+            region: options.region,
+            endpoint: options.endpoint,
+        });
+    }
+
+    /**
      * Uploads an object to S3 using Bun's native S3 client
      */
     public async upload(
@@ -29,13 +43,7 @@ export class S3Service {
         options: S3UploadOptions
     ): Promise<{ success: boolean; error?: string }> {
         try {
-            const client = new S3Client({
-                accessKeyId: options.accessKeyId,
-                secretAccessKey: options.secretAccessKey,
-                bucket: options.bucket,
-                region: options.region,
-                endpoint: options.endpoint,
-            });
+            const client = this.getClient(options);
 
             await client.write(key, data);
             
@@ -55,13 +63,7 @@ export class S3Service {
      */
     public async exists(key: string, options: S3UploadOptions): Promise<boolean> {
         try {
-            const client = new S3Client({
-                accessKeyId: options.accessKeyId,
-                secretAccessKey: options.secretAccessKey,
-                bucket: options.bucket,
-                region: options.region,
-                endpoint: options.endpoint,
-            });
+            const client = this.getClient(options);
 
             return await client.exists(key);
         } catch (error: any) {
