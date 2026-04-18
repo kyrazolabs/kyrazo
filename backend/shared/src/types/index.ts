@@ -14,6 +14,8 @@ export * from './workspace.types';
 export * from './target.types';
 export * from './ingest.types';
 export * from './transform.types';
+export * from './s3.types';
+export * from './sqs.types';
 
 export interface IPagination {
     total: number;

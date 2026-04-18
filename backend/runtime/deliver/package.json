@@ -35,6 +35,7 @@
         "typescript-eslint": "^8.45.0"
     },
     "dependencies": {
+        "@aws-sdk/client-sqs": "^3.1032.0",
         "@bull-board/api": "^6.13.0",
         "@bull-board/express": "^6.13.0",
         "@bull-board/ui": "^6.13.0",

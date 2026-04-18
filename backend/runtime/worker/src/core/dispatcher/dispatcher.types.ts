@@ -66,7 +66,7 @@ export interface SignatureResult {
 }
 
 export interface IConfiguredTarget {
-    type: 'target' | 'endpoint';
+    type: 'target' | 'endpoint' | 's3Bucket' | 'asqs';
     targetId: string;
     url: string;
     rateLimit?: number;

@@ -14,6 +14,9 @@ import { env } from '@/app/worker.env';
 import { dispatcherSignature } from '@/core/dispatcher/dispatcher.signature';
 import { dispatchAnalyticsProducer } from '@/services/analytics/dispatch.producer';
 import { sandboxExecutor } from '@/services/sandbox/sandbox.executor';
+import { S3Bucket, ASQS, unprefixId, RedisKeys } from '@kyrazo/shared';
+import { s3Transport } from '../storage/s3.transport';
+import { sqsTransport } from './sqs.transport';
 
 /**
  * Backoff schedule for webhook delivery retries
@@ -197,18 +200,22 @@ export class DispatchConsumer extends EventEmitter {
                 }
             }
 
-            // Perform signing before dispatch
-            logger.debug(`🔏 Signing message for target ${target.url}...`);
-            await job.log(`🔏 Signing message...`);
-            const signatureResult = await dispatcherSignature.sign(
-                finalBody,
-                event.workspaceId,
-                event.namespaceId,
-                target.targetId,
-                target.type
-            );
+            // Perform signing before dispatch (only for targets/endpoints)
+            let signatureHeaders = {};
+            if (target.type === 'target' || target.type === 'endpoint') {
+                logger.debug(`🔏 Signing message for target ${target.url}...`);
+                await job.log(`🔏 Signing message...`);
+                const signatureResult = await dispatcherSignature.sign(
+                    finalBody,
+                    event.workspaceId,
+                    event.namespaceId,
+                    target.targetId,
+                    target.type
+                );
 
-            const signatureHeaders = await dispatcherSignature.buildHeaders(signatureResult);
+                signatureHeaders = await dispatcherSignature.buildHeaders(signatureResult);
+                await job.log(`✅ Message signed`);
+            }
 
             // Merge custom headers if they exist
             if (target.customHeaders) {
@@ -220,12 +227,47 @@ export class DispatchConsumer extends EventEmitter {
             // Update delivery attempt record with final headers and body
             deliveryAttempt.request_header = JSON.stringify(headers);
             deliveryAttempt.request_body = JSON.stringify(finalBody);
-            await job.log(`✅ Message signed`);
-            const method = target.method || 'POST';
-            await job.log(`📤 Sending ${method} request to ${target.url}`);
-            const response = await httpRequester.request(method, target.url, finalBody, {
-                headers: headers,
-            });
+            
+            // 🛠️ ROUTE TO APPROPRIATE TRANSPORT
+            let response: { status: number; duration: number; headers?: any; data?: any; success?: boolean; error?: string };
+
+            if (target.type === 's3Bucket') {
+                const config = await this.getS3Config(target.targetId);
+                if (!config) throw new Error(`S3 Config not found: ${target.targetId}`);
+                
+                await job.log(`📤 Buffering to S3 (Hive Structure)...`);
+                await s3Transport.buffer(finalBody, config);
+                
+                response = {
+                    status: 202, // Accepted
+                    duration: 0,
+                    headers: {},
+                    data: 'Buffered in Redis for 1-minute batch flush',
+                    success: true,
+                };
+            } else if (target.type === 'asqs') {
+                const config = await this.getSQSConfig(target.targetId);
+                if (!config) throw new Error(`SQS Config not found: ${target.targetId}`);
+                
+                await job.log(`📤 Sending to SQS (${config.queueType})...`);
+                const sqsResult = await sqsTransport.send(finalBody, config);
+                
+                response = {
+                    status: sqsResult.success ? 200 : 500,
+                    duration: 0,
+                    headers: {},
+                    data: sqsResult.error || 'Sent to SQS successfully',
+                    success: sqsResult.success,
+                };
+            } else {
+                // Default: HTTP Request
+                const method = target.method || 'POST';
+                await job.log(`📤 Sending ${method} request to ${target.url}`);
+                response = await httpRequester.request(method, target.url, finalBody, {
+                    headers: headers,
+                });
+            }
+
             await job.log(`📥 Received response: ${response.status}`);
 
             // Update delivery attempt with response details
@@ -368,6 +410,36 @@ export class DispatchConsumer extends EventEmitter {
         console.log(
             '🚀 Force processing all waiting jobs... (Note: this is a consumer-only service)'
         );
+    }
+
+    /**
+     * Helper to fetch S3 Config with caching
+     */
+    private async getS3Config(id: string): Promise<any> {
+        const cacheKey = RedisKeys.context.s3Bucket(id);
+        const cached = await redisConfig.getQueueClient().get(cacheKey);
+        if (cached) return JSON.parse(cached);
+
+        const config = await S3Bucket.findById(unprefixId(id)).select('+secretAccessKey +iv').lean();
+        if (config) {
+            await redisConfig.getQueueClient().set(cacheKey, JSON.stringify(config), 'EX', 3600);
+        }
+        return config;
+    }
+
+    /**
+     * Helper to fetch SQS Config with caching
+     */
+    private async getSQSConfig(id: string): Promise<any> {
+        const cacheKey = RedisKeys.context.asqs(id);
+        const cached = await redisConfig.getQueueClient().get(cacheKey);
+        if (cached) return JSON.parse(cached);
+
+        const config = await ASQS.findById(unprefixId(id)).select('+secretAccessKey +iv').lean();
+        if (config) {
+            await redisConfig.getQueueClient().set(cacheKey, JSON.stringify(config), 'EX', 3600);
+        }
+        return config;
     }
 }
 

@@ -17,4 +17,6 @@ export * from './Usage.model';
 export * from './webhook_events_processed.model';
 export * from './Transform.model';
 export * from './TransformVersion.model';
+export * from './S3Bucket.model';
+export * from './ASQS.model';
 export * from './orchestrator';

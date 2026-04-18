@@ -74,7 +74,10 @@ const SourceSchema = new Schema<ISource>(
         name: { type: String, required: true, trim: true },
         description: { type: String },
 
-        service: { type: String, enum: ['stripe', 'paypal'] },
+        service: {
+            type: String,
+            enum: ['stripe', 'paypal', 'github', 'shopify', 'slack', 'webflow'],
+        },
 
         status: {
             type: String,
@@ -87,6 +90,11 @@ const SourceSchema = new Schema<ISource>(
 
         // forwarding
         forwarding: { type: Boolean, default: false },
+        destination: {
+            endpoints: [{ type: Schema.Types.ObjectId, ref: 'Endpoint' }],
+            s3bucket: [{ type: Schema.Types.ObjectId, ref: 'S3Bucket' }],
+            asqs: [{ type: Schema.Types.ObjectId, ref: 'ASQS' }],
+        },
         endpoints: [{ type: Schema.Types.ObjectId, ref: 'Endpoint' }],
 
         // Event types (optional now)

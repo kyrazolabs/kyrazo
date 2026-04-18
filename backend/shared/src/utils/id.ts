@@ -15,6 +15,8 @@ export const ID_PREFIXES = {
     apiKey: 'key',
     transformer: 'trf',
     transformerVersion: 'trv',
+    s3Bucket: 's3b',
+    sqs: 'sqs',
 } as const;
 
 export type IdType = keyof typeof ID_PREFIXES;

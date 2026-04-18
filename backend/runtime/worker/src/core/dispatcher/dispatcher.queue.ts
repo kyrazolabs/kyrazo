@@ -5,6 +5,8 @@ import { redisConfig } from '@/config';
 import { targetRepository } from '@/services/mongo/target.repo';
 import { logger, RedisKeys } from '@kyrazo/shared';
 import { endpointRepository } from '@/services/mongo/endpoint.repo';
+import { s3BucketRepository } from '@/services/mongo/s3bucket.repo';
+import { asqsRepository } from '@/services/mongo/asqs.repo';
 
 export enum JOB_PRIORITIES {
     LOW = 10,
@@ -37,7 +39,7 @@ export class DispatcherQueue extends EventEmitter {
         event: IDispatchedEvent,
         headers: IWebhookHeaders,
         targets: any[],
-        type: 'target' | 'endpoint' = 'target',
+        type: 'target' | 'endpoint' | 's3Bucket' | 'asqs' = 'target',
         transform?: { id: string; code: string }
     ): Promise<void> {
         try {
@@ -65,10 +67,10 @@ export class DispatcherQueue extends EventEmitter {
      */
     private async configureTargets(
         event: IDispatchedEvent,
-        type: 'target' | 'endpoint' = 'target'
+        type: 'target' | 'endpoint' | 's3Bucket' | 'asqs' = 'target'
     ): Promise<
         {
-            type: 'target' | 'endpoint';
+            type: 'target' | 'endpoint' | 's3Bucket' | 'asqs';
             targetId: string;
             url: string;
             rateLimit?: number;
@@ -79,7 +81,7 @@ export class DispatcherQueue extends EventEmitter {
         }[]
     > {
         const targets: {
-            type: 'target' | 'endpoint';
+            type: 'target' | 'endpoint' | 's3Bucket' | 'asqs';
             targetId: string;
             url: string;
             rateLimit?: number;
@@ -192,6 +194,68 @@ export class DispatcherQueue extends EventEmitter {
                         retryCount: endpoint.config.retryCount,
                         customHeaders: endpoint.customHeaders,
                         method: endpoint.method,
+                    });
+                }
+                break;
+            case 's3Bucket':
+                for await (const tar of event.targets) {
+                    if (!tar) continue;
+                    const cacheKey = RedisKeys.context.s3Bucket(tar.targetId);
+                    const cachedRaw = await redisConfig.get(cacheKey);
+                    let s3Bucket: any = cachedRaw ? JSON.parse(cachedRaw) : null;
+
+                    if (!s3Bucket) {
+                        s3Bucket = await s3BucketRepository.getS3BucketById(
+                            tar.targetId,
+                            event.workspaceId,
+                            event.namespaceId
+                        );
+                        if (s3Bucket) {
+                            await redisConfig.set(cacheKey, JSON.stringify(s3Bucket), 60 * 60);
+                        }
+                    }
+
+                    if (!s3Bucket) {
+                        logger.warn(`❌ S3 Bucket not found: ${tar.targetId}`);
+                        continue;
+                    }
+
+                    targets.push({
+                        type: 's3Bucket',
+                        targetId: (s3Bucket.id || s3Bucket._id).toString(),
+                        url: `s3://${s3Bucket.bucketName}`, // Virtual URL for identification
+                        retryCount: 3,
+                    });
+                }
+                break;
+            case 'asqs':
+                for await (const tar of event.targets) {
+                    if (!tar) continue;
+                    const cacheKey = RedisKeys.context.asqs(tar.targetId);
+                    const cachedRaw = await redisConfig.get(cacheKey);
+                    let asqs: any = cachedRaw ? JSON.parse(cachedRaw) : null;
+
+                    if (!asqs) {
+                        asqs = await asqsRepository.getASQSById(
+                            tar.targetId,
+                            event.workspaceId,
+                            event.namespaceId
+                        );
+                        if (asqs) {
+                            await redisConfig.set(cacheKey, JSON.stringify(asqs), 60 * 60);
+                        }
+                    }
+
+                    if (!asqs) {
+                        logger.warn(`❌ ASQS not found: ${tar.targetId}`);
+                        continue;
+                    }
+
+                    targets.push({
+                        type: 'asqs',
+                        targetId: (asqs.id || asqs._id).toString(),
+                        url: asqs.queueUrl,
+                        retryCount: 3,
                     });
                 }
                 break;

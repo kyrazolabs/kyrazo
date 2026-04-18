@@ -60,6 +60,8 @@ export const RedisKeys = {
         activeTransform: (workspaceId: string, namespaceId: string) =>
             `context:transform:active:${unprefixId(workspaceId)}:${unprefixId(namespaceId)}`,
         transformCode: (id: string) => `context:transform:code:${unprefixId(id)}`,
+        s3Bucket: (id: string) => `context:s3-bucket:${unprefixId(id)}`,
+        asqs: (id: string) => `context:asqs:${unprefixId(id)}`,
     },
     ingest: {
         endpoint: (id: string) => `ingest:endpoint:${unprefixId(id)}`,
@@ -70,5 +72,11 @@ export const RedisKeys = {
     idempotency: {
         key: (workspaceId: string, path: string, idempotencyKey: string) =>
             `idempotency:${unprefixId(workspaceId)}:${path}:${idempotencyKey}`,
+    },
+    storage: {
+        s3Batch: (destId: string, hourBucket: string) =>
+            `storage:batch:s3:${unprefixId(destId)}:${hourBucket}`,
+        s3BatchLock: (destId: string, hourBucket: string) =>
+            `storage:batch:s3:${unprefixId(destId)}:${hourBucket}:lock`,
     },
 };
