@@ -14,6 +14,7 @@
     "source": "src/index.ts",
     "scripts": {
         "build": "tsc -p tsconfig.json && cpx \"src/**/*.sql\" dist",
+        "seed": "bun run src/seeds/runner.ts",
         "build:watch": "bun run build && bun run watch",
         "watch": "concurrently -k -n TSC,SQL -c blue,green \"tsc -p tsconfig.json -w\" \"chokidar 'src/**/*.sql' -c 'cpx \\\"src/**/*.sql\\\" dist'\"",
         "rebuild": "rm -rf dist && bun run build",

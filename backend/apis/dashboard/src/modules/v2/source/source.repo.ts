@@ -1,9 +1,4 @@
-import {
-    ISource,
-    Source,
-    transformWithId,
-    unprefixId,
-} from '@kyrazo/shared';
+import { ISource, Source, transformWithId, unprefixId } from '@kyrazo/shared';
 import { ClientSession } from 'mongoose';
 
 export class SourceRepositoryV2 {
@@ -13,16 +8,17 @@ export class SourceRepositoryV2 {
         return transformWithId(savedSource.toJSON(), 'source') as any;
     }
 
-    async findById(
-        id: string,
-        workspaceId: string,
-        namespaceId: string
-    ): Promise<ISource | null> {
+    async findById(id: string, workspaceId: string, namespaceId: string): Promise<ISource | null> {
         const source = await Source.findOne({
             _id: unprefixId(id),
             workspaceId: unprefixId(workspaceId),
             namespaceId: unprefixId(namespaceId),
-        }).lean();
+        })
+            .populate('destination.endpoints')
+            .populate('destination.s3bucket')
+            .populate('destination.asqs')
+            .populate('transformId')
+            .lean();
         return source ? (transformWithId(source, 'source') as any) : null;
     }
 

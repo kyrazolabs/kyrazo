@@ -73,7 +73,20 @@ export class SourceServiceV2 {
             const source = await sourceRepo.findById(id, workspaceId, namespaceId);
             if (!source) throw new Error('Source not found');
 
-            if (data.transformer && source.transformId) {
+            const updateData: any = { ...data };
+            delete updateData.transformer;
+
+            if (data.transformer === null && source.transformId) {
+                // Explicitly requested to unlink/delete the managed transformer
+                await transformRepository.deleteById(
+                    prefixId(source.transformId.toString()!, 'transformer')!,
+                    workspaceId,
+                    namespaceId
+                );
+                updateData.transformId = null;
+                updateData.isManagedTransform = false;
+            } else if (data.transformer && source.transformId) {
+                // Update existing managed transformer
                 await transformRepository.update(
                     prefixId(source.transformId.toString()!, 'transformer')!,
                     workspaceId,
@@ -85,16 +98,29 @@ export class SourceServiceV2 {
                     },
                     userId
                 );
+            } else if (data.transformer && !source.transformId) {
+                // Create new managed transformer if it didn't exist
+                const transform = await transformRepository.create(
+                    {
+                        name: data.transformer.name || `${source.name} Transformer`,
+                        description:
+                            data.transformer.description || `Managed transformer for ${source.name}`,
+                        code: data.transformer.code,
+                        workspaceId: unprefixId(workspaceId) as any,
+                        namespaceId: unprefixId(namespaceId) as any,
+                        isActive: true,
+                    },
+                    userId
+                );
+                updateData.transformId = unprefixId(transform.id);
+                updateData.isManagedTransform = true;
             }
-
-            const updateData: any = { ...data };
-            delete updateData.transformer;
 
             if (data.destination) {
                 updateData.destination = {
-                    endpoints: data.destination.endpoints?.map(fid => unprefixId(fid)) || [],
-                    s3bucket: data.destination.s3bucket?.map(fid => unprefixId(fid)) || [],
-                    asqs: data.destination.asqs?.map(fid => unprefixId(fid)) || [],
+                    endpoints: data.destination.endpoints?.map((fid) => unprefixId(fid)) || [],
+                    s3bucket: data.destination.s3bucket?.map((fid) => unprefixId(fid)) || [],
+                    asqs: data.destination.asqs?.map((fid) => unprefixId(fid)) || [],
                 };
             }
 

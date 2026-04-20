@@ -1,14 +1,16 @@
-import { ASQS, unprefixId } from '@kyrazo/shared';
+import { ASQS, transformWithId, unprefixId } from '@kyrazo/shared';
 import { CreateASQSDto, UpdateASQSDto } from './asqs.types';
 
 export class ASQSRepo {
     async create(data: CreateASQSDto & { workspaceId: string; namespaceId: string; iv: string }) {
-        return await ASQS.create({
+        const asqs = await ASQS.create({
             ...data,
             workspaceId: unprefixId(data.workspaceId),
             namespaceId: unprefixId(data.namespaceId),
             transformId: data.transformId ? unprefixId(data.transformId) : undefined,
         });
+
+        return transformWithId(asqs, 'sqs') as any;
     }
 
     async findById(id: string, workspaceId: string, namespaceId: string, includeSecrets = false) {
@@ -22,14 +24,17 @@ export class ASQSRepo {
             query.select('+secretAccessKey +iv');
         }
 
-        return await query.lean();
+        const asqs = await query.lean();
+        return asqs ? (transformWithId(asqs, 'sqs') as any) : null;
     }
 
     async findByNamespace(workspaceId: string, namespaceId: string) {
-        return await ASQS.find({
+        const asqsQueues = await ASQS.find({
             workspaceId: unprefixId(workspaceId),
             namespaceId: unprefixId(namespaceId),
         }).lean();
+
+        return transformWithId(asqsQueues, 'sqs') as any;
     }
 
     async update(
@@ -38,7 +43,7 @@ export class ASQSRepo {
         namespaceId: string,
         data: UpdateASQSDto & { iv?: string }
     ) {
-        return await ASQS.findOneAndUpdate(
+        const updated = await ASQS.findOneAndUpdate(
             {
                 _id: unprefixId(id),
                 workspaceId: unprefixId(workspaceId),
@@ -50,6 +55,8 @@ export class ASQSRepo {
             },
             { new: true }
         ).lean();
+
+        return updated ? (transformWithId(updated, 'sqs') as any) : null;
     }
 
     async delete(id: string, workspaceId: string, namespaceId: string) {

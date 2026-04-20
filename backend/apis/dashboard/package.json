@@ -3,6 +3,7 @@
     "scripts": {
         "start": "bun run dist/index.js",
         "dev": "bun run --hot src/index.ts",
+        "seed": "bun run ../../shared/src/seeds/runner.ts",
         "tunnel": "bun run src/tunnel.ts",
         "typecheck": "bunx tsc --noEmit",
         "test": "bun test",

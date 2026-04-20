@@ -146,6 +146,8 @@ export function transformWithId<T>(data: T, type: IdType): TransformedWithId<T> 
             transformId: 'transformer',
             transform_id: 'transformer',
             createdBy: 'user',
+            s3bucketId: 's3Bucket',
+            asqsId: 'sqs',
         };
 
         for (const [field, idType] of Object.entries(idFields)) {
@@ -176,12 +178,26 @@ export function transformWithId<T>(data: T, type: IdType): TransformedWithId<T> 
             source: 'source',
             target: 'target',
             endpoint: 'endpoint',
+            endpoints: 'endpoint',
             user: 'user',
         };
 
         for (const [field, idType] of Object.entries(commonRefFields)) {
             if (obj[field] && typeof obj[field] === 'object') {
                 obj[field] = transformWithId(obj[field], idType as IdType);
+            }
+        }
+
+        // Handle destination nested object (Source model)
+        if (obj.destination && typeof obj.destination === 'object') {
+            if (obj.destination.endpoints) {
+                obj.destination.endpoints = transformWithId(obj.destination.endpoints, 'endpoint');
+            }
+            if (obj.destination.s3bucket) {
+                obj.destination.s3bucket = transformWithId(obj.destination.s3bucket, 's3Bucket');
+            }
+            if (obj.destination.asqs) {
+                obj.destination.asqs = transformWithId(obj.destination.asqs, 'sqs');
             }
         }
 

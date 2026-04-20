@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import sourcesV2Router from './source/source.routes';
 import transformsV2Router from './transforms/transforms.routes';
 import s3V2Router from './s3/s3.routes';
 import asqsV2Router from './asqs/asqs.routes';
@@ -8,6 +9,7 @@ import { redisConfig } from '@/configs';
 const router = new Hono();
 
 // Mount V2 routes
+router.route('/sources', sourcesV2Router);
 router.route('/transforms', transformsV2Router);
 router.route('/s3', s3V2Router);
 router.route('/asqs', asqsV2Router);

@@ -65,6 +65,7 @@ export const UpdateSourceSchema = z.object({
             name: z.string().optional(),
             description: z.string().optional(),
         })
+        .nullable()
         .optional(),
 });
 
