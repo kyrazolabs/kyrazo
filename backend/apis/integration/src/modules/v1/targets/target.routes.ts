@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { validate } from '@/core/middlewares/validator.middleware';
+import { validator } from '@/core/middlewares/validator.middleware';
 import { authenticate, checkScope } from '@/core/middlewares/auth.middleware';
 import { targetReadRateLimiter, targetWriteRateLimiter } from './target.rate-limiter';
 import {
@@ -23,8 +23,8 @@ target.post(
     authenticate,
     checkScope('dispatch:target:create'),
     targetWriteRateLimiter,
-    validate('param', GetNamespaceByIdSchema),
-    validate('json', CreateTargetSchema),
+    validator('param', GetNamespaceByIdSchema),
+    validator('json', CreateTargetSchema),
     TargetController.createTarget
 );
 
@@ -33,8 +33,8 @@ target.get(
     authenticate,
     checkScope('dispatch:target:read'),
     targetReadRateLimiter,
-    validate('param', GetNamespaceByIdSchema),
-    validate('query', SearchTargetSchema),
+    validator('param', GetNamespaceByIdSchema),
+    validator('query', SearchTargetSchema),
     TargetController.getTargets
 );
 
@@ -43,7 +43,7 @@ target.get(
     authenticate,
     checkScope('dispatch:target:read'),
     targetReadRateLimiter,
-    validate('param', GetNamespaceByIdSchema.extend(GetTargetByIdSchema.shape)),
+    validator('param', GetNamespaceByIdSchema.extend(GetTargetByIdSchema.shape)),
     TargetController.getTarget
 );
 
@@ -52,7 +52,7 @@ target.get(
     authenticate,
     checkScope('dispatch:target:read'),
     targetReadRateLimiter,
-    validate('param', GetNamespaceByIdSchema.extend(GetTargetByIdSchema.shape)),
+    validator('param', GetNamespaceByIdSchema.extend(GetTargetByIdSchema.shape)),
     TargetController.getTargetSecret
 );
 
@@ -61,8 +61,8 @@ target.patch(
     authenticate,
     checkScope('dispatch:target:update'),
     targetWriteRateLimiter,
-    validate('param', GetNamespaceByIdSchema.extend(GetTargetByIdSchema.shape)),
-    validate('json', UpdateTargetSchema),
+    validator('param', GetNamespaceByIdSchema.extend(GetTargetByIdSchema.shape)),
+    validator('json', UpdateTargetSchema),
     TargetController.updateTarget
 );
 
@@ -71,8 +71,8 @@ target.put(
     authenticate,
     checkScope('dispatch:target:update'),
     targetWriteRateLimiter,
-    validate('param', GetNamespaceByIdSchema.extend(GetTargetByIdSchema.shape)),
-    validate('json', UpdateTargetStatusSchema),
+    validator('param', GetNamespaceByIdSchema.extend(GetTargetByIdSchema.shape)),
+    validator('json', UpdateTargetStatusSchema),
     TargetController.updateTargetStatus
 );
 
@@ -81,7 +81,7 @@ target.delete(
     authenticate,
     checkScope('dispatch:target:delete'),
     targetWriteRateLimiter,
-    validate('param', GetNamespaceByIdSchema.extend(GetTargetByIdSchema.shape)),
+    validator('param', GetNamespaceByIdSchema.extend(GetTargetByIdSchema.shape)),
     TargetController.deleteTarget
 );
 

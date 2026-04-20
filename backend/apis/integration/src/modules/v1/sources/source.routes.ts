@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { validate } from '@/core/middlewares/validator.middleware';
+import { validator } from '@/core/middlewares/validator.middleware';
 import { authenticate, checkScope } from '@/core/middlewares/auth.middleware';
 import {
     CreateSourceSchema,
@@ -16,8 +16,8 @@ source.post(
     '/:namespaceId',
     authenticate,
     checkScope('ingest:source:create'),
-    validate('param', GetNamespaceByIdSchema),
-    validate('json', CreateSourceSchema),
+    validator('param', GetNamespaceByIdSchema),
+    validator('json', CreateSourceSchema),
     SourceController.createSource
 );
 
@@ -25,8 +25,8 @@ source.get(
     '/:namespaceId',
     authenticate,
     checkScope('ingest:source:read'),
-    validate('param', GetNamespaceByIdSchema),
-    validate('query', SearchSourceSchema),
+    validator('param', GetNamespaceByIdSchema),
+    validator('query', SearchSourceSchema),
     SourceController.getSources
 );
 
@@ -34,7 +34,7 @@ source.get(
     '/:namespaceId/:sourceId',
     authenticate,
     checkScope('ingest:source:read'),
-    validate('param', GetNamespaceByIdSchema.extend(GetSourceByIdSchema.shape)),
+    validator('param', GetNamespaceByIdSchema.extend(GetSourceByIdSchema.shape)),
     SourceController.getSource
 );
 
@@ -42,8 +42,8 @@ source.patch(
     '/:namespaceId/:sourceId',
     authenticate,
     checkScope('ingest:source:update'),
-    validate('param', GetNamespaceByIdSchema.extend(GetSourceByIdSchema.shape)),
-    validate('json', UpdateSourceSchema),
+    validator('param', GetNamespaceByIdSchema.extend(GetSourceByIdSchema.shape)),
+    validator('json', UpdateSourceSchema),
     SourceController.updateSource
 );
 
@@ -51,7 +51,7 @@ source.delete(
     '/:namespaceId/:sourceId',
     authenticate,
     checkScope('ingest:source:delete'),
-    validate('param', GetNamespaceByIdSchema.extend(GetSourceByIdSchema.shape)),
+    validator('param', GetNamespaceByIdSchema.extend(GetSourceByIdSchema.shape)),
     SourceController.deleteSource
 );
 

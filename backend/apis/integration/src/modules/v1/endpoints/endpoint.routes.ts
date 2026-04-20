@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { validate } from '@/core/middlewares/validator.middleware';
+import { validator } from '@/core/middlewares/validator.middleware';
 import { authenticate, checkScope } from '@/core/middlewares/auth.middleware';
 import {
     CreateEndpointSchema,
@@ -17,8 +17,8 @@ endpoint.post(
     '/:namespaceId',
     authenticate,
     checkScope('ingest:endpoint:create'),
-    validate('param', GetNamespaceByIdSchema),
-    validate('json', CreateEndpointSchema),
+    validator('param', GetNamespaceByIdSchema),
+    validator('json', CreateEndpointSchema),
     EndpointController.createEndpoint
 );
 
@@ -26,8 +26,8 @@ endpoint.get(
     '/:namespaceId',
     authenticate,
     checkScope('ingest:endpoint:read'),
-    validate('param', GetNamespaceByIdSchema),
-    validate('query', SearchEndpointSchema),
+    validator('param', GetNamespaceByIdSchema),
+    validator('query', SearchEndpointSchema),
     EndpointController.getEndpoints
 );
 
@@ -35,7 +35,7 @@ endpoint.get(
     '/:namespaceId/:endpointId',
     authenticate,
     checkScope('ingest:endpoint:read'),
-    validate('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
+    validator('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
     EndpointController.getEndpoint
 );
 
@@ -43,7 +43,7 @@ endpoint.get(
     '/:namespaceId/:endpointId/secret',
     authenticate,
     checkScope('ingest:endpoint:read'),
-    validate('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
+    validator('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
     EndpointController.getEndpointSecret
 );
 
@@ -51,8 +51,8 @@ endpoint.patch(
     '/:namespaceId/:endpointId',
     authenticate,
     checkScope('ingest:endpoint:update'),
-    validate('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
-    validate('json', UpdateEndpointSchema),
+    validator('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
+    validator('json', UpdateEndpointSchema),
     EndpointController.updateEndpoint
 );
 
@@ -60,8 +60,8 @@ endpoint.put(
     '/:namespaceId/:endpointId',
     authenticate,
     checkScope('ingest:endpoint:update'),
-    validate('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
-    validate('json', UpdateEndpointStatusSchema),
+    validator('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
+    validator('json', UpdateEndpointStatusSchema),
     EndpointController.updateEndpoint
 );
 
@@ -69,7 +69,7 @@ endpoint.delete(
     '/:namespaceId/:endpointId',
     authenticate,
     checkScope('ingest:endpoint:delete'),
-    validate('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
+    validator('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
     EndpointController.deleteEndpoint
 );
 

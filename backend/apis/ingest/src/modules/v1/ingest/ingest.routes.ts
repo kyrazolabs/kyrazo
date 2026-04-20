@@ -1,6 +1,6 @@
 import { Hono, type Context } from 'hono';
 import z from 'zod';
-import { validate } from '@/core/middlewares/validator.middleware';
+import { validator } from '@/core/middlewares/validator.middleware';
 import { ingestController } from './ingest.controller';
 import { redisConfig } from '@/configs';
 import {
@@ -44,7 +44,7 @@ ingest.post('/', getIngestRateLimiter(), async (c: Context) => {
 
 ingest.post(
     '/:service/:IEId',
-    validate(
+    validator(
         'param',
         z.object({
             service: z.string('Invalid service').min(5, 'Service is required'),
@@ -58,7 +58,7 @@ ingest.post(
 
 ingest.post(
     '/:IEId',
-    validate(
+    validator(
         'param',
         z.object({
             IEId: z.string('Invalid Ingress Endpoint').min(5, 'Ingress Endpoint is required'),
