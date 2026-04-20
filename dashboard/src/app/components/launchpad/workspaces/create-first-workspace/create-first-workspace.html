@@ -10,7 +10,7 @@
                 Workspace Name *
             </label>
             <input pInputText id="name" formControlName="name" placeholder="e.g. My Awesome Team"
-                class="w-full rounded-xl!" [class.p-invalid]="form.get('name')?.invalid && form.get('name')?.touched">
+                class="w-full rounded-xl!" [class.p-invalid]="form.get('name')?.invalid && form.get('name')?.touched" pSize="small">
             <small class="text-red-500" *ngIf="form.get('name')?.invalid && form.get('name')?.touched">
                 Workspace name is required (min 3 chars).
             </small>
@@ -22,11 +22,11 @@
             </label>
             <textarea pInputText id="description" formControlName="description"
                 placeholder="What is this workspace for?"
-                class="w-full rounded-xl! min-h-[100px]"></textarea>
+                class="w-full rounded-xl! min-h-[100px]" pSize="small"></textarea>
         </div>
 
         <div appScrollReveal delay="delay-500" class="pt-4">
-            <p-button type="submit" label="Continue" [loading]="loading()" styleClass="w-full rounded-xl! py-3"
+            <p-button type="submit" label="Continue" [loading]="loading()" styleClass="w-full rounded-xl! py-3 shadow-md shadow-primary/50 dark:shadow-primary/20"
                 icon="pi pi-arrow-right" iconPos="right"></p-button>
         </div>
     </form>

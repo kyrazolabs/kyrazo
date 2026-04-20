@@ -11,7 +11,7 @@
         <div class="flex items-center gap-4">
             <p-select [(ngModel)]="selectedTimeRange" [options]="timeRangeOptions" optionLabel="label"
                 [variant]="'outlined'" optionValue="value" placeholder="Select time range"
-                class="rounded-xl! custom-select-panel" (onChange)="onTimeRangeChange()" size="small" />
+                class="rounded-xl! custom-select-panel" (onChange)="onTimeRangeChange()" size="small" appendTo="body" />
             <p-button label="Export" icon="pi pi-download" [outlined]="true" severity="secondary"
                 styleClass="rounded-xl!" size="small" />
         </div>
@@ -40,7 +40,7 @@
                     <!-- Name -->
                     <div class="flex flex-col gap-2">
                         <label class="font-semibold text-surface-900 dark:text-surface-0">Target Name</label>
-                        <input pInputText [value]="targetEntity.name" [disabled]="true" class="w-full rounded-xl!" />
+                        <input pInputText [value]="targetEntity.name" [disabled]="true" class="w-full rounded-xl!"  pSize="small" />
                     </div>
 
                     <!-- URL -->
@@ -48,7 +48,7 @@
                         <label class="font-semibold text-surface-900 dark:text-surface-0">Target URL</label>
                         <div class="flex items-center gap-2">
                             <input pInputText [value]="targetEntity.url" [disabled]="true"
-                                class="w-full rounded-xl! font-mono text-sm" />
+                                class="w-full rounded-xl! font-mono text-sm"  pSize="small" />
                             <p-button icon="pi pi-copy" [outlined]="true" size="small" styleClass="rounded-xl!"
                                 pTooltip="Copy URL" tooltipStyleClass="text-xs! rounded-xl!" tooltipPosition="top"
                                 (onClick)="copyToClipboard(targetEntity.url)" />
@@ -60,7 +60,7 @@
                         <label class="font-semibold text-surface-900 dark:text-surface-0">Description</label>
                         <textarea pTextarea [value]="targetEntity.description || 'No description provided'"
                             [disabled]="true" rows="4" class="w-full rounded-xl!"
-                            [class.italic]="!targetEntity.description"></textarea>
+                            [class.italic]="!targetEntity.description" pSize="small"></textarea>
                     </div>
                 </div>
             </p-card>
@@ -72,10 +72,10 @@
                     @for (header of targetEntity.customHeaders | keyvalue; track header.key) {
                     <div class="flex flex-wrap md:flex-nowrap gap-3 items-center">
                         <input pInputText [value]="header.key" [disabled]="true" class="w-full md:w-1/3 rounded-xl!"
-                            placeholder="Key" />
+                            placeholder="Key"  pSize="small" />
                         <div class="flex flex-1 items-center gap-2 w-full">
                             <input pInputText [value]="header.value" [disabled]="true"
-                                class="w-full rounded-xl! font-mono text-sm" placeholder="Value" />
+                                class="w-full rounded-xl! font-mono text-sm" placeholder="Value"  pSize="small" />
                             <p-button icon="pi pi-copy" [outlined]="true" size="small" styleClass="rounded-xl!"
                                 pTooltip="Copy Value" tooltipPosition="left" tooltipStyleClass="text-xs! rounded-xl!"
                                 (onClick)="copyToClipboard(header.value)" />
@@ -146,7 +146,7 @@
                             <p-inputicon class="relative!">
                                 <span class="icon-[hugeicons--arrow-data-transfer-horizontal] size-5 absolute top-1/2 -translate-y-1/2 "></span>
                             </p-inputicon>
-                            <input pInputText [value]="targetEntity.method || 'POST'" [disabled]="true" class="w-full rounded-xl! pl-9!" />
+                            <input pInputText [value]="targetEntity.method || 'POST'" [disabled]="true" class="w-full rounded-xl! pl-9!"  pSize="small" />
                         </p-iconfield>
                     </div>
 
@@ -211,7 +211,7 @@
                                 [type]="isSecretVisible() ? 'text' : 'password'"
                                 [value]="signingSecret() || '********************************'"
                                 [disabled]="true"
-                                class="w-full rounded-xl! font-mono text-sm" />
+                                class="w-full rounded-xl! font-mono text-sm"  pSize="small" />
 
                              <p-button
                                 [icon]="loadingSecret() ? 'pi pi-spin pi-spinner' : (isSecretVisible() ? 'pi pi-eye-slash' : 'pi pi-eye')"

@@ -37,6 +37,7 @@ import { TagModule } from 'primeng/tag';
 import { TabsModule } from 'primeng/tabs';
 import { TooltipModule } from 'primeng/tooltip';
 import { CodeEditorComponent } from '@shared/components/code-editor/code-editor.component';
+import { FloatLabelModule } from 'primeng/floatlabel';
 
 @Component({
     selector: 'app-transform-form',
@@ -57,6 +58,7 @@ import { CodeEditorComponent } from '@shared/components/code-editor/code-editor.
         CodeEditorComponent,
         TagModule,
         TooltipModule,
+        FloatLabelModule,
     ],
     templateUrl: './transform-form.component.html',
     styleUrls: ['./transform-form.component.scss'],

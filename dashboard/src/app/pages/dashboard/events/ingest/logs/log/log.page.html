@@ -52,7 +52,7 @@
                         [value]="ingestEvent.provider"
                         [readonly]="true"
                         class="w-full rounded-xl!"
-                    />
+                     pSize="small" />
                 </div>
                 <div class="flex flex-col sm:flex-row gap-4">
                     <div>
@@ -96,7 +96,7 @@
                         [value]="ingestEvent.processing_error"
                         [readonly]="true"
                         class="w-full rounded-xl!"
-                    />
+                     pSize="small" />
                 </div>
 
                 <div *ngIf="ingestEvent.associated_event_id">
@@ -110,7 +110,7 @@
                         [value]="ingestEvent.associated_event_id"
                         [readonly]="true"
                         class="w-full font-mono rounded-xl!"
-                    />
+                     pSize="small" />
                 </div>
 <!--
                 <div *ngIf="ingestEvent.route_to">
@@ -124,7 +124,7 @@
                         [value]="ingestEvent.route_to"
                         [readonly]="true"
                         class="w-full rounded-xl!"
-                    />
+                     pSize="small" />
                 </div>
 
 
@@ -139,7 +139,7 @@
                         [value]="ingestEvent.route_max_retries"
                         [readonly]="true"
                         class="w-full rounded-xl!"
-                    />
+                     pSize="small" />
                 </div>
 
                 <div *ngIf="ingestEvent.route_inserted_at">
@@ -153,7 +153,7 @@
                         [value]="ingestEvent.route_inserted_at"
                         [readonly]="true"
                         class="w-full rounded-xl!"
-                    />
+                     pSize="small" />
                 </div> -->
 
 
@@ -169,7 +169,7 @@
                             [value]="ingestEvent.received_at"
                             [readonly]="true"
                             class="w-full rounded-xl!"
-                        />
+                         pSize="small" />
                     </div>
                     <div>
                         <label
@@ -182,7 +182,7 @@
                             [value]="ingestEvent.processed_at"
                             [readonly]="true"
                             class="w-full rounded-xl!"
-                        />
+                         pSize="small" />
                     </div>
                 </div>
             </div>

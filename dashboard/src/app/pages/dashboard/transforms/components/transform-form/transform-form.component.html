@@ -21,8 +21,10 @@
           <form [formGroup]="transformForm" class="space-y-4 mt-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="flex flex-col gap-2">
-                <label for="name" class="font-semibold text-sm">Name</label>
-                <input pInputText id="name" formControlName="name" placeholder="Transform name" class="rounded-xl!" />
+                <p-floatlabel variant="on">
+                  <input pInputText id="name" formControlName="name" class="w-full rounded-xl!" pSize="small" />
+                  <label for="name">Name</label>
+                </p-floatlabel>
               </div>
               <div class="flex flex-col gap-2">
                 <label for="isActive" class="font-semibold text-sm">Active</label>
@@ -34,8 +36,11 @@
             </div>
 
             <div class="flex flex-col gap-2">
-              <label for="description" class="font-semibold text-sm">Description</label>
-              <textarea pTextarea id="description" formControlName="description" rows="2" placeholder="Describe what this transform does" class="rounded-xl!"></textarea>
+              <p-floatlabel variant="on">
+                <textarea pTextarea id="description" formControlName="description" rows="2"
+                  class="w-full rounded-xl!" pSize="small"></textarea>
+                <label for="description">Description</label>
+              </p-floatlabel>
             </div>
 
             <div class="flex flex-col gap-2 h-[400px]">
@@ -59,8 +64,8 @@
             </div>
 
             <div class="flex justify-end gap-3 pt-4">
-              <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="cancel()" [disabled]="loading()" styleClass="rounded-xl!" />
-              <p-button [label]="isEditing() ? 'Update' : 'Create'" (onClick)="onSubmit()" [loading]="loading()" styleClass="rounded-xl!" />
+              <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="cancel()" [disabled]="loading()" styleClass="rounded-xl!" size="small" />
+              <p-button [label]="isEditing() ? 'Update' : 'Create'" (onClick)="onSubmit()" [loading]="loading()" styleClass="rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20" size="small" />
             </div>
           </form>
         </p-tabpanel>

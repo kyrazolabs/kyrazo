@@ -28,7 +28,7 @@
                 [disabled]="isLimitReached()"
                 [pTooltip]="isLimitReached() ? 'Namespace limit reached for your plan' : ''"
                 tooltipPosition="bottom"
-                styleClass="rounded-xl!"
+                styleClass="rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20"
             />
         </div>
     </div>
@@ -46,7 +46,7 @@
                     [(ngModel)]="searchQuery"
                     (input)="onSearch()"
                     placeholder="Search namespaces..."
-                    class="w-full md:w-80 rounded-xl!" />
+                    class="w-full md:w-80 rounded-xl!"  pSize="small" />
             </p-iconfield>
         </div>
     </p-card> -->
@@ -169,7 +169,7 @@
                             <p-button
                                 label="Create Namespace"
                                 severity="primary"
-                                styleClass="rounded-xl!"
+                                styleClass="rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20"
                                 size="small"
                                 (onClick)="openNew()"
                                 [disabled]="isLimitReached()"

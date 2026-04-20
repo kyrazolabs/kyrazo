@@ -12,7 +12,7 @@
             <p-button label="Refresh" icon="pi pi-refresh" size="small" severity="secondary" [outlined]="true"
                 (onClick)="refreshEndpoints()" [loading]="loader.loading$ | async" styleClass="w-full sm:w-auto rounded-xl!" />
             <p-button label="Add Endpoint" icon="pi pi-plus" size="small" (onClick)="openCreateDialog()"
-                styleClass="w-full sm:w-auto rounded-xl!" />
+                styleClass="w-full sm:w-auto rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20" />
         </div>
     </div>
 
@@ -24,7 +24,7 @@
                     <i class="pi pi-search"></i>
                 </p-inputicon>
                 <input pInputText type="text" (input)="onSearchInput($event)" [value]="searchQuery"
-                    placeholder="Search endpoints..." class="w-full md:w-80 rounded-xl!" />
+                    placeholder="Search endpoints..." class="w-full md:w-80 rounded-xl!"  pSize="small" />
             </p-iconfield>
 
             <div class="flex flex-wrap gap-2">
@@ -144,7 +144,7 @@
                                         size="small" [outlined]="true" (onClick)="refreshEndpoints()" styleClass="rounded-xl!"
                                         *ngIf="searchQuery || activeFilter !== 'all'" />
                                     <p-button label="Add Endpoint" icon="pi pi-plus"
-                                        (onClick)="openCreateDialog()" size="small" styleClass="rounded-xl!" />
+                                        (onClick)="openCreateDialog()" size="small" styleClass="rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20" />
                                 </div>
                             </div>
                         </div>

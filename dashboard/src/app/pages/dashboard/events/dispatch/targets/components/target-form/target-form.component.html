@@ -45,17 +45,17 @@
                 <div class="grid grid-cols-1 gap-6">
                      <!-- Name Field -->
                     <div class="flex flex-col gap-2">
-                        <label for="name" class="font-semibold text-surface-900 dark:text-surface-0">
-                            Name <span class="text-red-500">*</span>
-                        </label>
-                        <input id="name" type="text" pInputText formControlName="name" placeholder="My Webhook Target" class="w-full rounded-xl!"
-                            [class.ng-invalid]="targetForm.get('name')?.invalid && targetForm.get('name')?.touched" />
+                        <p-floatlabel variant="on">
+                            <input id="name" type="text" pInputText formControlName="name" class="w-full rounded-xl!" pSize="small"
+                                [class.ng-invalid]="targetForm.get('name')?.invalid && targetForm.get('name')?.touched" />
+                            <label for="name">Name *</label>
+                        </p-floatlabel>
                         @if (targetForm.get('name')?.hasError('required') && targetForm.get('name')?.touched) {
-                            <small class="text-red-500">
+                            <small class="text-red-500 text-xs italic ml-1">
                                 Name is required
                             </small>
                         } @if (targetForm.get('name')?.hasError('minlength') && targetForm.get('name')?.touched) {
-                            <small class="text-red-500">
+                            <small class="text-red-500 text-xs italic ml-1">
                                 Name must be at least 3 characters
                             </small>
                         }
@@ -66,37 +66,36 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <!-- URL Field -->
                     <div class="flex flex-col gap-2 md:col-span-2">
-                        <label for="url" class="font-semibold text-surface-900 dark:text-surface-0">
-                            Target URL <span class="text-red-500">*</span>
-                        </label>
-                        <p-iconfield iconPosition="left" class="w-full">
-                            <p-inputicon>
-                                <i class="pi pi-link"></i>
-                            </p-inputicon>
-                            <input id="url" type="url" pInputText formControlName="url" class="w-full rounded-xl!"
-                                placeholder="https://api.example.com/webhook"
-                                [class.ng-invalid]="targetForm.get('url')?.invalid && targetForm.get('url')?.touched" />
-                        </p-iconfield>
+                        <p-floatlabel variant="on">
+                            <p-iconfield iconPosition="left" class="w-full">
+                                <p-inputicon>
+                                    <i class="pi pi-link"></i>
+                                </p-inputicon>
+                                <input id="url" type="url" pInputText formControlName="url" class="w-full rounded-xl!" pSize="small"
+                                    [class.ng-invalid]="targetForm.get('url')?.invalid && targetForm.get('url')?.touched" />
+                            </p-iconfield>
+                            <label for="url">Target URL *</label>
+                        </p-floatlabel>
                         @if (targetForm.get('url')?.hasError('required') && targetForm.get('url')?.touched) {
-                            <small class="text-red-500">
+                            <small class="text-red-500 text-xs italic ml-1">
                                 URL is required
                             </small>
                         }
                         @if (targetForm.get('url')?.hasError('pattern') && targetForm.get('url')?.touched) {
-                            <small class="text-red-500">
+                            <small class="text-red-500 text-xs italic ml-1">
                                 Valid HTTPS URL is required
                             </small>
                         }
                     </div>
                     <!-- Method Field -->
                     <div class="flex flex-col gap-2">
-                        <label for="method" class="font-semibold text-surface-900 dark:text-surface-0">
-                            HTTP Method <span class="text-red-500">*</span>
-                        </label>
-                        <p-select id="method" [options]="methodOptions" formControlName="method" optionLabel="label"
-                            optionValue="value" placeholder="Select Method" styleClass="w-full rounded-xl!" size="small"/>
+                        <p-floatlabel variant="on">
+                            <p-select id="method" [options]="methodOptions" formControlName="method" optionLabel="label"
+                                optionValue="value" styleClass="w-full rounded-xl!" panelStyleClass="rounded-xl!" size="small" appendTo="body"/>
+                            <label for="method">HTTP Method *</label>
+                        </p-floatlabel>
                         @if (targetForm.get('method')?.hasError('required') && targetForm.get('method')?.touched) {
-                            <small class="text-red-500">
+                            <small class="text-red-500 text-xs italic ml-1">
                                 HTTP Method is required
                             </small>
                         }
@@ -105,11 +104,11 @@
 
                 <!-- Description -->
                 <div class="flex flex-col gap-2">
-                    <label for="description" class="font-semibold text-surface-900 dark:text-surface-0">
-                        Description
-                    </label>
-                    <textarea id="description" pTextarea formControlName="description" rows="3"
-                        placeholder="Optional description for this target" class="w-full rounded-xl!"></textarea>
+                    <p-floatlabel variant="on">
+                        <textarea id="description" pTextarea formControlName="description" rows="3"
+                            class="w-full rounded-xl!" pSize="small"></textarea>
+                        <label for="description">Description (Optional)</label>
+                    </p-floatlabel>
                 </div>
 
                 <!-- Enabled Checkbox -->
@@ -130,18 +129,18 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Timeout -->
                 <div class="flex flex-col gap-2">
-                    <label for="timeout" class="font-semibold text-surface-900 dark:text-surface-0">
-                        Timeout (ms)
-                    </label>
-                    <p-inputNumber id="timeout" formControlName="timeout" [min]="100" [max]="60000"
-                        [showButtons]="false" suffix=" ms" inputStyleClass="rounded-xl!" styleClass="w-full"
-                        [disabled]="!hasCustomTimeout()" [pTooltip]="!hasCustomTimeout() ? 'Custom timeout is not included in your plan' : ''" tooltipPosition="top"
-                        [attr.aria-describedby]="!hasCustomTimeout() ? 'timeout-pro-note' : 'timeout-help'" />
-                    <small id="timeout-help" class="text-surface-600 dark:text-surface-400">
+                    <p-floatlabel variant="on">
+                        <p-inputNumber id="timeout" formControlName="timeout" [min]="100" [max]="60000"
+                            [showButtons]="false" suffix=" ms" inputStyleClass="w-full rounded-xl!" styleClass="w-full" size="small"
+                            [disabled]="!hasCustomTimeout()" [pTooltip]="!hasCustomTimeout() ? 'Custom timeout is not included in your plan' : ''" tooltipPosition="top"
+                            [attr.aria-describedby]="!hasCustomTimeout() ? 'timeout-pro-note' : 'timeout-help'" />
+                        <label for="timeout">Timeout (ms)</label>
+                    </p-floatlabel>
+                    <small id="timeout-help" class="text-xs text-surface-600 dark:text-surface-400 italic ml-1">
                         Max wait time for response
                     </small>
                     @if (!hasCustomTimeout()) {
-                        <small id="timeout-pro-note" role="note" class="text-primary font-medium">
+                        <small id="timeout-pro-note" role="note" class="text-primary font-medium text-xs italic ml-1">
                             Included in Pro plan
                         </small>
                     }
@@ -149,18 +148,18 @@
 
                 <!-- Retry Count -->
                 <div class="flex flex-col gap-2">
-                    <label for="retryCount" class="font-semibold text-surface-900 dark:text-surface-0">
-                        Retry Count
-                    </label>
-                    <p-inputNumber id="retryCount" formControlName="retryCount" [min]="0" [max]="10"
-                        [showButtons]="false" inputStyleClass="rounded-xl!" styleClass="w-full"
-                        [disabled]="!hasCustomRetries()" [pTooltip]="!hasCustomRetries() ? 'Custom retries are not included in your plan' : ''" tooltipPosition="top"
-                        [attr.aria-describedby]="!hasCustomRetries() ? 'retries-pro-note' : 'retries-help'" />
-                    <small id="retries-help" class="text-surface-600 dark:text-surface-400">
+                    <p-floatlabel variant="on">
+                        <p-inputNumber id="retryCount" formControlName="retryCount" [min]="0" [max]="10"
+                            [showButtons]="false" inputStyleClass="w-full rounded-xl!" styleClass="w-full" size="small"
+                            [disabled]="!hasCustomRetries()" [pTooltip]="!hasCustomRetries() ? 'Custom retries are not included in your plan' : ''" tooltipPosition="top"
+                            [attr.aria-describedby]="!hasCustomRetries() ? 'retries-pro-note' : 'retries-help'" />
+                        <label for="retryCount">Retry Count</label>
+                    </p-floatlabel>
+                    <small id="retries-help" class="text-xs text-surface-600 dark:text-surface-400 italic ml-1">
                         Attempts on failure
                     </small>
                     @if (!hasCustomRetries()) {
-                        <small id="retries-pro-note" role="note" class="text-primary font-medium">
+                        <small id="retries-pro-note" role="note" class="text-primary font-medium text-xs italic ml-1">
                             Included in Pro plan
                         </small>
                     }
@@ -168,12 +167,12 @@
 
                 <!-- Rate Limit -->
                 <div class="flex flex-col gap-2">
-                    <label for="rateLimit" class="font-semibold text-surface-900 dark:text-surface-0">
-                        Rate Limit (Optional)
-                    </label>
-                    <p-inputNumber id="rateLimit" formControlName="rateLimit" [min]="0"
-                        [showButtons]="false" placeholder="Unlimited" suffix=" req/s" inputStyleClass="rounded-xl!" styleClass="w-full" />
-                    <small class="text-surface-600 dark:text-surface-400">
+                    <p-floatlabel variant="on">
+                        <p-inputNumber id="rateLimit" formControlName="rateLimit" [min]="0"
+                            [showButtons]="false" suffix=" req/s" inputStyleClass="w-full rounded-xl!" styleClass="w-full" size="small" />
+                        <label for="rateLimit">Rate Limit (Optional)</label>
+                    </p-floatlabel>
+                    <small class="text-xs text-surface-600 dark:text-surface-400 italic ml-1">
                         Max requests per second
                     </small>
                 </div>
@@ -193,18 +192,24 @@
 
             @if (hasCustomHeaders()) {
                 @if (customHeaders.length) {
-                     <div class="space-y-4 mb-4">
-                        @for (header of customHeaders; track $index; let i = $index) {
-                             <div class="flex gap-3 items-center rounded-xl">
-                                <input type="text" pInputText [(ngModel)]="header.key" [ngModelOptions]="{standalone: true}"
-                                    placeholder="Header Key (e.g. X-API-Key)" class="flex-1 rounded-xl!" />
-                                <input type="text" pInputText [(ngModel)]="header.value" [ngModelOptions]="{standalone: true}"
-                                    placeholder="Value" class="flex-1 rounded-xl!" />
-                                <p-button icon="pi pi-trash" severity="danger" [outlined]="true" size="small"
-                                    (onClick)="removeHeader(i)" styleClass="rounded-xl!" />
-                            </div>
-                        }
-                    </div>
+                      <div class="space-y-4 mb-4">
+                         @for (header of customHeaders; track $index; let i = $index) {
+                              <div class="flex gap-3 items-center rounded-xl">
+                                 <p-floatlabel variant="on" class="flex-1">
+                                    <input type="text" pInputText [(ngModel)]="header.key" [ngModelOptions]="{standalone: true}"
+                                        class="w-full rounded-xl!" pSize="small" />
+                                    <label>Header Key</label>
+                                 </p-floatlabel>
+                                 <p-floatlabel variant="on" class="flex-1">
+                                    <input type="text" pInputText [(ngModel)]="header.value" [ngModelOptions]="{standalone: true}"
+                                        class="w-full rounded-xl!" pSize="small" />
+                                    <label>Value</label>
+                                 </p-floatlabel>
+                                 <p-button icon="pi pi-trash" severity="danger" [outlined]="true" size="small"
+                                     (onClick)="removeHeader(i)" styleClass="rounded-xl!" />
+                             </div>
+                         }
+                     </div>
                 } @else {
                     <div class="text-center py-4 mb-4">
                          <p class="text-surface-600 dark:text-surface-400 text-sm">No custom headers configured</p>
@@ -222,7 +227,7 @@
         <div class="flex justify-end gap-2 pt-4">
             <p-button label="Cancel" icon="pi pi-times" size="small" [text]="true" (onClick)="cancel()" styleClass="rounded-xl!" />
             <p-button [label]="isEditing() ? 'Update Target' : 'Create Target'" icon="pi pi-check" size="small"
-                [loading]="loading()" (onClick)="onSubmit()" styleClass="rounded-xl!" />
+                [loading]="loading()" (onClick)="onSubmit()" styleClass="rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20" />
         </div>
     </div>
 }

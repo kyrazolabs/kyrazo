@@ -39,6 +39,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
+import { FloatLabelModule } from 'primeng/floatlabel';
 
 @Component({
     selector: 'app-target-form',
@@ -62,6 +63,7 @@ import { TooltipModule } from 'primeng/tooltip';
         SelectModule,
         TooltipModule,
         CopyIdComponent,
+        FloatLabelModule,
     ],
     templateUrl: './target-form.component.html',
     styleUrls: ['./target-form.component.scss'],

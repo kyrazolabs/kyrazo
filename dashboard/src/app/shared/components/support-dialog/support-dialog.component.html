@@ -30,7 +30,7 @@
                     name="subject"
                     placeholder="Brief summary of the issue"
                     class="w-full rounded-xl!"
-                    required />
+                    required  pSize="small" />
             </div>
 
             <!-- Type & Category Row -->
@@ -46,7 +46,8 @@
                         name="type"
                         class="w-full rounded-xl!"
                         [size]="'small'"
-                        placeholder="Select Type">
+                        placeholder="Select Type"
+                        appendTo="body">
                     </p-select>
                 </div>
                 <div class="flex flex-col gap-2 w-1/2" *ngIf="!isUncategorized">
@@ -60,7 +61,8 @@
                         class="w-full rounded-xl!"
                         [size]="'small'"
                         placeholder="Select Category"
-                        [emptyMessage]="'Select a Type first'">
+                        [emptyMessage]="'Select a Type first'"
+                        appendTo="body">
                     </p-select>
                 </div>
                 <div class="flex flex-col gap-2 w-1/2" *ngIf="isUncategorized">
@@ -86,7 +88,7 @@
                     rows="5"
                     placeholder="Describe your issue in detail..."
                     class="w-full rounded-xl!"
-                    required></textarea>
+                    required pSize="small"></textarea>
             </div>
         </form>
     </div>
@@ -105,7 +107,7 @@
             <p-button
                 label="Submit Ticket"
                 icon="pi pi-send"
-                styleClass="rounded-xl!"
+                styleClass="rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20"
                 [size]="'small'"
                 [loading]="supportSubmitting"
                 [disabled]="!supportForm.subject || !supportForm.message || !supportForm.Category"

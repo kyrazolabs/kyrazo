@@ -148,10 +148,29 @@ export const environment = {
         create: `${baseUrl}/v2/transforms`,
         update: (id: string) => `${baseUrl}/v2/transforms/${id}`,
         delete: (id: string) => `${baseUrl}/v2/transforms/${id}`,
-        test: (id?: string) => id 
-            ? `${baseUrl}/v2/transforms/${id}/test` 
-            : `${baseUrl}/v2/transforms/test`,
+        test: (id?: string) =>
+            id
+                ? `${baseUrl}/v2/transforms/${id}/test`
+                : `${baseUrl}/v2/transforms/test`,
         versions: (id: string) => `${baseUrl}/v2/transforms/${id}/versions`,
-        rollback: (id: string, version: number) => `${baseUrl}/v2/transforms/${id}/rollback/${version}`,
+        rollback: (id: string, version: number) =>
+            `${baseUrl}/v2/transforms/${id}/rollback/${version}`,
+    },
+    sourceV2: {
+        create: `${baseUrl}/v2/sources`,
+        get: (id: string) => `${baseUrl}/v2/sources/${id}`,
+        gets: `${baseUrl}/v2/sources`,
+        update: (id: string) => `${baseUrl}/v2/sources/${id}`,
+        delete: (id: string) => `${baseUrl}/v2/sources/${id}`,
+    },
+    s3: {
+        create: `${baseUrl}/v2/s3`, // Assuming v2 for storage for now as requested
+        gets: `${baseUrl}/v2/s3`,
+        test: `${baseUrl}/v2/s3/test`,
+    },
+    asqs: {
+        create: `${baseUrl}/v2/asqs`,
+        gets: `${baseUrl}/v2/asqs`,
+        test: `${baseUrl}/v2/asqs/test`,
     },
 };

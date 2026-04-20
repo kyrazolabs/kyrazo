@@ -217,7 +217,7 @@
     [header]="sourceDialogHeader"
     [(visible)]="sourceDialogVisible"
     [modal]="true"
-    [style]="{ width: '600px' }"
+    [style]="{ width: '700px' }"
     [breakpoints]="{ '960px': '75vw', '640px': '90vw' }"
     styleClass="rounded-2xl!"
     [draggable]="false"
@@ -330,10 +330,14 @@
 
 <app-support-dialog [(visible)]="supportDialogVisible" (visibleChange)="!$event && onSupportDialogHide()"></app-support-dialog>
 
-<app-avatar-selection-dialog 
+<app-avatar-selection-dialog
     [(visible)]="avatarDialogVisible"
     [currentAvatar]="currentAvatar"
     (avatarSelected)="onAvatarSelected($any($event))"
     (onHide)="onAvatarDialogHide()">
 </app-avatar-selection-dialog>
+
+<!-- V2 Storage Dialogs -->
+<app-s3-create-dialog></app-s3-create-dialog>
+<app-asqs-create-dialog></app-asqs-create-dialog>
 

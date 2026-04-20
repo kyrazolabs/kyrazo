@@ -32,7 +32,7 @@
                             First Name *
                         </label>
                         <input pInputText id="firstName" formControlName="firstName" type="text"
-                            placeholder="Enter your first name" class="w-full rounded-xl!"
+                            placeholder="Enter your first name" class="w-full rounded-xl!" pSize="small"
                             [class.p-invalid]="isFieldInvalid('firstName')"
                             [attr.aria-describedby]="isFieldInvalid('firstName') ? 'firstName-error' : null" />
                         <small *ngIf="isFieldInvalid('firstName')" id="firstName-error"
@@ -47,7 +47,7 @@
                             Last Name *
                         </label>
                         <input pInputText id="lastName" formControlName="lastName" type="text"
-                            placeholder="Enter your last name" class="w-full rounded-xl!"
+                            placeholder="Enter your last name" class="w-full rounded-xl!" pSize="small"
                             [class.p-invalid]="isFieldInvalid('lastName')"
                             [attr.aria-describedby]="isFieldInvalid('lastName') ? 'lastName-error' : null" />
                         <small *ngIf="isFieldInvalid('lastName')" id="lastName-error"
@@ -63,7 +63,7 @@
                         Email Address *
                     </label>
                     <input pInputText id="email" formControlName="email" type="email"
-                        placeholder="Enter your email address" autocomplete="email" class="w-full rounded-xl!"
+                        placeholder="Enter your email address" autocomplete="email" class="w-full rounded-xl!" pSize="small"
                         [class.p-invalid]="isFieldInvalid('email')"
                         [attr.aria-describedby]="isFieldInvalid('email') ? 'email-error' : null" />
                     <small *ngIf="isFieldInvalid('email')" id="email-error" class="p-error block mt-1 text-xs">
@@ -78,7 +78,7 @@
                     </label>
                     <p-select [options]="jobTitles" formControlName="jobTitle" inputId="jobTitle"
                         placeholder="Select your job title"
-                        styleClass="w-full rounded-xl!" class="w-full" size="small"
+                        styleClass="w-full rounded-xl!" class="w-full" size="small" appendTo="body"
                         [class.p-invalid]="isFieldInvalid('jobTitle')"
                         [attr.aria-describedby]="isFieldInvalid('jobTitle') ? 'jobTitle-error' : null"></p-select>
                     <small *ngIf="isFieldInvalid('jobTitle')" id="jobTitle-error" class="p-error block mt-1 text-xs">
@@ -92,7 +92,7 @@
                         Password *
                     </label>
                     <p-password formControlName="password" inputId="password" placeholder="Create a strong password"
-                        [toggleMask]="true" [feedback]="false" autocomplete="off"
+                        [toggleMask]="true" [feedback]="false" autocomplete="off" size="small"
                         inputStyleClass="w-full rounded-xl!" class="w-full" [class.p-invalid]="isFieldInvalid('password')"
                         [attr.aria-describedby]="isFieldInvalid('password') ? 'password-error' : null"></p-password>
                     <small *ngIf="isFieldInvalid('password')" id="password-error" class="p-error block mt-1 text-xs">
@@ -107,7 +107,7 @@
                     </label>
                     <p-password id="confirmPassword" formControlName="confirmPassword"
                         placeholder="Confirm your password"
-                        autocomplete="off" inputStyleClass="w-full rounded-xl!" class="w-full" [feedback]="false" [toggleMask]="true"
+                        autocomplete="off" inputStyleClass="w-full rounded-xl!" class="w-full" [feedback]="false" [toggleMask]="true" size="small"
                         [class.p-invalid]="isFieldInvalid('confirmPassword') || form.errors?.['passwordMismatch']" />
                     <small *ngIf="isFieldInvalid('confirmPassword') || form.errors?.['passwordMismatch']"
                         class="p-error block mt-1 text-xs">
@@ -139,7 +139,7 @@
                 <!-- Submit Button -->
                 <div class="pt-4">
                     <p-button type="submit" label="Create Account" icon="pi pi-user-plus" [loading]="loading()"
-                        [disabled]="loading()" styleClass="w-full rounded-xl! font-medium"></p-button>
+                        [disabled]="loading()" styleClass="w-full rounded-xl! font-medium shadow-md shadow-primary/50 dark:shadow-primary/20" size="small"></p-button>
                 </div>
             </form>
 
@@ -171,7 +171,8 @@
                     [loading]="loading()"
                     (onClick)="verify2FA()"
                     [disabled]="otpCode().length < 6"
-                    styleClass="w-full rounded-xl! font-medium"
+                    styleClass="w-full rounded-xl! font-medium shadow-md shadow-primary/50 dark:shadow-primary/20"
+                    size="small"
                 />
 
                 <div class="text-center">

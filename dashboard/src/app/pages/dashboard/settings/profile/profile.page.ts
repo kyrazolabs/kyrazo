@@ -31,6 +31,7 @@ import { SentryService } from '@core/3rd-party/sentry';
 
 import { PostHogService } from '@core/3rd-party/posthog';
 import { DialogService } from '@shared/services/dialog.service';
+import { FloatLabelModule } from 'primeng/floatlabel';
 
 @Component({
     selector: 'app-profile-settings',
@@ -48,6 +49,7 @@ import { DialogService } from '@shared/services/dialog.service';
         ConfirmDialogModule,
         DialogModule,
         InputOtpModule,
+        FloatLabelModule,
     ],
     templateUrl: './profile.page.html',
     styleUrl: './profile.page.scss',

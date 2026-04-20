@@ -32,7 +32,7 @@
                 class="w-full text-center font-mono uppercase rounded-xl! mx-4"
                 maxlength="8"
                 [pAutoFocus]="true"
-                (keyup.enter)="verify()" />
+                (keyup.enter)="verify()"  pSize="small" />
         </div>
 
         <div *ngIf="error" class="text-red-500 text-sm font-medium text-center px-4">
@@ -59,7 +59,7 @@
             <p-button
                 label="Verify"
                 [loading]="loading"
-                styleClass="w-full rounded-xl!"
+                styleClass="w-full rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20"
                 (onClick)="verify()"
                 [disabled]="isBackupCode ? code.length < 8 : code.length < 6"
             ></p-button>

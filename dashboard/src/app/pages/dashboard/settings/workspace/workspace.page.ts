@@ -41,6 +41,7 @@ import { finalize } from 'rxjs';
 import { SentryService } from '@core/3rd-party/sentry';
 import { PostHogService } from '@core/3rd-party/posthog';
 import { DialogService } from '@shared/services/dialog.service';
+import { FloatLabelModule } from 'primeng/floatlabel';
 
 @Component({
     selector: 'app-workspace-settings',
@@ -59,6 +60,7 @@ import { DialogService } from '@shared/services/dialog.service';
         DialogModule,
         SelectModule,
         ConfirmDialogModule,
+        FloatLabelModule,
     ],
     templateUrl: './workspace.page.html',
     styleUrl: './workspace.page.scss',

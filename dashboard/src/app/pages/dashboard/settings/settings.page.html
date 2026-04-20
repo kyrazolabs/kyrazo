@@ -29,7 +29,7 @@
             @if (currentTab === 'profile') {
                 <p-button label="Reset" icon="pi pi-refresh" [outlined]="true" severity="secondary"
                     styleClass="rounded-xl!" (onClick)="profileComp?.resetProfile()" />
-                <p-button label="Save Changes" icon="pi pi-save" styleClass="rounded-xl!"
+                <p-button label="Save Changes" icon="pi pi-save" styleClass="rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20"
                     (onClick)="profileComp?.saveProfile()"
                     [disabled]="profileComp?.profileForm?.invalid || profileComp?.isSaving"
                     [loading]="profileComp?.isSaving" />
@@ -40,15 +40,15 @@
                 <p-button label="Reset to Default" icon="pi pi-refresh" [outlined]="true" severity="secondary"
                     styleClass="rounded-xl!" (onClick)="notificationComp?.resetToDefaults()"
                     [disabled]="notificationComp?.isLoading" />
-                <p-button label="Save Settings" icon="pi pi-save" styleClass="rounded-xl!"
+                <p-button label="Save Settings" icon="pi pi-save" styleClass="rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20"
                     (onClick)="notificationComp?.saveNotifications()" [loading]="notificationComp?.isLoading" />
             } -->
 
             <!-- Workspace Actions -->
             @if (currentTab === 'workspace') {
-                <p-button label="Invite Member" icon="pi pi-user-plus" styleClass="rounded-xl!"
+                <p-button label="Invite Member" icon="pi pi-user-plus" styleClass="rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20"
                     (onClick)="workspaceComp?.openInviteDialog()" [disabled]="!workspaceComp?.canInviteMembers()" />
-                <p-button label="Save Changes" icon="pi pi-save" styleClass="rounded-xl!"
+                <p-button label="Save Changes" icon="pi pi-save" styleClass="rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20"
                     (onClick)="workspaceComp?.saveWorkspace()"
                     [disabled]="workspaceComp?.workspaceForm?.invalid || workspaceComp?.isSaving"
                     [loading]="workspaceComp?.isSaving" />
@@ -63,7 +63,7 @@
                     <p-button label="Cancel" icon="pi pi-times" [outlined]="true" severity="danger"
                         styleClass="rounded-xl!" (onClick)="billingComp?.cancelSubscription()" size="small" />
                 }
-                <p-button label="Upgrade" icon="pi pi-arrow-up" styleClass="rounded-xl!"
+                <p-button label="Upgrade" icon="pi pi-arrow-up" styleClass="rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20"
                     (onClick)="billingComp!.showUpgradeDialog = true" size="small" />
             }
         </div>

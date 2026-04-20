@@ -20,6 +20,7 @@
                 severity="secondary"
                 routerLink="/events/dispatch/logs"
                 styleClass="rounded-xl!"
+                size="small"
             />
         </div>
     </div>
@@ -52,6 +53,7 @@
                         [value]="delivery.target_url"
                         [readonly]="true"
                         class="w-full rounded-xl!"
+                        pSize="small"
                     />
                 </div>
 
@@ -95,6 +97,7 @@
                             [value]="delivery.scheduled_at"
                             [readonly]="true"
                             class="w-full rounded-xl!"
+                            pSize="small"
                         />
                     </div>
                     <div>
@@ -108,6 +111,7 @@
                             [value]="delivery.processed_at"
                             [readonly]="true"
                             class="w-full rounded-xl!"
+                            pSize="small"
                         />
                     </div>
                 </div>
@@ -257,6 +261,7 @@
                 severity="secondary"
                 styleClass="w-full sm:w-auto rounded-xl!"
                 [disabled]="delivery.status === 'delivered'"
+                size="small"
             />
         </div>
     </p-card>

@@ -41,6 +41,7 @@ import { DividerModule } from 'primeng/divider';
 import { MessageService } from 'primeng/api';
 import { MessageModule } from 'primeng/message';
 import { SkeletonModule } from 'primeng/skeleton';
+import { FloatLabelModule } from 'primeng/floatlabel';
 
 @Component({
     selector: 'app-endpoint-form',
@@ -62,6 +63,7 @@ import { SkeletonModule } from 'primeng/skeleton';
         MessageModule,
         SkeletonModule,
         CopyIdComponent,
+        FloatLabelModule,
     ],
     templateUrl: './endpoint-form.component.html',
     styleUrls: ['./endpoint-form.component.scss'],

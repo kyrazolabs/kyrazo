@@ -31,6 +31,8 @@ import { NamespaceFormComponent } from '@shared/components/namespace-form/namesp
 import { SupportDialogComponent } from '@shared/components/support-dialog/support-dialog.component';
 import { AvatarSelectionDialogComponent } from '@shared/components/avatar-selection-dialog/avatar-selection-dialog.component';
 import { TransformFormComponent } from '../transforms/components/transform-form/transform-form.component';
+import { S3CreateDialogComponent } from '../events/ingest/sources/components/s3-create-dialog/s3-create-dialog.component';
+import { ASQSCreateDialogComponent } from '../events/ingest/sources/components/asqs-create-dialog/asqs-create-dialog.component';
 
 @Component({
     selector: 'app-shell',
@@ -51,6 +53,8 @@ import { TransformFormComponent } from '../transforms/components/transform-form/
         SupportDialogComponent,
         AvatarSelectionDialogComponent,
         TransformFormComponent,
+        S3CreateDialogComponent,
+        ASQSCreateDialogComponent,
     ],
     templateUrl: './app-shell.html',
     styleUrl: './app-shell.scss',

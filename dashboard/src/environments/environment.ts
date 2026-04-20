@@ -177,14 +177,40 @@ export const environment = {
     },
     transform: {
         gets: `https://api.kyrazo.com/dashboard/v2/transforms`,
-        get: (id: string) => `https://api.kyrazo.com/dashboard/v2/transforms/${id}`,
+        get: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/transforms/${id}`,
         create: `https://api.kyrazo.com/dashboard/v2/transforms`,
-        update: (id: string) => `https://api.kyrazo.com/dashboard/v2/transforms/${id}`,
-        delete: (id: string) => `https://api.kyrazo.com/dashboard/v2/transforms/${id}`,
-        test: (id?: string) => id 
-            ? `https://api.kyrazo.com/dashboard/v2/transforms/${id}/test` 
-            : `https://api.kyrazo.com/dashboard/v2/transforms/test`,
-        versions: (id: string) => `https://api.kyrazo.com/dashboard/v2/transforms/${id}/versions`,
-        rollback: (id: string, version: number) => `https://api.kyrazo.com/dashboard/v2/transforms/${id}/rollback/${version}`,
+        update: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/transforms/${id}`,
+        delete: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/transforms/${id}`,
+        test: (id?: string) =>
+            id
+                ? `https://api.kyrazo.com/dashboard/v2/transforms/${id}/test`
+                : `https://api.kyrazo.com/dashboard/v2/transforms/test`,
+        versions: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/transforms/${id}/versions`,
+        rollback: (id: string, version: number) =>
+            `https://api.kyrazo.com/dashboard/v2/transforms/${id}/rollback/${version}`,
+    },
+    sourceV2: {
+        create: `https://api.kyrazo.com/dashboard/v2/sources`,
+        get: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/sources/${id}`,
+        gets: `https://api.kyrazo.com/dashboard/v2/sources`,
+        update: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/sources/${id}`,
+        delete: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/sources/${id}`,
+    },
+    s3: {
+        create: `https://api.kyrazo.com/dashboard/v2/s3`, // Assuming v2 for storage for now as requested
+        gets: `https://api.kyrazo.com/dashboard/v2/s3`,
+        test: `https://api.kyrazo.com/dashboard/v2/s3/test`,
+    },
+    asqs: {
+        create: `https://api.kyrazo.com/dashboard/v2/asqs`,
+        gets: `https://api.kyrazo.com/dashboard/v2/asqs`,
+        test: `https://api.kyrazo.com/dashboard/v2/asqs/test`,
     },
 };

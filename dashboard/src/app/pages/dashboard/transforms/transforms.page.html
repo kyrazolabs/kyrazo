@@ -24,7 +24,7 @@
         icon="pi pi-plus"
         [size]="'small'"
         (onClick)="openCreateDialog()"
-        styleClass="w-full sm:w-auto rounded-xl!"
+        styleClass="w-full sm:w-auto rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20"
       />
     </div>
   </div>
@@ -43,7 +43,7 @@
           [value]="searchQuery"
           placeholder="Search transforms..."
           class="w-full md:w-80 rounded-xl!"
-        />
+         pSize="small" />
       </p-iconfield>
 
       <div class="flex flex-wrap gap-2">
@@ -199,7 +199,7 @@
                   <p-button
                     label="Add Transform"
                     icon="pi pi-plus"
-                    styleClass="rounded-xl!"
+                    styleClass="rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20"
                     (onClick)="openCreateDialog()"
                     size="small"
                   />

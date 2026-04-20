@@ -22,6 +22,7 @@ import { SubscriptionService } from '@core/services/subscription.service';
 import { SentryService } from '@core/3rd-party/sentry';
 import { PostHogService } from '@core/3rd-party/posthog';
 import { InviteWorkspaceMemberRequest } from '@models/workspaces.types';
+import { FloatLabelModule } from 'primeng/floatlabel';
 
 @Component({
     selector: 'app-invite-member-form',
@@ -34,6 +35,7 @@ import { InviteWorkspaceMemberRequest } from '@models/workspaces.types';
         TextareaModule,
         ButtonModule,
         Select,
+        FloatLabelModule,
     ],
     templateUrl: './invite-member-form.component.html',
 })

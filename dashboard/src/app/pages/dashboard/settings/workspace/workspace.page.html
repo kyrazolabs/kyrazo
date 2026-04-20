@@ -8,24 +8,27 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Workspace Name -->
                 <div class="flex flex-col gap-2">
-                    <label class="font-semibold text-surface-900 dark:text-surface-0">Workspace Name</label>
-                    <input pInputText type="text" formControlName="name" placeholder="Enter workspace name"
-                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
-                        [class.border-red-500]="workspaceForm.get('name')?.invalid && workspaceForm.get('name')?.touched"
-                        [readonly]="!canEditWorkspace()" />
-                    <small *ngIf="workspaceForm.get('name')?.invalid && workspaceForm.get('name')?.touched" class="text-red-500 text-sm">
+                    <p-floatlabel variant="on">
+                        <input pInputText id="workspaceName" type="text" formControlName="name"
+                            class="w-full rounded-xl!" pSize="small"
+                            [class.border-red-500]="workspaceForm.get('name')?.invalid && workspaceForm.get('name')?.touched"
+                            [readonly]="!canEditWorkspace()" />
+                        <label for="workspaceName">Workspace Name</label>
+                    </p-floatlabel>
+                    <small *ngIf="workspaceForm.get('name')?.invalid && workspaceForm.get('name')?.touched" class="text-red-500 text-xs italic ml-1">
                         Workspace name is required and must be at least 2 characters
                     </small>
                 </div>
 
                 <!-- Workspace Description -->
                 <div class="flex flex-col gap-2">
-                    <label class="font-semibold text-surface-900 dark:text-surface-0">Description</label>
-                    <textarea pInputTextarea formControlName="description" rows="3"
-                        placeholder="Enter workspace description (optional)"
-                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800 resize-none"
-                        [readonly]="!canEditWorkspace()"></textarea>
-                    <small class="text-surface-600 dark:text-surface-400 text-sm">
+                    <p-floatlabel variant="on">
+                        <textarea id="workspaceDescription" pInputTextarea formControlName="description" rows="3"
+                            class="w-full rounded-xl! resize-none" pSize="small"
+                            [readonly]="!canEditWorkspace()"></textarea>
+                        <label for="workspaceDescription">Description (optional)</label>
+                    </p-floatlabel>
+                    <small class="text-surface-600 dark:text-surface-400 text-xs italic ml-1">
                         {{workspaceForm.get('description')?.value?.length || 0}}/2000 characters
                     </small>
                 </div>
@@ -41,7 +44,7 @@
                     <div class="flex items-center gap-2">
                         <input pInputText type="text" [value]="workspace?.id || 'N/A'" placeholder="Enter workspace name"
                             class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
-                            readonly disabled />
+                            readonly disabled  pSize="small" />
                         <p-button icon="pi pi-copy" [outlined]="true" size="small" styleClass="rounded-xl!"
                             pTooltip="Copy Workspace ID" tooltipStyleClass="text-xs! rounded-xl!" tooltipPosition="top"
                             (onClick)="copyToClipboard(workspace?.id || '')" />
@@ -53,7 +56,7 @@
                     <label class="font-semibold text-surface-900 dark:text-surface-0">Created</label>
                     <input pInputText type="text" [value]="workspace?.createdAt ? formatDate(workspace!.createdAt) : 'N/A'" placeholder="Enter workspace name"
                         class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
-                        readonly disabled />
+                        readonly disabled  pSize="small" />
                 </div>
 
                 <!-- Status -->
@@ -109,7 +112,7 @@
                                 <p-select [ngModel]="member.role" [options]="roleOptions"
                                     optionLabel="label" optionValue="value"
                                     (onChange)="updateMemberRole(member, $event.value)"
-                                    styleClass="w-32 rounded-xl!" panelStyleClass="rounded-xl!" size="small" />
+                                    styleClass="w-32 rounded-xl!" panelStyleClass="rounded-xl!" size="small" appendTo="body" />
                             </div>
                             <p-tag *ngIf="!canManageMember(member)" [value]="member.role | titlecase"
                                 [severity]="getRoleSeverity(member.role)" class="text-sm font-medium" />
@@ -150,7 +153,7 @@
                                     <p-button *ngIf="canInviteMembers()" label="Invite First Member" icon="pi pi-user-plus"
                                         (onClick)="openInviteDialog()" [disabled]="isMemberLimitReached()"
                                         [pTooltip]="isMemberLimitReached() ? 'Member limit reached for your plan' : ''"
-                                        styleClass="rounded-xl!" />
+                                        styleClass="rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20" />
                                 </div>
                             </div>
                         </td>

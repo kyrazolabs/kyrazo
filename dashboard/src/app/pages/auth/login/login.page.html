@@ -31,7 +31,7 @@
                     </label>
                     <input pInputText id="email" formControlName="email" type="email"
                         placeholder="Enter your email address" autocomplete="email" class="w-full rounded-xl!"
-                        [class.p-invalid]="isFieldInvalid('email')"
+                        [class.p-invalid]="isFieldInvalid('email')" pSize="small"
                         [attr.aria-describedby]="isFieldInvalid('email') ? 'email-error' : null" />
                     <small *ngIf="isFieldInvalid('email')" id="email-error" class="p-error block mt-1 text-xs">
                         {{ getFieldErrorMessage('email') }}
@@ -45,7 +45,7 @@
                     </label>
                         <p-password id="password" formControlName="password"
                             placeholder="Enter your password"
-                            autocomplete="off" inputStyleClass="w-full rounded-xl!" class="w-full" [feedback]="false"  [toggleMask]="true"
+                            autocomplete="off" inputStyleClass="w-full rounded-xl!" class="w-full" [feedback]="false"  [toggleMask]="true" size="small"
                             [class.p-invalid]="isFieldInvalid('password')"
                             [attr.aria-describedby]="isFieldInvalid('password') ? 'password-error' : null">
                         </p-password>
@@ -71,7 +71,7 @@
 
                 <!-- Submit Button -->
                 <p-button type="submit" label="Sign In" icon="pi pi-sign-in" [loading]="loading()"
-                    [disabled]="loading()" styleClass="w-full rounded-xl! font-medium" />
+                    [disabled]="loading()" styleClass="w-full rounded-xl! font-medium shadow-md shadow-primary/50 dark:shadow-primary/20" size="small" />
 
 
 
@@ -99,6 +99,7 @@
                 outlined="true"
                 styleClass="w-full rounded-xl! font-medium"
                 (onClick)="googleLogin()"
+                size="small"
               ></p-button>
             </div>
           </div>
@@ -131,7 +132,7 @@
                             class="w-full text-center font-mono uppercase rounded-xl!"
                             maxlength="8"
                             [pAutoFocus]="true"
-                            (keyup.enter)="verify2FA()" />
+                            (keyup.enter)="verify2FA()"  pSize="small" />
                     </div>
                 </div>
 
@@ -161,7 +162,8 @@
                         [loading]="loading()"
                         (onClick)="verify2FA()"
                         [disabled]="isBackupCode() ? otpCode().length < 8 : otpCode().length < 6"
-                        styleClass="rounded-xl! font-medium"
+                        styleClass="rounded-xl! font-medium shadow-md shadow-primary/50 dark:shadow-primary/20"
+                        size="small"
                     />
 
                 </div>

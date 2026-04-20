@@ -126,7 +126,7 @@ export class SourcesPage implements OnInit, OnDestroy {
         } = {
             page,
             limit,
-            q: search || '', // Always include 'q' parameter, even if empty
+            q: search || '',
         };
         if (status) queryParams.status = status;
 
@@ -136,47 +136,23 @@ export class SourcesPage implements OnInit, OnDestroy {
             .subscribe({
                 next: (response) => {
                     this.sources = response.data || [];
-                    this.totalRecords =
-                        response.pagination?.total || this.sources.length;
-                    this.applyClientSideFiltering();
+                    this.totalRecords = response.pagination?.total || this.sources.length;
+                    this.filteredSources = [...this.sources];
                 },
                 error: (err) => {
                     this.sentry.captureException(err);
                     this.posthog.capture('source_load_error', {
                         error: err.message,
                     });
-                    console.error(err);
-
                     this.sources = [];
+                    this.filteredSources = [];
                     this.totalRecords = 0;
                 },
             });
     }
 
     private applyClientSideFiltering() {
-        let filtered = [...this.sources];
-
-        // Apply status filter
-        if (this.activeFilter !== 'all') {
-            filtered = filtered.filter(
-                (source) => source.status === this.activeFilter,
-            );
-        }
-
-        // Apply search filter
-        if (this.searchQuery) {
-            const query = this.searchQuery.toLowerCase();
-            filtered = filtered.filter(
-                (source) =>
-                    source.name.toLowerCase().includes(query) ||
-                    source.description?.toLowerCase().includes(query) ||
-                    source.eventTypes.some((event) =>
-                        event.toLowerCase().includes(query),
-                    ),
-            );
-        }
-
-        this.filteredSources = filtered;
+        this.filteredSources = [...this.sources];
     }
 
     loadSourcesLazy(event: TableLazyLoadEvent) {
@@ -300,7 +276,7 @@ export class SourcesPage implements OnInit, OnDestroy {
                         ...this.sources[index],
                         status: newStatus,
                     };
-                    this.applyClientSideFiltering();
+                    this.filteredSources = [...this.sources];
                 }
 
                 this.messageService.add({
@@ -382,7 +358,7 @@ export class SourcesPage implements OnInit, OnDestroy {
         const index = this.sources.findIndex((s) => s.id === source.id);
         if (index !== -1) {
             this.sources.splice(index, 1);
-            this.applyClientSideFiltering();
+            this.filteredSources = [...this.sources];
         }
     }
 

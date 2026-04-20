@@ -57,7 +57,7 @@
                         <p-inputotp [(ngModel)]="verificationCode" [pAutoFocus]="true" [length]="6" [integerOnly]="true" (onComplete)="verify()" (keyup.enter)="verify()"></p-inputotp>
                     </div>
                 </div>
-                <p-button label="Activate 2FA" styleClass="w-full rounded-xl!" [loading]="isVerifying"
+                <p-button label="Activate 2FA" styleClass="w-full rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20" [loading]="isVerifying"
                     [disabled]="verificationCode.length < 6" (onClick)="verify()" />
             </div>
         </ng-container>
@@ -84,7 +84,7 @@
         <div class="flex flex-col gap-2">
             <p-button label="Copy to clipboard" icon="pi pi-copy" styleClass="w-full rounded-xl! p-button-outlined"
                 (onClick)="copyBackupCodes()" />
-            <p-button label="I've saved them" styleClass="w-full rounded-xl!" (onClick)="onHide()" />
+            <p-button label="I've saved them" styleClass="w-full rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20" (onClick)="onHide()" />
         </div>
     </div>
 </p-dialog>

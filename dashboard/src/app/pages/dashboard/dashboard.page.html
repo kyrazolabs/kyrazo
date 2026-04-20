@@ -52,7 +52,7 @@
                 <span class="font-bold text-surface-900 dark:text-surface-0">Read the Docs</span>
                 <span class="text-sm text-surface-500">Learn how to integrate Webhooks</span>
             </div>
-            <a href="https://docs.kyrazo.com" target="_blank" pButton icon="pi pi-book" label="Documentation"  pButton class="p-button-text rounded-xl!"></a>
+            <a href="https://docs.kyrazo.com" target="_blank" pButton icon="pi pi-book" label="Documentation" class="p-button-text rounded-xl!" pSize="small"></a>
         </div>
 
         <div class="bg-linear-to-r from-surface-0 to-primary-50/10 dark:from-surface-950 dark:to-primary-500/10 border-2 border-surface-100 dark:border-surface-900 rounded-xl p-6 flex items-center justify-between">
@@ -60,7 +60,7 @@
                 <span class="font-bold text-surface-900 dark:text-surface-0">Need Support?</span>
                 <span class="text-sm text-surface-500">Join our community or contact us</span>
             </div>
-            <p-button label="We hear you, bro" icon="icon-[hugeicons--bubble-chat-question] size-5" (click)="openSupportDialog()" styleClass="rounded-xl!" />
+            <p-button label="We hear you, bro" icon="icon-[hugeicons--bubble-chat-question] size-5" (click)="openSupportDialog()" styleClass="rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20" size="small" />
         </div>
     </div>
 
@@ -72,11 +72,11 @@
     <div class="flex flex-col gap-4 pt-2">
          <div class="flex flex-col gap-2">
             <label for="pname" class="font-medium">Namespace Name</label>
-            <input pInputText id="pname" [(ngModel)]="namespaceForm.name" placeholder="e.g. Acme Production" autofocus />
+            <input pInputText id="pname" [(ngModel)]="namespaceForm.name" placeholder="e.g. Acme Production" autofocus pSize="small" />
         </div>
         <div class="flex flex-col gap-2">
             <label for="pdesc" class="font-medium">Description</label>
-            <textarea pInputTextarea id="pdesc" [(ngModel)]="namespaceForm.description" rows="3" placeholder="Brief description of this namespace environment..." class="resize-none"></textarea>
+            <textarea pInputTextarea id="pdesc" [(ngModel)]="namespaceForm.description" rows="3" placeholder="Brief description of this namespace environment..." class="resize-none" pSize="small"></textarea>
         </div>
         @if (isLimitReached()) {
         <div class="p-3 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl flex items-start gap-3 mt-2 animate-fade-in">
@@ -89,9 +89,9 @@
         }
     </div>
     <ng-template pTemplate="footer">
-        <p-button label="Cancel" [text]="true" severity="secondary" (click)="namespaceDialogVisible = false" styleClass="rounded-xl!" />
+        <p-button label="Cancel" [text]="true" severity="secondary" (click)="namespaceDialogVisible = false" styleClass="rounded-xl!" size="small" />
         <p-button label="Create Namespace" [loading]="isCreating" (click)="createNamespace()" [disabled]="!namespaceForm.name || isLimitReached()"
             [pTooltip]="isLimitReached() ? 'Limit reached' : ''"
-            styleClass="rounded-xl!" />
+            styleClass="rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20" size="small" />
     </ng-template>
 </p-dialog>
