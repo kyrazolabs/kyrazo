@@ -179,6 +179,8 @@ export function transformWithId<T>(data: T, type: IdType): TransformedWithId<T> 
             target: 'target',
             endpoint: 'endpoint',
             endpoints: 'endpoint',
+            transformer: 'transformer',
+            transformId: 'transformer',
             user: 'user',
         };
 

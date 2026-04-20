@@ -78,8 +78,9 @@ export class SourceServiceV2 {
 
             if (data.transformer === null && source.transformId) {
                 // Explicitly requested to unlink/delete the managed transformer
+                const tfId = (source.transformId as any)._id || (source.transformId as any).id || source.transformId;
                 await transformRepository.deleteById(
-                    prefixId(source.transformId.toString()!, 'transformer')!,
+                    prefixId(tfId, 'transformer')!,
                     workspaceId,
                     namespaceId
                 );
@@ -87,8 +88,9 @@ export class SourceServiceV2 {
                 updateData.isManagedTransform = false;
             } else if (data.transformer && source.transformId) {
                 // Update existing managed transformer
+                const tfId = (source.transformId as any)._id || (source.transformId as any).id || source.transformId;
                 await transformRepository.update(
-                    prefixId(source.transformId.toString()!, 'transformer')!,
+                    prefixId(tfId, 'transformer')!,
                     workspaceId,
                     namespaceId,
                     {
@@ -141,8 +143,9 @@ export class SourceServiceV2 {
             if (!source) throw new Error('Source not found');
 
             if (source.isManagedTransform && source.transformId) {
+                const tfId = (source.transformId as any)._id || (source.transformId as any).id || source.transformId;
                 await transformRepository.deleteById(
-                    prefixId(source.transformId.toString()!, 'transformer')!,
+                    prefixId(tfId, 'transformer')!,
                     workspaceId,
                     namespaceId
                 );
