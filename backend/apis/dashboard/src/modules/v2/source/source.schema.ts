@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { PopulatedIdSchema } from '@kyrazo/shared';
 
 export const CreateSourceSchema = z.object({
     name: z.string().min(3).max(100),
@@ -10,9 +11,9 @@ export const CreateSourceSchema = z.object({
     forwarding: z.boolean().default(false),
     destination: z
         .object({
-            endpoints: z.array(z.string()).optional(),
-            s3bucket: z.array(z.string()).optional(),
-            asqs: z.array(z.string()).optional(),
+            endpoints: z.array(PopulatedIdSchema).optional(),
+            s3bucket: z.array(PopulatedIdSchema).optional(),
+            asqs: z.array(PopulatedIdSchema).optional(),
         })
         .optional(),
     eventTypes: z.array(z.string()).optional().default([]),
@@ -48,9 +49,9 @@ export const UpdateSourceSchema = z.object({
     forwarding: z.boolean().optional(),
     destination: z
         .object({
-            endpoints: z.array(z.string()).optional(),
-            s3bucket: z.array(z.string()).optional(),
-            asqs: z.array(z.string()).optional(),
+            endpoints: z.array(PopulatedIdSchema).optional(),
+            s3bucket: z.array(PopulatedIdSchema).optional(),
+            asqs: z.array(PopulatedIdSchema).optional(),
         })
         .optional(),
     eventTypes: z.array(z.string()).optional(),

@@ -1,4 +1,5 @@
 import z from 'zod';
+import { PopulatedIdSchema } from '@kyrazo/shared';
 
 const objectIdSchema = z
     .string()
@@ -32,7 +33,7 @@ export const SourceSchema = z.object({
     status: sourceStatus.default('active'),
 
     forwarding: z.boolean().default(false),
-    endpoints: z.array(objectIdSchema).optional(),
+    endpoints: z.array(PopulatedIdSchema).optional(),
 
     eventTypes: z
         .array(
