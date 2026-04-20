@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { zValidator } from '@/core/middlewares/validator.middleware';
+import { validate } from '@/core/middlewares/validator.middleware';
 import { AppContext, authenticate } from '@/core/middlewares/auth.middleware';
 import { sentryMiddleware } from '@/core/middlewares/sentry.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
@@ -15,8 +15,8 @@ import { NamespaceHeadersSchema } from '@/core/utils/libs/zod';
 
 const analytics = new Hono();
 
-// Header validation using zValidator
-const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema);
+// Header validation using validate
+const validateNamespaceHeaders = validate('header', NamespaceHeadersSchema);
 
 // Lazy wrapper for analytics routes rate limiter (user-based, normal level for read operations)
 const analyticsRateLimiter = async (c: AppContext, next: () => Promise<void>) => {
@@ -44,7 +44,7 @@ analytics.use('*', requireNamespaceAccess());
 analytics.get(
     '/dispatch/usage',
     analyticsRateLimiter,
-    zValidator('query', OverviewFilterSchema),
+    validate('query', OverviewFilterSchema),
     AnalyticsController.getDispatchUsage
 );
 
@@ -54,7 +54,7 @@ analytics.get(
 analytics.get(
     '/ingest/usage',
     analyticsRateLimiter,
-    zValidator('query', OverviewFilterSchema),
+    validate('query', OverviewFilterSchema),
     AnalyticsController.getIngestUsage
 );
 
@@ -64,8 +64,8 @@ analytics.get(
 analytics.get(
     '/targets/:targetId/overview',
     analyticsRateLimiter,
-    zValidator('param', TargetQuerySchema),
-    zValidator('query', OverviewFilterSchema),
+    validate('param', TargetQuerySchema),
+    validate('query', OverviewFilterSchema),
     AnalyticsController.getTargetOverview
 );
 

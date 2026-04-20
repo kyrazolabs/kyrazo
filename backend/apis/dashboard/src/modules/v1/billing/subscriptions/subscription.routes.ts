@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
 import { authenticate, requireOwnership } from '@/core/middlewares/auth.middleware';
 import { sentryMiddleware } from '@/core/middlewares/sentry.middleware';
+import { validate } from '@/core/middlewares/validator.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
 import { CreateSubscriptionDto, ChangePlanDto, CancelSubscriptionDto } from './subscription.dto';
 import { SubscriptionController } from './subscription.controller';
@@ -21,21 +21,7 @@ subscription.use('*', requireWorkspaceMembership());
 subscription.post(
     '/',
     subscriptionWriteRateLimiter,
-    zValidator('json', CreateSubscriptionDto, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    validate('json', CreateSubscriptionDto),
     SubscriptionController.createSubscription
 );
 
@@ -58,93 +44,23 @@ subscription.get('/limits', subscriptionReadRateLimiter, SubscriptionController.
 subscription.get(
     '/:id',
     subscriptionReadRateLimiter,
-    zValidator('param', z.object({ id: z.string() }), (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    validate('param', z.object({ id: z.string() })),
     SubscriptionController.getSubscription
 );
 
 subscription.post(
     '/:id/change-plan',
     subscriptionWriteRateLimiter,
-    zValidator('param', z.object({ id: z.string() }), (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
-    zValidator('json', ChangePlanDto, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    validate('param', z.object({ id: z.string() })),
+    validate('json', ChangePlanDto),
     SubscriptionController.changePlan
 );
 
 subscription.post(
     '/:id/cancel',
     subscriptionWriteRateLimiter,
-    zValidator('param', z.object({ id: z.string() }), (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
-    zValidator('json', CancelSubscriptionDto, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    validate('param', z.object({ id: z.string() })),
+    validate('json', CancelSubscriptionDto),
     SubscriptionController.cancelSubscription
 );
 

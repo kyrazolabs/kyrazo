@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { zValidator } from '@/core/middlewares/validator.middleware';
+import { validate } from '@/core/middlewares/validator.middleware';
 import { AppContext } from '@/core/middlewares/auth.middleware';
 
 import { authenticate } from '@/core/middlewares/auth.middleware';
@@ -23,8 +23,8 @@ import { NamespaceHeadersSchema } from '@/core/utils/libs/zod';
 
 const endpoint = new Hono();
 
-// Header validation using zValidator
-const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema);
+// Header validation using validate
+const validateNamespaceHeaders = validate('header', NamespaceHeadersSchema);
 
 // Lazy wrappers for endpoint routes rate limiters (user-based)
 const endpointReadRateLimiter = async (c: AppContext, next: () => Promise<void>) => {
@@ -62,50 +62,50 @@ endpoint.use('*', requireNamespaceAccess());
 endpoint.post(
     '/',
     endpointWriteRateLimiter,
-    zValidator('json', CreateEndpointSchema),
+    validate('json', CreateEndpointSchema),
     EndpointController.createEndpoint
 );
 
 endpoint.get(
     '/',
     endpointReadRateLimiter,
-    zValidator('query', SearchEndpointSchema),
+    validate('query', SearchEndpointSchema),
     EndpointController.getEndpoints
 );
 
 endpoint.get(
     '/:endpointId',
     endpointReadRateLimiter,
-    zValidator('param', GetEndpointByIdSchema),
+    validate('param', GetEndpointByIdSchema),
     EndpointController.getEndpoint
 );
 
 endpoint.get(
     '/:endpointId/secret',
     endpointReadRateLimiter,
-    zValidator('param', GetEndpointByIdSchema),
+    validate('param', GetEndpointByIdSchema),
     EndpointController.getEndpointSecret
 );
 
 endpoint.patch(
     '/:endpointId',
     endpointWriteRateLimiter,
-    zValidator('param', GetEndpointByIdSchema),
-    zValidator('json', UpdateEndpointSchema),
+    validate('param', GetEndpointByIdSchema),
+    validate('json', UpdateEndpointSchema),
     EndpointController.updateEndpoint
 );
 
 endpoint.put(
     '/:endpointId/:status',
     endpointWriteRateLimiter,
-    zValidator('param', UpdateEndpointStatusSchema),
+    validate('param', UpdateEndpointStatusSchema),
     EndpointController.updateEndpointStatus
 );
 
 endpoint.delete(
     '/:endpointId',
     endpointWriteRateLimiter,
-    zValidator('param', GetEndpointByIdSchema),
+    validate('param', GetEndpointByIdSchema),
     EndpointController.deleteEndpoint
 );
 

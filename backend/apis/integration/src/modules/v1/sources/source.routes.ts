@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { zValidator } from '@/core/middlewares/validator.middleware';
+import { validate } from '@/core/middlewares/validator.middleware';
 import { authenticate, checkScope } from '@/core/middlewares/auth.middleware';
 import {
     CreateSourceSchema,
@@ -16,8 +16,8 @@ source.post(
     '/:namespaceId',
     authenticate,
     checkScope('ingest:source:create'),
-    zValidator('param', GetNamespaceByIdSchema),
-    zValidator('json', CreateSourceSchema),
+    validate('param', GetNamespaceByIdSchema),
+    validate('json', CreateSourceSchema),
     SourceController.createSource
 );
 
@@ -25,8 +25,8 @@ source.get(
     '/:namespaceId',
     authenticate,
     checkScope('ingest:source:read'),
-    zValidator('param', GetNamespaceByIdSchema),
-    zValidator('query', SearchSourceSchema),
+    validate('param', GetNamespaceByIdSchema),
+    validate('query', SearchSourceSchema),
     SourceController.getSources
 );
 
@@ -34,7 +34,7 @@ source.get(
     '/:namespaceId/:sourceId',
     authenticate,
     checkScope('ingest:source:read'),
-    zValidator('param', GetNamespaceByIdSchema.extend(GetSourceByIdSchema.shape)),
+    validate('param', GetNamespaceByIdSchema.extend(GetSourceByIdSchema.shape)),
     SourceController.getSource
 );
 
@@ -42,8 +42,8 @@ source.patch(
     '/:namespaceId/:sourceId',
     authenticate,
     checkScope('ingest:source:update'),
-    zValidator('param', GetNamespaceByIdSchema.extend(GetSourceByIdSchema.shape)),
-    zValidator('json', UpdateSourceSchema),
+    validate('param', GetNamespaceByIdSchema.extend(GetSourceByIdSchema.shape)),
+    validate('json', UpdateSourceSchema),
     SourceController.updateSource
 );
 
@@ -51,7 +51,7 @@ source.delete(
     '/:namespaceId/:sourceId',
     authenticate,
     checkScope('ingest:source:delete'),
-    zValidator('param', GetNamespaceByIdSchema.extend(GetSourceByIdSchema.shape)),
+    validate('param', GetNamespaceByIdSchema.extend(GetSourceByIdSchema.shape)),
     SourceController.deleteSource
 );
 

@@ -1,6 +1,6 @@
 import { ITransform, ITransformVersion } from '@kyrazo/shared';
 import { transformRepository } from './transforms.repo';
-import { CreateTransformInput, UpdateTransformInput } from './transforms.schema';
+import { CreateTransformDto, UpdateTransformDto } from './transforms.types';
 
 import lo from 'lodash';
 import dayjs from 'dayjs';
@@ -48,9 +48,9 @@ export class TransformService {
     }
 
     async createTransform(
-        data: CreateTransformInput, 
-        userId: string, 
-        workspaceId: string, 
+        data: CreateTransformDto,
+        userId: string,
+        workspaceId: string,
         namespaceId: string
     ): Promise<ITransform> {
         const validation = this.validateCode(data.code);
@@ -76,7 +76,11 @@ export class TransformService {
         return transformRepository.findAll({ query, limit, page });
     }
 
-    async getTransformById(id: string, workspaceId: string, namespaceId: string): Promise<ITransform> {
+    async getTransformById(
+        id: string,
+        workspaceId: string,
+        namespaceId: string
+    ): Promise<ITransform> {
         const transform = await transformRepository.findById(id, workspaceId, namespaceId);
         if (!transform) throw new Error('Transform not found');
         return transform;
@@ -86,7 +90,7 @@ export class TransformService {
         id: string,
         workspaceId: string,
         namespaceId: string,
-        data: UpdateTransformInput,
+        data: UpdateTransformDto,
         userId: string
     ): Promise<ITransform> {
         if (data.code) {
@@ -96,7 +100,13 @@ export class TransformService {
             }
         }
 
-        const updated = await transformRepository.update(id, workspaceId, namespaceId, data, userId);
+        const updated = await transformRepository.update(
+            id,
+            workspaceId,
+            namespaceId,
+            data,
+            userId
+        );
         if (!updated) throw new Error('Transform not found');
         return updated;
     }
@@ -116,12 +126,21 @@ export class TransformService {
         version: number,
         userId: string
     ): Promise<ITransform> {
-        const rolledBack = await transformRepository.rollback(id, workspaceId, namespaceId, version, userId);
+        const rolledBack = await transformRepository.rollback(
+            id,
+            workspaceId,
+            namespaceId,
+            version,
+            userId
+        );
         if (!rolledBack) throw new Error('Rollback failed');
         return rolledBack;
     }
 
-    async testTransform(code: string, payload: any): Promise<{ result: any; logs: string[]; executionTimeMs: number }> {
+    async testTransform(
+        code: string,
+        payload: any
+    ): Promise<{ result: any; logs: string[]; executionTimeMs: number }> {
         const validation = this.validateCode(code);
         if (!validation.valid) {
             throw new Error(validation.error);
@@ -139,8 +158,10 @@ export class TransformService {
                 crypto: safeCrypto,
                 console: {
                     log: (...args: any[]) => logs.push(args.map(a => String(a)).join(' ')),
-                    error: (...args: any[]) => logs.push(`ERROR: ${args.map(a => String(a)).join(' ')}`),
-                    info: (...args: any[]) => logs.push(`INFO: ${args.map(a => String(a)).join(' ')}`),
+                    error: (...args: any[]) =>
+                        logs.push(`ERROR: ${args.map(a => String(a)).join(' ')}`),
+                    info: (...args: any[]) =>
+                        logs.push(`INFO: ${args.map(a => String(a)).join(' ')}`),
                 },
             };
 
@@ -157,7 +178,7 @@ export class TransformService {
 
             const fn = new Function('payload', script);
             const result = fn.call(utils, payload);
-            
+
             const executionTimeMs = performance.now() - startTime;
 
             return {

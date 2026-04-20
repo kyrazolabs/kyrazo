@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { zValidator } from '@/core/middlewares/validator.middleware';
+import { validate } from '@/core/middlewares/validator.middleware';
 
 import { AuthController } from '@/modules/v1/auth/auth.controller';
 import { authenticate } from '@/core/middlewares/auth.middleware';
@@ -42,33 +42,23 @@ const auth = new Hono();
 auth.post(
     '/register',
     registerRateLimiter,
-    zValidator('json', RegisterSchema),
+    validate('json', RegisterSchema),
     AuthController.register
 );
-auth.post(
-    '/login',
-    loginRateLimiter,
-    zValidator('json', LoginSchema),
-    AuthController.login
-);
+auth.post('/login', loginRateLimiter, validate('json', LoginSchema), AuthController.login);
 
-auth.post(
-    '/google',
-    loginRateLimiter,
-    zValidator('json', GoogleLoginSchema),
-    AuthController.google
-);
+auth.post('/google', loginRateLimiter, validate('json', GoogleLoginSchema), AuthController.google);
 
 auth.post(
     '/refresh-token',
     refreshTokenRateLimiter,
-    zValidator('json', RefreshTokenSchema),
+    validate('json', RefreshTokenSchema),
     AuthController.refreshToken
 );
 
 auth.post(
     '/forgot-password',
-    zValidator('json', ForgotPasswordSchema),
+    validate('json', ForgotPasswordSchema),
     forgotPasswordRateLimiter,
     AuthController.forgotPassword
 );
@@ -76,13 +66,13 @@ auth.post(
 auth.post(
     '/reset-password',
     resetPasswordRateLimiter,
-    zValidator('json', ResetPasswordSchema),
+    validate('json', ResetPasswordSchema),
     AuthController.resetPassword
 );
 
 auth.post(
     '/verify-email',
-    zValidator('json', VerifyEmailSchema),
+    validate('json', VerifyEmailSchema),
     verifyEmailRateLimiter,
     AuthController.verifyEmail
 );
@@ -94,14 +84,14 @@ auth.use('/logout', authenticate);
 auth.post(
     '/change-password',
     changePasswordProtectedRateLimiter,
-    zValidator('json', ChangePasswordSchema),
+    validate('json', ChangePasswordSchema),
     AuthController.changePassword
 );
 
 auth.post(
     '/logout',
     logoutProtectedRateLimiter,
-    zValidator('json', RefreshTokenSchema),
+    validate('json', RefreshTokenSchema),
     AuthController.logout
 );
 
@@ -113,31 +103,26 @@ auth.get(
 auth.post('/resend-verification', profileUpdateRateLimiter, AuthController.resendEmailVerification);
 
 // 2FA Routes
-auth.post(
-    '/2fa/setup',
-    authenticate,
-    zValidator('json', Setup2FASchema),
-    AuthController.setup2FA
-);
+auth.post('/2fa/setup', authenticate, validate('json', Setup2FASchema), AuthController.setup2FA);
 
 auth.post(
     '/2fa/verify-setup',
     authenticate,
-    zValidator('json', Verify2FASetupSchema),
+    validate('json', Verify2FASetupSchema),
     AuthController.verify2FASetup
 );
 
 auth.post(
     '/2fa/login',
     loginRateLimiter,
-    zValidator('json', Login2FASchema),
+    validate('json', Login2FASchema),
     AuthController.login2FA
 );
 
 auth.post(
     '/2fa/resend',
     loginRateLimiter,
-    zValidator('json', Resend2FAOTPSchema),
+    validate('json', Resend2FAOTPSchema),
     AuthController.resend2FAOTP
 );
 
@@ -147,14 +132,14 @@ auth.post('/2fa/disable', authenticate, requireRecentOTP('disable_2fa'), AuthCon
 auth.post(
     '/otp/request',
     authenticate,
-    zValidator('json', RequestSensitiveOTPSchema),
+    validate('json', RequestSensitiveOTPSchema),
     AuthController.requestSensitiveOTP
 );
 
 auth.post(
     '/otp/verify',
     authenticate,
-    zValidator('json', VerifySensitiveOTPSchema),
+    validate('json', VerifySensitiveOTPSchema),
     AuthController.verifySensitiveOTP
 );
 

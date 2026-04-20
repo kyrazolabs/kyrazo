@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { zValidator } from '@/core/middlewares/validator.middleware';
+import { validate } from '@/core/middlewares/validator.middleware';
 import { WorkspaceController } from '@/modules/v1/workspace/workspace.controller';
 import { authenticate } from '@/core/middlewares/auth.middleware';
 import { requireWorkspaceMembershipParam } from '@/core/middlewares/workspace.middleware';
@@ -25,7 +25,7 @@ workspace.use(authenticate);
 workspace.post(
     '/',
     workspaceWriteRateLimiter,
-    zValidator('json', CreateWorkspaceSchema),
+    validate('json', CreateWorkspaceSchema),
     WorkspaceController.createWorkspace
 );
 
@@ -34,20 +34,20 @@ workspace.get('/', workspaceReadRateLimiter, WorkspaceController.getUserWorkspac
 // This route does not require authentication
 workspace.get(
     '/invitations/details/:token',
-    zValidator('param', UpdateInvitationStatusSchema),
+    validate('param', UpdateInvitationStatusSchema),
     WorkspaceController.getInvitationDetails
 );
 workspace.post(
     '/invitations/:token/accept',
     workspaceWriteRateLimiter,
-    zValidator('param', UpdateInvitationStatusSchema),
+    validate('param', UpdateInvitationStatusSchema),
     WorkspaceController.acceptWorkspaceInvitation
 );
 
 workspace.post(
     '/invitations/:token/reject',
     workspaceWriteRateLimiter,
-    zValidator('param', UpdateInvitationStatusSchema),
+    validate('param', UpdateInvitationStatusSchema),
     WorkspaceController.rejectWorkspaceInvitation
 );
 
@@ -57,22 +57,22 @@ workspace.use('/', requireWorkspaceMembershipParam());
 workspace.post(
     '/:workspaceId/leave',
     workspaceWriteRateLimiter,
-    zValidator('param', GetWorkspaceByIdSchema),
+    validate('param', GetWorkspaceByIdSchema),
     WorkspaceController.leaveWorkspace
 );
 
 workspace.get(
     '/:workspaceId',
     workspaceReadRateLimiter,
-    zValidator('param', GetWorkspaceByIdSchema),
+    validate('param', GetWorkspaceByIdSchema),
     WorkspaceController.getWorkspaceById
 );
 
 workspace.patch(
     '/:workspaceId',
     workspaceWriteRateLimiter,
-    zValidator('param', GetWorkspaceByIdSchema),
-    zValidator('json', UpdateWorkspaceSchema),
+    validate('param', GetWorkspaceByIdSchema),
+    validate('json', UpdateWorkspaceSchema),
     requireWorkspaceMembershipParam(['admin', 'owner']),
     requireRecentOTP('update_workspace'),
     WorkspaceController.updateWorkspace
@@ -81,7 +81,7 @@ workspace.patch(
 workspace.delete(
     '/:workspaceId',
     workspaceWriteRateLimiter,
-    zValidator('param', GetWorkspaceByIdSchema),
+    validate('param', GetWorkspaceByIdSchema),
     requireWorkspaceMembershipParam(['owner']),
     requireRecentOTP('delete_workspace'),
     WorkspaceController.deleteWorkspace
@@ -90,7 +90,7 @@ workspace.delete(
 workspace.post(
     '/:workspaceId/restore',
     workspaceWriteRateLimiter,
-    zValidator('param', GetWorkspaceByIdSchema),
+    validate('param', GetWorkspaceByIdSchema),
     requireWorkspaceMembershipParam(['owner']),
     WorkspaceController.restoreWorkspace
 );
@@ -98,7 +98,7 @@ workspace.post(
 workspace.post(
     '/:workspaceId/archive',
     workspaceWriteRateLimiter,
-    zValidator('param', GetWorkspaceByIdSchema),
+    validate('param', GetWorkspaceByIdSchema),
     requireWorkspaceMembershipParam(['admin', 'owner']),
     WorkspaceController.archiveWorkspace
 );
@@ -106,7 +106,7 @@ workspace.post(
 workspace.post(
     '/:workspaceId/unarchive',
     workspaceWriteRateLimiter,
-    zValidator('param', GetWorkspaceByIdSchema),
+    validate('param', GetWorkspaceByIdSchema),
     requireWorkspaceMembershipParam(['admin', 'owner']),
     WorkspaceController.unarchiveWorkspace
 );
@@ -115,35 +115,35 @@ workspace.post(
 workspace.get(
     '/:workspaceId/members',
     workspaceReadRateLimiter,
-    zValidator('param', GetWorkspaceByIdSchema),
+    validate('param', GetWorkspaceByIdSchema),
     WorkspaceController.getWorkspaceMembers
 );
 
 workspace.post(
     '/:workspaceId/invitations',
     workspaceWriteRateLimiter,
-    zValidator('param', GetWorkspaceByIdSchema),
+    validate('param', GetWorkspaceByIdSchema),
     requireWorkspaceMembershipParam(['admin', 'owner']),
     checkWorkspaceLimits('maxMembers'),
-    zValidator('json', InviteWorkspaceMemberSchema),
+    validate('json', InviteWorkspaceMemberSchema),
     WorkspaceController.inviteUserToWorkspace
 );
 
 workspace.delete(
     '/:workspaceId/members/:userId',
     workspaceWriteRateLimiter,
-    zValidator('param', GetWorkspaceByIdSchema),
+    validate('param', GetWorkspaceByIdSchema),
     requireWorkspaceMembershipParam(['admin', 'owner']),
-    zValidator('param', WorkspaceMemberSchema),
+    validate('param', WorkspaceMemberSchema),
     WorkspaceController.removeUserFromWorkspace
 );
 
 workspace.patch(
     '/:workspaceId/members/role',
     workspaceWriteRateLimiter,
-    zValidator('param', GetWorkspaceByIdSchema),
+    validate('param', GetWorkspaceByIdSchema),
     requireWorkspaceMembershipParam(['admin', 'owner']),
-    zValidator('json', UpdateWorkspaceMemberRoleSchema),
+    validate('json', UpdateWorkspaceMemberRoleSchema),
     WorkspaceController.updateUserRoleInWorkspace
 );
 

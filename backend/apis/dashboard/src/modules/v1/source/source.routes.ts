@@ -3,7 +3,7 @@ import { authenticate } from '@/core/middlewares/auth.middleware';
 import { sentryMiddleware } from '@/core/middlewares/sentry.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
 import { requireNamespaceAccess } from '@/core/middlewares/namespace.middleware';
-import { zValidator } from '@/core/middlewares/validator.middleware';
+import { validate } from '@/core/middlewares/validator.middleware';
 
 import {
     CreateSourceSchema,
@@ -18,8 +18,8 @@ import { sourceWriteRateLimiter, sourceReadRateLimiter } from './source.ratelimi
 
 const source = new Hono();
 
-// Header validation using zValidator
-const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema);
+// Header validation using validate
+const validateNamespaceHeaders = validate('header', NamespaceHeadersSchema);
 
 source.use('*', authenticate);
 source.use('*', sentryMiddleware);
@@ -30,44 +30,44 @@ source.use('*', requireNamespaceAccess());
 source.post(
     '/',
     sourceWriteRateLimiter,
-    zValidator('json', CreateSourceSchema),
+    validate('json', CreateSourceSchema),
     SourceController.createSource
 );
 
 source.get(
     '/',
     sourceReadRateLimiter,
-    zValidator('query', SearchSourceSchema),
+    validate('query', SearchSourceSchema),
     SourceController.getSources
 );
 
 source.get(
     '/:sourceId',
     sourceReadRateLimiter,
-    zValidator('param', GetSourceByIdSchema),
+    validate('param', GetSourceByIdSchema),
     SourceController.getSource
 );
 
 source.patch(
     '/:sourceId',
     sourceWriteRateLimiter,
-    zValidator('param', GetSourceByIdSchema),
-    zValidator('json', UpdateSourceSchema),
+    validate('param', GetSourceByIdSchema),
+    validate('json', UpdateSourceSchema),
     SourceController.updateSource
 );
 
 source.put(
     '/:sourceId/auth',
     sourceWriteRateLimiter,
-    zValidator('param', GetSourceByIdSchema),
-    zValidator('json', UpdateSourceAuthSchema),
+    validate('param', GetSourceByIdSchema),
+    validate('json', UpdateSourceAuthSchema),
     SourceController.updateSourceAuth
 );
 
 source.delete(
     '/:sourceId',
     sourceWriteRateLimiter,
-    zValidator('param', GetSourceByIdSchema),
+    validate('param', GetSourceByIdSchema),
     SourceController.deleteSource
 );
 export default source;

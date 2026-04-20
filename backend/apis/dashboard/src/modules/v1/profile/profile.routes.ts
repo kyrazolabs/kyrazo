@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { zValidator } from '@/core/middlewares/validator.middleware';
+import { validate } from '@/core/middlewares/validator.middleware';
 
 import { profileController } from '@/modules/v1/profile/profile.controller';
 import { authenticate } from '@/core/middlewares/auth.middleware';
@@ -22,7 +22,7 @@ profile.patch(
     '/',
     profileUpdateRateLimiter,
     requireRecentOTP('update_profile'),
-    zValidator('json', UpdateProfileSchema),
+    validate('json', UpdateProfileSchema),
     profileController.updateProfile
 );
 
@@ -30,7 +30,7 @@ profile.get('/preferences', preferencesReadRateLimiter, profileController.getPre
 profile.patch(
     '/preferences',
     preferencesUpdateRateLimiter,
-    zValidator('json', UpdatePreferencesSchema),
+    validate('json', UpdatePreferencesSchema),
     profileController.updatePreferences
 );
 

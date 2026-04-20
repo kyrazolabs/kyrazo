@@ -4,7 +4,7 @@ import { authenticate } from '@/core/middlewares/auth.middleware';
 import { sentryMiddleware } from '@/core/middlewares/sentry.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
 import { requireNamespaceAccess } from '@/core/middlewares/namespace.middleware';
-import { zValidator } from '@/core/middlewares/validator.middleware';
+import { validate } from '@/core/middlewares/validator.middleware';
 import { targetReadRateLimiter, targetWriteRateLimiter } from './target.ratelimiter';
 import {
     CreateTargetSchema,
@@ -17,8 +17,8 @@ import { TargetController } from './target.controller';
 
 const target = new Hono();
 
-// Header validation using zValidator
-const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema);
+// Header validation using validate
+const validateNamespaceHeaders = validate('header', NamespaceHeadersSchema);
 
 target.use('*', authenticate);
 target.use('*', sentryMiddleware);
@@ -29,50 +29,50 @@ target.use('*', requireNamespaceAccess());
 target.post(
     '/',
     targetWriteRateLimiter,
-    zValidator('json', CreateTargetSchema),
+    validate('json', CreateTargetSchema),
     TargetController.createTarget
 );
 
 target.get(
     '/',
     targetReadRateLimiter,
-    zValidator('query', SearchTargetSchema),
+    validate('query', SearchTargetSchema),
     TargetController.getTargets
 );
 
 target.get(
     '/:targetId',
     targetReadRateLimiter,
-    zValidator('param', GetTargetByIdSchema),
+    validate('param', GetTargetByIdSchema),
     TargetController.getTarget
 );
 
 target.get(
     '/:targetId/secret',
     targetReadRateLimiter,
-    zValidator('param', GetTargetByIdSchema),
+    validate('param', GetTargetByIdSchema),
     TargetController.getTargetSecret
 );
 
 target.patch(
     '/:targetId',
     targetWriteRateLimiter,
-    zValidator('param', GetTargetByIdSchema),
-    zValidator('json', UpdateTargetSchema),
+    validate('param', GetTargetByIdSchema),
+    validate('json', UpdateTargetSchema),
     TargetController.updateTarget
 );
 
 target.put(
     '/:targetId',
     targetWriteRateLimiter,
-    zValidator('json', UpdateTargetStatusSchema),
+    validate('json', UpdateTargetStatusSchema),
     TargetController.updateTargetStatus
 );
 
 target.delete(
     '/:targetId',
     targetWriteRateLimiter,
-    zValidator('param', GetTargetByIdSchema),
+    validate('param', GetTargetByIdSchema),
     TargetController.deleteTarget
 );
 

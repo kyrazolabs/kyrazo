@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { zValidator } from '@/core/middlewares/validator.middleware';
+import { validate } from '@/core/middlewares/validator.middleware';
 import { authenticate, checkScope } from '@/core/middlewares/auth.middleware';
 import {
     CreateEndpointSchema,
@@ -17,8 +17,8 @@ endpoint.post(
     '/:namespaceId',
     authenticate,
     checkScope('ingest:endpoint:create'),
-    zValidator('param', GetNamespaceByIdSchema),
-    zValidator('json', CreateEndpointSchema),
+    validate('param', GetNamespaceByIdSchema),
+    validate('json', CreateEndpointSchema),
     EndpointController.createEndpoint
 );
 
@@ -26,8 +26,8 @@ endpoint.get(
     '/:namespaceId',
     authenticate,
     checkScope('ingest:endpoint:read'),
-    zValidator('param', GetNamespaceByIdSchema),
-    zValidator('query', SearchEndpointSchema),
+    validate('param', GetNamespaceByIdSchema),
+    validate('query', SearchEndpointSchema),
     EndpointController.getEndpoints
 );
 
@@ -35,7 +35,7 @@ endpoint.get(
     '/:namespaceId/:endpointId',
     authenticate,
     checkScope('ingest:endpoint:read'),
-    zValidator('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
+    validate('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
     EndpointController.getEndpoint
 );
 
@@ -43,7 +43,7 @@ endpoint.get(
     '/:namespaceId/:endpointId/secret',
     authenticate,
     checkScope('ingest:endpoint:read'),
-    zValidator('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
+    validate('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
     EndpointController.getEndpointSecret
 );
 
@@ -51,8 +51,8 @@ endpoint.patch(
     '/:namespaceId/:endpointId',
     authenticate,
     checkScope('ingest:endpoint:update'),
-    zValidator('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
-    zValidator('json', UpdateEndpointSchema),
+    validate('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
+    validate('json', UpdateEndpointSchema),
     EndpointController.updateEndpoint
 );
 
@@ -60,8 +60,8 @@ endpoint.put(
     '/:namespaceId/:endpointId',
     authenticate,
     checkScope('ingest:endpoint:update'),
-    zValidator('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
-    zValidator('json', UpdateEndpointStatusSchema),
+    validate('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
+    validate('json', UpdateEndpointStatusSchema),
     EndpointController.updateEndpoint
 );
 
@@ -69,7 +69,7 @@ endpoint.delete(
     '/:namespaceId/:endpointId',
     authenticate,
     checkScope('ingest:endpoint:delete'),
-    zValidator('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
+    validate('param', GetNamespaceByIdSchema.extend(GetEndpointByIdSchema.shape)),
     EndpointController.deleteEndpoint
 );
 

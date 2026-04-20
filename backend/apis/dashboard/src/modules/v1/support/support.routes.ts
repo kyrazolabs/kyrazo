@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { SupportController } from './support.controller';
-import { zValidator } from '@/core/middlewares/validator.middleware';
+import { validate } from '@/core/middlewares/validator.middleware';
 import { SupportTicketSchema } from './support.schema';
 import { NamespaceHeadersSchema } from '@kyrazo/shared';
 import { authenticate } from '@/core/middlewares/auth.middleware';
@@ -9,8 +9,8 @@ import { requireNamespaceAccess } from '@/core/middlewares/namespace.middleware'
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
 import { supportReadRateLimiter } from './support.ratelimiter';
 
-// Header validation using zValidator
-const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema);
+// Header validation using validate
+const validateNamespaceHeaders = validate('header', NamespaceHeadersSchema);
 
 const support = new Hono();
 
@@ -23,7 +23,7 @@ support.use('*', requireNamespaceAccess());
 support.post(
     '/',
     supportReadRateLimiter,
-    zValidator('json', SupportTicketSchema),
+    validate('json', SupportTicketSchema),
     SupportController.createTicket
 );
 

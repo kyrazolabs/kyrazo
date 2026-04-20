@@ -1,4 +1,12 @@
-import { ITransform, ITransformVersion, Transform, TransformVersion, transformWithId, unprefixId, RedisKeys } from '@kyrazo/shared';
+import {
+    ITransform,
+    ITransformVersion,
+    Transform,
+    TransformVersion,
+    transformWithId,
+    unprefixId,
+    RedisKeys,
+} from '@kyrazo/shared';
 import { Types } from 'mongoose';
 import { redisConfig } from '@/configs';
 
@@ -27,7 +35,11 @@ export class TransformRepository {
         return transformWithId(savedTransform.toJSON(), 'transformer') as any;
     }
 
-    async findById(id: string, workspaceId: string, namespaceId: string): Promise<ITransform | null> {
+    async findById(
+        id: string,
+        workspaceId: string,
+        namespaceId: string
+    ): Promise<ITransform | null> {
         const transform = await Transform.findOne({
             _id: unprefixId(id),
             workspaceId: unprefixId(workspaceId),
@@ -83,7 +95,7 @@ export class TransformRepository {
             if (!existing) return;
 
             const codeChanged = data.code && data.code !== existing.code;
-            
+
             if (codeChanged) {
                 const nextVersion = existing.currentVersion + 1;
                 existing.currentVersion = nextVersion;
@@ -109,7 +121,9 @@ export class TransformRepository {
         if (updatedTransform) {
             await redisConfig.del(RedisKeys.context.activeTransform(workspaceId, namespaceId));
         }
-        return updatedTransform ? (transformWithId(updatedTransform.toJSON(), 'transformer') as any) : null;
+        return updatedTransform
+            ? (transformWithId(updatedTransform.toJSON(), 'transformer') as any)
+            : null;
     }
 
     async deleteById(id: string, workspaceId: string, namespaceId: string): Promise<boolean> {
@@ -186,7 +200,9 @@ export class TransformRepository {
         if (updatedTransform) {
             await redisConfig.del(RedisKeys.context.activeTransform(workspaceId, namespaceId));
         }
-        return updatedTransform ? (transformWithId(updatedTransform.toJSON(), 'transformer') as any) : null;
+        return updatedTransform
+            ? (transformWithId(updatedTransform.toJSON(), 'transformer') as any)
+            : null;
     }
 }
 

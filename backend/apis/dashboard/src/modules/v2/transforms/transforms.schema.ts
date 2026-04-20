@@ -12,10 +12,7 @@ export const CreateTransformSchema = z.object({
         .string()
         .min(3, 'Name must be at least 3 characters')
         .max(100, 'Name must be at most 100 characters'),
-    description: z
-        .string()
-        .max(500, 'Description must be at most 500 characters')
-        .optional(),
+    description: z.string().max(500, 'Description must be at most 500 characters').optional(),
     code: z
         .string()
         .min(10, 'Code must be at least 10 characters')
@@ -29,10 +26,7 @@ export const UpdateTransformSchema = z.object({
         .min(3, 'Name must be at least 3 characters')
         .max(100, 'Name must be at most 100 characters')
         .optional(),
-    description: z
-        .string()
-        .max(500, 'Description must be at most 500 characters')
-        .optional(),
+    description: z.string().max(500, 'Description must be at most 500 characters').optional(),
     code: z
         .string()
         .min(10, 'Code must be at least 10 characters')
@@ -64,10 +58,3 @@ export const RollbackParamSchema = z.object({
     id: transformIdSchema,
     version: versionSchema,
 });
-
-export type CreateTransformInput = z.infer<typeof CreateTransformSchema>;
-export type UpdateTransformInput = z.infer<typeof UpdateTransformSchema>;
-export type TestTransformInput = z.infer<typeof TestTransformSchema>;
-export type FilterTransformInput = z.infer<typeof SearchTransformSchema>;
-export type GetTransformByIdInput = z.infer<typeof TransformIdParamSchema>;
-export type RollbackTransformInput = z.infer<typeof RollbackParamSchema>;

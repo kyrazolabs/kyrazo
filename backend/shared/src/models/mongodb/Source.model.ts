@@ -105,6 +105,9 @@ const SourceSchema = new Schema<ISource>(
             maxAttempts: { type: Number, default: 3 },
         },
 
+        transformId: { type: Schema.Types.ObjectId, ref: 'Transform' },
+        isManagedTransform: { type: Boolean, default: false },
+
         // Authentication config
         authentication: {
             type: AuthenticationSchema,

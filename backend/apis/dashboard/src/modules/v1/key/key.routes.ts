@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { zValidator } from '@/core/middlewares/validator.middleware';
+import { validate } from '@/core/middlewares/validator.middleware';
 import { authenticate } from '@/core/middlewares/auth.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
 import { requireRecentOTP } from '@/core/middlewares/otp.middleware';
@@ -17,7 +17,7 @@ key.use(requireWorkspaceMembership(['owner', 'admin', 'member']));
 key.post(
     '/',
     keyManagementRateLimiter,
-    zValidator('json', createAPIKeySchema),
+    validate('json', createAPIKeySchema),
     requireRecentOTP('manage_keys'),
     KeyController.createKey
 );
@@ -25,21 +25,21 @@ key.post(
 key.get(
     '/',
     keyManagementRateLimiter,
-    zValidator('query', getKeysSchema),
+    validate('query', getKeysSchema),
     KeyController.getKeysSchema
 );
 
 key.get(
     '/check-scopes/:keyId',
     keyManagementRateLimiter,
-    zValidator('param', checkScopeSchema),
+    validate('param', checkScopeSchema),
     KeyController.checkScopes
 );
 
 key.delete(
     '/:keyId',
     keyManagementRateLimiter,
-    zValidator('param', revokeKeyById),
+    validate('param', revokeKeyById),
     requireRecentOTP('manage_keys'),
     KeyController.deleteKey
 );

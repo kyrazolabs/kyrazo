@@ -3,7 +3,7 @@ import type { ValidationTargets } from 'hono';
 import { zValidator as zv } from '@hono/zod-validator';
 import { IErrorResponse } from '@kyrazo/shared';
 
-export const zValidator = <T extends ZodSchema, Target extends keyof ValidationTargets>(
+export const validate = <T extends ZodSchema, Target extends keyof ValidationTargets>(
     target: Target,
     schema: T
 ) =>

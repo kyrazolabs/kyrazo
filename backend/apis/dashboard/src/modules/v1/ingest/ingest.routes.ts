@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { zValidator } from '@/core/middlewares/validator.middleware';
+import { validate } from '@/core/middlewares/validator.middleware';
 import { NamespaceHeadersSchema } from '@/core/utils/libs/zod';
 import { authenticate } from '@/core/middlewares/auth.middleware';
 import { sentryMiddleware } from '@/core/middlewares/sentry.middleware';
@@ -17,8 +17,8 @@ import { ingestRateLimiter } from './ingest.ratelimiter';
 
 const ingest = new Hono();
 
-// Header validation using zValidator
-const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema);
+// Header validation using validate
+const validateNamespaceHeaders = validate('header', NamespaceHeadersSchema);
 
 ingest.use('*', authenticate);
 ingest.use('*', sentryMiddleware);
@@ -32,8 +32,8 @@ ingest.use('*', requireNamespaceAccess());
 ingest.get(
     '/source/:sourceId',
     ingestRateLimiter,
-    zValidator('param', GetIngestEventsSchema),
-    zValidator('query', GetIngestsEventsBySourceSchema),
+    validate('param', GetIngestEventsSchema),
+    validate('query', GetIngestsEventsBySourceSchema),
     IngestController.getIngestEventsBySource
 );
 
@@ -43,7 +43,7 @@ ingest.get(
 ingest.get(
     '/events',
     ingestRateLimiter,
-    zValidator('query', GetIngestEventsSchema),
+    validate('query', GetIngestEventsSchema),
     IngestController.getIngestEvents
 );
 
@@ -53,7 +53,7 @@ ingest.get(
 ingest.get(
     '/events/:eventId',
     ingestRateLimiter,
-    zValidator('param', GetIngestsByEventIdSchema),
+    validate('param', GetIngestsByEventIdSchema),
     IngestController.getIngestEventById
 );
 

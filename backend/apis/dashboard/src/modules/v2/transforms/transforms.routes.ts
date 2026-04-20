@@ -5,7 +5,7 @@ import { AppContext, authenticate } from '@/core/middlewares/auth.middleware';
 import { sentryMiddleware } from '@/core/middlewares/sentry.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
 import { requireNamespaceAccess } from '@/core/middlewares/namespace.middleware';
-import { zValidator } from '@/core/middlewares/validator.middleware';
+import { validate } from '@/core/middlewares/validator.middleware';
 import {
     transformReadRateLimiter,
     transformWriteRateLimiter,
@@ -24,8 +24,8 @@ import { transformService } from './transforms.service';
 
 const transforms = new Hono();
 
-// Header validation using zValidator
-const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema);
+// Header validation using validate
+const validateNamespaceHeaders = validate('header', NamespaceHeadersSchema);
 
 transforms.use('*', authenticate);
 transforms.use('*', sentryMiddleware);
@@ -37,7 +37,7 @@ transforms.use('*', requireNamespaceAccess());
 transforms.post(
     '/',
     transformWriteRateLimiter,
-    zValidator('json', CreateTransformSchema),
+    validate('json', CreateTransformSchema),
     TransformController.createTransform
 );
 
@@ -45,7 +45,7 @@ transforms.post(
 transforms.get(
     '/',
     transformReadRateLimiter,
-    zValidator('query', SearchTransformSchema),
+    validate('query', SearchTransformSchema),
     TransformController.getTransforms
 );
 
@@ -53,7 +53,7 @@ transforms.get(
 transforms.get(
     '/:id',
     transformReadRateLimiter,
-    zValidator('param', TransformIdParamSchema),
+    validate('param', TransformIdParamSchema),
     TransformController.getTransform
 );
 
@@ -61,8 +61,8 @@ transforms.get(
 transforms.put(
     '/:id',
     transformWriteRateLimiter,
-    zValidator('param', TransformIdParamSchema),
-    zValidator('json', UpdateTransformSchema),
+    validate('param', TransformIdParamSchema),
+    validate('json', UpdateTransformSchema),
     TransformController.updateTransform
 );
 
@@ -70,7 +70,7 @@ transforms.put(
 transforms.delete(
     '/:id',
     transformWriteRateLimiter,
-    zValidator('param', TransformIdParamSchema),
+    validate('param', TransformIdParamSchema),
     TransformController.deleteTransform
 );
 
@@ -78,7 +78,7 @@ transforms.delete(
 transforms.get(
     '/:id/versions',
     transformReadRateLimiter,
-    zValidator('param', TransformIdParamSchema),
+    validate('param', TransformIdParamSchema),
     TransformController.getVersions
 );
 
@@ -86,7 +86,7 @@ transforms.get(
 transforms.post(
     '/:id/rollback/:version',
     transformWriteRateLimiter,
-    zValidator('param', RollbackParamSchema),
+    validate('param', RollbackParamSchema),
     TransformController.rollback
 );
 
@@ -102,11 +102,14 @@ transforms.post(
 transforms.put(
     '/:id/test',
     transformTestRateLimiter,
-    zValidator('param', TransformIdParamSchema),
-    zValidator('json', z.object({ 
-        code: z.string().optional(),
-        payload: z.any().default({}) 
-    })),
+    validate('param', TransformIdParamSchema),
+    validate(
+        'json',
+        z.object({
+            code: z.string().optional(),
+            payload: z.any().default({}),
+        })
+    ),
     async (c: AppContext) => {
         // @ts-ignore
         const { id } = c.req.valid('param');
@@ -148,7 +151,7 @@ transforms.put(
 transforms.post(
     '/test',
     transformTestRateLimiter,
-    zValidator('json', TestTransformSchema),
+    validate('json', TestTransformSchema),
     TransformController.testTransform
 );
 

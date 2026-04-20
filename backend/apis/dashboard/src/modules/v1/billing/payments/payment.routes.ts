@@ -1,10 +1,10 @@
 import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
 import { authenticate } from '@/core/middlewares/auth.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
 import { CreateBillingPortalDto } from './payment.dto';
 import { PaymentController } from './payment.controller';
 import { paymentReadRateLimiter } from './payment.ratelimiter';
+import { validate } from '@/core/middlewares/validator.middleware';
 
 const payment = new Hono();
 
@@ -19,21 +19,7 @@ payment.post('/webhook', PaymentController.handleWebhook);
 payment.post(
     '/portal',
     paymentReadRateLimiter,
-    zValidator('json', CreateBillingPortalDto, (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    statusCode: 400,
-                    errors: JSON.parse(result.error.message).map((e: any) => ({
-                        field: e.path.join('.') || 'unknown',
-                        message: e.message,
-                    })),
-                },
-                400
-            );
-        }
-    }),
+    validate('json', CreateBillingPortalDto),
     PaymentController.createBillingPortal
 );
 

@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { zValidator } from '@/core/middlewares/validator.middleware';
+import { validate } from '@/core/middlewares/validator.middleware';
 import { AppContext, authenticate } from '@/core/middlewares/auth.middleware';
 import { sentryMiddleware } from '@/core/middlewares/sentry.middleware';
 import { requireWorkspaceMembership } from '@/core/middlewares/workspace.middleware';
@@ -22,8 +22,8 @@ import { NamespaceHeadersSchema } from '@/core/utils/libs/zod';
 
 const delivery = new Hono();
 
-// Header validation using zValidator
-const validateNamespaceHeaders = zValidator('header', NamespaceHeadersSchema);
+// Header validation using validate
+const validateNamespaceHeaders = validate('header', NamespaceHeadersSchema);
 
 // Lazy wrapper for delivery routes rate limiter (user-based, normal level for read operations)
 const deliveryRateLimiter = async (c: AppContext, next: () => Promise<void>) => {
@@ -51,7 +51,7 @@ delivery.use('*', requireNamespaceAccess());
 delivery.get(
     '/',
     deliveryRateLimiter,
-    zValidator('query', GetDeliveriesSchema),
+    validate('query', GetDeliveriesSchema),
     DeliveryController.getDeliveries
 );
 
@@ -61,7 +61,7 @@ delivery.get(
 delivery.get(
     '/targets',
     deliveryRateLimiter,
-    zValidator('query', GetDeliveriesSchema.omit({ status: true })),
+    validate('query', GetDeliveriesSchema.omit({ status: true })),
     DeliveryController.getTargets
 );
 
@@ -71,8 +71,8 @@ delivery.get(
 delivery.get(
     '/targets/:targetId',
     deliveryRateLimiter,
-    zValidator('param', TargetQuerySchema),
-    zValidator('query', GetDeliveriesSchema),
+    validate('param', TargetQuerySchema),
+    validate('query', GetDeliveriesSchema),
     DeliveryController.getDeliveriesByTarget
 );
 
@@ -82,8 +82,8 @@ delivery.get(
 delivery.get(
     '/targets/:targetId/overview',
     deliveryRateLimiter,
-    zValidator('param', TargetQuerySchema),
-    zValidator('query', OverviewFilterSchema),
+    validate('param', TargetQuerySchema),
+    validate('query', OverviewFilterSchema),
     DeliveryController.getDeliveryStatsByTarget
 );
 
@@ -93,8 +93,8 @@ delivery.get(
 delivery.get(
     '/source/:sourceId',
     deliveryRateLimiter,
-    zValidator('param', GetDeliveriesBySourceIdSchema),
-    zValidator('query', GetDeliveriesBySourceSchema),
+    validate('param', GetDeliveriesBySourceIdSchema),
+    validate('query', GetDeliveriesBySourceSchema),
     DeliveryController.getDeliveriesBySource
 );
 
@@ -104,7 +104,7 @@ delivery.get(
 delivery.get(
     '/:deliveryId',
     deliveryRateLimiter,
-    zValidator('param', GetDeliveryByIdSchema),
+    validate('param', GetDeliveryByIdSchema),
     DeliveryController.getDeliveryById
 );
 

@@ -12,13 +12,13 @@ import {
     UpdateTransformResponse,
 } from './transforms.types';
 import {
-    CreateTransformInput,
-    FilterTransformInput,
-    GetTransformByIdInput,
-    RollbackTransformInput,
-    TestTransformInput,
-    UpdateTransformInput,
-} from './transforms.schema';
+    CreateTransformDto,
+    FilterTransformDto,
+    GetTransformByIdDto,
+    RollbackTransformDto,
+    TestTransformDto,
+    UpdateTransformDto,
+} from './transforms.types';
 
 export class TransformController {
     static async createTransform(c: AppContext): Promise<Response> {
@@ -42,7 +42,7 @@ export class TransformController {
             }
 
             // @ts-ignore
-            const valid: CreateTransformInput = c.req.valid('json');
+            const valid: CreateTransformDto = c.req.valid('json');
             const saved = await transformService.createTransform(
                 valid,
                 userId,
@@ -94,12 +94,7 @@ export class TransformController {
             }
 
             // @ts-ignore
-            const {
-                q,
-                isActive,
-                limit = 10,
-                page = 1,
-            }: FilterTransformInput = c.req.valid('query');
+            const { q, isActive, limit = 10, page = 1 }: FilterTransformDto = c.req.valid('query');
             const query: Record<string, unknown> = { workspaceId, namespaceId };
             if (q) query.name = { $regex: q, $options: 'i' };
             if (isActive !== undefined) query.isActive = isActive;
@@ -160,7 +155,7 @@ export class TransformController {
             }
 
             // @ts-ignore
-            const { id }: GetTransformByIdInput = c.req.valid('param');
+            const { id }: GetTransformByIdDto = c.req.valid('param');
             const transform = await transformService.getTransformById(
                 id,
                 workspaceId.toString(),
@@ -212,9 +207,9 @@ export class TransformController {
             }
 
             // @ts-ignore
-            const { id }: GetTransformByIdInput = c.req.valid('param');
+            const { id }: GetTransformByIdDto = c.req.valid('param');
             // @ts-ignore
-            const valid: UpdateTransformInput = c.req.valid('json');
+            const valid: UpdateTransformDto = c.req.valid('json');
 
             const updated = await transformService.updateTransform(
                 id,
@@ -268,7 +263,7 @@ export class TransformController {
             }
 
             // @ts-ignore
-            const { id }: GetTransformByIdInput = c.req.valid('param');
+            const { id }: GetTransformByIdDto = c.req.valid('param');
             const deleted = await transformService.deleteTransform(
                 id,
                 workspaceId.toString(),
@@ -302,7 +297,7 @@ export class TransformController {
     static async getVersions(c: AppContext): Promise<Response> {
         try {
             // @ts-ignore
-            const { id }: GetTransformByIdInput = c.req.valid('param');
+            const { id }: GetTransformByIdDto = c.req.valid('param');
             const versions = await transformService.getVersions(id);
 
             return c.json<GetTransformVersionsResponse>(
@@ -350,7 +345,7 @@ export class TransformController {
             }
 
             // @ts-ignore
-            const { id, version }: RollbackTransformInput = c.req.valid('param');
+            const { id, version }: RollbackTransformDto = c.req.valid('param');
             const rolledBack = await transformService.rollback(
                 id,
                 workspaceId.toString(),
@@ -386,7 +381,7 @@ export class TransformController {
     static async testTransform(c: AppContext): Promise<Response> {
         try {
             // @ts-ignore
-            const { code, payload }: TestTransformInput = c.req.valid('json');
+            const { code, payload }: TestTransformDto = c.req.valid('json');
             const result = await transformService.testTransform(code, payload);
 
             return c.json<TestTransformResponse>(
