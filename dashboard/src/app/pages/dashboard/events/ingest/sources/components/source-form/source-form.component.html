@@ -295,7 +295,12 @@
                             <!-- S3 Storage -->
                             <div class="flex flex-col gap-4">
                                 <div class="flex items-center justify-between">
-                                    <h3 class="text-sm font-semibold uppercase tracking-wider text-surface-500">S3 Storage</h3>
+                                    <div class="flex items-center gap-3">
+                                        <h3 class="text-sm font-semibold uppercase tracking-wider text-surface-500">S3 Storage</h3>
+                                        <div class="ml-2 px-2.5 py-0.5 rounded-full bg-primary-500/10 border border-primary-500/30 text-primary-600 shadow-primary-500/20 text-[10px] font-bold uppercase tracking-wider shrink-0">
+                                            Beta
+                                        </div>
+                                    </div>
                                     <p-button label="Add New Bucket" icon="pi pi-plus" size="small" [text]="true" (onClick)="openS3Dialog()" />
                                 </div>
                                 <div class="flex flex-col gap-2">
@@ -319,7 +324,12 @@
                             <!-- ASQS Queues -->
                             <div class="flex flex-col gap-4">
                                 <div class="flex items-center justify-between">
-                                    <h3 class="text-sm font-semibold uppercase tracking-wider text-surface-500">SQS Queues</h3>
+                                    <div class="flex items-center gap-3">
+                                        <h3 class="text-sm font-semibold uppercase tracking-wider text-surface-500">SQS Queues</h3>
+                                        <div class="ml-2 px-2.5 py-0.5 rounded-full bg-primary-500/10 border border-primary-500/30 text-primary-600 shadow-primary-500/20 text-[10px] font-bold uppercase tracking-wider shrink-0">
+                                            Beta
+                                        </div>
+                                    </div>
                                     <p-button label="Add New Queue" icon="pi pi-plus" size="small" [text]="true" (onClick)="openASQSDialog()" />
                                 </div>
                                 <div class="flex flex-col gap-2">

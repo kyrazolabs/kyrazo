@@ -48,7 +48,8 @@
                 [rowsPerPageOptions]="[10,20,50,100]"
                 [totalRecords]="totalRecords"
                 (onLazyLoad)="loadEndpointsLazy($event)"
-                dataKey="_id"
+                dataKey="id"
+                styleClass="p-datatable-sm"
                 responsiveLayout="scroll">
             <ng-template pTemplate="header">
                 <tr>
