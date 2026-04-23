@@ -1,6 +1,6 @@
-import { secretCrypto, RedisKeys, logger, unprefixId, prefixId } from '@kyrazo/shared';
+import { secretCrypto, RedisKeys, logger, unprefixId, prefixId, buildS3Config, S3Provider } from '@kyrazo/shared';
 import { redisConfig } from '@/configs';
-import { S3Client } from 'bun';
+import { S3Client, HeadBucketCommand } from '@aws-sdk/client-s3';
 import { s3Repo } from './s3.repo';
 import { transformRepository } from '../transform/transform.repo';
 import { CreateS3Dto, UpdateS3Dto } from './s3.types';
@@ -170,18 +170,24 @@ export class S3Service {
         accessKeyId: string;
         secretAccessKey: string;
         endpoint?: string;
+        provider: S3Provider;
+        forcePathStyle: boolean;
     }): Promise<{ success: boolean; error?: string }> {
         try {
-            const client = new this.S3ClientClass({
+            const config = buildS3Config(options.provider, {
+                region: options.region,
                 accessKeyId: options.accessKeyId,
                 secretAccessKey: options.secretAccessKey,
-                bucket: options.bucketName,
-                region: options.region,
                 endpoint: options.endpoint,
+                forcePathStyle: options.forcePathStyle,
             });
 
-            // Try to check if bucket exists or just list a single object
-            await client.exists('.kyrazo-connection-test'); 
+            const client = new this.S3ClientClass(config);
+
+            // Try to check if bucket exists
+            await client.send(new HeadBucketCommand({
+                Bucket: options.bucketName,
+            })); 
             
             return { success: true };
         } catch (error: any) {

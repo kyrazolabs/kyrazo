@@ -33,6 +33,7 @@ mock.module('@kyrazo/shared', () => {
         Source: Object.assign(MockSource, {
             startSession: mock().mockResolvedValue(mockSession),
             findOne: mock().mockReturnValue({
+                populate: mock().mockReturnThis(),
                 session: mock().mockReturnThis(),
                 lean: mock().mockResolvedValue(mockDoc),
                 then: (cb: any) => cb(mockDoc),
@@ -41,6 +42,7 @@ mock.module('@kyrazo/shared', () => {
                 sort: mock().mockReturnThis(),
                 skip: mock().mockReturnThis(),
                 limit: mock().mockReturnThis(),
+                populate: mock().mockReturnThis(),
                 lean: mock().mockResolvedValue([mockDoc]),
             }),
             findOneAndUpdate: mock().mockReturnValue({
@@ -80,6 +82,7 @@ describe('SourceRepositoryV2 - Comprehensive Tests', () => {
 
     it('should handle findById for missing source', async () => {
         (Source.findOne as any).mockReturnValueOnce({
+            populate: mock().mockReturnThis(),
             session: mock().mockReturnThis(),
             lean: mock().mockResolvedValue(null),
             then: (cb: any) => cb(null),

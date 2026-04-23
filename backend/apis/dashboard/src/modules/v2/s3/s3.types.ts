@@ -7,10 +7,12 @@ export type UpdateS3Dto = z.infer<typeof UpdateS3Schema>;
 export interface IS3Response {
     id: string;
     name: string;
+    provider: string;
     bucketName: string;
     region: string;
     accessKeyId: string;
     endpoint?: string;
+    forcePathStyle: boolean;
     transformer?: string;
     isManagedTransform: boolean;
     enabled: boolean;

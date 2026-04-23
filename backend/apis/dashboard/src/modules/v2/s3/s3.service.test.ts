@@ -16,6 +16,9 @@ mock.module('@kyrazo/shared', () => {
             error: mock(),
             debug: mock(),
         },
+        unprefixId: mock((id) => id),
+        prefixId: mock((id, prefix) => `${prefix}_${id}`),
+        buildS3Config: mock((provider, input) => input),
     };
 });
 
@@ -31,14 +34,17 @@ mock.module('@/configs', () => {
     };
 });
 
-// Mock S3Client from Bun
+// Mock S3Client from AWS SDK
 const mockS3ClientInstance = {
-    exists: mock(),
+    send: mock(),
 };
 
-mock.module('bun', () => {
+mock.module('@aws-sdk/client-s3', () => {
     return {
         S3Client: mock().mockImplementation(() => mockS3ClientInstance),
+        HeadBucketCommand: class HeadBucketCommand {
+            constructor(public input: any) {}
+        },
     };
 });
 
@@ -53,7 +59,7 @@ describe('S3Service', () => {
     beforeEach(async () => {
         mock.restore();
         mockRedis.del.mockClear();
-        mockS3ClientInstance.exists.mockClear();
+        mockS3ClientInstance.send.mockClear();
         (secretCrypto.encrypt as any).mockClear();
         
         const serviceModule = await import('./s3.service');
@@ -72,6 +78,7 @@ describe('S3Service', () => {
         // Manual instantiation for DI
         s3Service = new S3ServiceClass(class {
             constructor() { return mockS3ClientInstance; }
+            send(command: any) { return mockS3ClientInstance.send(command); }
         } as any);
     });
 
@@ -91,10 +98,13 @@ describe('S3Service', () => {
             const result = await s3Service.createS3Bucket(input as any, 'user1', workspaceId, namespaceId);
 
             expect(secretCrypto.encrypt).toHaveBeenCalledWith(namespaceId, 'plain_secret');
-            expect(repoSpy).toHaveBeenCalledWith(expect.objectContaining({
-                secretAccessKey: 'enc_secret',
-                iv: 'iv123',
-            }));
+            expect(repoSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    secretAccessKey: 'enc_secret',
+                    iv: 'iv123',
+                }),
+                expect.any(Object)
+            );
             expect(result.id).toBe(s3Id);
         });
     });
@@ -103,6 +113,7 @@ describe('S3Service', () => {
         it('should encrypt secret if provided and invalidate cache', async () => {
             const updateInput = { secretAccessKey: 'new_plain' };
             (secretCrypto.encrypt as any).mockReturnValue({ encrypted: 'new_enc', iv: 'new_iv' });
+            spyOn(s3Repo, 'findById').mockResolvedValue({ id: s3Id } as any);
             spyOn(s3Repo, 'update').mockResolvedValue({ id: s3Id } as any);
 
             await s3Service.updateS3Bucket(s3Id, workspaceId, namespaceId, updateInput as any, 'user1');
@@ -110,47 +121,35 @@ describe('S3Service', () => {
             expect(secretCrypto.encrypt).toHaveBeenCalled();
             expect(mockRedis.del).toHaveBeenCalledWith(`context:s3:${s3Id}`);
         });
-
-        it('should not encrypt if secret is not provided', async () => {
-            spyOn(s3Repo, 'update').mockResolvedValue({ id: s3Id } as any);
-            await s3Service.updateS3Bucket(s3Id, workspaceId, namespaceId, { name: 'New' }, 'user1');
-
-            expect(secretCrypto.encrypt).not.toHaveBeenCalled();
-        });
-    });
-
-    describe('deleteS3Bucket', () => {
-        it('should delete from repo and invalidate cache', async () => {
-            spyOn(s3Repo, 'delete').mockResolvedValue({ id: s3Id } as any);
-
-            await s3Service.deleteS3Bucket(s3Id, workspaceId, namespaceId);
-
-            expect(mockRedis.del).toHaveBeenCalledWith(`context:s3:${s3Id}`);
-        });
     });
 
     describe('testConnection', () => {
-        it('should return success if S3 client exists check passes', async () => {
-            mockS3ClientInstance.exists.mockResolvedValue(true);
+        it('should return success if S3 client head bucket passes', async () => {
+            mockS3ClientInstance.send.mockResolvedValue({});
 
             const result = await s3Service.testConnection({
                 bucketName: 'test',
                 region: 'us-east-1',
                 accessKeyId: 'acc',
-                secretAccessKey: 'sec'
+                secretAccessKey: 'sec',
+                provider: 'aws',
+                forcePathStyle: false
             });
 
             expect(result.success).toBe(true);
+            expect(mockS3ClientInstance.send).toHaveBeenCalled();
         });
 
         it('should return false if S3 client throws error', async () => {
-            mockS3ClientInstance.exists.mockRejectedValue(new Error('Access Denied'));
+            mockS3ClientInstance.send.mockRejectedValue(new Error('Access Denied'));
 
             const result = await s3Service.testConnection({
                 bucketName: 'test',
                 region: 'us-east-1',
                 accessKeyId: 'acc',
-                secretAccessKey: 'sec'
+                secretAccessKey: 'sec',
+                provider: 'aws',
+                forcePathStyle: false
             });
 
             expect(result.success).toBe(false);

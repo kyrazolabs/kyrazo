@@ -7,14 +7,18 @@ export class S3Controller {
         const data = c.req.valid('json') as any;
         const workspaceId = c.workspace?.workspaceId;
         const namespaceId = c.namespace?.namespaceId;
-
-        const userId = c.get('userId');
+        const userId = c.user?.userId;
 
         if (!workspaceId || !namespaceId || !userId) {
             return c.json({ success: false, error: 'Unauthorized' }, 401);
         }
 
-        const s3Bucket = await s3Service.createS3Bucket(data, userId.toString(), workspaceId.toString(), namespaceId.toString());
+        const s3Bucket = await s3Service.createS3Bucket(
+            data,
+            userId.toString(),
+            workspaceId.toString(),
+            namespaceId.toString()
+        );
 
         return c.json<ISuccessResponse<any>>({
             success: true,
@@ -31,7 +35,10 @@ export class S3Controller {
             return c.json({ success: false, error: 'Unauthorized' }, 401);
         }
 
-        const s3Buckets = await s3Service.listS3Buckets(workspaceId.toString(), namespaceId.toString());
+        const s3Buckets = await s3Service.listS3Buckets(
+            workspaceId.toString(),
+            namespaceId.toString()
+        );
 
         return c.json<ISuccessResponse<any>>({
             success: true,
@@ -50,17 +57,24 @@ export class S3Controller {
             return c.json({ success: false, error: 'Unauthorized' }, 401);
         }
 
-        const s3Bucket = await s3Service.getS3Bucket(id, workspaceId.toString(), namespaceId.toString());
-        
+        const s3Bucket = await s3Service.getS3Bucket(
+            id,
+            workspaceId.toString(),
+            namespaceId.toString()
+        );
+
         if (!s3Bucket) {
-            return c.json<IErrorResponse>({
-                success: false,
-                error: {
-                    code: 'NOT_FOUND',
-                    message: 'S3 Bucket not found',
-                    requestId: c.get('requestId'),
-                }
-            }, 404);
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'NOT_FOUND',
+                        message: 'S3 Bucket not found',
+                        requestId: c.get('requestId'),
+                    },
+                },
+                404
+            );
         }
 
         return c.json<ISuccessResponse<any>>({
@@ -76,24 +90,32 @@ export class S3Controller {
         const data = c.req.valid('json') as any;
         const workspaceId = c.workspace?.workspaceId;
         const namespaceId = c.namespace?.namespaceId;
-
-        const userId = c.get('userId');
+        const userId = c.user?.userId;
 
         if (!workspaceId || !namespaceId || !userId) {
             return c.json({ success: false, error: 'Unauthorized' }, 401);
         }
 
-        const updated = await s3Service.updateS3Bucket(id, workspaceId.toString(), namespaceId.toString(), data, userId.toString());
+        const updated = await s3Service.updateS3Bucket(
+            id,
+            workspaceId.toString(),
+            namespaceId.toString(),
+            data,
+            userId.toString()
+        );
 
         if (!updated) {
-            return c.json<IErrorResponse>({
-                success: false,
-                error: {
-                    code: 'NOT_FOUND',
-                    message: 'S3 Bucket not found',
-                    requestId: c.get('requestId'),
-                }
-            }, 404);
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'NOT_FOUND',
+                        message: 'S3 Bucket not found',
+                        requestId: c.get('requestId'),
+                    },
+                },
+                404
+            );
         }
 
         return c.json<ISuccessResponse<any>>({
@@ -113,17 +135,24 @@ export class S3Controller {
             return c.json({ success: false, error: 'Unauthorized' }, 401);
         }
 
-        const deleted = await s3Service.deleteS3Bucket(id, workspaceId.toString(), namespaceId.toString());
+        const deleted = await s3Service.deleteS3Bucket(
+            id,
+            workspaceId.toString(),
+            namespaceId.toString()
+        );
 
         if (!deleted) {
-            return c.json<IErrorResponse>({
-                success: false,
-                error: {
-                    code: 'NOT_FOUND',
-                    message: 'S3 Bucket not found',
-                    requestId: c.get('requestId'),
-                }
-            }, 404);
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'NOT_FOUND',
+                        message: 'S3 Bucket not found',
+                        requestId: c.get('requestId'),
+                    },
+                },
+                404
+            );
         }
 
         return c.json<ISuccessResponse<any>>({
@@ -135,13 +164,16 @@ export class S3Controller {
 
     static async testConnection(c: AppContext) {
         const data = c.req.valid('json') as any;
-        
+
         const result = await s3Service.testConnection(data);
 
-        return c.json({
-            success: result.success,
-            message: result.success ? 'Connection successful' : 'Connection failed',
-            error: result.error,
-        }, result.success ? 200 : 400);
+        return c.json(
+            {
+                success: result.success,
+                message: result.success ? 'Connection successful' : 'Connection failed',
+                error: result.error,
+            },
+            result.success ? 200 : 400
+        );
     }
 }

@@ -1,7 +1,7 @@
 import { redisConfig } from '@/config';
 import { logger, RedisKeys, unprefixId, S3Bucket } from '@kyrazo/shared';
 import dayjs from 'dayjs';
-import { s3Service } from '@/services/storage/s3.service';
+import { s3Service, S3Service } from '@/services/storage/s3.service';
 import { Queue, Worker, Job } from 'bullmq';
 
 export class S3Transport {
@@ -136,13 +136,9 @@ export class S3Transport {
             const filename = `batch_${dayjs().valueOf()}.ndjson`;
             const fullKey = `${path}${filename}`;
 
-            const result = await s3Service.upload(fullKey, ndjson, {
-                bucket: config.bucketName,
-                region: config.region,
-                accessKeyId: config.accessKeyId,
-                secretAccessKey: config.secretAccessKey,
-                endpoint: config.endpoint,
-            });
+            const options = S3Service.fromBucket(config);
+
+            const result = await s3Service.upload(fullKey, ndjson, 'application/x-ndjson', options);
 
             if (result.success) {
                 await redis.del(tempKey);

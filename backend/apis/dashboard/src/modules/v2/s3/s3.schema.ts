@@ -2,11 +2,13 @@ import { z } from 'zod';
 
 export const CreateS3Schema = z.object({
     name: z.string().min(1, 'Name is required').max(100),
+    provider: z.enum(['aws', 'cloudflare', 'backblaze', 'minio', 'custom']).default('aws'),
     bucketName: z.string().min(1, 'Bucket name is required'),
     region: z.string().min(1, 'Region is required'),
     accessKeyId: z.string().min(1, 'Access key ID is required'),
     secretAccessKey: z.string().min(1, 'Secret access key is required'),
     endpoint: z.string().url('Invalid endpoint URL').optional().or(z.literal('')),
+    forcePathStyle: z.boolean().default(false),
     transformer: z
         .object({
             code: z.string().min(1, 'Transformer code is required'),
@@ -30,4 +32,6 @@ export const TestS3ConnectionSchema = z.object({
     accessKeyId: z.string().min(1),
     secretAccessKey: z.string().min(1),
     endpoint: z.string().url().optional().or(z.literal('')),
+    provider: z.enum(['aws', 'cloudflare', 'backblaze', 'minio', 'custom']).default('aws'),
+    forcePathStyle: z.boolean().default(false),
 });

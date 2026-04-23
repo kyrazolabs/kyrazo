@@ -7,13 +7,23 @@ mock.module('@kyrazo/shared', () => {
     const original = require('@kyrazo/shared');
     return {
         ...original,
-        ASQS: {
-            create: mock(),
-            findOne: mock(),
-            find: mock(),
-            findOneAndUpdate: mock(),
-            findOneAndDelete: mock(),
-        },
+        ASQS: Object.assign(
+            mock().mockImplementation((data) => ({
+                ...data,
+                save: mock().mockImplementation(function(this: any) {
+                    return Promise.resolve({
+                        toJSON: () => ({ ...this, _id: '65c3f1e5f1e5f1e5f1e5f1e7' })
+                    });
+                }),
+            })),
+            {
+                create: mock(),
+                findOne: mock(),
+                find: mock(),
+                findOneAndUpdate: mock(),
+                findOneAndDelete: mock(),
+            }
+        ),
         unprefixId: (id: string) => id.split('_')[1] || id,
     };
 });
@@ -42,7 +52,7 @@ describe('ASQSRepo', () => {
 
             await asqsRepo.create(data as any);
 
-            expect(ASQS.create).toHaveBeenCalledWith(expect.objectContaining({
+            expect(ASQS).toHaveBeenCalledWith(expect.objectContaining({
                 workspaceId: '65c3f1e5f1e5f1e5f1e5f1e5',
                 namespaceId: '65c3f1e5f1e5f1e5f1e5f1e6',
             }));

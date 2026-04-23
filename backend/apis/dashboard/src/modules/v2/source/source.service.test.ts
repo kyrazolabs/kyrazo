@@ -27,7 +27,7 @@ mock.module('./source.repo', () => ({
     },
 }));
 
-mock.module('../transforms/transforms.repo', () => ({
+mock.module('../transform/transform.repo', () => ({
     transformRepository: {
         create: mock().mockImplementation(data => {
             if (data.name === 'Bad Transform') throw new Error('TRANSFORM_ERROR');

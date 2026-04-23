@@ -7,13 +7,26 @@ mock.module('@kyrazo/shared', () => {
     const original = require('@kyrazo/shared');
     return {
         ...original,
-        S3Bucket: {
-            create: mock(),
-            findOne: mock(),
-            find: mock(),
-            findOneAndUpdate: mock(),
-            findOneAndDelete: mock(),
-        },
+        S3Bucket: Object.assign(
+            mock().mockImplementation((data) => ({
+                ...data,
+                save: mock().mockImplementation(function(this: any) {
+                    return Promise.resolve({
+                        toJSON: () => ({ ...this, _id: '65c3f1e5f1e5f1e5f1e5f1e7' })
+                    });
+                }),
+            })),
+            {
+                create: mock(),
+                findOne: mock(),
+                find: mock(),
+                findOneAndUpdate: mock(),
+                findOneAndDelete: mock(),
+                startSession: mock().mockResolvedValue({
+                    endSession: mock(),
+                }),
+            }
+        ),
         unprefixId: (id: string) => id.split('_')[1] || id,
     };
 });
@@ -42,7 +55,7 @@ describe('S3Repo', () => {
 
             await s3Repo.create(data as any);
 
-            expect(S3Bucket.create).toHaveBeenCalledWith(expect.objectContaining({
+            expect(S3Bucket).toHaveBeenCalledWith(expect.objectContaining({
                 workspaceId: '65c3f1e5f1e5f1e5f1e5f1e5',
                 namespaceId: '65c3f1e5f1e5f1e5f1e5f1e6',
             }));
