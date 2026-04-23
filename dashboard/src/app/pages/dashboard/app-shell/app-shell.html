@@ -295,7 +295,7 @@
     [header]="namespaceDialogHeader"
     [(visible)]="namespaceDialogVisible"
     [modal]="true"
-    [style]="{ width: '500px' }"
+    [style]="{ width: '700px' }"
     [breakpoints]="{ '960px': '75vw', '640px': '90vw' }"
     styleClass="rounded-2xl!"
     [draggable]="false"
@@ -307,25 +307,6 @@
         (onSuccess)="onNamespaceFormSuccess($event)"
         (onCancel)="onNamespaceDialogHide()"
     ></app-namespace-form>
-</p-dialog>
-
-<!-- Transform Form Dialog (Global) -->
-<p-dialog
-    [header]="transformDialogHeader"
-    [(visible)]="transformDialogVisible"
-    [modal]="true"
-    [style]="{ width: '1000px' }"
-    [breakpoints]="{ '1199px': '90vw', '575px': '95vw' }"
-    styleClass="rounded-2xl!"
-    [draggable]="false"
-    [resizable]="false"
-    (onHide)="onTransformDialogHide()"
->
-    <app-transform-form
-        [transformId]="transformDialogId"
-        (onSuccess)="onTransformFormSuccess($event)"
-        (onCancel)="onTransformDialogHide()"
-    ></app-transform-form>
 </p-dialog>
 
 <app-support-dialog [(visible)]="supportDialogVisible" (visibleChange)="!$event && onSupportDialogHide()"></app-support-dialog>

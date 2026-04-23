@@ -108,7 +108,7 @@ export const eventsRoutes: Routes = [
     //     data: { title: 'Edit Source', animation: 'ingest-targets' },
     // },
     {
-        path: 'ingest/endpoints',
+        path: 'ingest/destinations/endpoints',
         loadComponent: () =>
             import('./ingest/endpoints/endpoints.page').then(
                 (p) => p.EndpointsPage,
@@ -116,22 +116,32 @@ export const eventsRoutes: Routes = [
         resolve: { data: endpointsResolver },
         data: { title: 'Endpoints', animation: 'endpoints' },
     },
-    // {
-    //     path: 'ingest/endpoints/create',
-    //     loadComponent: () =>
-    //         import('./ingest/endpoints/form/form.page').then(
-    //             (p) => p.EndpointFormPage,
-    //         ),
-    //     data: { title: 'Create Endpoint', animation: 'endpoint-create' },
-    // },
     {
-        path: 'ingest/endpoints/:id',
+        path: 'ingest/destinations/endpoints/:id',
         loadComponent: () =>
             import('./ingest/endpoints/detail/detail.page').then(
                 (p) => p.EndpointDetailPage,
             ),
         resolve: { endpoint: endpointResolver },
         data: { title: 'Endpoint Details', animation: 'endpoint-detail' },
+    },
+    {
+        path: 'ingest/destinations/s3',
+        loadComponent: () =>
+            import('./ingest/destinations/s3/s3.page').then((p) => p.S3Page),
+        data: { title: 'S3 Storage', animation: 's3' },
+    },
+    {
+        path: 'ingest/destinations/asqs',
+        loadComponent: () =>
+            import('./ingest/destinations/asqs/asqs.page').then((p) => p.ASQSPage),
+        data: { title: 'SQS Queues', animation: 'asqs' },
+    },
+    // Backward compatibility redirect
+    {
+        path: 'ingest/endpoints',
+        redirectTo: 'ingest/destinations/endpoints',
+        pathMatch: 'full'
     },
     // {
     //     path: 'ingest/endpoints/:id/edit',

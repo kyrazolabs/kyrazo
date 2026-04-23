@@ -25,7 +25,9 @@
                 <p-button [label]="source()!.status === 'active' ? 'Pause' : 'Activate'"
                     [icon]="source()!.status === 'active' ? 'icon-[hugeicons--pause] size-4.5' : 'icon-[hugeicons--play] size-4.5'"
                     [severity]="source()!.status === 'active' ? 'secondary' : 'primary'"
-                    [outlined]="source()!.status === 'active'" styleClass="rounded-xl!" (onClick)="toggleStatus()" size="small"/>
+                    [outlined]="source()!.status === 'active'" 
+                    styleClass="rounded-xl! {{ source()!.status !== 'active' ? 'shadow-md shadow-primary/50 dark:shadow-primary/20' : '' }}" 
+                    (onClick)="toggleStatus()" size="small"/>
             </div>
         </div>
 
@@ -310,7 +312,7 @@
                                 <div *ngIf="s3Buckets().length > 0" class="space-y-3 mt-6">
                                     <div class="text-xs font-bold uppercase tracking-wider text-surface-500 mb-2 flex items-center gap-2">
                                         <i class="icon-[hugeicons--database] size-5!"></i> S3 Storage Targets
-                                        <div class="ml-2 px-2.5 py-0.5 rounded-full bg-primary-500/10 border border-primary-500/30 text-primary-600 shadow-primary-500/20 text-[10px] font-bold uppercase tracking-wider shrink-0">
+                                        <div class="ml-2 px-2.5 py-0.5 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-600 shadow-yellow-500/20 text-[10px] font-bold uppercase tracking-wider shrink-0">
                                             Beta
                                         </div>
                                     </div>
@@ -337,7 +339,7 @@
                                 <div *ngIf="asqsQueues().length > 0" class="space-y-3 mt-6">
                                     <div class="text-xs font-bold uppercase tracking-wider text-surface-500 mb-2 flex items-center gap-2">
                                         <i class="icon-[hugeicons--server-stack-03] size-5!"></i> SQS Queue Targets
-                                        <div class="ml-2 px-2.5 py-0.5 rounded-full bg-primary-500/10 border border-primary-500/30 text-primary-600 shadow-primary-500/20 text-[10px] font-bold uppercase tracking-wider shrink-0">
+                                        <div class="ml-2 px-2.5 py-0.5 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-600 shadow-yellow-500/20 text-[10px] font-bold uppercase tracking-wider shrink-0">
                                             Beta
                                         </div>
                                     </div>
@@ -377,7 +379,7 @@
                                         <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0">
                                             Managed Transformer
                                         </h3>
-                                        <div class="ml-2 px-2.5 py-0.5 rounded-full bg-primary-500/10 border border-primary-500/30 text-primary-600 shadow-primary-500/20 text-[10px] font-bold uppercase tracking-wider shrink-0">
+                                        <div class="ml-2 px-2.5 py-0.5 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-600 shadow-yellow-500/20 text-[10px] font-bold uppercase tracking-wider shrink-0">
                                             Beta
                                         </div>
                                     </div>

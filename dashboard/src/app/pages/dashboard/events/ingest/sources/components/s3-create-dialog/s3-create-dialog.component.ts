@@ -10,6 +10,10 @@ import { DialogService } from '@shared/services/dialog.service';
 import { S3Service } from '@core/services/s3.service';
 import { MessageService } from 'primeng/api';
 import { SentryService } from '@core/3rd-party/sentry';
+import { ToggleSwitch } from 'primeng/toggleswitch';
+import { DividerModule } from 'primeng/divider';
+import { CodeEditorComponent } from '@shared/components/code-editor/code-editor.component';
+import { FormsModule } from '@angular/forms';
 
 // PrimeNG
 import { DialogModule } from 'primeng/dialog';
@@ -19,6 +23,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { MessageModule } from 'primeng/message';
 import { PasswordModule } from 'primeng/password';
 import { SelectModule } from 'primeng/select';
+import { SkeletonModule } from 'primeng/skeleton';
 
 @Component({
     selector: 'app-s3-create-dialog',
@@ -33,6 +38,11 @@ import { SelectModule } from 'primeng/select';
         MessageModule,
         PasswordModule,
         SelectModule,
+        SkeletonModule,
+        ToggleSwitch,
+        DividerModule,
+        CodeEditorComponent,
+        FormsModule
     ],
     templateUrl: './s3-create-dialog.component.html',
 })
@@ -46,6 +56,8 @@ export class S3CreateDialogComponent {
     visible = signal(false);
     loading = signal(false);
     testing = signal(false);
+    fetching = signal(false);
+    s3Id = signal<string | null>(null);
 
     s3Form: FormGroup;
 
@@ -58,12 +70,88 @@ export class S3CreateDialogComponent {
             secretAccessKey: ['', [Validators.required]],
             endpoint: [''],
         });
+    }
 
+    useTransformer = false;
+    transformerCode = this.getDefaultTransformerCode();
+
+    private getDefaultTransformerCode(): string {
+        return `/**
+ * Kyrazo Managed Transformer
+ * 
+ * @param {Object} payload - The incoming event
+ * @return {Object} The transformed payload
+ */
+return function transform(payload) {
+    return payload;
+}(payload);`;
+    }
+
+    ngOnInit() {
         this.dialogService.s3DialogState$.subscribe((state) => {
             if (state.visible) {
-                this.s3Form.reset({ region: 'us-east-1' });
+                if (state.s3Id) {
+                    this.s3Id.set(state.s3Id);
+                    this.loadBucket(state.s3Id);
+                } else {
+                    this.s3Id.set(null);
+                    this.useTransformer = false;
+                    this.transformerCode = this.getDefaultTransformerCode();
+                    this.s3Form.reset({ region: 'us-east-1' });
+                    this.s3Form.get('bucketName')?.enable();
+                    this.s3Form.get('region')?.enable();
+                    this.s3Form.get('endpoint')?.enable();
+                    this.s3Form.get('accessKeyId')?.setValidators([Validators.required]);
+                    this.s3Form.get('secretAccessKey')?.setValidators([Validators.required]);
+                }
+                this.s3Form.get('accessKeyId')?.updateValueAndValidity();
+                this.s3Form.get('secretAccessKey')?.updateValueAndValidity();
             }
             this.visible.set(state.visible);
+        });
+    }
+
+    loadBucket(id: string) {
+        this.fetching.set(true);
+        this.s3Service.get(id).subscribe({
+            next: (res) => {
+                this.fetching.set(false);
+                if (res.data) {
+                    this.s3Form.patchValue({
+                        name: res.data.name,
+                        bucketName: res.data.bucketName,
+                        region: res.data.region,
+                        endpoint: res.data.endpoint
+                    });
+                    // Credentials are optional on update
+                    this.s3Form.get('accessKeyId')?.clearValidators();
+                    this.s3Form.get('secretAccessKey')?.clearValidators();
+                    this.s3Form.get('accessKeyId')?.updateValueAndValidity();
+                    this.s3Form.get('secretAccessKey')?.updateValueAndValidity();
+                    
+                    this.s3Form.get('bucketName')?.disable();
+                    this.s3Form.get('region')?.disable();
+                    this.s3Form.get('endpoint')?.disable();
+
+                    // Transformer logic
+                    if (res.data.transformer) {
+                        this.useTransformer = true;
+                        this.transformerCode = typeof res.data.transformer === 'object' ? res.data.transformer.code : this.getDefaultTransformerCode();
+                    } else {
+                        this.useTransformer = false;
+                        this.transformerCode = this.getDefaultTransformerCode();
+                    }
+                }
+            },
+            error: (err) => {
+                this.fetching.set(false);
+                this.sentry.captureException(err);
+                this.mes.add({
+                    severity: 'error',
+                    summary: 'Load Failed',
+                    detail: 'Could not load bucket details',
+                });
+            },
         });
     }
 
@@ -74,7 +162,7 @@ export class S3CreateDialogComponent {
         }
 
         this.testing.set(true);
-        this.s3Service.test(this.s3Form.value).subscribe({
+        this.s3Service.test(this.s3Form.getRawValue()).subscribe({
             next: (res) => {
                 this.testing.set(false);
                 if (res.success) {
@@ -110,13 +198,29 @@ export class S3CreateDialogComponent {
         }
 
         this.loading.set(true);
-        this.s3Service.create(this.s3Form.value).subscribe({
+        const id = this.s3Id();
+        const payload: any = this.s3Form.getRawValue();
+
+        if (this.useTransformer) {
+            payload.transformer = {
+                code: this.transformerCode,
+                name: `${payload.name} Transformer`,
+            };
+        } else if (id) {
+            payload.transformer = null;
+        }
+
+        const obs = id 
+            ? this.s3Service.update(id, payload) 
+            : this.s3Service.create(payload);
+
+        obs.subscribe({
             next: (res) => {
                 this.loading.set(false);
                 this.mes.add({
                     severity: 'success',
-                    summary: 'Bucket Added',
-                    detail: 'S3 bucket destination created successfully',
+                    summary: id ? 'Bucket Updated' : 'Bucket Added',
+                    detail: id ? 'S3 bucket destination updated successfully' : 'S3 bucket destination created successfully',
                 });
                 this.dialogService.notifyS3Saved(res.data);
                 this.close();
@@ -126,7 +230,7 @@ export class S3CreateDialogComponent {
                 this.sentry.captureException(err);
                 this.mes.add({
                     severity: 'error',
-                    summary: 'Creation Failed',
+                    summary: id ? 'Update Failed' : 'Creation Failed',
                     detail: err.message,
                 });
             },

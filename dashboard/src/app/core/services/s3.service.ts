@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
 import { ApiResponse } from '@models/index';
-import { IS3Bucket, CreateS3Request } from '@models/s3.types';
+import { IS3Bucket, CreateS3Request, UpdateS3Request } from '@models/s3.types';
 import { environment } from 'environments/environment';
 
 @Injectable({
@@ -10,6 +10,12 @@ import { environment } from 'environments/environment';
 })
 export class S3Service {
     private readonly http = inject(HttpClient);
+
+    get(id: string): Observable<ApiResponse<IS3Bucket>> {
+        return this.http
+            .get<ApiResponse<IS3Bucket>>(environment.s3.get(id))
+            .pipe(catchError(this.handleError));
+    }
 
     gets(): Observable<ApiResponse<IS3Bucket[]>> {
         return this.http
@@ -20,6 +26,18 @@ export class S3Service {
     create(payload: CreateS3Request): Observable<ApiResponse<IS3Bucket>> {
         return this.http
             .post<ApiResponse<IS3Bucket>>(environment.s3.create, payload)
+            .pipe(catchError(this.handleError));
+    }
+
+    update(id: string, payload: UpdateS3Request): Observable<ApiResponse<IS3Bucket>> {
+        return this.http
+            .patch<ApiResponse<IS3Bucket>>(environment.s3.update(id), payload)
+            .pipe(catchError(this.handleError));
+    }
+
+    delete(id: string): Observable<ApiResponse<void>> {
+        return this.http
+            .delete<ApiResponse<void>>(environment.s3.delete(id))
             .pipe(catchError(this.handleError));
     }
 

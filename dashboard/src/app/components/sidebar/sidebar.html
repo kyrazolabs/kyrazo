@@ -65,20 +65,7 @@
                                             <span class="font-medium">Namespaces</span>
                                         </a>
                                     </li>
-                                    <li>
-                                        <a pRipple [routerLink]="'/transforms'"
-                                            class="flex items-center justify-between cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect"
-                                            [class]="isRouteActive('/transforms') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
-                                            <div class="flex items-center">
-                                                <i class="icon-[hugeicons--source-code] size-5 mr-2"></i>
-                                                <span class="font-medium">Transformers</span>
-                                            </div>
 
-                                            <div class="px-2.5 py-0.5 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-600 shadow-yellow-500/20 text-[10px] font-bold uppercase tracking-wider">
-                                                Exp
-                                            </div>
-                                        </a>
-                                    </li>
                                     <!-- <li>
                                         <a pRipple [routerLink]="'/connectors'"
                                             pTooltip="Not Ready Yet"
@@ -188,7 +175,7 @@
                                                 <li>
                                                     <a pRipple [routerLink]="'/events/ingest'"
                                                         class="flex items-center cursor-pointer py-2 px-4 mt-2 rounded-xl duration-150 transition-colors click-effect"
-                                                        [class]="isRouteActive('/events/ingest') && !isRouteActive('/endpoints') && !isRouteActive('/events/ingest/sources') && !isRouteActive('/events/ingest/endpoints') && !isRouteActive('/events/ingest/logs') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                        [class]="isRouteActive('/events/ingest') && !isRouteActive('/endpoints') && !isRouteActive('/events/ingest/sources') && !isRouteActive('/events/ingest/destinations') && !isRouteActive('/events/ingest/logs') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
                                                         <i class="icon-[hugeicons--activity-03] size-5 mr-2"></i>
                                                         <span class="font-medium">Usage</span>
                                                     </a>
@@ -202,12 +189,41 @@
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a pRipple [routerLink]="'/events/ingest/endpoints'"
-                                                        class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect"
-                                                        [class]="isRouteActive('/events/ingest/endpoints') || isRouteActive('/endpoints') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
-                                                        <i class="pi pi-link mr-2"></i>
-                                                        <span class="font-medium">Endpoints</span>
+                                                    <a pRipple
+                                                        class="flex items-center cursor-pointer py-2 px-4 rounded-xl text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-500 transition-colors p-ripple click-effect"
+                                                        (click)="toggleDestinations()">
+                                                        <i class="icon-[hugeicons--directions-02] size-5 mr-2"></i>
+                                                        <span class="font-medium">Destinations</span>
+                                                        <i class="pi pi-chevron-down ml-auto duration-200 transition-transform" [class.rotate-180]="destinationsDropdownOpen"></i>
                                                     </a>
+                                                    <ul
+                                                        class="list-none py-0 pl-4 pr-0 m-0 space-y-1 overflow-y-hidden transition-[max-height,opacity] duration-500 ease-in-out"
+                                                        [class]="destinationsDropdownOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'">
+                                                        <li>
+                                                            <a pRipple [routerLink]="'/events/ingest/destinations/endpoints'"
+                                                                class="flex items-center cursor-pointer py-2 px-4 mt-1 rounded-xl duration-150 transition-colors click-effect"
+                                                                [class]="isRouteActive('/events/ingest/destinations/endpoints') || isRouteActive('/endpoints') || isRouteActive('/events/ingest/endpoints') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                                <!-- <i class="icon-[hugeicons--link-02] size-5 mr-2"></i> -->
+                                                                <span class="font-medium text-base">Endpoints</span>
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a pRipple [routerLink]="'/events/ingest/destinations/s3'"
+                                                                class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect"
+                                                                [class]="isRouteActive('/events/ingest/destinations/s3') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                                <!-- <i class="icon-[hugeicons--database] size-5 mr-2"></i> -->
+                                                                <span class="font-medium text-base">S3 Buckets</span>
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a pRipple [routerLink]="'/events/ingest/destinations/asqs'"
+                                                                class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect"
+                                                                [class]="isRouteActive('/events/ingest/destinations/asqs') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                                <!-- <i class="icon-[hugeicons--server-stack-03] size-5 mr-2"></i> -->
+                                                                <span class="font-medium text-base">Amazon SQS</span>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
                                                 </li>
                                                 <li>
                                                     <a pRipple [routerLink]="'/events/ingest/logs'"

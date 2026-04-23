@@ -83,13 +83,15 @@ export class DialogService {
     // S3 Dialog State
     private s3DialogStateSubject = new BehaviorSubject<{
         visible: boolean;
-    }>({ visible: false });
+        s3Id: string | null;
+    }>({ visible: false, s3Id: null });
     s3DialogState$ = this.s3DialogStateSubject.asObservable();
 
     // ASQS Dialog State
     private asqsDialogStateSubject = new BehaviorSubject<{
         visible: boolean;
-    }>({ visible: false });
+        asqsId: string | null;
+    }>({ visible: false, asqsId: null });
     asqsDialogState$ = this.asqsDialogStateSubject.asObservable();
 
 
@@ -282,12 +284,12 @@ export class DialogService {
     }
 
     // S3 Dialog Methods
-    openS3Dialog() {
-        this.s3DialogStateSubject.next({ visible: true });
+    openS3Dialog(s3Id: string | null = null) {
+        this.s3DialogStateSubject.next({ visible: true, s3Id });
     }
 
     closeS3Dialog() {
-        this.s3DialogStateSubject.next({ visible: false });
+        this.s3DialogStateSubject.next({ visible: false, s3Id: null });
     }
 
     notifyS3Saved(data?: any) {
@@ -295,12 +297,12 @@ export class DialogService {
     }
 
     // ASQS Dialog Methods
-    openASQSDialog() {
-        this.asqsDialogStateSubject.next({ visible: true });
+    openASQSDialog(asqsId: string | null = null) {
+        this.asqsDialogStateSubject.next({ visible: true, asqsId });
     }
 
     closeASQSDialog() {
-        this.asqsDialogStateSubject.next({ visible: false });
+        this.asqsDialogStateSubject.next({ visible: false, asqsId: null });
     }
 
     notifyASQSSaved(data?: any) {

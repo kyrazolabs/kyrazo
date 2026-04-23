@@ -1,3 +1,9 @@
+export interface TransformerData {
+    code: string;
+    name?: string;
+    description?: string;
+}
+
 export interface IS3Bucket {
     id: string;
     name: string;
@@ -6,6 +12,8 @@ export interface IS3Bucket {
     accessKeyId: string;
     secretAccessKey: string;
     endpoint?: string;
+    transformer?: string | TransformerData;
+    isManagedTransform?: boolean;
     createdAt?: string;
     updatedAt?: string;
 }
@@ -17,6 +25,7 @@ export interface CreateS3Request {
     accessKeyId: string;
     secretAccessKey: string;
     endpoint?: string;
+    transformer?: string | TransformerData;
 }
 
 export interface UpdateS3Request extends Partial<CreateS3Request> {}

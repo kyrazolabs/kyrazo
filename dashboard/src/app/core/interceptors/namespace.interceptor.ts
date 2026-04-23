@@ -11,6 +11,7 @@ export const namespaceInterceptor: HttpInterceptorFn = (req, next) => {
         req.url.includes('/v1/sources') ||
         req.url.includes('/v2/sources') ||
         req.url.includes('/v1/endpoints') ||
+        req.url.includes('/v2/endpoints') ||
         req.url.includes('/v1/deliveries') ||
         req.url.includes('/v1/keys') ||
         req.url.includes('/v1/analytics') ||

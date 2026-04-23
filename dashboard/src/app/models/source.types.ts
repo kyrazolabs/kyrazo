@@ -53,7 +53,7 @@ export interface ISource {
     };
 
     // V2 Fields
-    transformId?: string | ITransform;
+    transformer?: string | ITransform;
     isManagedTransform?: boolean;
     destination?: {
         endpoints?: string[] | IEndpoint[];
@@ -175,7 +175,7 @@ export interface GetSourceResponse {
     forwarding?: boolean;
 
     // V2 Fields
-    transformId?: string | ITransform;
+    transformer?: string | ITransform;
     isManagedTransform?: boolean;
     destination?: {
         endpoints?: string[] | IEndpoint[];

@@ -49,6 +49,14 @@ export const environment = {
             `${baseUrl}/v1/endpoints/${id}/${status}`,
         delete: (id: string) => `${baseUrl}/v1/endpoints/${id}`,
     },
+    endpointV2: {
+        create: `${baseUrl}/v2/endpoints`,
+        get: (id: string) => `${baseUrl}/v2/endpoints/${id}`,
+        getSecret: (id: string) => `${baseUrl}/v2/endpoints/${id}/secret`,
+        gets: `${baseUrl}/v2/endpoints`,
+        update: (id: string) => `${baseUrl}/v2/endpoints/${id}`,
+        delete: (id: string) => `${baseUrl}/v2/endpoints/${id}`,
+    },
     delivery: {
         get: (id: string) => `${baseUrl}/v1/deliveries/${id}`,
         gets: `${baseUrl}/v1/deliveries`,
@@ -119,6 +127,14 @@ export const environment = {
         delete: (id: string) => `${baseUrl}/v1/namespaces/${id}`,
         restore: (id: string) => `${baseUrl}/v1/namespaces/${id}/restore`,
     },
+    namespaceV2: {
+        create: `${baseUrl}/v2/namespaces`,
+        gets: `${baseUrl}/v2/namespaces`,
+        get: (id: string) => `${baseUrl}/v2/namespaces/${id}`,
+        update: (id: string) => `${baseUrl}/v2/namespaces/${id}`,
+        delete: (id: string) => `${baseUrl}/v2/namespaces/${id}`,
+        restore: (id: string) => `${baseUrl}/v2/namespaces/${id}/restore`,
+    },
     analytics: {
         dispatchUsage: `${baseUrl}/v1/analytics/dispatch/usage`,
         ingestUsage: `${baseUrl}/v1/analytics/ingest/usage`,
@@ -165,12 +181,18 @@ export const environment = {
     },
     s3: {
         create: `${baseUrl}/v2/s3`, // Assuming v2 for storage for now as requested
+        get: (id: string) => `${baseUrl}/v2/s3/${id}`,
         gets: `${baseUrl}/v2/s3`,
+        update: (id: string) => `${baseUrl}/v2/s3/${id}`,
+        delete: (id: string) => `${baseUrl}/v2/s3/${id}`,
         test: `${baseUrl}/v2/s3/test`,
     },
     asqs: {
         create: `${baseUrl}/v2/asqs`,
+        get: (id: string) => `${baseUrl}/v2/asqs/${id}`,
         gets: `${baseUrl}/v2/asqs`,
+        update: (id: string) => `${baseUrl}/v2/asqs/${id}`,
+        delete: (id: string) => `${baseUrl}/v2/asqs/${id}`,
         test: `${baseUrl}/v2/asqs/test`,
     },
 };

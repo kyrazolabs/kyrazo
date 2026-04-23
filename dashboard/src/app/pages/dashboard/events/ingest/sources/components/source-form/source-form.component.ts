@@ -136,7 +136,7 @@ export class SourceFormComponent implements OnInit, OnChanges {
     activeTransformerTab = signal(0);
     transformerTabOptions = [
         { label: 'Editor', value: 0 },
-        { label: 'Test & Debug', value: 1 }
+        { label: 'Test & Debug', value: 1 },
     ];
 
     availableEndpoints = signal<any[]>([]);
@@ -212,33 +212,43 @@ export class SourceFormComponent implements OnInit, OnChanges {
         // Subscription for automatic selection of newly created dialog items
         this.dialogService.s3Saved$.subscribe((bucket) => {
             this.loadS3Buckets();
-            const current = this.sourceForm.get('destination.s3bucket')?.value || [];
-            this.sourceForm.get('destination.s3bucket')?.setValue([...current, bucket.id]);
+            const current =
+                this.sourceForm.get('destination.s3bucket')?.value || [];
+            this.sourceForm
+                .get('destination.s3bucket')
+                ?.setValue([...current, bucket.id]);
         });
 
         this.dialogService.asqsSaved$.subscribe((queue) => {
             this.loadASQSQueues();
-            const current = this.sourceForm.get('destination.asqs')?.value || [];
-            this.sourceForm.get('destination.asqs')?.setValue([...current, queue.id]);
+            const current =
+                this.sourceForm.get('destination.asqs')?.value || [];
+            this.sourceForm
+                .get('destination.asqs')
+                ?.setValue([...current, queue.id]);
         });
 
         this.dialogService.endpointSaved$.subscribe((endpoint) => {
             this.loadEndpoints();
-            const current = this.sourceForm.get('destination.endpoints')?.value || [];
-            this.sourceForm.get('destination.endpoints')?.setValue([...current, endpoint.id]);
+            const current =
+                this.sourceForm.get('destination.endpoints')?.value || [];
+            this.sourceForm
+                .get('destination.endpoints')
+                ?.setValue([...current, endpoint.data.endpoint.id]);
+            console.log(JSON.stringify(endpoint));
         });
     }
 
     private getDefaultTransformerCode(): string {
         return `/**
  * Kyrazo Managed Transformer
- * 
+ *
  * @param {Object} payload - The incoming event
  * @return {Object} The transformed payload
  */
 return function transform(payload) {
     // Write your transformation logic here
-    
+
     return payload;
 }(payload);`;
     }
@@ -263,19 +273,22 @@ return function transform(payload) {
 
     loadEndpoints() {
         this.endpointService.gets().subscribe({
-            next: (response) => this.availableEndpoints.set(response.data || []),
+            next: (response) =>
+                this.availableEndpoints.set(response.data || []),
         });
     }
 
     loadS3Buckets() {
         this.s3Service.gets().subscribe({
-            next: (response) => this.availableS3Buckets.set(response.data || []),
+            next: (response) =>
+                this.availableS3Buckets.set(response.data || []),
         });
     }
 
     loadASQSQueues() {
         this.asqsService.gets().subscribe({
-            next: (response) => this.availableASQSQueues.set(response.data || []),
+            next: (response) =>
+                this.availableASQSQueues.set(response.data || []),
         });
     }
 
@@ -357,21 +370,27 @@ return function transform(payload) {
             type: source.type,
             service: source.service,
             eventTypes: source.eventTypes || [],
-            useTransformer: !!source.transformId,
+            useTransformer: !!source.transformer,
             transformer: {
                 code:
-                    (source.transformId && typeof source.transformId === 'object'
-                        ? source.transformId.code
-                        : source.transformer?.code) || this.getDefaultTransformerCode(),
+                    (source.transformer &&
+                    typeof source.transformer === 'object'
+                        ? source.transformer.code
+                        : source.transformer) ||
+                    this.getDefaultTransformerCode(),
             },
             destination: {
-                endpoints: (source.destination?.endpoints || source.endpoints || []).map(
-                    (e: any) => e.id || e,
-                ),
+                endpoints: (
+                    source.destination?.endpoints ||
+                    source.endpoints ||
+                    []
+                ).map((e: any) => e.id || e),
                 s3bucket: (source.destination?.s3bucket || []).map(
                     (e: any) => e.id || e,
                 ),
-                asqs: (source.destination?.asqs || []).map((e: any) => e.id || e),
+                asqs: (source.destination?.asqs || []).map(
+                    (e: any) => e.id || e,
+                ),
             },
         });
 
@@ -412,7 +431,8 @@ return function transform(payload) {
                     this.mes.add({
                         severity: 'error',
                         summary: 'Test Failed',
-                        detail: err.error?.message || 'Error occurred during test',
+                        detail:
+                            err.error?.message || 'Error occurred during test',
                     });
                 },
             });
@@ -445,9 +465,9 @@ return function transform(payload) {
                 name: `${formValue.name} Transformer`,
                 code: formValue.transformer.code,
             };
-        } else if (this.isEditing() && this.loadedSource()?.transformId) {
+        } else if (this.isEditing() && this.loadedSource()?.transformer) {
             // If it was enabled but now disabled, we need a way to tell the backend to unlink
-            data.transformer = null; 
+            data.transformer = null;
         }
 
         if (!this.isEditing()) {
@@ -456,7 +476,10 @@ return function transform(payload) {
                 backoffStrategy: backoffStrategy.EXPONENTIAL,
                 interval: 1000,
             };
-            if (formValue.service !== 'general' && formValue.authentication?.secret) {
+            if (
+                formValue.service !== 'general' &&
+                formValue.authentication?.secret
+            ) {
                 data.authentication = {
                     enabled: true,
                     type: 'service',

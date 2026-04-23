@@ -20,18 +20,18 @@ export class EndpointService {
         payload: Omit<IEndpoint, '_id' | 'userId'>,
     ): Observable<ApiResponse<IEndpoint>> {
         return this.http
-            .post<ApiResponse<IEndpoint>>(environment.endpoint.create, payload)
+            .post<ApiResponse<IEndpoint>>(environment.endpointV2.create, payload)
             .pipe(catchError(this.handleError));
     }
 
     update(
         id: string,
-        payload: Omit<IEndpoint, '_id' | 'userId'>,
+        payload: Partial<IEndpoint>,
     ): Observable<ApiResponse<IEndpoint>> {
         return this.http
             .patch<
                 ApiResponse<IEndpoint>
-            >(environment.endpoint.update(id), payload)
+            >(environment.endpointV2.update(id), payload)
             .pipe(catchError(this.handleError));
     }
 
@@ -39,22 +39,18 @@ export class EndpointService {
         id: string,
         status: EndpointStatus,
     ): Observable<ApiResponse<IEndpoint>> {
-        return this.http
-            .put<
-                ApiResponse<IEndpoint>
-            >(environment.endpoint.updateStatus(id, status), status)
-            .pipe(catchError(this.handleError));
+        return this.update(id, { status });
     }
 
     get(id: string): Observable<ApiResponse<IEndpoint>> {
         return this.http
-            .get<ApiResponse<IEndpoint>>(environment.endpoint.get(id))
+            .get<ApiResponse<IEndpoint>>(environment.endpointV2.get(id))
             .pipe(catchError(this.handleError));
     }
 
     getSecret(id: string): Observable<ApiResponse<string>> {
         return this.http
-            .get<ApiResponse<string>>(environment.endpoint.getSecret(id))
+            .get<ApiResponse<string>>(environment.endpointV2.getSecret(id))
             .pipe(catchError(this.handleError));
     }
 
@@ -84,7 +80,7 @@ export class EndpointService {
         return this.http
             .get<
                 ApiResponse<IEndpoint[]>
-            >(environment.endpoint.gets, { params })
+            >(environment.endpointV2.gets, { params })
             .pipe(catchError(this.handleError));
     }
 

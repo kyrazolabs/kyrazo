@@ -33,6 +33,7 @@ body {
 
         --p-select-sm-font-size: .925rem !important;
         --p-inputtext-sm-font-size: .925rem !important;
+        --p-textarea-sm-font-size: .925rem !important;
 
 
 
@@ -208,11 +209,59 @@ body {
         }
     }
 
+    // ─── Dialog Content Expand/Collapse Animation ────────────────────────────
+    //
+    // PrimeNG v20 uses Angular [@animation] for dialog enter/leave.
+    // Animating height:auto (when @if blocks expand) requires the CSS grid trick:
+    //   grid-template-rows: 0fr → 1fr  (only this property can transition auto height)
+    //
+    // Usage in templates:
+    //   <div class="dialog-expand-row" [class.dialog-expand-row--open]="condition">
+    //       <div class="dialog-expand-content"> ... </div>
+    //   </div>
+    //
+    .dialog-expand-row {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
+        &.dialog-expand-row--open {
+            grid-template-rows: 1fr;
+        }
+    }
+    .dialog-expand-content {
+        overflow: hidden;
+    }
+    // ─── Tab Panels Smooth Transition ────────────────────────────────────────
+    // Allows the tab container to smoothly resize when switching between
+    // tabs of different heights (e.g. source form config vs destinations).
+    .p-tabpanels {
+        interpolate-size: allow-keywords;
+        transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        // Ensure height is explicit so it can transition to/from auto
+        height: auto;
+    }
+
+    // Animate the newly active tab's content in
+    .p-tabpanel {
+        animation: fadeInTab 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    // ─────────────────────────────────────────────────────────────────────────
 
 }
 
 // Global Animations
+
+@keyframes fadeInTab {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
 // Fade In Up
 @keyframes fadeInUp {

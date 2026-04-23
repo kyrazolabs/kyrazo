@@ -188,8 +188,8 @@ export class SourcePage implements OnInit, AfterViewInit {
                 }
 
                 // Extract populated transformer
-                if (sourceData.transformId && typeof sourceData.transformId !== 'string') {
-                    this.transformer.set(sourceData.transformId as ITransform);
+                if (sourceData.transformer && typeof sourceData.transformer !== 'string') {
+                    this.transformer.set(sourceData.transformer as ITransform);
                 } else {
                     this.transformer.set(null);
                 }

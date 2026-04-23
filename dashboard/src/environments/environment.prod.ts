@@ -49,6 +49,18 @@ export const environment = {
             `${baseUrl}/v1/endpoints/${id}/${status}`,
         delete: (id: string) => `${baseUrl}/v1/endpoints/${id}`,
     },
+    endpointV2: {
+        create: `https://api.kyrazo.com/dashboard/v2/endpoints`,
+        get: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/endpoints/${id}`,
+        getSecret: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/endpoints/${id}/secret`,
+        gets: `https://api.kyrazo.com/dashboard/v2/endpoints`,
+        update: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/endpoints/${id}`,
+        delete: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/endpoints/${id}`,
+    },
     delivery: {
         get: (id: string) => `${baseUrl}/v1/deliveries/${id}`,
         gets: `${baseUrl}/v1/deliveries`,
@@ -118,6 +130,14 @@ export const environment = {
         update: (id: string) => `${baseUrl}/v1/namespaces/${id}`,
         delete: (id: string) => `${baseUrl}/v1/namespaces/${id}`,
         restore: (id: string) => `${baseUrl}/v1/namespaces/${id}/restore`,
+    },
+    namespaceV2: {
+        create: `${baseUrl}/v2/namespaces`,
+        gets: `${baseUrl}/v2/namespaces`,
+        get: (id: string) => `${baseUrl}/v2/namespaces/${id}`,
+        update: (id: string) => `${baseUrl}/v2/namespaces/${id}`,
+        delete: (id: string) => `${baseUrl}/v2/namespaces/${id}`,
+        restore: (id: string) => `${baseUrl}/v2/namespaces/${id}/restore`,
     },
     analytics: {
         dispatchUsage: `${baseUrl}/v1/analytics/dispatch/usage`,

@@ -10,6 +10,10 @@ import { DialogService } from '@shared/services/dialog.service';
 import { ASQSService } from '@core/services/asqs.service';
 import { MessageService } from 'primeng/api';
 import { SentryService } from '@core/3rd-party/sentry';
+import { ToggleSwitch } from 'primeng/toggleswitch';
+import { DividerModule } from 'primeng/divider';
+import { CodeEditorComponent } from '@shared/components/code-editor/code-editor.component';
+import { FormsModule } from '@angular/forms';
 
 // PrimeNG
 import { DialogModule } from 'primeng/dialog';
@@ -19,6 +23,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { MessageModule } from 'primeng/message';
 import { PasswordModule } from 'primeng/password';
 import { SelectModule } from 'primeng/select';
+import { SkeletonModule } from 'primeng/skeleton';
 
 @Component({
     selector: 'app-asqs-create-dialog',
@@ -31,8 +36,13 @@ import { SelectModule } from 'primeng/select';
         InputTextModule,
         FloatLabelModule,
         MessageModule,
-        PasswordModule,
         SelectModule,
+        SkeletonModule,
+        ToggleSwitch,
+        DividerModule,
+        CodeEditorComponent,
+        FormsModule,
+        PasswordModule,
     ],
     templateUrl: './asqs-create-dialog.component.html',
 })
@@ -46,6 +56,8 @@ export class ASQSCreateDialogComponent {
     visible = signal(false);
     loading = signal(false);
     testing = signal(false);
+    fetching = signal(false);
+    asqsId = signal<string | null>(null);
 
     asqsForm: FormGroup;
 
@@ -57,12 +69,85 @@ export class ASQSCreateDialogComponent {
             accessKeyId: ['', [Validators.required]],
             secretAccessKey: ['', [Validators.required]],
         });
+    }
 
+    useTransformer = false;
+    transformerCode = this.getDefaultTransformerCode();
+
+    private getDefaultTransformerCode(): string {
+        return `/**
+ * Kyrazo Managed Transformer
+ * 
+ * @param {Object} payload - The incoming event
+ * @return {Object} The transformed payload
+ */
+return function transform(payload) {
+    return payload;
+}(payload);`;
+    }
+
+    ngOnInit() {
         this.dialogService.asqsDialogState$.subscribe((state) => {
             if (state.visible) {
-                this.asqsForm.reset({ region: 'us-east-1' });
+                if (state.asqsId) {
+                    this.asqsId.set(state.asqsId);
+                    this.loadQueue(state.asqsId);
+                } else {
+                    this.asqsId.set(null);
+                    this.useTransformer = false;
+                    this.transformerCode = this.getDefaultTransformerCode();
+                    this.asqsForm.reset({ region: 'us-east-1' });
+                    this.asqsForm.get('queueUrl')?.enable();
+                    this.asqsForm.get('region')?.enable();
+                    this.asqsForm.get('accessKeyId')?.setValidators([Validators.required]);
+                    this.asqsForm.get('secretAccessKey')?.setValidators([Validators.required]);
+                }
+                this.asqsForm.get('accessKeyId')?.updateValueAndValidity();
+                this.asqsForm.get('secretAccessKey')?.updateValueAndValidity();
             }
             this.visible.set(state.visible);
+        });
+    }
+
+    loadQueue(id: string) {
+        this.fetching.set(true);
+        this.asqsService.get(id).subscribe({
+            next: (res) => {
+                this.fetching.set(false);
+                if (res.data) {
+                    this.asqsForm.patchValue({
+                        name: res.data.name,
+                        queueUrl: res.data.queueUrl,
+                        region: res.data.region
+                    });
+                    // Credentials are optional on update
+                    this.asqsForm.get('accessKeyId')?.clearValidators();
+                    this.asqsForm.get('secretAccessKey')?.clearValidators();
+                    this.asqsForm.get('accessKeyId')?.updateValueAndValidity();
+                    this.asqsForm.get('secretAccessKey')?.updateValueAndValidity();
+
+                    this.asqsForm.get('queueUrl')?.disable();
+                    this.asqsForm.get('region')?.disable();
+
+                    // Transformer logic
+                    if (res.data.transformer) {
+                        this.useTransformer = true;
+                        this.transformerCode = typeof res.data.transformer === 'object' ? res.data.transformer.code : this.getDefaultTransformerCode();
+                    } else {
+                        this.useTransformer = false;
+                        this.transformerCode = this.getDefaultTransformerCode();
+                    }
+                }
+            },
+            error: (err) => {
+                this.fetching.set(false);
+                this.sentry.captureException(err);
+                this.mes.add({
+                    severity: 'error',
+                    summary: 'Load Failed',
+                    detail: 'Could not load queue details',
+                });
+            },
         });
     }
 
@@ -73,7 +158,7 @@ export class ASQSCreateDialogComponent {
         }
 
         this.testing.set(true);
-        this.asqsService.test(this.asqsForm.value).subscribe({
+        this.asqsService.test(this.asqsForm.getRawValue()).subscribe({
             next: (res) => {
                 this.testing.set(false);
                 if (res.success) {
@@ -109,13 +194,29 @@ export class ASQSCreateDialogComponent {
         }
 
         this.loading.set(true);
-        this.asqsService.create(this.asqsForm.value).subscribe({
+        const id = this.asqsId();
+        const payload: any = this.asqsForm.getRawValue();
+
+        if (this.useTransformer) {
+            payload.transformer = {
+                code: this.transformerCode,
+                name: `${payload.name} Transformer`,
+            };
+        } else if (id) {
+            payload.transformer = null;
+        }
+
+        const obs = id 
+            ? this.asqsService.update(id, payload) 
+            : this.asqsService.create(payload);
+
+        obs.subscribe({
             next: (res) => {
                 this.loading.set(false);
                 this.mes.add({
                     severity: 'success',
-                    summary: 'Queue Added',
-                    detail: 'ASQS queue destination created successfully',
+                    summary: id ? 'Queue Updated' : 'Queue Added',
+                    detail: id ? 'ASQS queue destination updated successfully' : 'ASQS queue destination created successfully',
                 });
                 this.dialogService.notifyASQSSaved(res.data);
                 this.close();
@@ -125,7 +226,7 @@ export class ASQSCreateDialogComponent {
                 this.sentry.captureException(err);
                 this.mes.add({
                     severity: 'error',
-                    summary: 'Creation Failed',
+                    summary: id ? 'Update Failed' : 'Creation Failed',
                     detail: err.message,
                 });
             },

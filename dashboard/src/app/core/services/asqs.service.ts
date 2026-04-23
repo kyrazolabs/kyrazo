@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
 import { ApiResponse } from '@models/index';
-import { IASQSQueue, CreateASQSRequest } from '@models/asqs.types';
+import { IASQSQueue, CreateASQSRequest, UpdateASQSRequest } from '@models/asqs.types';
 import { environment } from 'environments/environment';
 
 @Injectable({
@@ -10,6 +10,12 @@ import { environment } from 'environments/environment';
 })
 export class ASQSService {
     private readonly http = inject(HttpClient);
+
+    get(id: string): Observable<ApiResponse<IASQSQueue>> {
+        return this.http
+            .get<ApiResponse<IASQSQueue>>(environment.asqs.get(id))
+            .pipe(catchError(this.handleError));
+    }
 
     gets(): Observable<ApiResponse<IASQSQueue[]>> {
         return this.http
@@ -20,6 +26,18 @@ export class ASQSService {
     create(payload: CreateASQSRequest): Observable<ApiResponse<IASQSQueue>> {
         return this.http
             .post<ApiResponse<IASQSQueue>>(environment.asqs.create, payload)
+            .pipe(catchError(this.handleError));
+    }
+
+    update(id: string, payload: UpdateASQSRequest): Observable<ApiResponse<IASQSQueue>> {
+        return this.http
+            .patch<ApiResponse<IASQSQueue>>(environment.asqs.update(id), payload)
+            .pipe(catchError(this.handleError));
+    }
+
+    delete(id: string): Observable<ApiResponse<void>> {
+        return this.http
+            .delete<ApiResponse<void>>(environment.asqs.delete(id))
             .pipe(catchError(this.handleError));
     }
 
