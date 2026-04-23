@@ -4,9 +4,10 @@ import { PopulatedIdSchema } from '@kyrazo/shared';
 export const CreateSourceSchema = z.object({
     name: z.string().min(3).max(100),
     description: z.string().max(500).optional(),
-    service: z
-        .enum(['stripe', 'paypal', 'github', 'shopify', 'slack', 'webflow', 'general'])
-        .default('general'),
+    service: z.enum(
+        ['stripe', 'paypal', 'github', 'shopify', 'slack', 'webflow'],
+        'Invalid service'
+    ),
     type: z.string().default('receive'), // Currently only supporting receive v2
     forwarding: z.boolean().default(false),
     destination: z

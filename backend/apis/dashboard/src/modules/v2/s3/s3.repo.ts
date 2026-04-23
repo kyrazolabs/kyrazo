@@ -1,16 +1,18 @@
 import { S3Bucket, transformWithId, unprefixId } from '@kyrazo/shared';
+import { ClientSession } from 'mongoose';
 import { CreateS3Dto, UpdateS3Dto } from './s3.types';
 
 export class S3Repo {
-    async create(data: CreateS3Dto & { workspaceId: string; namespaceId: string; iv: string }) {
-        const s3Bucket = await S3Bucket.create({
+    async create(data: Omit<CreateS3Dto, 'transformer'> & { workspaceId: string; namespaceId: string; iv: string; isManagedTransform?: boolean; transformer?: any }, options?: { session?: ClientSession }) {
+        const s3Bucket = new S3Bucket({
             ...data,
             workspaceId: unprefixId(data.workspaceId),
             namespaceId: unprefixId(data.namespaceId),
-            transformId: data.transformId ? unprefixId(data.transformId) : undefined,
+            transformer: data.transformer ? unprefixId(data.transformer as string) : undefined,
         });
 
-        return transformWithId(s3Bucket, 's3Bucket') as any;
+        const saved = await s3Bucket.save({ session: options?.session });
+        return transformWithId(saved.toJSON(), 's3Bucket') as any;
     }
 
     async findById(id: string, workspaceId: string, namespaceId: string, includeSecrets = false) {
@@ -41,7 +43,8 @@ export class S3Repo {
         id: string,
         workspaceId: string,
         namespaceId: string,
-        data: UpdateS3Dto & { iv?: string }
+        data: Omit<UpdateS3Dto, 'transformer'> & { iv?: string; isManagedTransform?: boolean; transformer?: any },
+        options?: { session?: ClientSession }
     ) {
         const updated = await S3Bucket.findOneAndUpdate(
             {
@@ -51,12 +54,16 @@ export class S3Repo {
             },
             {
                 ...data,
-                transformId: data.transformId ? unprefixId(data.transformId) : undefined,
+                transformer: data.transformer ? unprefixId(data.transformer as string) : undefined,
             },
-            { new: true }
+            { new: true, session: options?.session }
         ).lean();
 
         return updated ? (transformWithId(updated, 's3Bucket') as any) : null;
+    }
+
+    async startSession(): Promise<ClientSession> {
+        return await S3Bucket.startSession();
     }
 
     async delete(id: string, workspaceId: string, namespaceId: string) {

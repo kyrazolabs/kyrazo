@@ -3,7 +3,7 @@ import { config } from '@/configs/app';
 import {
     createSlidingWindowLimiter,
     createRateLimitMiddleware,
-} from '@/core/middlewares/rate-limiter.middleware';
+} from '@/core/middlewares/ratelimit.middleware';
 
 // Lazy wrappers for namespace routes rate limiter (user-based)
 export const namespaceReadRateLimiter = async (c: AppContext, next: () => Promise<void>) => {

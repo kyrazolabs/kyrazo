@@ -7,7 +7,7 @@ import {
     SearchTransformSchema,
     TransformIdParamSchema,
     RollbackParamSchema,
-} from './transforms.schema';
+} from './transform.schema';
 
 export type CreateTransformDto = z.infer<typeof CreateTransformSchema>;
 export type UpdateTransformDto = z.infer<typeof UpdateTransformSchema>;

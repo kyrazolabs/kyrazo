@@ -1,6 +1,6 @@
 import { describe, it, expect, mock, spyOn, beforeEach } from 'bun:test';
-import { TransformController } from './transforms.controller';
-import { transformService } from './transforms.service';
+import { TransformController } from './transform.controller';
+import { transformService } from './transform.service';
 
 const mockContext = (
     body: any = {},

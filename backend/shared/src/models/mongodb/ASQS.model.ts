@@ -22,11 +22,12 @@ const ASQSSchema = new Schema<IASQS>(
         accessKeyId: { type: String, required: true },
         secretAccessKey: { type: String, required: true, select: false },
         iv: { type: String, required: true, select: false },
-        transformId: {
+        transformer: {
             type: Schema.Types.ObjectId,
             ref: 'Transform',
             required: false,
         },
+        isManagedTransform: { type: Boolean, default: false },
         queueType: {
             type: String,
             enum: ['standard', 'fifo'],

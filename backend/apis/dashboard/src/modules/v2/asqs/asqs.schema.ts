@@ -8,7 +8,14 @@ export const CreateASQSSchema = z.object({
     region: z.string().min(1, 'Region is required'),
     accessKeyId: z.string().min(1, 'Access key ID is required'),
     secretAccessKey: z.string().min(1, 'Secret access key is required'),
-    transformId: z.string().optional(),
+    transformer: z
+        .object({
+            code: z.string().min(1, 'Transformer code is required'),
+            name: z.string().optional(),
+            description: z.string().optional(),
+        })
+        .optional()
+        .nullable(),
     enabled: z.boolean().default(true),
 });
 

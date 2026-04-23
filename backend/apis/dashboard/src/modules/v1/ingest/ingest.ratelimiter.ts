@@ -3,7 +3,7 @@ import { AppContext } from '@/core/middlewares/auth.middleware';
 import {
     createRateLimitMiddleware,
     createSlidingWindowLimiter,
-} from '@/core/middlewares/rate-limiter.middleware';
+} from '@/core/middlewares/ratelimit.middleware';
 
 // Lazy wrapper for ingest routes rate limiter (user-based, normal level for read operations)
 export const ingestRateLimiter = async (c: AppContext, next: () => Promise<void>) => {

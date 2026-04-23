@@ -1,6 +1,6 @@
 import { ISource, unprefixId, prefixId, logger, generateIngressId } from '@kyrazo/shared';
 import { sourceRepositoryV2 as sourceRepo } from './source.repo';
-import { transformRepository } from '../transforms/transforms.repo';
+import { transformRepository } from '../transform/transform.repo';
 import { CreateSourceDto, UpdateSourceDto, SearchSourceDto } from './source.types';
 import { config } from '@/configs';
 
@@ -15,7 +15,7 @@ export class SourceServiceV2 {
         let savedSource: any;
 
         await session.withTransaction(async () => {
-            let transformId: any;
+            let transformer: any;
 
             if (data.transformer) {
                 const transform = await transformRepository.create(
@@ -30,7 +30,7 @@ export class SourceServiceV2 {
                     },
                     userId
                 );
-                transformId = unprefixId(transform.id);
+                transformer = unprefixId(transform.id);
             }
 
             const ingressId = generateIngressId(userId);
@@ -43,7 +43,7 @@ export class SourceServiceV2 {
                 namespaceId: unprefixId(namespaceId),
                 ingressId,
                 ingressUrl,
-                transformId,
+                transformer,
                 isManagedTransform: !!data.transformer,
                 destination: {
                     endpoints: data.destination?.endpoints?.map(id => unprefixId(id)) || [],
@@ -76,19 +76,25 @@ export class SourceServiceV2 {
             const updateData: any = { ...data };
             delete updateData.transformer;
 
-            if (data.transformer === null && source.transformId) {
+            if (data.transformer === null && source.transformer) {
                 // Explicitly requested to unlink/delete the managed transformer
-                const tfId = (source.transformId as any)._id || (source.transformId as any).id || source.transformId;
+                const tfId =
+                    (source.transformer as any)._id ||
+                    (source.transformer as any).id ||
+                    source.transformer;
                 await transformRepository.deleteById(
                     prefixId(tfId, 'transformer')!,
                     workspaceId,
                     namespaceId
                 );
-                updateData.transformId = null;
+                updateData.transformer = null;
                 updateData.isManagedTransform = false;
-            } else if (data.transformer && source.transformId) {
+            } else if (data.transformer && source.transformer) {
                 // Update existing managed transformer
-                const tfId = (source.transformId as any)._id || (source.transformId as any).id || source.transformId;
+                const tfId =
+                    (source.transformer as any)._id ||
+                    (source.transformer as any).id ||
+                    source.transformer;
                 await transformRepository.update(
                     prefixId(tfId, 'transformer')!,
                     workspaceId,
@@ -100,13 +106,14 @@ export class SourceServiceV2 {
                     },
                     userId
                 );
-            } else if (data.transformer && !source.transformId) {
+            } else if (data.transformer && !source.transformer) {
                 // Create new managed transformer if it didn't exist
                 const transform = await transformRepository.create(
                     {
                         name: data.transformer.name || `${source.name} Transformer`,
                         description:
-                            data.transformer.description || `Managed transformer for ${source.name}`,
+                            data.transformer.description ||
+                            `Managed transformer for ${source.name}`,
                         code: data.transformer.code,
                         workspaceId: unprefixId(workspaceId) as any,
                         namespaceId: unprefixId(namespaceId) as any,
@@ -114,15 +121,15 @@ export class SourceServiceV2 {
                     },
                     userId
                 );
-                updateData.transformId = unprefixId(transform.id);
+                updateData.transformer = unprefixId(transform.id);
                 updateData.isManagedTransform = true;
             }
 
             if (data.destination) {
                 updateData.destination = {
-                    endpoints: data.destination.endpoints?.map((fid) => unprefixId(fid)) || [],
-                    s3bucket: data.destination.s3bucket?.map((fid) => unprefixId(fid)) || [],
-                    asqs: data.destination.asqs?.map((fid) => unprefixId(fid)) || [],
+                    endpoints: data.destination.endpoints?.map(fid => unprefixId(fid)) || [],
+                    s3bucket: data.destination.s3bucket?.map(fid => unprefixId(fid)) || [],
+                    asqs: data.destination.asqs?.map(fid => unprefixId(fid)) || [],
                 };
             }
 
@@ -142,8 +149,11 @@ export class SourceServiceV2 {
             const source = await sourceRepo.findById(id, workspaceId, namespaceId);
             if (!source) throw new Error('Source not found');
 
-            if (source.isManagedTransform && source.transformId) {
-                const tfId = (source.transformId as any)._id || (source.transformId as any).id || source.transformId;
+            if (source.isManagedTransform && source.transformer) {
+                const tfId =
+                    (source.transformer as any)._id ||
+                    (source.transformer as any).id ||
+                    source.transformer;
                 await transformRepository.deleteById(
                     prefixId(tfId, 'transformer')!,
                     workspaceId,

@@ -1,8 +1,9 @@
 import { Hono } from 'hono';
 import sourcesV2Router from './source/source.routes';
-import transformsV2Router from './transforms/transforms.routes';
+import namespacesV2Router from './namespace/namespace.routes';
 import s3V2Router from './s3/s3.routes';
 import asqsV2Router from './asqs/asqs.routes';
+import endpointV2Router from './endpoint/endpoint.routes';
 import { clickhouseConfig, databaseConfig } from '@kyrazo/shared';
 import { redisConfig } from '@/configs';
 
@@ -10,9 +11,11 @@ const router = new Hono();
 
 // Mount V2 routes
 router.route('/sources', sourcesV2Router);
-router.route('/transforms', transformsV2Router);
+router.route('/namespaces', namespacesV2Router);
+
 router.route('/s3', s3V2Router);
 router.route('/asqs', asqsV2Router);
+router.route('/endpoints', endpointV2Router);
 
 // Health check endpoint
 router.get('/health', async c => {
@@ -60,7 +63,7 @@ router.get('/health', async c => {
                 redisQueue,
             },
             timestamp: new Date().toISOString(),
-            version: '1.0.0',
+            version: '2',
         });
     } catch (error: any) {
         return c.json(
@@ -69,7 +72,7 @@ router.get('/health', async c => {
                 message: 'Health check failed',
                 error: error instanceof Error ? error.message : 'Unknown error',
                 timestamp: new Date().toISOString(),
-                version: '1.0.0',
+                version: '2',
             },
             500
         );

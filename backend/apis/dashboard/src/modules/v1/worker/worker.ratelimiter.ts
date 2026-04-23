@@ -3,7 +3,7 @@ import { config } from '@/configs/app';
 import {
     createSlidingWindowLimiter,
     createRateLimitMiddleware,
-} from '@/core/middlewares/rate-limiter.middleware';
+} from '@/core/middlewares/ratelimit.middleware';
 
 export const workerReadRateLimiter = async (c: AppContext, next: () => Promise<void>) => {
     const limiter = createRateLimitMiddleware(

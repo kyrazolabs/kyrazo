@@ -33,8 +33,8 @@ asqs.post('/', validate('json', CreateASQSSchema), ASQSController.createASQS);
 // GET /asqs/:id → Get single
 asqs.get('/:id', validate('param', ASQSIdParamSchema), ASQSController.getASQS);
 
-// PUT /asqs/:id → Update
-asqs.put(
+// PATCH /asqs/:id → Update
+asqs.patch(
     '/:id',
     validate('param', ASQSIdParamSchema),
     validate('json', UpdateASQSSchema),

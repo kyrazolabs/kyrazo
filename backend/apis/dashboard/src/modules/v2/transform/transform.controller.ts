@@ -1,6 +1,6 @@
 import { AppContext } from '@/core/middlewares/auth.middleware';
 import { IErrorResponse, logger } from '@kyrazo/shared';
-import { transformService } from './transforms.service';
+import { transformService } from './transform.service';
 import {
     CreateTransformResponse,
     DeleteTransformResponse,
@@ -10,7 +10,7 @@ import {
     RollbackTransformResponse,
     TestTransformResponse,
     UpdateTransformResponse,
-} from './transforms.types';
+} from './transform.types';
 import {
     CreateTransformDto,
     FilterTransformDto,
@@ -18,7 +18,7 @@ import {
     RollbackTransformDto,
     TestTransformDto,
     UpdateTransformDto,
-} from './transforms.types';
+} from './transform.types';
 
 export class TransformController {
     static async createTransform(c: AppContext): Promise<Response> {

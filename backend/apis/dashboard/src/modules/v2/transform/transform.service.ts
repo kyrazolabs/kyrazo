@@ -1,6 +1,6 @@
 import { ITransform, ITransformVersion } from '@kyrazo/shared';
-import { transformRepository } from './transforms.repo';
-import { CreateTransformDto, UpdateTransformDto } from './transforms.types';
+import { transformRepository } from './transform.repo';
+import { CreateTransformDto, UpdateTransformDto } from './transform.types';
 
 import lo from 'lodash';
 import dayjs from 'dayjs';

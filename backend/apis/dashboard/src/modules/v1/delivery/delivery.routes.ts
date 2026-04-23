@@ -8,7 +8,7 @@ import { config } from '@/configs/app';
 import {
     createSlidingWindowLimiter,
     createRateLimitMiddleware,
-} from '@/core/middlewares/rate-limiter.middleware';
+} from '@/core/middlewares/ratelimit.middleware';
 import { DeliveryController } from '@/modules/v1/delivery/delivery.controller';
 import {
     GetDeliveriesBySourceIdSchema,

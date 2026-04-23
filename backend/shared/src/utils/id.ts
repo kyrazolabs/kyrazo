@@ -143,8 +143,7 @@ export function transformWithId<T>(data: T, type: IdType): TransformedWithId<T> 
             namespace: 'namespace',
             workspace: 'workspace',
             id: type, // Fallback for 'id' field
-            transformId: 'transformer',
-            transform_id: 'transformer',
+            transformer: 'transformer',
             createdBy: 'user',
             s3bucketId: 's3Bucket',
             asqsId: 'sqs',
@@ -180,7 +179,6 @@ export function transformWithId<T>(data: T, type: IdType): TransformedWithId<T> 
             endpoint: 'endpoint',
             endpoints: 'endpoint',
             transformer: 'transformer',
-            transformId: 'transformer',
             user: 'user',
         };
 

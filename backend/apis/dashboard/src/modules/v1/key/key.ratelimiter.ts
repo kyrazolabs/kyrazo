@@ -3,7 +3,7 @@ import { config } from '@/configs/app';
 import {
     createSlidingWindowLimiter,
     createRateLimitMiddleware,
-} from '@/core/middlewares/rate-limiter.middleware';
+} from '@/core/middlewares/ratelimit.middleware';
 
 // Lazy wrapper for API key management rate limiter (user-based, sensitive operations)
 export const keyManagementRateLimiter = async (c: AppContext, next: () => Promise<void>) => {

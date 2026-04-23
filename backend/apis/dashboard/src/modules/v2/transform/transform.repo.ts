@@ -9,18 +9,19 @@ import {
 } from '@kyrazo/shared';
 import { Types } from 'mongoose';
 import { redisConfig } from '@/configs';
+import { ClientSession } from 'mongoose';
 
 export class TransformRepository {
-    async create(data: Partial<ITransform>, userId: string): Promise<ITransform> {
-        const session = await Transform.startSession();
+    async create(data: Partial<ITransform>, userId: string, options?: { session?: ClientSession }): Promise<ITransform> {
+        const session = options?.session || (await Transform.startSession());
         let savedTransform: any;
 
-        await session.withTransaction(async () => {
+        const execute = async (s: ClientSession) => {
             const transform = new Transform({
                 ...data,
                 currentVersion: 1,
             });
-            savedTransform = await transform.save({ session });
+            savedTransform = await transform.save({ session: s });
 
             const version = new TransformVersion({
                 transformId: savedTransform._id,
@@ -28,10 +29,18 @@ export class TransformRepository {
                 code: data.code,
                 createdBy: unprefixId(userId),
             });
-            await version.save({ session });
-        });
+            await version.save({ session: s });
+        };
 
-        await session.endSession();
+        if (options?.session) {
+            await execute(options.session);
+        } else {
+            await (session as ClientSession).withTransaction(async () => {
+                await execute(session as ClientSession);
+            });
+            await (session as ClientSession).endSession();
+        }
+
         return transformWithId(savedTransform.toJSON(), 'transformer') as any;
     }
 
@@ -80,17 +89,18 @@ export class TransformRepository {
         workspaceId: string,
         namespaceId: string,
         data: Partial<ITransform>,
-        userId: string
+        userId: string,
+        options?: { session?: ClientSession }
     ): Promise<ITransform | null> {
-        const session = await Transform.startSession();
+        const session = options?.session || (await Transform.startSession());
         let updatedTransform: any;
 
-        await session.withTransaction(async () => {
+        const execute = async (s: ClientSession) => {
             const existing = await Transform.findOne({
                 _id: unprefixId(id),
                 workspaceId: unprefixId(workspaceId),
                 namespaceId: unprefixId(namespaceId),
-            }).session(session);
+            }).session(s);
 
             if (!existing) return;
 
@@ -107,17 +117,25 @@ export class TransformRepository {
                     code: data.code,
                     createdBy: unprefixId(userId),
                 });
-                await version.save({ session });
+                await version.save({ session: s });
             }
 
             if (data.name) existing.name = data.name;
             if (data.description !== undefined) existing.description = data.description;
             if (data.isActive !== undefined) existing.isActive = data.isActive;
 
-            updatedTransform = await existing.save({ session });
-        });
+            updatedTransform = await existing.save({ session: s });
+        };
 
-        await session.endSession();
+        if (options?.session) {
+            await execute(options.session);
+        } else {
+            await (session as ClientSession).withTransaction(async () => {
+                await execute(session as ClientSession);
+            });
+            await (session as ClientSession).endSession();
+        }
+
         if (updatedTransform) {
             await redisConfig.del(RedisKeys.context.activeTransform(workspaceId, namespaceId));
         }
@@ -126,7 +144,7 @@ export class TransformRepository {
             : null;
     }
 
-    async deleteById(id: string, workspaceId: string, namespaceId: string): Promise<boolean> {
+    async deleteById(id: string, workspaceId: string, namespaceId: string, options?: { session?: ClientSession }): Promise<boolean> {
         // Soft delete/deactivate as requested
         const result = await Transform.findOneAndUpdate(
             {
@@ -135,7 +153,7 @@ export class TransformRepository {
                 namespaceId: unprefixId(namespaceId),
             },
             { isActive: false },
-            { new: true }
+            { new: true, session: options?.session }
         );
         if (result) {
             await redisConfig.del(RedisKeys.context.activeTransform(workspaceId, namespaceId));

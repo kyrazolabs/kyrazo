@@ -33,7 +33,7 @@ export interface ISource extends Document {
 
     // Authentication
     authentication?: ISourceAuthentication;
-    transformId?: Types.ObjectId;
+    transformer?: Types.ObjectId;
     isManagedTransform?: boolean;
 
     retryPolicy: {

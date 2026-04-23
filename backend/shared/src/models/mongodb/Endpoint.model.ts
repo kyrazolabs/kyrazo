@@ -29,6 +29,8 @@ const EndpointSchema = new Schema<IEndpoint>(
         },
         description: { type: String, default: '' },
         enabled: { type: Boolean, default: true },
+        transformer: { type: Schema.Types.ObjectId, ref: 'Transform' },
+        isManagedTransform: { type: Boolean, default: false },
 
         userId: { type: Schema.Types.ObjectId, required: true, index: true },
 
@@ -65,6 +67,7 @@ const EndpointSchema = new Schema<IEndpoint>(
             virtuals: true,
             transform: function (doc, ret: any) {
                 ret.id = `end_${ret._id.toString()}`;
+                if (ret.transformer) ret.transformer = `trn_${ret.transformer.toString()}`;
                 delete ret._id;
                 delete ret.__v;
             },
@@ -73,6 +76,7 @@ const EndpointSchema = new Schema<IEndpoint>(
             virtuals: true,
             transform: function (doc, ret: any) {
                 ret.id = `end_${ret._id.toString()}`;
+                if (ret.transformer) ret.transformer = `trn_${ret.transformer.toString()}`;
                 delete ret._id;
                 delete ret.__v;
             },

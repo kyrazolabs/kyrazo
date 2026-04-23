@@ -2,9 +2,12 @@ import { describe, it, expect, mock, beforeEach } from 'bun:test';
 import { Transform, TransformVersion } from '@kyrazo/shared';
 
 // Mocking Mongoose models
-const mockSave = mock().mockResolvedValue({ _id: 'raw_1', toJSON: () => ({ _id: 'raw_1', code: 'test' }) });
+const mockSave = mock().mockResolvedValue({
+    _id: 'raw_1',
+    toJSON: () => ({ _id: 'raw_1', code: 'test' }),
+});
 const mockSession = {
-    withTransaction: mock((cb) => cb()),
+    withTransaction: mock(cb => cb()),
     endSession: mock(),
 };
 
@@ -19,11 +22,11 @@ class MockDocument {
 const mockDoc = new MockDocument();
 
 // Mock constructor
-const MockTransform = function(data: any) {
+const MockTransform = function (data: any) {
     return Object.assign(new MockDocument(), data);
 } as any;
 
-const MockTransformVersion = function(data: any) {
+const MockTransformVersion = function (data: any) {
     return Object.assign(new MockDocument(), data);
 } as any;
 
@@ -95,12 +98,20 @@ describe('TransformRepository', () => {
         mock.restore();
         mockSave.mockClear();
         mockSession.withTransaction.mockClear();
-        const module = await import('./transforms.repo');
+        const module = await import('./transform.repo');
         transformRepository = module.transformRepository;
     });
 
     it('should create a transform and a version entry', async () => {
-        await transformRepository.create({ name: 'T', code: 'test', workspaceId: workspaceId as any, namespaceId: namespaceId as any }, 'user1');
+        await transformRepository.create(
+            {
+                name: 'T',
+                code: 'test',
+                workspaceId: workspaceId as any,
+                namespaceId: namespaceId as any,
+            },
+            'user1'
+        );
 
         expect(mockSave).toHaveBeenCalled();
         expect(mockSession.withTransaction).toHaveBeenCalled();

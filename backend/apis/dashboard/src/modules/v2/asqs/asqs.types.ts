@@ -12,7 +12,8 @@ export interface IASQSResponse {
     useContentBasedDeduplication: boolean;
     region: string;
     accessKeyId: string;
-    transformId?: string;
+    transformer?: string;
+    isManagedTransform: boolean;
     enabled: boolean;
     createdAt: string;
     updatedAt: string;

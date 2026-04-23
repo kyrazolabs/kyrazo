@@ -1,16 +1,16 @@
 import { describe, it, expect, mock, beforeEach } from 'bun:test';
 import { sourceServiceV2 } from './source.service';
 import { sourceRepositoryV2 } from './source.repo';
-import { transformRepository } from '../transforms/transforms.repo';
+import { transformRepository } from '../transform/transform.repo';
 
 // Mocking dependencies
 mock.module('./source.repo', () => ({
     sourceRepositoryV2: {
         startSession: mock().mockResolvedValue({
-            withTransaction: mock((cb) => cb()),
+            withTransaction: mock(cb => cb()),
             endSession: mock(),
         }),
-        create: mock().mockImplementation((data) => {
+        create: mock().mockImplementation(data => {
             if (data.name === 'FailMe') throw new Error('DB_ERROR');
             return Promise.resolve({ id: 'src_1', ...data });
         }),
@@ -19,7 +19,7 @@ mock.module('./source.repo', () => ({
             return Promise.resolve({ id, ...data });
         }),
         deleteById: mock().mockResolvedValue(true),
-        findById: mock().mockImplementation((id) => {
+        findById: mock().mockImplementation(id => {
             if (id === 'src_none') return Promise.resolve(null);
             return Promise.resolve({ id, transformId: 'tr_1', isManagedTransform: true });
         }),
@@ -29,7 +29,7 @@ mock.module('./source.repo', () => ({
 
 mock.module('../transforms/transforms.repo', () => ({
     transformRepository: {
-        create: mock().mockImplementation((data) => {
+        create: mock().mockImplementation(data => {
             if (data.name === 'Bad Transform') throw new Error('TRANSFORM_ERROR');
             return Promise.resolve({ id: 'tr_1', ...data });
         }),
@@ -69,7 +69,7 @@ describe('SourceServiceV2 - Comprehensive Tests', () => {
         it('should handle managed transformer creation failure', async () => {
             const input: any = {
                 name: 'Managed Source',
-                transformer: { name: 'Bad Transform', code: '...' }
+                transformer: { name: 'Bad Transform', code: '...' },
             };
             try {
                 await sourceServiceV2.create(input, userId, workspaceId, namespaceId);
@@ -83,7 +83,13 @@ describe('SourceServiceV2 - Comprehensive Tests', () => {
     describe('update', () => {
         it('should throw if source not found', async () => {
             try {
-                await sourceServiceV2.update('src_none', workspaceId, namespaceId, { name: 'X' }, userId);
+                await sourceServiceV2.update(
+                    'src_none',
+                    workspaceId,
+                    namespaceId,
+                    { name: 'X' },
+                    userId
+                );
                 throw new Error('Should have failed');
             } catch (e: any) {
                 expect(e.message).toBe('Source not found');
@@ -92,7 +98,13 @@ describe('SourceServiceV2 - Comprehensive Tests', () => {
 
         it('should handle update repository failure', async () => {
             try {
-                await sourceServiceV2.update('src_fail', workspaceId, namespaceId, { name: 'X' }, userId);
+                await sourceServiceV2.update(
+                    'src_fail',
+                    workspaceId,
+                    namespaceId,
+                    { name: 'X' },
+                    userId
+                );
                 throw new Error('Should have failed');
             } catch (e: any) {
                 expect(e.message).toBe('UPDATE_ERROR');
@@ -118,10 +130,10 @@ describe('SourceServiceV2 - Comprehensive Tests', () => {
         });
 
         it('should delete source but skip transformer cleanup if not managed', async () => {
-            (sourceRepositoryV2.findById as any).mockResolvedValueOnce({ 
-                id: 'src_1', 
-                transformId: 'tr_1', 
-                isManagedTransform: false 
+            (sourceRepositoryV2.findById as any).mockResolvedValueOnce({
+                id: 'src_1',
+                transformId: 'tr_1',
+                isManagedTransform: false,
             });
             await sourceServiceV2.delete('src_1', workspaceId, namespaceId);
             expect(transformRepository.deleteById).not.toHaveBeenCalled();
@@ -133,7 +145,11 @@ describe('SourceServiceV2 - Comprehensive Tests', () => {
         it('should apply search filters correctly', async () => {
             const options = { q: 'stripe', status: 'active' as any, limit: 10, page: 1 };
             await sourceServiceV2.gets(workspaceId, namespaceId, options);
-            expect(sourceRepositoryV2.findAll).toHaveBeenCalledWith(workspaceId, namespaceId, expect.anything());
+            expect(sourceRepositoryV2.findAll).toHaveBeenCalledWith(
+                workspaceId,
+                namespaceId,
+                expect.anything()
+            );
         });
     });
 });

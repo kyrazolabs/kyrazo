@@ -58,14 +58,21 @@ describe('S3Service', () => {
         
         const serviceModule = await import('./s3.service');
         const S3ServiceClass = serviceModule.S3Service;
+
+        const repoModule = await import('./s3.repo');
+        s3Repo = repoModule.s3Repo;
+        
+        // Mock startSession
+        const mockSession = {
+            withTransaction: mock((callback: any) => callback()),
+            endSession: mock().mockResolvedValue(undefined),
+        };
+        spyOn(s3Repo, 'startSession').mockResolvedValue(mockSession as any);
         
         // Manual instantiation for DI
         s3Service = new S3ServiceClass(class {
             constructor() { return mockS3ClientInstance; }
         } as any);
-        
-        const repoModule = await import('./s3.repo');
-        s3Repo = repoModule.s3Repo;
     });
 
     describe('createS3Bucket', () => {
@@ -81,7 +88,7 @@ describe('S3Service', () => {
             (secretCrypto.encrypt as any).mockReturnValue({ encrypted: 'enc_secret', iv: 'iv123' });
             const repoSpy = spyOn(s3Repo, 'create').mockResolvedValue({ id: s3Id } as any);
 
-            const result = await s3Service.createS3Bucket(input as any, workspaceId, namespaceId);
+            const result = await s3Service.createS3Bucket(input as any, 'user1', workspaceId, namespaceId);
 
             expect(secretCrypto.encrypt).toHaveBeenCalledWith(namespaceId, 'plain_secret');
             expect(repoSpy).toHaveBeenCalledWith(expect.objectContaining({
@@ -98,7 +105,7 @@ describe('S3Service', () => {
             (secretCrypto.encrypt as any).mockReturnValue({ encrypted: 'new_enc', iv: 'new_iv' });
             spyOn(s3Repo, 'update').mockResolvedValue({ id: s3Id } as any);
 
-            await s3Service.updateS3Bucket(s3Id, workspaceId, namespaceId, updateInput as any);
+            await s3Service.updateS3Bucket(s3Id, workspaceId, namespaceId, updateInput as any, 'user1');
 
             expect(secretCrypto.encrypt).toHaveBeenCalled();
             expect(mockRedis.del).toHaveBeenCalledWith(`context:s3:${s3Id}`);
@@ -106,7 +113,7 @@ describe('S3Service', () => {
 
         it('should not encrypt if secret is not provided', async () => {
             spyOn(s3Repo, 'update').mockResolvedValue({ id: s3Id } as any);
-            await s3Service.updateS3Bucket(s3Id, workspaceId, namespaceId, { name: 'New' });
+            await s3Service.updateS3Bucket(s3Id, workspaceId, namespaceId, { name: 'New' }, 'user1');
 
             expect(secretCrypto.encrypt).not.toHaveBeenCalled();
         });

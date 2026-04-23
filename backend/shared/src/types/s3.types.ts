@@ -12,7 +12,8 @@ export interface IS3Bucket extends BaseDocument {
     secretAccessKey: string;
     iv: string;
     endpoint?: string; // Optional for S3-compatible storage like MinIO
-    transformId?: Types.ObjectId;
+    transformer?: Types.ObjectId;
+    isManagedTransform: boolean;
     enabled: boolean;
 }
 

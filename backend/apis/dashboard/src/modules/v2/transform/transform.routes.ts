@@ -10,7 +10,7 @@ import {
     transformReadRateLimiter,
     transformWriteRateLimiter,
     transformTestRateLimiter,
-} from './transforms.ratelimiter';
+} from './transform.ratelimiter';
 import {
     CreateTransformSchema,
     SearchTransformSchema,
@@ -18,9 +18,9 @@ import {
     UpdateTransformSchema,
     TestTransformSchema,
     RollbackParamSchema,
-} from './transforms.schema';
-import { TransformController } from './transforms.controller';
-import { transformService } from './transforms.service';
+} from './transform.schema';
+import { TransformController } from './transform.controller';
+import { transformService } from './transform.service';
 
 const transforms = new Hono();
 

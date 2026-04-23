@@ -1,6 +1,6 @@
 import { describe, it, expect, mock, beforeEach, spyOn } from 'bun:test';
-import { transformService } from './transforms.service';
-import { transformRepository } from './transforms.repo';
+import { transformService } from './transform.service';
+import { transformRepository } from './transform.repo';
 
 describe('TransformService', () => {
     beforeEach(() => {
@@ -18,7 +18,7 @@ describe('TransformService', () => {
                 'setTimeout(() => {}, 0)',
                 'global.something = 1',
                 'obj.__proto__',
-                'String.prototype.xxx = 1'
+                'String.prototype.xxx = 1',
             ];
 
             for (const code of forbidden) {
@@ -39,9 +39,9 @@ describe('TransformService', () => {
         it('should successfully transform a payload', async () => {
             const code = 'event.count = event.count + 1; return event;';
             const payload = { count: 10 };
-            
+
             const result = await transformService.testTransform(code, payload);
-            
+
             expect(result.result.count).toBe(11);
             expect(result.executionTimeMs).toBeGreaterThan(0);
         });
@@ -49,7 +49,7 @@ describe('TransformService', () => {
         it('should capture console logs', async () => {
             const code = 'console.log("hello"); console.info("world"); return event;';
             const result = await transformService.testTransform(code, {});
-            
+
             expect(result.logs).toContain('hello');
             expect(result.logs).toContain('INFO: world');
         });
@@ -57,7 +57,7 @@ describe('TransformService', () => {
         it('should catch runtime errors', async () => {
             const code = 'throw new Error("Boom");';
             const result = await transformService.testTransform(code, {});
-            
+
             expect(result.result).toBeNull();
             expect(result.logs).toContain('Runtime Error: Boom');
         });
@@ -67,7 +67,7 @@ describe('TransformService', () => {
             const result = await transformService.testTransform(code, {});
             expect(result.result).toHaveLength(64); // SHA-256 hex length
         });
-        
+
         it('should provide lodash utilities', async () => {
             const code = 'return lodash.get(event, "a.b");';
             const result = await transformService.testTransform(code, { a: { b: 42 } });

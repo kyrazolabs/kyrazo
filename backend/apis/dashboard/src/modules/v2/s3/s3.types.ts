@@ -11,7 +11,8 @@ export interface IS3Response {
     region: string;
     accessKeyId: string;
     endpoint?: string;
-    transformId?: string;
+    transformer?: string;
+    isManagedTransform: boolean;
     enabled: boolean;
     createdAt: string;
     updatedAt: string;

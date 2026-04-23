@@ -55,6 +55,12 @@ describe('ASQSService', () => {
 
     beforeEach(() => {
         mock.restore();
+        // Mock startSession
+        const mockSession = {
+            withTransaction: mock((callback: any) => callback()),
+            endSession: mock().mockResolvedValue(undefined),
+        };
+        spyOn(asqsRepo, 'startSession').mockResolvedValue(mockSession as any);
     });
 
     describe('createASQS', () => {
@@ -70,7 +76,7 @@ describe('ASQSService', () => {
             (secretCrypto.encrypt as any).mockReturnValue({ encrypted: 'encrypted', iv: 'iv' });
             const repoSpy = spyOn(asqsRepo, 'create').mockResolvedValue({ id: asqsId } as any);
 
-            await asqsService.createASQS(input as any, workspaceId, namespaceId);
+            await asqsService.createASQS(input as any, 'user1', workspaceId, namespaceId);
 
             expect(secretCrypto.encrypt).toHaveBeenCalled();
             expect(repoSpy).toHaveBeenCalled();

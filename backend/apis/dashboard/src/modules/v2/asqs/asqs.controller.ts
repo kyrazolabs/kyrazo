@@ -8,11 +8,13 @@ export class ASQSController {
         const workspaceId = c.workspace?.workspaceId;
         const namespaceId = c.namespace?.namespaceId;
 
-        if (!workspaceId || !namespaceId) {
+        const userId = c.get('userId');
+
+        if (!workspaceId || !namespaceId || !userId) {
             return c.json({ success: false, error: 'Unauthorized' }, 401);
         }
 
-        const asqs = await asqsService.createASQS(data, workspaceId.toString(), namespaceId.toString());
+        const asqs = await asqsService.createASQS(data, userId.toString(), workspaceId.toString(), namespaceId.toString());
 
         return c.json<ISuccessResponse<any>>({
             success: true,
@@ -75,11 +77,13 @@ export class ASQSController {
         const workspaceId = c.workspace?.workspaceId;
         const namespaceId = c.namespace?.namespaceId;
 
-        if (!workspaceId || !namespaceId) {
+        const userId = c.get('userId');
+
+        if (!workspaceId || !namespaceId || !userId) {
             return c.json({ success: false, error: 'Unauthorized' }, 401);
         }
 
-        const updated = await asqsService.updateASQS(id, workspaceId.toString(), namespaceId.toString(), data);
+        const updated = await asqsService.updateASQS(id, workspaceId.toString(), namespaceId.toString(), data, userId.toString());
 
         if (!updated) {
             return c.json<IErrorResponse>({

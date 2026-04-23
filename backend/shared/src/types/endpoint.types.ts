@@ -14,6 +14,8 @@ export interface IEndpoint<T = string> extends BaseDocument {
     method: EndpointMethods;
     description: string;
     enabled: boolean;
+    transformer?: string | any;
+    isManagedTransform: boolean;
 
     userId: Types.ObjectId;
 

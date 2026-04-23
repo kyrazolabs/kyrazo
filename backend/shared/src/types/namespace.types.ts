@@ -12,6 +12,8 @@ export interface INamespace extends Document {
     isDeleted: boolean;
     deletedAt?: Date;
     whiteLabelHeaders?: string;
+    transformer?: Types.ObjectId;
+    isManagedTransform?: boolean;
 
     // Virtual fields
     creator?: IUser;

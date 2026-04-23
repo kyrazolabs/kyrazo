@@ -8,7 +8,7 @@ import { config } from '@/configs/app';
 import {
     createSlidingWindowLimiter,
     createRateLimitMiddleware,
-} from '@/core/middlewares/rate-limiter.middleware';
+} from '@/core/middlewares/ratelimit.middleware';
 import { AnalyticsController } from '@/modules/v1/analytics/analytics.controller';
 import { OverviewFilterSchema, TargetQuerySchema } from './analytics.schema';
 import { NamespaceHeadersSchema } from '@/core/utils/libs/zod';

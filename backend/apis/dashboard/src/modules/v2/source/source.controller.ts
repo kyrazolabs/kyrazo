@@ -1,7 +1,7 @@
 import { AppContext } from '@/core/middlewares/auth.middleware';
 import { IErrorResponse, logger } from '@kyrazo/shared';
 import { sourceServiceV2 as sourceService } from './source.service';
-import { transformService } from '../transforms/transforms.service';
+import { transformService } from '../transform/transform.service';
 import {
     CreateSourceResponseV2,
     DeleteSourceResponseV2,

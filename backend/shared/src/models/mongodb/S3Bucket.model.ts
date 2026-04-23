@@ -23,11 +23,12 @@ const S3BucketSchema = new Schema<IS3Bucket>(
         secretAccessKey: { type: String, required: true, select: false },
         iv: { type: String, required: true, select: false },
         endpoint: { type: String, trim: true },
-        transformId: {
+        transformer: {
             type: Schema.Types.ObjectId,
             ref: 'Transform',
             required: false,
         },
+        isManagedTransform: { type: Boolean, default: false },
         enabled: { type: Boolean, default: true },
     },
     {

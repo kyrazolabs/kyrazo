@@ -17,7 +17,7 @@ export class SourceRepositoryV2 {
             .populate('destination.endpoints')
             .populate('destination.s3bucket')
             .populate('destination.asqs')
-            .populate('transformId')
+            .populate('transformer')
             .lean();
         return source ? (transformWithId(source, 'source') as any) : null;
     }

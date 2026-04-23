@@ -1,16 +1,18 @@
 import { ASQS, transformWithId, unprefixId } from '@kyrazo/shared';
+import { ClientSession } from 'mongoose';
 import { CreateASQSDto, UpdateASQSDto } from './asqs.types';
 
 export class ASQSRepo {
-    async create(data: CreateASQSDto & { workspaceId: string; namespaceId: string; iv: string }) {
-        const asqs = await ASQS.create({
+    async create(data: Omit<CreateASQSDto, 'transformer'> & { workspaceId: string; namespaceId: string; iv: string; isManagedTransform?: boolean; transformer?: any }, options?: { session?: ClientSession }) {
+        const asqs = new ASQS({
             ...data,
             workspaceId: unprefixId(data.workspaceId),
             namespaceId: unprefixId(data.namespaceId),
-            transformId: data.transformId ? unprefixId(data.transformId) : undefined,
+            transformer: data.transformer ? unprefixId(data.transformer as string) : undefined,
         });
 
-        return transformWithId(asqs, 'sqs') as any;
+        const saved = await asqs.save({ session: options?.session });
+        return transformWithId(saved.toJSON(), 'sqs') as any;
     }
 
     async findById(id: string, workspaceId: string, namespaceId: string, includeSecrets = false) {
@@ -41,7 +43,8 @@ export class ASQSRepo {
         id: string,
         workspaceId: string,
         namespaceId: string,
-        data: UpdateASQSDto & { iv?: string }
+        data: Omit<UpdateASQSDto, 'transformer'> & { iv?: string; isManagedTransform?: boolean; transformer?: any },
+        options?: { session?: ClientSession }
     ) {
         const updated = await ASQS.findOneAndUpdate(
             {
@@ -51,12 +54,16 @@ export class ASQSRepo {
             },
             {
                 ...data,
-                transformId: data.transformId ? unprefixId(data.transformId) : undefined,
+                transformer: data.transformer ? unprefixId(data.transformer as string) : undefined,
             },
-            { new: true }
+            { new: true, session: options?.session }
         ).lean();
 
         return updated ? (transformWithId(updated, 'sqs') as any) : null;
+    }
+
+    async startSession(): Promise<ClientSession> {
+        return await ASQS.startSession();
     }
 
     async delete(id: string, workspaceId: string, namespaceId: string) {

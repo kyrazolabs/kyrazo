@@ -33,8 +33,8 @@ s3.post('/', validate('json', CreateS3Schema), S3Controller.createS3Bucket);
 // GET /s3/:id → Get single bucket
 s3.get('/:id', validate('param', S3IdParamSchema), S3Controller.getS3Bucket);
 
-// PUT /s3/:id → Update bucket
-s3.put(
+// PATCH /s3/:id → Update bucket
+s3.patch(
     '/:id',
     validate('param', S3IdParamSchema),
     validate('json', UpdateS3Schema),

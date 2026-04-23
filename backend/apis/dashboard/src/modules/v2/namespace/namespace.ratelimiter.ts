@@ -3,30 +3,12 @@ import { AppContext } from '@/core/middlewares/auth.middleware';
 import {
     createRateLimitMiddleware,
     createSlidingWindowLimiter,
-} from '@/core/middlewares/rate-limiter.middleware';
+} from '@/core/middlewares/ratelimit.middleware';
 
 /**
- * Rate limiter for testing transforms.
- * Limit: 20 tests per minute per customer (userId).
+ * Standard read/write rate limiters for namespace operations.
  */
-export const transformTestRateLimiter = async (c: AppContext, next: () => Promise<void>) => {
-    const limiter = createRateLimitMiddleware(
-        createSlidingWindowLimiter({
-            points: 20,
-            duration: 60,
-            blockDuration: 60,
-        }),
-        c => `rate_limit:transform_test:${(c as any).user.userId}`,
-        'Too many transform test requests. Please wait a minute.'
-    );
-    return limiter(c, next);
-};
-
-/**
- * Standard read/write rate limiters for other transform operations.
- * Using existing security config values.
- */
-export const transformReadRateLimiter = async (c: AppContext, next: () => Promise<void>) => {
+export const namespaceReadRateLimiter = async (c: AppContext, next: () => Promise<void>) => {
     const limiter = createRateLimitMiddleware(
         createSlidingWindowLimiter({
             points: config.security.rateLimiter.protected.normal.points,
@@ -39,7 +21,7 @@ export const transformReadRateLimiter = async (c: AppContext, next: () => Promis
     return limiter(c, next);
 };
 
-export const transformWriteRateLimiter = async (c: AppContext, next: () => Promise<void>) => {
+export const namespaceWriteRateLimiter = async (c: AppContext, next: () => Promise<void>) => {
     const limiter = createRateLimitMiddleware(
         createSlidingWindowLimiter({
             points: config.security.rateLimiter.protected.medium.points,

@@ -11,7 +11,8 @@ export interface IASQS extends BaseDocument {
     accessKeyId: string;
     secretAccessKey: string;
     iv: string;
-    transformId?: Types.ObjectId;
+    transformer?: Types.ObjectId;
+    isManagedTransform: boolean;
     queueType: 'standard' | 'fifo';
     useContentBasedDeduplication?: boolean;
     enabled: boolean;

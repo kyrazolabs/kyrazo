@@ -8,11 +8,13 @@ export class S3Controller {
         const workspaceId = c.workspace?.workspaceId;
         const namespaceId = c.namespace?.namespaceId;
 
-        if (!workspaceId || !namespaceId) {
+        const userId = c.get('userId');
+
+        if (!workspaceId || !namespaceId || !userId) {
             return c.json({ success: false, error: 'Unauthorized' }, 401);
         }
 
-        const s3Bucket = await s3Service.createS3Bucket(data, workspaceId.toString(), namespaceId.toString());
+        const s3Bucket = await s3Service.createS3Bucket(data, userId.toString(), workspaceId.toString(), namespaceId.toString());
 
         return c.json<ISuccessResponse<any>>({
             success: true,
@@ -75,11 +77,13 @@ export class S3Controller {
         const workspaceId = c.workspace?.workspaceId;
         const namespaceId = c.namespace?.namespaceId;
 
-        if (!workspaceId || !namespaceId) {
+        const userId = c.get('userId');
+
+        if (!workspaceId || !namespaceId || !userId) {
             return c.json({ success: false, error: 'Unauthorized' }, 401);
         }
 
-        const updated = await s3Service.updateS3Bucket(id, workspaceId.toString(), namespaceId.toString(), data);
+        const updated = await s3Service.updateS3Bucket(id, workspaceId.toString(), namespaceId.toString(), data, userId.toString());
 
         if (!updated) {
             return c.json<IErrorResponse>({

@@ -5,7 +5,7 @@ import { config } from '@/configs/app';
 import {
     createSlidingWindowLimiter,
     createRateLimitMiddleware,
-} from '@/core/middlewares/rate-limiter.middleware';
+} from '@/core/middlewares/ratelimit.middleware';
 import { IErrorResponse } from '@kyrazo/shared';
 
 // Helper function to get IP

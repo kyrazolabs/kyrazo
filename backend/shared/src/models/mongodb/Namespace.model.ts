@@ -43,6 +43,15 @@ const NamespaceSchema = new Schema<INamespace>(
             type: String,
             trim: true,
         },
+        transformer: {
+            type: Schema.Types.ObjectId,
+            ref: 'Transform',
+            default: null,
+        },
+        isManagedTransform: {
+            type: Boolean,
+            default: false,
+        },
     },
     {
         timestamps: true,
