@@ -19,12 +19,12 @@ RUN bun run build
 
 # 3. Install Dashboard Dependencies
 WORKDIR /app
-COPY apis/dashboard/package.json apis/dashboard/bun.lock ./apis/dashboard/
-WORKDIR /app/apis/dashboard
+COPY api/dashboard/package.json api/dashboard/bun.lock ./api/dashboard/
+WORKDIR /app/api/dashboard
 RUN bun install --frozen-lockfile
 
 # 4. Copy Dashboard source and BUILD
-COPY apis/dashboard ./
+COPY api/dashboard ./
 RUN bun run build
 
 # Stage 2: Production runner
@@ -35,29 +35,29 @@ WORKDIR /app
 RUN apk add --no-cache su-exec wget
 
 # Copy all installed dependencies
-COPY --from=builder /app/apis/dashboard/node_modules /app/apis/dashboard/node_modules
+COPY --from=builder /app/api/dashboard/node_modules /app/api/dashboard/node_modules
 
 # FORCE COPY Shared into node_modules (replaces symlink with actual code)
-RUN rm -rf /app/apis/dashboard/node_modules/@kyrazo/shared && mkdir -p /app/apis/dashboard/node_modules/@kyrazo/shared
-COPY --from=builder /app/shared /app/apis/dashboard/node_modules/@kyrazo/shared
+RUN rm -rf /app/api/dashboard/node_modules/@kyrazo/shared && mkdir -p /app/api/dashboard/node_modules/@kyrazo/shared
+COPY --from=builder /app/shared /app/api/dashboard/node_modules/@kyrazo/shared
 
 # ALSO Copy shared to /app/shared because tsconfig paths point to "../../shared"
 COPY --from=builder /app/shared /app/shared
 
 # Copy dashboard package binaries, config, and BUILT dist
-COPY --from=builder /app/apis/dashboard/package.json /app/apis/dashboard/package.json
-COPY --from=builder /app/apis/dashboard/tsconfig.json /app/apis/dashboard/tsconfig.json
-COPY --from=builder /app/apis/dashboard/dist /app/apis/dashboard/dist
-COPY --from=builder /app/apis/dashboard/src /app/apis/dashboard/src
+COPY --from=builder /app/api/dashboard/package.json /app/api/dashboard/package.json
+COPY --from=builder /app/api/dashboard/tsconfig.json /app/api/dashboard/tsconfig.json
+COPY --from=builder /app/api/dashboard/dist /app/api/dashboard/dist
+COPY --from=builder /app/api/dashboard/src /app/api/dashboard/src
 
 # Set working directory to dashboard package
-WORKDIR /app/apis/dashboard
+WORKDIR /app/api/dashboard
 
 # Pre-create logs directory
-RUN mkdir -p /app/apis/dashboard/logs && chown -R bun:bun /app/apis/dashboard/logs
+RUN mkdir -p /app/api/dashboard/logs && chown -R bun:bun /app/api/dashboard/logs
 
 # Copy and setup entrypoint script
-COPY apis/dashboard/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY api/dashboard/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Ensure everything is owned by the bun user (for non-volume cases)

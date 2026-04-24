@@ -2,7 +2,7 @@ services:
   ingest-api:
     build:
       context: .
-      dockerfile: apis/ingest/Dockerfile
+      dockerfile: api/ingest/Dockerfile
     container_name: kyrazo-ingest-api
     ports:
       - "${PORT}:${PORT}"
@@ -49,7 +49,7 @@ services:
       # Security Configuration
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
     volumes:
-      - ./logs:/app/apis/ingest/logs
+      - ./logs:/app/api/ingest/logs
 
       - /data/nats/certs:/data/nats/certs:ro
 

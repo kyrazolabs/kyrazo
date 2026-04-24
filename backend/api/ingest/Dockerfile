@@ -19,12 +19,12 @@ RUN bun run build
 
 # 3. Install ingest Dependencies
 WORKDIR /app
-COPY apis/ingest/package.json apis/ingest/bun.lock ./apis/ingest/
-WORKDIR /app/apis/ingest
+COPY api/ingest/package.json api/ingest/bun.lock ./api/ingest/
+WORKDIR /app/api/ingest
 RUN bun install --frozen-lockfile
 
 # 4. Copy ingest source
-COPY apis/ingest ./
+COPY api/ingest ./
 RUN bun run build
 
 # Stage 2: Production runner
@@ -35,31 +35,31 @@ WORKDIR /app
 RUN apk add --no-cache su-exec wget
 
 # Copy all installed dependencies
-COPY --from=builder /app/apis/ingest/node_modules /app/apis/ingest/node_modules
+COPY --from=builder /app/api/ingest/node_modules /app/api/ingest/node_modules
 
 # FORCE COPY Shared into node_modules (replaces symlink with actual code)
-# We copy /app/shared (which is built) to /app/apis/ingest/node_modules/@kyrazo/shared
-RUN rm -rf /app/apis/ingest/node_modules/@kyrazo/shared && mkdir -p /app/apis/ingest/node_modules/@kyrazo/shared
-COPY --from=builder /app/shared /app/apis/ingest/node_modules/@kyrazo/shared
+# We copy /app/shared (which is built) to /app/api/ingest/node_modules/@kyrazo/shared
+RUN rm -rf /app/api/ingest/node_modules/@kyrazo/shared && mkdir -p /app/api/ingest/node_modules/@kyrazo/shared
+COPY --from=builder /app/shared /app/api/ingest/node_modules/@kyrazo/shared
 
 # ALSO Copy shared to /app/shared because tsconfig paths point to "../../shared"
 COPY --from=builder /app/shared /app/shared
 
 # Copy ingest package binaries and config
-COPY --from=builder /app/apis/ingest/package.json /app/apis/ingest/package.json
-COPY --from=builder /app/apis/ingest/tsconfig.json /app/apis/ingest/tsconfig.json
-COPY --from=builder /app/apis/ingest/src /app/apis/ingest/src
-COPY --from=builder /app/apis/ingest/dist /app/apis/ingest/dist
+COPY --from=builder /app/api/ingest/package.json /app/api/ingest/package.json
+COPY --from=builder /app/api/ingest/tsconfig.json /app/api/ingest/tsconfig.json
+COPY --from=builder /app/api/ingest/src /app/api/ingest/src
+COPY --from=builder /app/api/ingest/dist /app/api/ingest/dist
 
 # Set working directory to ingest package
-WORKDIR /app/apis/ingest
+WORKDIR /app/api/ingest
 
 # Pre-create logs & certs directory
-RUN mkdir -p /app/apis/ingest/logs && chown -R bun:bun /app/apis/ingest/logs
+RUN mkdir -p /app/api/ingest/logs && chown -R bun:bun /app/api/ingest/logs
 RUN mkdir -p /data/nats/certs && chown -R bun:bun /data/nats/certs
 
 # Copy and setup entrypoint script
-COPY apis/ingest/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY api/ingest/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Ensure everything is owned by the bun user before switching

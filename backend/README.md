@@ -59,7 +59,7 @@ A modular, event-driven webhook infrastructure backend built with Bun, TypeScrip
 
 ```
 backend/
-├── apis/                    # HTTP API Services
+├── api/                    # HTTP API Services
 │   ├── dashboard/          # Main Dashboard API (management, billing, etc.)
 │   ├── ingest/             # Webhook Ingestion API (receives webhooks)
 │   └── integration/        # Integration API (sources, targets, endpoints)
@@ -83,7 +83,7 @@ backend/
 
 ### 1. Dashboard API
 
-**Path:** `apis/dashboard`
+**Path:** `api/dashboard`
 **Port:** 3000 (default)
 **Description:** Main REST API for the Kyrazo platform management
 
@@ -91,26 +91,26 @@ backend/
 
 The Dashboard API uses versioned endpoints under `/v1` and `/v2`:
 
-| Feature        | v1 Path                              | v2 Path                              | Description                   |
-| -------------- | ------------------------------------ | ------------------------------------ | ----------------------------- |
-| Authentication | `/auth`                             | -                                    | Login, register, OAuth        |
-| Profile        | `/profile`                          | -                                    | User profile management       |
-| Workspaces     | `/workspaces`                       | -                                    | Workspace CRUD                |
-| Namespaces     | `/namespaces`                       | `/v2/namespaces`                     | Namespace management          |
-| API Keys       | `/keys`                             | -                                    | API key CRUD                  |
-| Endpoints      | `/endpoints`                        | `/v2/endpoints`                      | Webhook endpoints             |
-| Sources        | `/sources`                          | `/v2/sources`                        | Event sources                 |
-| Targets        | `/targets`                          | -                                    | Delivery targets              |
-| Ingest         | `/ingest`                          | -                                    | Ingestion settings            |
-| Analytics     | `/analytics`                        | -                                    | Event analytics               |
-| Billing       | `/payments`, `/subscriptions`       | -                                    | Billing & subscriptions       |
-| Plans          | `/plans`                            | -                                    | Pricing plans                |
-| Workers        | `/workers`                          | -                                    | Worker management             |
-| Support       | `/support`                         | -                                    | Support tickets               |
-| ASQS           | -                                   | `/v2/asqs`                           | SQS queue management        |
-| S3             | -                                   | `/v2/s3`                            | S3 bucket management        |
-| Transform     | -                                   | `/v2/transform`                      | Data transformations           |
-| Health        | `/health`                          | -                                    | Service health check          |
+| Feature        | v1 Path                       | v2 Path          | Description             |
+| -------------- | ----------------------------- | ---------------- | ----------------------- |
+| Authentication | `/auth`                       | -                | Login, register, OAuth  |
+| Profile        | `/profile`                    | -                | User profile management |
+| Workspaces     | `/workspaces`                 | -                | Workspace CRUD          |
+| Namespaces     | `/namespaces`                 | `/v2/namespaces` | Namespace management    |
+| API Keys       | `/keys`                       | -                | API key CRUD            |
+| Endpoints      | `/endpoints`                  | `/v2/endpoints`  | Webhook endpoints       |
+| Sources        | `/sources`                    | `/v2/sources`    | Event sources           |
+| Targets        | `/targets`                    | -                | Delivery targets        |
+| Ingest         | `/ingest`                     | -                | Ingestion settings      |
+| Analytics      | `/analytics`                  | -                | Event analytics         |
+| Billing        | `/payments`, `/subscriptions` | -                | Billing & subscriptions |
+| Plans          | `/plans`                      | -                | Pricing plans           |
+| Workers        | `/workers`                    | -                | Worker management       |
+| Support        | `/support`                    | -                | Support tickets         |
+| ASQS           | -                             | `/v2/asqs`       | SQS queue management    |
+| S3             | -                             | `/v2/s3`         | S3 bucket management    |
+| Transform      | -                             | `/v2/transform`  | Data transformations    |
+| Health         | `/health`                     | -                | Service health check    |
 
 **v1** - Legacy endpoints (original implementation)
 **v2** - Newer endpoints with improved schemas and structure
@@ -120,7 +120,7 @@ The Dashboard API uses versioned endpoints under `/v1` and `/v2`:
 **Development:**
 
 ```bash
-cd apis/dashboard
+cd api/dashboard
 bun install
 bun run dev
 ```
@@ -136,7 +136,7 @@ bun run dist/cluster.js
 
 ### 2. Ingest API
 
-**Path:** `apis/ingest`
+**Path:** `api/ingest`
 **Port:** 3001 (default)
 **Description:** Receives incoming webhooks from external services
 
@@ -160,14 +160,14 @@ bun run dist/cluster.js
 **Development:**
 
 ```bash
-cd apis/ingest
+cd api/ingest
 bun install
 bun run dev
 ```
 
 ### 3. Integration API
 
-**Path:** `apis/integration`
+**Path:** `api/integration`
 **Port:** 3002 (default)
 **Description:** Integration management for sources, targets, and endpoints
 
@@ -184,7 +184,7 @@ bun run dev
 **Development:**
 
 ```bash
-cd apis/integration
+cd api/integration
 bun install
 bun run dev
 ```
@@ -391,9 +391,9 @@ Common variables:
 cd shared && bun install && bun run build
 
 # Then run any API/service
-cd apis/dashboard && bun run dev
-cd apis/ingest && bun run dev
-cd apis/integration && bun run dev
+cd api/dashboard && bun run dev
+cd api/ingest && bun run dev
+cd api/integration && bun run dev
 
 # Services
 cd services/orchestrator && bun run dev
@@ -484,18 +484,18 @@ GitHub Actions workflows are in `.github/workflows/`:
 
 ## Tech Stack Summary
 
-| Component          | Technology       |
-| ------------------ | ---------------- |
-| Runtime            | Bun              |
-| Language           | TypeScript, Rust |
-| HTTP Framework     | Hono             |
-| Primary Database  | MongoDB          |
-| Events/Analytics   | ClickHouse       |
-| Queue/Cache        | Dragonfly        |
-| Message Broker     | NATS             |
-| Auth               | Clerk            |
-| Payments           | Stripe, PayPal   |
-| Logging            | Winston          |
-| Validation         | Zod              |
-| Error Tracking     | Sentry           |
-| Rate Limiting      | Arcjet           |
+| Component        | Technology       |
+| ---------------- | ---------------- |
+| Runtime          | Bun              |
+| Language         | TypeScript, Rust |
+| HTTP Framework   | Hono             |
+| Primary Database | MongoDB          |
+| Events/Analytics | ClickHouse       |
+| Queue/Cache      | Dragonfly        |
+| Message Broker   | NATS             |
+| Auth             | Clerk            |
+| Payments         | Stripe, PayPal   |
+| Logging          | Winston          |
+| Validation       | Zod              |
+| Error Tracking   | Sentry           |
+| Rate Limiting    | Arcjet           |

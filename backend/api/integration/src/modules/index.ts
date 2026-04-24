@@ -9,11 +9,15 @@ import { redisConfig, natsConfig } from '@/configs';
 
 const router = new Hono();
 
+import v2Router from './v2/router';
+
 // Mount routes
-router.route('/events', eventsRouter);
-router.route('/targets', targetsRouter);
-router.route('/endpoints', endpointsRouter);
-router.route('/sources', sourceRouter);
+router.route('/v1/events', eventsRouter);
+router.route('/v1/targets', targetsRouter);
+router.route('/v1/endpoints', endpointsRouter);
+router.route('/v1/sources', sourceRouter);
+
+router.route('/v2', v2Router);
 
 // Health check endpoint
 router.get('/health', async (c: AppContext) => {

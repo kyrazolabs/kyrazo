@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-LOG_DIR="/app/apis/dashboard/logs"
+LOG_DIR="/app/api/dashboard/logs"
 
 if [ "$(id -u)" = "0" ]; then
     echo "🔧 Setting permissions for log directory..."
@@ -21,18 +21,18 @@ for service in redis mongodb clickhouse; do
 
     if [ -d "$SOURCE_DIR" ]; then
         FILES_PRESENT=$(ls "$SOURCE_DIR"/*.crt "$SOURCE_DIR"/*.key "$SOURCE_DIR"/*.pem 2>/dev/null | wc -l)
-        
+
         if [ "$FILES_PRESENT" -gt 0 ]; then
             echo "🔧 Relocating $SOURCE_DIR certificates to $TARGET_DIR for consistent environment access..."
             mkdir -p "$TARGET_DIR"
             cp -L "$SOURCE_DIR"/* "$TARGET_DIR/" 2>/dev/null || true
-            
+
             # Ensure proper ownership if running as root
             if [ "$(id -u)" = "0" ]; then
                 chown -R bun:bun "$TARGET_DIR"
             fi
             chmod -R 700 "$TARGET_DIR"
-            
+
             # ALWAYS export path overrides to ensure the app uses the writable copies
             if [ "$service" = "redis" ]; then
                 export REDIS_CA_FILE="$TARGET_DIR/ca.crt"

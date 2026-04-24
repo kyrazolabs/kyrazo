@@ -17,12 +17,12 @@ RUN bun run build
 
 # 3. Install integration Dependencies
 WORKDIR /app
-COPY apis/integration/package.json apis/integration/bun.lock ./apis/integration/
-WORKDIR /app/apis/integration
+COPY api/integration/package.json api/integration/bun.lock ./api/integration/
+WORKDIR /app/api/integration
 RUN bun install --frozen-lockfile
 
 # 4. Copy integration source
-COPY apis/integration ./
+COPY api/integration ./
 RUN bun run build
 
 # Stage 2: Production runner
@@ -33,31 +33,31 @@ WORKDIR /app
 RUN apk add --no-cache su-exec wget
 
 # Copy all installed dependencies
-COPY --from=builder /app/apis/integration/node_modules /app/apis/integration/node_modules
+COPY --from=builder /app/api/integration/node_modules /app/api/integration/node_modules
 
 # FORCE COPY Shared into node_modules (replaces symlink with actual code)
-# We copy /app/shared (which is built) to /app/apis/integration/node_modules/@kyrazo/shared
-RUN rm -rf /app/apis/integration/node_modules/@kyrazo/shared && mkdir -p /app/apis/integration/node_modules/@kyrazo/shared
-COPY --from=builder /app/shared /app/apis/integration/node_modules/@kyrazo/shared
+# We copy /app/shared (which is built) to /app/api/integration/node_modules/@kyrazo/shared
+RUN rm -rf /app/api/integration/node_modules/@kyrazo/shared && mkdir -p /app/api/integration/node_modules/@kyrazo/shared
+COPY --from=builder /app/shared /app/api/integration/node_modules/@kyrazo/shared
 
 # ALSO Copy shared to /app/shared because tsconfig paths point to "../../shared"
 COPY --from=builder /app/shared /app/shared
 
 # Copy integration package binaries and config
-COPY --from=builder /app/apis/integration/package.json /app/apis/integration/package.json
-COPY --from=builder /app/apis/integration/tsconfig.json /app/apis/integration/tsconfig.json
-COPY --from=builder /app/apis/integration/src /app/apis/integration/src
-COPY --from=builder /app/apis/integration/dist /app/apis/integration/dist
+COPY --from=builder /app/api/integration/package.json /app/api/integration/package.json
+COPY --from=builder /app/api/integration/tsconfig.json /app/api/integration/tsconfig.json
+COPY --from=builder /app/api/integration/src /app/api/integration/src
+COPY --from=builder /app/api/integration/dist /app/api/integration/dist
 
 # Set working directory to integration package
-WORKDIR /app/apis/integration
+WORKDIR /app/api/integration
 
 # Pre-create logs & certs directory
-RUN mkdir -p /app/apis/integration/logs && chown -R bun:bun /app/apis/integration/logs
+RUN mkdir -p /app/api/integration/logs && chown -R bun:bun /app/api/integration/logs
 RUN mkdir -p /data/nats/certs && chown -R bun:bun /data/nats/certs
 
 # Copy and setup entrypoint script
-COPY apis/integration/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY api/integration/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Ensure everything is owned by the bun user before switching

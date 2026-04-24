@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-LOG_DIR="/app/apis/ingest/logs"
+LOG_DIR="/app/api/ingest/logs"
 CERTS_DIR="/data/nats/certs"
 
 if [ "$(id -u)" = "0" ]; then
@@ -30,18 +30,18 @@ for service in redis mongodb; do
 
     if [ -d "$SOURCE_DIR" ]; then
         FILES_PRESENT=$(ls "$SOURCE_DIR"/*.crt "$SOURCE_DIR"/*.key "$SOURCE_DIR"/*.pem 2>/dev/null | wc -l)
-        
+
         if [ "$FILES_PRESENT" -gt 0 ]; then
             echo "🔧 Relocating $SOURCE_DIR certificates to $TARGET_DIR for consistent environment access..."
             mkdir -p "$TARGET_DIR"
             cp -L "$SOURCE_DIR"/* "$TARGET_DIR/" 2>/dev/null || true
-            
+
             # Ensure proper ownership if running as root
             if [ "$(id -u)" = "0" ]; then
                 chown -R bun:bun "$TARGET_DIR"
             fi
             chmod -R 700 "$TARGET_DIR"
-            
+
             # ALWAYS export path overrides to ensure the app uses the writable copies
             if [ "$service" = "redis" ]; then
                 export REDIS_CA_FILE="$TARGET_DIR/ca.crt"
@@ -73,7 +73,7 @@ if [ -d "$NATS_SOURCE" ]; then
             chown -R bun:bun "$NATS_TARGET"
         fi
         chmod -R 700 "$NATS_TARGET"
-        
+
         # Override environment variables if they point to the shared location
         export NATS_CA_FILE="$NATS_TARGET/ca.pem"
         export NATS_CERT_FILE="$NATS_TARGET/nats.pem"

@@ -2,7 +2,7 @@ services:
   dashboard-api:
     build:
       context: .
-      dockerfile: apis/dashboard/Dockerfile
+      dockerfile: api/dashboard/Dockerfile
     container_name: kyrazo-dashboard-api
     ports:
       - "${PORT:-3003}:${PORT:-3003}"
@@ -75,7 +75,7 @@ services:
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - SENTRY_DSN=${SENTRY_DSN}
     volumes:
-      - ./logs:/app/apis/dashboard/logs
+      - ./logs:/app/api/dashboard/logs
 
       - /etc/ssl/mongodb/ca.crt:/etc/ssl/mongodb/ca.crt:ro
       - /etc/ssl/mongodb/mongodb.pem:/etc/ssl/mongodb/mongodb.pem:ro

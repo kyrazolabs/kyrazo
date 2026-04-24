@@ -2,7 +2,7 @@ services:
   integration-api:
     build:
       context: .
-      dockerfile: apis/integration/Dockerfile
+      dockerfile: api/integration/Dockerfile
     container_name: kyrazo-integration-api
     ports:
       - "${PORT}:${PORT}"
@@ -49,7 +49,7 @@ services:
       # Security Configuration
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
     volumes:
-      - ./logs:/app/apis/integration/logs
+      - ./logs:/app/api/integration/logs
 
       - /data/nats/certs:/data/nats/certs:ro
       - /etc/ssl/mongodb/ca.crt:/etc/ssl/mongodb/ca.crt:ro

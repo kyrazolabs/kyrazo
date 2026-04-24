@@ -46,7 +46,7 @@ The configuration is hardened for the public network:
 
 ### Client Security (`tls`)
 
-Requires all clients (APIs/Workers) to provide a valid certificate signed by your CA.
+Requires all clients (api/Workers) to provide a valid certificate signed by your CA.
 
 ```hcl
 tls {

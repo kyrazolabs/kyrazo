@@ -4,13 +4,13 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - 'apis/integration/**'
+      - 'api/integration/**'
       - 'shared/**'
       - '.github/workflows/ci-integration.yml'
   pull_request:
     branches: [main, develop]
     paths:
-      - 'apis/integration/**'
+      - 'api/integration/**'
       - 'shared/**'
 
 jobs:
@@ -36,12 +36,12 @@ jobs:
 
       - name: Install service dependencies
         run: bun install
-        working-directory: apis/integration
+        working-directory: api/integration
 
       - name: Typecheck
         run: bun run typecheck
-        working-directory: apis/integration
+        working-directory: api/integration
 
       - name: Build
         run: bun run build
-        working-directory: apis/integration
+        working-directory: api/integration

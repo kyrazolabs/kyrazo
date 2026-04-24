@@ -8,9 +8,9 @@ WORKFLOWS_DIR="$SCRIPT_DIR/.github/workflows"
 declare -A CI_CONFIGS
 CI_CONFIGS=(
     [shared]="shared|shared|false|bun"
-    [integration]="apis/integration|ci-integration|true|bun"
-    [ingest]="apis/ingest|ci-ingest|true|bun"
-    [dashboard]="apis/dashboard|ci-dashboard|true|bun"
+    [integration]="api/integration|ci-integration|true|bun"
+    [ingest]="api/ingest|ci-ingest|true|bun"
+    [dashboard]="api/dashboard|ci-dashboard|true|bun"
     [loadbalancer]="services/loadbalancer|ci-loadbalancer|false|rust"
     [mail]="services/mail|ci-mail|true|bun"
     [ingestor]="services/ingestor|ci-ingestor|true|bun"
