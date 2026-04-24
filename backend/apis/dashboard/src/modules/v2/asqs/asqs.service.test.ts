@@ -12,7 +12,7 @@ mock.module('@kyrazo/shared', () => {
         },
         RedisKeys: {
             context: {
-                asqs: mock((id) => `context:sqs:${id}`),
+                asqs: mock(id => `context:sqs:${id}`),
             },
         },
         logger: {
@@ -41,9 +41,13 @@ const mockSQSInstance = {
 
 mock.module('@aws-sdk/client-sqs', () => {
     return {
-        SQSClient: function() { return mockSQSInstance; },
+        SQSClient: function () {
+            return mockSQSInstance;
+        },
         SendMessageCommand: class {
-            constructor(params: any) { (this as any).params = params; }
+            constructor(params: any) {
+                (this as any).params = params;
+            }
         },
     };
 });
@@ -91,7 +95,7 @@ describe('ASQSService', () => {
                 queueUrl: 'url',
                 region: 'us-east-1',
                 accessKeyId: 'acc',
-                secretAccessKey: 'sec'
+                secretAccessKey: 'sec',
             });
 
             expect(result.success).toBe(true);
@@ -104,7 +108,7 @@ describe('ASQSService', () => {
                 queueUrl: 'url',
                 region: 'us-east-1',
                 accessKeyId: 'acc',
-                secretAccessKey: 'sec'
+                secretAccessKey: 'sec',
             });
 
             expect(result.success).toBe(false);

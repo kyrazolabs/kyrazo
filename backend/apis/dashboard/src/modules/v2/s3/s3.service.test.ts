@@ -9,14 +9,14 @@ mock.module('@kyrazo/shared', () => {
         },
         RedisKeys: {
             context: {
-                s3Bucket: mock((id) => `context:s3:${id}`),
+                s3Bucket: mock(id => `context:s3:${id}`),
             },
         },
         logger: {
             error: mock(),
             debug: mock(),
         },
-        unprefixId: mock((id) => id),
+        unprefixId: mock(id => id),
         prefixId: mock((id, prefix) => `${prefix}_${id}`),
         buildS3Config: mock((provider, input) => input),
     };
@@ -61,25 +61,31 @@ describe('S3Service', () => {
         mockRedis.del.mockClear();
         mockS3ClientInstance.send.mockClear();
         (secretCrypto.encrypt as any).mockClear();
-        
+
         const serviceModule = await import('./s3.service');
         const S3ServiceClass = serviceModule.S3Service;
 
         const repoModule = await import('./s3.repo');
         s3Repo = repoModule.s3Repo;
-        
+
         // Mock startSession
         const mockSession = {
             withTransaction: mock((callback: any) => callback()),
             endSession: mock().mockResolvedValue(undefined),
         };
         spyOn(s3Repo, 'startSession').mockResolvedValue(mockSession as any);
-        
+
         // Manual instantiation for DI
-        s3Service = new S3ServiceClass(class {
-            constructor() { return mockS3ClientInstance; }
-            send(command: any) { return mockS3ClientInstance.send(command); }
-        } as any);
+        s3Service = new S3ServiceClass(
+            class {
+                constructor() {
+                    return mockS3ClientInstance;
+                }
+                send(command: any) {
+                    return mockS3ClientInstance.send(command);
+                }
+            } as any
+        );
     });
 
     describe('createS3Bucket', () => {
@@ -95,7 +101,12 @@ describe('S3Service', () => {
             (secretCrypto.encrypt as any).mockReturnValue({ encrypted: 'enc_secret', iv: 'iv123' });
             const repoSpy = spyOn(s3Repo, 'create').mockResolvedValue({ id: s3Id } as any);
 
-            const result = await s3Service.createS3Bucket(input as any, 'user1', workspaceId, namespaceId);
+            const result = await s3Service.createS3Bucket(
+                input as any,
+                'user1',
+                workspaceId,
+                namespaceId
+            );
 
             expect(secretCrypto.encrypt).toHaveBeenCalledWith(namespaceId, 'plain_secret');
             expect(repoSpy).toHaveBeenCalledWith(
@@ -116,7 +127,13 @@ describe('S3Service', () => {
             spyOn(s3Repo, 'findById').mockResolvedValue({ id: s3Id } as any);
             spyOn(s3Repo, 'update').mockResolvedValue({ id: s3Id } as any);
 
-            await s3Service.updateS3Bucket(s3Id, workspaceId, namespaceId, updateInput as any, 'user1');
+            await s3Service.updateS3Bucket(
+                s3Id,
+                workspaceId,
+                namespaceId,
+                updateInput as any,
+                'user1'
+            );
 
             expect(secretCrypto.encrypt).toHaveBeenCalled();
             expect(mockRedis.del).toHaveBeenCalledWith(`context:s3:${s3Id}`);
@@ -133,7 +150,7 @@ describe('S3Service', () => {
                 accessKeyId: 'acc',
                 secretAccessKey: 'sec',
                 provider: 'aws',
-                forcePathStyle: false
+                forcePathStyle: false,
             });
 
             expect(result.success).toBe(true);
@@ -149,7 +166,7 @@ describe('S3Service', () => {
                 accessKeyId: 'acc',
                 secretAccessKey: 'sec',
                 provider: 'aws',
-                forcePathStyle: false
+                forcePathStyle: false,
             });
 
             expect(result.success).toBe(false);

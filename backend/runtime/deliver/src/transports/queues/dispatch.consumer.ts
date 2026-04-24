@@ -174,8 +174,10 @@ export class DispatchConsumer extends EventEmitter {
 
             // 🛠️ APPLY CUSTOM TRANSFORMER
             let finalBody = { ...body };
-            if (job.data.transform) {
-                const { code, id } = job.data.transform;
+            const transformToApply = target.transform || job.data.transform;
+
+            if (transformToApply) {
+                const { code, id } = transformToApply;
                 logger.debug(
                     `[Consumer] Applying custom transformer ${id} for delivery ${deliveryId}`
                 );

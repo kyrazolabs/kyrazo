@@ -7,14 +7,18 @@ export class ASQSController {
         const data = c.req.valid('json') as any;
         const workspaceId = c.workspace?.workspaceId;
         const namespaceId = c.namespace?.namespaceId;
-
-        const userId = c.get('userId');
+        const userId = c.user?.userId;
 
         if (!workspaceId || !namespaceId || !userId) {
             return c.json({ success: false, error: 'Unauthorized' }, 401);
         }
 
-        const asqs = await asqsService.createASQS(data, userId.toString(), workspaceId.toString(), namespaceId.toString());
+        const asqs = await asqsService.createASQS(
+            data,
+            userId.toString(),
+            workspaceId.toString(),
+            namespaceId.toString()
+        );
 
         return c.json<ISuccessResponse<any>>({
             success: true,
@@ -31,7 +35,10 @@ export class ASQSController {
             return c.json({ success: false, error: 'Unauthorized' }, 401);
         }
 
-        const asqsList = await asqsService.listASQS(workspaceId.toString(), namespaceId.toString());
+        const asqsList = await asqsService.listASQS(
+            workspaceId.toString(),
+            namespaceId.toString()
+        );
 
         return c.json<ISuccessResponse<any>>({
             success: true,
@@ -50,17 +57,24 @@ export class ASQSController {
             return c.json({ success: false, error: 'Unauthorized' }, 401);
         }
 
-        const asqs = await asqsService.getASQS(id, workspaceId.toString(), namespaceId.toString());
-        
+        const asqs = await asqsService.getASQS(
+            id,
+            workspaceId.toString(),
+            namespaceId.toString()
+        );
+
         if (!asqs) {
-            return c.json<IErrorResponse>({
-                success: false,
-                error: {
-                    code: 'NOT_FOUND',
-                    message: 'SQS destination not found',
-                    requestId: c.get('requestId'),
-                }
-            }, 404);
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'NOT_FOUND',
+                        message: 'SQS destination not found',
+                        requestId: c.get('requestId'),
+                    },
+                },
+                404
+            );
         }
 
         return c.json<ISuccessResponse<any>>({
@@ -76,24 +90,32 @@ export class ASQSController {
         const data = c.req.valid('json') as any;
         const workspaceId = c.workspace?.workspaceId;
         const namespaceId = c.namespace?.namespaceId;
-
-        const userId = c.get('userId');
+        const userId = c.user?.userId;
 
         if (!workspaceId || !namespaceId || !userId) {
             return c.json({ success: false, error: 'Unauthorized' }, 401);
         }
 
-        const updated = await asqsService.updateASQS(id, workspaceId.toString(), namespaceId.toString(), data, userId.toString());
+        const updated = await asqsService.updateASQS(
+            id,
+            workspaceId.toString(),
+            namespaceId.toString(),
+            data,
+            userId.toString()
+        );
 
         if (!updated) {
-            return c.json<IErrorResponse>({
-                success: false,
-                error: {
-                    code: 'NOT_FOUND',
-                    message: 'SQS destination not found',
-                    requestId: c.get('requestId'),
-                }
-            }, 404);
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'NOT_FOUND',
+                        message: 'SQS destination not found',
+                        requestId: c.get('requestId'),
+                    },
+                },
+                404
+            );
         }
 
         return c.json<ISuccessResponse<any>>({
@@ -113,17 +135,24 @@ export class ASQSController {
             return c.json({ success: false, error: 'Unauthorized' }, 401);
         }
 
-        const deleted = await asqsService.deleteASQS(id, workspaceId.toString(), namespaceId.toString());
+        const deleted = await asqsService.deleteASQS(
+            id,
+            workspaceId.toString(),
+            namespaceId.toString()
+        );
 
         if (!deleted) {
-            return c.json<IErrorResponse>({
-                success: false,
-                error: {
-                    code: 'NOT_FOUND',
-                    message: 'SQS destination not found',
-                    requestId: c.get('requestId'),
-                }
-            }, 404);
+            return c.json<IErrorResponse>(
+                {
+                    success: false,
+                    error: {
+                        code: 'NOT_FOUND',
+                        message: 'SQS destination not found',
+                        requestId: c.get('requestId'),
+                    },
+                },
+                404
+            );
         }
 
         return c.json<ISuccessResponse<any>>({
@@ -135,13 +164,16 @@ export class ASQSController {
 
     static async testConnection(c: AppContext) {
         const data = c.req.valid('json') as any;
-        
+
         const result = await asqsService.testConnection(data);
 
-        return c.json({
-            success: result.success,
-            message: result.success ? 'Connection successful' : 'Connection failed',
-            error: result.error,
-        }, result.success ? 200 : 400);
+        return c.json(
+            {
+                success: result.success,
+                message: result.success ? 'Connection successful' : 'Connection failed',
+                error: result.error,
+            },
+            result.success ? 200 : 400
+        );
     }
 }

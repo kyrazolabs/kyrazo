@@ -1,4 +1,4 @@
-import { Transform, RedisKeys, type ITransform, logger } from '@kyrazo/shared';
+import { Transform, RedisKeys, type ITransform, logger, unprefixId } from '@kyrazo/shared';
 import { redisConfig } from '@/config';
 
 /**
@@ -55,6 +55,40 @@ export class TransformRepository {
         } catch (error: any) {
             logger.error(`[TransformRepo] Error fetching active transformer: ${error.message}`);
             return null; // Fallback to no transformation on DB/Redis error
+        }
+    }
+    /**
+     * Get a specific transformer by ID with Redis caching.
+     * Cache Key: context:transform:code:{id}
+     */
+    public async getTransformerById(id: string): Promise<ITransform | null> {
+        const cacheKey = RedisKeys.context.transformCode(id);
+
+        try {
+            // 1. Try Redis cache
+            const cached = await redisConfig.get(cacheKey);
+            if (cached) {
+                logger.debug(`[TransformRepo] Cache hit for transformer: ${id}`);
+                return JSON.parse(cached);
+            }
+
+            // 2. Cache miss, query MongoDB
+            logger.debug(`[TransformRepo] Cache miss for transformer: ${id}, querying DB...`);
+            const transform = await Transform.findById(unprefixId(id));
+
+            if (transform) {
+                // 3. Store in Redis (24 hour TTL for code snapshots)
+                await redisConfig.set(cacheKey, JSON.stringify(transform), 86400);
+            } else {
+                // Cache the absence for a shorter period
+                await redisConfig.set(cacheKey, 'null', 300);
+                return null;
+            }
+
+            return transform as any;
+        } catch (error: any) {
+            logger.error(`[TransformRepo] Error fetching transformer ${id}: ${error.message}`);
+            return null;
         }
     }
 }

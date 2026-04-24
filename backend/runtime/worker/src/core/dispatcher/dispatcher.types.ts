@@ -74,12 +74,17 @@ export interface IConfiguredTarget {
     retryCount?: number;
     customHeaders?: Record<string, string>;
     method?: string;
+    transform?: {
+        id: string;
+        code: string;
+    };
 }
 export interface IDispatchJobData {
     event: IDispatchedEvent;
     target: IConfiguredTarget;
     headers: IWebhookHeaders;
     deliveryId: string;
+    // Job-level default transform (fallback)
     transform?: {
         id: string;
         code: string;

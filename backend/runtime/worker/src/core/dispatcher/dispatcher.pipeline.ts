@@ -5,7 +5,6 @@ import { dispatcherQueue } from './dispatcher.queue';
 import { dispatcherTransformer } from './dispatcher.transformer';
 import { dispatcherValidator } from './dispatcher.validator';
 import { redisConfig } from '@/config';
-import { transformRepository } from '@/services/mongo/transform.repo';
 
 /**
  * @title Dispatcher Pipeline
@@ -64,24 +63,12 @@ export class DispatcherPipeline {
                 return;
             }
 
-            logger.debug(`[Pipeline] Step 4: Custom Transform Check`);
-            const activeTransform = await transformRepository.getActiveTransformer(
-                envelope.workspaceId,
-                envelope.namespaceId
-            );
-
             logger.debug(`[Pipeline] Step 5: Enqueue`);
             await dispatcherQueue.enqueue(
                 envelope,
                 headers,
                 targets,
-                'target',
-                activeTransform
-                    ? {
-                          id: activeTransform.id,
-                          code: activeTransform.code,
-                      }
-                    : undefined
+                'target'
             );
 
             logger.debug(`✅ Publish event processed: ${messageData.eventId}`);

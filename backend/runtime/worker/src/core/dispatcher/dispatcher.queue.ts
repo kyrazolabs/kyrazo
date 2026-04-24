@@ -7,6 +7,8 @@ import { logger, RedisKeys } from '@kyrazo/shared';
 import { endpointRepository } from '@/services/mongo/endpoint.repo';
 import { s3BucketRepository } from '@/services/mongo/s3bucket.repo';
 import { asqsRepository } from '@/services/mongo/asqs.repo';
+import { transformRepository } from '@/services/mongo/transform.repo';
+import { Source, Namespace, unprefixId } from '@kyrazo/shared';
 
 export enum JOB_PRIORITIES {
     LOW = 10,
@@ -39,8 +41,7 @@ export class DispatcherQueue extends EventEmitter {
         event: IDispatchedEvent,
         headers: IWebhookHeaders,
         targets: any[],
-        type: 'target' | 'endpoint' | 's3Bucket' | 'asqs' = 'target',
-        transform?: { id: string; code: string }
+        type: 'target' | 'endpoint' | 's3Bucket' | 'asqs' = 'target'
     ): Promise<void> {
         try {
             logger.info(
@@ -53,7 +54,7 @@ export class DispatcherQueue extends EventEmitter {
             }
 
             const configuredTargets = await this.configureTargets(event, type);
-            const jobIds = await dispatchProducer.enqueue(event, configuredTargets, headers, transform);
+            const jobIds = await dispatchProducer.enqueue(event, configuredTargets, headers);
 
             logger.info(`✅ Queued ${jobIds.length} dispatch jobs for event ${event.id}`);
         } catch (error: any) {
@@ -78,6 +79,7 @@ export class DispatcherQueue extends EventEmitter {
             retryCount?: number;
             customHeaders?: Record<string, string>;
             method?: string;
+            transform?: { id: string; code: string };
         }[]
     > {
         const targets: {
@@ -89,7 +91,56 @@ export class DispatcherQueue extends EventEmitter {
             retryCount?: number;
             customHeaders?: Record<string, string>;
             method?: string;
+            transform?: { id: string; code: string };
         }[] = [];
+
+        // 🔍 Fetch Source for hierarchy fallback if applicable
+        let sourceTransform: { id: string; code: string } | undefined;
+        if (event.sourceId) {
+            const sourceCacheKey = RedisKeys.context.source(event.sourceId);
+            const cachedSourceRaw = await redisConfig.get(sourceCacheKey);
+            let source: any = cachedSourceRaw ? JSON.parse(cachedSourceRaw) : null;
+
+            if (!source) {
+                source = await Source.findById(unprefixId(event.sourceId));
+                if (source) {
+                    await redisConfig.set(sourceCacheKey, JSON.stringify(source), 3600);
+                }
+            }
+
+            if (source?.transformer) {
+                const tr = await this.resolveTransform(source.transformer.toString());
+                if (tr) {
+                    sourceTransform = tr;
+                }
+            }
+        }
+
+        // 🔍 Fetch Namespace for hierarchy fallback
+        let namespaceTransform: { id: string; code: string } | undefined;
+        const namespaceCacheKey = RedisKeys.context.workspaceNamespace(event.workspaceId, event.namespaceId);
+        const cachedNamespaceRaw = await redisConfig.get(namespaceCacheKey);
+        let namespace: any = cachedNamespaceRaw ? JSON.parse(cachedNamespaceRaw) : null;
+
+        if (!namespace) {
+            namespace = await Namespace.findOne({
+                _id: unprefixId(event.namespaceId),
+                workspaceId: unprefixId(event.workspaceId),
+            }).lean();
+            if (namespace) {
+                await redisConfig.set(namespaceCacheKey, JSON.stringify(namespace), 3600);
+            }
+        }
+
+        if (namespace?.transformer) {
+            const tr = await this.resolveTransform(namespace.transformer.toString());
+            if (tr) {
+                namespaceTransform = tr;
+            }
+        }
+
+        const globalFallback = sourceTransform ?? namespaceTransform;
+
         switch (type) {
             case 'target':
                 for await (const tar of event.targets) {
@@ -143,6 +194,10 @@ export class DispatcherQueue extends EventEmitter {
                         retryCount: target.config?.retryCount ?? 3,
                         customHeaders: target.customHeaders,
                         method: target.method,
+                        // Hierarchy: Target > Namespace (Source transformer is skipped for dispatch targets)
+                        transform: target.transformer 
+                            ? await this.resolveTransform(target.transformer.toString()) 
+                            : namespaceTransform,
                     });
                 }
                 break;
@@ -194,6 +249,7 @@ export class DispatcherQueue extends EventEmitter {
                         retryCount: endpoint.config.retryCount,
                         customHeaders: endpoint.customHeaders,
                         method: endpoint.method,
+                        transform: endpoint.transformer ? await this.resolveTransform(endpoint.transformer.toString()) : globalFallback,
                     });
                 }
                 break;
@@ -225,6 +281,7 @@ export class DispatcherQueue extends EventEmitter {
                         targetId: (s3Bucket.id || s3Bucket._id).toString(),
                         url: `s3://${s3Bucket.bucketName}`, // Virtual URL for identification
                         retryCount: 3,
+                        transform: s3Bucket.transformer ? await this.resolveTransform(s3Bucket.transformer.toString()) : globalFallback,
                     });
                 }
                 break;
@@ -256,12 +313,21 @@ export class DispatcherQueue extends EventEmitter {
                         targetId: (asqs.id || asqs._id).toString(),
                         url: asqs.queueUrl,
                         retryCount: 3,
+                        transform: asqs.transformer ? await this.resolveTransform(asqs.transformer.toString()) : globalFallback,
                     });
                 }
                 break;
         }
 
         return targets;
+    }
+
+    /**
+     * Helper to resolve transformer ID/Code from cache/DB
+     */
+    private async resolveTransform(id: string): Promise<{ id: string; code: string } | undefined> {
+        const tr = await transformRepository.getTransformerById(id);
+        return tr ? { id: tr.id, code: tr.code } : undefined;
     }
 }
 

@@ -63,7 +63,7 @@ export class DispatchProducer {
             const jobData = {
                 event,
                 headers,
-                transform,
+                transform, // Job-level default (fallback)
             };
 
             const jobs = await this.dispatchQueue.addBulk(

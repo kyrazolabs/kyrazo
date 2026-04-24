@@ -2,13 +2,13 @@ import { describe, it, expect, mock, beforeEach } from 'bun:test';
 import { Source } from '@kyrazo/shared';
 
 // Mocking Mongoose models
-const mockSave = mock().mockResolvedValue({ 
-    _id: '507f1f77bcf86cd799439011', 
-    toJSON: () => ({ _id: '507f1f77bcf86cd799439011', name: 'Test Source' }) 
+const mockSave = mock().mockResolvedValue({
+    _id: '507f1f77bcf86cd799439011',
+    toJSON: () => ({ _id: '507f1f77bcf86cd799439011', name: 'Test Source' }),
 });
 
 const mockSession = {
-    withTransaction: mock((cb) => cb()),
+    withTransaction: mock(cb => cb()),
     endSession: mock(),
 };
 
@@ -22,7 +22,7 @@ class MockDocument {
 const mockDoc = new MockDocument();
 
 // Mock constructor
-const MockSource = function(data: any) {
+const MockSource = function (data: any) {
     return Object.assign(new MockDocument(), data);
 } as any;
 
@@ -46,8 +46,9 @@ mock.module('@kyrazo/shared', () => {
                 lean: mock().mockResolvedValue([mockDoc]),
             }),
             findOneAndUpdate: mock().mockReturnValue({
-                lean: mock().mockImplementation(function(this: any) {
-                    if (this._criteria && this._criteria._id === 'invalid') return Promise.resolve(null);
+                lean: mock().mockImplementation(function (this: any) {
+                    if (this._criteria && this._criteria._id === 'invalid')
+                        return Promise.resolve(null);
                     return Promise.resolve(mockDoc);
                 }),
             }),
@@ -101,7 +102,9 @@ describe('SourceRepositoryV2 - Comprehensive Tests', () => {
         (Source.findOneAndUpdate as any).mockReturnValueOnce({
             lean: mock().mockResolvedValue(null),
         });
-        const result = await sourceRepository.update('src_missing', workspaceId, namespaceId, { name: 'X' });
+        const result = await sourceRepository.update('src_missing', workspaceId, namespaceId, {
+            name: 'X',
+        });
         expect(result).toBeNull();
     });
 
