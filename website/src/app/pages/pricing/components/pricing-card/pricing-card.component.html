@@ -20,38 +20,37 @@
     </div>
 
     <div class="mb-8">
-        <div class="flex items-baseline gap-1">
-            @if (plan.slug === 'enterprise' || plan.slug === 'custom') {
+        <div class="flex items-baseline gap-1 flex-wrap">
+            @if (plan.priceNote) {
                 <span class="text-5xl font-black tracking-tighter font-sansation!"
                     [class]="plan.highlighted ? 'text-shadow-primary-500 text-shadow-lg!' : ''">Custom</span>
+                <span class="text-sm opacity-60 font-medium">({{ plan.priceNote }})</span>
             } @else {
                 <span class="text-base font-medium opacity-70 self-start mt-2">
-                    €
+                    $
                 </span>
                 <span class="text-6xl font-black tracking-tighter font-sansation!"
                  [class]="plan.highlighted ? 'text-shadow-primary-500 text-shadow-lg!' : ''">{{ formatPrice(currentPrice) }}</span>
                 <span class="text-sm opacity-60 font-medium">{{ intervalLabel }}</span>
             }
         </div>
-        <!-- @if (plan.priceCentsMonthly > 0) {
-            <div class="mt-3 flex justify-center">
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest leading-none animate-bounce-slow shadow-md border"
-                    [class]="plan.highlighted ? 'bg-primary-500/10 border-primary-400/30 text-primary-400 shadow-primary-500/20' : 'bg-primary-500/10 border-primary-500/30 text-primary-600 shadow-primary-500/20'">
-                    Get 2 months free by paying annually
-                </span>
+        @if (plan.commitment) {
+            <div class="mt-3 text-xs font-black uppercase tracking-widest opacity-60">
+                {{ plan.commitment }}
             </div>
-        } -->
+        }
     </div>
 
-    <a
-        [href]="(plan.slug === 'enterprise' || plan.slug === 'custom') ? 'mailto:sales@kyrazo.com' : 'https://dash.kyrazo.com/auth/register'" pButton
-        [label]="(plan.slug === 'enterprise' || plan.slug === 'custom') ? 'Contact Sales' : (plan.slug === 'free' ? 'Start for Free' : 'Get Started')"
+    <button
+        pButton
+        [label]="(plan.slug === 'enterprise' || plan.slug === 'custom') ? 'Contact Enterprise Sales' : 'Book Discovery Call'"
+        (click)="onCta()"
         [severity]="plan.highlighted ? 'primary' : 'secondary'"
         size="small"
         [class]="'w-full py-4 font-bold! rounded-xl! transition-all duration-300 ' +
         (plan.highlighted ? 'shadow-lg shadow-primary-500/40' : 'hover:bg-primary-500/10 hover:border-primary-500/30 hover:text-primary-500')"
         [outlined]="!plan.highlighted">
-    </a>
+    </button>
 
     <div class="mt-10 grow">
         <p class="text-xs font-bold uppercase tracking-[0.2em] mb-6 opacity-40">What's included</p>

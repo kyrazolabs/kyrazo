@@ -1,12 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 
 import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directive';
 import { PostHogService } from '@core/3rd-party/posthog';
+import { CalendlyService } from '@shared/services/calendly.service';
 
 @Component({
     selector: 'app-landing-cta',
@@ -14,8 +13,6 @@ import { PostHogService } from '@core/3rd-party/posthog';
     imports: [
         CommonModule,
         ButtonModule,
-        InputTextModule,
-        FormsModule,
         ScrollRevealDirective,
         RouterModule,
     ],
@@ -24,22 +21,15 @@ import { PostHogService } from '@core/3rd-party/posthog';
 })
 export class CtaComponent {
     private posthog = inject(PostHogService);
-    email: string = '';
+    private calendly = inject(CalendlyService);
 
-    onSubmit() {
-        this.posthog.capture('cta_signup', { email: this.email });
-        const url = this.email
-            ? `https://dash.kyrazo.com/auth/register?email=${encodeURIComponent(this.email)}`
-            : 'https://dash.kyrazo.com/auth/register';
-        window.open(url, '_top', 'noopener,noreferrer');
+    bookMeeting() {
+        this.posthog.capture('cta_book_discovery_clicked');
+        this.calendly.openDiscoveryPopup();
     }
 
-    trackCta() {
-        this.posthog.capture('cta_early_access_clicked');
-        window.open(
-            'https://dash.kyrazo.com/auth/register',
-            '_top',
-            'noopener,noreferrer',
-        );
+    contactSales() {
+        this.posthog.capture('cta_contact_sales_clicked');
+        this.calendly.openDiscoveryPopup();
     }
 }

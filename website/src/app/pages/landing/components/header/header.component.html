@@ -9,149 +9,15 @@
 
             <div class="flex items-center justify-center gap-2 sm:gap-3 cursor-pointer transition-transform duration-300"  [class.scale-90]="isScrolled" routerLink="/" aria-label="Home">
                 <img [src]="(isScrolled && headerService.currentTheme() === 'light') ? 'logo-light.png' : 'logo-light.png'" alt="Kyrazo logo" width="40" height="40" class="h-8 w-8 sm:h-10 sm:w-10 p-1 rounded-xl bg-primary-500 flex items-center justify-center transition-transform duration-300" >
-                <span class="bg-linear-to-b bg-clip-text text-transparent tracking-tighter text-2xl sm:text-3xl font-bold"
+                <span class="bg-linear-to-b bg-clip-text text-transparent tracking-tighter text-2xl sm:text-3xl font-bold font-sansation"
                     [ngClass]="(isScrolled && headerService.currentTheme() === 'dark') ? 'from-white to-surface-400' : 'from-black to-surface-600'">Kyrazo</span>
-            </div>
-
-            <!-- Center Nav -->
-            <div class="hidden lg:flex items-center p-1 gap-1 rounded-full transition-all duration-300 border absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 will-change-transform"
-                [ngClass]="{
-                    'bg-surface-0/50 dark:bg-surface-950/50 border-surface-200 dark:border-surface-800 shadow-2xs': !isScrolled,
-                    'bg-transparent border-transparent!': isScrolled
-                }">
-                @for (item of items; track $index) {
-                    <div class="relative flex items-center"
-                        (mouseenter)="item.items ? onMouseEnter(item.label!) : null"
-                        (mouseleave)="item.items ? onMouseLeave() : null">
-
-                        @if (item.items) {
-                            <button
-                                (click)="toggleDropdown($event, item.label!)"
-                                class="dropdown-trigger bg-transparent border-none px-3 py-2 rounded-3xl font-medium transition-colors cursor-pointer text-sm flex items-center gap-1 group click-effect"
-                                [ngClass]="{
-                                    'text-surface-300 hover:text-primary-500 hover:bg-surface-800': isScrolled && headerService.currentTheme() === 'dark',
-                                    'text-surface-600 hover:text-primary-500 hover:bg-surface-100': isScrolled && headerService.currentTheme() === 'light',
-                                    'text-surface-600 dark:text-surface-300 hover:text-primary-500 hover:bg-surface-100 dark:hover:bg-surface-800': !isScrolled
-                                }">
-                                {{ item.label }}
-                                <i class="pi pi-chevron-down text-[10px]! ml-2 transition-transform duration-300" [class.rotate-180]="activeDropdown() === item.label"></i>
-                            </button>
-                        } @else {
-                            <a
-                                [routerLink]="item.routerLink"
-                                (click)="item.command?.({originalEvent: $event})"
-                                class="bg-transparent border-none px-3 py-2 rounded-3xl font-medium transition-colors cursor-pointer text-sm flex items-center gap-1 group no-underline click-effect"
-                                [ngClass]="{
-                                    'text-surface-300 hover:text-primary-500 hover:bg-surface-800': isScrolled && headerService.currentTheme() === 'dark',
-                                    'text-surface-600 hover:text-primary-500 hover:bg-surface-100': isScrolled && headerService.currentTheme() === 'light',
-                                    'text-surface-600 dark:text-surface-300 hover:text-primary-500 hover:bg-surface-100 dark:hover:bg-surface-800': !isScrolled
-                                }">
-                                {{ item.label }}
-                            </a>
-                        }
-
-                        @if (item.items && activeDropdown() === item.label) {
-                            <div @dropdownAnimation
-                                class="dropdown-menu absolute top-full left-0 mt-2 min-w-[200px] max-w-[220px] backdrop-blur-sm! border rounded-2xl shadow-xl p-2 z-50"
-                                [ngClass]="{
-                                    'bg-surface-950/95 border-surface-800': isScrolled && headerService.currentTheme() === 'dark',
-                                    'bg-white/95 border-surface-200 shadow-lg': isScrolled && headerService.currentTheme() === 'light',
-                                    'bg-surface-0/95 dark:bg-surface-950/75 border-surface-200 dark:border-surface-800': !isScrolled
-                                }">
-                                @for (subItem of item.items; track subItem.label) {
-                                    <a
-                                        [routerLink]="subItem.routerLink"
-                                        (click)="subItem.command?.({originalEvent: $event})"
-                                        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors cursor-pointer no-underline click-effect"
-                                        [ngClass]="{
-                                            'text-surface-300 hover:text-primary-500 hover:bg-surface-800/50': isScrolled && headerService.currentTheme() === 'dark',
-                                            'text-surface-600 hover:text-primary-500 hover:bg-surface-100': isScrolled && headerService.currentTheme() === 'light',
-                                            'text-surface-600 dark:text-surface-300 hover:text-primary-500 hover:bg-primary-500/5 dark:hover:bg-surface-800/50': !isScrolled
-                                        }">
-                                        @if (subItem.icon) {
-                                            <i [class]="subItem.icon + ' text-lg'"></i>
-                                        }
-                                        <span class="font-medium truncate">{{ subItem.label }}</span>
-                                    </a>
-                                }
-                            </div>
-                        }
-                    </div>
-                }
-
             </div>
 
             <!-- Right Actions -->
             <div class="flex items-center px-2 gap-1 sm:gap-2">
-                <div class="lg:hidden">
-                    <p-button
-                        icon="pi pi-bars"
-                        (click)="toggleMobileMenu()"
-                        [text]="true"
-                        [rounded]="true"
-                        styleClass="w-9! h-9! rounded-xl!"
-                    />
-                </div>
-
-                <p-button label="Log In" (click)="trackLogin()" [text]="true" size="small"
-                    [styleClass]="'text-xs hidden! sm:block! sm:text-sm! w-14 sm:w-18! font-bold! rounded-xl! ' + (isScrolled && headerService.currentTheme() === 'light' ? 'text-surface-900!' : '')"></p-button>
-                <p-button label="Get Started" (click)="trackGetStarted()" severity="primary" size="small" styleClass="text-xs hidden! sm:block! sm:text-sm! w-22 sm:w-26! font-bold! rounded-xl!"></p-button>
+                <p-button label="Contact Sales" (click)="contactSales()" severity="primary" size="small"
+                    styleClass="text-xs sm:text-sm! w-26 sm:w-32! font-bold! rounded-xl!"></p-button>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Mobile Menu Drawer -->
-<p-drawer [visible]="isMobileMenuVisible()" (visibleChange)="isMobileMenuVisible.set($event)" position="right" [modal]="true" blockScroll>
-    <ng-template pTemplate="header">
-        <div class="flex items-center gap-2">
-            <img [src]="isDarkMode() ? 'logo-dark.png' : 'logo-light.png'" alt="Kyrazo logo" width="32" height="32" class="h-8 w-8 p-1 rounded-lg bg-primary">
-            <span class="text-xl font-bold">Kyrazo</span>
-        </div>
-    </ng-template>
-    <div class="flex flex-col gap-2 pt-4">
-        @for (item of items; track $index) {
-            <div class="flex flex-col gap-1">
-                @if (item.items) {
-                    <div class="px-3 py-2 text-xs font-bold text-surface-400 dark:text-surface-500 uppercase tracking-wider">
-                        {{ item.label }}
-                    </div>
-                    @for (subItem of item.items; track subItem.label) {
-                        <a
-                            [routerLink]="subItem.routerLink"
-                            (click)="subItem.command?.({originalEvent: $event}); isMobileMenuVisible.set(false)"
-                            class="flex items-center gap-3 px-4 py-2 rounded-xl text-surface-600 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors no-underline">
-                            @if (subItem.icon) {
-                                <i [class]="subItem.icon + ' text-xl'"></i>
-                            }
-                            <span class="font-medium text-base">{{ subItem.label }}</span>
-                        </a>
-                    }
-                    <div class="h-px bg-surface-100 dark:bg-surface-800 my-1 mx-3"></div>
-
-                } @else {
-                    <a
-                        [routerLink]="item.routerLink"
-                        (click)="item.command?.({originalEvent: $event}); isMobileMenuVisible.set(false)"
-                        class="flex items-center gap-3 px-4 py-2 rounded-xl text-surface-600 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors no-underline">
-                        @if (item.icon) {
-                            <!-- <i [class]="item.icon + ' text-xl'"></i> -->
-                        }
-                        <span class="font-medium text-md">{{ item.label }}</span>
-                    </a>
-                }
-            </div>
-            <!-- @if (!$last) {
-            } -->
-        }
-
-
-    </div>
-    <ng-template #footer>
-        <div class="mt-8 flex flex-row justify-between gap-3 px-2 md:hidden">
-            <p-button label="Log In" (click)="trackLogin(); isMobileMenuVisible.set(false)" [text]="true" [size]="'small'" styleClass="w-full font-bold! rounded-xl! px-6!"></p-button>
-            <p-button label="Get Started" (click)="trackGetStarted(); isMobileMenuVisible.set(false)" severity="primary" [size]="'small'" styleClass="w-full font-bold! rounded-xl! px-6!"></p-button>
-        </div>
-    </ng-template>
-</p-drawer>
-

@@ -4,7 +4,8 @@ import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { PricingPlan } from '../../pricing.model';
 import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directive';
-import { Router } from '@angular/router';
+import { PostHogService } from '@core/3rd-party/posthog';
+import { CalendlyService } from '@shared/services/calendly.service';
 
 @Component({
     selector: 'app-pricing-card',
@@ -17,6 +18,24 @@ export class PricingCardComponent {
     @Input() plan!: PricingPlan;
     @Input() isYearly = false;
     @Input() delay = '';
+
+    private posthog = inject(PostHogService);
+    private calendly = inject(CalendlyService);
+
+    get isContactSalesPlan(): boolean {
+        return this.plan.slug === 'enterprise' || this.plan.slug === 'custom';
+    }
+
+    onCta(): void {
+        if (this.isContactSalesPlan) {
+            this.posthog.capture(
+                `pricing_${this.plan.slug}_contact_enterprise_sales_clicked`,
+            );
+        } else {
+            this.posthog.capture(`pricing_${this.plan.slug}_cta_clicked`);
+        }
+        this.calendly.openDiscoveryPopup();
+    }
 
     get currentPrice(): number {
         return this.isYearly

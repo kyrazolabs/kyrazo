@@ -41,54 +41,52 @@
         </div> -->
 
         <h2 class="text-3xl md:text-6xl font-black mt-8 mb-6 md:mb-8 tracking-tighter leading-[1.1] md:leading-none">
-            <span class="bg-linear-to-b from-white to-surface-400 bg-clip-text font-sansation! text-transparent">Ready to experience the <br class="hidden md:block"> future of </span> <span class="text-primary-500 text-glow font-sansation! italic decoration-primary-500/30 underline-offset-8">webhooks?</span>
+            <span class="bg-linear-to-b from-white to-surface-400 bg-clip-text font-sansation! text-transparent">Ready for <br class="hidden md:block"> truly </span> <span class="text-primary-500 text-glow font-sansation! italic decoration-primary-500/30 underline-offset-8">dedicated webhooks?</span>
         </h2>
 
         <p class="text-base md:text-lg text-surface-400 mb-8 md:mb-10 font-medium px-2 md:px-0 max-w-xl mx-auto leading-relaxed">
-            Stop polling and start building. Join the resilient event-driven revolution with <span class="text-white font-bold">Kyrazo</span>.
+            Book a discovery meeting and we'll design an isolated deployment for your workload — or contact enterprise sales for custom requirements.
         </p>
 
-        <!-- Email Capture Form -->
-        <div class="flex flex-col items-center gap-4 justify-center w-full max-w-lg mx-auto">
-            <div class="flex flex-col sm:flex-row gap-2 w-full">
-                <input
-                    pInputText
-                    type="email"
-                    [(ngModel)]="email"
-                    (keyup.enter)="onSubmit()"
-                    placeholder="Enter your email address"
-                    class="flex-1 bg-white/5! border-white/10! text-white! rounded-xl! placeholder:text-surface-500! focus:border-primary-500/60! focus:ring-primary-500/20!"
-                    aria-label="Email address"
-                    id="cta-email-input"
-                />
-                <p-button
-                    label="Get start for free"
-                    icon="pi pi-arrow-right"
-                    iconPos="right"
-                    (onClick)="onSubmit()"
-                />
-            </div>
-
-            <!-- Trust Indicator -->
-            <div class="flex items-center gap-3 text-surface-500 text-[10px] uppercase tracking-[0.2em] font-black mt-1">
-                <div class="flex items-center gap-1.5">
-                    <i class="pi pi-shield text-primary-500"></i>
-                    <span>Bank-Grade Security</span>
-                </div>
-                <div class="w-1 h-1 rounded-full bg-surface-800"></div>
-                <div class="flex items-center gap-1.5">
-                    <i class="pi pi-lock text-primary-500"></i>
-                    <span>No Spam, Ever</span>
-                </div>
-            </div>
-
-            <!-- Secondary Link -->
-            <a href="https://docs.kyrazo.com"
-               class="text-surface-500 hover:text-surface-300 text-sm font-medium transition-colors cursor-pointer no-underline mb-12"
-               aria-label="View documentation">
-                Or read the documentation →
-            </a>
+        <!-- Sales CTAs -->
+        <div class="flex flex-col sm:flex-row items-center gap-4 justify-center w-full max-w-lg mx-auto">
+            <p-button
+                label="Book Discovery Meeting"
+                icon="pi pi-calendar"
+                iconPos="left"
+                (onClick)="bookMeeting()"
+                styleClass="w-full sm:w-auto px-8! font-bold! rounded-xl! shadow-xl! shadow-primary-500/20"
+            />
+            <p-button
+                label="Contact Sales"
+                icon="pi pi-envelope"
+                iconPos="left"
+                (onClick)="contactSales()"
+                outline
+                severity="secondary"
+                styleClass="w-full sm:w-auto px-8! font-bold! rounded-xl!"
+            />
         </div>
+
+        <!-- Trust Indicator -->
+        <div class="flex items-center gap-3 text-surface-500 text-[10px] uppercase tracking-[0.2em] font-black mt-6 mx-auto justify-center">
+            <div class="flex items-center gap-1.5">
+                <i class="pi pi-shield text-primary-500"></i>
+                <span>Physically Isolated Infrastructure</span>
+            </div>
+            <div class="w-1 h-1 rounded-full bg-surface-800"></div>
+            <div class="flex items-center gap-1.5">
+                <i class="pi pi-lock text-primary-500"></i>
+                <span>Custom SLAs Available</span>
+            </div>
+        </div>
+
+        <!-- Secondary Link -->
+        <a href="https://docs.kyrazo.com"
+           class="text-surface-500 hover:text-surface-300 text-sm font-medium transition-colors cursor-pointer no-underline mt-6 mb-12 inline-block"
+           aria-label="View documentation">
+            Or read the documentation →
+        </a>
 
         <!-- Integrated Footer Section -->
         <div class="mt-20 pt-16 border-t border-surface-800/50 flex flex-col gap-16">
@@ -98,7 +96,7 @@
                 <div class="col-span-2 md:col-span-2">
                     <div class="flex items-center gap-3 mb-6">
                         <img src="logo-light.png" alt="Kyrazo" width="40" height="40" class="h-10 w-10 rounded-xl bg-primary p-1 shadow-lg shadow-primary-500/20">
-                        <span class="text-3xl bg-linear-to-b from-white to-surface-400 bg-clip-text text-transparent font-black tracking-tighter">Kyrazo</span>
+                        <span class="text-3xl bg-linear-to-b from-white to-surface-400 bg-clip-text text-transparent font-black font-sansation! tracking-tighter">Kyrazo</span>
                     </div>
                     <p class="text-sm text-surface-500 leading-relaxed max-w-[340px]">
                         The next generation of event-driven infrastructure. Built for reliability and performance.
@@ -115,12 +113,12 @@
                     </ul>
                 </div>
 
-                <!-- Resources -->
+                <!-- Company -->
                 <div>
-                    <h4 class="text-xs font-black uppercase tracking-widest text-surface-300 mb-6 font-sansation!">Resources</h4>
+                    <h4 class="text-xs font-black uppercase tracking-widest text-surface-300 mb-6 font-sansation!">Company</h4>
                     <ul class="space-y-4">
-                        <li><a routerLink="/blog" class="text-sm text-surface-500 hover:text-primary-400 font-medium no-underline transition-colors">Blog</a></li>
-                        <li><a href="https://status.kyrazo.com" target="_blank" class="text-sm text-surface-500 hover:text-primary-400 font-medium no-underline transition-colors">Status</a></li>
+                        <li><a routerLink="/about" class="text-sm text-surface-500 hover:text-primary-400 font-medium no-underline transition-colors">About Us</a></li>
+                        <li><a routerLink="/pricing" class="text-sm text-surface-500 hover:text-primary-400 font-medium no-underline transition-colors">Pricing</a></li>
                         <li><a href="mailto:support@kyrazo.com" class="text-sm text-surface-500 hover:text-primary-400 font-medium no-underline transition-colors">Support</a></li>
                     </ul>
                 </div>

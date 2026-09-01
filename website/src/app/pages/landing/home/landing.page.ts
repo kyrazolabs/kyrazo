@@ -9,6 +9,7 @@ import { TrustComponent } from '@pages/landing/components/trust/trust.component'
 import { Motivation } from '@pages/landing/components/motivation/motivation';
 import { DedicatedWorkersComponent } from '@pages/landing/components/dedicated-workers/dedicated-workers.component';
 import { PricingComponent } from '@pages/landing/components/pricing/pricing.component';
+import { BookDemoComponent } from '@pages/landing/components/book-demo/book-demo.component';
 import { IntegrationsComponent } from '@pages/landing/components/integrations/integrations.component';
 import { ComparisonComponent } from '@pages/landing/components/comparison/comparison.component';
 import { HeaderThemeDirective } from '@shared/directives/header-theme.directive';
@@ -31,6 +32,7 @@ import { SeoService } from '@core/services/seo.service';
         TrustComponent,
         Motivation,
         PricingComponent,
+        BookDemoComponent,
         IntegrationsComponent,
         ComparisonComponent,
         HeaderThemeDirective,
@@ -57,10 +59,10 @@ export class LandingPage implements OnInit {
             offers: {
                 '@type': 'Offer',
                 priceCurrency: 'USD',
-                price: '0',
+                price: '499',
             },
             description:
-                'Webhooks as a Service platform for reliable event management with dedicated workers.',
+                'Dedicated webhook infrastructure for enterprise B2B. Physically isolated compute, databases, and delivery workers with zero noisy-neighbor degradation.',
             url: 'https://kyrazo.com',
             image: 'https://kyrazo.com/og-image.png',
         });
