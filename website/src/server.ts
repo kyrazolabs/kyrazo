@@ -1,68 +1,63 @@
-import {
-    AngularNodeAppEngine,
-    createNodeRequestHandler,
-    isMainModule,
-    writeResponseToNodeResponse,
-} from '@angular/ssr/node';
-import express from 'express';
+import { AngularAppEngine, createRequestHandler } from '@angular/ssr';
 import { join } from 'node:path';
+import { statSync } from 'node:fs';
 
+const angularApp = new AngularAppEngine();
+
+// In Bun, import.meta.dir is equivalent to __dirname
+// When built, server.mjs is usually in dist/website/server, and browser is in dist/website/browser
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
-const app = express();
-const angularApp = new AngularNodeAppEngine();
-
 /**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/{*splat}', (req, res) => {
- *   // Handle API request
- * });
- * ```
+ * Handle all requests by serving static files or rendering the Angular application.
  */
+async function handleRequest(req: Request) {
+    const url = new URL(req.url);
 
-/**
- * Serve static files from /browser
- */
-app.use(
-    express.static(browserDistFolder, {
-        maxAge: '1y',
-        index: false,
-        redirect: false,
-    }),
-);
+    // 0. Healthcheck endpoint (used by the Docker HEALTHCHECK)
+    if (url.pathname === '/health') {
+        return new Response('OK');
+    }
 
-/**
- * Handle all other requests by rendering the Angular application.
- */
-app.use((req, res, next) => {
-    angularApp
-        .handle(req)
-        .then((response) =>
-            response ? writeResponseToNodeResponse(response, res) : next(),
-        )
-        .catch(next);
-});
+    // 1. Serve static files from /browser
+    if (url.pathname !== '/') {
+        const filePath = join(browserDistFolder, url.pathname);
+        try {
+            const stat = statSync(filePath);
+            if (stat.isFile()) {
+                // Return static file using Bun.file
+                return new Response(Bun.file(filePath));
+            }
+        } catch (e) {
+            // File not found, fall through to Angular SSR
+        }
+    }
 
-/**
- * Start the server if this module is the main entry point, or it is ran via PM2.
- * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
- */
-if (isMainModule(import.meta.url) || process.env['pm_id']) {
-    const port = process.env['PORT'] || 4000;
-    const server = app.listen(port, () => {
-        console.log(`Server running on port ${port}`);
-    });
+    // 2. Let Angular handle the request
+    const response = await angularApp.handle(req);
+    if (response) {
+        return response;
+    }
 
-    server.on('error', (error: any) => {
-        console.error('Server failed to start:', error);
-    });
+    // 3. Fallback to 404
+    return new Response('Not Found', { status: 404 });
 }
 
 /**
- * Request handler used by the Angular CLI (for dev-server and during build) or Firebase Cloud Functions.
+ * Request handler used by the Angular CLI (for dev-server and during build) or Cloud Functions.
  */
-export const reqHandler = createNodeRequestHandler(app);
+export const reqHandler = createRequestHandler(handleRequest);
+
+/**
+ * Start the server if this module is the main entry point
+ */
+if (import.meta.main) {
+    const port = Number(process.env['PORT']) || 4000;
+    
+    Bun.serve({
+        port,
+        fetch: handleRequest
+    });
+
+    console.log(`Server running on port ${port}`);
+}
