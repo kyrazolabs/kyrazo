@@ -4,28 +4,28 @@
             Privacy <span class="text-primary-500">Policy</span>
         </h1>
         <p class="text-surface-500 dark:text-surface-400 font-medium">
-            Last updated: April 1, 2026
+            Last updated: September 2, 2026
         </p>
     </div>
 
     <div class="prose prose-lg dark:prose-invert max-w-none text-surface-600 dark:text-surface-300 space-y-12">
         <section>
             <p class="leading-relaxed">
-                This Privacy Policy explains how <strong>Kyrazo LLC</strong> (“we”, “our”, “us”) collects, uses, and protects personal data when you use our website and services. We are committed to processing your data securely and transparently.
+                This Privacy Policy explains how <strong>Kyrazo LLC</strong> (“we”, “our”, “us”) collects, uses, and protects personal data when you use our website, book a discovery meeting, or use our dedicated webhook infrastructure. Kyrazo is a sales-led service. We do not offer self-serve account signup. We are committed to processing your data securely and transparently.
             </p>
         </section>
 
         <section>
             <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">1. Information We Collect</h2>
-            <p class="mb-4">We collect the minimum personal data required to provide account access and operate our high-scale webhook infrastructure.</p>
+            <p class="mb-4">We collect the minimum personal data required to evaluate a deployment, provision dedicated infrastructure, and operate the Service.</p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
                 <div class="p-6 rounded-2xl bg-surface-50 dark:bg-surface-900/50 border border-surface-200 dark:border-surface-900">
-                    <span class="text-lg font-bold text-surface-900 dark:text-surface-0 mb-3">1.1 Account Information</span>
+                    <span class="text-lg font-bold text-surface-900 dark:text-surface-0 mb-3">1.1 Sales & Workspace Information</span>
                     <ul class="list-disc list-inside space-y-1 text-sm font-medium">
-                        <li>Name & Email address</li>
-                        <li>Workspace configurations</li>
-                        <li>Authentication metadata</li>
+                        <li>Name, email, company, and meeting details</li>
+                        <li>Workspace configurations after provisioning</li>
+                        <li>Authentication metadata for authorized users</li>
                     </ul>
                 </div>
                 <div class="p-6 rounded-2xl bg-surface-50 dark:bg-surface-900/50 border border-surface-200 dark:border-surface-900">
@@ -40,30 +40,32 @@
         </section>
 
         <section>
-            <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">2. Data Security & Encryption</h2>
-            <p>We implement application-level encryption for all sensitive data. Payloads moving through our system are protected using <strong>AES-256-GCM</strong> encryption.</p>
+            <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">2. Data Security & Isolation</h2>
+            <p>Professional deployments run on physically isolated compute, databases, and delivery workers reserved exclusively for your organization. Enterprise BYOC deployments process payload data inside the cloud boundary specified in your Order Form. We also implement application-level encryption for sensitive data using <strong>AES-256-GCM</strong>.</p>
             <ul class="list-disc list-inside space-y-2 mt-4">
                 <li><strong>In Transit:</strong> All data is encrypted using TLS 1.2+ (HTTPS).</li>
-                <li><strong>At Rest:</strong> Sensitive fields and high-volume event payloads are encrypted before being stored in our databases.</li>
+                <li><strong>At Rest:</strong> Sensitive fields and high-volume event payloads are encrypted before being stored.</li>
+                <li><strong>Isolation:</strong> No shared database memory and no multi-tenant worker pools on Professional dedicated infrastructure.</li>
             </ul>
         </section>
 
         <section>
             <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">3. Data Residency & Hosting</h2>
-            <p>Our infrastructure is designed for performance and compliance:</p>
+            <p>Hosting depends on the deployment model in your Order Form:</p>
             <ul class="list-disc list-inside space-y-2 mt-4">
-                <li><strong>Primary Storage & Hosting:</strong> All application and event data is processed and stored on <strong>Netcup</strong> infrastructure in <strong>Germany/Austria (EU)</strong>.</li>
-                <li><strong>Backups:</strong> Encrypted snapshots are replicated to <strong>EEA (EU)</strong> regions for disaster recovery via Cloudflare R2.</li>
+                <li><strong>Professional:</strong> Dedicated <strong>Spaceship</strong> Starlight virtual machines provisioned exclusively for your environment. The region is specified in your Order Form.</li>
+                <li><strong>Enterprise BYOC / private cloud:</strong> Processing occurs in your cloud account or private deployment as specified in the Order Form. Payload data does not leave that boundary unless you instruct otherwise.</li>
+                <li><strong>Backups:</strong> Encrypted snapshots for managed deployments are replicated to <strong>EEA (EU)</strong> regions for disaster recovery via Cloudflare R2, unless your Order Form specifies another arrangement.</li>
             </ul>
         </section>
 
         <section>
             <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">4. Data Retention</h2>
-            <p>We adhere to the principle of storage limitation. Data is purged based on your service agreement and subscription tier:</p>
+            <p>We adhere to the principle of storage limitation. Data is purged based on your Order Form and service agreement:</p>
             <ul class="list-disc list-inside space-y-2 mt-4">
-                <li><strong>Ingest & Dispatch Events:</strong> Deleted automatically based on the <strong>customer subscription</strong> terms.</li>
-                <li><strong>Processed Webhooks:</strong> Retained according to subscription-level retention settings.</li>
-                <li><strong>Account Data:</strong> Retained for the duration of your active subscription.</li>
+                <li><strong>Ingest & Dispatch Events:</strong> Deleted automatically according to the retention period in your Order Form.</li>
+                <li><strong>Processed Webhooks:</strong> Retained according to contracted retention settings.</li>
+                <li><strong>Workspace Data:</strong> Retained for the duration of the active contract, then deleted or returned when the dedicated environment is decommissioned.</li>
             </ul>
         </section>
 
@@ -73,19 +75,23 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
                 <div class="p-4 rounded-xl border border-surface-200 dark:border-surface-800">
                     <span class="font-bold text-surface-900 dark:text-surface-0">Stripe</span>
-                    <p class="text-xs">Payment & Billing (USA/Global)</p>
+                    <p class="text-xs">Invoicing & Billing (USA/Global)</p>
                 </div>
                 <div class="p-4 rounded-xl border border-surface-200 dark:border-surface-800">
-                    <span class="font-bold text-surface-900 dark:text-surface-0">Netcup</span>
-                    <p class="text-xs">Primary Hosting (Germany/Austria)</p>
+                    <span class="font-bold text-surface-900 dark:text-surface-0">Spaceship</span>
+                    <p class="text-xs">Dedicated VMs (region per Order Form)</p>
                 </div>
                 <div class="p-4 rounded-xl border border-surface-200 dark:border-surface-800">
                     <span class="font-bold text-surface-900 dark:text-surface-0">Cloudflare</span>
                     <p class="text-xs">DNS & Object Storage (Global/EEA)</p>
                 </div>
                 <div class="p-4 rounded-xl border border-surface-200 dark:border-surface-800">
-                    <span class="font-bold text-surface-900 dark:text-surface-0">PostHog EU</span>
-                    <p class="text-xs">Product Analytics (Europe)</p>
+                    <span class="font-bold text-surface-900 dark:text-surface-0">Calendly</span>
+                    <p class="text-xs">Discovery meeting scheduling (USA/Global)</p>
+                </div>
+                <div class="p-4 rounded-xl border border-surface-200 dark:border-surface-800">
+                    <span class="font-bold text-surface-900 dark:text-surface-0">Umami</span>
+                    <p class="text-xs">Website Analytics (self-hosted)</p>
                 </div>
                 <div class="p-4 rounded-xl border border-surface-200 dark:border-surface-800">
                     <span class="font-bold text-surface-900 dark:text-surface-0">Sentry</span>

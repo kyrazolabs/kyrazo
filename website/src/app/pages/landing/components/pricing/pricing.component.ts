@@ -7,7 +7,7 @@ import {
     CalendlyService,
     CALENDLY_DISCOVERY_URL,
 } from '@shared/services/calendly.service';
-import { PostHogService } from '@core/3rd-party/posthog';
+import { UmamiService } from '@core/3rd-party/umami';
 
 interface EnterpriseTier {
     name: string;
@@ -32,7 +32,7 @@ interface EnterpriseTier {
     styleUrl: './pricing.component.scss',
 })
 export class PricingComponent {
-    private posthog = inject(PostHogService);
+    private umami = inject(UmamiService);
     private calendly = inject(CalendlyService);
 
     readonly calendlyUrl = CALENDLY_DISCOVERY_URL;
@@ -75,7 +75,7 @@ export class PricingComponent {
     ];
 
     onSelect(plan: EnterpriseTier): void {
-        this.posthog.capture(`pricing_${plan.slug}_cta_clicked`);
+        this.umami.capture(`pricing_${plan.slug}_cta_clicked`);
         if (plan.ctaAction === 'calendly') {
             this.calendly.openDiscoveryPopup();
         } else {

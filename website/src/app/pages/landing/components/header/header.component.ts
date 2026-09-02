@@ -19,7 +19,7 @@ import { RouterLink } from '@angular/router';
 import { DrawerModule } from 'primeng/drawer';
 import { HeaderService } from '@shared/services/header.service';
 
-import { PostHogService } from '@core/3rd-party/posthog';
+import { UmamiService } from '@core/3rd-party/umami';
 import { CalendlyService } from '@shared/services/calendly.service';
 
 @Component({
@@ -39,7 +39,7 @@ import { CalendlyService } from '@shared/services/calendly.service';
     animations: [dropdownAnimation],
 })
 export class HeaderComponent {
-    private posthog = inject(PostHogService);
+    private umami = inject(UmamiService);
     layoutService: LayoutService = inject(LayoutService);
     headerService = inject(HeaderService);
     private calendly = inject(CalendlyService);
@@ -85,7 +85,7 @@ export class HeaderComponent {
     }
 
     contactSales() {
-        this.posthog.capture('header_contact_sales_clicked');
+        this.umami.capture('header_contact_sales_clicked');
         this.calendly.openDiscoveryPopup();
     }
 }

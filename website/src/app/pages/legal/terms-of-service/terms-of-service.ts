@@ -3,7 +3,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
-import { PostHogService } from '@core/3rd-party/posthog';
+import { UmamiService } from '@core/3rd-party/umami';
 import { CtaComponent } from "@pages/landing/components/cta/cta.component";
 
 @Component({
@@ -14,9 +14,9 @@ import { CtaComponent } from "@pages/landing/components/cta/cta.component";
     styleUrl: './terms-of-service.scss',
 })
 export class TermsOfService {
-    private posthog = inject(PostHogService);
+    private umami = inject(UmamiService);
 
     ngOnInit() {
-        this.posthog.capture('terms_of_service_viewed');
+        this.umami.capture('terms_of_service_viewed');
     }
 }

@@ -4,7 +4,7 @@ import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { PricingPlan } from '../../pricing.model';
 import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directive';
-import { PostHogService } from '@core/3rd-party/posthog';
+import { UmamiService } from '@core/3rd-party/umami';
 import { CalendlyService } from '@shared/services/calendly.service';
 
 @Component({
@@ -19,7 +19,7 @@ export class PricingCardComponent {
     @Input() isYearly = false;
     @Input() delay = '';
 
-    private posthog = inject(PostHogService);
+    private umami = inject(UmamiService);
     private calendly = inject(CalendlyService);
 
     get isContactSalesPlan(): boolean {
@@ -28,11 +28,11 @@ export class PricingCardComponent {
 
     onCta(): void {
         if (this.isContactSalesPlan) {
-            this.posthog.capture(
+            this.umami.capture(
                 `pricing_${this.plan.slug}_contact_enterprise_sales_clicked`,
             );
         } else {
-            this.posthog.capture(`pricing_${this.plan.slug}_cta_clicked`);
+            this.umami.capture(`pricing_${this.plan.slug}_cta_clicked`);
         }
         this.calendly.openDiscoveryPopup();
     }

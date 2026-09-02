@@ -4,7 +4,7 @@
             GDPR <span class="text-primary-500">Compliance</span>
         </h1>
         <p class="text-surface-500 dark:text-surface-400 font-medium">
-            Effective Date: January 1, 2026
+            Effective Date: September 2, 2026
         </p>
     </div>
 
@@ -12,7 +12,7 @@
         <section>
             <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">1. Commitment to GDPR</h2>
             <p class="leading-relaxed">
-                At <strong>Kyrazo</strong>, we are committed to ensuring the security and protection of the personal information that we process. Our infrastructure is built with "privacy by design," ensuring that data protection principles are integrated into our core event-driven architecture.
+                At <strong>Kyrazo</strong>, we are committed to ensuring the security and protection of the personal information that we process. Our dedicated infrastructure is built with "privacy by design": physically isolated compute, databases, and delivery workers per customer, with data protection principles integrated into our event-driven architecture.
             </p>
         </section>
 
@@ -29,34 +29,42 @@
 
         <section>
             <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">3. Technical & Organizational Measures</h2>
-            <p>Our backend implements rigorous security standards to protect your data:</p>
+            <p>Our dedicated environments implement rigorous security standards to protect your data:</p>
             <ul class="list-disc list-inside space-y-2 mt-4">
                 <li><strong>Encryption at Rest:</strong> Sensitive payloads (Headers & Bodies) are encrypted using <strong>AES-256-GCM</strong>.</li>
                 <li><strong>Encryption in Transit:</strong> All API traffic is secured via <strong>TLS 1.3</strong> or higher.</li>
-                <li><strong>Tenant Isolation:</strong> Strict isolation of workspace data to prevent cross-tenant access.</li>
-                <li><strong>Access Control:</strong> Secure credential hashing and role-based access control.</li>
+                <li><strong>Physical Isolation:</strong> Dedicated virtual machines, databases, and delivery workers per customer. Zero shared database memory.</li>
+                <li><strong>Access Control:</strong> Credentials are issued to authorized users after contract provisioning, with role-based access control.</li>
             </ul>
         </section>
 
         <section>
             <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">4. Sub-processors</h2>
-            <p>We utilize carefully selected sub-processors to maintain our high-performance infrastructure:</p>
+            <p>We utilize carefully selected sub-processors to maintain dedicated infrastructure and operate the website:</p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                 <div class="p-4 rounded-xl bg-surface-50 dark:bg-surface-900/50 border border-surface-200 dark:border-surface-900 text-sm">
-                    <span class="font-bold text-surface-900 dark:text-surface-0">Netcup (Germany/Austria)</span>
-                    <p class="opacity-70">Primary cloud infrastructure and hosting within the EEA.</p>
+                    <span class="font-bold text-surface-900 dark:text-surface-0">Spaceship</span>
+                    <p class="opacity-70">Dedicated Starlight virtual machines. Region is specified in the customer Order Form.</p>
                 </div>
                 <div class="p-4 rounded-xl bg-surface-50 dark:bg-surface-900/50 border border-surface-200 dark:border-surface-900 text-sm">
                     <span class="font-bold text-surface-900 dark:text-surface-0">Stripe (USA/Global)</span>
-                    <p class="opacity-70">Payment processing and billing management.</p>
+                    <p class="opacity-70">Invoice processing and contract billing.</p>
                 </div>
                 <div class="p-4 rounded-xl bg-surface-50 dark:bg-surface-900/50 border border-surface-200 dark:border-surface-900 text-sm">
                     <span class="font-bold text-surface-900 dark:text-surface-0">Cloudflare (Global/EEA)</span>
                     <p class="opacity-70">DNS, WAF, and secure object storage backups.</p>
                 </div>
                 <div class="p-4 rounded-xl bg-surface-50 dark:bg-surface-900/50 border border-surface-200 dark:border-surface-900 text-sm">
-                    <span class="font-bold text-surface-900 dark:text-surface-0">PostHog EU</span>
-                    <p class="opacity-70">Usage analytics hosted within the EEA for product optimization.</p>
+                    <span class="font-bold text-surface-900 dark:text-surface-0">Calendly (USA/Global)</span>
+                    <p class="opacity-70">Discovery meeting scheduling for sales-led onboarding.</p>
+                </div>
+                <div class="p-4 rounded-xl bg-surface-50 dark:bg-surface-900/50 border border-surface-200 dark:border-surface-900 text-sm">
+                    <span class="font-bold text-surface-900 dark:text-surface-0">Sentry (USA/Global)</span>
+                    <p class="opacity-70">Error monitoring for application reliability.</p>
+                </div>
+                <div class="p-4 rounded-xl bg-surface-50 dark:bg-surface-900/50 border border-surface-200 dark:border-surface-900 text-sm">
+                    <span class="font-bold text-surface-900 dark:text-surface-0">Umami</span>
+                    <p class="opacity-70">Privacy-friendly website analytics, self-hosted.</p>
                 </div>
             </div>
         </section>

@@ -1,15 +1,16 @@
 {
-    "name": "kyrazo-website",
+    "name": "website",
     "version": "0.0.0",
     "scripts": {
         "ng": "bunx ng",
         "dev": "bunx ng serve",
         "start": "bunx ng serve",
-        "build": "bunx ng build",
+        "build": "bunx ng build --configuration production",
         "watch": "bunx ng build --watch --configuration development",
         "test": "bunx ng test",
         "typecheck": "bunx tsc --noEmit",
-        "serve:ssr:website": "bun dist/website/server/server.mjs"
+        "preview": "bunx ng serve --configuration production",
+        "zip": "rm -f dist/browser.zip && cd dist/website/browser && zip -r ../../browser.zip ."
     },
     "private": true,
     "dependencies": {
@@ -31,10 +32,8 @@
         "@uiw/codemirror-theme-material": "^4.25.9",
         "chart.js": "^4.4.8",
         "codemirror": "^6.0.2",
-        "express": "^5.2.1",
         "marked": "^17.0.1",
         "postcss": "^8.5.6",
-        "posthog-js": "^1.335.2",
         "primeicons": "^7.0.0",
         "primeng": "^21",
         "rxjs": "~7.8.2",

@@ -19,24 +19,14 @@ RUN bun install --frozen-lockfile
 COPY . .
 RUN bun run build
 
-# ---- Stage 2: Production runtime — pure Bun --------------------------------
-FROM oven/bun:1
+# ---- Stage 2: Production runtime — static nginx ----------------------------
+FROM nginx:1.27-alpine
 
 ENV NODE_ENV=production
-ENV PORT=4000
 EXPOSE 4000
 
-WORKDIR /app
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /app/dist/website/browser /usr/share/nginx/html
 
-# The Angular build output is self-contained: only dist is needed at runtime
-COPY --from=builder /app/dist ./dist
-
-# Run as the non-root `bun` user provided by the base image
-USER bun
-
-# Healthcheck using Bun itself — no curl or apt-get needed
-HEALTHCHECK --start-period=20s --interval=30s --timeout=5s --retries=3 \
-    CMD bun -e "fetch('http://localhost:' + (process.env.PORT || 4000) + '/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
-
-# Start the server using Bun
-CMD ["bun", "dist/website/server/server.mjs"]
+HEALTHCHECK --start-period=10s --interval=30s --timeout=5s --retries=3 \
+    CMD wget -qO- http://127.0.0.1:4000/health || exit 1

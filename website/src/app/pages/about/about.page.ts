@@ -1,7 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PostHogService } from '@core/3rd-party/posthog';
-import { SeoService } from '@core/services/seo.service';
 import { HeaderThemeDirective } from '@shared/directives/header-theme.directive';
 import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directive';
 import { CtaComponent } from '@pages/landing/components/cta/cta.component';
@@ -38,17 +36,4 @@ import { CtaComponent } from '@pages/landing/components/cta/cta.component';
         </div>
     `
 })
-export class AboutPage implements OnInit {
-    private posthog = inject(PostHogService);
-    private seoService = inject(SeoService);
-
-    ngOnInit() {
-        this.posthog.trackPageView();
-        this.seoService.setSchema({
-            '@context': 'https://schema.org',
-            '@type': 'AboutPage',
-            name: 'About Kyrazo',
-            description: 'Learn about Kyrazo, the dedicated webhook infrastructure for enterprise B2B.',
-        });
-    }
-}
+export class AboutPage {}

@@ -1,4 +1,10 @@
 import { Routes } from '@angular/router';
+import {
+    ABOUT_SCHEMA,
+    HOME_SCHEMA,
+    PRICING_SCHEMA,
+    webPageSchema,
+} from '@core/seo/page-schemas';
 
 export const routes: Routes = [
     {
@@ -22,6 +28,7 @@ export const routes: Routes = [
                         keywords:
                             'Dedicated Webhook Infrastructure, Enterprise Webhooks, Webhooks as a Service, Isolated Infrastructure, Noisy Neighbor, BYOC, Private Cloud Webhooks, Kyrazo',
                     },
+                    schema: HOME_SCHEMA,
                 },
             },
             {
@@ -31,11 +38,16 @@ export const routes: Routes = [
                         (p) => p.PrivacyPage,
                     ),
                 data: {
-                    title: 'Privacy Policy - Kyrazo',
+                    title: 'Privacy Policy',
                     meta: {
                         description:
                             "Read Kyrazo's Privacy Policy to understand how we collect, use, and protect your data.",
                     },
+                    schema: webPageSchema(
+                        'Privacy Policy',
+                        '/legal/privacy-policy',
+                        "Read Kyrazo's Privacy Policy to understand how we collect, use, and protect your data.",
+                    ),
                 },
             },
             {
@@ -45,11 +57,16 @@ export const routes: Routes = [
                         (p) => p.RefundPage,
                     ),
                 data: {
-                    title: 'Refund Policy - Kyrazo',
+                    title: 'Refund Policy',
                     meta: {
                         description:
                             "Kyrazo's Refund Policy. Understand our terms for refunds and cancellations.",
                     },
+                    schema: webPageSchema(
+                        'Refund Policy',
+                        '/legal/refund-policy',
+                        "Kyrazo's Refund Policy. Understand our terms for refunds and cancellations.",
+                    ),
                 },
             },
             {
@@ -59,11 +76,16 @@ export const routes: Routes = [
                         (p) => p.TermsOfService,
                     ),
                 data: {
-                    title: 'Terms of Service - Kyrazo',
+                    title: 'Terms of Service',
                     meta: {
                         description:
                             "Kyrazo's Terms of Service. Read the rules and regulations for using our platform.",
                     },
+                    schema: webPageSchema(
+                        'Terms of Service',
+                        '/legal/terms-of-service',
+                        "Kyrazo's Terms of Service. Read the rules and regulations for using our platform.",
+                    ),
                 },
             },
             {
@@ -73,11 +95,16 @@ export const routes: Routes = [
                         (p) => p.GDPRPage,
                     ),
                 data: {
-                    title: 'GDPR Compliance - Kyrazo',
+                    title: 'GDPR Compliance',
                     meta: {
                         description:
                             "Kyrazo's commitment to GDPR and data protection. Learn about your rights and how we handle your data.",
                     },
+                    schema: webPageSchema(
+                        'GDPR Compliance',
+                        '/legal/gdpr',
+                        "Kyrazo's commitment to GDPR and data protection. Learn about your rights and how we handle your data.",
+                    ),
                 },
             },
             {
@@ -87,14 +114,18 @@ export const routes: Routes = [
                         (p) => p.DPAPage,
                     ),
                 data: {
-                    title: 'Data Processing Agreement - Kyrazo',
+                    title: 'Data Processing Agreement',
                     meta: {
                         description:
                             "Kyrazo's Data Processing Agreement (DPA). Understand how we process personal data on your behalf.",
                     },
+                    schema: webPageSchema(
+                        'Data Processing Agreement',
+                        '/legal/dpa',
+                        "Kyrazo's Data Processing Agreement (DPA). Understand how we process personal data on your behalf.",
+                    ),
                 },
             },
-
             {
                 path: 'about',
                 loadComponent: () =>
@@ -102,11 +133,12 @@ export const routes: Routes = [
                         (p) => p.AboutPage,
                     ),
                 data: {
-                    title: 'About Kyrazo',
+                    title: 'About',
                     meta: {
                         description:
                             'Learn about Kyrazo, the dedicated webhook infrastructure for enterprise B2B.',
                     },
+                    schema: ABOUT_SCHEMA,
                 },
             },
             {
@@ -116,11 +148,12 @@ export const routes: Routes = [
                         (p) => p.PricingPage,
                     ),
                 data: {
-                    title: 'Pricing - Kyrazo',
+                    title: 'Pricing',
                     meta: {
                         description:
                             'Dedicated webhook infrastructure pricing. Professional plans from $499/month on annual contracts; enterprise BYOC and private cloud deployments with custom billing.',
                     },
+                    schema: PRICING_SCHEMA,
                 },
             },
         ],
@@ -132,7 +165,14 @@ export const routes: Routes = [
             import('@shared/ui/not-found/not-found.component').then(
                 (p) => p.NotFoundComponent,
             ),
-        data: { animation: 'not-found' },
+        data: {
+            animation: 'not-found',
+            title: 'Page Not Found',
+            meta: {
+                description: 'The page you requested could not be found.',
+                robots: 'noindex, nofollow',
+            },
+        },
     },
     {
         path: '**',

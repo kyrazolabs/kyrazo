@@ -2,7 +2,7 @@ import { Component, inject } from "@angular/core";
 
 import { CommonModule } from "@angular/common";
 
-import { PostHogService } from "@core/3rd-party/posthog";
+import { UmamiService } from "@core/3rd-party/umami";
 import { CtaComponent } from "@pages/landing/components/cta/cta.component";
 
 @Component({
@@ -13,9 +13,9 @@ import { CtaComponent } from "@pages/landing/components/cta/cta.component";
   styleUrl: "./refund.page.scss",
 })
 export class RefundPage {
-  private posthog = inject(PostHogService);
+  private umami = inject(UmamiService);
 
   ngOnInit() {
-    this.posthog.capture("refund_policy_viewed");
+    this.umami.capture("refund_policy_viewed");
   }
 }

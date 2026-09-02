@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directive';
 import { CalendlyService } from '@shared/services/calendly.service';
-import { PostHogService } from '@core/3rd-party/posthog';
+import { UmamiService } from '@core/3rd-party/umami';
 
 @Component({
     selector: 'app-landing-comparison',
@@ -12,10 +12,10 @@ import { PostHogService } from '@core/3rd-party/posthog';
 })
 export class ComparisonComponent {
     private calendly = inject(CalendlyService);
-    private posthog = inject(PostHogService);
+    private umami = inject(UmamiService);
 
     contactSales() {
-        this.posthog.capture('comparison_book_discovery_clicked');
+        this.umami.capture('comparison_book_discovery_clicked');
         this.calendly.openDiscoveryPopup();
     }
 }

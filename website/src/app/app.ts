@@ -14,8 +14,6 @@ import { AppConfig } from '@components/app.config';
 import { environment } from 'environments/environment';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs/operators';
-import * as Sentry from '@sentry/angular';
-import posthog from 'posthog-js';
 
 @Component({
     selector: 'app-root',
@@ -52,16 +50,9 @@ export class App implements OnInit {
             });
     }
 
-    private initAnalytics() {
-        if (environment.posthog.key) {
-            posthog.init(environment.posthog.key, {
-                api_host: environment.posthog.host,
-                person_profiles: 'identified_only',
-                capture_pageview: false,
-            });
-        }
-
+    private async initAnalytics() {
         if (environment.sentry.enabled) {
+            const Sentry = await import('@sentry/angular');
             Sentry.init({
                 dsn: environment.sentry.dsn,
                 environment: environment.production

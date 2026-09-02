@@ -2,13 +2,16 @@ import {
     Component,
     ElementRef,
     forwardRef,
+    inject,
     Input,
     OnChanges,
     OnDestroy,
     AfterViewInit,
+    PLATFORM_ID,
     SimpleChanges,
     ViewChild,
 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { EditorState, Extension, Compartment, Prec } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
@@ -244,6 +247,7 @@ export class CodeEditorComponent
     @Input() readonly = false;
     @Input() showLineNumbers = true;
 
+    private readonly platformId = inject(PLATFORM_ID);
     private view: EditorView | null = null;
     private value = '';
     private formDisabled = false;
@@ -258,6 +262,7 @@ export class CodeEditorComponent
     private lineNumbersCompartment = new Compartment();
 
     ngAfterViewInit(): void {
+        if (!isPlatformBrowser(this.platformId)) return;
         this.initEditor();
     }
 
