@@ -53,7 +53,7 @@ export class PricingComponent {
             features: [
                 'Fully dedicated, isolated compute & database infrastructure',
                 'Isolated delivery workers',
-                '14-day enterprise trial option',
+                'Dedicated environment after paid onboarding',
             ],
         },
         {

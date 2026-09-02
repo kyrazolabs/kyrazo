@@ -14,21 +14,21 @@ Kyrazo is a managed webhook gateway: ingest, verify, queue, and dispatch events 
 ## Pages
 
 - [Home](https://kyrazo.com/): Dedicated webhook infrastructure for enterprise B2B
-- [Pricing](https://kyrazo.com/pricing): Professional and Enterprise plans
-- [About](https://kyrazo.com/about): Why Kyrazo isolates every workload
-- [Privacy Policy](https://kyrazo.com/legal/privacy-policy)
-- [Terms of Service](https://kyrazo.com/legal/terms-of-service)
-- [Refund Policy](https://kyrazo.com/legal/refund-policy)
-- [GDPR](https://kyrazo.com/legal/gdpr)
-- [DPA](https://kyrazo.com/legal/dpa)
+- [Pricing](https://kyrazo.com/pricing/): Professional and Enterprise plans
+- [About](https://kyrazo.com/about/): Why Kyrazo isolates every workload
+- [Privacy Policy](https://kyrazo.com/legal/privacy-policy/)
+- [Terms of Service](https://kyrazo.com/legal/terms-of-service/)
+- [Refund Policy](https://kyrazo.com/legal/refund-policy/)
+- [GDPR](https://kyrazo.com/legal/gdpr/)
+- [DPA](https://kyrazo.com/legal/dpa/)
 
 ## Docs
 
 - [Documentation](https://docs.kyrazo.com)
 - [API Reference](https://docs.kyrazo.com/api-reference/introduction)
-- [Status](https://status.kyrazo.com)
 
 ## Contact
 
-- Email: support@kyrazo.com
+- Sales: sales@kyrazo.com
+- Support: support@kyrazo.com
 - Book a discovery meeting via kyrazo.com

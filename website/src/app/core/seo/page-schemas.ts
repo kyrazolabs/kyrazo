@@ -6,7 +6,7 @@ export const HOME_SCHEMA = [
         name: 'Kyrazo',
         applicationCategory: 'DeveloperApplication',
         operatingSystem: 'Web',
-        url: SITE_URL,
+        url: `${SITE_URL}/`,
         image: DEFAULT_OG_IMAGE,
         description:
             'Dedicated webhook infrastructure for enterprise B2B. Physically isolated compute, databases, and delivery workers with zero noisy-neighbor degradation.',
@@ -25,23 +25,31 @@ export const HOME_SCHEMA = [
                 name: 'What is Kyrazo?',
                 acceptedAnswer: {
                     '@type': 'Answer',
-                    text: 'Kyrazo is a webhook gateway and event orchestration platform designed to help teams reliably receive, process, and route events between systems.',
+                    text: 'Kyrazo is dedicated webhook infrastructure for enterprise B2B. Each customer gets physically isolated compute, databases, and delivery workers to ingest, process, and dispatch events — with no noisy-neighbor sharing.',
                 },
             },
             {
                 '@type': 'Question',
-                name: 'How does Kyrazo handle traffic spikes?',
+                name: 'Is Kyrazo self-serve?',
                 acceptedAnswer: {
                     '@type': 'Answer',
-                    text: 'Kyrazo is built with scalability in mind. It uses asynchronous processing and horizontally scalable workers to handle increased event volume while maintaining stable ingestion.',
+                    text: 'No. Access is provisioned after a discovery meeting and an executed Order Form. There is no public signup or in-product checkout.',
                 },
             },
             {
                 '@type': 'Question',
-                name: 'Is my data protected during transmission?',
+                name: 'How much does Professional cost?',
                 acceptedAnswer: {
                     '@type': 'Answer',
-                    text: 'Yes. All data is transmitted over secure TLS connections. Kyrazo also supports request verification mechanisms, such as signatures, to help ensure payload integrity.',
+                    text: 'Professional is $499 per month on an annual contract. Enterprise is custom billed ($1,000–$5,000+ per month). A one-time onboarding and security setup fee ($500–$1,500) applies to new dedicated deployments.',
+                },
+            },
+            {
+                '@type': 'Question',
+                name: 'Do you offer a free trial?',
+                acceptedAnswer: {
+                    '@type': 'Answer',
+                    text: 'No. A discovery meeting is free and does not provision servers. Dedicated infrastructure is spun up only after an Order Form and the one-time onboarding fee ($500–$1,500), which is non-refundable once provisioning starts.',
                 },
             },
             {
@@ -49,7 +57,7 @@ export const HOME_SCHEMA = [
                 name: 'What happens if a destination endpoint is unavailable?',
                 acceptedAnswer: {
                     '@type': 'Answer',
-                    text: 'If a delivery attempt fails, Kyrazo can retry delivery based on configurable retry policies. Failed attempts are recorded to help with troubleshooting and observability.',
+                    text: 'If a delivery attempt fails, Kyrazo retries based on configurable retry policies. Failed attempts are recorded to help with troubleshooting and observability.',
                 },
             },
             {
@@ -57,7 +65,7 @@ export const HOME_SCHEMA = [
                 name: 'Do I need to modify my existing code?',
                 acceptedAnswer: {
                     '@type': 'Answer',
-                    text: 'In many cases, no changes are required. You can point your existing webhooks to Kyrazo’s ingestion endpoint. For more advanced use cases, SDKs are available for Node.js, Python, and Go.',
+                    text: 'Often no. After provisioning you receive a dedicated hostname — a Kyrazo subdomain or your own domain — for the dashboard and API. Point existing webhooks at that ingest URL. There is no shared api.kyrazo.com or public signup. SDKs are available for Node.js, Python, and Go.',
                 },
             },
         ],
@@ -67,7 +75,7 @@ export const HOME_SCHEMA = [
 export const ABOUT_SCHEMA = {
     '@type': 'AboutPage',
     name: 'About Kyrazo',
-    url: `${SITE_URL}/about`,
+    url: `${SITE_URL}/about/`,
     description:
         'Learn about Kyrazo, the dedicated webhook infrastructure for enterprise B2B.',
 };
@@ -75,7 +83,7 @@ export const ABOUT_SCHEMA = {
 export const PRICING_SCHEMA = {
     '@type': 'WebPage',
     name: 'Pricing',
-    url: `${SITE_URL}/pricing`,
+    url: `${SITE_URL}/pricing/`,
     description:
         'Dedicated webhook infrastructure pricing for enterprise B2B. Isolated compute, database, and delivery workers on annual or custom contracts.',
     mainEntity: {
@@ -83,7 +91,7 @@ export const PRICING_SCHEMA = {
         name: 'Kyrazo Professional',
         priceCurrency: 'USD',
         price: '499',
-        url: `${SITE_URL}/pricing`,
+        url: `${SITE_URL}/pricing/`,
     },
 };
 
@@ -95,7 +103,7 @@ export function webPageSchema(
     return {
         '@type': 'WebPage',
         name,
-        url: `${SITE_URL}${path}`,
+        url: `${SITE_URL}${path.endsWith('/') ? path : `${path}/`}`,
         description,
     };
 }

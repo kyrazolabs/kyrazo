@@ -14,6 +14,11 @@ const browserDistFolder = join(import.meta.dirname, '../browser');
 async function handleRequest(req: Request) {
     const url = new URL(req.url);
 
+    if (url.hostname === 'www.kyrazo.com') {
+        url.hostname = 'kyrazo.com';
+        return Response.redirect(url.toString(), 301);
+    }
+
     // 0. Healthcheck endpoint (used by the Docker HEALTHCHECK)
     if (url.pathname === '/health') {
         return new Response('OK');

@@ -64,7 +64,7 @@ export interface PricingPlan {
  *
  * - Professional: $499/mo on an annual contract. Fully dedicated, isolated
  *   compute & database infrastructure with isolated delivery workers.
- *   14-day enterprise trial option available.
+ *   Dedicated environment provisioned after paid onboarding.
  * - Enterprise: Custom billing ($1,000–$5,000+/mo). BYOC / private cloud
  *   deployment, custom SLAs with 24/7 priority support, custom compliance.
  *
@@ -110,7 +110,7 @@ export const PROFESSIONAL_PLAN: PricingPlan = {
     benefits: [
         'Fully dedicated, isolated compute & database infrastructure',
         'Isolated delivery workers',
-        '14-day enterprise trial option',
+        'Dedicated environment after paid onboarding',
         'Automatic retries with exponential backoff',
         'Signature verification & payload normalization',
         'Priority support',

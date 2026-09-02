@@ -8,8 +8,8 @@
             }">
 
             <div class="flex items-center justify-center gap-2 sm:gap-3 cursor-pointer transition-transform duration-300"  [class.scale-90]="isScrolled" routerLink="/" aria-label="Home">
-                <img [src]="(isScrolled && headerService.currentTheme() === 'light') ? 'logo-light.png' : 'logo-light.png'" alt="Kyrazo logo" width="40" height="40" class="h-8 w-8 sm:h-10 sm:w-10 p-1 rounded-xl bg-primary-500 flex items-center justify-center transition-transform duration-300" >
-                <span class="bg-linear-to-b bg-clip-text text-transparent tracking-tighter text-2xl sm:text-3xl font-bold font-sansation"
+                <img [src]="(isScrolled && headerService.currentTheme() === 'light') ? 'logo-light.png' : 'logo-light.png'" alt="Kyrazo logo" width="40" height="40" class="h-8 w-8 sm:h-9 sm:w-9 p-1 rounded-xl bg-primary-500 flex items-center justify-center transition-transform duration-300" >
+                <span class="bg-linear-to-b bg-clip-text text-transparent tracking-tighter uppercase text-2xl sm:text-4xl font-bold font-sansation"
                     [ngClass]="(isScrolled && headerService.currentTheme() === 'dark') ? 'from-white to-surface-400' : 'from-black to-surface-600'">Kyrazo</span>
             </div>
 

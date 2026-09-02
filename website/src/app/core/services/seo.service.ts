@@ -138,7 +138,7 @@ export class SeoService {
         if (url.pathname === '/' || url.pathname === '') {
             return `${SITE_URL}/`;
         }
-        const pathname = url.pathname.replace(/\/+$/, '');
+        const pathname = url.pathname.replace(/\/+$/, '') + '/';
         return `${SITE_URL}${pathname}`;
     }
 

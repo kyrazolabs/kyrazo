@@ -60,12 +60,12 @@ export const routes: Routes = [
                     title: 'Refund Policy',
                     meta: {
                         description:
-                            "Kyrazo's Refund Policy. Understand our terms for refunds and cancellations.",
+                            'Kyrazo refund and cancellation terms for dedicated deployments: paid onboarding, annual contracts, and Order Form billing. No unpaid trial.',
                     },
                     schema: webPageSchema(
                         'Refund Policy',
                         '/legal/refund-policy',
-                        "Kyrazo's Refund Policy. Understand our terms for refunds and cancellations.",
+                        'Kyrazo refund and cancellation terms for dedicated deployments: paid onboarding, annual contracts, and Order Form billing. No unpaid trial.',
                     ),
                 },
             },

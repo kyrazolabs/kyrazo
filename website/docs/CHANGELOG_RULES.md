@@ -11,8 +11,8 @@ Kyrazo is a distributed SaaS platform composed of multiple repositories and serv
     - Legal pages
     - Blog system
 
-2.  **Client Dashboard (dash.kyrazo.com)**
-    - User dashboard UI
+2.  **Customer dashboard (dedicated hostname)**
+    - Per-customer subdomain or BYO domain — not a shared dash.kyrazo.com
     - Configuration, analytics visualization, and account management
 
 3.  **Backend Platform (multiple APIs)**

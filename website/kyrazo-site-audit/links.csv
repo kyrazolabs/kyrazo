@@ -1,0 +1,57 @@
+url,source_page,type,status,final_url,notes
+https://kyrazo.com/,seed,internal,200,https://kyrazo.com/,redirects=0
+https://www.kyrazo.com/,seed,internal,200,https://www.kyrazo.com/,redirects=0
+http://kyrazo.com/,seed,internal,200,https://kyrazo.com/,redirects=1
+https://kyrazo.com/about/,nav,internal,200,https://kyrazo.com/about/,redirects=0
+https://kyrazo.com/pricing/,nav,internal,200,https://kyrazo.com/pricing/,redirects=0
+https://kyrazo.com/legal/privacy-policy/,footer,internal,200,https://kyrazo.com/legal/privacy-policy/,redirects=0
+https://kyrazo.com/legal/terms-of-service/,footer,internal,200,https://kyrazo.com/legal/terms-of-service/,redirects=0
+https://kyrazo.com/legal/refund-policy/,footer,internal,200,https://kyrazo.com/legal/refund-policy/,redirects=0
+https://kyrazo.com/legal/gdpr/,footer,internal,200,https://kyrazo.com/legal/gdpr/,redirects=0
+https://kyrazo.com/legal/dpa/,footer,internal,200,https://kyrazo.com/legal/dpa/,redirects=0
+https://kyrazo.com/dashboard,docs-live,internal,404,https://kyrazo.com/dashboard,redirects=0
+https://kyrazo.com/not-found/,robots,internal,200,https://kyrazo.com/not-found/,redirects=0
+https://kyrazo.com/health,robots,internal,404,https://kyrazo.com/health,redirects=0
+https://kyrazo.com/robots.txt,seo,asset,200,https://kyrazo.com/robots.txt,redirects=0
+https://kyrazo.com/sitemap.xml,seo,asset,200,https://kyrazo.com/sitemap.xml,redirects=0
+https://kyrazo.com/llms.txt,seo,asset,200,https://kyrazo.com/llms.txt,redirects=0
+https://kyrazo.com/favicon.ico,seo,asset,200,https://kyrazo.com/favicon.ico,redirects=0
+https://kyrazo.com/og-image.png,seo,asset,200,https://kyrazo.com/og-image.png,redirects=0
+https://kyrazo.com/logo-light.png,homepage,asset,200,https://kyrazo.com/logo-light.png,redirects=0
+https://kyrazo.com/founder.webp,pricing,asset,200,https://kyrazo.com/founder.webp,redirects=0
+https://docs.kyrazo.com/,homepage,external,200,https://docs.kyrazo.com/,redirects=0
+https://docs.kyrazo.com/quickstart,docs-nav,external,200,https://docs.kyrazo.com/quickstart,redirects=0
+https://docs.kyrazo.com/essentials/concepts,docs-nav,external,200,https://docs.kyrazo.com/essentials/concepts,redirects=0
+https://docs.kyrazo.com/essentials/architecture,docs-nav,external,200,https://docs.kyrazo.com/essentials/architecture,redirects=0
+https://docs.kyrazo.com/essentials/use-cases,docs-nav,external,200,https://docs.kyrazo.com/essentials/use-cases,redirects=0
+https://docs.kyrazo.com/essentials/security,docs-nav,external,200,https://docs.kyrazo.com/essentials/security,redirects=0
+https://docs.kyrazo.com/sdks/nodejs,docs-nav,external,200,https://docs.kyrazo.com/sdks/nodejs,redirects=0
+https://docs.kyrazo.com/sdks/python,docs-nav,external,200,https://docs.kyrazo.com/sdks/python,redirects=0
+https://docs.kyrazo.com/sdks/go,docs-nav,external,200,https://docs.kyrazo.com/sdks/go,redirects=0
+https://docs.kyrazo.com/essentials/dispatch-overview,docs-nav,external,200,https://docs.kyrazo.com/essentials/dispatch-overview,redirects=0
+https://docs.kyrazo.com/essentials/target,docs-nav,external,200,https://docs.kyrazo.com/essentials/target,redirects=0
+https://docs.kyrazo.com/essentials/webhooks-verification,docs-nav,external,200,https://docs.kyrazo.com/essentials/webhooks-verification,redirects=0
+https://docs.kyrazo.com/essentials/transformers,docs-nav,external,200,https://docs.kyrazo.com/essentials/transformers,redirects=0
+https://docs.kyrazo.com/essentials/ingest-overview,docs-nav,external,200,https://docs.kyrazo.com/essentials/ingest-overview,redirects=0
+https://docs.kyrazo.com/essentials/sources,docs-nav,external,200,https://docs.kyrazo.com/essentials/sources,redirects=0
+https://docs.kyrazo.com/essentials/endpoints,docs-nav,external,200,https://docs.kyrazo.com/essentials/endpoints,redirects=0
+https://docs.kyrazo.com/api-reference,footer,external,200,https://docs.kyrazo.com/api-reference/introduction,redirects=1
+https://docs.kyrazo.com/api-reference/introduction,docs-nav,external,200,https://docs.kyrazo.com/api-reference/introduction,redirects=0
+https://docs.kyrazo.com/essentials/target-management,docs-broken,external,404,https://docs.kyrazo.com/essentials/target-management,redirects=0
+https://docs.kyrazo.com/integrations,homepage-dead-link,external,404,https://docs.kyrazo.com/integrations,redirects=0
+https://docs.kyrazo.com/llms.txt,docs,asset,200,https://docs.kyrazo.com/llms.txt,redirects=0
+https://docs.kyrazo.com/robots.txt,docs,asset,200,https://docs.kyrazo.com/robots.txt,redirects=0
+https://docs.kyrazo.com/sitemap.xml,docs,asset,200,https://docs.kyrazo.com/sitemap.xml,redirects=0
+https://docs.kyrazo.com/favicon.ico,docs,asset,200,https://docs.kyrazo.com/favicon.ico,redirects=0
+https://api.kyrazo.com/,docs,external,DNS,,NXDOMAIN/resolve fail: [Errno -2] Name or service not known
+https://api.kyrazo.com/dashboard,env,external,DNS,,NXDOMAIN/resolve fail: [Errno -2] Name or service not known
+https://dashboard.kyrazo.com/,local-docs,external,DNS,,NXDOMAIN/resolve fail: [Errno -2] Name or service not known
+https://status.kyrazo.com/,llms,external,DNS,,NXDOMAIN/resolve fail: [Errno -2] Name or service not known
+https://app.kyrazo.com/,guess,external,DNS,,NXDOMAIN/resolve fail: [Errno -2] Name or service not known
+https://calendly.com/kyrazo/kyrazo-infrastructure-discovery-call,cta,external,200,https://calendly.com/kyrazo/kyrazo-infrastructure-discovery-call,redirects=0
+https://assets.calendly.com/assets/external/widget.js,index.html,asset,200,https://assets.calendly.com/assets/external/widget.js,redirects=0
+mailto:sales@kyrazo.com,cta,external,n/a,mailto:sales@kyrazo.com,mailto
+mailto:support@kyrazo.com,footer,external,n/a,mailto:support@kyrazo.com,mailto
+mailto:billing@kyrazo.com,refund,external,n/a,mailto:billing@kyrazo.com,mailto
+mailto:privacy@kyrazo.com,gdpr,external,n/a,mailto:privacy@kyrazo.com,mailto
+mailto:legal@kyrazo.com,tos,external,n/a,mailto:legal@kyrazo.com,mailto
