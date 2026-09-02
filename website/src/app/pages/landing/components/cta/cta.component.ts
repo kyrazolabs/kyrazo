@@ -30,6 +30,7 @@ export class CtaComponent {
 
     contactSales() {
         this.umami.capture('cta_contact_sales_clicked');
-        this.calendly.openDiscoveryPopup();
+        window.location.href =
+            'mailto:sales@kyrazo.com?subject=Kyrazo%20Enterprise%20Inquiry';
     }
 }

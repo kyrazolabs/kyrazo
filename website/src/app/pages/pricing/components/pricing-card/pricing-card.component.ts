@@ -31,9 +31,11 @@ export class PricingCardComponent {
             this.umami.capture(
                 `pricing_${this.plan.slug}_contact_enterprise_sales_clicked`,
             );
-        } else {
-            this.umami.capture(`pricing_${this.plan.slug}_cta_clicked`);
+            window.location.href =
+                'mailto:sales@kyrazo.com?subject=Enterprise%20Plan%20Inquiry';
+            return;
         }
+        this.umami.capture(`pricing_${this.plan.slug}_cta_clicked`);
         this.calendly.openDiscoveryPopup();
     }
 

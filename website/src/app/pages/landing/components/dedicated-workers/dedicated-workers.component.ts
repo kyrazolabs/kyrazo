@@ -22,14 +22,14 @@ export class DedicatedWorkersComponent {
         {
             title: 'Predictable Latency',
             description:
-                'Eliminate P99 spikes caused by "noisy neighbors". Maintain consistent sub-100ms processing times regardless of global platform load.',
+                'Eliminate P99 spikes caused by noisy neighbors. Your workers serve only your events, independent of other customers.',
             icon: 'icon-[hugeicons--dashboard-speed-01]',
             color: 'text-emerald-500',
         },
         {
             title: 'Independent Scaling',
             description:
-                'Scale your worker fleet based on YOUR traffic patterns, not the platforms. Auto-scale from 10 to 10k concurrent workers.',
+                'Scale your worker fleet based on your traffic patterns, not a shared platform’s noisy neighbors.',
             icon: 'icon-[hugeicons--chart-up-01]',
             color: 'text-violet-500',
         },

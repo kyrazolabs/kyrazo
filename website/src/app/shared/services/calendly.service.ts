@@ -30,7 +30,7 @@ export class CalendlyService {
     openDiscoveryPopup(): void {
         if (!this.isBrowser) return;
         this.ensureWidget().then(() => {
-            window.Calendly?.initPopupWidget({ url: CALENDLY_DISCOVERY_URL });
+            window.Calendly?.initPopupWidget?.({ url: CALENDLY_DISCOVERY_URL });
         });
     }
 
@@ -38,7 +38,7 @@ export class CalendlyService {
     initInlineWidgets(): void {
         if (!this.isBrowser) return;
         this.ensureWidget().then(() => {
-            window.Calendly?.initInlineWidgets();
+            window.Calendly?.initInlineWidgets?.();
         });
     }
 

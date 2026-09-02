@@ -20,7 +20,6 @@ import { DrawerModule } from 'primeng/drawer';
 import { HeaderService } from '@shared/services/header.service';
 
 import { UmamiService } from '@core/3rd-party/umami';
-import { CalendlyService } from '@shared/services/calendly.service';
 
 @Component({
     selector: 'app-landing-header',
@@ -42,7 +41,6 @@ export class HeaderComponent {
     private umami = inject(UmamiService);
     layoutService: LayoutService = inject(LayoutService);
     headerService = inject(HeaderService);
-    private calendly = inject(CalendlyService);
 
     isMobileMenuVisible = signal<boolean>(false);
 
@@ -86,6 +84,7 @@ export class HeaderComponent {
 
     contactSales() {
         this.umami.capture('header_contact_sales_clicked');
-        this.calendly.openDiscoveryPopup();
+        window.location.href =
+            'mailto:sales@kyrazo.com?subject=Kyrazo%20Sales%20Inquiry';
     }
 }

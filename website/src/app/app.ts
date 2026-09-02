@@ -63,7 +63,6 @@ export class App implements OnInit {
                     'localhost',
                     /^\/api\//,
                     'https://kyrazo.com',
-                    'https://api.kyrazo.com',
                 ],
                 tracesSampleRate: 1.0,
                 sendDefaultPii: true,

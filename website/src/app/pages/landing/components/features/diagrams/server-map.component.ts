@@ -42,9 +42,8 @@ import { dropdownAnimation } from '@shared/animations/dropdown.animation';
                 <p
                     class="text-surface-400 text-lg md:text-xl max-w-3xl mx-auto mb-20 font-medium opacity-80"
                 >
-                    Our edge network spans the globe, ensuring your webhooks are
-                    processed with sub-millisecond precision, no matter where
-                    they originate.
+                    Dedicated workers reserved for your workload — no noisy
+                    neighbors, no shared-queue contention.
                 </p>
 
                 <!-- The Map Container -->
@@ -182,21 +181,21 @@ import { dropdownAnimation } from '@shared/animations/dropdown.animation';
                     <div class="flex flex-col items-center gap-2 group/stat">
                         <span
                             class="text-4xl font-black text-white tracking-tighter group-hover/stat:text-primary-500 transition-colors"
-                            >< 5ms</span
+                            >Isolated</span
                         >
                         <span
                             class="text-[11px] uppercase font-bold text-surface-500 tracking-[0.25em]"
-                            >P99 Latency</span
+                            >Dedicated Workers</span
                         >
                     </div>
                     <div class="flex flex-col items-center gap-2 group/stat">
                         <span
                             class="text-4xl font-black text-white tracking-tighter group-hover/stat:text-primary-500 transition-colors"
-                            >12</span
+                            >1:1</span
                         >
                         <span
                             class="text-[11px] uppercase font-bold text-surface-500 tracking-[0.25em]"
-                            >Edge Nodes</span
+                            >Tenant Isolation</span
                         >
                     </div>
                     <div class="flex flex-col items-center gap-2 group/stat">
