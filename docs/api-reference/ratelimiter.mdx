@@ -3,20 +3,20 @@ title: "Rate Limiting"
 description: "Information about rate limits for the Kyrazo Integration API"
 ---
 
-Kyrazo applies rate limits to ensure the stability and reliability of the platform for all users. Limits are applied per workspace and depend on your subscription plan.
+Kyrazo applies rate limits per dedicated deployment. Limits are set in your Order Form, not by a public self-serve plan.
 
 ## Rate Limit Tiers
 
-The specific limits for your workspace depend on your plan. For the **Free** tier, the following limits apply:
+Default Professional deployments use the following unless your Order Form specifies otherwise:
 
 | Limit Type | Value |
 | :--- | :--- |
-| **Requests Per Second (RPS)** | 25 requests/sec |
-| **Monthly Event Quota** | 100,000 events/month |
-| **Fallback (Unauthenticated)** | 5 requests/sec per IP |
+| **Requests Per Second (RPS)** | Scoped in your Order Form |
+| **Event volume** | Scoped in your Order Form |
+| **Unauthenticated** | Rejected |
 
 <Note>
-  If you require higher limits, please contact us or upgrade your plan via the dashboard.
+  Need higher limits? Contact your Kyrazo account team — there is no in-product plan upgrade.
 </Note>
 
 ## Resource Specific Limits
@@ -43,7 +43,7 @@ If you exceed your rate limit, the API will respond with a `429 Too Many Request
   "success": false,
   "error": {
     "code": "RATE_LIMIT_EXCEEDED",
-    "message": "Too many requests. Please upgrade your plan or slow down.",
+    "message": "Too many requests. Slow down or contact your Kyrazo account team.",
     "retryAfter": 1
   }
 }

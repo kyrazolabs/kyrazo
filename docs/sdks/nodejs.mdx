@@ -29,13 +29,15 @@ pnpm add @kyrazo/sdk
 
 ## Quickstart
 
-To get started, you'll need an **API Key** from the [Kyrazo Dashboard](https://kyrazo.com/dashboard).
+To get started, you'll need an **API Key** from your dedicated Kyrazo dashboard (hostname in your Order Form).
 
 ```typescript
 import { Kyrazo } from "@kyrazo/sdk";
 
 // Initialize with your API key
-const kyrazo = new Kyrazo("your_api_key_here");
+const kyrazo = new Kyrazo("your_api_key_here", {
+    baseURL: "https://{YOUR_HOST}",
+});
 ```
 
 ## Configuration
@@ -51,7 +53,7 @@ The `Kyrazo` constructor accepts the following parameters:
 
 | Property | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `baseURL` | `string` | `https://api.kyrazo.com` | Custom API base URL. |
+| `baseURL` | `string` | — | Required. Your dedicated API host (`https://{YOUR_HOST}`). |
 | `timeout` | `number` | `30000` | Request timeout in milliseconds. |
 | `maxRetries` | `number` | `3` | Maximum number of retry attempts for failed requests. |
 | `headers` | `Record<string, string>` | `{}` | Custom headers to include in every request. |
@@ -60,6 +62,7 @@ The `Kyrazo` constructor accepts the following parameters:
 
 ```typescript
 const kyrazo = new Kyrazo("your_api_key", {
+    baseURL: "https://{YOUR_HOST}",
     timeout: 60000,
     maxRetries: 5,
 });

@@ -31,8 +31,9 @@ import (
 func main() {
 	ctx := context.Background()
 
-	// Initialize the SDK with security
+	// Initialize the SDK with your dedicated host (Order Form) and API key
 	s := kyrazo.New(
+		kyrazo.WithServerURL(os.Getenv("KYRAZO_BASE_URL")),
 		kyrazo.WithSecurity(os.Getenv("KYRAZO_API_KEY")),
 	)
 

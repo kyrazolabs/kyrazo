@@ -10,7 +10,7 @@ A **Source** represents a specific input channel in Kyrazo. It is the "entry poi
 When you create a Source, Kyrazo generates a unique **Ingress URL**. This is the URL you provide to your 3rd-party service (e.g., in the Stripe or PayPal developer dashboard).
 
 Format:
-`https://api.kyrazo.com/v1/ingest/{ingressId}`
+`https://{YOUR_HOST}/v1/ingest/{ingressId}`
 
 ## Configuration Options
 
@@ -25,7 +25,18 @@ Security is paramount for inbound webhooks. Kyrazo supports several authenticati
 - **Service Specific**: Specialized verification logic for providers that use unique signing methods.
 
 ### 3. Forwarding & Endpoints
-The primary job of a Source is to route data. By enabling **Forwarding**, you can link a Source to one or more [Endpoints](/essentials/endpoints). When an event is received by the Source, Kyrazo automatically enqueues it for delivery to all linked active Endpoints.
+The primary job of a Source is to route data. By enabling **Forwarding**, you can link a Source to one or more [Destinations](/essentials/destinations) (Endpoints, S3 Buckets, or ASQS). When an event is received by the Source, Kyrazo automatically enqueues it for delivery to all linked active destinations.
+
+## Transformers & Data Shaping
+
+Sources can have an optional **Transformer** attached to them.
+
+### Default Fallback Logic
+The Source-level transformer acts as the **global default** for all destinations linked to that source. 
+- If a destination (like an Endpoint) has its own transformer, it **overrides** the source transformer.
+- If a destination has no transformer, it **falls back** to the source transformer.
+
+This allows you to define a "standard" shape for all your data at the source level, while still providing granular overrides for specific destinations that might require a different format.
 
 ## Best Practices
 

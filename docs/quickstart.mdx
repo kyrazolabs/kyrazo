@@ -3,13 +3,13 @@ title: "Quickstart"
 description: "Dispatch your first event in under 5 minutes"
 ---
 
-Welcome to Kyrazo! This guide will help you get your first event dispatched from your system to a webhook target.
+Welcome to Kyrazo. This guide assumes your dedicated environment is already provisioned. Kyrazo is sales-led: there is no public signup, and no shared `api.kyrazo.com` or `dashboard.kyrazo.com`. Your dashboard and API live on the hostname in your Order Form — a Kyrazo subdomain or a domain you bring.
 
 ## 1. Get your API Key
 
 To authenticate your requests, you'll need an API Key.
 
-1.  Log in to the [Kyrazo Dashboard](https://kyrazo.com/dashboard).
+1.  After your dedicated environment is provisioned, open the dashboard URL from your Order Form (a Kyrazo subdomain or your own domain). There is no shared public dashboard.
 2.  Navigate to the **Secrets Page** in the sidebar.
 3.  Click **Generate New Key**.
 4.  Give it a name and select the necessary **Scopes** (e.g., `Dispatch Event`).
@@ -37,7 +37,9 @@ Now you're ready to send data. Use one of our official SDKs or a simple `curl` c
     ```typescript
     import { Kyrazo } from "@kyrazo/sdk";
 
-    const kyrazo = new Kyrazo("{YOUR_API_KEY}");
+    const kyrazo = new Kyrazo("{YOUR_API_KEY}", {
+        baseURL: "https://{YOUR_HOST}",
+    });
 
     await kyrazo.events.single("{NAMESPACE_ID}", {
         event: "user.signup",
@@ -50,7 +52,7 @@ Now you're ready to send data. Use one of our official SDKs or a simple `curl` c
     ```python
     from kyrazo import Kyrazo
 
-    client = Kyrazo("{YOUR_API_KEY}")
+    client = Kyrazo("{YOUR_API_KEY}", base_url="https://{YOUR_HOST}")
 
     client.events.publish(
         namespace_id="{NAMESPACE_ID}",
@@ -98,7 +100,7 @@ Now you're ready to send data. Use one of our official SDKs or a simple `curl` c
   </Tab>
   <Tab title="cURL">
     ```bash
-    curl -X POST "https://api.kyrazo.com/v1/namespaces/{NAMESPACE_ID}/publish" \
+    curl -X POST "https://{YOUR_HOST}/v1/events/{NAMESPACE_ID}/publish" \
          -H "x-api-key: {YOUR_API_KEY}" \
          -H "Content-Type: application/json" \
          -d '{
