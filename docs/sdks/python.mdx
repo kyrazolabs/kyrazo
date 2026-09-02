@@ -21,13 +21,13 @@ poetry add kyrazo
 
 ## Quickstart
 
-Initialize the client with your **API Key** from the [Kyrazo Dashboard](https://kyrazo.com/dashboard).
+Initialize the client with your **API Key** from your dedicated Kyrazo dashboard (hostname in your Order Form).
 
 ```python
 from kyrazo import Kyrazo
 
 # Initialize with only your API key (positional)
-client = Kyrazo("your_api_key_here")
+client = Kyrazo("your_api_key_here", base_url="https://{YOUR_HOST}")
 ```
 
 ## Configuration
@@ -46,6 +46,7 @@ The `Kyrazo` constructor accepts the following parameters:
 ```python
 client = Kyrazo(
     "your_api_key",
+    base_url="https://{YOUR_HOST}",
     timeout=60,
     retries=5
 )

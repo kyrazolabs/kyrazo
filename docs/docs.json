@@ -1,11 +1,19 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "aspen",
+  "openapi": [
+    "api-reference/openapi/events.json",
+    "api-reference/openapi/targets.json",
+    "api-reference/openapi/sources.json",
+    "api-reference/openapi/endpoints.json",
+    "api-reference/openapi/transformers.json",
+    "api-reference/openapi/namespaces.json"
+  ],
+  "theme": "almond",
   "name": "Kyrazo",
   "colors": {
-    "primary": "#09090b",
-    "dark": "#09090b",
-    "light": "#fafafa"
+    "primary": "#6366ee",
+    "dark": "#6366ee",
+    "light": "#6366ee"
   },
   "favicon": "/favicon.ico",
   "navigation": {
@@ -51,7 +59,15 @@
             "pages": [
               "essentials/ingest-overview",
               "essentials/sources",
-              "essentials/endpoints"
+              {
+                "group": "Destinations",
+                "pages": [
+                  "essentials/destinations",
+                  "essentials/endpoints",
+                  "essentials/s3bucket",
+                  "essentials/asqs"
+                ]
+              }
             ]
           }
         ]
@@ -64,6 +80,30 @@
             "pages": [
               "api-reference/introduction",
               "api-reference/ratelimiter"
+            ]
+          },
+          {
+            "group": "Namespaces",
+            "pages": [
+              "api-reference/integration/list-namespaces",
+              "api-reference/integration/create-namespace",
+              "api-reference/integration/get-namespace",
+              "api-reference/integration/update-namespace",
+              "api-reference/integration/delete-namespace",
+              "api-reference/integration/restore-namespace"
+            ]
+          },
+          {
+            "group": "Transformers",
+            "pages": [
+              "api-reference/integration/list-transforms",
+              "api-reference/integration/create-transform",
+              "api-reference/integration/get-transform",
+              "api-reference/integration/update-transform",
+              "api-reference/integration/delete-transform",
+              "api-reference/integration/list-transform-versions",
+              "api-reference/integration/rollback-transform",
+              "api-reference/integration/test-transform"
             ]
           },
           {
@@ -94,6 +134,16 @@
             "group": "Ingest",
             "pages": [
               {
+                "group": "Sources",
+                "pages": [
+                  "api-reference/integration/list-sources",
+                  "api-reference/integration/create-source",
+                  "api-reference/integration/get-source",
+                  "api-reference/integration/update-source",
+                  "api-reference/integration/delete-source"
+                ]
+              },
+              {
                 "group": "Endpoints",
                 "pages": [
                   "api-reference/integration/list-endpoints",
@@ -105,13 +155,23 @@
                 ]
               },
               {
-                "group": "Sources",
+                "group": "S3 Buckets",
                 "pages": [
-                  "api-reference/integration/list-sources",
-                  "api-reference/integration/create-source",
-                  "api-reference/integration/get-source",
-                  "api-reference/integration/update-source",
-                  "api-reference/integration/delete-source"
+                  "api-reference/integration/list-s3",
+                  "api-reference/integration/create-s3",
+                  "api-reference/integration/get-s3",
+                  "api-reference/integration/update-s3",
+                  "api-reference/integration/delete-s3"
+                ]
+              },
+              {
+                "group": "Amazon ASQS",
+                "pages": [
+                  "api-reference/integration/list-asqs",
+                  "api-reference/integration/create-asqs",
+                  "api-reference/integration/get-asqs",
+                  "api-reference/integration/update-asqs",
+                  "api-reference/integration/delete-asqs"
                 ]
               }
             ]
@@ -134,8 +194,8 @@
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://dash.kyrazo.com"
+      "label": "Get access",
+      "href": "https://kyrazo.com"
     }
   },
   "contextual": {

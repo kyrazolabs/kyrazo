@@ -26,7 +26,7 @@ The Integration API allows you to programmatically publish events and manage web
 
 ## Authentication
 
-All API endpoints are authenticated using the **x-api-key** header. You can manage your API keys within the [Kyrazo Dashboard](https://kyrazo.com/dashboard) under the **Secrets Page**.
+All API endpoints are authenticated using the **x-api-key** header. Manage API keys in **your** Kyrazo dashboard (the hostname from your Order Form) under the **Secrets Page**.
 
 ```bash
 x-api-key: <your_api_key>
@@ -42,14 +42,14 @@ X-Idempotency-Key: <unique_key>
 
 ## Base URL
 
-The production base URL for the Kyrazo Integration API is:
+There is no shared API host. Use the dedicated hostname from your Order Form (Kyrazo subdomain or your custom domain):
 
 ```http
-https://api.kyrazo.com
+https://{YOUR_HOST}
 ```
 
 <Note>
-  Ensure you are using the correct Namespace ID from your dashboard when constructing the publish URL: `https://api.kyrazo.com/v1/events/{namespaceId}/publish`
+  Publish URL: `https://{YOUR_HOST}/v1/events/{namespaceId}/publish`. Pass this host to the SDK as `baseURL` / `base_url`.
 </Note>
 
 ## SDK Support
@@ -78,7 +78,9 @@ import {
   ValidationError,
 } from "@kyrazo/sdk";
 
-const client = new Kyrazo("kz_live.v2.hSuq...");
+const client = new Kyrazo(process.env.KYRAZO_API_KEY, {
+  baseURL: process.env.KYRAZO_BASE_URL, // https://{YOUR_HOST}
+});
 
 try {
   // Create a webhook target
@@ -103,7 +105,7 @@ try {
   if (error instanceof RateLimitError) {
     console.log(`Rate limited. Retry in ${error.retryAfter}s`);
   } else if (error instanceof LimitExceededError) {
-    console.log("Monthly limit exceeded. Upgrade your plan.");
+    console.log("Deployment limit reached. Contact your Kyrazo account team.");
   } else if (error instanceof ValidationError) {
     console.log("Invalid payload:", error.message);
   } else if (error instanceof AuthenticationError) {
