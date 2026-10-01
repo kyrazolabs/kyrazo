@@ -1,0 +1,139 @@
+/**
+ * Batch Publish Events Function
+ *
+ * Publishes multiple events in a single request for efficient bulk operations.
+ *
+ * @module modules/dispatch/publish-events
+ */
+
+import type { HttpClient } from "../../utils/http";
+import { ValidationError } from "../../errors";
+import type {
+  PublishEventPayload,
+  BatchPublishEventResponse,
+  PublishEventOptions,
+} from "./types";
+
+/** Maximum events per batch request */
+const MAX_BATCH_SIZE = 100;
+
+/**
+ * Create the publishEvents function bound to an HTTP client
+ * @internal
+ */
+export function createPublishEvents(httpClient: HttpClient) {
+  /**
+   * Publish multiple events in a single batch request
+   *
+   * Sends up to 100 events in a single API call for efficient bulk operations.
+   * Each event is queued independently for delivery.
+   *
+   * @param namespaceId - The namespace ID to publish events to (MongoDB ObjectId format)
+   * @param events - Array of event payloads (max 100 per batch)
+   * @param options - Optional configuration including idempotency key
+   * @returns Promise resolving to an array of queued event details
+   *
+   * @throws {ValidationError} When events array is empty, exceeds 100, or contains invalid payloads
+   * @throws {AuthenticationError} When the API key is invalid or missing
+   * @throws {LimitExceededError} When the monthly event limit is exceeded
+   * @throws {RateLimitError} When too many requests are sent in a short period
+   * @throws {ServerError} When the server fails to process the events
+   *
+   * @example Batch publishing multiple events
+   * ```typescript
+   * const response = await kyrazo.events.batch("namespace-123", [
+   *   {
+   *     event: "user.created",
+   *     payload: { userId: "u_1" },
+   *     targets: ["target-1"]
+   *   },
+   *   {
+   *     event: "user.created",
+   *     payload: { userId: "u_2" },
+   *     targets: ["target-2"]
+   *   }
+   * ]);
+   *
+   * console.log(`Published ${response.queuedCount} events`);
+   * ```
+   */
+  return async function publishEvents(
+    namespaceId: string,
+    events: PublishEventPayload[],
+    options?: PublishEventOptions,
+  ): Promise<BatchPublishEventResponse> {
+    // Validate namespaceId
+    if (
+      !namespaceId ||
+      typeof namespaceId !== "string" ||
+      namespaceId.trim() === ""
+    ) {
+      throw new ValidationError(
+        "namespaceId is required and must be a non-empty string",
+      );
+    }
+
+    // Validate events array
+    if (!Array.isArray(events)) {
+      throw new ValidationError("events must be an array");
+    }
+
+    if (events.length === 0) {
+      throw new ValidationError("events array cannot be empty");
+    }
+
+    if (events.length > MAX_BATCH_SIZE) {
+      throw new ValidationError(
+        `Maximum ${MAX_BATCH_SIZE} events per batch allowed`,
+      );
+    }
+
+    // Validate each event
+    for (let i = 0; i < events.length; i++) {
+      const event = events[i];
+
+      if (!event || typeof event !== "object") {
+        throw new ValidationError(`events[${i}] must be an object`);
+      }
+
+      const { event: eventName } = event as any;
+
+      if (!eventName || typeof eventName !== "string") {
+        throw new ValidationError(`events[${i}].event is required`);
+      }
+
+      if (event.payload === undefined || event.payload === null) {
+        throw new ValidationError(`events[${i}].payload is required`);
+      }
+
+      if (!Array.isArray(event.targets) || event.targets.length === 0) {
+        throw new ValidationError(
+          `events[${i}].targets must be a non-empty array`,
+        );
+      }
+
+      // Validate targets
+      for (let j = 0; j < event.targets.length; j++) {
+        const target = event.targets[j];
+        if (!target || typeof target !== "string") {
+          throw new ValidationError(
+            `events[${i}].targets[${j}] must be a string (target ID)`,
+          );
+        }
+      }
+    }
+
+    // Make the request
+    const requestOptions = options?.idempotencyKey
+      ? { headers: { "Idempotency-Key": options.idempotencyKey } }
+      : undefined;
+
+    const response = await httpClient.post<BatchPublishEventResponse>(
+      `/v1/events/${namespaceId}/publish/batch`,
+      events,
+      requestOptions,
+    );
+
+    return response.data;
+  };
+}

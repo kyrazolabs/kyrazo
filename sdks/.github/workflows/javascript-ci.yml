@@ -1,0 +1,43 @@
+name: JavaScript SDK CI
+
+on:
+  push:
+    branches: [ develop ]
+    paths:
+      - 'javascript/**'
+      - '.github/workflows/javascript-ci.yml'
+  pull_request:
+    branches: [ develop ]
+    paths:
+      - 'javascript/**'
+
+jobs:
+  test:
+    name: Test and Lint JavaScript SDK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        working-directory: javascript
+        run: bun install
+
+      - name: Run typecheck
+        working-directory: javascript
+        run: bun run typecheck
+        continue-on-error: true
+
+      - name: Run linting
+        working-directory: javascript
+        run: bun run lint
+        continue-on-error: true
+
+      - name: Run tests
+        working-directory: javascript
+        run: bun run test
