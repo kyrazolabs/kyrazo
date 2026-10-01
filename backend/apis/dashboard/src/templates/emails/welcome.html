@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Welcome to {{brandName}}</title>
+                <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+        <style>
+            body {
+                font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #f8f9fa;
+                padding: 0;
+            }
+            .container {
+                background-color: #ffffff;
+                margin: 20px;
+                padding: 40px;
+                border-radius: 16px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            }
+            .header {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            .logo {
+                font-size: 28px;
+                font-weight: bold;
+                color: #09090b;
+                margin-bottom: 10px;
+            }
+            .welcome-message {
+                font-size: 24px;
+                color: #1f2937;
+                margin-bottom: 20px;
+            }
+            .content {
+                margin-bottom: 30px;
+            }
+            .cta-button {
+                display: inline-block;
+                background-color: #09090b;
+                color: #ffffff;
+                text-decoration: none;
+                padding: 12px 24px;
+                border-radius: 12px;
+                font-weight: 500;
+                margin: 20px 0;
+            }
+            .footer {
+                margin-top: 40px;
+                padding-top: 20px;
+                border-top: 1px solid #e5e7eb;
+                font-size: 14px;
+                color: #6b7280;
+                text-align: center;
+            }
+            @media screen and (max-width: 600px) {
+                .container {
+                    margin: 10px !important;
+                    padding: 24px !important;
+                }
+                .welcome-message {
+                    font-size: 20px !important;
+                }
+                .cta-button {
+                    width: 100% !important;
+                    box-sizing: border-box !important;
+                    text-align: center !important;
+                    padding: 14px 20px !important;
+                }
+            }
+            .feature-list {
+                background-color: #f9fafb;
+                padding: 20px;
+                border-radius: 12px;
+                margin: 20px 0;
+            }
+            .feature-item {
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+            }
+            .feature-item::before {
+                content: '✓';
+                color: #10b981;
+                font-weight: bold;
+                margin-right: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">{{brandName}}</div>
+                <h1 class="welcome-message">
+                    Welcome aboard, {{firstName}}! 🎉
+                </h1>
+            </div>
+
+            <div class="content">
+                <p>
+                    Thank you for joining {{brandName}}! We're excited to have
+                    you as part of our community.
+                </p>
+
+                <p>
+                    Your account has been successfully created and you can now
+                    start building powerful source integrations.
+                </p>
+
+                <div class="feature-list">
+                    <h3 style="margin-top: 0; color: #1f2937">
+                        What you can do:
+                    </h3>
+                    <div class="feature-item">
+                        Create and manage source endpoints
+                    </div>
+                    <div class="feature-item">
+                        Monitor delivery status and analytics
+                    </div>
+                    <div class="feature-item">
+                        Set up custom notifications and alerts
+                    </div>
+                    <div class="feature-item">
+                        Integrate with your favorite tools
+                    </div>
+                </div>
+
+                <div style="text-align: center">
+                    <a href="{{baseUrl}}/dashboard" class="cta-button"
+                        >Get Started</a
+                    >
+                </div>
+
+                <p>
+                    If you have any questions, feel free to reach out to our
+                    support team at
+                    <a href="mailto:{{supportEmail}}">{{supportEmail}}</a>.
+                </p>
+            </div>
+
+            <div class="footer">
+                <p>
+                    This email was sent to {{email}} because you signed up for
+                    {{brandName}}.
+                </p>
+                <p>
+                    If you didn't create this account, please ignore this email.
+                </p>
+                <p>&copy; 2024 {{brandName}}. All rights reserved.</p>
+            </div>
+        </div>
+    </body>
+</html>

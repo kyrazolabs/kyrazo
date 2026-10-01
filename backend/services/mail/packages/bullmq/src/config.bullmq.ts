@@ -1,0 +1,92 @@
+import { Redis } from "ioredis";
+import type { QueueOptions } from "bullmq";
+import * as queuesName from "./constants/constants.bullmq.js";
+import * as queues from "./queues/queues.bullmq.js";
+
+export class BullmqHandler {
+  private redisUrl: string;
+  private bullmqOptions: QueueOptions;
+  public redisClient: Redis;
+
+  constructor(redisUrl: string, tls: boolean = false) {
+    this.redisUrl = redisUrl;
+    const options: any = {
+      maxRetriesPerRequest: null,
+      enableOfflineQueue: true,
+      reconnectOnError: (err: Error) => {
+        const targetError = "READONLY";
+        const isRecoverable = err.message.includes(targetError);
+        if (isRecoverable) {
+          console.warn("[Redis BullMQ] Reconnecting due to READONLY error.");
+        }
+        return isRecoverable;
+      },
+    };
+
+    if (tls) {
+      options.tls = {
+        rejectUnauthorized: true,
+        checkServerIdentity: () => undefined,
+      };
+
+      const fs = require("fs");
+      const caFile = "/etc/ssl/redis/ca.crt";
+      const certFile = "/etc/ssl/redis/client.crt";
+      const keyFile = "/etc/ssl/redis/client.key";
+
+      if (caFile && fs.existsSync(caFile)) {
+        options.tls.ca = fs.readFileSync(caFile);
+        console.info("[Redis BullMQ] Loaded CA certificate from /etc/ssl/redis/ca.crt");
+      }
+      if (certFile && fs.existsSync(certFile)) {
+        options.tls.cert = fs.readFileSync(certFile);
+        console.info("[Redis BullMQ] Loaded client certificate from /etc/ssl/redis/client.crt");
+      }
+      if (keyFile && fs.existsSync(keyFile)) {
+        options.tls.key = fs.readFileSync(keyFile);
+        console.info("[Redis BullMQ] Loaded client key from /etc/ssl/redis/client.key");
+      }
+    }
+
+    this.redisClient = new Redis(this.redisUrl, options);
+    this.redisClient.on("connect", () => {
+      console.info("[Redis BullMQ] Connection established");
+    });
+
+    this.redisClient.on("ready", () => {
+      console.info("[Redis BullMQ] Client ready to use");
+    });
+
+    this.redisClient.on("error", (err) => {
+      console.error("[Redis BullMQ] Redis error:", err);
+    });
+
+    this.redisClient.on("reconnecting", () => {
+      console.info("[Redis BullMQ] Attempting to reconnect...");
+    });
+
+    this.redisClient.on("end", () => {
+      console.info("[Redis BullMQ] Connection closed");
+    });
+    this.bullmqOptions = {
+      connection: this.redisClient,
+      prefix: "mailq",
+      defaultJobOptions: {
+        attempts: 10, // 10 retry
+        backoff: {
+          type: "exponential",
+          delay: 5000, // retry after 5s, 10s, 20s
+        },
+        removeOnComplete: true,
+        removeOnFail: false, // Keep failed jobs to be handled later
+      },
+    };
+  }
+
+  public getQueueNames() {
+    return queuesName;
+  }
+  public getQueues() {
+    return queues.bullmqQueues(this.bullmqOptions);
+  }
+}

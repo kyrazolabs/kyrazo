@@ -1,0 +1,362 @@
+import { Schema, model } from 'mongoose';
+import { IWorkspace } from '@/types';
+import { IUserWorkspace, WorkspaceRole } from '@/types';
+
+// Workspace schema
+type WorkspaceDocument = IWorkspace & {
+    archive: () => Promise<IWorkspace>;
+    unarchive: () => Promise<IWorkspace>;
+    softDelete: () => Promise<IWorkspace>;
+    restore: () => Promise<IWorkspace>;
+    updateSettings: (settings: any) => Promise<IWorkspace>;
+}
+
+type IUserWorkspaceDocument = IUserWorkspace & {
+    findByUser: (userId: string) => Promise<IUserWorkspace[]>;
+    findByWorkspace: (workspaceId: string) => Promise<IUserWorkspace[]>;
+    findByUserAndWorkspace: (userId: string, workspaceId: string) => Promise<IUserWorkspace>;
+    findOwner: (workspaceId: string) => Promise<IUserWorkspace | null>;
+    findAdmins: (workspaceId: string) => Promise<IUserWorkspace[]>;
+    findByRole: (workspaceId: string, role: WorkspaceRole) => Promise<IUserWorkspace[]>;
+    getUserRole: (userId: string, workspaceId: string) => Promise<WorkspaceRole | null>;
+    isUserMember: (userId: string, workspaceId: string) => Promise<boolean>;
+    isUserOwner: (userId: string, workspaceId: string) => Promise<boolean>;
+    isUserAdmin: (userId: string, workspaceId: string) => Promise<boolean>;
+    getMemberCount: (workspaceId: string) => Promise<number>;
+    getRoleStats: (workspaceId: string) => Promise<Record<WorkspaceRole, number>>;
+    getRecentMembers: (workspaceId: string, days?: number) => Promise<IUserWorkspace[]>;
+    getPendingInvitations: (workspaceId: string) => Promise<IUserWorkspace[]>;
+}
+  
+
+const workspaceSchema = new Schema<WorkspaceDocument>({
+    name: {
+        type: String,
+        required: [true, 'Workspace name is required'],
+        trim: true,
+        minlength: [2, 'Workspace name must be at least 2 characters long'],
+        maxlength: [100, 'Workspace name cannot exceed 100 characters'],
+    },
+    description: {
+        type: String,
+        default: null,
+        maxlength: [1000, 'Description cannot exceed 1000 characters'],
+    },
+    avatar: {
+        type: String,
+        default: null,
+    },
+    ownerId: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: [true, 'Owner ID is required'],
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false,
+    },
+    deletedAt: {
+        type: Date,
+        default: null,
+    },
+    isArchived: {
+        type: Boolean,
+        default: false,
+    },
+}, {
+    timestamps: true,
+    toJSON: {
+        virtuals: true,
+        transform: function (doc, ret) {
+            delete (ret as any).__v;
+            return ret;
+        },
+    },
+    toObject: {
+        virtuals: true,
+    },
+});
+
+// UserWorkspace schema
+const userWorkspaceSchema = new Schema<IUserWorkspaceDocument>({
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: [true, 'User ID is required'],
+    },
+    // workspaceId: {
+    //     type: Schema.Types.ObjectId,
+    //     ref: 'Workspace',
+    //     required: [true, 'Workspace ID is required'],
+    // }, // Commented out for first version - depends on userId instead
+    role: {
+        type: String,
+        enum: ['owner', 'admin', 'member', 'viewer'],
+        required: [true, 'Role is required'],
+        default: 'member',
+    },
+    joinedAt: {
+        type: Date,
+        default: Date.now,
+    },
+    invitedBy: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        default: null,
+    },
+    invitationAcceptedAt: {
+        type: Date,
+        default: null,
+    },
+}, {
+    timestamps: true,
+    toJSON: {
+        virtuals: true,
+        transform: function (doc, ret) {
+            delete (ret as any).__v;
+            return ret;
+        },
+    },
+    toObject: {
+        virtuals: true,
+    },
+});
+
+// Indexes
+workspaceSchema.index({ name: 1 });
+workspaceSchema.index({ ownerId: 1 });
+workspaceSchema.index({ isDeleted: 1 });
+workspaceSchema.index({ isArchived: 1 });
+workspaceSchema.index({ createdAt: -1 });
+workspaceSchema.index({ name: 'text', description: 'text' });
+
+userWorkspaceSchema.index({ userId: 1, workspaceId: 1 }, { unique: true });
+userWorkspaceSchema.index({ workspaceId: 1, role: 1 });
+userWorkspaceSchema.index({ userId: 1, role: 1 });
+userWorkspaceSchema.index({ joinedAt: -1 });
+userWorkspaceSchema.index({ invitedBy: 1 });
+
+
+
+// Virtual fields
+workspaceSchema.virtual('owner', {
+    ref: 'User',
+    localField: 'ownerId',
+    foreignField: '_id',
+    justOne: true,
+});
+workspaceSchema.virtual('users', {
+    ref: 'UserWorkspace',
+    localField: '_id',
+    foreignField: 'workspaceId',
+});
+workspaceSchema.virtual('projects', {
+    ref: 'Project',
+    localField: '_id',
+    foreignField: 'workspaceId',
+});
+
+userWorkspaceSchema.virtual('user', {
+    ref: 'User',
+    localField: 'userId',
+    foreignField: '_id',
+    justOne: true,
+});
+userWorkspaceSchema.virtual('workspace', {
+    ref: 'Workspace',
+    localField: 'workspaceId',
+    foreignField: '_id',
+    justOne: true,
+});
+
+// Instance methods
+workspaceSchema.methods.softDelete = async function (): Promise<IWorkspace> {
+    this.isDeleted = true;
+    this.deletedAt = new Date();
+    return this.save();
+};
+workspaceSchema.methods.restore = async function (): Promise<IWorkspace> {
+    this.isDeleted = false;
+    this.deletedAt = null;
+    return this.save();
+};
+workspaceSchema.methods.archive = async function (): Promise<IWorkspace> {
+    this.isArchived = true;
+    return this.save();
+};
+workspaceSchema.methods.unarchive = async function (): Promise<IWorkspace> {
+    this.isArchived = false;
+    return this.save();
+};
+// workspaceSchema.methods.updateSettings = async function (settings: any): Promise<IWorkspace> {
+//     Object.assign(this.settings, settings);
+//     return this.save();
+// };
+
+userWorkspaceSchema.methods.updateRole = async function (newRole: WorkspaceRole): Promise<IUserWorkspace> {
+    this.role = newRole;
+    return this.save();
+};
+userWorkspaceSchema.methods.acceptInvitation = async function (): Promise<IUserWorkspace> {
+    this.invitationAcceptedAt = new Date();
+    return this.save();
+};
+userWorkspaceSchema.methods.isOwner = function (): boolean {
+    return this.role === 'owner';
+};
+userWorkspaceSchema.methods.isAdmin = function (): boolean {
+    return this.role === 'admin' || this.role === 'owner';
+};
+userWorkspaceSchema.methods.canManageUsers = function (): boolean {
+    return this.role === 'admin' || this.role === 'owner';
+};
+userWorkspaceSchema.methods.canManageSettings = function (): boolean {
+    return this.role === 'owner';
+};
+
+
+// Static methods
+workspaceSchema.statics.findByOwner = function (ownerId: string) {
+    return this.find({ ownerId, isDeleted: false, isArchived: false });
+};
+workspaceSchema.statics.searchWorkspaces = function (query: string, limit: number = 10) {
+    return this.find(
+        {
+            $text: { $search: query },
+            isDeleted: false,
+            isArchived: false
+        },
+        { score: { $meta: 'textScore' } }
+    )
+        .sort({ score: { $meta: 'textScore' } })
+        .limit(limit);
+};
+workspaceSchema.statics.getWorkspaceStats = async function () {
+    const stats = await this.aggregate([
+        {
+            $group: {
+                _id: null,
+                totalWorkspaces: { $sum: 1 },
+                activeWorkspaces: { $sum: { $cond: [{ $and: [{ $eq: ['$isDeleted', false] }, { $eq: ['$isArchived', false] }] }, 1, 0] } },
+                deletedWorkspaces: { $sum: { $cond: [{ $eq: ['$isDeleted', true] }, 1, 0] } },
+                archivedWorkspaces: { $sum: { $cond: [{ $eq: ['$isArchived', true] }, 1, 0] } },
+            },
+        },
+        {
+            $project: {
+                _id: 0,
+                totalWorkspaces: 1,
+                activeWorkspaces: 1,
+                deletedWorkspaces: 1,
+                archivedWorkspaces: 1,
+            },
+        },
+    ]);
+
+    return stats[0] || { totalWorkspaces: 0, activeWorkspaces: 0, deletedWorkspaces: 0, archivedWorkspaces: 0 };
+};
+workspaceSchema.statics.getRecentWorkspaces = function (days: number = 30) {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    return this.find({
+        createdAt: { $gte: startDate },
+        isDeleted: false,
+        isArchived: false
+    }).sort({ createdAt: -1 });
+};
+workspaceSchema.statics.findDeleted = function () {
+    return this.find({ isDeleted: true });
+};
+workspaceSchema.statics.findArchived = function () {
+    return this.find({ isArchived: true });
+};
+workspaceSchema.statics.permanentlyDelete = function (workspaceId: string) {
+    return this.findByIdAndDelete(workspaceId);
+};
+
+
+userWorkspaceSchema.statics.findByUser = function (userId: string) {
+    return this.find({ userId }).populate('workspace');
+};
+userWorkspaceSchema.statics.findByWorkspace = function (workspaceId: string) {
+    return this.find({ workspaceId }).populate('user');
+};
+userWorkspaceSchema.statics.findByUserAndWorkspace = function (userId: string, workspaceId: string) {
+    return this.findOne({ userId, workspaceId });
+};
+userWorkspaceSchema.statics.findOwner = function (workspaceId: string) {
+    return this.findOne({ workspaceId, role: 'owner' }).populate('user');
+};
+userWorkspaceSchema.statics.findAdmins = function (workspaceId: string) {
+    return this.find({
+        workspaceId,
+        role: { $in: ['owner', 'admin'] }
+    }).populate('user');
+};
+userWorkspaceSchema.statics.findByRole = function (workspaceId: string, role: WorkspaceRole) {
+    return this.find({ workspaceId, role }).populate('user');
+};
+userWorkspaceSchema.statics.getUserRole = async function (userId: string, workspaceId: string): Promise<WorkspaceRole | null> {
+    const membership = await this.findOne({ userId, workspaceId });
+    return membership ? membership.role : null;
+};
+userWorkspaceSchema.statics.isUserMember = async function (userId: string, workspaceId: string): Promise<boolean> {
+    const membership = await this.findOne({ userId, workspaceId });
+    return !!membership;
+};
+userWorkspaceSchema.statics.isUserOwner = async function (userId: string, workspaceId: string): Promise<boolean> {
+    const membership = await this.findOne({ userId, workspaceId, role: 'owner' });
+    return !!membership;
+};
+userWorkspaceSchema.statics.isUserAdmin = async function (userId: string, workspaceId: string): Promise<boolean> {
+    const membership = await this.findOne({
+        userId,
+        workspaceId,
+        role: { $in: ['owner', 'admin'] }
+    });
+    return !!membership;
+};
+userWorkspaceSchema.statics.getMemberCount = function (workspaceId: string) {
+    return this.countDocuments({ workspaceId });
+};
+userWorkspaceSchema.statics.getRoleStats = async function (workspaceId: string) {
+    const stats = await this.aggregate([
+        { $match: { workspaceId: new Schema.Types.ObjectId(workspaceId) } },
+        {
+            $group: {
+                _id: '$role',
+                count: { $sum: 1 },
+            },
+        },
+    ]);
+
+    const result: Record<WorkspaceRole, number> = { owner: 0, admin: 0, member: 0, viewer: 0 };
+    stats.forEach(stat => {
+        result[stat._id as WorkspaceRole] = stat.count;
+    });
+
+    return result;
+};
+userWorkspaceSchema.statics.getRecentMembers = function (workspaceId: string, days: number = 30) {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    return this.find({
+        workspaceId,
+        joinedAt: { $gte: startDate },
+    }).populate('user').sort({ joinedAt: -1 });
+};
+userWorkspaceSchema.statics.getPendingInvitations = function (workspaceId: string) {
+    return this.find({
+        workspaceId,
+        invitationAcceptedAt: null,
+    }).populate('user');
+  };
+
+
+// Export the model
+export const Workspace = model<WorkspaceDocument>('Workspace', workspaceSchema);
+export const UserWorkspace = model<IUserWorkspaceDocument>('UserWorkspace', userWorkspaceSchema);
+
+

@@ -1,0 +1,94 @@
+services:
+  dashboard-api:
+    build:
+      context: .
+      dockerfile: apis/dashboard/Dockerfile
+    container_name: kyrazo-dashboard-api
+    ports:
+      - "${PORT:-3003}:${PORT:-3003}"
+    environment:
+      - COOLIFY_RESOURCE_UUID
+
+      - PORT=${PORT}
+      - HOST=${HOST}
+      - NODE_ENV=${NODE_ENV}
+      - APP_NAME=${APP_NAME}
+      - APP_URL=${APP_URL}
+      - FRONTEND_URL=${FRONTEND_URL}
+      - SUPPORT_EMAIL=${SUPPORT_EMAIL}
+
+      # Databases Configuration
+      - MONGODB_URI=${MONGODB_URI}
+      - MONGODB_DB_NAME=${MONGODB_DB_NAME}
+      - MONGODB_MAX_POOL_SIZE=${MONGODB_MAX_POOL_SIZE}
+      - MONGODB_MIN_POOL_SIZE=${MONGODB_MIN_POOL_SIZE}
+      - MONGODB_SERVER_SELECTION_TIMEOUT_MS=${MONGODB_SERVER_SELECTION_TIMEOUT_MS}
+      - MONGODB_SOCKET_TIMEOUT_MS=${MONGODB_SOCKET_TIMEOUT_MS}
+      - MONGODB_CONNECT_TIMEOUT_MS=${MONGODB_CONNECT_TIMEOUT_MS}
+      - MONGODB_HEARTBEAT_FREQUENCY_MS=${MONGODB_HEARTBEAT_FREQUENCY_MS}
+      - MONGODB_RETRY_WRITES=${MONGODB_RETRY_WRITES}
+      - MONGODB_RETRY_READS=${MONGODB_RETRY_READS}
+      - MONGODB_SSL=${MONGODB_SSL}
+      - MONGODB_CA_FILE=${MONGODB_CA_FILE:-/etc/ssl/mongodb/ca.crt}
+      - MONGODB_CERT_KEY_FILE=${MONGODB_CERT_KEY_FILE:-/etc/ssl/mongodb/mongodb.pem}
+
+      - CLICKHOUSE_URL=${CLICKHOUSE_URL}
+      - CLICKHOUSE_CA_FILE=${CLICKHOUSE_CA_FILE:-/etc/ssl/clickhouse/ca.crt}
+      - NODE_EXTRA_CA_CERTS=${NODE_EXTRA_CA_CERTS:-/etc/ssl/clickhouse/ca.crt}
+      - REDIS_URL=${REDIS_URL}
+      - REDIS_TLS=${REDIS_TLS}
+      - REDIS_CA_FILE=${REDIS_CA_FILE:-/etc/ssl/redis/ca.crt}
+      - REDIS_CERT_FILE=${REDIS_CERT_FILE:-/etc/ssl/redis/client.crt}
+      - REDIS_KEY_FILE=${REDIS_KEY_FILE:-/etc/ssl/redis/client.key}
+
+      - QUEUE_REDIS_URL=${QUEUE_REDIS_URL}
+      - QUEUE_REDIS_TLS=${QUEUE_REDIS_TLS}
+      - QUEUE_REDIS_CA_FILE=${QUEUE_REDIS_CA_FILE:-/etc/ssl/redis/ca.crt}
+      - QUEUE_REDIS_CERT_FILE=${QUEUE_REDIS_CERT_FILE:-/etc/ssl/redis/client.crt}
+      - QUEUE_REDIS_KEY_FILE=${QUEUE_REDIS_KEY_FILE:-/etc/ssl/redis/client.key}
+
+      # Security Configuration
+      - TWO_FA_ISSUER=${TWO_FA_ISSUER}
+      - TWO_FA_SERVICE_NAME=${TWO_FA_SERVICE_NAME}
+
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - JWT_ACCESS_EXPIRES_IN=${JWT_ACCESS_EXPIRES_IN}
+      - JWT_REFRESH_EXPIRES_IN=${JWT_REFRESH_EXPIRES_IN}
+
+      - RESET_TOKEN_EXPIRY=${RESET_TOKEN_EXPIRY}
+      - VERIFICATION_TOKEN_EXPIRY=${VERIFICATION_TOKEN_EXPIRY}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+
+      - CORS_CREDENTIALS=${CORS_CREDENTIALS}
+      - CORS_ORIGIN=${CORS_ORIGIN}
+
+      # Stripe Configuration
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - STRIPE_MAIN_PRODUCT_ID=${STRIPE_MAIN_PRODUCT_ID}
+      - BILLING_BASE_URL=${BILLING_BASE_URL}
+
+      # 3rd-Party Configuration
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - SENTRY_DSN=${SENTRY_DSN}
+    volumes:
+      - ./logs:/app/apis/dashboard/logs
+
+      - /etc/ssl/mongodb/ca.crt:/etc/ssl/mongodb/ca.crt:ro
+      - /etc/ssl/mongodb/mongodb.pem:/etc/ssl/mongodb/mongodb.pem:ro
+
+      - /etc/ssl/redis/ca.crt:/etc/ssl/redis/ca.crt:ro
+      - /etc/ssl/redis/client.crt:/etc/ssl/redis/client.crt:ro
+      - /etc/ssl/redis/client.key:/etc/ssl/redis/client.key:ro
+
+      - /etc/ssl/clickhouse/ca.crt:/etc/ssl/clickhouse/ca.crt:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:${PORT}/v1/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 20s

@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "types": ["bun-types"],
+    "strict": true,
+    "skipLibCheck": true,
+    "composite": true,
+    "declaration": true,
+    "sourceMap": true
+  },
+  "files": [],
+  "references": [
+    { "path": "./apps/mail" },
+    { "path": "./packages/bullmq" },
+    { "path": "./packages/utils" }
+  ]
+}

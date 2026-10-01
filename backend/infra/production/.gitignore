@@ -1,0 +1,4 @@
+nats/certs/**
+databases/ssl/mongo
+databases/ssl/dragonfly
+databases/ssl/clickhouse

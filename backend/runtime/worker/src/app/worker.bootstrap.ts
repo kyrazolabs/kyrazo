@@ -1,0 +1,47 @@
+import { redisConfig, natsConfig } from '@/config';
+import { databaseConfig, logger, Source, Endpoint } from '@kyrazo/shared';
+import { lifecycle } from './worker.lifecycle';
+import { WorkerConsumer } from '@/consumers/nats/nats.listener';
+import { env } from './worker.env';
+import { dispatchProducer } from '@/consumers/batch/dispatch.producer';
+import { ingestProducer } from '@/consumers/batch/ingest.producer';
+import { dispatchProducer as dispatchQueue } from '@/consumers/queues/dispatch.producer';
+
+export const bootstrap = async () => {
+    lifecycle();
+    try {
+        await databaseConfig.connect();
+        logger.info('Database connected successfully');
+
+        // Sync indexes
+        await Source.syncIndexes();
+        await Endpoint.syncIndexes();
+        logger.info('MongoDB indexes synced');
+
+        await redisConfig.connect();
+        logger.info('Redis connected successfully');
+
+        await natsConfig.connect().then(() => {
+            logger.info('NATS connected successfully');
+        });
+
+        // Initialize BullMQ Components after Redis is ready
+        await dispatchProducer.initialize();
+        await dispatchQueue.initialize();
+        await ingestProducer.initialize();
+        const workerConsumer = new WorkerConsumer(env.worker.WORKSPACE_ID!);
+        await workerConsumer.start().catch((err: any) => {
+            logger.error('WorkerConsumer initialization failed:', err);
+        });
+        
+        // Start consumption loop in the background to allow health check server to start
+        workerConsumer.consume().catch((err: any) => {
+            logger.error('WorkerConsumer consumption failed:', err);
+        });
+
+        return true;
+    } catch (error: any) {
+        logger.error('Failed to initialize connections:', error);
+        return false;
+    }
+};

@@ -1,0 +1,36 @@
+name: CI - Loadbalancer Service
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'services/loadbalancer/**'
+      - '.github/workflows/ci-loadbalancer.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'services/loadbalancer/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: services/loadbalancer
+
+      - name: Cargo Check
+        run: cargo check
+        working-directory: services/loadbalancer
+
+      - name: Cargo Build
+        run: cargo build --release
+        working-directory: services/loadbalancer
