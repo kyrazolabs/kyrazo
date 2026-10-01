@@ -1,0 +1,34 @@
+# Kyrazo
+
+> Dedicated webhook infrastructure for enterprise B2B. Physically isolated compute, databases, and delivery workers — zero noisy-neighbor degradation, zero shared database memory.
+
+Kyrazo is a managed webhook gateway: ingest, verify, queue, and dispatch events on infrastructure reserved exclusively for one customer. Unlike shared-queue platforms, each deployment runs on its own VMs, database, and delivery workers.
+
+## Product
+
+- Isolated compute, database, and delivery workers per customer
+- Signature verification, payload normalization, retries with exponential backoff
+- Professional plan from $499/month on an annual contract
+- Enterprise BYOC / private cloud with custom SLAs, SAML/SSO, and compliance
+
+## Pages
+
+- [Home](https://kyrazo.com/): Dedicated webhook infrastructure for enterprise B2B
+- [Pricing](https://kyrazo.com/pricing/): Professional and Enterprise plans
+- [About](https://kyrazo.com/about/): Why Kyrazo isolates every workload
+- [Privacy Policy](https://kyrazo.com/legal/privacy-policy/)
+- [Terms of Service](https://kyrazo.com/legal/terms-of-service/)
+- [Refund Policy](https://kyrazo.com/legal/refund-policy/)
+- [GDPR](https://kyrazo.com/legal/gdpr/)
+- [DPA](https://kyrazo.com/legal/dpa/)
+
+## Docs
+
+- [Documentation](https://docs.kyrazo.com)
+- [API Reference](https://docs.kyrazo.com/api-reference/introduction)
+
+## Contact
+
+- Sales: sales@kyrazo.com
+- Support: support@kyrazo.com
+- Book a discovery meeting via kyrazo.com

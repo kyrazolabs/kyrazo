@@ -1,0 +1,36 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
+import { HeaderComponent } from './components/header/header.component';
+import { filter } from 'rxjs/operators';
+
+@Component({
+    selector: 'app-landing-layout',
+    standalone: true,
+    imports: [CommonModule, RouterOutlet, HeaderComponent],
+    template: `
+        <main class="min-h-screen min-w-screen relative overflow-x-hidden">
+            <app-landing-header></app-landing-header>
+
+            <!-- Shared Background Blobs -->
+            <div
+                class="absolute -top-24 -left-48 w-[300px] h-[300px] md:w-[400px] md:h-[400px] bg-primary-500/30 dark:bg-primary-500/10 blur-3xl rounded-full pointer-events-none"
+            ></div>
+            <div
+                class="absolute bottom-0 -right-48 w-[400px] h-[400px] md:w-[600px] md:h-[600px] bg-primary-400/20 dark:bg-primary-400/5 blur-[80px] md:blur-[100px] rounded-full pointer-events-none"
+            ></div>
+
+            <router-outlet></router-outlet>
+        </main>
+    `,
+    styles: [
+        `
+            :host {
+                display: block;
+            }
+        `,
+    ],
+})
+export class LandingLayoutComponent implements OnInit {
+    ngOnInit() {}
+}

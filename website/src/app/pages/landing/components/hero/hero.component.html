@@ -1,0 +1,124 @@
+<section
+    class="landing-hero group flex flex-col items-center justify-center text-center px-6 py-20 md:py-32 bg-transparent overflow-hidden relative min-h-screen"
+    (mousemove)="onMouseMove($event)"
+    (mouseleave)="onMouseLeave()"
+>
+    <!-- Background Interactive Blobs -->
+    <div class="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        <div #blob1 class="absolute -top-[10%] -left-[10%] w-[600px] h-[600px] bg-primary-500/30 dark:bg-primary-500/20 rounded-full blur-[100px] opacity-70 mix-blend-multiply dark:mix-blend-screen transition-all ease-out duration-75 will-change-transform"></div>
+        <div #blob2 class="absolute top-[20%] right-[10%] w-[500px] h-[500px] bg-primary-400/30 dark:bg-primary-600/20 rounded-full blur-[120px] opacity-70 mix-blend-multiply dark:mix-blend-screen transition-all ease-out duration-75 will-change-transform"></div>
+    </div>
+
+    <div class="z-10 max-w-6xl mx-auto">
+        <div class="mb-6 inline-block animate-fade-in-up">
+            <span
+                class="px-3 py-1 rounded-full bg-primary-500/10 text-primary-600 dark:text-primary-400 text-xs font-semibold border border-primary-500/20"
+            >
+                Dedicated Webhook Infrastructure for Enterprise B2B
+            </span>
+        </div>
+
+        <!-- Background Keywords -->
+        <div
+            class="absolute inset-0 max-w-8xl mx-auto z-0 pointer-events-none overflow-hidden select-none opacity-20 dark:opacity-10 font-caveat"
+        >
+            <span
+                class="absolute top-[15%] left-[10%] text-4xl md:text-5xl font-black text-surface-400 dark:text-surface-300 -rotate-12 blur-[1px] md:blur-[2px] animate-floating"
+                >Fast</span
+            >
+            <span
+                class="absolute top-[20%] right-[10%] text-3xl md:text-5xl font-black text-primary-500/80 rotate-12 blur-[1px] md:blur-[2px] animate-floating"
+                >Dedicated</span
+            >
+
+            <span
+                class="absolute top-[50%] left-[5%] text-3xl md:text-6xl font-black text-primary-500/40 -rotate-6 blur-[1.5px] md:blur-[3px] animate-floating"
+                >Simple</span
+            >
+            <span
+                class="absolute top-[45%] right-[5%] text-4xl md:text-6xl font-black text-surface-400 dark:text-surface-300 rotate-6 blur-[1.5px] md:blur-[3px] animate-floating"
+                >Scalable</span
+            >
+
+            <span
+                class="absolute bottom-[20%] left-[15%] text-3xl md:text-5xl font-black text-primary-500/60 -rotate-3 blur-[1px] md:blur-[2px] animate-floating"
+                >Reliable</span
+            >
+            <span
+                class="absolute bottom-[20%] right-[15%] text-4xl md:text-5xl font-black text-surface-400 dark:text-surface-300 rotate-3 blur-[1px] md:blur-[2px] animate-floating"
+                >Secure</span
+            >
+        </div>
+
+        <h1
+            class="relative z-10 text-3xl md:text-6xl font-extrabold mb-6 text-surface-900 dark:text-surface-0 tracking-tight leading-[1.1] max-w-6xl animate-fade-in-up delay-100 px-4"
+        >
+            Dedicated Webhook Infrastructure
+            <span class="text-primary text-4xl md:text-7xl relative inline-block font-sansation!">
+                for Enterprise B2B
+            </span>
+        </h1>
+
+        <p
+            class="text-lg md:text-xl text-surface-600 dark:text-surface-300 mb-10 max-w-3xl mx-auto leading-relaxed animate-fade-in-up delay-200 px-6"
+        >
+            Physically isolated compute, databases, and delivery workers reserved
+            exclusively for your workload. Zero noisy-neighbor performance
+            degradation. Zero shared database memory.
+        </p>
+
+        <div
+            class="flex flex-col sm:flex-row max-w-lg justify-between items-center mb-6 px-6 mx-auto animate-fade-in-up delay-300"
+        >
+            <p-button
+                label="Book Discovery Meeting"
+                ariaLabel="Book a Discovery Meeting with Kyrazo"
+                (click)="bookDiscovery()"
+                styleClass="text-base! font-bold! shadow-xl! shadow-primary-500/20 transition-all! duration-500! hover:shadow-primary-500/40 rounded-xl! w-full sm:w-auto px-8!"
+                size="small"
+                class="w-full sm:w-auto"
+            ></p-button>
+            <p-button
+                label="Read Docs"
+                ariaLabel="View Kyrazo Documentation"
+                (click)="trackDocs()"
+                icon="icon-[hugeicons--book-02] size-4.5"
+                severity="secondary"
+                styleClass="text-base! rounded-xl! w-full sm:w-auto px-8!"
+                [outlined]="true"
+                size="small"
+                class="w-full sm:w-auto"
+            ></p-button>
+        </div>
+
+        <div
+            class="flex flex-col items-center gap-3 mb-16 animate-fade-in-up delay-400"
+        >
+            <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 pt-6 border-t border-surface-200/10 max-w-2xl mx-auto px-4">
+                <div class="flex items-center gap-2 group/badges cursor-pointer" routerLink="/legal/refund-policy">
+                    <i class="icon-[hugeicons--shield-02] text-primary-500"></i>
+                    <span class="text-xs font-bold uppercase tracking-widest text-surface-500 group-hover/badges:text-surface-400 transition-colors">Paid Onboarding</span>
+                </div>
+                <div class="hidden sm:block w-1 h-1 rounded-full bg-surface-200/20"></div>
+                <div class="flex items-center gap-2 group/badges cursor-pointer" routerLink="/legal/gdpr">
+                    <i class="icon-[hugeicons--finger-print] text-primary-500"></i>
+                    <span class="text-xs font-bold uppercase tracking-widest text-surface-500 group-hover/badges:text-surface-400 transition-colors">GDPR Ready</span>
+                </div>
+                <div class="hidden sm:block w-1 h-1 rounded-full bg-surface-200/20"></div>
+                <div class="flex items-center gap-2 group/badges cursor-pointer" routerLink="/legal/dpa">
+                    <i class="icon-[hugeicons--agreement-01] text-primary-500"></i>
+                    <span class="text-xs font-bold uppercase tracking-widest text-surface-500 group-hover/badges:text-surface-400 transition-colors">DPA Available</span>
+                </div>
+            </div>
+        </div>
+
+        <div
+            class="pt-8 border-t border-surface-200 dark:border-surface-900 animate-fade-in-up delay-500"
+        >
+            <p class="text-surface-500 dark:text-surface-400 text-sm">
+                Sales-led onboarding. Isolated infrastructure reserved for your
+                workload.
+            </p>
+        </div>
+    </div>
+</section>

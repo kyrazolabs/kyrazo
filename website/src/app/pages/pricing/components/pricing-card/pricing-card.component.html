@@ -1,0 +1,72 @@
+<div
+    appScrollReveal
+    [delay]="delay"
+    [class]="'group relative p-8 rounded-xl border transition-all duration-500 flex flex-col h-full ' +
+    (plan.highlighted ?
+    'bg-surface-950 text-surface-0 border-surface-800 shadow-[0_20px_50px_rgba(0,0,0,0.3)] scale-105 z-10' :
+    'bg-surface-0 dark:bg-surface-950/40 backdrop-blur-md! border-surface-200 dark:border-surface-800 hover:border-primary-500/50 hover:shadow-2xl hover:shadow-primary-500/5')">
+
+    @if (plan.tag) {
+        <div class="absolute -top-4 left-1/2 -translate-x-1/2">
+            <span class="px-4 py-1.5 rounded-full bg-primary-500 text-white text-xs font-bold tracking-wider uppercase shadow-lg shadow-primary-500/30">
+                {{ plan.tag }}
+            </span>
+        </div>
+    }
+
+    <div class="mb-8">
+        <h3 class="text-xl font-bold mb-2 tracking-tight" [class.text-primary-400]="plan.highlighted">{{ plan.name }}</h3>
+        <p class="text-sm opacity-70 leading-relaxed">{{ plan.description }}</p>
+    </div>
+
+    <div class="mb-8">
+        <div class="flex items-baseline gap-1 flex-wrap">
+            @if (plan.priceNote) {
+                <span class="text-5xl font-black tracking-tighter font-sansation!"
+                    [class]="plan.highlighted ? 'text-shadow-primary-500 text-shadow-lg!' : ''">Custom</span>
+                <span class="text-sm opacity-60 font-medium">({{ plan.priceNote }})</span>
+            } @else {
+                <span class="text-base font-medium opacity-70 self-start mt-2">
+                    $
+                </span>
+                <span class="text-6xl font-black tracking-tighter font-sansation!"
+                 [class]="plan.highlighted ? 'text-shadow-primary-500 text-shadow-lg!' : ''">{{ formatPrice(currentPrice) }}</span>
+                <span class="text-sm opacity-60 font-medium">{{ intervalLabel }}</span>
+            }
+        </div>
+        @if (plan.commitment) {
+            <div class="mt-3 text-xs font-black uppercase tracking-widest opacity-60">
+                {{ plan.commitment }}
+            </div>
+        }
+    </div>
+
+    <button
+        pButton
+        [label]="(plan.slug === 'enterprise' || plan.slug === 'custom') ? 'Contact Enterprise Sales' : 'Book Discovery Call'"
+        (click)="onCta()"
+        [severity]="plan.highlighted ? 'primary' : 'secondary'"
+        size="small"
+        [class]="'w-full py-4 font-bold! rounded-xl! transition-all duration-300 ' +
+        (plan.highlighted ? 'shadow-lg shadow-primary-500/40' : 'hover:bg-primary-500/10 hover:border-primary-500/30 hover:text-primary-500')"
+        [outlined]="!plan.highlighted">
+    </button>
+
+    <div class="mt-10 grow">
+        <p class="text-xs font-bold uppercase tracking-[0.2em] mb-6 opacity-40">What's included</p>
+        <ul class="space-y-4">
+            @for (benefit of plan.benefits; track $index) {
+                <li class="flex items-center gap-3 group/item">
+                    <div class="mt-1 rounded-full p-1 aspect-square! flex items-center bg-primary-500/10 dark:bg-primary-500/20 shrink-0">
+                        <i class="pi pi-check text-[10px]! text-primary-500 font-bold"></i>
+                    </div>
+                    <span class="text-sm opacity-80 group-hover/item:opacity-100 transition-opacity leading-snug">{{ benefit }}</span>
+                </li>
+            }
+        </ul>
+    </div>
+
+    @if (plan.highlighted) {
+        <div class="absolute -inset-px rounded-[2.5rem] border border-primary-500/50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+    }
+</div>

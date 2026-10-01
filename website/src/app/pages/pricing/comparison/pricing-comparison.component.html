@@ -1,0 +1,70 @@
+<section class="py-16 md:py-24" id="compare">
+    <div class="max-w-7xl mx-auto px-4 md:px-6">
+        <div class="text-center mb-12 md:mb-16" appScrollReveal>
+            <h2 class="text-3xl md:text-5xl font-bold mb-6 text-surface-900 dark:text-surface-0 tracking-tight">
+                Compare Plan Features
+            </h2>
+            <p class="text-lg text-surface-600 dark:text-surface-400 max-w-2xl mx-auto">
+                Find the perfect balance of performance and capabilities for your unique needs.
+            </p>
+        </div>
+
+        <div class="overflow-x-auto -mx-4 md:mx-0" appScrollReveal delay="delay-200">
+            <table class="w-full border-collapse min-w-[800px]">
+                <thead>
+                    <tr class="border-b border-surface-200 dark:border-surface-800">
+                        <th class="py-6 px-4 text-left font-semibold text-surface-900 dark:text-surface-0 w-1/4">Features</th>
+                        @for (plan of plans; track plan.slug) {
+                            <th class="py-6 px-4 text-center w-1/5" [class.bg-surface-50/50]="plan.highlighted" [class.dark:bg-surface-900/20]="plan.highlighted">
+                                <div class="text-lg font-bold mb-1">{{ plan.name }}</div>
+                                <div class="text-primary-500 font-bold font-sansation!">
+                                    @if (plan.priceNote || plan.slug === 'enterprise' || plan.slug === 'custom') {
+                                        Custom
+                                    } @else {
+                                        @let rawPrice = isYearly ? plan.priceCentsYearly : plan.priceCentsMonthly;
+                                        @let price = isYearly ? rawPrice / 10 : rawPrice;
+                                        {{ price === 0 ? '$0' : '$' + (price / 100) }}
+                                        <span class="text-[10px] opacity-60 font-medium">/mo</span>
+                                    }
+                                </div>
+                            </th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (group of featureGroups; track group.name) {
+                        <!-- Header for group -->
+                        <tr class="bg-surface-50/50 dark:bg-surface-900/30">
+                            <td colspan="5" class="py-4 px-4 font-bold text-sm uppercase tracking-wider text-surface-500">
+                                {{ group.name }}
+                            </td>
+                        </tr>
+                        @for (feature of group.features; track feature.label) {
+                            <tr class="border-b border-surface-100 dark:border-surface-900 hover:bg-surface-50/30 dark:hover:bg-surface-900/10 transition-colors">
+                                <td class="py-4 px-4 text-sm text-surface-700 dark:text-surface-300">
+                                    <span [pTooltip]="feature.tooltip || ''" tooltipPosition="bottom" [attr.cursor]="feature.tooltip ? 'help' : null">
+                                        {{ feature.label }}
+                                    </span>
+                                </td>
+                                @for (plan of plans; track plan.slug) {
+                                    <td class="py-4 px-4 text-center text-sm" [class.bg-surface-50/30]="plan.highlighted" [class.dark:bg-surface-900/10]="plan.highlighted">
+                                        @let value = getValue(plan, feature.key);
+                                        @if (plan.slug === 'custom' && (feature.key === 'limits.eventsPerMonth' || feature.key === 'limits.eventsPerSecond' || feature.key === 'features.retentionDays')) {
+                                            <span [class.font-semibold]="plan.highlighted" class="font-sansation!">Custom</span>
+                                        } @else if (feature.format === 'check') {
+                                            <i [class]="value ? 'pi pi-check text-green-500' : 'pi pi-times text-surface-300 dark:text-surface-700'" class="text-lg"></i>
+                                        } @else {
+                                            <span [class.font-semibold]="plan.highlighted" class="font-sansation!">
+                                                {{ formatValue(value, feature.format) }}
+                                            </span>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

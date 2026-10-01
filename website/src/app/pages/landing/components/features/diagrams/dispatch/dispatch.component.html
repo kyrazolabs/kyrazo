@@ -1,0 +1,108 @@
+
+        <div
+            class="relative w-full h-full flex items-center justify-center py-4 overflow-hidden"
+        >
+            <!-- Diagram Container -->
+            <div
+                class="relative flex items-center justify-between w-full max-w-xl h-full px-2 md:px-4"
+            >
+                <!-- Source (Left) -->
+                <div class="z-20">
+                    <div
+                        class="px-2 md:px-3 py-1.5 md:py-2 rounded-lg md:rounded-xl bg-surface-50 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 shadow-2xs flex items-center gap-1 md:gap-2"
+                    >
+                        <span
+                            class="text-[8px] md:text-xs font-black uppercase tracking-widest text-surface-900 dark:text-surface-50"
+                            >API Platform</span
+                        >
+                    </div>
+                </div>
+
+                <!-- Connection SVG Layer -->
+                <svg
+                    class="absolute inset-0 w-full h-full pointer-events-none"
+                    viewBox="0 0 400 300"
+                    preserveAspectRatio="xMidYMid meet"
+                    aria-hidden="true"
+                >
+                    <!-- Source to Center K (3 Comets for Continuous Flow) -->
+                    <path
+                        d="M-100,150 L185,150"
+                        class="text-primary-500/10 fill-none stroke-2 md:stroke-3"
+                        stroke="currentColor"
+                        pathLength="400"
+                    />
+                    @for (i of [0, 1, 2]; track i) {
+                        <path
+                            d="M-100,150 L185,150"
+                            class="stroke-primary-400 pipeline-flow animation-delay"
+                            fill="none"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            pathLength="400"
+                            [style.animation-delay]="i * 1.0 + 's'"
+                        />
+                    }
+
+                    <!-- Center K to Targets -->
+                    @for (path of dispatchPaths; track $index) {
+                        <!-- Static Path -->
+                        <path
+                            [attr.d]="path.d"
+                            class="text-primary-500/10 fill-none stroke-2 md:stroke-3"
+                            stroke="currentColor"
+                            pathLength="400"
+                        />
+                        <path
+                            [attr.d]="path.d"
+                            class="stroke-primary-400 pipeline-flow animation-delay"
+                            fill="none"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            pathLength="400"
+                            [style.animation-delay]="$index * 1.0 + 0.5 + 's'"
+                        />
+                    }
+                </svg>
+
+                <!-- Kyrazo Core (Center) -->
+                <div
+                    class="relative z-20 w-12 h-12 md:w-14 md:h-14 aspect-square! rounded-lg md:rounded-xl bg-primary dark:bg-primary flex items-center justify-center shadow-2xl border-2 border-primary-300 dark:border-primary-800"
+                >
+                    <img
+                        [src]="
+                            isDarkMode() ? 'logo-dark.png' : 'logo-light.png'
+                        "
+                        alt="Kyrazo"
+                        width="48"
+                        height="48"
+                        loading="lazy"
+                        decoding="async"
+                        class="w-full h-full p-1 object-contain transition-transform duration-300"
+                    />
+
+                </div>
+
+                <!-- Targets (Right) -->
+                <div class="flex flex-col gap-6 md:gap-8 z-20 items-end">
+                    @for (target of targets; track target.name) {
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="px-2 md:px-3 py-1 md:py-1.5 rounded-lg md:rounded-xl bg-surface-50 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 shadow-2xs flex items-center gap-1 md:gap-2"
+                            >
+                                <i
+                                    class="pi pi-link text-primary-500 text-[8px] md:text-[10px]"
+                                ></i>
+
+                                <span
+                                    class="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-surface-900 dark:text-surface-50"
+                                    >{{ target.name }}</span
+                                >
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+
