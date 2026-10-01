@@ -1,0 +1,109 @@
+<div class="space-y-6">
+
+    <!-- Email Notifications -->
+    <form [formGroup]="notificationForm" class="space-y-6 mb-6">
+        <p-card header="Email Notifications"
+            class="card-panel">
+            <div class="space-y-6">
+                <!-- Webhook Failures -->
+                <div
+                    class="flex items-start justify-between p-4 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-800">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="pi pi-exclamation-triangle text-red-500"></i>
+                            <h4 class="font-semibold text-surface-900 dark:text-surface-0">Event Failures</h4>
+                            <p-tag value="Critical" severity="danger" [rounded]="true" class="text-xs" />
+                        </div>
+                        <p class="text-sm text-surface-600 dark:text-surface-400">
+                            Get a report when event deliveries fail or timeout
+                        </p>
+                    </div>
+                    <div class="flex items-center ml-4">
+                        <p-toggleswitch formControlName="webhookFailures" styleClass="rounded-full!" />
+                    </div>
+                </div>
+
+                <!-- Daily Summary -->
+                <div
+                    class="flex items-start justify-between p-4 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-800">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="pi pi-chart-line text-blue-500"></i>
+                            <h4 class="font-semibold text-surface-900 dark:text-surface-0">Daily Summary</h4>
+                            <p-tag value="Optional" severity="info" [rounded]="true" class="text-xs" />
+                        </div>
+                        <p class="text-sm text-surface-600 dark:text-surface-400">
+                            Receive daily reports with webhook delivery statistics and performance metrics
+                        </p>
+                    </div>
+                    <div class="flex items-center ml-4">
+                        <p-toggleswitch formControlName="dailySummary" styleClass="rounded-full!" />
+                    </div>
+                </div>
+
+                <!-- Security Alerts -->
+                <div
+                    class="flex items-start justify-between p-4 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-800">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="pi pi-shield text-orange-500"></i>
+                            <h4 class="font-semibold text-surface-900 dark:text-surface-0">Security Alerts</h4>
+                            <p-tag value="Required" severity="warn" [rounded]="true" class="text-xs" />
+                        </div>
+                        <p class="text-sm text-surface-600 dark:text-surface-400">
+                            Important security notifications including login attempts and API key changes
+                        </p>
+                    </div>
+                    <div class="flex items-center ml-4">
+                        <p-toggleswitch formControlName="securityAlerts" styleClass="rounded-full!" />
+                    </div>
+                </div>
+
+                <!-- Weekly Reports -->
+                <div
+                    class="flex items-start justify-between p-4 bg-surface-50 dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-800">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="pi pi-calendar text-green-500"></i>
+                            <h4 class="font-semibold text-surface-900 dark:text-surface-0">Weekly Reports</h4>
+                            <p-tag value="Optional" severity="info" [rounded]="true" class="text-xs" />
+                        </div>
+                        <p class="text-sm text-surface-600 dark:text-surface-400">
+                            Comprehensive weekly analytics and insights about your webhook performance
+                        </p>
+                    </div>
+                    <div class="flex items-center ml-4">
+                        <p-toggleswitch formControlName="weeklyReports" styleClass="rounded-full!" />
+                    </div>
+                </div>
+            </div>
+        </p-card>
+
+        <!-- Notification Preferences -->
+        <p-card header="Notification Preferences"
+            class="card-panel">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Email Frequency -->
+                <div class="flex flex-col gap-2">
+                    <p-floatlabel variant="on">
+                        <p-select id="emailFrequency" formControlName="emailFrequency" [options]="frequencyOptions" optionLabel="label"
+                            optionValue="value" class="w-full rounded-xl!"
+                            panelStyleClass="rounded-xl!" size="small" appendTo="body" />
+                        <label for="emailFrequency">Email Frequency</label>
+                    </p-floatlabel>
+                </div>
+
+                <!-- Quiet Hours -->
+                <div class="flex flex-col gap-2">
+                    <p-floatlabel variant="on">
+                        <p-select id="quietHours" formControlName="quietHours" [options]="quietHoursOptions" optionLabel="label"
+                            optionValue="value" class="w-full rounded-xl!"
+                            panelStyleClass="rounded-xl!" size="small" appendTo="body" />
+                        <label for="quietHours">Quiet Hours</label>
+                    </p-floatlabel>
+                </div>
+            </div>
+        </p-card>
+    </form>
+
+</div>

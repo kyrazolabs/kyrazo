@@ -1,0 +1,181 @@
+<div class="space-y-6 mb-4">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <!-- Right section -->
+        <div>
+            <h1 class="text-2xl font-bold">{{ isEdit ? 'Edit' : 'Create' }} Endpoint</h1>
+            <p class="opacity-80">{{ isEdit ? 'Update your endpoint configuration' : 'Set up a new endpoint' }}</p>
+        </div>
+
+        <!-- Left section -->
+        <div class="flex items-center gap-4">
+            <p-button label="Cancel" icon="pi pi-times" [outlined]="true" severity="secondary" styleClass="w-full sm:w-auto rounded-xl!"  routerLink="/events/ingest/endpoints" />
+        </div>
+    </div>
+
+
+    <!-- Form -->
+    <form [formGroup]="endpointForm" (ngSubmit)="onSubmit()">
+
+        <!-- Basic Information -->
+        <p-card header="Basic Information" class="mb-4 card-panel">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Name Field -->
+                <div class="flex flex-col gap-2">
+                    <p-floatlabel variant="on">
+                        <input id="name" type="text" pInputText formControlName="name" class="w-full rounded-xl!" pSize="small"
+                            [class.ng-invalid]="endpointForm.get('name')?.errors && endpointForm.get('name')?.touched" />
+                        <label for="name">Name *</label>
+                    </p-floatlabel>
+                    <small class="text-xs text-red-500 italic ml-1"
+                        *ngIf="endpointForm.get('name')?.errors?.['required'] && endpointForm.get('name')?.touched">
+                        Name is required
+                    </small>
+                </div>
+
+                <!-- Status Field -->
+                <div class="flex flex-col gap-2">
+                    <p-floatlabel variant="on">
+                        <p-select id="status" formControlName="status" [options]="statusOptions"
+                            optionLabel="label" optionValue="value" class="w-full rounded-xl!" panelStyleClass="rounded-xl! custom-select-panel" size="small" appendTo="body" />
+                        <label for="status">Status</label>
+                    </p-floatlabel>
+                </div>
+            </div>
+
+            <!-- URL and Method -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                <!-- URL Field -->
+                <div class="flex flex-col gap-2 md:col-span-2">
+                    <p-floatlabel variant="on">
+                        <input id="url" type="url" pInputText formControlName="url" class="w-full rounded-xl!" pSize="small"
+                            [class.ng-invalid]="endpointForm.get('url')?.errors && endpointForm.get('url')?.touched" />
+                        <label for="url">URL *</label>
+                    </p-floatlabel>
+                    <small class="text-xs text-red-500 italic ml-1"
+                        *ngIf="endpointForm.get('url')?.errors?.['required'] && endpointForm.get('url')?.touched">
+                        URL is required
+                    </small>
+                    <small class="text-xs text-red-500 italic ml-1"
+                        *ngIf="endpointForm.get('url')?.errors?.['pattern'] && endpointForm.get('url')?.touched">
+                        Please enter a valid URL
+                    </small>
+                </div>
+
+                <!-- Method Field -->
+                <div class="flex flex-col gap-2">
+                    <p-floatlabel variant="on">
+                        <p-select id="method" formControlName="method" [options]="methodOptions"
+                            optionLabel="label" optionValue="value" class="w-full rounded-xl!" panelStyleClass="rounded-xl! custom-select-panel" size="small" appendTo="body" />
+                        <label for="method">Method</label>
+                    </p-floatlabel>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="flex flex-col gap-2 mt-6">
+                <p-floatlabel variant="on">
+                    <textarea id="description" pInputTextarea formControlName="description" rows="3"
+                        class="w-full rounded-xl!" pSize="small"></textarea>
+                    <label for="description">Description</label>
+                </p-floatlabel>
+            </div>
+
+            <!-- Enabled Checkbox -->
+            <div class="flex items-center gap-2 mt-6">
+                <p-checkbox formControlName="enabled" [binary]="true" inputId="enabled" class="rounded-xl!" />
+                <label for="enabled" class="font-semibold text-surface-900 dark:text-surface-0">
+                    Enable this endpoint
+                </label>
+            </div>
+        </p-card>
+
+        <!-- Configuration Settings -->
+        <p-card header="Configuration Settings" class="mb-4 card-panel">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Timeout -->
+                <div class="flex flex-col gap-2">
+                    <p-floatlabel variant="on">
+                        <p-inputNumber id="timeoutMs" formControlName="timeoutMs" [min]="100" [max]="30000" [step]="100"
+                            [showButtons]="false" suffix=" ms" inputStyleClass="w-full rounded-xl!" size="small" />
+                        <label for="timeoutMs">Timeout (ms)</label>
+                    </p-floatlabel>
+                    <small class="text-xs text-surface-600 dark:text-surface-400 italic ml-1">
+                        Request timeout in milliseconds
+                    </small>
+                </div>
+
+                <!-- Retry Count -->
+                <div class="flex flex-col gap-2">
+                    <p-floatlabel variant="on">
+                        <p-inputNumber id="retryCount" formControlName="retryCount" [min]="0" [max]="10"
+                            [showButtons]="false" inputStyleClass="w-full rounded-xl!" size="small" />
+                        <label for="retryCount">Retry Count</label>
+                    </p-floatlabel>
+                    <small class="text-xs text-surface-600 dark:text-surface-400 italic ml-1">
+                        Number of retry attempts on failure
+                    </small>
+                </div>
+
+                <!-- Rate Limit -->
+                <div class="flex flex-col gap-2">
+                    <p-floatlabel variant="on">
+                        <p-inputNumber id="rateLimit" formControlName="rateLimit" [min]="1" [max]="1000"
+                            [showButtons]="false" suffix="/min" inputStyleClass="w-full rounded-xl!" size="small" />
+                        <label for="rateLimit">Rate Limit (optional)</label>
+                    </p-floatlabel>
+                    <small class="text-xs text-surface-600 dark:text-surface-400 italic ml-1">
+                        Maximum requests per minute
+                    </small>
+                </div>
+            </div>
+        </p-card>
+
+        <!-- Custom Headers -->
+        <p-card header="Custom Headers" class="mb-4 card-panel" *ngIf="customHeaders && (customHeaders | keyvalue)?.length !== 0">
+            <div class="space-y-4">
+                <div *ngFor="let header of customHeaders; let i = index; trackBy: trackByIndex"
+                    class="flex gap-3 items-center">
+                    <p-floatlabel variant="on" class="flex-1">
+                        <input type="text" pInputText [(ngModel)]="header.key" [ngModelOptions]="{standalone: true}"
+                            class="w-full rounded-xl!" pSize="small" />
+                        <label>Header name</label>
+                    </p-floatlabel>
+                    <p-floatlabel variant="on" class="flex-1">
+                        <input type="text" pInputText [(ngModel)]="header.value" [ngModelOptions]="{standalone: true}"
+                            class="w-full rounded-xl!" pSize="small" />
+                        <label>Header value</label>
+                    </p-floatlabel>
+                    <p-button icon="pi pi-trash" severity="danger" [outlined]="true" size="small"
+                        (onClick)="removeHeader(i)" [disabled]="customHeaders.length <= 0" styleClass="rounded-xl!" />
+                </div>
+            </div>
+
+            <p-divider />
+
+            <p-button label="Add Header" icon="pi pi-plus" [outlined]="true" size="small" styleClass="rounded-xl!" (onClick)="addHeader()" />
+        </p-card>
+
+        <!-- Empty state for headers -->
+        <p-card header="Custom Headers" class="card-panel"
+            *ngIf="!customHeaders || (customHeaders | keyvalue)?.length === 0">
+            <div class="text-center py-8">
+                <i class="pi pi-info-circle text-3xl! text-surface-400 dark:text-surface-500 mb-4"></i>
+                <p class="text-surface-600 dark:text-surface-400 mb-4">No custom headers configured</p>
+                <p-button label="Add Headers" icon="pi pi-plus" [outlined]="true" styleClass="rounded-xl!" (onClick)="addHeader()" />
+            </div>
+        </p-card>
+
+        <!-- Form Actions -->
+        <div class="flex flex-col sm:flex-row items-center justify-end gap-3">
+            <p-button label="Cancel" icon="pi pi-times" [outlined]="true" severity="secondary" styleClass="w-full sm:w-auto rounded-xl!"
+                routerLink="/events/ingest/endpoints" />
+            <p-button type="submit" [label]="(isEdit ? 'Update' : 'Create') + ' Endpoint'"
+                [icon]="loading ? 'pi pi-spin pi-spinner' : (isEdit ? 'pi pi-check' : 'pi pi-plus')" styleClass="w-full sm:w-auto rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20"
+                [disabled]="endpointForm.invalid || loading" [loading]="loading" />
+        </div>
+    </form>
+</div>
+
+<!-- Toast Messages -->
+<p-toast />

@@ -1,0 +1,40 @@
+::ng-deep {
+  // Select and Multiselect Triggers
+  .p-select,
+  .p-multiselect,
+  .p-paginator .p-select {
+    border-radius: 0.75rem !important; // rounded-xl
+  }
+
+  // Options
+  .p-select-option{
+    border-radius: 0.75rem !important; // rounded-xl
+    margin: 4px 4px;
+
+  }
+  .p-multiselect-option {
+    border-radius: 0.75rem !important; // rounded-xl
+    margin: 2px 8px;
+  }
+
+  // Panels
+  .p-select-panel,
+  .p-multiselect-panel,
+  .p-select-list-container,
+  .p-select-overlay,
+  .p-select-list {
+    border-radius: 0.75rem !important; // rounded-xl
+  }
+
+  // Paginator
+  .p-paginator-page {
+    border-radius: 0.75rem !important; // rounded-xl
+    margin: 2px 8px !important;
+  }
+}
+
+:host ::ng-deep {
+  .p-multiselect-chip {
+    border-radius: 0.75rem !important; // rounded-xl
+  }
+}

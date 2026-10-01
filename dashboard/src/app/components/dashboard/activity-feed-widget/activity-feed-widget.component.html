@@ -1,0 +1,47 @@
+<div class="card-panel h-full flex flex-col">
+    <div class="flex items-center justify-between mb-4">
+        <div>
+           <h3 class="font-bold text-lg text-surface-900 dark:text-surface-0">Recent Activity</h3>
+           <p class="text-sm text-surface-500">Latest delivery attempts</p>
+        </div>
+        <p-button icon="pi pi-arrow-right" [link]="true" size="small" routerLink="/events/dispatch/logs" />
+    </div>
+
+    <div class="flex flex-col gap-0 overflow-y-auto max-h-[400px] relative">
+         <!-- Vertical Timeline Line -->
+        <div class="absolute left-4.5 top-2 bottom-2 w-px bg-surface-200 dark:bg-surface-700 z-0"></div>
+
+        @for (item of activities; track item.id) {
+            <div class="flex gap-4 items-start p-2 relative z-10 group hover:bg-surface-50 dark:hover:bg-surface-800/50 rounded-lg transition-colors cursor-pointer">
+                <!-- Status Icon -->
+                <div class="mt-1 shrink-0 bg-surface-0 dark:bg-surface-950! z-10 p-0.5">
+                    <i class="pi text-sm"
+                       [ngClass]="{
+                           'pi-check-circle text-green-500': item.status === 'succeeded' || item.status === 'delivered',
+                           'pi-times-circle text-red-500': item.status === 'failed',
+                           'pi-clock text-yellow-500 hover:animate-spin': item.status === 'pending' || item.status === 'processing'
+                       }"></i>
+                </div>
+
+                <div class="flex flex-col gap-0.5 min-w-0 flex-1">
+                    <div class="flex items-center justify-between">
+                         <span class="font-medium text-sm text-surface-900 dark:text-surface-0 truncate">{{ item.event_type }}</span>
+                         <span class="text-xs text-surface-400 font-mono">{{ item.created_at | date:'HH:mm:ss' }}</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-xs text-surface-500 max-w-[150px] truncate" [title]="item.target_name">{{ item.target_name }}</span>
+                         @if (item.status === 'failed') {
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400">FAILED</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+        @if (activities.length === 0) {
+            <div class="text-center py-12 text-surface-500 italic flex flex-col items-center gap-2">
+                <i class="pi pi-inbox text-2xl opacity-50"></i>
+                <span>No recent activity</span>
+            </div>
+        }
+    </div>
+</div>

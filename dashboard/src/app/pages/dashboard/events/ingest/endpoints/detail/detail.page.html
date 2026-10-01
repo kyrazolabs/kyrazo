@@ -1,0 +1,312 @@
+<div class="space-y-6 mb-4">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <!-- Left section -->
+        <div>
+            <h1 class="text-2xl font-bold">Endpoint Details</h1>
+            @if (endpoint().id) {
+                <div class="flex items-center gap-2 mt-1">
+                    <app-copy-id [id]="endpoint().id!" [fullWidth]="true" />
+                    <span class="text-xs opacity-50 uppercase font-bold tracking-wider">Endpoint ID</span>
+                </div>
+            }
+            <p class="opacity-80 mt-2">View and manage your endpoint configuration</p>
+        </div>
+
+        <!-- Right section -->
+        <div class="flex items-center gap-4">
+            <p-button label="Edit" icon="icon-[hugeicons--edit-03] size-5" styleClass="w-full sm:w-auto rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20" size="small"
+                (onClick)="openEditDialog()" />
+            <p-button label="Back" icon="pi pi-arrow-left" [outlined]="true" severity="secondary"
+                styleClass="w-full sm:w-auto rounded-xl!" size="small" routerLink="/events/ingest/destinations/endpoints" />
+        </div>
+    </div>
+
+    <!-- Main Grid Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Left Column: General Info & Headers -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- General Information -->
+            <p-card header="General Information" class="card-panel">
+                <div class="flex flex-col gap-6">
+                    <!-- Name -->
+                    <div class="flex flex-col gap-2">
+                        <label class="font-semibold text-surface-900 dark:text-surface-0">Endpoint Name</label>
+                        <input pInputText [value]="endpoint().name" [disabled]="true" class="w-full rounded-xl!"  pSize="small" />
+                    </div>
+
+                    <!-- URL -->
+                    <div class="flex flex-col gap-2">
+                        <label class="font-semibold text-surface-900 dark:text-surface-0">Endpoint URL</label>
+                        <div class="flex items-center gap-2">
+                            <input pInputText [value]="endpoint().url" [disabled]="true" class="w-full rounded-xl! font-mono text-sm"  pSize="small" />
+                            <p-button icon="pi pi-copy" [outlined]="true" size="small" styleClass="rounded-xl!"
+                                pTooltip="Copy URL" tooltipStyleClass="text-xs! rounded-xl!" tooltipPosition="top"
+                                (onClick)="copyToClipboard(endpoint().url || '')" />
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="flex flex-col gap-2">
+                        <label class="font-semibold text-surface-900 dark:text-surface-0">Description</label>
+                        <textarea pTextarea [value]="endpoint().description || 'No description provided'" [disabled]="true" rows="6"
+                            class="w-full rounded-xl!" [class.italic]="!endpoint().description" pSize="small"></textarea>
+                    </div>
+                </div>
+            </p-card>
+
+            <!-- Custom Headers -->
+            <p-card header="Custom Headers" class="card-panel">
+                 @if (endpoint().customHeaders && (endpoint().customHeaders | keyvalue)?.length !== 0) {
+                    <div class="space-y-4">
+                        <div *ngFor="let header of endpoint().customHeaders | keyvalue" class="flex flex-col md:flex-row gap-3 items-center">
+                            <input pInputText [value]="header.key" [disabled]="true" class="w-full md:w-1/3 rounded-xl!" placeholder="Key"  pSize="small" />
+                            <div class="flex flex-1 items-center gap-2 w-full">
+                                <input pInputText [value]="header.value" [disabled]="true" class="w-full rounded-xl! font-mono text-sm" placeholder="Value"  pSize="small" />
+                                <p-button icon="pi pi-copy" [outlined]="true" size="small" styleClass="shrink-0 rounded-xl!"
+                                    pTooltip="Copy Value" tooltipPosition="left" tooltipStyleClass="text-xs! rounded-xl!"
+                                    (onClick)="copyToClipboard(header.value)" />
+                            </div>
+                        </div>
+                    </div>
+                } @else {
+                     <div class="flex flex-col items-center justify-center py-12 border-2 border-dashed border-surface-200 dark:border-surface-700 rounded-xl">
+                        <div class="w-12 h-12 rounded-full bg-surface-100 dark:bg-surface-800 flex items-center justify-center mb-3">
+                            <i class="pi pi-code text-xl text-surface-500"></i>
+                        </div>
+                        <p class="text-surface-600 dark:text-surface-400 font-medium mb-1">No custom headers</p>
+                        <p class="text-surface-500 dark:text-surface-500 text-sm mb-4">Add headers to authenticate requests</p>
+                        <p-button label="Add Headers" icon="pi pi-plus" [outlined]="true" size="small" styleClass="rounded-xl!"
+                            (onClick)="openEditDialog()" />
+                    </div>
+                }
+            </p-card>
+        </div>
+
+        <!-- Right Column: Status & Configuration -->
+        <div class="space-y-6">
+            <!-- Status Card -->
+            <p-card class="card-panel">
+                <div class="flex flex-col gap-4">
+                    <span class="font-bold text-lg text-surface-900 dark:text-surface-0">Status</span>
+
+                    <div class="flex items-center justify-between p-3 bg-surface-50 dark:bg-surface-800/50 rounded-xl border border-surface-200 dark:border-surface-800">
+                        <div class="flex items-center gap-3">
+                           <span class="relative flex h-3 w-3">
+                              <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+                                [ngClass]="{'bg-green-400': endpoint().enabled, 'bg-red-400': !endpoint().enabled}"></span>
+                              <span class="relative inline-flex rounded-full h-3 w-3"
+                                [ngClass]="{'bg-green-500': endpoint().enabled, 'bg-red-500': !endpoint().enabled}"></span>
+                            </span>
+                            <span class="font-medium" [ngClass]="{'text-green-600 dark:text-green-400': endpoint().enabled, 'text-red-600 dark:text-red-400': !endpoint().enabled}">
+                                {{endpoint().enabled ? 'Active' : 'Inactive'}}
+                            </span>
+                        </div>
+                        <p-checkbox [binary]="true" [ngModel]="endpoint().enabled" [disabled]="true" />
+                    </div>
+
+                    <div class="flex flex-col gap-2 mt-2">
+                        <label class="text-sm font-semibold text-surface-600 dark:text-surface-400">Created On</label>
+                        <div class="flex items-center gap-2">
+                            <i class="pi pi-calendar text-surface-400"></i>
+                            <span class="text-surface-900 dark:text-surface-0 font-medium">{{formatDate(endpoint().createdAt || '')}}</span>
+                        </div>
+                    </div>
+                </div>
+            </p-card>
+
+            <!-- Configuration Details -->
+            <p-card header="Configuration" class="card-panel">
+                <div class="flex flex-col gap-5">
+                    <!-- Method -->
+                    <div class="flex flex-col gap-2">
+                        <label class="text-sm font-semibold text-surface-600 dark:text-surface-400">Method</label>
+                        <p-iconfield iconPosition="left" class="w-full md:w-auto">
+                                <p-inputicon class="relative!">
+                                    <span class="icon-[hugeicons--arrow-data-transfer-horizontal] size-5 absolute top-1/2 -translate-y-1/2 "></span>
+                                </p-inputicon>
+                                <input pInputText [value]="endpoint().method" [disabled]="true" class="w-full rounded-xl! pl-9!"  pSize="small" />
+                        </p-iconfield>
+                    </div>
+
+                    <!-- Timeout -->
+                    <div class="flex flex-col gap-2">
+                        <label class="text-sm font-semibold text-surface-600 dark:text-surface-400">Timeout</label>
+                        <p-iconfield iconPosition="left" class="w-full md:w-auto">
+                                <p-inputicon class="relative!">
+                                    <span class="icon-[hugeicons--stop-watch] size-5 absolute top-1/2 -translate-y-1/2 "></span>
+                                </p-inputicon>
+                                <p-inputNumber [ngModel]="endpoint().config?.timeout" [disabled]="true" suffix=" ms"
+                                inputStyleClass="w-full rounded-xl! pl-9!" styleClass="w-full" [showButtons]="false" />
+                        </p-iconfield>
+                    </div>
+
+                    <!-- Retry Count -->
+                    <div class="flex flex-col gap-2">
+                         <label class="text-sm font-semibold text-surface-600 dark:text-surface-400">Retry Count</label>
+                         <p-iconfield iconPosition="left" class="w-full md:w-auto">
+                                <p-inputicon class="relative!">
+                                    <span class="icon-[hugeicons--arrow-reload-horizontal] size-5 absolute top-1/2 -translate-y-1/2 "></span>
+                                </p-inputicon>
+                                <p-inputNumber [ngModel]="endpoint().config?.retryCount" [disabled]="true" suffix=" attempts"
+                                inputStyleClass="w-full rounded-xl! pl-9!" styleClass="w-full" [showButtons]="false" />
+                        </p-iconfield>
+                    </div>
+
+                    <!-- Rate Limit -->
+                    <div class="flex flex-col gap-2">
+                        <label class="text-sm font-semibold text-surface-600 dark:text-surface-400">Rate Limit</label>
+                        <p-iconfield iconPosition="left" class="w-full md:w-auto">
+                                <p-inputicon class="relative!">
+                                    <span class="icon-[hugeicons--zap] size-5 absolute top-1/2 -translate-y-1/2 "></span>
+                                </p-inputicon>
+                                <p-inputNumber [ngModel]="endpoint().config?.rateLimit" [disabled]="true" placeholder="Unlimited"
+                                inputStyleClass="w-full rounded-xl! pl-9!" styleClass="w-full" [showButtons]="false" />
+                        </p-iconfield>
+                    </div>
+                </div>
+            </p-card>
+
+            <!-- Signing Secret -->
+             <p-card class="card-panel">
+                <ng-template pTemplate="header">
+                    <div class="flex items-center gap-3">
+                        <span class="w-10 h-10 rounded-xl bg-primary-500/15 dark:bg-primary-500/10 flex items-center justify-center text-primary-600 dark:text-primary-500">
+                            <i class="icon-[hugeicons--square-lock-01] text-xl"></i>
+                        </span>
+                        <div>
+                            <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-0.5">Signing Secret</h2>
+                            <p class="text-sm text-surface-500 dark:text-surface-400 m-0">Verify the authenticity of payloads</p>
+                        </div>
+                    </div>
+                </ng-template>
+
+                <div class="flex flex-col gap-4 mt-2">
+                    <div class="flex flex-col gap-2">
+                         <div class="flex items-center gap-2">
+                            <input pInputText
+                                [type]="isSecretVisible() ? 'text' : 'password'"
+                                [value]="signingSecret() || '********************************'"
+                                [disabled]="true"
+                                class="w-full rounded-xl! font-mono text-sm"  pSize="small" />
+
+                             <p-button
+                                [icon]="loadingSecret() ? 'pi pi-spin pi-spinner' : (isSecretVisible() ? 'pi pi-eye-slash' : 'pi pi-eye')"
+                                [outlined]="true"
+                                size="small"
+                                styleClass="rounded-xl!"
+                                [pTooltip]="isSecretVisible() ? 'Hide Secret' : 'View Secret'"
+                                tooltipPosition="top"
+                                tooltipStyleClass="text-xs! rounded-xl!"
+                                (onClick)="toggleSecret()"
+                                [disabled]="loadingSecret()" />
+
+                            <p-button [icon]="isCopied() ? 'pi pi-check' : 'pi pi-copy'"
+                                [outlined]="true"
+                                size="small"
+                                styleClass="rounded-xl!"
+                                [pTooltip]="copyTooltip()"
+                                tooltipPosition="top"
+                                tooltipStyleClass="text-xs! rounded-xl!"
+                                (onClick)="copyToClipboard(signingSecret() || '')"
+                                [disabled]="!signingSecret()" />
+                        </div>
+                        <p class="text-xs text-surface-500 dark:text-surface-400">
+                            Use this secret to verify signatures of incoming requests. <a href="https://docs.kyrazo.com/essentials/webhooks-verification" target="_blank" class="text-primary hover:underline">Learn more about verification</a>.
+                        </p>
+                    </div>
+                </div>
+            </p-card>
+        </div>
+    </div>
+
+    <!-- Recent Activity/Stats - Commented out as requested -->
+    <!--
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" *ngIf="endpoint()?.stats">
+        Total Requests Card
+        <div class="card-panel flex flex-col gap-2 h-full">
+            <div class="flex items-start gap-2 justify-between">
+                <span class="text-xl font-light leading-tight">
+                    Total Requests
+                </span>
+                <span
+                    class="shrink-0 bg-surface-100 dark:bg-surface-800 text-surface-900 dark:text-surface-0 rounded-lg w-8 h-8 flex items-center justify-center">
+                    <i class="pi pi-chart-bar text-xl! leading-none!"></i>
+                </span>
+            </div>
+            <div class="flex flex-col gap-1 w-full">
+                <div class="text-3xl font-medium leading-tight">
+                    {{endpoint()?.stats?.totalRequests}}
+                </div>
+                <div class="text-surface-600 dark:text-surface-400 text-sm leading-tight">
+                    {{ endpoint()?.stats?.totalRequests === 1 ? 'Request processed' : 'Requests processed' }}
+                </div>
+            </div>
+        </div>
+
+        Successful Requests Card
+        <div class="card-panel flex flex-col gap-2 h-full">
+            <div class="flex items-start gap-2 justify-between">
+                <span class="text-xl font-light leading-tight">
+                    Successful
+                </span>
+                <span
+                    class="shrink-0 bg-green-100 dark:bg-green-400/20 text-green-600 dark:text-green-400 rounded-lg w-8 h-8 flex items-center justify-center border border-green-200 dark:border-green-400/40">
+                    <i class="pi pi-check-circle text-xl! leading-none!"></i>
+                </span>
+            </div>
+            <div class="flex flex-col gap-1 w-full">
+                <div class="text-3xl font-medium leading-tight">
+                    {{endpoint()?.stats?.successfulRequests}}
+                </div>
+                <div class="text-surface-600 dark:text-surface-400 text-sm leading-tight">
+                    {{getSuccessRate()}}% success rate
+                </div>
+            </div>
+        </div>
+
+        Failed Requests Card
+        <div class="card-panel flex flex-col gap-2 h-full">
+            <div class="flex items-start gap-2 justify-between">
+                <span class="text-xl font-light leading-tight">
+                    Failed
+                </span>
+                <span
+                    class="shrink-0 bg-red-100 dark:bg-red-400/20 text-red-600 dark:text-red-400 rounded-lg w-8 h-8 flex items-center justify-center border border-red-200 dark:border-red-400/40">
+                    <i class="pi pi-times-circle text-xl! leading-none!"></i>
+                </span>
+            </div>
+            <div class="flex flex-col gap-1 w-full">
+                <div class="text-3xl font-medium leading-tight">
+                    {{endpoint()?.stats?.failedRequests}}
+                </div>
+                <div class="text-surface-600 dark:text-surface-400 text-sm leading-tight">
+                    {{ endpoint()?.stats?.failedRequests === 1 ? 'Request failed' : 'Requests failed' }}
+                </div>
+            </div>
+        </div>
+
+        Average Response Time Card
+        <div class="card-panel flex flex-col gap-2 h-full">
+            <div class="flex items-start gap-2 justify-between">
+                <span class="text-xl font-light leading-tight">
+                    Avg Response
+                </span>
+                <span
+                    class="shrink-0 bg-blue-100 dark:bg-blue-400/20 text-blue-600 dark:text-blue-400 rounded-lg w-8 h-8 flex items-center justify-center border border-blue-200 dark:border-blue-400/40">
+                    <i class="pi pi-clock text-xl! leading-none!"></i>
+                </span>
+            </div>
+            <div class="flex flex-col gap-1 w-full">
+                <div class="text-3xl font-medium leading-tight">
+                    {{endpoint()?.stats?.avgResponseTime}}ms
+                </div>
+                <div class="text-surface-600 dark:text-surface-400 text-sm leading-tight">
+                    Average response time
+                </div>
+            </div>
+        </div>
+    </div>
+    -->
+</div>

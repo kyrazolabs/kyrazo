@@ -1,0 +1,225 @@
+<div
+    class="border-b-2 border-surface-200 dark:border-surface-900 p-2 mx-auto w-full"
+>
+    <div class="flex justify-between items-center">
+        <div class="flex gap-1 lg:gap-3 p-1 items-center">
+            <p-button
+                [outlined]="true"
+                [text]="true"
+                (click)="openSidebar()"
+                [icon]="isOpenSidebar()? 'icon-[hugeicons--arrow-left-01] text-lg!' : 'icon-[hugeicons--arrow-right-01] text-lg!'"
+                class="after:border after:border-surface-300 dark:after:border-surface-600" />
+            <div class="flex items-center gap-1 lg:gap-2 overflow-hidden">
+                <!-- Namespace Selector (shown only when workspace is selected) -->
+                <div
+                    class="flex items-center justify-between cursor-pointer duration-300 hover:bg-surface-50 dark:hover:bg-surface-800/50 transition-all shrink-0 click-effect outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded-lg"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Select Namespace"
+                    (click)="toggleNamespaceSelector($event)"
+                    (keydown.enter)="toggleNamespaceSelector($event)"
+                    (keydown.space)="$event.preventDefault(); toggleNamespaceSelector($event)">
+                    <div class="flex justify-between items-center gap-1 lg:gap-2">
+                        <h3 class="text-sm lg:text-lg font-medium truncate max-w-[100px] lg:max-w-none">{{ selectedNamespace?.name || 'Select Namespace' }}</h3>
+                        <i class="icon-[lucide--chevrons-up-down] size-4 lg:size-5 aspect-square text-surface-400 dark:text-surface-500"></i>
+                    </div>
+                </div>
+                <p class="text-sm lg:text-lg font-medium shrink-0"> {{ pageTitle ? '/' : '' }} </p>
+                <p class="text-sm lg:text-lg font-medium truncate"> {{ pageTitle ? pageTitle : '' }} </p>
+            </div>
+        </div>
+        <!-- Namespace Popover -->
+        <p-popover #pp styleClass="rounded-2xl!">
+            <div class="flex flex-col gap-2">
+                <div>
+                    <div *ngIf="loadingNamespaces" class="flex flex-col items-center justify-center p-2">
+                        <i class="pi pi-spinner pi-spin"></i>
+                        <span class="text-sm">Loading namespaces...</span>
+                    </div>
+                    <ul *ngIf="!loadingNamespaces" class="list-none p-0 m-0 flex flex-col">
+                        <li *ngFor="let namespace of namespaces" class="flex items-center gap-2 px-2 py-1 hover:bg-emphasis cursor-pointer rounded-lg click-effect" (click)="selectNamespace(namespace)">
+                            <div>
+                                <span class="text-sm font-medium">{{ namespace.name }}</span>
+                            </div>
+                        </li>
+                        <li *ngIf="namespaces.length === 0 && !loadingNamespaces" class="flex flex-col items-center justify-center p-2 text-sm text-center text-surface-500 dark:text-surface-400 line-clamp-2 click-effect">
+                            <i class="pi pi-plus" (click)="showCreateNamespace()"></i>
+                            <span class="text-sm">Create One</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </p-popover>
+
+        <div class="flex items-center gap-1 lg:gap-2">
+            <!-- Search Button -->
+            <!-- <p-button
+                [outlined]="true"
+                [text]="true"
+                icon="icon-[hugeicons--search-01] text-lg!"
+                (click)="showSearch()"
+                class="hidden lg:inline-flex"
+                pTooltip="Search (Ctrl+K)" tooltipPosition="bottom" /> -->
+
+            <p-dialog
+                maskStyleClass="backdrop-blur-sm"
+                [modal]="true"
+                [(visible)]="searchVisible"
+                [draggable]="false"
+                [closable]="false"
+                [position]="'center'"
+                [minY]="10"
+                [style]="{ width: '25rem' }"
+            >
+                <div class="flex items-center gap-4 mb-4">
+                    <input
+                        pInputText
+                        id="username"
+                        class="flex-auto"
+                        autocomplete="off"
+                        placeholder="Search ..."
+                        fluid
+                     pSize="small" />
+                </div>
+                <div class="w-full h-48 flex justify-center">
+                    <div class="justify-center items-center">
+                        <i class="size-20 icon-[hugeicons--search-01] text-surface-400"></i>
+                        <p class="text-xl mt-10"> No Results</p>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2">
+                    <p-button
+                        label="Cancel"
+                        severity="secondary"
+                        (click)="searchVisible = false"
+                        size="small"
+                    />
+                    <p-button label="Save" (click)="searchVisible = false" size="small"  styleClass="shadow-md shadow-primary/50 dark:shadow-primary/20" />
+                </div>
+            </p-dialog>
+
+            <!-- Worker Status -->
+            <p-button
+                [outlined]="true"
+                [text]="true"
+                (click)="workerDrawerVisible.set(true)"
+                icon="icon-[hugeicons--cpu] text-lg!"
+                class="hidden lg:inline-flex"
+                pTooltip="Worker Status" tooltipPosition="bottom">
+            </p-button>
+
+            <!-- Palette / Config -->
+            <div class="relative hidden lg:block z-50">
+                <p-button
+                    #settingsButton
+                    (click)="toggleConfig()"
+                    [outlined]="true"
+                    [text]="true"
+                    icon="pi pi-palette"
+                    pTooltip="Theme Settings" tooltipPosition="bottom"
+                    size="small"
+                />
+                <app-config *ngIf="showConfig" @dropdownAnimation />
+            </div>
+
+            <!-- Dark Mode Toggle -->
+            <p-button
+                [outlined]="true"
+                [text]="true"
+                (click)="toggleDarkMode()"
+                [icon]="isDarkMode()? 'pi pi-moon' : 'pi pi-sun'"
+                class="hidden lg:inline-flex"
+                pTooltip="Toggle Dark Mode" tooltipPosition="bottom"
+                size="small"
+            />
+            <p-button pRipple
+                [outlined]="true"
+                severity="primary"
+                [raised]="false"
+                styleClass="p-0!"
+                rounded
+                (click)="op.toggle($event)"
+                size="small" >
+                @if (avatarUrl()) {
+                    <p-avatar [image]="avatarUrl()!" size="normal"/>
+                } @else {
+                    <p-avatar icon="pi pi-user" size="normal"/>
+                }
+            </p-button>
+
+            <p-popover #op
+                styleClass="rounded-2xl! -mb-10! shadow-2xl! border-2! border-surface-200! dark:border-surface-800!">
+                <div class="flex flex-col gap-4 w-40">
+                            <ul
+                                class="list-none py-0 pr-0 m-0 transition-all duration-400 ease-in-out">
+                                <li>
+                                    <a pRipple [routerLink]="'/settings'" [queryParams]="{ tab: 'profile' }"
+                                        class="flex items-center cursor-pointer p-2 rounded-xl text-sm text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-150 transition-colors p-ripple click-effect">
+                                        <i class="icon-[hugeicons--user-03] text-lg! mr-2"></i>
+                                        <span class="font-medium">Profile</span>
+                                    </a>
+                                </li>
+                                <!-- <li>
+                                    <a pRipple [routerLink]="'/settings'" [queryParams]="{ tab: 'notifications' }"
+                                        class="flex items-center cursor-pointer p-2 rounded-xl text-sm text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-150 transition-colors p-ripple click-effect">
+                                        <i class="icon-[hugeicons--notification-01] text-lg! mr-2"></i>
+                                        <span class="font-medium">Notifications</span>
+                                    </a>
+                                </li> -->
+                                <li>
+                                    <a pRipple [routerLink]="'/settings'" [queryParams]="{ tab: 'billing' }"
+                                        class="flex items-center cursor-pointer p-2 rounded-xl text-sm text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-150 transition-colors p-ripple click-effect">
+                                        <i class="icon-[hugeicons--credit-card] text-lg! mr-2"></i>
+                                        <span class="font-medium">Billing</span>
+                                    </a>
+                                </li>
+
+                                <!-- Mobile only Theme/Config -->
+                                @if (layoutService.isMobile()) {
+                                    <div class="my-1 border-t border-surface-200 dark:border-surface-800"></div>
+                                    <li>
+                                        <a pRipple (click)="workerDrawerVisible.set(true)"
+                                            class="flex items-center cursor-pointer p-2 rounded-xl text-sm text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-150 transition-colors p-ripple click-effect">
+                                            <i class="icon-[hugeicons--cpu] text-lg! mr-2"></i>
+                                            <span class="font-medium">Worker Status</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a pRipple (click)="toggleDarkMode()"
+                                            class="flex items-center cursor-pointer p-2 rounded-xl text-sm text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-150 transition-colors p-ripple click-effect">
+                                            <i [class]="isDarkMode() ? 'pi pi-moon' : 'pi pi-sun text-lg!'" class="mr-2"></i>
+                                            <span class="font-medium">{{ isDarkMode() ? 'Dark Mode' : 'Light Mode' }}</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <div class="relative">
+                                            <a pRipple (click)="toggleConfig()"
+                                                class="flex items-center cursor-pointer p-2 rounded-xl text-sm text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-150 transition-colors p-ripple click-effect">
+                                                <i class="pi pi-palette mr-2"></i>
+                                                <span class="font-medium">Theme Settings</span>
+                                            </a>
+                                            <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-60" *ngIf="showConfig">
+                                                <app-config @dropdownAnimation />
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <div class="my-1 border-t border-surface-200 dark:border-surface-800"></div>
+                                }
+
+                                <li>
+                                    <a pRipple (click)="logout()"
+                                        class="flex items-center cursor-pointer p-2 rounded-xl text-sm text-surface-700 dark:text-surface-100 hover:text-red-700 dark:hover:text-red-500 hover:bg-red-100 dark:hover:bg-red-700/30 duration-150 transition-colors p-ripple click-effect">
+                                        <i class="icon-[hugeicons--logout-05] text-lg! mr-2"></i>
+                                        <span class="font-medium">Logout</span>
+                                    </a>
+                                </li>
+                    </ul>
+                </div>
+            </p-popover>
+        </div>
+    </div>
+</div>
+
+<app-worker-status [(visible)]="workerDrawerVisible" />
+
+

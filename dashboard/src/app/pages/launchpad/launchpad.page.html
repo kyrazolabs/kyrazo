@@ -1,0 +1,85 @@
+<div class="min-h-screen bg-surface-50 dark:bg-surface-950 flex flex-col items-center justify-center p-6">
+    <div class="w-full max-w-7xl flex flex-col justify-center items-center">
+        <!-- Logo/Header -->
+        <div class="text-center mb-8">
+            <h1 appScrollReveal delay="delay-50" class="text-4xl font-bold text-surface-900 dark:text-surface-0 mb-2">Welcome to Kyrazo</h1>
+            <p appScrollReveal delay="delay-100" class="text-surface-600 dark:text-surface-400">Let's get your first workspace and namespace set up.</p>
+        </div>
+
+        <!-- Progress Steps -->
+        <div class="flex items-center justify-center mb-12">
+            <div appScrollReveal delay="delay-100" class="flex items-center space-x-4">
+                <div [class]="'w-10 h-10 rounded-full flex items-center justify-center font-bold ' +
+                    (currentStep() >= 1 ? 'bg-primary text-white' : 'bg-surface-200 dark:bg-surface-800 text-surface-500')">
+                    1
+                </div>
+                <div [class]="'h-1 w-16 rounded ' + (currentStep() >= 2 ? 'bg-primary' : 'bg-surface-200 dark:bg-surface-800')"></div>
+                <div [class]="'w-10 h-10 rounded-full flex items-center justify-center font-bold ' +
+                    (currentStep() >= 2 ? 'bg-primary text-white' : 'bg-surface-200 dark:bg-surface-800 text-surface-500')">
+                    2
+                </div>
+                <div [class]="'h-1 w-16 rounded ' + (currentStep() >= 3 ? 'bg-primary' : 'bg-surface-200 dark:bg-surface-800')"></div>
+                <div [class]="'w-10 h-10 rounded-full flex items-center justify-center font-bold ' +
+                    (currentStep() >= 3 ? 'bg-primary text-white' : 'bg-surface-200 dark:bg-surface-800 text-surface-500')">
+                    3
+                </div>
+            </div>
+        </div>
+
+        <!-- Step Content -->
+            @if (currentStep() === 1) {
+                <div class="w-full flex justify-center">
+                    <app-create-first-workspace (workspaceCreated)="onWorkspaceCreated($event)"></app-create-first-workspace>
+                </div>
+            } @else if (currentStep() === 2) {
+                <div class="text-center w-full flex justify-center">
+                    <app-create-first-namespace
+                        [visible]="true"
+                        [workspaceId]="createdWorkspaceId()!"
+                        (namespaceCreated)="onNamespaceCreated($event)">
+                    </app-create-first-namespace>
+                </div>
+            } @else if (currentStep() === 3) {
+                <div class="text-center space-y-8 py-4">
+                    <div appScrollReveal delay="delay-100" class="flex items-center justify-center w-24 h-24 bg-green-100 dark:bg-green-900/30 rounded-full mx-auto">
+                        <i class="icon-[hugeicons--checkmark-circle-01] size-16 text-5xl text-green-500"></i>
+                    </div>
+
+                    <div class="space-y-4">
+                        <h2 appScrollReveal delay="delay-150" class="text-3xl font-bold text-surface-900 dark:text-surface-0">
+                            You're all set! 🎉
+                        </h2>
+                        <p appScrollReveal delay="delay-300" class="text-xl text-surface-600 dark:text-surface-300 max-w-md mx-auto leading-relaxed">
+                            Your workspace and first namespace are ready. Welcome to Kyrazo!
+                        </p>
+                    </div>
+
+                    <div appScrollReveal delay="delay-500" class="pt-6">
+                        <p-button
+                            label="Go to Dashboard"
+                            icon="pi pi-arrow-right"
+                            iconPos="right"
+                            (click)="goToDashboard()"
+                            styleClass="rounded-2xl! py-4 px-8 text-lg font-bold shadow-md shadow-primary/50 dark:shadow-primary/20">
+                        </p-button>
+                    </div>
+                </div>
+            }
+    </div>
+
+    <!-- Confetti Particles -->
+    <div class="confetti-container">
+        @for (p of confettiParticles(); track p.id) {
+            <div class="confetti"
+                [style.left]="p.left"
+                [style.background-color]="p.color"
+                [style.animation-delay]="p.delay"
+                [style.width]="p.size"
+                [style.height]="p.size"
+                [style.--x]="p.x"
+                [style.--y]="p.y"
+                [style.--rotation]="p.rotation">
+            </div>
+        }
+    </div>
+</div>

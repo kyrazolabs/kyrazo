@@ -1,0 +1,153 @@
+<div class="flex items-center gap-2">
+    <p-drawer #drawerRef [(visible)]="visible" position="right" blockScroll [style]="{ width: '500px' }" styleClass="border-l! border-surface-200! dark:border-surface-800! bg-surface-0! dark:bg-surface-950!">
+        <ng-template #headless>
+            <div class="flex justify-between items-center m-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 aspect-square! flex justify-center items-center rounded-xl bg-primary-50 dark:bg-primary-500/10">
+                        <i class="icon-[hugeicons--cpu-charge] text-primary text-2xl! aspect-square!"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <h3 class="text-base font-bold text-surface-900 dark:text-surface-0 leading-none">
+                            Dedicated Workers
+                        </h3>
+                        <span class="text-xs text-surface-500 mt-1 uppercase tracking-wider font-semibold">
+                            System Status & Connectivity
+                        </span>
+                    </div>
+                </div>
+                <!-- Header Action -->
+                <div class="flex items-center">
+                    <p-button icon="pi pi-refresh text-lg!" [text]="true" [rounded]="true" (onClick)="workerService.loadWorkers()"
+                    [loading]="workerService.loading()" styleClass="h-8 w-8 hover:bg-primary-50 dark:hover:bg-primary-500/10"></p-button>
+                    <p-button type="button" (click)="closeCallback($event)" icon="pi pi-times text-lg!" [text]="true" severity="secondary" [rounded]="true" styleClass="h-8 w-8 hover:bg-primary-50 dark:hover:bg-primary-500/10"></p-button>
+                </div>
+            </div>
+            <div class="flex flex-col h-full overflow-hidden">
+
+                <div class="px-6 pb-4 space-y-3">
+                    <div class="flex items-center gap-2">
+                        <p-iconfield iconPosition="left" class="flex-1">
+                            <p-inputicon class="icon-[hugeicons--search-01] text-surface-400" />
+                            <input pInputText type="text"
+                                [ngModel]="searchQuery()"
+                                (ngModelChange)="searchQuery.set($event)"
+                                placeholder="Search by ID, IP or Status..."
+                                class="w-full bg-surface-50 dark:bg-surface-900 border-surface-200 dark:border-surface-800 rounded-xl text-sm"  pSize="small" />
+                        </p-iconfield>
+
+                        <p-button #sortBtn [outlined]="true"
+                            (onClick)="sortPopover.toggle($event)"
+                            styleClass="w-9! aspect-square! rounded-xl!"
+                            severity="secondary"
+                            pTooltip="Sort Workers" tooltipPosition="bottom"
+                            icon="icon-[hugeicons--sorting-05] text-xl!"/>
+
+                        <p-popover #sortPopover styleClass="w-[280px] rounded-xl!">
+                            <div class="p-2 space-y-4">
+                                <div class="flex flex-col gap-2">
+                                    <span class="text-xs font-bold text-surface-500 uppercase tracking-wider">Sort by Field</span>
+                                    <p-select [options]="sortFieldOptions"
+                                        [ngModel]="sortField()"
+                                        (ngModelChange)="sortField.set($event)"
+                                        optionLabel="label" optionValue="value" size="small" appendTo="body">
+                                        <ng-template #item let-item>
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-sm! font-medium!">{{item.label}}</span>
+                                            </div>
+                                        </ng-template>
+                                    </p-select>
+                                </div>
+
+                                <div class="flex flex-col gap-2">
+                                    <span class="text-xs font-bold text-surface-500 uppercase tracking-wider">Sort Order</span>
+                                    <p-selectButton [options]="sortOrderOptions"
+                                        [ngModel]="sortOrder()"
+                                        (ngModelChange)="sortOrder.set($event)"
+                                        optionValue="value"
+                                        styleClass="w-full flex">
+                                        <ng-template #item let-item>
+                                            <div class="flex items-center gap-2 px-3">
+                                                <span class="text-xs! font-bold! uppercase!">{{item.label}}</span>
+                                            </div>
+                                        </ng-template>
+                                    </p-selectButton>
+                                </div>
+                            </div>
+                        </p-popover>
+                    </div>
+                </div>
+
+                <div class="mx-6 border-t border-surface-200 dark:border-surface-900 "></div>
+
+
+                <!-- Worker List -->
+                <div class="flex-1 overflow-y-auto p-6 space-y-4">
+                    @if (filteredWorkers().length === 0 && !workerService.loading()) {
+                    <div class="py-12 flex flex-col items-center justify-center text-center px-6">
+                        <div class="size-16 rounded-full bg-surface-50 dark:bg-surface-800 flex items-center justify-center mb-4">
+                            <i class="icon-[hugeicons--settings-01] text-4xl! text-surface-400"></i>
+                        </div>
+                        <h4 class="text-base font-bold text-surface-900 dark:text-surface-0 mb-1">
+                            {{ searchQuery() ? 'No Matching Workers' : 'No Active Workers' }}
+                        </h4>
+                        <p class="text-sm text-surface-500 leading-relaxed">
+                            {{ searchQuery() ? 'Try adjusting your search query.' : 'There are currently no dedicated workers assigned to your workspace.' }}
+                        </p>
+                    </div>
+                    }
+
+                    @for (worker of filteredWorkers(); track worker.worker_id) {
+                    <div class="p-4 rounded-2xl border border-surface-200 dark:border-surface-800 bg-surface-0 dark:bg-surface-900/20 hover:border-primary-500/30 transition-all duration-200 group">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex flex-col">
+                                <span class="text-base font-bold text-surface-900 dark:text-surface-0 flex items-center gap-3">
+                                    <i class="icon-[hugeicons--chip] text-xl text-primary"></i>
+                                    Worker {{ $index + 1 }}
+                                </span>
+                                <span class="text-sm text-surface-500 font-mono mt-1 click-effect cursor-pointer select-none" (click)="copyToClipboard(worker.worker_id, worker.worker_id + '_id')" >ID: {{ copied() === worker.worker_id + '_id' ? 'Copied' : worker.worker_id.split('-')[0] + '-' + worker.worker_id.split('-')[1] }}...</span>
+                            </div>
+                            <p-tag [severity]="workerService.getBadgeSeverity(worker.status)" [value]="worker.status"
+                                styleClass="text-xs! rounded-xl! font-bold px-2"></p-tag>
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-2">
+                            <!-- IPv4 -->
+                            <div class="flex items-center justify-between py-2 px-4 rounded-xl bg-surface-50 dark:bg-surface-900/50 border border-surface-200 dark:border-surface-800">
+                                <span class="text-xs font-bold text-surface-500 dark:text-surface-400 uppercase">IPv4</span>
+                                <span (click)="copyToClipboard(worker.server_ip, worker.worker_id + '_ipv4')" class="text-sm font-mono text-surface-700 dark:text-surface-300 cursor-pointer select-none click-effect truncate max-w-[180px]">
+                                    {{ copied() === worker.worker_id + '_ipv4' ? 'Copied' : worker.server_ip }}
+                                </span>
+                            </div>
+                            <!-- IPv6 -->
+                            @if (worker.server_ipv6) {
+                            <div class="flex items-center justify-between py-2 px-4 rounded-xl bg-surface-50 dark:bg-surface-900/50 border border-surface-200 dark:border-surface-800">
+                                <span class="text-xs font-bold text-surface-500 dark:text-surface-400 uppercase">IPv6</span>
+                                <span (click)="copyToClipboard(worker.server_ipv6!, worker.worker_id + '_ipv6')" class="text-sm font-mono text-surface-700 dark:text-surface-300 cursor-pointer select-none click-effect truncate max-w-[180px]" [pTooltip]="worker.server_ipv6" tooltipPosition="bottom">
+                                    {{ copied() === worker.worker_id + '_ipv6' ? 'Copied' : worker.server_ipv6 }}
+                                </span>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                    }
+                </div>
+
+                <!-- Footer -->
+                <!-- <div class="p-4 mt-auto">
+                    <div class="my-4 mx-2 border-t border-surface-50 dark:border-surface-900 "></div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="size-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                            <span class="text-sm font-bold text-surface-600 dark:text-surface-400">System Healthy</span>
+                        </div>
+                        <button class="text-sm font-bold text-primary hover:text-primary-600 transition-colors flex items-center gap-1 group">
+                            Manage Workers
+                            <i class="icon-[hugeicons--arrow-right-01] text-lg transition-transform group-hover:translate-x-0.5"></i>
+                        </button>
+                    </div>
+                </div> -->
+            </div>
+        </ng-template>
+
+    </p-drawer>
+</div>

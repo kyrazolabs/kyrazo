@@ -1,0 +1,388 @@
+@if (initialLoading()) {
+    <div class="flex flex-col gap-6">
+        <div class="flex flex-col gap-4">
+            <p-skeleton width="100%" height="2.5rem" borderRadius="12px"></p-skeleton>
+            <p-skeleton width="100%" height="5rem" borderRadius="12px"></p-skeleton>
+            <p-skeleton width="100%" height="2.5rem" borderRadius="12px"></p-skeleton>
+        </div>
+    </div>
+} @else {
+    <div class="flex flex-col h-full" [formGroup]="sourceForm">
+        <p-tabs [value]="0" class="pb-4">
+            <p-tablist>
+                <p-tab [value]="0">
+                    <div class="flex items-center gap-2">
+                        <i class="pi pi-cog"></i>
+                        <span>Configuration</span>
+                    </div>
+                </p-tab>
+                <p-tab [value]="1">
+                    <div class="flex items-center gap-2">
+                        <i class="pi pi-code"></i>
+                        <span>Transformer</span>
+                    </div>
+                </p-tab>
+                @if (isEditing()) {
+                    <p-tab [value]="2">
+                        <div class="flex items-center gap-2">
+                            <i class="pi pi-send"></i>
+                            <span>Destinations</span>
+                        </div>
+                    </p-tab>
+                }
+            </p-tablist>
+
+            <p-tabpanels styleClass="p-0 pt-6">
+                <!-- Tab 1: Configuration -->
+                <p-tabpanel [value]="0">
+                    <div class="flex flex-col gap-6">
+                        <!-- General Info -->
+                        <div class="flex flex-col gap-4">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-sm font-semibold uppercase tracking-wider text-surface-500">General Information</h3>
+                                @if (isEditing() && sourceId) {
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs font-semibold text-surface-400">ID:</span>
+                                        <app-copy-id [id]="sourceId" [fullWidth]="true" />
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="flex flex-col gap-2">
+                                    <p-floatlabel variant="on">
+                                        <input pInputText id="name" formControlName="name" class="w-full rounded-xl!" pSize="small"/>
+                                        <label for="name">Source Name *</label>
+                                    </p-floatlabel>
+                                    @if (sourceForm.get('name')?.invalid && sourceForm.get('name')?.touched) {
+                                        <small class="text-red-500 ml-1">Required</small>
+                                    }
+                                </div>
+                                <div class="flex flex-col gap-2">
+                                    <p-floatlabel variant="on">
+                                        <p-select [options]="statusOptions" formControlName="status" optionLabel="label" optionValue="value" class="w-full rounded-xl!" appendTo="body" size="small" />
+                                        <label>Status</label>
+                                    </p-floatlabel>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col gap-2">
+                                <p-floatlabel variant="on">
+                                    <textarea pTextarea id="description" formControlName="description" rows="2" class="w-full rounded-xl!" pSize="small"></textarea>
+                                    <label for="description">Description (Optional)</label>
+                                </p-floatlabel>
+                            </div>
+                        </div>
+
+                        <p-divider />
+
+                        <!-- Integration -->
+                        <div class="flex flex-col gap-4">
+                            <h3 class="text-sm font-semibold uppercase tracking-wider text-surface-500">Integration</h3>
+
+                            <div class="flex flex-col gap-2">
+                                <p-floatlabel variant="on">
+                                    <p-select [options]="servicesItem" formControlName="service" optionLabel="label" optionValue="value" size="small"
+                                        [filter]="true" filterBy="label" class="w-full rounded-xl!" panelStyleClass="rounded-xl!" appendTo="body">
+                                        <ng-template let-item pTemplate="item">
+                                            <div class="flex items-center gap-2">
+                                                <span [class]="item.icon"></span>
+                                                <span>{{ item.label }}</span>
+                                            </div>
+                                        </ng-template>
+                                        <ng-template let-item pTemplate="selectedItem">
+                                            @if (item) {
+                                                <div class="flex items-center gap-2">
+                                                    <span [class]="item.icon"></span>
+                                                    <span>{{ item.label }}</span>
+                                                </div>
+                                            }
+                                        </ng-template>
+                                    </p-select>
+                                    <label>Service Provider *</label>
+                                </p-floatlabel>
+                            </div>
+
+                            <div class="dialog-expand-row" [class.dialog-expand-row--open]="!isEditing() && sourceForm.get('service')?.value && sourceForm.get('service')?.value !== 'general'">
+                                <div class="dialog-expand-content">
+                                    <div class="flex flex-col gap-2 pt-2" formGroupName="authentication">
+                                        <p-floatlabel variant="on">
+                                            <p-password formControlName="secret" [toggleMask]="true" [feedback]="false" styleClass="w-full" inputStyleClass="w-full rounded-xl!" autocomplete="off" size="small"></p-password>
+                                            <label>Webhook Secret *</label>
+                                        </p-floatlabel>
+                                        <small class="text-surface-400 italic">Signature verification secret.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dialog-expand-row" [class.dialog-expand-row--open]="sourceForm.get('service')?.value">
+                            <div class="dialog-expand-content">
+                                <p-divider />
+
+                                <!-- Event Filtering -->
+                                <div class="flex flex-col gap-4 pb-2">
+                                    <div class="flex items-center justify-between">
+                                        <h3 class="text-sm font-semibold uppercase tracking-wider text-surface-500">Routing & Filtering</h3>
+                                    </div>
+
+                                    <div class="flex flex-col gap-2">
+                                        <label class="text-sm font-medium">Filter Incoming Event Types</label>
+                                        <p-autocomplete formControlName="eventTypes" [suggestions]="filteredEventTypes()"
+                                            (completeMethod)="searchEventTypes($event)" [multiple]="true" [dropdown]="false"
+                                            class="w-full rounded-xl!" panelStyleClass="rounded-xl!" size="small" [placeholder]="'Search or select event types...'"
+                                            [unique]="true"
+                                            [addOnBlur]="true"
+                                            appendTo="body"
+                                        ></p-autocomplete>
+                                        <small class="text-surface-400">Accept specific event types (e.g. <code>user.created</code>). Empty allows all.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </p-tabpanel>
+
+                <!-- Tab 2: Managed Transformer -->
+                <p-tabpanel [value]="1">
+                    <div class="flex flex-col">
+                        <!-- Toolbar -->
+                        <div class="flex items-center justify-between py-4 bg-surface-0/50 dark:bg-surface-900/50 backdrop-blur-md">
+                            <div class="flex items-center gap-3">
+                                <p-toggle-switch formControlName="useTransformer" />
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-semibold">Enable Managed Transformer</span>
+                                    <span class="text-xs text-surface-400">Reshape payload before delivery</span>
+                                </div>
+                            </div>
+                            <div class="dialog-expand-row" [class.dialog-expand-row--open]="sourceForm.get('useTransformer')?.value">
+                                <div class="dialog-expand-content">
+                                    <div class="flex gap-2">
+                                        <p-selectButton
+                                            [options]="transformerTabOptions"
+                                            [ngModel]="activeTransformerTab()"
+                                            (ngModelChange)="onTransformerTabChange($event)"
+                                            [ngModelOptions]="{standalone: true}" [size]="'small'"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <!-- Active Transformer Content -->
+                            <div class="dialog-expand-row" [class.dialog-expand-row--open]="sourceForm.get('useTransformer')?.value">
+                                <div class="dialog-expand-content">
+                                    <div class="flex-1 overflow-hidden animate-in fade-in duration-300" formGroupName="transformer">
+                                        <!-- Editor Tab -->
+                                        <div class="h-[500px] flex flex-col" [hidden]="activeTransformerTab() !== 0">
+                                            <div class="flex-1 min-h-0 relative rounded-xl overflow-hidden shadow-inner">
+                                                @if (sourceForm.get('useTransformer')?.value) {
+                                                    <app-code-editor formControlName="code" language="javascript"></app-code-editor>
+                                                }
+
+                                                <div class="absolute bottom-4 right-4 flex items-center gap-2">
+                                                    <a href="https://docs.kyrazo.com/essentials/transformers" target="_blank"
+                                                       class="text-[10px] font-bold uppercase tracking-widest text-surface-400 hover:text-primary transition-colors flex items-center gap-1.5 bg-surface-0/80 dark:bg-surface-900/80 px-2 py-1 rounded-md backdrop-blur-sm border border-surface-200/50 dark:border-surface-800/50">
+                                                        <i class="pi pi-external-link"></i>
+                                                        Docs
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Test & Debug Tab -->
+                                        <div class="h-[500px] overflow-y-auto p-4 space-y-6" [hidden]="activeTransformerTab() !== 1">
+                                            <!-- Input Section -->
+                                            <div class="flex flex-col gap-3">
+                                                <div class="flex items-center justify-between">
+                                                    <div class="flex items-center gap-2">
+                                                        <i class="pi pi-file-edit text-primary"></i>
+                                                        <span class="text-xs font-bold uppercase tracking-widest text-surface-500">Test Input (JSON)</span>
+                                                    </div>
+                                                    <p-button label="Run Test" icon="pi pi-play" size="small" [outlined]="true"
+                                                        [loading]="isTestingTransformer()" (onClick)="onTestTransformer()" styleClass="rounded-xl! py-1!" />
+                                                </div>
+                                                <div class="h-64 rounded-xl border border-surface-200 dark:border-surface-800 overflow-hidden bg-surface-0 dark:bg-surface-900 shadow-inner">
+                                                    @if (sourceForm.get('useTransformer')?.value) {
+                                                        <app-code-editor [ngModel]="testPayload()" (ngModelChange)="testPayload.set($event)" [ngModelOptions]="{standalone: true}" language="json"></app-code-editor>
+                                                    }
+                                                </div>
+                                            </div>
+
+                                            <!-- Output & Logs Section -->
+                                            <div class="space-y-4">
+                                                <div class="flex items-center justify-between">
+                                                    <div class="flex items-center gap-2">
+                                                        <i class="pi pi-box text-primary"></i>
+                                                        <span class="text-xs font-bold uppercase tracking-widest text-surface-500">Execution Results</span>
+                                                    </div>
+                                                    @if (testExecutionTime() > 0) {
+                                                        <div class="flex items-center gap-2 px-2 py-0.5 bg-primary/10 border border-primary/20 rounded-full">
+                                                            <i class="pi pi-bolt text-[10px] text-primary"></i>
+                                                            <span class="text-[10px] font-bold text-primary">{{ testExecutionTime() }}ms</span>
+                                                        </div>
+                                                    }
+                                                </div>
+
+                                                <!-- Transformed Output -->
+                                                <div class="overflow-hidden">
+                                                    <div class="p-3">
+                                                        <span class="text-xs font-bold uppercase tracking-tighter text-surface-400">Transformed Output</span>
+                                                    </div>
+                                                    <div class="h-64 rounded-xl border border-surface-200 dark:border-surface-800 overflow-hidden bg-surface-0 dark:bg-surface-900 shadow-inner">
+                                                        @if (testResult()) {
+                                                            <app-code-editor [ngModel]="testResultFormatted()" [readonly]="true" [ngModelOptions]="{standalone: true}" language="json"></app-code-editor>
+                                                        } @else if (isTestingTransformer()) {
+                                                            <div class="h-full flex flex-col items-center justify-center opacity-40 gap-3">
+                                                                <i class="pi pi-spin pi-spinner text-2xl"></i>
+                                                                <span class="text-sm italic">Executing transformer...</span>
+                                                            </div>
+                                                        } @else {
+                                                            @if (sourceForm.get('useTransformer')?.value) {
+                                                                <app-code-editor [ngModel]="" [readonly]="true" [ngModelOptions]="{standalone: true}" language="json"></app-code-editor>
+                                                            }
+                                                        }
+                                                    </div>
+                                                </div>
+
+                                                <!-- Logs -->
+                                                <div class="rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-950 overflow-hidden">
+                                                    <div class="px-4 py-2 border-b border-surface-800 flex items-center justify-between">
+                                                        <span class="text-[10px] font-bold uppercase tracking-widest text-surface-500">Console Logs</span>
+                                                    </div>
+                                                    <div class="h-40 overflow-y-auto p-4 font-mono text-xs text-emerald-400/90 selection:bg-emerald-500/20">
+                                                        @for (log of testLogs(); track $index) {
+                                                            <div class="flex gap-3 py-0.5 group">
+                                                                <span class="opacity-20 select-none group-hover:opacity-40 transition-opacity w-4 text-right">#{{ $index + 1 }}</span>
+                                                                <span class="whitespace-pre-wrap">{{ log }}</span>
+                                                            </div>
+                                                        } @empty {
+                                                            <div class="h-full flex items-center justify-center text-surface-600 italic">
+                                                                <i class="pi pi-info-circle mr-2"></i>
+                                                                No logs generated
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Disabled Placeholder -->
+                            <div class="dialog-expand-row" [class.dialog-expand-row--open]="!sourceForm.get('useTransformer')?.value">
+                                <div class="dialog-expand-content">
+                                    <div class="flex-1 flex flex-col items-center justify-center py-16 text-center opacity-50 select-none grayscale pointer-events-none animate-in fade-in duration-300">
+                                        <div class="relative mb-6">
+                                            <i class="pi pi-code text-7xl text-surface-300"></i>
+                                            <i class="pi pi-slash absolute inset-0 text-7xl text-red-400/30"></i>
+                                        </div>
+                                        <h4 class="text-lg font-bold text-surface-600 dark:text-surface-300">Transformer logic is bypassed</h4>
+                                        <p class="text-sm max-w-sm text-surface-500">Enable the managed transformer to apply custom JavaScript transformations to incoming events before delivery.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </p-tabpanel>
+
+                <!-- Tab 3: Destinations -->
+                @if (isEditing()) {
+                    <p-tabpanel [value]="2">
+                        <div class="flex flex-col gap-8" formGroupName="destination">
+                            <!-- Endpoints -->
+                            <div class="flex flex-col gap-4">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-sm font-semibold uppercase tracking-wider text-surface-500">Webhook Destinations</h3>
+                                    <p-button label="Add New Endpoint" icon="pi pi-plus" size="small" [text]="true" (onClick)="openEndpointDialog()" />
+                                </div>
+                                <div class="flex flex-col gap-2">
+                                    <p-multiSelect [options]="availableEndpoints()" formControlName="endpoints" optionLabel="url" optionValue="id"
+                                        display="chip" class="w-full rounded-xl!" panelStyleClass="rounded-xl!" [filter]="true" appendTo="body" size="small"
+                                        placeholder="Select Webhook Endpoints">
+                                        <ng-template let-endpoint pTemplate="item">
+                                            <div class="flex flex-col">
+                                                <span class="font-medium text-sm">{{ endpoint.url }}</span>
+                                                <span class="text-xs text-surface-400">{{ endpoint.description }}</span>
+                                            </div>
+                                        </ng-template>
+                                    </p-multiSelect>
+                                    <small class="text-surface-400 italic">Standard webhooks managed in the Endpoints tab.</small>
+                                </div>
+                            </div>
+
+                            <p-divider />
+
+                            <!-- S3 Storage -->
+                            <div class="flex flex-col gap-4">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <h3 class="text-sm font-semibold uppercase tracking-wider text-surface-500">S3 Storage</h3>
+                                        <div class="ml-2 px-2.5 py-0.5 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-600 shadow-yellow-500/20 text-[10px] font-bold uppercase tracking-wider shrink-0">
+                                            Beta
+                                        </div>
+                                    </div>
+                                    <p-button label="Add New Bucket" icon="pi pi-plus" size="small" [text]="true" (onClick)="openS3Dialog()" />
+                                </div>
+                                <div class="flex flex-col gap-2">
+                                    <p-multiSelect [options]="availableS3Buckets()" formControlName="s3bucket" optionLabel="name" optionValue="id"
+                                        display="chip" class="w-full rounded-xl!" panelStyleClass="rounded-xl!" [filter]="true" appendTo="body" size="small"
+                                        placeholder="Select S3 Buckets">
+                                        <ng-template let-bucket pTemplate="item">
+                                            <div class="flex flex-col">
+                                                <span class="font-medium text-sm">
+                                                    {{ bucket.name }} <span class="text-xs text-surface-400">{{ bucket.bucketName }} ({{ bucket.region }})</span>
+                                               </span>
+                                            </div>
+                                        </ng-template>
+                                    </p-multiSelect>
+                                    <small class="text-surface-400 italic">Archive event streams directly to S3 compatible storage.</small>
+                                </div>
+                            </div>
+
+                            <p-divider />
+
+                            <!-- ASQS Queues -->
+                            <div class="flex flex-col gap-4">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <h3 class="text-sm font-semibold uppercase tracking-wider text-surface-500">SQS Queues</h3>
+                                        <div class="ml-2 px-2.5 py-0.5 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-600 shadow-yellow-500/20 text-[10px] font-bold uppercase tracking-wider shrink-0">
+                                            Beta
+                                        </div>
+                                    </div>
+                                    <p-button label="Add New Queue" icon="pi pi-plus" size="small" [text]="true" (onClick)="openASQSDialog()" />
+                                </div>
+                                <div class="flex flex-col gap-2">
+                                    <p-multiSelect [options]="availableASQSQueues()" formControlName="asqs" optionLabel="name" optionValue="id"
+                                        display="chip" class="w-full rounded-xl!" panelStyleClass="rounded-xl!" [filter]="true" appendTo="body" size="small"
+                                        placeholder="Select SQS Queues">
+                                        <ng-template let-queue pTemplate="item">
+                                            <div class="flex flex-col">
+                                                <span class="font-medium text-sm">
+                                                    {{ queue.name }} <span class="text-xs text-surface-400">{{ queue.region }}</span>
+                                                </span>
+                                            </div>
+                                        </ng-template>
+                                    </p-multiSelect>
+                                    <small class="text-surface-400 italic">Push events to SQS for asynchronous processing.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </p-tabpanel>
+                }
+            </p-tabpanels>
+        </p-tabs>
+
+        <!-- Form Actions -->
+        <div class="flex justify-end items-center mt-auto pt-4 bg-surface-0 dark:bg-surface-950 p-4 -mx-4 -mb-4 rounded-b-2xl">
+
+            <div class="flex gap-3">
+                <p-button label="Cancel" size="small" [text]="true" severity="secondary" (onClick)="cancel()" styleClass="rounded-xl!" />
+                <p-button [label]="isEditing() ? 'Save Changes' : 'Create Source'" icon="pi pi-check" size="small"
+                    [loading]="loading()" (onClick)="onSubmit()" styleClass="rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20" />
+            </div>
+        </div>
+    </div>
+}

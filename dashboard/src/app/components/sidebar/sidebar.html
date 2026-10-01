@@ -1,0 +1,486 @@
+<div class="fixed h-auto bottom-0 top-0 left-0 flex justify-center w-80 lg:w-auto">
+    <div #sidebarContent
+        class="flex flex-col justify-center w-full lg:w-[296px] h-full bg-transparent! p-4 mx-auto lg:border-r border-surface-200 dark:border-surface-900 overflow-y-auto">
+        <div class="flex flex-col justify-center p-4 w-full h-full bg-surface-0 dark:bg-surface-950 border-2 border-surface-200/80 dark:border-surface-900 rounded-xl relative">
+            <!-- Mobile Close Button -->
+            <div class="absolute top-2 right-2 lg:hidden z-10">
+                <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="secondary" size="small"
+                          (click)="layoutService.closeSidebar()" />
+            </div>
+
+            <div class="flex items-center justify-between cursor-pointer p-2 rounded-lg duration-300 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors click-effect" (click)="toggle($event)">
+                <div class="flex items-center gap-2 min-w-0 pr-8 lg:pr-0">
+                    <div class="flex items-center justify-center w-10 h-10 aspect-square bg-surface-100 dark:bg-surface-800 rounded-lg shrink-0">
+                        <span class="text-xl font-semibold">#</span>
+                    </div>
+                    <div class="flex flex-col min-w-0 flex-1">
+                        <div class="flex items-center gap-2">
+                            <h2 class="font-semibold text-md truncate">{{ selectedWorkspace?.name || 'Select Workspace' }}</h2>
+                            @if (subscriptionService.subscription(); as sub) {
+                                <p-badge [value]="sub.planSnapshot?.name || sub.plan?.name || 'Free'" styleClass="text-[10px]! h-4! min-w-8" />
+                            }
+                        </div>
+                        <p class="font-medium text-xs truncate w-full text-surface-500 dark:text-surface-400">{{ selectedWorkspace?.description || ''}}</p>
+                    </div>
+                </div>
+                <i class="icon-[lucide--chevrons-up-down] size-5 aspect-square text-surface-400 dark:text-surface-500 hidden lg:block shrink-0"></i>
+            </div>
+
+                <p-popover #wp styleClass="rounded-2xl! w-[232px]">
+                        <div>
+                            <!-- <span class="font-medium block mb-2">Workspaces</span> -->
+                            <ul class="list-none p-0 m-0 flex flex-col ">
+                                <li *ngFor="let membership of workspaceMemberships" class="flex items-center gap-2 p-1.5 hover:bg-emphasis cursor-pointer rounded-border overflow-hidden click-effect" (click)="selectWorkspace(membership.workspace)">
+                                    <div class="flex items-center justify-center w-8 h-8 aspect-square bg-surface-200 dark:bg-surface-700 rounded-lg shrink-0">
+                                        <span class="text-base font-semibold">{{ generateHashtag(membership.workspace.name) }}</span>
+                                    </div>
+                                    <div class="flex flex-col min-w-0">
+                                        <span class="text-base font-medium truncate w-full">{{ membership.workspace.name }}</span>
+                                        <div class="text-[11px] text-surface-500 dark:text-surface-400 truncate w-full">{{ membership.workspace.description || 'No description' }}</div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                </p-popover>
+            <div class="overflow-y-auto mt-4">
+                <ul class="list-none py-2 m-0">
+                    <li>
+                        <ul class="list-none p-0 m-0 space-y-1 overflow-hidden">
+                            <li>
+                                <ul
+                                    class="list-none py-0 pl-4 pr-0 m-0 space-y-1 overflow-y-hidden transition-all duration-400 ease-in-out">
+                                    <li>
+                                        <a pRipple [routerLink]="'/'"
+                                            class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect"
+                                            [class]="isRouteActive('/') && !isRouteActive('/connectors') && !isRouteActive('/namespaces') && !isRouteActive('/inspector') && !isRouteActive('/endpoints') && !isRouteActive('/events') && !isRouteActive('/secrets') && !isRouteActive('/settings') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                            <i class="icon-[hugeicons--home-04] size-5 mr-2"></i>
+                                            <span class="font-medium">Home</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a pRipple [routerLink]="'/namespaces'"
+                                            class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect"
+                                            [class]="isRouteActive('/namespaces') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                            <i class="icon-[hugeicons--dashboard-square-setting] size-5 mr-2"></i>
+                                            <span class="font-medium">Namespaces</span>
+                                        </a>
+                                    </li>
+
+                                    <!-- <li>
+                                        <a pRipple [routerLink]="'/connectors'"
+                                            pTooltip="Not Ready Yet"
+                                            tooltipPosition="right"
+                                            tooltipStyleClass="text-xs font-bold"
+                                            class="flex items-center justify-between cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
+                                            [class]="isRouteActive('/connectors') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                            <div class="flex items-center">
+                                                <i class="icon-[hugeicons--flow] size-5 mr-2"></i>
+                                                <span class="font-medium">Connectors</span>
+                                            </div>
+
+                                            <div class="flex items-center gap-1.5 p-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md">
+                                                <i class="icon-[hugeicons--timer-01] text-sm"></i>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a pRipple  [routerLink]="'/inspector'"
+                                            pTooltip="Almost There"
+                                            tooltipPosition="right"
+                                            tooltipStyleClass="text-xs font-bold"
+                                            class="flex items-center justify-between cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors"
+                                            [class]="isRouteActive('/inspector') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                            <div class="flex items-center">
+                                                <i class="icon-[hugeicons--zap] size-5 mr-2"></i>
+                                                <span class="font-medium">Inspector</span>
+                                            </div>
+
+                                            <div class="flex items-center gap-1.5 p-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md">
+                                                <i class="icon-[hugeicons--timer-01] text-sm"></i>
+                                            </div>
+                                        </a>
+                                    </li> -->
+                                </ul>
+                            </li>
+                            <li>
+                                <!-- <div class="border border-surface-200 dark:border-surface-900 m-4"></div> -->
+                                <ul
+                                    class="list-none py-0 pl-4 pr-0 m-0 overflow-y-hidden transition-all duration-400 ease-in-out">
+                                    <!-- <li>
+                                        <a pRipple [routerLink]="'/webhooks'"
+                                            class="flex items-center cursor-pointer py-2 px-4 rounded-xl text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-150 transition-colors p-ripple">
+                                            <i class="icon-[lucide--webhook] size-4 mr-2"></i>
+                                            <span class="font-medium">Webhooks</span>
+                                        </a>
+                                    </li> -->
+                                    <!-- <li>
+                                        <a pRipple [routerLink]="'/endpoints'"
+                                            class="flex items-center cursor-pointer py-2 px-4 rounded-xl text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-150 transition-colors p-ripple">
+                                            <i class="pi pi-link mr-2"></i>
+                                            <span class="font-medium">Event Types</span>
+                                        </a>
+                                    </li> -->
+                                    @if (subscriptionService.hasFeature('dispatch')()) {
+                                        <li>
+                                            <a pRipple
+                                                class="flex items-center cursor-pointer py-2 px-4 rounded-xl text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-500 transition-colors p-ripple click-effect"
+                                                (click)="toggleDispatch()">
+                                                <i class="icon-[hugeicons--rocket-01] size-5 mr-2"></i>
+                                                <span class="font-medium">Dispatch</span>
+                                                <i class="pi pi-chevron-down ml-auto duration-200 transition-transform" [class.rotate-180]="dispatchDropdownOpen"></i>
+                                            </a>
+                                            <ul
+                                                class="list-none py-0 pl-4 pr-0 m-0 space-y-1 overflow-y-hidden transition-[max-height,opacity] duration-500 ease-in-out"
+                                                [class]="dispatchDropdownOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'">
+                                                <li>
+                                                    <a pRipple [routerLink]="'/events/dispatch'"
+                                                        class="flex items-center cursor-pointer py-2 px-4 mt-2 rounded-xl duration-150 transition-colors click-effect"
+                                                        [class]="isRouteActive('/events/dispatch') && !isRouteActive('/endpoints') && !isRouteActive('/events/dispatch/targets') && !isRouteActive('/events/dispatch/logs') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                        <i class="icon-[hugeicons--activity-03] size-5 mr-2"></i>
+                                                        <span class="font-medium">Usage</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a pRipple [routerLink]="'/events/dispatch/targets'"
+                                                        class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect"
+                                                        [class]="isRouteActive('/events/dispatch/targets') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                        <i class="icon-[hugeicons--target-02] size-5 mr-2"></i>
+                                                        <span class="font-medium">Targets</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a pRipple [routerLink]="'/events/dispatch/logs'"
+                                                        class="flex items-center cursor-pointer py-2 px-4 mb-2 rounded-xl duration-150 transition-colors click-effect"
+                                                        [class]="isRouteActive('/events/dispatch/logs') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                        <i class="icon-[hugeicons--transaction-history] size-5 mr-2"></i>
+                                                        <span class="font-medium">Logs</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    }
+
+                                    @if (subscriptionService.hasFeature('ingest')()) {
+                                        <li>
+                                            <a pRipple
+                                                class="flex items-center cursor-pointer py-2 px-4 rounded-xl text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-500 transition-colors p-ripple click-effect"
+                                                (click)="toggleIngest()">
+                                                <i class="icon-[hugeicons--inbox-download] size-5 mr-2"></i>
+                                                <span class="font-medium">Ingest</span>
+                                                <i class="pi pi-chevron-down ml-auto duration-200 transition-transform" [class.rotate-180]="ingestDropdownOpen"></i>
+                                            </a>
+                                            <ul
+                                                class="list-none py-0 pl-4 pr-0 m-0 space-y-1 overflow-y-hidden transition-[max-height,opacity] duration-500 ease-in-out"
+                                                [class]="ingestDropdownOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'">
+                                                <li>
+                                                    <a pRipple [routerLink]="'/events/ingest'"
+                                                        class="flex items-center cursor-pointer py-2 px-4 mt-2 rounded-xl duration-150 transition-colors click-effect"
+                                                        [class]="isRouteActive('/events/ingest') && !isRouteActive('/endpoints') && !isRouteActive('/events/ingest/sources') && !isRouteActive('/events/ingest/destinations') && !isRouteActive('/events/ingest/logs') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                        <i class="icon-[hugeicons--activity-03] size-5 mr-2"></i>
+                                                        <span class="font-medium">Usage</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a pRipple [routerLink]="'/events/ingest/sources'"
+                                                        class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect"
+                                                        [class]="isRouteActive('/events/ingest/sources') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                        <i class="icon-[hugeicons--live-streaming-02] size-5 mr-2"></i>
+                                                        <span class="font-medium">Source</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a pRipple
+                                                        class="flex items-center cursor-pointer py-2 px-4 rounded-xl text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 duration-500 transition-colors p-ripple click-effect"
+                                                        (click)="toggleDestinations()">
+                                                        <i class="icon-[hugeicons--directions-02] size-5 mr-2"></i>
+                                                        <span class="font-medium">Destinations</span>
+                                                        <i class="pi pi-chevron-down ml-auto duration-200 transition-transform" [class.rotate-180]="destinationsDropdownOpen"></i>
+                                                    </a>
+                                                    <ul
+                                                        class="list-none py-0 pl-4 pr-0 m-0 space-y-1 overflow-y-hidden transition-[max-height,opacity] duration-500 ease-in-out"
+                                                        [class]="destinationsDropdownOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'">
+                                                        <li>
+                                                            <a pRipple [routerLink]="'/events/ingest/destinations/endpoints'"
+                                                                class="flex items-center cursor-pointer py-2 px-4 mt-1 rounded-xl duration-150 transition-colors click-effect"
+                                                                [class]="isRouteActive('/events/ingest/destinations/endpoints') || isRouteActive('/endpoints') || isRouteActive('/events/ingest/endpoints') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                                <!-- <i class="icon-[hugeicons--link-02] size-5 mr-2"></i> -->
+                                                                <span class="font-medium text-base">Endpoints</span>
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a pRipple [routerLink]="'/events/ingest/destinations/s3'"
+                                                                class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect"
+                                                                [class]="isRouteActive('/events/ingest/destinations/s3') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                                <!-- <i class="icon-[hugeicons--database] size-5 mr-2"></i> -->
+                                                                <span class="font-medium text-base">S3 Buckets</span>
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a pRipple [routerLink]="'/events/ingest/destinations/asqs'"
+                                                                class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect"
+                                                                [class]="isRouteActive('/events/ingest/destinations/asqs') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                                <!-- <i class="icon-[hugeicons--server-stack-03] size-5 mr-2"></i> -->
+                                                                <span class="font-medium text-base">Amazon SQS</span>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                                <li>
+                                                    <a pRipple [routerLink]="'/events/ingest/logs'"
+                                                        class="flex items-center cursor-pointer py-2 px-4 mb-2 rounded-xl duration-150 transition-colors click-effect"
+                                                        [class]="isRouteActive('/events/ingest/logs') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                                        <i class="icon-[hugeicons--transaction-history] size-5 mr-2"></i>
+                                                        <span class="font-medium">Logs</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+                            <li>
+                                <!-- <div class="border border-surface-200 dark:border-surface-900 m-4"></div> -->
+
+                                <ul
+                                    class="list-none py-0 pl-4 pr-0 m-0 space-y-1 overflow-y-hidden transition-all duration-400 ease-in-out">
+                                    <li>
+                                        <a pRipple [routerLink]="'/secrets'"
+                                            class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect"
+                                            [class]="isRouteActive('/secrets') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                            <i class="pi pi-key mr-2"></i>
+                                            <span class="font-medium">Secrets</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a pRipple [routerLink]="'/settings'" [queryParams]="{ tab: 'profile' }"
+                                            class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect"
+                                            [class]="isRouteActive('/settings?tab=profile') || isRouteActive('/settings?tab=workspace') || isRouteActive('/settings?tab=billing') ? 'text-primary bg-primary/15 hover:bg-primary/25 dark:text-primary-400 dark:bg-primary-400/10 dark:hover:bg-primary-400/20' : 'text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'">
+                                            <i class="pi pi-cog mr-2"></i>
+                                            <span class="font-medium">Settings</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="mt-auto relative" #helpContainer>
+
+                <div class="flex flex-col gap-4 w-full p-2">
+                    <ul>
+                        <li>
+                            <div class="m-2 border border-surface-200 dark:border-surface-900"></div>
+                            <!-- <a
+                                class="flex items-center py-2 px-4 rounded-xl text-surface-500 dark:text-surface-300">
+                                <span class="text-sm font-medium">Support</span>
+                            </a> -->
+                            <ul
+                                class="list-none py-0 pr-0 m-0 overflow-y-hidden transition-all duration-400 ease-in-out">
+                                <li>
+                                    <a pRipple
+                                        href="https://docs.kyrazo.com"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700">
+                                        <i class="icon-[hugeicons--book-02] size-5 mr-2"></i>
+                                        <span class="text-sm font-medium">Documents</span>
+                                        <i class="pi pi-arrow-up-right text-xs! ml-1 opacity-75"></i>
+                                    </a>
+                                </li>
+                                <!-- <li>
+                                    <a pRipple
+                                        class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700">
+                                        <i class="icon-[hugeicons--source-code] size-5 mr-2"></i>
+                                        <span class="text-sm font-medium">API Doc</span>
+                                        <i class="pi pi-arrow-up-right text-xs! ml-1 opacity-75"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a pRipple
+                                        class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700">
+                                        <i class="icon-[hugeicons--package] size-5 mr-2"></i>
+                                        <span class="text-sm font-medium">SDKs Doc</span>
+                                        <i class="pi pi-arrow-up-right text-xs! ml-1 opacity-75"></i>
+                                    </a>
+                                </li> -->
+                                <li>
+                                    <a pRipple
+                                        class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700"
+                                        (click)="openSupportDialog()">
+                                        <i class="icon-[hugeicons--bubble-chat-question] size-5 mr-2"></i>
+                                        <span class="text-sm font-medium">Support</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <!-- <li>
+                            <a
+                                class="flex items-center py-2 px-4 rounded-xl text-surface-500 dark:text-surface-300">
+                                <span class="text-sm font-medium">What's new?</span>
+                            </a>
+                            <ul>
+                                <li>
+                                    <a pRipple href="https://kyrazo.com/changelogs" target="_blank"
+                                        class="flex items-center cursor-pointer py-2 px-4 rounded-xl duration-150 transition-colors click-effect text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700">
+                                        <i class="pi pi-history mr-2"></i>
+                                        <span class="text-sm font-medium">Changelogs</span>
+                                        <i class="pi pi-arrow-up-right text-xs! ml-1 opacity-75"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li> -->
+                    </ul>
+                </div>
+                <!-- <p-button [icon]="'pi pi-question'" [rounded]="true" severity="secondary" [outlined]="true" [size]="'small'"
+                    (click)="toggleHelp($event)" />
+                <div #helpMenu *ngIf="helpVisible"
+                    @dropdownAnimation
+                    class="absolute bottom-full justify-center! items-center! mb-2 w-48 bg-surface-0 dark:bg-surface-950! border border-surface-200 dark:border-surface-800 rounded-2xl drop-shadow-md z-50">
+                </div> -->
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Toast for notifications -->
+<p-toast></p-toast>
+
+<!-- <p-menu [model]="items" class="fixed h-auto bottom-4 top-4 left-4 flex justify-center"
+    styleClass="w-full md:w-[264px] h-full bg-transparent! p-6 mx-auto rounded-2xl! border border-surface-200 dark:border-surface-800 overflow-y-auto">
+    <ng-template #start>
+        <div class="flex items-center gap-3 px-3 py-4 mb-4 border-b border-surface-200 dark:border-surface-800">
+            <div class="relative">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"
+                    class="text-primary">
+                    <rect width="32" height="32" rx="8" fill="currentColor" fill-opacity="0.1" />
+                    <path d="M16 8L20 12H18V20H14V12H12L16 8Z" fill="currentColor" />
+                    <path d="M8 20L12 16V18H20V22H12V24L8 20Z" fill="currentColor" fill-opacity="0.7" />
+                    <path d="M24 12L20 16V14H12V10H20V8L24 12Z" fill="currentColor" fill-opacity="0.5" />
+                </svg>
+                <div
+                    class="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-surface-900">
+                </div>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-2xl font-semibold text-surface-900 dark:text-surface-0">
+                    Hookster
+                </span>
+                <span class="text-sm font-medium text-primary leading-tight">Webhooks Simplified</span>
+            </div>
+        </div>
+
+    </ng-template>
+
+    <ng-template #submenuheader let-item>
+        <div class="flex items-center gap-2 -px-4 pt-2 text-xs font-semibold text-surface-600 dark:text-surface-300 uppercase tracking-wider">
+            <span>{{ item.label }}</span>
+        </div>
+    </ng-template>
+
+    <ng-template #item let-item>
+        <p-button [routerLink]="item.url" class="flex items-center p-menu-item-link group relative overflow-hidden rounded-xl!">
+            <div class="flex items-center gap-3 w-full">
+                <div
+                    class="flex items-center justify-center w-8 h-8 rounded-lg bg-surface-100 dark:bg-surface-800 group-hover:bg-primary group-hover:text-white transition-all duration-200">
+                    <i [class]="item.icon" class="text-sm"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <span
+                        class="text-sm font-medium text-surface-700 dark:text-surface-200 group-hover:text-surface-900 dark:group-hover:text-surface-0">
+                        {{ item.label }}
+                    </span>
+                    <div *ngIf="item.description" class="text-xs text-surface-500 dark:text-surface-400 mt-0.5">
+                        {{ item.description }}
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <p-badge *ngIf="item.badge" [value]="item.badge" [severity]="item.badgeType || 'info'"
+                        class="text-xs" />
+                    <div *ngIf="item.status" class="w-2 h-2 rounded-full"
+                        [class.bg-green-500]="item.status === 'active'"
+                        [class.bg-yellow-500]="item.status === 'warn'" [class.bg-red-500]="item.status === 'error'">
+                    </div>
+                    <span *ngIf="item.shortcut"
+                        class="text-xs px-2 py-1 bg-surface-200 dark:bg-surface-700 text-surface-600 dark:text-surface-300 rounded border opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        {{ item.shortcut }}
+                    </span>
+                </div>
+            </div>
+        </p-button>
+    </ng-template>
+
+
+    <ng-template #end>
+        <div class="mt-auto pt-4 border-t border-surface-200 dark:border-surface-800">
+            <p-button pRipple
+                class="relative overflow-hidden w-full border-0 bg-transparent flex items-center p-3 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-xl cursor-pointer transition-all duration-200 group"
+                (click)="op.toggle($event)"  styleClass="shadow-md shadow-primary/50 dark:shadow-primary/20">
+                <p-avatar
+                    image="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face&auto=format"
+                    class="mr-3" shape="circle" size="normal" />
+                <div class="flex-1 text-left min-w-0">
+                    <div class="text-sm font-semibold text-surface-700 dark:text-surface-200 truncate">
+                        Admin User
+                    </div>
+                    <div class="text-xs text-surface-500 dark:text-surface-400">
+                        admin&#64;kyrazo.com
+                    </div>
+                </div>
+                <i
+                    class="pi pi-chevron-right text-xs text-surface-400 group-hover:text-surface-600 transition-colors duration-200"></i>
+            </p-button>
+
+            <p-popover #op>
+                <div class="flex flex-col gap-4 w-[14rem]">
+                    <div class="relative overflow-hidden w-full border-0 bg-transparent flex items-center p-3">
+                        <p-avatar image="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face&auto=format"
+                            class="mr-3" shape="circle" size="normal" />
+                        <div class="flex-1 text-left min-w-0">
+                            <div class="text-sm font-semibold text-surface-700 dark:text-surface-200 truncate">
+                                Admin User
+                            </div>
+                            <div class="text-xs text-surface-500 dark:text-surface-400">
+                                admin&#64;kyrazo.com
+                            </div>
+                        </div>
+                    </div>
+                    <p-menu [model]="avatarItem" styleClass="border-none!">
+                        <ng-template #avatarIte let-item class="border-none!">
+                            <div pRipple [routerLink]="item.url" class="flex items-center p-menu-item-link group relative overflow-hidden">
+                                <div class="flex items-center gap-3 w-full">
+                                    <div
+                                        class="flex items-center justify-center w-8 h-8 rounded-lg bg-surface-100 dark:bg-surface-800 group-hover:bg-primary group-hover:text-white transition-all duration-200">
+                                        <i [class]="item.icon" class="text-sm"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <span
+                                            class="text-sm font-medium text-surface-700 dark:text-surface-200 group-hover:text-surface-900 dark:group-hover:text-surface-0">
+                                            {{ item.label }}
+                                        </span>
+                                        <div *ngIf="item.description" class="text-xs text-surface-500 dark:text-surface-400 mt-0.5">
+                                            {{ item.description }}
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <p-badge *ngIf="item.badge" [value]="item.badge" [severity]="item.badgeType || 'info'"
+                                            class="text-xs" />
+                                        <div *ngIf="item.status" class="w-2 h-2 rounded-full" [class.bg-green-500]="item.status === 'active'"
+                                            [class.bg-yellow-500]="item.status === 'warn'" [class.bg-red-500]="item.status === 'error'">
+                                        </div>
+                                        <span *ngIf="item.shortcut"
+                                            class="text-xs px-2 py-1 bg-surface-200 dark:bg-surface-700 text-surface-600 dark:text-surface-300 rounded border opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                            {{ item.shortcut }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-menu>
+                </div>
+            </p-popover>
+        </div>
+    </ng-template>
+</p-menu> -->

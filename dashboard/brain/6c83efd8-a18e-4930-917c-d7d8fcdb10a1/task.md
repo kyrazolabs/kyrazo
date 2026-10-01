@@ -1,0 +1,24 @@
+# Task List
+
+- [x] Standardize UI selectors (`appendTo="body"`)
+    - [x] Dispatch Logs status selector
+    - [x] Dispatch Usage time range selector
+    - [x] Dispatch Target creation form HTTP Method
+    - [x] Ingest Source details filter and link existing selectors
+    - [x] Ingest Source form (Status, Endpoints, Service)
+    - [x] Ingest Endpoint form (Status, Method)
+    - [x] Dispatch Target overview time range
+- [x] Integrate Premium Transformer Editor into Source Form
+    - [x] Update `source-form.component.ts` logic (Test timing, formatting)
+    - [x] Refactor `source-form.component.html` layout (Single column, Tabs)
+    - [x] Remove placeholders and implement floating labels in Source Form
+    - [x] Standardize Endpoint Form (Remove placeholders, floating labels)
+    - [x] Verify Destinations visibility logic
+    - [x] Verify premium styling and micro-animations
+- [x] Generalize S3 Support
+    - [x] Update `s3.types.ts` model
+    - [x] Update `s3-create-dialog` component (Labels, Endpoint field)
+    - [x] Update `source-form` labels for S3
+- [x] Testing & Verification
+    - [x] Create test files for `backend/apis/dashboard/src/modules/v2/source`
+    - [x] Run full test suite

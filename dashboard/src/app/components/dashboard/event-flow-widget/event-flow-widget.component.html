@@ -1,0 +1,90 @@
+<div class="card-panel relative overflow-hidden">
+    <!-- Background Decor (Optional) -->
+    <div class="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+        <i class="pi pi-sitemap text-9xl"></i>
+    </div>
+
+    <div class="flex items-center justify-between mb-8 relative z-10">
+        <div>
+            <h3 class="font-bold text-xl text-surface-900 dark:text-surface-0">Event Pipeline</h3>
+            <span class="text-sm text-surface-500">Real-time event flow snapshot</span>
+        </div>
+        <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400 text-xs font-semibold animate-pulse">
+            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+            Live
+        </div>
+    </div>
+
+    <!-- Pipeline Container -->
+    <div class="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10 px-4 md:px-12">
+        
+        <!-- Connecting Line Logic:
+             We use absolute positioning to draw lines between the flex items. 
+             This is a visual approximation for a clean look. 
+        -->
+        <div class="hidden md:block absolute top-10 left-[10%] right-[10%] h-0.5 bg-surface-200 dark:bg-surface-700 -z-10"></div>
+
+
+        <!-- Step 1: Sources -->
+        <div class="group flex flex-col items-center gap-4 relative">
+             <!-- Connector Line (Left-Out for first item) -->
+            <div class="w-20 h-20 rounded-2xl bg-surface-0 dark:bg-surface-950! border-2 border-primary-100 dark:border-primary-900/50 shadow-lg flex items-center justify-center group-hover:-translate-y-1 transition-transform duration-300">
+                <div class="w-16 h-16 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                    <i class="pi pi-server text-2xl"></i>
+                </div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold tracking-tight text-surface-900 dark:text-surface-0">{{ stats.ingests | number }}</div>
+                <div class="text-xs font-semibold uppercase tracking-wider text-surface-500 mt-1">Sources</div>
+            </div>
+        </div>
+
+        <!-- Arrow 1 -->
+        <i class="hidden md:block pi pi-arrow-right text-surface-300 dark:text-surface-600"></i>
+
+        <!-- Step 2: Ingest -->
+        <div class="group flex flex-col items-center gap-4 relative">
+            <div class="w-20 h-20 rounded-2xl bg-surface-0 dark:bg-surface-950! border-2 border-primary-100 dark:border-primary-900/50 shadow-lg flex items-center justify-center group-hover:-translate-y-1 transition-transform duration-300">
+                 <div class="w-16 h-16 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                    <i class="pi pi-download text-2xl"></i>
+                </div>
+            </div>
+             <div class="text-center">
+                <div class="text-2xl font-bold tracking-tight text-surface-900 dark:text-surface-0">{{ stats.total_events | number }}</div>
+                <div class="text-xs font-semibold uppercase tracking-wider text-surface-500 mt-1">Ingested</div>
+            </div>
+        </div>
+
+        <!-- Arrow 2 -->
+        <i class="hidden md:block pi pi-arrow-right text-surface-300 dark:text-surface-600"></i>
+
+        <!-- Step 3: Dispatch -->
+         <div class="group flex flex-col items-center gap-4 relative">
+            <div class="w-20 h-20 rounded-2xl bg-surface-0 dark:bg-surface-950! border-2 border-primary-100 dark:border-primary-900/50 shadow-lg flex items-center justify-center group-hover:-translate-y-1 transition-transform duration-300">
+                 <div class="w-16 h-16 rounded-xl bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center text-purple-600 dark:text-purple-400">
+                    <i class="pi pi-send text-2xl"></i>
+                </div>
+            </div>
+             <div class="text-center">
+                <div class="text-2xl font-bold tracking-tight text-surface-900 dark:text-surface-0">{{ stats.total_deliveries | number }}</div>
+                <div class="text-xs font-semibold uppercase tracking-wider text-surface-500 mt-1">Dispatched</div>
+            </div>
+        </div>
+
+        <!-- Arrow 3 -->
+        <i class="hidden md:block pi pi-arrow-right text-surface-300 dark:text-surface-600"></i>
+
+        <!-- Step 4: Targets -->
+        <div class="group flex flex-col items-center gap-4 relative">
+             <div class="w-20 h-20 rounded-2xl bg-surface-0 dark:bg-surface-950! border-2 border-primary-100 dark:border-primary-900/50 shadow-lg flex items-center justify-center group-hover:-translate-y-1 transition-transform duration-300">
+                 <div class="w-16 h-16 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                    <i class="pi pi-box text-2xl"></i>
+                </div>
+            </div>
+             <div class="text-center">
+                <div class="text-2xl font-bold tracking-tight text-surface-900 dark:text-surface-0">{{ stats.active_targets | number }}</div>
+                <div class="text-xs font-semibold uppercase tracking-wider text-surface-500 mt-1">Targets</div>
+            </div>
+        </div>
+    </div>
+</div>

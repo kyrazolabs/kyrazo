@@ -1,0 +1,41 @@
+<div class="card-panel h-full flex flex-col justify-between">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="font-bold text-lg text-surface-900 dark:text-surface-0">Infrastructure Health</h3>
+        <div class="px-2 py-1 rounded-full text-xs font-bold flex items-center gap-2"
+             [ngClass]="{
+                'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400': isHealthy,
+                'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400': !isHealthy
+             }">
+             <span class="w-2 h-2 rounded-full" [ngClass]="isHealthy ? 'bg-emerald-500' : 'bg-red-500'"></span>
+             {{ isHealthy ? 'Operational' : 'Degraded' }}
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+        <!-- Queue Status -->
+        <div class="p-4 bg-surface-50 dark:bg-surface-800/50 rounded-xl border border-surface-100 dark:border-surface-900">
+            <div class="text-surface-500 text-xs font-medium uppercase tracking-wider mb-2">Backlog</div>
+            <div class="flex items-baseline gap-2">
+                <span class="text-2xl font-bold font-mono">{{ queueDepth | number }}</span>
+                <span class="text-xs text-surface-500">events</span>
+            </div>
+             <div class="w-full bg-surface-200 dark:bg-surface-700 h-1.5 rounded-full mt-3 overflow-hidden">
+                <div class="h-full bg-blue-500 transition-all duration-500" [style.width.%]="(queueDepth / 1000) * 100"></div>
+            </div>
+        </div>
+
+        <!-- Workers Status -->
+         <div class="p-4 bg-surface-50 dark:bg-surface-800/50 rounded-xl border border-surface-100 dark:border-surface-900">
+            <div class="text-surface-500 text-xs font-medium uppercase tracking-wider mb-2">Workers</div>
+             <div class="flex items-baseline gap-2">
+                <span class="text-2xl font-bold font-mono">Dynamic</span>
+                <span class="text-xs text-emerald-500 font-medium">Auto-Scaling</span>
+            </div>
+             <div class="flex gap-1 mt-3">
+                 @for (i of [1,2,3,4,5]; track i) {
+                     <div class="h-1.5 flex-1 rounded-full bg-emerald-500/40 animate-pulse"></div>
+                 }
+            </div>
+        </div>
+    </div>
+</div>

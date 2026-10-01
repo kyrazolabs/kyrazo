@@ -1,0 +1,118 @@
+<p-dialog
+    [(visible)]="visible"
+    (visibleChange)="visibleChange.emit($event)"
+    [modal]="true"
+    [style]="{ width: '500px' }"
+    [draggable]="false"
+    [resizable]="false"
+    header="Submit Support Ticket"
+    appendTo="body"
+    styleClass="rounded-2xl!">
+    <div class="space-y-6 p-1">
+        <!-- Description -->
+        <div class="text-center">
+            <p class="text-surface-600 dark:text-surface-300 text-base font-medium">
+                Need help? Submit a ticket and our team will get back to you.
+            </p>
+        </div>
+
+        <!-- Support Form -->
+        <form class="space-y-4" (ngSubmit)="submitForm()">
+            <!-- Subject Field -->
+            <div class="flex flex-col gap-2">
+                <label for="ticketSubject" class="text-sm font-medium text-surface-900 dark:text-surface-0">
+                    Subject <span class="text-red-500">*</span>
+                </label>
+                <input
+                    pInputText
+                    id="ticketSubject"
+                    [(ngModel)]="supportForm.subject"
+                    name="subject"
+                    placeholder="Brief summary of the issue"
+                    class="w-full rounded-xl!"
+                    required  pSize="small" />
+            </div>
+
+            <!-- Type & Category Row -->
+            <div class="flex gap-4">
+                <div class="flex flex-col gap-2 w-1/2">
+                    <label class="text-sm font-medium text-surface-900 dark:text-surface-0">
+                        Type <span class="text-red-500">*</span>
+                    </label>
+                    <p-select
+                        [options]="supportTypes"
+                        [(ngModel)]="supportForm.Types"
+                        (onChange)="onTypeChange()"
+                        name="type"
+                        class="w-full rounded-xl!"
+                        [size]="'small'"
+                        placeholder="Select Type"
+                        appendTo="body">
+                    </p-select>
+                </div>
+                <div class="flex flex-col gap-2 w-1/2" *ngIf="!isUncategorized">
+                    <label class="text-sm font-medium text-surface-900 dark:text-surface-0">
+                        Category <span class="text-red-500">*</span>
+                    </label>
+                    <p-select
+                        [options]="currentCategories"
+                        [(ngModel)]="supportForm.Category"
+                        name="category"
+                        class="w-full rounded-xl!"
+                        [size]="'small'"
+                        placeholder="Select Category"
+                        [emptyMessage]="'Select a Type first'"
+                        appendTo="body">
+                    </p-select>
+                </div>
+                <div class="flex flex-col gap-2 w-1/2" *ngIf="isUncategorized">
+                    <label class="text-sm font-medium text-surface-400 dark:text-surface-500">
+                        Category
+                    </label>
+                    <div class="w-full p-2 text-sm text-surface-400 dark:text-surface-500 bg-surface-50 dark:bg-surface-900/50 rounded-xl italic">
+                        Not applicable
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message Field -->
+            <div class="flex flex-col gap-2">
+                <label for="ticketMessage" class="text-sm font-medium text-surface-900 dark:text-surface-0">
+                    Message <span class="text-red-500">*</span>
+                </label>
+                <textarea
+                    pInputTextarea
+                    id="ticketMessage"
+                    [(ngModel)]="supportForm.message"
+                    name="message"
+                    rows="5"
+                    placeholder="Describe your issue in detail..."
+                    class="w-full rounded-xl!"
+                    required pSize="small"></textarea>
+            </div>
+        </form>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="flex justify-end gap-3 mt-4">
+            <p-button
+                label="Cancel"
+                icon="pi pi-times"
+                [outlined]="true"
+                severity="secondary"
+                styleClass="rounded-xl!"
+                [size]="'small'"
+                (onClick)="closeDialog()">
+            </p-button>
+            <p-button
+                label="Submit Ticket"
+                icon="pi pi-send"
+                styleClass="rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20"
+                [size]="'small'"
+                [loading]="supportSubmitting"
+                [disabled]="!supportForm.subject || !supportForm.message || !supportForm.Category"
+                (onClick)="submitForm()">
+            </p-button>
+        </div>
+    </ng-template>
+</p-dialog>
