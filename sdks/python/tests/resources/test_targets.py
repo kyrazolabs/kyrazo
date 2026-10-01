@@ -1,0 +1,107 @@
+from httpx import Response
+from kyrazo.resources.targets import CreateTargetInput
+
+
+def test_create_target_success(client, mock_api):
+    namespace_id = "proj_123"
+    payload = {
+        "name": "My Target",
+        "url": "https://example.com/target",
+        "method": "POST",
+        "retryCount": 3,
+        "rateLimitDuration": 60,
+        "config": {"timeout": 5000, "retryCount": 3, "rateLimitDuration": 60},
+    }
+
+    response_data = {
+        "data": {
+            "id": "tgt_123",
+            "name": "My Target",
+            "url": "https://example.com/target",
+            "method": "POST",
+            "description": None,
+            "enabled": True,
+            "config": {
+                "timeout": 5000,
+                "retryCount": 3,
+                "rateLimit": None,
+                "rateLimitDuration": 60,
+            },
+            "customHeaders": None,
+            "createdAt": "2024-01-01T00:00:00Z",
+            "updatedAt": "2024-01-01T00:00:00Z",
+        }
+    }
+
+    mock_api.post(f"/v1/targets/{namespace_id}").mock(
+        return_value=Response(201, json=response_data)
+    )
+
+    target_input = CreateTargetInput(**payload)
+    target = client.targets.create(namespace_id, target_input)
+
+    assert target.id == "tgt_123"
+    assert target.name == "My Target"
+    assert target.method == "POST"
+
+
+def test_delete_target(client, mock_api):
+    namespace_id = "proj_123"
+    target_id = "tgt_123"
+
+    mock_api.delete(f"/v1/targets/{namespace_id}/{target_id}").mock(
+        return_value=Response(200, json={"success": True})
+    )
+
+    success = client.targets.delete(namespace_id, target_id)
+    assert success is True
+
+
+def test_get_target_secret(client, mock_api):
+    namespace_id = "proj_123"
+    target_id = "tgt_123"
+    secret = "whsec_12345"
+
+    mock_api.get(f"/v1/targets/{namespace_id}/{target_id}/secret").mock(
+        return_value=Response(
+            200, json={"success": True, "data": secret}
+        )
+    )
+
+    result = client.targets.get_secret(namespace_id, target_id)
+    assert result == secret
+
+
+def test_update_target_status(client, mock_api):
+    namespace_id = "proj_123"
+    target_id = "tgt_123"
+    enabled = False
+
+    response_data = {
+        "success": True,
+        "data": {
+            "id": "tgt_123",
+            "name": "My Target",
+            "url": "https://example.com/target",
+            "method": "POST",
+            "enabled": False,
+            "config": {
+                "timeout": 5000,
+                "retryCount": 3,
+                "rateLimit": None,
+                "rateLimitDuration": 60,
+            },
+            "customHeaders": None,
+            "createdAt": "2024-01-01T00:00:00Z",
+            "updatedAt": "2024-01-01T00:00:00Z",
+        },
+    }
+
+    route = mock_api.put(f"/v1/targets/{namespace_id}/{target_id}").mock(
+        return_value=Response(200, json=response_data)
+    )
+
+    target = client.targets.update_status(namespace_id, target_id, enabled)
+    assert target.enabled is False
+    import json
+    assert json.loads(route.calls.last.request.content) == {"targetId": target_id, "enabled": enabled}

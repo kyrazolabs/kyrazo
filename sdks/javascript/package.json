@@ -1,0 +1,56 @@
+{
+    "name": "@kyrazo/sdk",
+    "version": "2.0.0",
+    "description": "Official Kyrazo SDK for JavaScript/TypeScript",
+    "main": "dist/index.js",
+    "module": "dist/index.mjs",
+    "types": "dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.mjs",
+            "require": "./dist/index.js"
+        }
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+        "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+        "typecheck": "tsc --noEmit",
+        "lint": "eslint src --ext .ts",
+        "test": "vitest",
+        "prepublishOnly": "npm run build"
+    },
+    "keywords": [
+        "kyrazo",
+        "webhooks",
+        "events",
+        "sdk",
+        "api"
+    ],
+    "author": "Kyrazo",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/kyrazolabs/sdks.git",
+        "directory": "sdks/javascript"
+    },
+    "bugs": {
+        "url": "https://github.com/kyrazolabs/sdks/issues"
+    },
+    "homepage": "https://github.com/kyrazolabs/sdks/tree/main/sdks/javascript#readme",
+    "devDependencies": {
+        "@types/node": "^20.10.0",
+        "tsup": "^8.0.1",
+        "typescript": "^5.3.3",
+        "vitest": "^1.6.1"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}
