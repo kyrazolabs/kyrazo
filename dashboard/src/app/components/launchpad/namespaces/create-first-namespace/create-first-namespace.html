@@ -1,0 +1,110 @@
+<div
+    [draggable]="false"
+    [style]="{ width: '32rem' }"
+    styleClass=""
+>
+    <div class="flex flex-col items-center text-center space-y-6 p-4">
+        <!-- Welcome Icon -->
+        <!-- <div class="flex items-center justify-center w-20 h-20 bg-primary rounded-full shadow-lg">
+            <i class="pi pi-rocket text-white text-3xl"></i>
+        </div> -->
+
+
+        <!-- Benefits List -->
+        <div appScrollReveal class="bg-surface-50 dark:bg-surface-800 rounded-xl p-4 w-full">
+            <h3 class="font-semibold text-surface-900 dark:text-surface-0 mb-3">What you can do with namespaces:</h3>
+            <ul class="space-y-2 text-sm text-surface-600 dark:text-surface-300">
+                <li class="flex items-center gap-2">
+                    <i class="pi pi-check-circle text-green-500"></i>
+                    <span>Organize your webhooks by application</span>
+                </li>
+                <!-- <li class="flex items-center gap-2">
+                    <i class="pi pi-check-circle text-green-500"></i>
+                    <span>Manage different environments (dev, prod)</span>
+                    <p-tag severity="contrast" value="Soon" [rounded]="true" class="text-[10px]!" />
+                </li> -->
+                <li class="flex items-center gap-2">
+                    <i class="pi pi-check-circle text-green-500"></i>
+                    <span>Track analytics and deliveries per namespace</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Create Namespace Form -->
+        <form [formGroup]="namespaceForm" class="w-full space-y-4">
+            <div appScrollReveal delay="delay-150" class="space-y-2">
+                <label for="namespaceName" class="block text-sm font-medium text-surface-700 dark:text-surface-300">
+                    Namespace Name *
+                </label>
+                <input
+                    pInputText
+                    id="namespaceName"
+                    formControlName="name"
+                    placeholder="e.g., My Web App, E-commerce API, Mobile App"
+                    class="w-full"
+                    [class.ng-invalid]="namespaceForm.get('name')?.invalid && namespaceForm.get('name')?.touched"
+                />
+                @if (namespaceForm.get('name')?.invalid && namespaceForm.get('name')?.touched) {
+                    <small
+                        class="p-error block"
+                    >
+                        Namespace name is required and must be at least 3 characters
+                    </small>
+                }
+            </div>
+
+            <div appScrollReveal delay="delay-300" class="space-y-2 text-left">
+                <label for="namespaceDescription" class="block text-sm font-medium text-surface-700 dark:text-surface-300">
+                    Description <span class="text-surface-500">(optional)</span>
+                </label>
+                <input
+                    pInputText
+                    id="namespaceDescription"
+                    formControlName="description"
+                    placeholder="Brief description of your namespace..."
+                    class="w-full"
+                />
+            </div>
+
+            <div appScrollReveal delay="delay-450" class="space-y-2 text-left">
+                <div class="flex items-center justify-between">
+                    <label for="ipWhitelist" class="font-semibold text-surface-900 dark:text-surface-0">
+                        Header Prefix
+                    </label>
+                    @if (!hasWhiteLabelFeature) {
+                    <span (click)="dialogService.openBillingDialog()" pTooltip="Upgrade to Pro to restrict API keys by IP"
+                        class="px-2.5 py-0.5 rounded-full bg-primary-500/10 border border-primary-500/30 text-primary-600 shadow-primary-500/20 text-[10px] font-bold uppercase tracking-wider cursor-pointer">
+                        Pro</span>
+                    }
+                    <!-- <p-tag value="Professional" severity="success" [rounded]="true" class="text-xs! py-1 cursor-pointer transition-all duration-200 shadow-sm shadow-transparent hover:shadow-sky-400 dark:hover:shadow-sky-500/40" /> -->
+                </div>
+                <input
+                    pInputText
+                    id="prefix"
+                    formControlName="whiteLabelHeaders"
+                    [placeholder]="hasWhiteLabelFeature ? 'e.g. X-Kyrazo' : 'X-Webhook (Default)'"
+                    [readonly]="!hasWhiteLabelFeature"
+                    [disabled]="!hasWhiteLabelFeature"
+                    class="w-full"
+                />
+                <p class="text-[11px] opacity-60">
+                    {{ hasWhiteLabelFeature ? 'Custom prefix for outbound webhook headers.' : 'Standard "X-Webhook" prefix will be used.' }}
+                </p>
+            </div>
+        </form>
+
+        <!-- Action Buttons -->
+        <div appScrollReveal delay="delay-500" class="flex gap-3 w-full pt-4">
+            <p-button
+                label="Create Namespace"
+                icon="pi pi-plus"
+                (click)="onCreate()"
+                class="flex-1"
+                fluid="true"
+                styleClass="rounded-xl! fluid!"
+                [disabled]="namespaceForm.invalid || isCreating"
+                [loading]="isCreating"
+            />
+        </div>
+    </div>
+</div>

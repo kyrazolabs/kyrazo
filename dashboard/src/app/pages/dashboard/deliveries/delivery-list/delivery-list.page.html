@@ -1,0 +1,269 @@
+<div class="flex flex-col gap-6">
+    <!-- Header -->
+    <div class="bg-transparent p-4 rounded-xl border border-surface-200 dark:border-surface-800">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-bold">Deliveries</h1>
+                <p class="opacity-80 mt-1">Monitor webhook delivery attempts and their status</p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                <p-select [(ngModel)]="selectedStatus" [options]="statusOptions" placeholder="All Status"
+                    optionLabel="label" optionValue="value" (ngModelChange)="applyFilters()"
+                    class="w-full sm:w-48" panelStyleClass="rounded-xl! custom-select-panel" [showClear]="true" size="small" />
+
+                <!-- Search -->
+                <p-iconfield iconPosition="left" class="w-full md:w-auto">
+                    <p-inputicon>
+                        <i class="pi pi-search"></i>
+                    </p-inputicon>
+                    <input pInputText type="text" (input)="onSearchInput($event)" [value]="searchTerm"
+                        placeholder="Search deliveries..." class="w-full md:w-80 rounded-xl!" />
+                </p-iconfield>
+
+                <!-- Refresh Button -->
+                <p-button icon="pi pi-refresh" [outlined]="true" styleClass="rounded-xl!" pTooltip="Refresh deliveries"
+                    tooltipPosition="bottom" tooltipStyleClass="text-xs! rounded-xl!" (onClick)="refreshDeliveries()"
+                    [loading]="loader.loading$ | async" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Deliveries Table -->
+    <p-card class="card-panel">
+        <p-table #dt [value]="filteredDeliveries" [lazy]="true" [paginator]="true" [rows]="rows"
+            [rowsPerPageOptions]="[10,20,50,100]" [totalRecords]="totalRecords"
+            (onLazyLoad)="loadDeliveriesLazy($event)" dataKey="id" [sortField]="'timestamp'" [sortOrder]="-1"
+            styleClass="p-datatable-sm" [tableStyle]="{'min-width': '60rem'}" [loading]="loader.loading$ | async">
+
+            <ng-template #header>
+                <tr>
+                    <th pSortableColumn="delivery_id" class="text-left">
+                        <div class="flex items-center gap-2">
+                            ID
+                            <p-sortIcon field="delivery_id" />
+                        </div>
+                    </th>
+                    <th class="text-left">
+                        Event Type
+                    </th>
+                    <th class="text-left">
+                        Target
+                    </th>
+                    <th pSortableColumn="status" class="text-left">
+                        <div class="flex items-center gap-2">
+                            Status
+                            <p-sortIcon field="status" />
+                        </div>
+                    </th>
+                    <th pSortableColumn="response_code" class="text-left">
+                        Response
+                        <p-sortIcon field="response_code" />
+                    </th>
+                    <th pSortableColumn="response_time_ms" class="text-left">
+                        Latency
+                        <p-sortIcon field="response_time_ms" />
+                    </th>
+                    <th pSortableColumn="processed_at" class="text-left">
+                        <div class="flex items-center gap-2">
+                            Timestamp
+                            <p-sortIcon field="processed_at" />
+                        </div>
+                    </th>
+                    <th class="text-left">Actions</th>
+                </tr>
+            </ng-template>
+
+            <ng-template #body let-delivery>
+                <tr class="hover:bg-surface-50 dark:hover:bg-surface-800">
+                    <!-- ID -->
+                    <td>
+                        <div class="font-mono text-xs text-surface-700 dark:text-surface-300">
+                            {{ delivery.delivery_id }}
+                        </div>
+                    </td>
+
+                    <!-- Event Type -->
+                    <td>
+                        <p-tag [value]="delivery.eventType" severity="info" class="text-xs!" />
+                    </td>
+
+                    <!-- Endpoint -->
+                    <td>
+                        <div class="flex flex-col gap-1">
+                            <div class="text-sm font-medium text-surface-900 dark:text-surface-0">
+                                {{ delivery.webhook_type | titlecase }} Webhook
+                            </div>
+                            <div class="text-xs font-mono text-surface-600 dark:text-surface-400 truncate max-w-xs">
+                                {{ delivery.target }}
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- Status -->
+                    <td>
+                        <div class="flex items-center gap-2">
+                            <p-tag [value]="delivery.status | titlecase" [severity]="getStatusSeverity(delivery.status)"
+                                styleClass="text-xs font-medium" />
+                            <span *ngIf="delivery.attempt_number && delivery.attempt_number > 1"
+                                class="text-xs text-surface-500 dark:text-surface-400">
+                                ({{ delivery.attempt_number }} attempts)
+                            </span>
+                        </div>
+                    </td>
+
+                    <!-- Response -->
+                    <td>
+                        <div class="text-sm text-surface-700 dark:text-surface-300 font-mono">
+                            {{ delivery.responseCode }}
+                        </div>
+                    </td>
+
+                    <!-- Latency -->
+                    <td>
+                        <div class="text-sm text-surface-700 dark:text-surface-300">
+                            <span *ngIf="delivery.latencyMs !== undefined; else noLatency">
+                                {{ delivery.latencyMs }}ms
+                            </span>
+                            <ng-template #noLatency>
+                                <span class="text-surface-400 dark:text-surface-500">-</span>
+                            </ng-template>
+                        </div>
+                    </td>
+
+                    <!-- Timestamp -->
+                    <td>
+                        <div class="text-sm text-surface-600 dark:text-surface-400">
+                            {{ formatTimestamp(delivery.timestamp) }}
+                        </div>
+                    </td>
+
+                    <!-- Actions -->
+                    <td>
+                        <div class="flex gap-2">
+                            <p-button icon="pi pi-eye" [outlined]="true" size="small" styleClass="rounded-xl!"
+                                pTooltip="View details" tooltipPosition="top" tooltipStyleClass="text-xs! rounded-xl!"
+                                [routerLink]="['/deliveries/' + delivery.delivery_id]" />
+                            <p-button icon="pi pi-refresh" [outlined]="true" size="small" severity="secondary"
+                                styleClass="rounded-xl!" pTooltip="Retry delivery" tooltipPosition="top"
+                                tooltipStyleClass="text-xs! rounded-xl!" (onClick)="retryDelivery(delivery.delivery_id)"
+                                [disabled]="delivery.status === 'delivered' || delivery.status === 'pending'" />
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template  pTemplate="emptymessage">
+                <tr>
+                    <td colspan="8" class="text-center py-12">
+                        <div class="flex flex-col items-center gap-4 my-10">
+                            <i class="pi pi-inbox text-6xl text-surface-400 dark:text-surface-500"></i>
+                            <div>
+                                <h3 class="text-lg font-medium text-surface-900 dark:text-surface-0 mb-2">
+                                    {{ searchTerm ? 'No deliveries found' :
+                                    activeFilter === 'all' ? 'No deliveries found' :
+                                    'No ' + activeFilter + ' deliveries' }}
+                                </h3>
+                                <p class="text-surface-600 dark:text-surface-400 mb-4">
+                                    {{ searchTerm ? 'Try adjusting your search terms' : activeFilter === 'all' ? 'Webhook deliveries will appear here once you start sending events.' : 'Try adjusting your filters or check back later' }}
+                                </p>
+                                <div class="flex gap-2">
+                                    <p-button label="Clear Filters" icon="pi pi-filter-slash" severity="secondary"
+                                        size="small" [outlined]="true" (onClick)="refreshDeliveries()"
+                                        *ngIf="searchTerm || activeFilter !== 'all'" />
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </p-card>
+
+    <!-- Stats Summary -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Total Deliveries -->
+        <div class="card-panel flex flex-col gap-2 h-full">
+            <div class="flex items-start gap-2 justify-between">
+                <span class="text-xl font-light leading-tight">
+                    Total Deliveries
+                </span>
+                <span
+                    class="shrink-0 bg-surface-100 dark:bg-surface-800 text-surface-900 dark:text-surface-0 rounded-lg w-8 h-8 flex items-center justify-center">
+                    <i class="pi pi-send text-xl! leading-none!"></i>
+                </span>
+            </div>
+            <div class="flex flex-col gap-1 w-full">
+                <div class="text-3xl font-medium leading-tight">
+                    {{ getTotalCount() }}
+                </div>
+                <div class="text-surface-600 dark:text-surface-400 text-sm leading-tight">
+                    {{ getTotalCount() === 1 ? 'Event delivered' : 'Events delivered' }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Successful -->
+        <div class="card-panel flex flex-col gap-2 h-full">
+            <div class="flex items-start gap-2 justify-between">
+                <span class="text-xl font-light leading-tight">
+                    Successful
+                </span>
+                <span
+                    class="shrink-0 bg-green-100 dark:bg-green-400/20 text-green-600 dark:text-green-400 rounded-lg w-8 h-8 flex items-center justify-center border border-green-200 dark:border-green-400/40">
+                    <i class="pi pi-check-circle text-xl! leading-none!"></i>
+                </span>
+            </div>
+            <div class="flex flex-col gap-1 w-full">
+                <div class="text-3xl font-medium leading-tight">
+                    {{ getSuccessCount() }}
+                </div>
+                <div class="text-surface-600 dark:text-surface-400 text-sm leading-tight">
+                    {{ getSuccessRate() }}% success rate
+                </div>
+            </div>
+        </div>
+
+        <!-- Failed -->
+        <div class="card-panel flex flex-col gap-2 h-full">
+            <div class="flex items-start gap-2 justify-between">
+                <span class="text-xl font-light leading-tight">
+                    Failed
+                </span>
+                <span
+                    class="shrink-0 bg-red-100 dark:bg-red-400/20 text-red-600 dark:text-red-400 rounded-lg w-8 h-8 flex items-center justify-center border border-red-200 dark:border-red-400/40">
+                    <i class="pi pi-times-circle text-xl! leading-none!"></i>
+                </span>
+            </div>
+            <div class="flex flex-col gap-1 w-full">
+                <div class="text-3xl font-medium leading-tight">
+                    {{ getFailedCount() }}
+                </div>
+                <div class="text-surface-600 dark:text-surface-400 text-sm leading-tight">
+                    {{ getFailedCount() === 1 ? 'Delivery failed' : 'Deliveries failed' }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Rate -->
+        <div class="card-panel flex flex-col gap-2 h-full">
+            <div class="flex items-start gap-2 justify-between">
+                <span class="text-xl font-light leading-tight">
+                    Success Rate
+                </span>
+                <span
+                    class="shrink-0 bg-blue-100 dark:bg-blue-400/20 text-blue-600 dark:text-blue-400 rounded-lg w-8 h-8 flex items-center justify-center border border-blue-200 dark:border-blue-400/40">
+                    <i class="pi pi-chart-line text-xl! leading-none!"></i>
+                </span>
+            </div>
+            <div class="flex flex-col gap-1 w-full">
+                <div class="text-3xl font-medium leading-tight">
+                    {{ getSuccessRate() }}%
+                </div>
+                <div class="text-surface-600 dark:text-surface-400 text-sm leading-tight">
+                    Success requests rate
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

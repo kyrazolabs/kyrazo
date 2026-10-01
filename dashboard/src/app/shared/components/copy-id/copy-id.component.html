@@ -1,0 +1,11 @@
+<div class="flex items-center gap-2 group">
+    <p-button icon="pi pi-copy" size="small" severity="secondary" [outlined]="true" (onClick)="copy($event)"
+        styleClass="p-0.5! w-[26px]! aspect-square! rounded-lg!" pTooltip="Copy ID" tooltipPosition="top"/>
+    <span class="font-mono text-sm text-surface-500 dark:text-surface-400"
+        [class.truncate]="!fullWidth" [class.max-w-[120px]]="!fullWidth" [pTooltip]="id"
+         tooltipPosition="top">
+        {{ id }}
+    </span>
+</div>
+
+<p-toast />

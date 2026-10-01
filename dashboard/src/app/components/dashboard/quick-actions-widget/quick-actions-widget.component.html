@@ -1,0 +1,30 @@
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+    @for (action of actions; track $index) {
+        <button
+            pRipple
+            [routerLink]="action.route"
+            (click)="handleAction(action)"
+            class="group relative flex items-center gap-4 p-4 rounded-2xl border-2 border-surface-100 dark:border-surface-900 bg-surface-0 dark:bg-surface-950! hover:border-primary-500/50 hover:shadow-sm hover:-translate-y-0.5 transition-all duration-300 w-full text-left cursor-pointer click-effect">
+
+            <!-- Icon Box -->
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors shrink-0" [ngClass]="action.bg">
+                <i [ngClass]="[action.icon, action.color]"></i>
+            </div>
+
+            <!-- Text Content -->
+            <div class="flex flex-col min-w-0">
+                <span class="font-bold text-surface-900 dark:text-surface-0 group-hover:text-primary-500 transition-colors truncate block">
+                    {{ action.label }}
+                </span>
+                <span class="text-sm text-surface-500 truncate block">
+                    {{ action.desc }}
+                </span>
+            </div>
+
+            <!-- Arrow Indicator (Opacity 0 -> 100 on hover) -->
+            <div class="absolute right-4 opacity-0 group-hover:opacity-100 transition-opacity text-primary-500">
+                <i class="pi pi-arrow-right text-sm"></i>
+            </div>
+        </button>
+    }
+</div>

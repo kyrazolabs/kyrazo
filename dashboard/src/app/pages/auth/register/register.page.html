@@ -1,0 +1,188 @@
+<div class="bg-surface-50 dark:bg-surface-950 min-h-screen w-full flex items-center justify-center p-4">
+    <app-config class="hidden" />
+    <p-card class="card-panel w-full max-w-md mx-auto">
+        <ng-template pTemplate="header">
+            <div class="text-center pt-6 pb-2">
+                <!-- <img src="/demo/images/blocks/logos/hyper.svg" alt="Logo" height="50" class="mb-4 mx-auto"
+                    loading="lazy"> -->
+                <div class="text-surface-900 dark:text-surface-0 text-3xl font-semibold mb-2">
+                    Create Account
+                </div>
+                <p class="text-surface-600 dark:text-surface-300 text-sm mb-4">
+                    Join us today and get started
+                </p>
+                <div class="text-surface-600 dark:text-surface-300 text-sm">
+                    Already have an account?
+                    <a class="font-medium no-underline ml-1 text-primary hover:text-primary-600 cursor-pointer transition-colors duration-200"
+                        [routerLink]="'/auth/login'">
+                        Sign in here
+                    </a>
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="content">
+            <form *ngIf="!pending2FA()" [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+
+                <!-- Name Fields -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- First Name -->
+                    <div class="space-y-1">
+                        <label for="firstName" class="block text-surface-900 dark:text-surface-100 font-medium text-sm">
+                            First Name *
+                        </label>
+                        <input pInputText id="firstName" formControlName="firstName" type="text"
+                            placeholder="Enter your first name" class="w-full rounded-xl!"
+                            [class.p-invalid]="isFieldInvalid('firstName')"
+                            [attr.aria-describedby]="isFieldInvalid('firstName') ? 'firstName-error' : null" />
+                        <small *ngIf="isFieldInvalid('firstName')" id="firstName-error"
+                            class="p-error block mt-1 text-xs">
+                            {{ getFieldErrorMessage('firstName') }}
+                        </small>
+                    </div>
+
+                    <!-- Last Name -->
+                    <div class="space-y-1">
+                        <label for="lastName" class="block text-surface-900 dark:text-surface-100 font-medium text-sm">
+                            Last Name *
+                        </label>
+                        <input pInputText id="lastName" formControlName="lastName" type="text"
+                            placeholder="Enter your last name" class="w-full rounded-xl!"
+                            [class.p-invalid]="isFieldInvalid('lastName')"
+                            [attr.aria-describedby]="isFieldInvalid('lastName') ? 'lastName-error' : null" />
+                        <small *ngIf="isFieldInvalid('lastName')" id="lastName-error"
+                            class="p-error block mt-1 text-xs">
+                            {{ getFieldErrorMessage('lastName') }}
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="space-y-1">
+                    <label for="email" class="block text-surface-900 dark:text-surface-100 font-medium text-sm">
+                        Email Address *
+                    </label>
+                    <input pInputText id="email" formControlName="email" type="email"
+                        placeholder="Enter your email address" autocomplete="email" class="w-full rounded-xl!"
+                        [class.p-invalid]="isFieldInvalid('email')"
+                        [attr.aria-describedby]="isFieldInvalid('email') ? 'email-error' : null" />
+                    <small *ngIf="isFieldInvalid('email')" id="email-error" class="p-error block mt-1 text-xs">
+                        {{ getFieldErrorMessage('email') }}
+                    </small>
+                </div>
+
+                <!-- Job Title -->
+                <div class="space-y-1">
+                    <label for="jobTitle" class="block text-surface-900 dark:text-surface-100 font-medium text-sm">
+                        Job Title *
+                    </label>
+                    <p-select [options]="jobTitles" formControlName="jobTitle" inputId="jobTitle"
+                        placeholder="Select your job title"
+                        styleClass="w-full rounded-xl!" class="w-full" size="small"
+                        [class.p-invalid]="isFieldInvalid('jobTitle')"
+                        [attr.aria-describedby]="isFieldInvalid('jobTitle') ? 'jobTitle-error' : null"></p-select>
+                    <small *ngIf="isFieldInvalid('jobTitle')" id="jobTitle-error" class="p-error block mt-1 text-xs">
+                        {{ getFieldErrorMessage('jobTitle') }}
+                    </small>
+                </div>
+
+                <!-- Password -->
+                <div class="space-y-1">
+                    <label for="password" class="block text-surface-900 dark:text-surface-100 font-medium text-sm">
+                        Password *
+                    </label>
+                    <p-password formControlName="password" inputId="password" placeholder="Create a strong password"
+                        [toggleMask]="true" [feedback]="false" autocomplete="off"
+                        inputStyleClass="w-full rounded-xl!" class="w-full" [class.p-invalid]="isFieldInvalid('password')"
+                        [attr.aria-describedby]="isFieldInvalid('password') ? 'password-error' : null"></p-password>
+                    <small *ngIf="isFieldInvalid('password')" id="password-error" class="p-error block mt-1 text-xs">
+                        {{ getFieldErrorMessage('password') }}
+                    </small>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="space-y-1">
+                    <label for="confirmPassword" class="block text-surface-900 dark:text-surface-100 font-medium text-sm">
+                        Confirm Password *
+                    </label>
+                    <p-password id="confirmPassword" formControlName="confirmPassword"
+                        placeholder="Confirm your password"
+                        autocomplete="off" inputStyleClass="w-full rounded-xl!" class="w-full" [feedback]="false" [toggleMask]="true"
+                        [class.p-invalid]="isFieldInvalid('confirmPassword') || form.errors?.['passwordMismatch']" />
+                    <small *ngIf="isFieldInvalid('confirmPassword') || form.errors?.['passwordMismatch']"
+                        class="p-error block mt-1 text-xs">
+                        {{ getFieldErrorMessage('confirmPassword') }}
+                    </small>
+                </div>
+
+                <!-- Terms Agreement -->
+                <div class="flex items-start space-x-3 py-2 font-semibold">
+                    <p-checkbox formControlName="agreeToTerms" inputId="agreeToTerms" [binary]="true"
+                        [class.p-invalid]="isFieldInvalid('agreeToTerms')"></p-checkbox>
+                    <div class="flex-1">
+                        <label for="agreeToTerms" class="text-surface-900 dark:text-surface-400 text-sm cursor-pointer">
+                            I agree to the
+                            <a href="/legal/terms-of-service" target="_blank" class="text-primary hover:text-primary-600 underline">
+                                Terms of Service
+                            </a>
+                            and
+                            <a href="/legal/privacy-policy" target="_blank" class="text-primary hover:text-primary-600 underline">
+                                Privacy Policy
+                            </a> *
+                        </label>
+                        <small *ngIf="isFieldInvalid('agreeToTerms')" class="p-error block mt-1 text-xs">
+                            {{ getFieldErrorMessage('agreeToTerms') }}
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-4">
+                    <p-button type="submit" label="Create Account" icon="pi pi-user-plus" [loading]="loading()"
+                        [disabled]="loading()" styleClass="w-full rounded-xl! font-medium"></p-button>
+                </div>
+            </form>
+
+            <!-- 2FA Step -->
+            <div *ngIf="pending2FA()" class="space-y-6">
+                <div class="text-center">
+                    <div class="mb-4">
+                        <i class="pi pi-envelope text-4xl text-primary"></i>
+                    </div>
+                    <div class="text-xl font-semibold mb-2">Verify your Email</div>
+                    <p class="text-surface-600 dark:text-surface-300 text-sm mb-6">
+                        We've sent a 6-digit verification code to your email address. Please enter it below to complete your registration.
+                    </p>
+
+                    <div class="flex justify-center">
+                        <p-inputotp
+                            [ngModel]="otpCode()"
+                            (ngModelChange)="otpCode.set($event)"
+                            [length]="6"
+                            [integerOnly]="true"
+                            (onComplete)="verify2FA()"
+                        ></p-inputotp>
+                    </div>
+                </div>
+
+                <p-button
+                    label="Verify Account"
+                    icon="pi pi-check-circle"
+                    [loading]="loading()"
+                    (onClick)="verify2FA()"
+                    [disabled]="otpCode().length < 6"
+                    styleClass="w-full rounded-xl! font-medium"
+                />
+
+                <div class="text-center">
+                    <button type="button"
+                        class="text-surface-600 dark:text-surface-400 hover:text-primary transition-colors duration-200 bg-transparent border-0 cursor-pointer text-sm font-medium click-effect"
+                        (click)="pending2FA.set(false)">
+                        <i class="pi pi-arrow-left mr-1 text-xs"></i>
+                        Back to registration
+                    </button>
+                </div>
+            </div>
+        </ng-template>
+    </p-card>
+    </div>

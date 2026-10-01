@@ -1,0 +1,192 @@
+<div class="space-y-6">
+
+    <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="flex flex-col gap-6">
+        <!-- Basic Information -->
+        <p-card header="Basic Information"
+            class="card-panel">
+             <div class="flex flex-col md:flex-row gap-8">
+                <!-- Avatar Section -->
+                <div class="flex flex-col items-center gap-4 w-32 h-32 aspect-square!">
+                    <div class="relative group">
+                        <img [src]="getAvatarUrl(profileForm.get('avatar')?.value)"
+                            alt="Profile Avatar"
+                            class="rounded-full object-cover border-2 border-primary" />
+                        <button type="button"
+                            (click)="showAvatarDialog()"
+                            pTooltip="Change Avatar"
+                            tooltipPosition="top"
+                            class="absolute bottom-0 right-0 w-8 h-8 bg-primary text-white rounded-xl flex items-center justify-center click-effect">
+                            <i class="pi pi-pencil"></i>
+                        </button>
+                    </div>
+                    <span class="font-semibold text-surface-900 dark:text-surface-0">
+                        Profile Avatar
+                    </span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+
+                    <!-- First Name -->
+                    <div class="flex flex-col gap-2">
+                        <label class="font-semibold text-surface-900 dark:text-surface-0">First Name</label>
+                        <input pInputText type="text" formControlName="firstName" placeholder="Enter your first name"
+                            class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
+                            [class.border-red-500]="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched" />
+                        @if (profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched) {
+                        <small class="text-red-500 text-sm">
+                            First name is required and must be at least 2 characters
+                        </small>
+                        }
+                    </div>
+
+                    <!-- Last Name -->
+                    <div class="flex flex-col gap-2">
+                        <label class="font-semibold text-surface-900 dark:text-surface-0">Last Name</label>
+                        <input pInputText type="text" formControlName="lastName" placeholder="Enter your last name"
+                            class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
+                            [class.border-red-500]="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched" />
+                        @if (profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched) {
+                        <small class="text-red-500 text-sm">
+                            Last name is required and at least 2 characters
+                        </small>
+                        }
+                    </div>
+
+                    <!-- Email Address -->
+                    <div class="flex flex-col gap-2">
+                        <label class="font-semibold text-surface-900 dark:text-surface-0">Email Address</label>
+                        <input pInputText type="email" formControlName="email" placeholder="Enter your email address"
+                            class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
+                            [class.border-red-500]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched" />
+                        @if (profileForm.get('email')?.invalid && profileForm.get('email')?.touched) {
+                        <small class="text-red-500 text-sm">
+                            Please enter a valid email address
+                        </small>
+                        }
+                    </div>
+
+
+                    <!-- Job Title -->
+                    <div class="flex flex-col gap-2">
+                        <label class="font-semibold text-surface-900 dark:text-surface-0">Job Title</label>
+                        <input pInputText type="text" formControlName="jobTitle" placeholder="Enter your job title"
+                            class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800" />
+                    </div>
+                </div>
+            </div>
+        </p-card>
+
+        <!-- Account Settings -->
+        <p-card header="Account Settings"
+            class="card-panel">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Time Zone -->
+                <div class="flex flex-col gap-2">
+                    <label class="font-semibold text-surface-900 dark:text-surface-0">Time Zone</label>
+                    <p-select formControlName="timeZone" [options]="timezoneOptions" optionLabel="label"
+                        optionValue="value" [filter]="true" filterBy="label" filterPlaceholder="Search ..."
+                        placeholder="Select timezone" class="w-full rounded-xl!" panelStyleClass="rounded-xl!" size="small" />
+                </div>
+
+                <!-- Language -->
+                <div class="flex flex-col gap-2">
+                    <label class="font-semibold text-surface-900 dark:text-surface-0">Language</label>
+                    <p-select formControlName="language" [options]="languageOptions" optionLabel="label"
+                        optionValue="value" placeholder="Select language" styleClass="w-full rounded-xl!"
+                        panelStyleClass="rounded-xl!" size="small" />
+                </div>
+
+                <!-- Account Status -->
+                <div class="flex flex-col gap-2">
+                    <label class="font-semibold text-surface-900 dark:text-surface-0">Account Status</label>
+                    <div class="flex items-center pt-2">
+                        <p-tag [value]="originalProfile?.isActive ? 'Active' : 'Inactive'"
+                            [severity]="originalProfile?.isActive ? 'success' : 'danger'" class="text-sm font-medium"
+                            [rounded]="true" />
+                    </div>
+                </div>
+
+                <!-- Member Since -->
+                <div class="flex flex-col gap-2">
+                    <label class="font-semibold text-surface-900 dark:text-surface-0">Member Since</label>
+                    <input pInputText type="text" [value]="originalProfile?.createdAt ? formatDate(originalProfile!.createdAt) : 'N/A'" placeholder="Enter workspace name"
+                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
+                        readonly disabled />
+                </div>
+
+                <!-- Last Login -->
+                <div class="flex flex-col gap-2">
+                    <label class="font-semibold text-surface-900 dark:text-surface-0">Last Login</label>
+                    <input pInputText type="text" [value]="originalProfile?.lastLogin ? formatDate(originalProfile!.lastLogin) : 'Never'" placeholder="Enter workspace name"
+                        class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
+                        readonly disabled />
+                </div>
+
+                <!-- Account ID -->
+                <div class="flex flex-col gap-2">
+                    <label class="font-semibold text-surface-900 dark:text-surface-0">Account ID</label>
+                    <div class="flex items-center gap-2">
+                        <input pInputText type="text" [value]="originalProfile?.id || 'N/A'" placeholder="Enter workspace name"
+                            class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
+                            readonly disabled />
+                        <p-button icon="pi pi-copy" [outlined]="true" size="small" styleClass="rounded-xl!"
+                            pTooltip="Copy Account ID" tooltipStyleClass="text-xs! rounded-xl!" tooltipPosition="top"
+                            (onClick)="copyToClipboard(originalProfile?.id || '')" />
+                    </div>
+                </div>
+            </div>
+        </p-card>
+
+        <!-- Change Password -->
+        <p-card header="Security & Password"
+            class="card-panel">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Change Password Form -->
+                <div [formGroup]="passwordForm" class="space-y-4">
+                    <div class="flex flex-col gap-2">
+                        <label class="font-semibold text-surface-900 dark:text-surface-0 text-sm">Update Password</label>
+                        <div class="space-y-4">
+                            <input pInputText type="password" formControlName="currentPassword" placeholder="Current Password"
+                                (keydown.enter)="$event.preventDefault(); changePassword()"
+                                class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800 text-sm" />
+                            <input pInputText type="password" formControlName="newPassword" placeholder="New Password"
+                                (keydown.enter)="$event.preventDefault(); changePassword()"
+                                class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800 text-sm" />
+                            <input pInputText type="password" formControlName="confirmPassword" placeholder="Confirm New Password"
+                                (keydown.enter)="$event.preventDefault(); changePassword()"
+                                class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800 text-sm" />
+                            <p-button label="Change Password" icon="pi pi-lock" styleClass="rounded-xl! w-full"
+                                [disabled]="passwordForm.invalid || isChangingPassword" [loading]="isChangingPassword"
+                                (onClick)="changePassword()" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Two-Factor Authentication -->
+                <div class="flex flex-col gap-4 p-4 border border-surface-200 dark:border-surface-800 rounded-2xl bg-surface-50/50 dark:bg-surface-900/50">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="icon-[hugeicons--user-shield-01] text-xl! text-primary"></i>
+                            <span class="font-semibold text-surface-900 dark:text-surface-0">Two-Factor Authentication</span>
+                        </div>
+                        <p-tag [value]="originalProfile?.is2FAEnabled ? 'Enabled' : 'Disabled'"
+                            [severity]="originalProfile?.is2FAEnabled ? 'success' : 'warn'" [rounded]="true" />
+                    </div>
+                    <p class="text-xs text-surface-600 dark:text-surface-400">
+                        Add an extra layer of security to your account by requiring more than just a password to log in.
+                    </p>
+                    <div class="mt-auto">
+                        @if (!originalProfile?.is2FAEnabled) {
+                        <p-button label="Enable 2FA" icon="pi pi-plus"
+                            styleClass="rounded-xl! w-full" size="small" (onClick)="start2FASetup()" />
+                        }
+                        @if (originalProfile?.is2FAEnabled) {
+                        <p-button label="Disable 2FA" icon="pi pi-trash"
+                            severity="danger" [outlined]="true" styleClass="rounded-xl! w-full" size="small" (onClick)="disable2FA()" />
+                        }
+                    </div>
+                </div>
+            </div>
+        </p-card>
+    </form>
+
+</div>

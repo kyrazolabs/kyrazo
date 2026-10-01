@@ -1,0 +1,97 @@
+<div class="flex flex-col w-full mx-auto gap-8 flex-1 p-2 animate-fade-in">
+
+    <!-- Header Section -->
+    <div class="flex flex-col gap-6">
+        <app-welcome-widget />
+    </div>
+
+    <!-- Quick Actions Hero -->
+    <div class="w-full">
+        <app-quick-actions-widget (actionClick)="handleQuickAction($event)" />
+    </div>
+
+    <!-- Control Center Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        @for (card of navCards(); track card.title) {
+            <div class="group relative bg-surface-0 dark:bg-surface-950! border-2 border-surface-100 dark:border-surface-900 rounded-2xl p-4 hover:shadow-sm hover:border-primary-500/50 transition-all duration-300 cursor-pointer flex flex-col h-full"
+                 [routerLink]="card.route">
+
+                <!-- Icon & Header -->
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors" [ngClass]="card.bg">
+                        <i class="pi text-xl" [ngClass]="[card.icon, card.color]"></i>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="flex flex-col gap-2 mb-8 flex-1">
+                    <h3 class="font-bold text-xl text-surface-900 dark:text-surface-0 group-hover:text-primary-500 transition-colors">
+                        {{ card.title }}
+                    </h3>
+                    <p class="text-sm font-medium text-surface-400 dark:text-surface-500 uppercase tracking-wider">
+                        {{ card.subtitle }}
+                    </p>
+                    <p class="text-surface-600 dark:text-surface-300 text-sm leading-relaxed mt-1">
+                        {{ card.description }}
+                    </p>
+                </div>
+
+                <!-- Action Footer -->
+                <div class="mt-auto flex items-center text-sm font-semibold text-primary-500 group-hover:translate-x-1 transition-transform">
+                    <span>{{ card.actionLabel }}</span>
+                    <i class="pi pi-arrow-right ml-2 text-xs"></i>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Documentation & Help (Optional Footer) -->
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-linear-to-r from-surface-0 to-primary-50/10 dark:from-surface-950 dark:to-primary-500/10 border-2 border-surface-100 dark:border-surface-900 rounded-2xl p-6 flex items-center justify-between">
+            <div class="flex flex-col gap-1">
+                <span class="font-bold text-surface-900 dark:text-surface-0">Read the Docs</span>
+                <span class="text-sm text-surface-500">Learn how to integrate Webhooks</span>
+            </div>
+            <a href="https://docs.kyrazo.com" target="_blank" pButton icon="pi pi-book" label="Documentation"  pButton class="p-button-text rounded-xl!"></a>
+        </div>
+
+        <div class="bg-linear-to-r from-surface-0 to-primary-50/10 dark:from-surface-950 dark:to-primary-500/10 border-2 border-surface-100 dark:border-surface-900 rounded-xl p-6 flex items-center justify-between">
+             <div class="flex flex-col gap-1">
+                <span class="font-bold text-surface-900 dark:text-surface-0">Need Support?</span>
+                <span class="text-sm text-surface-500">Join our community or contact us</span>
+            </div>
+            <p-button label="We hear you, bro" icon="icon-[hugeicons--bubble-chat-question] size-5" (click)="openSupportDialog()" styleClass="rounded-xl!" />
+        </div>
+    </div>
+
+</div>
+<p-toast />
+
+<!-- Create Namespace Dialog -->
+<p-dialog header="Create Namespace" styleClass="rounded-xl!" [(visible)]="namespaceDialogVisible" [modal]="true" [style]="{ width: '40rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [draggable]="false" [resizable]="false">
+    <div class="flex flex-col gap-4 pt-2">
+         <div class="flex flex-col gap-2">
+            <label for="pname" class="font-medium">Namespace Name</label>
+            <input pInputText id="pname" [(ngModel)]="namespaceForm.name" placeholder="e.g. Acme Production" autofocus />
+        </div>
+        <div class="flex flex-col gap-2">
+            <label for="pdesc" class="font-medium">Description</label>
+            <textarea pInputTextarea id="pdesc" [(ngModel)]="namespaceForm.description" rows="3" placeholder="Brief description of this namespace environment..." class="resize-none"></textarea>
+        </div>
+        @if (isLimitReached()) {
+        <div class="p-3 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl flex items-start gap-3 mt-2 animate-fade-in">
+            <i class="pi pi-exclamation-triangle text-amber-500 mt-0.5"></i>
+            <div class="flex flex-col gap-1">
+                <span class="text-amber-800 dark:text-amber-400 font-semibold text-sm">Namespace limit reached</span>
+                <span class="text-amber-700 dark:text-amber-500 text-xs">You have reached the maximum number of namespaces for your current plan. Please upgrade to create more.</span>
+            </div>
+        </div>
+        }
+    </div>
+    <ng-template pTemplate="footer">
+        <p-button label="Cancel" [text]="true" severity="secondary" (click)="namespaceDialogVisible = false" styleClass="rounded-xl!" />
+        <p-button label="Create Namespace" [loading]="isCreating" (click)="createNamespace()" [disabled]="!namespaceForm.name || isLimitReached()"
+            [pTooltip]="isLimitReached() ? 'Limit reached' : ''"
+            styleClass="rounded-xl!" />
+    </ng-template>
+</p-dialog>

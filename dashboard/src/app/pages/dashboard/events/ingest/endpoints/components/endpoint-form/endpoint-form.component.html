@@ -1,0 +1,213 @@
+
+@if (initialLoading()) {
+    <div class="flex flex-col gap-6">
+        <div class="flex flex-col gap-4">
+            <div class="flex flex-col gap-2">
+                <p-skeleton width="10rem" height="1.5rem" class="mb-2"></p-skeleton>
+                <p-skeleton width="100%" height="2.5rem" borderRadius="12px"></p-skeleton>
+            </div>
+
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div class="flex flex-col gap-2">
+                    <p-skeleton width="8rem" height="1.5rem" class="mb-2"></p-skeleton>
+                    <p-skeleton width="100%" height="2.5rem" borderRadius="12px"></p-skeleton>
+                 </div>
+                  <div class="flex flex-col gap-2">
+                    <p-skeleton width="8rem" height="1.5rem" class="mb-2"></p-skeleton>
+                    <p-skeleton width="100%" height="2.5rem" borderRadius="12px"></p-skeleton>
+                 </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <p-skeleton width="10rem" height="1.5rem" class="mb-2"></p-skeleton>
+                <p-skeleton width="100%" height="5rem" borderRadius="12px"></p-skeleton>
+            </div>
+        </div>
+        <p-divider />
+         <div class="flex flex-col gap-4">
+            <p-skeleton width="8rem" height="1.5rem" class="mb-2"></p-skeleton>
+            <p-skeleton width="100%" height="2.5rem" borderRadius="12px"></p-skeleton>
+        </div>
+    </div>
+} @else {
+    <div class="space-y-6" [formGroup]="endpointForm">
+        <!-- Basic Information -->
+        <div class="flex flex-col gap-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0">Basic Information</h3>
+                @if (isEditing() && endpointId) {
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-semibold text-surface-500">ID:</span>
+                        <app-copy-id [id]="endpointId" [fullWidth]="true" />
+                    </div>
+                }
+            </div>
+            <div class="grid grid-cols-1 gap-6">
+                <!-- Name Field -->
+                <div class="flex flex-col gap-2">
+                    <label for="name" class="font-semibold text-surface-900 dark:text-surface-0">
+                        Name <span class="text-red-500">*</span>
+                    </label>
+                    <input id="name" type="text" pInputText formControlName="name" placeholder="Enter endpoint name" class="w-full rounded-xl!"
+                        [class.ng-invalid]="endpointForm.get('name')?.invalid && endpointForm.get('name')?.touched" />
+                    @if (endpointForm.get('name')?.hasError('required') && endpointForm.get('name')?.touched) {
+                        <small class="text-red-500">
+                            Name is required
+                        </small>
+                    }
+                </div>
+
+                <!-- URL and Method -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- URL Field -->
+                    <div class="flex flex-col gap-2 md:col-span-2">
+                        <label for="url" class="font-semibold text-surface-900 dark:text-surface-0">
+                            URL <span class="text-red-500">*</span>
+                        </label>
+                        <input id="url" type="url" pInputText formControlName="url" class="w-full rounded-xl!"
+                            placeholder="https://api.example.com/callback"
+                            [class.ng-invalid]="endpointForm.get('url')?.invalid && endpointForm.get('url')?.touched" />
+                         @if (endpointForm.get('url')?.hasError('required') && endpointForm.get('url')?.touched) {
+                            <small class="text-red-500">
+                                URL is required
+                            </small>
+                        }
+                         @if (endpointForm.get('url')?.hasError('pattern') && endpointForm.get('url')?.touched) {
+                            <small class="text-red-500">
+                                Please enter a valid URL
+                            </small>
+                        }
+                    </div>
+
+                    <!-- Method Field -->
+                    <div class="flex flex-col gap-2">
+                        <label for="method" class="font-semibold text-surface-900 dark:text-surface-0">
+                            Method
+                        </label>
+                        <p-select id="method" formControlName="method" [options]="methodOptions" placeholder="Select method"
+                            optionLabel="label" optionValue="value" class="w-full" styleClass="rounded-xl!" panelStyleClass="rounded-xl! custom-select-panel" size="small" />
+                    </div>
+                </div>
+
+                <!-- Status Field (Only if editing) -->
+                 @if (isEditing()) {
+                    <div class="flex flex-col gap-2">
+                        <label for="status" class="font-semibold text-surface-900 dark:text-surface-0">
+                            Status
+                        </label>
+                        <p-select id="status" formControlName="status" [options]="statusOptions" placeholder="Select status"
+                            optionLabel="label" optionValue="value" class="w-full" styleClass="rounded-xl!" panelStyleClass="rounded-xl! custom-select-panel" size="small" />
+                    </div>
+                }
+
+                <!-- Description -->
+                <div class="flex flex-col gap-2">
+                    <label for="description" class="font-semibold text-surface-900 dark:text-surface-0">
+                        Description
+                    </label>
+                    <textarea id="description" pTextarea formControlName="description" rows="3"
+                        placeholder="Describe this endpoint's purpose" class="w-full rounded-xl!"></textarea>
+                </div>
+
+                <!-- Enabled Checkbox -->
+                <div class="flex items-center gap-2">
+                    <p-checkbox formControlName="enabled" [binary]="true" inputId="enabled" styleClass="rounded-xl!" />
+                    <label for="enabled" class="font-semibold text-surface-900 dark:text-surface-0">
+                        Enable this endpoint
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <p-divider />
+
+        <!-- Configuration Settings -->
+        <div class="flex flex-col gap-4">
+            <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0">Configuration Settings</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Timeout -->
+                <div class="flex flex-col gap-2">
+                    <label for="timeoutMs" class="font-semibold text-surface-900 dark:text-surface-0">
+                        Timeout (ms)
+                    </label>
+                    <p-inputNumber id="timeoutMs" formControlName="timeoutMs" [min]="100" [max]="30000" [step]="100"
+                        [showButtons]="false" suffix=" ms" inputStyleClass="rounded-xl!"
+                        [disabled]="!hasCustomTimeout()" [pTooltip]="!hasCustomTimeout() ? 'Custom timeout is not included in your plan' : ''" tooltipPosition="top" />
+                    <small class="text-surface-600 dark:text-surface-400">
+                        Request timeout in milliseconds
+                    </small>
+                </div>
+
+                <!-- Retry Count -->
+                <div class="flex flex-col gap-2">
+                    <label for="retryCount" class="font-semibold text-surface-900 dark:text-surface-0">
+                        Retry Count
+                    </label>
+                    <p-inputNumber id="retryCount" formControlName="retryCount" [min]="0" [max]="10"
+                        [showButtons]="false" inputStyleClass="rounded-xl!"
+                        [disabled]="!hasCustomRetries()" [pTooltip]="!hasCustomRetries() ? 'Custom retries are not included in your plan' : ''" tooltipPosition="top" />
+                    <small class="text-surface-600 dark:text-surface-400">
+                        Number of retry attempts on failure
+                    </small>
+                </div>
+
+                <!-- Rate Limit -->
+                <div class="flex flex-col gap-2">
+                    <label for="rateLimit" class="font-semibold text-surface-900 dark:text-surface-0">
+                        Rate Limit (optional)
+                    </label>
+                    <p-inputNumber id="rateLimit" formControlName="rateLimit" [min]="1" [max]="1000"
+                        [showButtons]="false" suffix="/min" inputStyleClass="rounded-xl!"/>
+                    <small class="text-surface-600 dark:text-surface-400">
+                        Maximum requests per minute
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <p-divider />
+
+        <!-- Custom Headers -->
+        <div class="flex flex-col gap-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0">Custom Headers</h3>
+                @if (!hasCustomHeaders()) {
+                    <span class="text-xs bg-primary/10 text-primary px-2 py-1 rounded-md font-medium">Pro Feature</span>
+                }
+            </div>
+
+            @if (hasCustomHeaders()) {
+                @if (customHeaders && customHeaders.length > 0) {
+                     <div class="space-y-4 mb-4">
+                        @for (header of customHeaders; track $index; let i = $index) {
+                             <div class="flex gap-3 items-center rounded-xl">
+                                <input type="text" pInputText [(ngModel)]="header.key" [ngModelOptions]="{standalone: true}"
+                                    placeholder="Header name" class="flex-1 rounded-xl!" />
+                                <input type="text" pInputText [(ngModel)]="header.value" [ngModelOptions]="{standalone: true}"
+                                    placeholder="Header value" class="flex-1 rounded-xl!" />
+                                <p-button icon="pi pi-trash" severity="danger" [outlined]="true" size="small"
+                                    (onClick)="removeHeader(i)" styleClass="rounded-xl!" />
+                            </div>
+                        }
+                    </div>
+                } @else {
+                    <div class="text-center py-4 mb-4">
+                         <p class="text-surface-600 dark:text-surface-400 text-sm">No custom headers configured</p>
+                    </div>
+                }
+                 <p-button label="Add Header" icon="pi pi-plus" [outlined]="true" size="small" styleClass="rounded-xl!" (onClick)="addHeader()" />
+            } @else {
+                <div class="flex flex-col items-center justify-center py-8 text-center border border-dashed border-surface-200 dark:border-surface-800 rounded-xl bg-surface-50 dark:bg-surface-950">
+                    <p class="text-surface-500 dark:text-surface-400 text-sm mb-4">Custom headers are not included in your current plan.</p>
+                    <p-button label="Upgrade to Unlock" icon="pi pi-lock" size="small" [outlined]="true" (onClick)="dialogService.openBillingDialog()" styleClass="rounded-xl!" />
+                </div>
+            }
+        </div>
+
+        <div class="flex justify-end gap-2 pt-4">
+            <p-button label="Cancel" icon="pi pi-times" size="small" [text]="true" (onClick)="cancel()" styleClass="rounded-xl!" />
+            <p-button [label]="isEditing() ? 'Update Endpoint' : 'Create Endpoint'" icon="pi pi-check" size="small"
+                [loading]="loading()" (onClick)="onSubmit()" styleClass="rounded-xl!" />
+        </div>
+    </div>
+}

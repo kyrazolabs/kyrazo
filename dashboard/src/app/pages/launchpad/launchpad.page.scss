@@ -1,0 +1,49 @@
+:host {
+    display: block;
+    background: radial-gradient(circle at top right, var(--primary-50), transparent),
+                radial-gradient(circle at bottom left, var(--primary-100), transparent);
+}
+
+.onboarding-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    }
+}
+
+.confetti-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 50;
+    overflow: hidden;
+}
+
+.confetti {
+    position: absolute;
+    bottom: -20px;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    animation: celebrate 2.5s cubic-bezier(0.1, 0.7, 0.4, 1) forwards;
+}
+
+@keyframes celebrate {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+        transform: translate(0, 0) rotate(0deg) scale(1);
+    }
+    100% {
+        transform: translate(var(--x), var(--y)) rotate(var(--rotation)) scale(0.5);
+        opacity: 0;
+    }
+}

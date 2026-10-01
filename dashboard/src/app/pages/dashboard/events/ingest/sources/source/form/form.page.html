@@ -1,0 +1,165 @@
+<div class="space-y-6 mb-4">
+    <!-- Header -->
+    <div
+        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+        <!-- Left section -->
+        <div>
+            <h1 class="text-2xl font-bold">
+                {{ isEditing() ? 'Edit Source' : 'Create Source' }}
+            </h1>
+            <p class="opacity-80">
+                {{ isEditing() ? 'Update your receive source configuration' : 'Set up a new receive source endpoint' }}
+            </p>
+        </div>
+
+        <!-- Right Sections -->
+        <div class="flex items-center gap-4">
+            <p-button label="Cancel" icon="pi pi-times" [outlined]="true" severity="secondary" styleClass="rounded-xl!" (onClick)="goBack()" />
+        </div>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="sourceForm" (ngSubmit)="onSubmit()">
+
+        <!-- Basic Information Card -->
+        <p-card class="mb-4 card-panel">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Name Field -->
+                <div class="flex flex-col gap-2">
+                    <label for="name" class="font-semibold text-surface-900 dark:text-surface-0">
+                        Name <span class="text-red-500">*</span>
+                    </label>
+                    <input id="name" type="text" pInputText formControlName="name" placeholder="Enter source name" class="rounded-xl!"
+                        [class.ng-invalid]="sourceForm.get('name')?.errors?.['required'] && sourceForm.get('name')?.touched" />
+                        @if (sourceForm.get('name')?.errors?.['required'] && sourceForm.get('name')?.touched) {
+                            <small class="text-red-500">
+                                Name is required
+                            </small>
+                        }
+                </div>
+
+                <!-- Status Field -->
+                <div class="flex flex-col gap-2">
+                    <label for="status" class="font-semibold text-surface-900 dark:text-surface-0">
+                        Status
+                    </label>
+                    <p-select id="status" formControlName="status" [options]="statusOptions" placeholder="Select status"
+                        optionLabel="label" optionValue="value" class="w-full rounded-xl!" panelStyleClass="rounded-xl!" size="small" />
+                </div>
+            </div>
+
+            <!-- Description Field -->
+            <div class="flex flex-col gap-2 mt-6">
+                <label for="description" class="font-semibold text-surface-900 dark:text-surface-0">
+                    Description
+                </label>
+                <textarea  id="description" pInputTextarea formControlName="description" rows="3"
+                    placeholder="Describe what this source does" class="w-full rounded-xl!"></textarea>
+            </div>
+
+            <!-- Endpoints Field -->
+            <div class="flex flex-col gap-2 mt-6">
+                <label for="endpoints" class="font-semibold text-surface-900 dark:text-surface-0">
+                    Forwarding Endpoints
+                </label>
+                <p-multiSelect
+                    id="endpoints"
+                    formControlName="endpoints"
+                    [options]="availableEndpoints()"
+                    optionLabel="name"
+                    optionValue="_id"
+                    placeholder="Select endpoints to forward to"
+                    styleClass="w-full rounded-xl!"
+                    panelStyleClass="rounded-xl!"
+                    display="chip"
+                    size="small"
+                    [filter]="true">
+                </p-multiSelect>
+                <small class="text-surface-500">Select endpoints where received events will be forwarded to.</small>
+            </div>
+
+
+            <div class="grid grid-cols-1 md:grid-cols-10 gap-6 mt-6 w-full">
+                <div class="col-span-10!">
+                    <!-- Service -->
+                    <div class="flex flex-col gap-2">
+                        <label for="service" class="font-semibold text-surface-900 dark:text-surface-0">
+                            Service <span class="text-red-500">*</span>
+                        </label>
+                        <p-select  id="service" formControlName="service" [options]="servicesItem" placeholder="Select Services" optionLabel="label" filterBy="label" [filterFields]="['label']" filterPlaceHolder="Search ..." optionValue="value" class="w-full md:w-80 rounded-xl!" panelStyleClass="rounded-xl! col-span-5!"  fluid size="small" >
+                            <ng-template #selectedItem let-selectedOption>
+                                @if (selectedOption) {
+                                    <div class="flex items-center gap-2">
+                                        <span [class]="selectedOption.icon" style="width: 18px"> </span>
+                                        <div>{{ selectedOption.label }}</div>
+                                    </div>
+                                }
+                            </ng-template>
+                            <ng-template let-service #item>
+                                <div class="flex items-center gap-2 last:mb-2">
+                                    <span [class]="service.icon" style="width: 18px"> </span>
+                                    <div class="flex gap-2 justify-center items-center">{{ service.label }} <span class="text-sm opacity-70">{{ service.subLabel || '' }}</span></div>
+                                </div>
+                            </ng-template>
+                            <ng-template #header>
+                                <div class="font-medium px-4 py-2 mt-2">Available Services</div>
+                            </ng-template>
+                        </p-select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Source Secret (for non-general services) -->
+            @if (sourceForm.get('service')?.value && sourceForm.get('service')?.value !== 'general') {
+                <div class="flex flex-col gap-2 mt-6">
+                    <label for="sourceServiceSecret" class="font-semibold text-surface-900 dark:text-surface-0">
+                        Source Service Secret <span class="text-red-500">*</span>
+                    </label>
+                    @if (secretControl.errors?.['required'] && secretControl.touched) {
+                        <p-password id="sourceServiceSecret" [formControl]="secretControl"
+                            placeholder="Enter source signing secret" class="w-full"
+                            inputStyleClass="rounded-xl!" [feedback]="false" [toggleMask]="true" fluid  autocomplete="off"/>
+                    }
+                    @if (secretControl.errors?.['required'] && secretControl.touched) {
+                        <small class="text-red-500">
+                            Source signing secret is required
+                        </small>
+                    }
+                </div>
+            }
+
+            <!-- Event Types Card (only for non-general services) -->
+            @if (sourceForm.get('service')?.value && sourceForm.get('service')?.value !== 'general') {
+                <div class="flex items-center justify-start gap-4 mt-6">
+                    <p-toggle-switch formControlName="showEventTypes" />
+                    <span class="text-primary ">Filter incoming event by their Event Type</span>
+                </div>
+
+
+                @if (sourceForm.get('showEventTypes')?.value) {
+                    <div formArrayName="eventTypes" class="space-y-3 mt-4">
+                        @for (control of eventTypesArray.controls; track $index) {
+                            <div class="flex gap-3 items-start">
+                                <input [formControlName]="$index" type="text" pInputText
+                                    placeholder="e.g., user.created" class="flex-1 rounded-xl!" />
+                                <p-button icon="pi pi-trash" severity="danger" [outlined]="true"
+                                    (onClick)="removeEventType($index)" [disabled]="eventTypesArray.length <= 1" styleClass="rounded-xl!" />
+                                <p-button icon="pi pi-plus" [outlined]="true" [hidden]="$index !== eventTypesArray.length - 1" styleClass="rounded-xl!" (onClick)="addEventType()" />
+
+                            </div>
+                        }
+                    </div>
+                }
+            }
+
+        </p-card>
+
+        <!-- Form Actions -->
+        <div class="flex items-center justify-end gap-3">
+            <p-button label="Cancel" icon="pi pi-times" [outlined]="true" severity="secondary" styleClass="rounded-xl!"  (onClick)="goBack()" />
+            <p-button type="submit" [label]="isEditing() ? 'Update Source' : 'Create Source'"
+                [icon]="loading() ? 'pi pi-spin pi-spinner' : (isEditing() ? 'pi pi-check' : 'pi pi-plus')"
+                [disabled]="sourceForm.invalid || loading()" styleClass="rounded-xl!"  [loading]="loading()" />
+        </div>
+    </form>
+</div>

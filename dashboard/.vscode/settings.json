@@ -1,0 +1,9 @@
+{
+    "cSpell.words": [
+        "inputgroup",
+        "topbar"
+    ],
+    "window.commandCenter": true,
+    "workbench.editor.navigationScope": "default",
+    "files.autoSave": "onWindowChange"
+}

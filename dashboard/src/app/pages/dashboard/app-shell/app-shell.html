@@ -1,0 +1,339 @@
+<div
+    class="min-h-screen relative w-full! px-4 lg:px-6 flex flex-row gap-6 overflow-x-hidden"
+>
+    <div
+        #blob1
+        class="absolute -top-24 left-0 w-[400px] h-[400px] bg-primary-500/10 dark:bg-primary-500/5 blur-3xl rounded-full pointer-events-none will-change-transform"
+    ></div>
+    <div
+        #blob2
+        class="absolute bottom-0 right-0 w-[600px] h-[600px] bg-primary-400/10 dark:bg-primary-400/5 blur-[100px] rounded-full pointer-events-none will-change-transform"
+    ></div>
+
+    <!-- Mobile Backdrop -->
+    @if (layoutService.isMobile() && layoutService.appState().openSidebar) {
+    <div
+        class="fixed inset-0 bg-surface-900/50 backdrop-blur-sm z-40 transition-opacity duration-300 lg:hidden"
+        (click)="layoutService.closeSidebar()"
+    ></div>
+    }
+
+    <!-- Fixed Sidebar (completely independent layer) -->
+    <aside
+        class="fixed left-0 top-0 w-80 rounded h-screen z-50 transition-transform duration-300 ease-in-out"
+        [class.translate-x-0]="layoutService.appState().openSidebar"
+        [class.-translate-x-full]="!layoutService.appState().openSidebar"
+    >
+        <app-sidebar />
+    </aside>
+
+    <!-- Main content wrapper (with dynamic left margin based on sidebar state) -->
+    <div
+        class="flex flex-col gap-6 w-full! min-w-0 transition-all duration-300 ease-in-out"
+        [class.lg:ml-72]="layoutService.appState().openSidebar"
+        [class.ml-0]="!layoutService.appState().openSidebar || layoutService.isMobile()"
+    >
+        <!-- Fixed Navbar (sticks to top of main content area) -->
+    <nav class="sticky top-0 z-30">
+            <app-topbar />
+        </nav>
+
+        <!-- Scrollable Main content -->
+        <main
+            class="flex-1 w-full! h-full overflow-y-auto relative overflow-hidden"
+            [@routeAnimations]="childRoute(ChildOutlet)"
+        >
+            <router-outlet #ChildOutlet="outlet"></router-outlet>
+        </main>
+        <!-- <app-footer [animationKey]="footerAnimationKey" /> -->
+    </div>
+</div>
+
+<p-dialog
+    [(visible)]="secretV"
+    [modal]="true"
+    [closable]="false"
+    [style]="{ width: '40vw' }"
+    [breakpoints]="{ '1199px': '60vw', '575px': '90vw' }"
+    styleClass="rounded-xl!"
+    [draggable]="false"
+    [resizable]="false"
+>
+    <div class="flex flex-col items-center gap-6 py-8">
+        <!-- Success/Info Message -->
+        <div
+            class="rounded-xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center p-4"
+        >
+            <i class="icon-[hugeicons--checkmark-circle-04] size-14"></i>
+        </div>
+
+        <div class="text-center space-y-2">
+            <h2 class="text-2xl font-bold">API Key Generated</h2>
+            <p class="text-surface-600 dark:text-surface-400 max-w-lg mx-auto">
+                Please copy this key and store it securely. For security
+                reasons,
+                <span class="font-bold underline"
+                    >you won't be able to see it again.</span
+                >
+            </p>
+        </div>
+
+        <!-- Secret Key/Value -->
+        <div class="space-y-2">
+            <label
+                class="text-sm font-semibold text-surface-700 dark:text-surface-300"
+            >
+                Secret Key
+            </label>
+            <div class="flex items-center gap-2">
+                <div
+                    class="flex-1 max-w-full overflow-x-auto bg-surface-100 dark:bg-surface-800 p-3 rounded-xl!"
+                >
+                    <code
+                        class="text-sm font-mono block whitespace-pre-wrap break-all"
+                        >{{ secret.masked ? secret.maskedKey : secret.key
+                        }}</code
+                    >
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col gap-1">
+                    <p-button
+                        [icon]="secret.masked ? 'pi pi-eye' : 'pi pi-eye-slash'"
+                        [outlined]="true"
+                        severity="secondary"
+                        size="small"
+                        styleClass="rounded-xl!"
+                        (onClick)="toggleKeyVisibility()"
+                        [pTooltip]="secret.masked ? 'Show secret' : 'Hide secret'"
+                    >
+                    </p-button>
+
+                    <p-button
+                        icon="pi pi-copy"
+                        [outlined]="true"
+                        severity="secondary"
+                        size="small"
+                        styleClass="rounded-xl!"
+                        (onClick)="copyToClipboard(secret.key)"
+                        pTooltip="Copy to clipboard"
+                    >
+                    </p-button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Info -->
+        <!-- <div class="grid grid-cols-2 gap-4 pt-2" *ngIf="secret.createdAt || secret.lastModified">
+            <div class="space-y-1" *ngIf="secret.createdAt">
+                <label class="text-xs font-medium text-surface-600 dark:text-surface-400">Created</label>
+                <span class="text-xs text-surface-700 dark:text-surface-300">{{ secret.createdAt | date:'short'
+                    }}</span>
+            </div>
+            <div class="space-y-1" *ngIf="secret.lastModified">
+                <label class="text-xs font-medium text-surface-600 dark:text-surface-400">Last Modified</label>
+                <span class="text-xs text-surface-700 dark:text-surface-300">{{ secret.lastModified | date:'short'
+                    }}</span>
+            </div>
+        </div> -->
+
+        <!-- Warning Message -->
+        <div
+            class="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg"
+        >
+            <i
+                class="pi pi-exclamation-triangle text-amber-600 dark:text-amber-400 mt-0.5"
+            ></i>
+            <div class="text-amber-800 dark:text-amber-200 text-xs">
+                <strong>Security Notice:</strong> Keep this secret safe and
+                never share it publicly. This dialog will close automatically
+                after copying.
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog
+    header="Ingress Endpoint"
+    [(visible)]="ingressV"
+    [modal]="true"
+    [closable]="true"
+    [style]="{ width: '50vw' }"
+    [breakpoints]="{ '1199px': '60vw', '575px': '90vw' }"
+    styleClass="rounded-xl!"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ zIndex: 1 }"
+>
+    <div class="space-y-4">
+        <!-- Success Message -->
+        <div
+            class="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl"
+        >
+            <i class="pi pi-info-circle text-blue-600 dark:text-blue-400"></i>
+            <span class="text-blue-800 dark:text-blue-200 text-sm font-medium">
+                Ingress endpoint created successfully
+            </span>
+        </div>
+
+        <!-- Ingress URL -->
+        <div class="space-y-2">
+            <label
+                class="text-sm font-semibold text-surface-700 dark:text-surface-300"
+            >
+                Endpoint URL
+            </label>
+            <div class="flex items-center gap-2">
+                <div
+                    class="flex-1 max-w-full overflow-x-auto bg-surface-100 dark:bg-surface-800 p-3 rounded-xl!"
+                >
+                    <code
+                        class="text-sm font-mono block whitespace-pre-wrap break-all"
+                    >
+                        {{ ingress.url }}
+                    </code>
+                </div>
+
+                <!-- Copy Button -->
+                <div class="flex flex-col gap-1">
+                    <p-button
+                        icon="pi pi-copy"
+                        [outlined]="true"
+                        severity="secondary"
+                        size="small"
+                        styleClass="rounded-xl!"
+                        (onClick)="copyToClipboard(ingress.url)"
+                        pTooltip="Copy to clipboard"
+                    >
+                    </p-button>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<!-- Source Form Dialog (Global) -->
+<p-dialog
+    [header]="sourceDialogHeader"
+    [(visible)]="sourceDialogVisible"
+    [modal]="true"
+    [style]="{ width: '600px' }"
+    [breakpoints]="{ '960px': '75vw', '640px': '90vw' }"
+    styleClass="rounded-2xl!"
+    [draggable]="false"
+    [resizable]="false"
+    (onHide)="onSourceDialogHide()"
+>
+    <app-source-form
+        [sourceId]="sourceDialogId"
+        (onSuccess)="onSourceFormSuccess($event)"
+        (onCancel)="onSourceDialogHide()"
+    ></app-source-form>
+</p-dialog>
+
+<!-- Endpoint Form Dialog (Global) -->
+<p-dialog
+    [header]="endpointDialogHeader"
+    [(visible)]="endpointDialogVisible"
+    [modal]="true"
+    [style]="{ width: '800px' }"
+    [breakpoints]="{ '960px': '90vw', '640px': '90vw' }"
+    styleClass="rounded-2xl!"
+    [draggable]="false"
+    [resizable]="false"
+    (onHide)="onEndpointDialogHide()"
+>
+    <app-endpoint-form
+        [endpointId]="endpointDialogId"
+        (onSuccess)="onEndpointFormSuccess($event)"
+        (onCancel)="onEndpointDialogHide()"
+    ></app-endpoint-form>
+</p-dialog>
+
+<!-- Target Form Dialog (Global) -->
+<p-dialog
+    [header]="targetDialogHeader"
+    [(visible)]="targetDialogVisible"
+    [modal]="true"
+    [style]="{ width: '800px' }"
+    [breakpoints]="{ '960px': '90vw', '640px': '90vw' }"
+    styleClass="rounded-2xl!"
+    [draggable]="false"
+    [resizable]="false"
+    (onHide)="onTargetDialogHide()"
+>
+    <app-target-form
+        [targetId]="targetDialogId"
+        (onSuccess)="onTargetFormSuccess($event)"
+        (onCancel)="onTargetDialogHide()"
+    ></app-target-form>
+</p-dialog>
+
+<app-twofa-setup-dialog></app-twofa-setup-dialog>
+
+<!-- Invite Member Dialog (Global) -->
+<p-dialog
+    header="Invite Team Member"
+    [(visible)]="inviteMemberDialogVisible"
+    [modal]="true"
+    [style]="{ width: '500px' }"
+    [breakpoints]="{ '960px': '75vw', '640px': '90vw' }"
+    styleClass="rounded-2xl!"
+    [draggable]="false"
+    [resizable]="false"
+    (onHide)="onInviteMemberDialogHide()"
+>
+    <app-invite-member-form
+        [workspaceId]="inviteMemberWorkspaceId"
+        (onSuccess)="onInviteMemberSuccess($event)"
+        (onCancel)="onInviteMemberDialogHide()"
+    ></app-invite-member-form>
+</p-dialog>
+
+<!-- Namespace Form Dialog (Global) -->
+<p-dialog
+    [header]="namespaceDialogHeader"
+    [(visible)]="namespaceDialogVisible"
+    [modal]="true"
+    [style]="{ width: '500px' }"
+    [breakpoints]="{ '960px': '75vw', '640px': '90vw' }"
+    styleClass="rounded-2xl!"
+    [draggable]="false"
+    [resizable]="false"
+    (onHide)="onNamespaceDialogHide()"
+>
+    <app-namespace-form
+        [namespaceId]="namespaceDialogId"
+        (onSuccess)="onNamespaceFormSuccess($event)"
+        (onCancel)="onNamespaceDialogHide()"
+    ></app-namespace-form>
+</p-dialog>
+
+<!-- Transform Form Dialog (Global) -->
+<p-dialog
+    [header]="transformDialogHeader"
+    [(visible)]="transformDialogVisible"
+    [modal]="true"
+    [style]="{ width: '1000px' }"
+    [breakpoints]="{ '1199px': '90vw', '575px': '95vw' }"
+    styleClass="rounded-2xl!"
+    [draggable]="false"
+    [resizable]="false"
+    (onHide)="onTransformDialogHide()"
+>
+    <app-transform-form
+        [transformId]="transformDialogId"
+        (onSuccess)="onTransformFormSuccess($event)"
+        (onCancel)="onTransformDialogHide()"
+    ></app-transform-form>
+</p-dialog>
+
+<app-support-dialog [(visible)]="supportDialogVisible" (visibleChange)="!$event && onSupportDialogHide()"></app-support-dialog>
+
+<app-avatar-selection-dialog 
+    [(visible)]="avatarDialogVisible"
+    [currentAvatar]="currentAvatar"
+    (avatarSelected)="onAvatarSelected($any($event))"
+    (onHide)="onAvatarDialogHide()">
+</app-avatar-selection-dialog>
+

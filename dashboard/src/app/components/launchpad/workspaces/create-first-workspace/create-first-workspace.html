@@ -1,0 +1,33 @@
+<div class="space-y-6 w-xl max-w-xl">
+    <div appScrollReveal delay="delay-150" class="text-center">
+        <h2 appScrollReveal class="text-2xl font-bold text-surface-900 dark:text-surface-0">Create Your Workspace</h2>
+        <p appScrollReveal delay="delay-100" class="text-surface-600 dark:text-surface-400 mt-2">A workspace is where you manage your namespaces and team.</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+        <div appScrollReveal delay="delay-200" class="space-y-1">
+            <label for="name" class="block text-sm font-medium text-surface-700 dark:text-surface-300">
+                Workspace Name *
+            </label>
+            <input pInputText id="name" formControlName="name" placeholder="e.g. My Awesome Team"
+                class="w-full rounded-xl!" [class.p-invalid]="form.get('name')?.invalid && form.get('name')?.touched">
+            <small class="text-red-500" *ngIf="form.get('name')?.invalid && form.get('name')?.touched">
+                Workspace name is required (min 3 chars).
+            </small>
+        </div>
+
+        <div appScrollReveal delay="delay-300" class="space-y-1">
+            <label for="description" class="block text-sm font-medium text-surface-700 dark:text-surface-300">
+                Description (Optional)
+            </label>
+            <textarea pInputText id="description" formControlName="description"
+                placeholder="What is this workspace for?"
+                class="w-full rounded-xl! min-h-[100px]"></textarea>
+        </div>
+
+        <div appScrollReveal delay="delay-500" class="pt-4">
+            <p-button type="submit" label="Continue" [loading]="loading()" styleClass="w-full rounded-xl! py-3"
+                icon="pi pi-arrow-right" iconPos="right"></p-button>
+        </div>
+    </form>
+</div>

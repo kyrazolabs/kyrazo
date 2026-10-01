@@ -1,0 +1,120 @@
+<div class="mx-auto space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold">{{ isEditMode ? 'Edit Target' : 'Create Target' }}</h1>
+            <p class="text-surface-500 dark:text-surface-400">
+                {{ isEditMode ? 'Update existing dispatch target configuration' : 'Configure a new target for event dispatch' }}
+            </p>
+        </div>
+        <div class="flex gap-2">
+            <p-button label="Cancel" severity="secondary" [size]="'small'" [outlined]="true" routerLink="/events/dispatch/targets"
+                [disabled]="loading" styleClass="rounded-xl!"/>
+            <p-button [label]="isEditMode ? 'Update' : 'Create'" [size]="'small'" [icon]="loading ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
+                (onClick)="onSubmit()" [loading]="loading" [disabled]="form.invalid || loading" styleClass="rounded-xl!"/>
+        </div>
+    </div>
+
+    <form [formGroup]="form" class="space-y-6">
+        <!-- Basic Info -->
+        <p-card header="Basic Information" styleClass="card-panel">
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="flex flex-col gap-2">
+                        <label for="name" class="font-medium text-surface-900 dark:text-surface-0">Name</label>
+                        <input pInputText id="name" formControlName="name" placeholder="My Webhook Target"
+                            [ngClass]="{'ng-invalid ng-dirty': form.get('name')?.invalid && form.get('name')?.touched}" />
+                        <small class="text-red-500" *ngIf="form.get('name')?.invalid && form.get('name')?.touched">
+                            Name is required (3-100 chars)
+                        </small>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-2">
+                        <label for="url" class="font-medium text-surface-900 dark:text-surface-0">Target URL</label>
+                        <div class="relative w-full">
+                            <p-iconfield iconPosition="left" class="w-full md:w-auto">
+                                <p-inputicon>
+                                    <i class="pi pi-link"></i>
+                                </p-inputicon>
+                                <input pInputText id="url" formControlName="url" placeholder="https://api.example.com/webhook"
+                                    class="pl-10 w-full"
+                                    [ngClass]="{'ng-invalid ng-dirty': form.get('url')?.invalid && form.get('url')?.touched}" />
+                            </p-iconfield>
+                        </div>
+                        <small class="text-red-500" *ngIf="form.get('url')?.invalid && form.get('url')?.touched">
+                            Valid HTTPS URL is required
+                        </small>
+                    </div>
+
+                    <div class="flex flex-col gap-2">
+                        <label for="method" class="font-medium text-surface-900 dark:text-surface-0">HTTP Method</label>
+                        <p-select [options]="methodOptions" formControlName="method" optionLabel="label"
+                            optionValue="value" placeholder="Select Method" styleClass="w-full rounded-xl!" />
+                        <small class="text-red-500" *ngIf="form.get('method')?.invalid && form.get('method')?.touched">
+                            HTTP Method is required
+                        </small>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label for="description" class="font-medium text-surface-900 dark:text-surface-0">Description</label>
+                    <textarea pInputTextarea id="description" formControlName="description" rows="3"
+                        placeholder="Optional description for this target" class="w-full rounded-xl!"></textarea>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <p-checkbox id="enabled" formControlName="enabled" [binary]="true" class="rounded!"></p-checkbox>
+                    <label for="enabled" class="cursor-pointer select-none text-surface-900 dark:text-surface-0">Enable this target</label>
+                </div>
+            </div>
+        </p-card>
+
+        <!-- Configuration -->
+        <p-card header="Configuration" styleClass="card-panel">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" formGroupName="config">
+                <div class="flex flex-col gap-2">
+                    <label class="font-medium text-surface-900 dark:text-surface-0">Timeout (ms)</label>
+                    <p-inputNumber formControlName="timeout" [min]="100" [max]="60000" suffix=" ms"
+                        styleClass="w-full" inputStyleClass="w-full"></p-inputNumber>
+                    <small class="text-surface-500">Max wait time for response</small>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="font-medium text-surface-900 dark:text-surface-0">Retry Count</label>
+                    <p-inputNumber formControlName="retryCount" [min]="0" [max]="10" [showButtons]="true"
+                         styleClass="w-full" inputStyleClass="w-full"></p-inputNumber>
+                    <small class="text-surface-500">Attempts on failure</small>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="font-medium text-surface-900 dark:text-surface-0">Rate Limit (Optional)</label>
+                    <p-inputNumber formControlName="rateLimit" [min]="0" placeholder="Unlimted" suffix=" req/s"
+                         styleClass="w-full" inputStyleClass="w-full"></p-inputNumber>
+                    <small class="text-surface-500">Max requests per second</small>
+                </div>
+            </div>
+        </p-card>
+
+        <!-- Custom Headers -->
+        <p-card header="Custom Headers" styleClass="card-panel">
+            <div class="space-y-4">
+                <div formArrayName="customHeaders" class="space-y-3">
+                    <div *ngFor="let header of customHeaders.controls; let i=index" [formGroupName]="i"
+                         class="flex gap-3 items-start">
+                        <div class="flex-1">
+                            <input pInputText formControlName="key" placeholder="Header Key (e.g. X-API-Key)" class="w-full" />
+                        </div>
+                        <div class="flex-1">
+                            <input pInputText formControlName="value" placeholder="Value" class="w-full" />
+                        </div>
+                        <p-button icon="pi pi-trash" [text]="true" styleClass="rounded-xl!" severity="danger" (onClick)="removeHeader(i)" />
+                    </div>
+                </div>
+
+                <p-button label="Add Header" icon="pi pi-plus" [text]="true" size="small" (onClick)="addHeader()" />
+            </div>
+        </p-card>
+    </form>
+</div>
+<p-toast />

@@ -1,0 +1,257 @@
+<div class="space-y-6 mb-4">
+    <!-- Header -->
+    <div
+        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6"
+    >
+        <div>
+            <h1 class="text-2xl font-bold">Namespaces</h1>
+            <p class="opacity-80">
+                Manage your workspace namespaces and environments
+            </p>
+        </div>
+        <div class="flex items-center gap-4">
+            <p-button
+                label="Refresh"
+                icon="pi pi-refresh"
+                size="small"
+                severity="secondary"
+                [outlined]="true"
+                (onClick)="loadNamespaces()"
+                [loading]="loading"
+                styleClass="rounded-xl!"
+            />
+            <p-button
+                label="New Namespace"
+                icon="pi pi-plus"
+                size="small"
+                (onClick)="openNew()"
+                [disabled]="isLimitReached()"
+                [pTooltip]="isLimitReached() ? 'Namespace limit reached for your plan' : ''"
+                tooltipPosition="bottom"
+                styleClass="rounded-xl!"
+            />
+        </div>
+    </div>
+
+    <!-- Filter and Search -->
+    <!-- <p-card class="card-panel">
+        <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+             <p-iconfield iconPosition="left" class="w-full md:w-auto">
+                <p-inputicon>
+                    <i class="pi pi-search"></i>
+                </p-inputicon>
+                <input
+                    pInputText
+                    type="text"
+                    [(ngModel)]="searchQuery"
+                    (input)="onSearch()"
+                    placeholder="Search namespaces..."
+                    class="w-full md:w-80 rounded-xl!" />
+            </p-iconfield>
+        </div>
+    </p-card> -->
+
+    <!-- Table -->
+    <p-card class="card-panel">
+        <p-table
+            [value]="namespaces()"
+            [loading]="loading"
+            [rowHover]="true"
+            [paginator]="true"
+            [rows]="10"
+            dataKey="id"
+            responsiveLayout="scroll"
+            [showGridlines]="false"
+            styleClass="p-datatable-sm lg:p-datatable-md"
+        >
+            <ng-template pTemplate="header">
+                <tr>
+                    <th
+                        pSortableColumn="name"
+                        class="rounded-xl! border-none!"
+                        style="min-width: 150px"
+                        >
+                        <div class="flex items-center gap-2">
+                            Name <p-sortIcon field="name" />
+                        </div>
+                    </th>
+                    <th
+                        class="rounded-xl! border-none!"
+                        style="min-width: 250px"
+                    >
+                        Description
+                    </th>
+                    <th
+                        class="rounded-xl! border-none!"
+                        style="width: 130px !important"
+                    >
+                        ID
+                    </th>
+                    <th
+                        pSortableColumn="createdAt"
+                        class="rounded-xl! border-none!"
+                        style="min-width: 120px"
+                    >
+                        <div class="flex items-center gap-2">
+                            Created <p-sortIcon field="createdAt" />
+                        </div>
+                    </th>
+                    <th
+                        class="rounded-xl! border-none! flex justify-center gap-2"
+                        style="min-width: 120px"
+                    >
+                        Actions
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-namespace>
+                <tr class="rounded-xl!">
+                    <td
+                        class="font-bold text-surface-900 dark:text-surface-0 truncate max-w-[200px]"
+                        [pTooltip]="namespace.name"
+                        tooltipPosition="top"
+                    >
+                        {{ namespace.name }}
+                    </td>
+                    <td class="text-surface-600 dark:text-surface-400">
+                        <div
+                            class="truncate max-w-[300px]"
+                            [pTooltip]="namespace.description"
+                            tooltipPosition="top"
+                        >
+                            {{ namespace.description || '-' }}
+                        </div>
+                    </td>
+                    <td>
+                        <app-copy-id [id]="namespace.id" />
+                    </td>
+                    <td>
+                        <span class="text-sm text-surface-500"
+                            >{{ namespace.createdAt | date:'mediumDate' }}</span
+                        >
+                    </td>
+                    <td>
+                        <div class="flex justify-center gap-2">
+                            <p-button
+                                icon="pi pi-pencil"
+                                [outlined]="true"
+                                size="small"
+                                severity="secondary"
+                                styleClass="rounded-xl!"
+                                (onClick)="editNamespace(namespace)"
+                                pTooltip="Edit"
+                            />
+                            <p-button
+                                icon="pi pi-trash"
+                                [outlined]="true"
+                                size="small"
+                                severity="danger"
+                                styleClass="rounded-xl!"
+                                (onClick)="deleteNamespace(namespace)"
+                                pTooltip="Delete"
+                            />
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="5" class="text-center py-12!">
+                        <div class="flex flex-col items-center gap-4">
+                            <i
+                                class="icon-[hugeicons--dashboard-square-01] text-6xl! text-surface-400"
+                            ></i>
+                            <div
+                                class="text-lg! font-semibold text-surface-500"
+                            >
+                                No namespaces found.
+                            </div>
+                            <p-button
+                                label="Create Namespace"
+                                severity="primary"
+                                styleClass="rounded-xl!"
+                                size="small"
+                                (onClick)="openNew()"
+                                [disabled]="isLimitReached()"
+                                [pTooltip]="isLimitReached() ? 'Namespace limit reached for your plan' : ''"
+                            />
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </p-card>
+</div>
+
+<p-confirmDialog #cd styleClass="rounded-2xl!">
+    <ng-template
+        #headless
+        let-message
+        let-onAccept="onAccept"
+        let-onReject="onReject"
+    >
+        <div
+            class="flex flex-col items-center p-6 bg-surface-0 dark:bg-surface-950! rounded-2xl! border border-surface-200 dark:border-surface-800 shadow-lg max-w-md mx-auto"
+        >
+            <!-- Danger Icon Circle -->
+            <div
+                class="rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 inline-flex justify-center items-center h-20 w-20 -mt-16"
+            >
+                <i class="pi pi-exclamation-triangle text-4xl!"></i>
+            </div>
+
+            <!-- Header -->
+            <h3
+                class="font-bold text-2xl text-surface-900 dark:text-surface-0 text-center mb-2 mt-6"
+            >
+                {{ message.header || 'Confirm Delete' }}
+            </h3>
+
+            <!-- Message -->
+            <p
+                class="text-surface-600 dark:text-surface-400 text-center mb-6 leading-relaxed"
+            >
+                {{ message.message || 'Are you sure you want to delete this
+                item? This action cannot be undone.' }}
+            </p>
+
+            <!-- Warning Box -->
+            <div
+                class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6 w-full"
+            >
+                <div class="flex items-start gap-3">
+                    <i
+                        class="pi pi-info-circle text-red-600 dark:text-red-400 mt-0.5 shrink-0"
+                    ></i>
+                    <div class="text-sm text-red-800 dark:text-red-300">
+                        <p class="font-medium mb-1">
+                            This action is irreversible
+                        </p>
+                        <p class="opacity-90">
+                            All associated data, sources, and targets will be
+                            permanently removed.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-between w-full gap-6 mt-6">
+                <p-button
+                    label="Delete"
+                    icon="pi pi-trash"
+                    severity="danger"
+                    (onClick)="onAccept()"
+                    styleClass="w-40 rounded-xl!"
+                ></p-button>
+                <p-button
+                    label="Cancel"
+                    icon="pi pi-times"
+                    [outlined]="true"
+                    severity="secondary"
+                    (onClick)="onReject()"
+                    styleClass="w-40 rounded-xl!"
+                ></p-button>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmDialog>
+<p-toast />
