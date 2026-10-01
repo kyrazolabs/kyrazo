@@ -1,0 +1,106 @@
+# ═══════════════════════════════════════════════════════
+# Rust Load Balancer — Configuration
+# ═══════════════════════════════════════════════════════
+# Variables like ${VAR_NAME} are substituted by entrypoint.sh
+# from environment variables at container startup.
+# ═══════════════════════════════════════════════════════
+
+[server]
+bind             = "0.0.0.0:${PORT}"
+metrics_bind     = "${METRICS_BIND}"
+worker_threads   = 0
+max_connections  = 100000
+skip_ssl_verify  = false
+
+# ── Ingest API backends ───────────────────────────────
+
+[[backends]]
+id               = "ingest-1"
+address          = "${INGEST_SERVER1_IP}"
+weight           = 1
+max_connections  = 1500
+
+[[backends]]
+id               = "ingest-2"
+address          = "${INGEST_SERVER2_IP}"
+weight           = 1
+max_connections  = 1500
+
+# ── Dashboard API backends ────────────────────────────
+
+[[backends]]
+id               = "dashboard-1"
+address          = "${DASHBOARD_SERVER1_IP}"
+weight           = 1
+max_connections  = 500
+
+[[backends]]
+id               = "dashboard-2"
+address          = "${DASHBOARD_SERVER2_IP}"
+weight           = 1
+max_connections  = 500
+
+# ── Integration/Default API backends ──────────────────
+
+[[backends]]
+id               = "api-1"
+address          = "${API_SERVER1_IP}"
+weight           = 1
+max_connections  = 3000
+
+[[backends]]
+id               = "api-2"
+address          = "${API_SERVER2_IP}"
+weight           = 1
+max_connections  = 3000
+
+# ── Health Checks ─────────────────────────────────────
+
+[health_check]
+interval_secs        = ${HEALTH_CHECK_INTERVAL}
+timeout_secs         = ${HEALTH_CHECK_TIMEOUT}
+path                 = "${HEALTH_CHECK_PATH}"
+healthy_threshold    = 2
+unhealthy_threshold  = 3
+
+# ── Routing Rules (matches old Nginx path-based routing) ──
+
+[[rules]]
+id              = "ingest-rule"
+match_path      = "/ingest/*"
+match_methods   = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
+backends        = ["ingest-1", "ingest-2"]
+priority        = 10
+strip_prefix    = true
+
+[[rules]]
+id              = "dashboard-rule"
+match_path      = "/dashboard/*"
+match_methods   = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
+backends        = ["dashboard-1", "dashboard-2"]
+priority        = 10
+strip_prefix    = true
+
+# Catch-all: everything else goes to the default API backends
+# (no rule needed — unmatched requests use the global pool,
+#  but we define one explicitly for clarity)
+[[rules]]
+id              = "api-rule"
+match_path      = "/"
+match_methods   = []
+backends        = ["api-1", "api-2"]
+priority        = 1
+
+# ── Rate Limiting ─────────────────────────────────────
+
+[rate_limit]
+enabled              = true
+requests_per_second  = ${RATE_LIMIT_RPS}
+burst                = ${RATE_LIMIT_BURST}
+
+# ── Retry Policy ──────────────────────────────────────
+
+[retry]
+enabled       = true
+max_attempts  = 3
+backoff_ms    = [50, 200, 500]

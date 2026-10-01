@@ -1,0 +1,38 @@
+name: CI - Shared Library
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'shared/**'
+      - '.github/workflows/ci-shared.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'shared/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+        working-directory: shared
+
+      - name: Typecheck
+        run: bunx tsc --noEmit
+        working-directory: shared
+
+      - name: Build
+        run: bun run build
+        working-directory: shared
+

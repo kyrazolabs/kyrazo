@@ -1,0 +1,39 @@
+services:
+  orchestrator:
+    build:
+      context: .
+      dockerfile: services/orchestrator/Dockerfile
+    restart: always
+    environment:
+      - PORT=${PORT}
+      - WORKERS=${WORKERS}
+      - NODE_ENV=${NODE_ENV}
+
+      - MONGODB_URI=${MONGODB_URI}
+      - MONGODB_SSL=${MONGODB_SSL}
+      - MONGODB_DB_NAME=${MONGODB_DB_NAME}
+      - MONGODB_MIN_POOL_SIZE=5
+      - MONGODB_MAX_POOL_SIZE=15
+      - MONGODB_SSL=true
+
+      - COOLIFY_API_URL=${COOLIFY_API_URL}
+      - COOLIFY_API_TOKEN=${COOLIFY_API_TOKEN}
+      - COOLIFY_GITHUB_APP_UUID=${COOLIFY_GITHUB_APP_UUID}
+      - COOLIFY_REPOSITORY=${COOLIFY_REPOSITORY}
+      - COOLIFY_BRANCH=${COOLIFY_BRANCH}
+
+    volumes:
+      - ./logs:/app/services/orchestrator/logs
+
+      - /etc/ssl/mongodb/ca.crt:/etc/ssl/mongodb/ca.crt:ro
+      - /etc/ssl/mongodb/mongodb.pem:/etc/ssl/mongodb/mongodb.pem:ro
+
+      - /etc/ssl/redis/ca.crt:/etc/ssl/redis/ca.crt:ro
+      - /etc/ssl/redis/client.crt:/etc/ssl/redis/client.crt:ro
+      - /etc/ssl/redis/client.key:/etc/ssl/redis/client.key:ro
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:${PORT}/v1/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 20s

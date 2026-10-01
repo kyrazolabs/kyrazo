@@ -1,0 +1,60 @@
+{
+    "name": "@kyrazo/shared",
+    "version": "1.0.0",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./dist/index.js",
+            "require": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        },
+        "./src": "./src/index.ts"
+    },
+    "source": "src/index.ts",
+    "scripts": {
+        "build": "tsc -p tsconfig.json && cpx \"src/**/*.sql\" dist",
+        "seed": "bun run src/seeds/runner.ts",
+        "build:watch": "bun run build && bun run watch",
+        "watch": "concurrently -k -n TSC,SQL -c blue,green \"tsc -p tsconfig.json -w\" \"chokidar 'src/**/*.sql' -c 'cpx \\\"src/**/*.sql\\\" dist'\"",
+        "rebuild": "rm -rf dist && bun run build",
+        "clean": "rm -rf dist && echo 'Done.'",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "format": "prettier --write .",
+        "format:check": "prettier --check ."
+    },
+    "private": true,
+    "devDependencies": {
+        "@eslint/js": "^9.39.4",
+        "@types/bun": "latest",
+        "@types/pg": "^8.20.0",
+        "chokidar-cli": "^3.0.0",
+        "concurrently": "^9.2.1",
+        "cpx": "^1.5.0",
+        "eslint": "^9.39.4",
+        "globals": "^16.5.0",
+        "prettier": "3.7.4",
+        "typescript-eslint": "^8.59.0"
+    },
+    "peerDependencies": {
+        "typescript": "^5.9.3"
+    },
+    "dependencies": {
+        "@aws-sdk/client-s3": "^3.1035.0",
+        "@clickhouse/client": "^1.18.3",
+        "@supabase/supabase-js": "^2.104.0",
+        "crypto": "^1.0.1",
+        "dotenv": "^16.6.1",
+        "drizzle-orm": "^0.45.2",
+        "fix-esm": "^1.0.1",
+        "install": "^0.13.0",
+        "mongoose": "^9.5.0",
+        "pg": "^8.20.0",
+        "postgres": "^3.4.9",
+        "winston": "^3.19.0",
+        "winston-daily-rotate-file": "^5.0.0",
+        "winston-transport": "^4.9.0",
+        "zod": "^4.3.6"
+    }
+}

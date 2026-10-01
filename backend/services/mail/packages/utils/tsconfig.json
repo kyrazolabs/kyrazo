@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/utils.tsbuildinfo",
+    "rootDir": "src",
+    "paths": {
+      "@utils/*": ["./src/*"]
+    },
+    "outDir": "./build"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "build"]
+}

@@ -1,0 +1,41 @@
+{
+  "name": "ingestor",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "private": true,
+  "scripts": {
+    "start": "bun run dist/index.js",
+    "dev": "bun run --hot src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "build:watch": "bun run build && bun run watch",
+    "prod": "bun run build && bun run migrate",
+    "watch": "concurrently -k -n TSC -c blue \"tsc -p tsconfig.json -w\"",
+    "rebuild": "rm -rf dist && bun run build",
+    "clean": "rm -rf dist && echo 'Done.'",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@eslint/json": "^0.14.0",
+    "@eslint/markdown": "^7.5.1",
+    "@types/bun": "latest",
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0",
+    "ioredis-mock": "^8.13.1",
+    "prettier": "^3.6.2",
+    "typescript-eslint": "^8.47.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "drizzle-kit": "^0.31.8",
+    "drizzle-orm": "^0.45.1",
+    "ioredis": "^5.8.2",
+    "postgres": "^3.4.7",
+    "@kyrazo/shared": "file:../../shared"
+  }
+}

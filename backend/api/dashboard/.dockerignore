@@ -1,0 +1,50 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Testing
+coverage
+tests
+test-auth.ts
+webhooks_test.json
+jest.config.ts
+
+# Production
+dist
+build
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs
+*.log
+
+# Environment Variables
+.env
+.env.production
+.env.development
+.env.test
+
+# Git
+.git
+.gitignore
+
+# Configs not needed in prod
+tsconfig.json
+eslint.config.mts
+.prettierignore
+.prettierrc
+scripts
+docs
+events.json
+README.md
+BILLING_README.md
+BILLING_COMPLETE_GUIDE.md
+Hookify_Billing_API.postman_collection.json
+nixpacks.toml

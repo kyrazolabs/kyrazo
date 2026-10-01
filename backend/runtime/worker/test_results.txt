@@ -1,0 +1,272 @@
+$ bun test
+bun test v1.3.13 (bf2e2cec)
+
+src/config/nats.config.test.ts:
+[dotenv@17.2.2] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.2] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+(pass) NatsConfig > should be a singleton
+(pass) NatsConfig > should provide connection details
+
+src/config/redis.config.test.ts:
+[dotenv@17.2.2] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+(pass) RedisConfig > should be a singleton
+(pass) RedisConfig > should provide connection details
+
+src/config/app.config.test.ts:
+(pass) AppConfig > should have basic properties
+
+src/app/worker.env.test.ts:
+[dotenv@17.2.2] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+(pass) WorkerEnv > should have required environment variables or defaults
+
+src/app/worker.bootstrap.test.ts:
+(pass) WorkerBootstrap > should bootstrap successfully [1.00ms]
+
+src/app/worker.lifecycle.test.ts:
+(pass) WorkerLifecycle > should initialize lifecycle
+
+dist/config/app.config.test.js:
+[dotenv@17.2.2] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+(pass) AppConfig > should have basic properties
+
+dist/config/nats.config.test.js:
+[dotenv@17.2.2] injecting env (0) from .env -- tip: 📡 observe env with Radar: https://dotenvx.com/radar
+(pass) NatsConfig > should be a singleton
+(pass) NatsConfig > should provide connection details
+
+dist/config/redis.config.test.js:
+[dotenv@17.2.2] injecting env (0) from .env -- tip: 📡 observe env with Radar: https://dotenvx.com/radar
+(pass) RedisConfig > should be a singleton
+(pass) RedisConfig > should provide connection details
+
+dist/app/worker.bootstrap.test.js:
+[dotenv@17.2.2] injecting env (0) from .env -- tip: 📡 auto-backup env with Radar: https://dotenvx.com/radar
+(pass) WorkerBootstrap > should bootstrap successfully [1.00ms]
+
+dist/app/worker.env.test.js:
+(pass) WorkerEnv > should have required environment variables or defaults [1.00ms]
+
+dist/app/worker.lifecycle.test.js:
+(pass) WorkerLifecycle > should initialize lifecycle
+
+src/consumers/nats/nats.listener.test.ts:
+(pass) WorkerConsumer > should start
+
+src/consumers/batch/dispatch.producer.test.ts:
+(pass) DispatchProducer > should be a singleton
+(pass) DispatchProducer > should initialize queues
+
+src/consumers/batch/ingest.producer.test.ts:
+(pass) IngestProducer > should be a singleton
+(pass) IngestProducer > should initialize queues
+
+src/consumers/queues/dispatch.producer.test.ts:
+(pass) DispatchProducer > should be a singleton
+(pass) DispatchProducer > should start onStart [1.00ms]
+
+src/core/receiver/receiver.detector.test.ts:
+(pass) ReceiverDetector > should route paypal events [1.00ms]
+(pass) ReceiverDetector > should skip unknown sources
+
+src/core/receiver/receiver.pipeline.test.ts:
+(pass) ReceiverPipeline > should call detector with event
+
+src/core/receiver/receiver.transformer.test.ts:
+(pass) ReceiverTransformer > should transform IReceivedEvent to SQLIngestEvent
+
+src/core/dispatcher/dispatcher.signature.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+1 | })
+2 | {
+    ^
+SyntaxError: Export named 'DispatcherSignature' not found in module '/home/nxion/Projects/SaaS/Kyrazo/backend/runtime/worker/src/core/dispatcher/dispatcher.signature.ts'.
+      at loadAndEvaluateModule (2:1)
+-------------------------------
+
+
+src/core/dispatcher/dispatcher.headers.test.ts:
+(pass) DispatcherHeaders > should be a singleton
+(pass) DispatcherHeaders > should build default headers correctly [5.00ms]
+
+src/core/dispatcher/dispatcher.pipeline.test.ts:
+(pass) DispatcherPipeline > should process valid publish event [1.00ms]
+(pass) DispatcherPipeline > should skip invalid event
+(pass) DispatcherPipeline > should skip duplicate events
+
+src/core/dispatcher/dispatcher.queue.test.ts:
+(pass) DispatcherQueue > should enqueue tasks to BullMQ [2.00ms]
+
+src/core/dispatcher/dispatcher.transformer.test.ts:
+(pass) DispatcherTransformer > should transform raw event into IDispatchedEvent
+(pass) DispatcherTransformer > should handling missing optional fields with defaults
+
+src/core/dispatcher/dispatcher.validator.test.ts:
+(pass) DispatcherValidator > should be a singleton
+(pass) DispatcherValidator > shouldProcess > should return true if no required type is specified [1.00ms]
+(pass) DispatcherValidator > shouldProcess > should return true for exact match
+(pass) DispatcherValidator > shouldProcess > should return true for receive events starting with receive.
+(pass) DispatcherValidator > shouldProcess > should return false for mismatch
+Event is null or undefined
+(pass) DispatcherValidator > validate > should return false for null event
+Event missing eventId
+(pass) DispatcherValidator > validate > should return false if eventId is missing
+Event missing workspaceId
+(pass) DispatcherValidator > validate > should return false if workspaceId is missing
+Event missing namespaceId
+(pass) DispatcherValidator > validate > should validate publish events correctly
+
+dist/consumers/batch/dispatch.producer.test.js:
+(pass) DispatchProducer > should be a singleton
+(pass) DispatchProducer > should initialize queues
+
+dist/consumers/batch/ingest.producer.test.js:
+(pass) IngestProducer > should be a singleton
+(pass) IngestProducer > should initialize queues
+
+dist/consumers/queues/dispatch.producer.test.js:
+(pass) DispatchProducer > should be a singleton
+(pass) DispatchProducer > should start onStart
+
+dist/consumers/nats/nats.listener.test.js:
+(pass) WorkerConsumer > should start
+
+dist/core/dispatcher/dispatcher.headers.test.js:
+(pass) DispatcherHeaders > should be a singleton
+(pass) DispatcherHeaders > should build default headers correctly
+
+dist/core/dispatcher/dispatcher.pipeline.test.js:
+(pass) DispatcherPipeline > should process valid publish event
+(pass) DispatcherPipeline > should skip invalid event
+(pass) DispatcherPipeline > should skip duplicate events
+
+dist/core/dispatcher/dispatcher.queue.test.js:
+(pass) DispatcherQueue > should enqueue tasks to BullMQ [2.00ms]
+
+dist/core/dispatcher/dispatcher.signature.test.js:
+(pass) DispatcherSignature > should sign a body correctly [1.00ms]
+(pass) DispatcherSignature > should build headers correctly
+(pass) DispatcherSignature > should verify a valid signature
+
+dist/core/dispatcher/dispatcher.transformer.test.js:
+(pass) DispatcherTransformer > should transform raw event into IDispatchedEvent
+(pass) DispatcherTransformer > should handling missing optional fields with defaults
+
+dist/core/dispatcher/dispatcher.validator.test.js:
+(pass) DispatcherValidator > should be a singleton
+(pass) DispatcherValidator > shouldProcess > should return true if no required type is specified
+(pass) DispatcherValidator > shouldProcess > should return true for exact match
+(pass) DispatcherValidator > shouldProcess > should return true for receive events starting with receive.
+(pass) DispatcherValidator > shouldProcess > should return false for mismatch
+Event is null or undefined
+(pass) DispatcherValidator > validate > should return false for null event
+Event missing eventId
+(pass) DispatcherValidator > validate > should return false if eventId is missing
+Event missing workspaceId
+(pass) DispatcherValidator > validate > should return false if workspaceId is missing
+Event missing namespaceId
+(pass) DispatcherValidator > validate > should validate publish events correctly
+
+dist/core/receiver/receiver.detector.test.js:
+(pass) ReceiverDetector > should route paypal events
+(pass) ReceiverDetector > should skip unknown sources
+
+dist/core/receiver/receiver.pipeline.test.js:
+(pass) ReceiverPipeline > should call detector with event
+
+dist/core/receiver/receiver.transformer.test.js:
+(pass) ReceiverTransformer > should transform IReceivedEvent to SQLIngestEvent [1.00ms]
+
+src/core/receiver/sources/paypal/paypal.pipeline.test.ts:
+(pass) PayPalPipeline > should process valid paypal event [1.00ms]
+(pass) PayPalPipeline > should handle invalid signature
+
+src/core/receiver/sources/paypal/paypal.transformer.test.ts:
+(pass) PayPalTransformer > should transform PayPal event to IDispatchedEvent
+
+src/core/receiver/sources/github/github.pipeline.test.ts:
+(pass) GitHubPipeline > should process valid github event [1.00ms]
+
+src/core/receiver/sources/github/github.transformer.test.ts:
+(pass) GitHubTransformer > should transform a GitHub push event
+(pass) GitHubTransformer > should transform a GitHub pull_request opened event
+
+src/core/receiver/sources/slack/slack.pipeline.test.ts:
+(pass) SlackPipeline > should process valid slack event [1.00ms]
+(pass) SlackPipeline > should handle url_verification without signature check
+
+src/core/receiver/sources/slack/slack.transformer.test.ts:
+(pass) SlackTransformer > should transform a Slack event [1.00ms]
+(pass) SlackTransformer > should handle url_verification transformation
+
+src/core/receiver/sources/shopify/shopify.pipeline.test.ts:
+(pass) ShopifyPipeline > should process valid shopify event [1.00ms]
+(pass) ShopifyPipeline > should fail if signature is invalid
+
+src/core/receiver/sources/shopify/shopify.transformer.test.ts:
+(pass) ShopifyTransformer > should transform a Shopify orders/create event
+(pass) ShopifyTransformer > should fallback to shop domain if id is missing
+
+src/core/receiver/sources/stripe/stripe.pipeline.test.ts:
+(pass) StripePipeline > should process valid stripe event [1.00ms]
+
+src/core/receiver/sources/stripe/stripe.transformer.test.ts:
+(pass) StripeTransformer > should transform Stripe event to IDispatchedEvent
+
+src/core/receiver/sources/webflow/webflow.pipeline.test.ts:
+(pass) WebflowPipeline > should process valid webflow event [1.00ms]
+
+src/core/receiver/sources/webflow/webflow.transformer.test.ts:
+(pass) WebflowTransformer > should transform a Webflow event
+
+dist/core/receiver/sources/paypal/paypal.pipeline.test.js:
+(pass) PayPalPipeline > should process valid paypal event
+(pass) PayPalPipeline > should handle invalid signature
+
+dist/core/receiver/sources/paypal/paypal.transformer.test.js:
+(pass) PayPalTransformer > should transform PayPal event to IDispatchedEvent
+
+dist/core/receiver/sources/stripe/stripe.pipeline.test.js:
+(pass) StripePipeline > should process valid stripe event
+
+dist/core/receiver/sources/stripe/stripe.transformer.test.js:
+(pass) StripeTransformer > should transform Stripe event to IDispatchedEvent
+
+dist/core/receiver/sources/github/github.pipeline.test.js:
+(pass) GitHubPipeline > should process valid github event
+
+dist/core/receiver/sources/github/github.transformer.test.js:
+(pass) GitHubTransformer > should transform a GitHub push event
+(pass) GitHubTransformer > should transform a GitHub pull_request opened event [1.00ms]
+
+dist/core/receiver/sources/shopify/shopify.pipeline.test.js:
+(pass) ShopifyPipeline > should process valid shopify event [1.00ms]
+(pass) ShopifyPipeline > should fail if signature is invalid
+
+dist/core/receiver/sources/shopify/shopify.transformer.test.js:
+(pass) ShopifyTransformer > should transform a Shopify orders/create event
+(pass) ShopifyTransformer > should fallback to shop domain if id is missing
+
+dist/core/receiver/sources/slack/slack.pipeline.test.js:
+(pass) SlackPipeline > should process valid slack event
+(pass) SlackPipeline > should handle url_verification without signature check
+
+dist/core/receiver/sources/slack/slack.transformer.test.js:
+(pass) SlackTransformer > should transform a Slack event
+(pass) SlackTransformer > should handle url_verification transformation
+
+dist/core/receiver/sources/webflow/webflow.pipeline.test.js:
+(pass) WebflowPipeline > should process valid webflow event
+
+dist/core/receiver/sources/webflow/webflow.transformer.test.js:
+(pass) WebflowTransformer > should transform a Webflow event
+
+1 tests failed:
+
+ 111 pass
+ 1 fail
+ 1 error
+ 291 expect() calls
+Ran 112 tests across 62 files. [1076.00ms]
+error: script "test" exited with code 1

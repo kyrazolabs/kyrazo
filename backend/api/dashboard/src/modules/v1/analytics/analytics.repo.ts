@@ -1,0 +1,46 @@
+import { AnalyticsRepo as CHAnalyticsRepo, logger } from '@kyrazo/shared';
+
+export class AnalyticsRepo {
+    static async getDispatchOverview(days: number = 7, workspaceId: string, namespaceId: string) {
+        try {
+            const data = await CHAnalyticsRepo.getDispatchOverview(days, workspaceId, namespaceId);
+            if (!data) throw new Error('Failed to get dispatch overview from ClickHouse');
+            return data;
+        } catch (error: any) {
+            logger.error('Failed to get dispatch overview', error);
+            throw error;
+        }
+    }
+
+    static async getTargetOverview(
+        days: number = 7,
+        workspaceId: string,
+        targetId: string,
+        namespaceId: string
+    ) {
+        try {
+            const data = await CHAnalyticsRepo.getTargetOverview(
+                days,
+                workspaceId,
+                targetId,
+                namespaceId
+            );
+            if (!data) throw new Error('Failed to get target overview from ClickHouse');
+            return data;
+        } catch (error: any) {
+            logger.error('Failed to get target overview', error);
+            throw error;
+        }
+    }
+
+    static async getIngestOverview(days: number = 7, workspaceId: string, namespaceId: string) {
+        try {
+            const data = await CHAnalyticsRepo.getIngestOverview(days, workspaceId, namespaceId);
+            if (!data) throw new Error('Failed to get ingest overview from ClickHouse');
+            return data;
+        } catch (error: any) {
+            logger.error('Failed to get ingest overview', error);
+            throw error;
+        }
+    }
+}

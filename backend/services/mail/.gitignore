@@ -1,0 +1,64 @@
+# Node modules
+node_modules/
+**/node_modules
+
+# PNPM workspace cache and symlinks
+.pnpm/
+.pnpm-debug.log
+.pnp.*
+shrinkwrap.yaml
+
+# Env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build outputs
+build/
+dist/
+.next/
+out/
+.turbo/
+**/build/
+**/dist/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+**/*.log
+
+# TypeScript build info
+*.tsbuildinfo
+
+# OS/System
+.DS_Store
+Thumbs.db
+
+# IDEs/editors
+# .vscode/
+.idea/
+
+# Testing
+coverage/
+apps/**/coverage/
+packages/**/coverage/
+
+# Lint/Cache
+.eslintcache
+.million
+
+# React Email / Emails
+.react-email
+out/
+
+# Wrangler cache (but NOT wrangler.jsonc config)
+**/.wrangler/
+
+
+# Docker compose
+docker-compose.yml
+clean-builds.sh

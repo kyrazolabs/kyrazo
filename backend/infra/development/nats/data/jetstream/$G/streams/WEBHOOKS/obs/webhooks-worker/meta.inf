@@ -1,0 +1,1 @@
+{"Created":"2025-10-27T08:59:40.796866274Z","Name":"webhooks-worker","durable_name":"webhooks-worker","name":"webhooks-worker","deliver_policy":"all","ack_policy":"explicit","ack_wait":30000000000,"max_deliver":10,"replay_policy":"instant","max_waiting":512,"max_ack_pending":10,"num_replicas":0,"metadata":{"_nats.req.level":"0"}}
