@@ -1,0 +1,106 @@
+---
+title: "Python"
+description: "Official Kyrazo SDK for Python"
+---
+
+The Kyrazo Python SDK provides a type-safe, asynchronous-ready client for interacting with the Kyrazo API. It supports Python 3.9+ and is designed for high-performance event orchestration.
+
+## Installation
+
+Install the SDK using your preferred package manager:
+
+<CodeGroup>
+```bash pip
+pip install kyrazo
+```
+
+```bash poetry
+poetry add kyrazo
+```
+</CodeGroup>
+
+## Quickstart
+
+Initialize the client with your **API Key** from your dedicated Kyrazo dashboard (hostname in your Order Form).
+
+```python
+from kyrazo import Kyrazo
+
+# Initialize with only your API key (positional)
+client = Kyrazo("your_api_key_here", base_url="https://{YOUR_HOST}")
+```
+
+## Configuration
+
+The `Kyrazo` constructor accepts the following parameters:
+
+| Parameter | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `api_key` | `str` | Yes | Your Kyrazo API key passed as the first argument. |
+| `base_url` | `str` | No | Custom API base URL as a keyword argument. |
+| `timeout` | `int` | No | Request timeout in seconds. |
+| `retries` | `int` | No | Maximum number of retry attempts. |
+
+### Example with Config
+
+```python
+client = Kyrazo(
+    "your_api_key",
+    base_url="https://{YOUR_HOST}",
+    timeout=60,
+    retries=5
+)
+
+# Publish a single event
+event = client.events.publish(
+    namespace_id="namespace_id",
+    body={
+        "event": "user.signup",
+        "payload": {
+            "userId": "123",
+            "email": "user@example.com",
+        },
+        "targets": ["target_id"],
+    }
+)
+
+print(f"Event published! ID: {event.event_id}")
+```
+
+## Error Handling
+
+The SDK provides specialized exception classes for precise error handling.
+
+```python
+from kyrazo import Kyrazo, RateLimitError, ValidationError, AuthenticationError
+
+try:
+    client.events.publish(...)
+except RateLimitError as e:
+    print(f"Rate limited! Retry after {e.retry_after}s")
+except ValidationError as e:
+    print(f"Invalid request data: {e.message}")
+except AuthenticationError:
+    print("Invalid API Key")
+```
+
+## Webhook Verification
+
+Verify incoming webhooks from Kyrazo using the built-in helper.
+
+```python
+from kyrazo import Webhook, ValidationError
+
+# headers should be a dictionary of incoming request headers
+try:
+    Webhook.verify(
+        raw_body_string,
+        headers,
+        "your_target_secret"
+    )
+    print("Successfully verified webhook")
+except ValidationError as e:
+    print(f"Verification failed: {e}")
+```
+
+For more details on verification policies and best practices, see the [Signature Verification](/essentials/webhooks-verification) guide.

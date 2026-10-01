@@ -1,0 +1,133 @@
+---
+title: "Integration API"
+description: "Documentation for the Kyrazo Integration API"
+---
+
+## Overview
+
+The Integration API allows you to programmatically publish events and manage webhook targets within your namespaces. It is designed for high-performance and reliable event delivery.
+
+<CardGroup cols={2}>
+  <Card
+    title="Publish Events"
+    icon="bolt"
+    href="/api-reference/integration/publish-event"
+  >
+    Learn how to send events to your targets.
+  </Card>
+  <Card
+    title="Manage Targets"
+    icon="gears"
+    href="/api-reference/integration/create-target"
+  >
+    Configure where your events should be delivered.
+  </Card>
+</CardGroup>
+
+## Authentication
+
+All API endpoints are authenticated using the **x-api-key** header. Manage API keys in **your** Kyrazo dashboard (the hostname from your Order Form) under the **Secrets Page**.
+
+```bash
+x-api-key: <your_api_key>
+```
+
+### Idempotency
+
+To prevent duplicate processing of the same request (e.g., due to network retries), you can provide an optional `X-Idempotency-Key` header. Kyrazo ensures that requests with the same key are processed only once.
+
+```bash
+X-Idempotency-Key: <unique_key>
+```
+
+## Base URL
+
+There is no shared API host. Use the dedicated hostname from your Order Form (Kyrazo subdomain or your custom domain):
+
+```http
+https://{YOUR_HOST}
+```
+
+<Note>
+  Publish URL: `https://{YOUR_HOST}/v1/events/{namespaceId}/publish`. Pass this host to the SDK as `baseURL` / `base_url`.
+</Note>
+
+## SDK Support
+
+Kyrazo provides official SDKs to make integration easier.
+
+<CodeGroup>
+  ```bash Node.js
+  npm install @kyrazo/sdk
+  ```
+
+  {/* ```bash Python
+  pip install kyrazo
+  ``` */}
+</CodeGroup>
+
+### Usage Example
+
+<CodeGroup>
+```javascript Node.js
+import {
+  AuthenticationError,
+  Kyrazo,
+  LimitExceededError,
+  RateLimitError,
+  ValidationError,
+} from "@kyrazo/sdk";
+
+const client = new Kyrazo(process.env.KYRAZO_API_KEY, {
+  baseURL: process.env.KYRAZO_BASE_URL, // https://{YOUR_HOST}
+});
+
+try {
+  // Create a webhook target
+  const target = await client.targets.create("ns_69674fad7590d01406e98126", {
+    name: "Production Webhook",
+    url: "https://api.example.com/webhooks",
+    method: "POST",
+    config: { timeout: 5000, retryCount: 3, rateLimitDuration: 60 },
+  });
+
+  // Publish an event
+  await client.events.single("pro_696...", {
+    event: "user.created",
+    payload: {
+      user_id: "u_334",
+      email: "user@example.com",
+      plan: "pro",
+    },
+    targets: [target.data.id],
+  });
+} catch (error) {
+  if (error instanceof RateLimitError) {
+    console.log(`Rate limited. Retry in ${error.retryAfter}s`);
+  } else if (error instanceof LimitExceededError) {
+    console.log("Deployment limit reached. Contact your Kyrazo account team.");
+  } else if (error instanceof ValidationError) {
+    console.log("Invalid payload:", error.message);
+  } else if (error instanceof AuthenticationError) {
+    console.log("Invalid API key");
+  }
+}
+```
+{/* 
+```python Python
+from kyrazo import Kyrazo
+
+client = Kyrazo("your_api_key")
+
+# Publish an event
+response = client.events.publish(
+    namespace_id="proj_123",
+    body={
+        "event": "user.created",
+        "payload": {"id": 1, "name": "Alice"},
+        "targets": ["target_123"]
+    }
+)
+print(response.event_id)
+``` */}
+</CodeGroup>

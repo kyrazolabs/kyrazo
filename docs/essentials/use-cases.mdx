@@ -1,0 +1,67 @@
+---
+title: "Use Cases"
+description: "Common scenarios and practical applications for Kyrazo"
+---
+
+Kyrazo is built to handle complex event-driven workflows with ease. Here are some of the most common ways engineering teams use the platform to simplify their infrastructure.
+
+## 1. SaaS Webhook Infrastructure
+
+If you are building a SaaS product, providing webhooks to your customers is a standard requirement. However, building a reliable webhook engine from scratch is a massive undertaking.
+
+- **The Kyrazo Advantage**: Use Kyrazo as your backend for customer webhooks. You send events to Kyrazo, and we handle the retries, the management dashboard, and the secure delivery to their URLs.
+- **Outcome**: Save months of engineering time and provide an enterprise-grade integration experience to your customers.
+
+## 2. Distributed System Synchronization
+
+Maintaining data consistency across microservices can be challenging, especially during network partitions or service downtime.
+
+- **The Kyrazo Advantage**: Use Kyrazo as an event bridge between services. When a record changes in one service, publish an event to Kyrazo. Other services subscribe to these events as targets.
+- **Outcome**: Guaranteed at-least-once delivery ensures that eventually, all your systems stay in sync without complex distributed transaction logic.
+
+## 3. Integration Hub (Third-Party Sync)
+
+Modern workflows often require data to flow between multiple third-party tools (e.g., Stripe -> Slack, Shopify -> CRM, GitHub -> Messaging).
+
+- **The Kyrazo Advantage**: Act as a central hub for all external integrations. Instead of writing custom webhook handlers for every service, route them through Kyrazo.
+- **Outcome**: A single place to monitor and debug every integration point in your stack.
+
+## 4. Audit Logging & Compliance
+
+For security and compliance, it's often necessary to have a permanent, unalterable record of all critical system events.
+
+- **The Kyrazo Advantage**: Kyrazo's ingest capabilities allow you to capture every event and store it securely. With full delivery traceability, you can prove exactly when an event was sent, where it went, and what the response was.
+- **Outcome**: Easy compliance reporting and simplified debugging of complex historical issues.
+
+{/*
+## 5. Legacy System Bridge
+
+Legacy systems often lack the reliability or security features required for modern cloud applications.
+
+- **The Kyrazo Advantage**: Use Kyrazo as a proxy for legacy APIs. By routing requests through Kyrazo, you gain automatic retries and modernized security headers for old systems that don't support them natively.
+- **Outcome**: Modernize your infrastructure without having to rewrite legacy backend components.
+
+The Legacy System Bridge use case is about using Kyrazo as a "modernization proxy" for older systems that weren't designed for today's high-scale, cloud-native environments.
+
+Here is a breakdown of how it works and the specific problems it solves:
+
+1. Adding Reliability to "Flaky" Systems
+Legacy systems often run on older hardware or unstable internal networks. If your modern application tries to send data to a legacy API and it's temporarily down, your modern app might crash or lose data.
+
+The Bridge: Kyrazo accepts the event from your modern app immediately. If the legacy system is down, Kyrazo's distributed workers handle the retries in the background. Your modern app doesn't have to wait or worry about the legacy system's uptime.
+2. Protecting Old Servers (Rate Limiting)
+A legacy system might only be able to handle, for example, 5 requests per second. If your new cloud application suddenly sends 500 requests per second (a "thundering herd"), the legacy system will likely crash.
+
+The Bridge: Kyrazo acts as a buffer. It can ingest events at high speed, queue them, and then drip-feed them to the legacy system at a controlled rate that it can safely process.
+3. Modernizing Security
+Many legacy systems don't support modern security standards like HMAC signatures or custom authentication headers.
+
+The Bridge:
+Outgoing: When Kyrazo dispatches to the legacy system, it can add the necessary security headers or signatures that the legacy system requires but your main app shouldn't have to manage.
+Incoming: If you are sending data from a legacy system, Kyrazo can verify the integrity and origin before passing it to your modern infrastructure.
+4. Protocol & Format Decoupling
+Legacy systems often require very specific, rigid data formats.
+
+The Bridge: By using Kyrazo, you keep your modern application's code "clean." Your modern app sends a standard JSON event, and Kyrazo ensures that event is delivered. While we currently focus on standard HTTP, the architecture allows for future transformations where Kyrazo could potentially map modern JSON to the specific format the legacy system expects.
+In short: It allows you to keep your old, stable (but limited) systems running while your new applications move at full speed, without the two interfering with each other's performance or security.
+*/}

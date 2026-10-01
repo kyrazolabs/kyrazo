@@ -1,0 +1,71 @@
+---
+title: "Overview"
+description: "Learn how to publish events from your system to external targets"
+---
+
+**Dispatch** is the process of pushing events from your application to Kyrazo, which then handles the reliable delivery to any number of configured [Targets](/essentials/target-management).
+
+## How Dispatch Works
+
+When an event occurs in your system (e.g., a new user signs up), you publish that event to the Kyrazo Integration API. Kyrazo asynchronously delivers that event to all active targets associated with your namespace.
+
+### 1. The Event Payload
+
+Every event sent to Kyrazo follows a standard structure to ensure consistency across all your integrations.
+
+- **`eventType`**: A unique string identifying the action (e.g., `invoice.paid`).
+- **`data`**: The current state of the object related to the event.
+- **`previous`**: (Optional) The previous state of the object, allowing your users to track changes.
+- **`metadata`**: Additional context such as `timestamp` and `eventId`.
+
+### 2. Idempotency
+
+Reliability is built into the core of Kyrazo. We support **Idempotency Keys** for all publish requests. 
+
+By including the `X-Idempotency-Key` header, you can safely retry requests without fear of creating duplicate events. If a request with the same key is received multiple times within a 24-hour window, Kyrazo will return the original response without processing the event again.
+
+## Scalability & Performance
+
+Kyrazo is built with a decoupled architecture:
+
+1.  **Fast Ingestion**: The API validates and acknowledges your event in milliseconds.
+2.  **Distributed Processing**: Background workers pick up the event and prepare it for delivery.
+3.  **Concurrency Control**: Deliver events to thousands of targets simultaneously without affecting your system's performance.
+
+## Reliability & Retries
+
+Kyrazo uses a **stepped backoff strategy** with jitter to handle failed deliveries. If a webhook target returns a non-2xx response or is unreachable, the delivery is automatically rescheduled at progressively longer intervals.
+
+### Retry Schedule
+
+The backoff schedule applies cumulatively across all retry attempts:
+
+| Attempt | Delay (base) | Effective Range (±20% jitter) |
+| :--- | :--- | :--- |
+| 1 | 1 minute | 48s – 1m 12s |
+| 2 | 10 minutes | 8m – 12m |
+| 3 | 30 minutes | 24m – 36m |
+| 4 | 1 hour | 48m – 1h 12m |
+| 5 | 4 hours | 3h 12m – 4h 48m |
+| 6 | 12 hours | 9h 36m – 14h 24m |
+| 7+ | 24 hours | 19h 12m – 28h 48m |
+
+### Jitter
+
+Each delay has **±20% random jitter** applied to prevent the [thundering herd problem](https://en.wikipedia.org/wiki/Thundering_herd_problem). For example, the 10-minute step becomes a random value between 8 and 12 minutes. This distributes retry load evenly across infrastructure.
+
+### Maximum Attempts
+
+The number of retry attempts is configurable per target via the `retryCount` setting in the [Target configuration](/essentials/target). Once all attempts are exhausted, the event is marked as **Failed** and logged in your delivery history with the full response details.
+
+<Note>
+  All delivery attempts — including retries — are recorded in ClickHouse and visible in the **Dispatch Logs** section of your dashboard with request/response headers, body, status code, and latency.
+</Note>
+
+## Getting Started with Dispatch
+
+To start dispatching events, you'll need:
+1.  An **API Key** from your Namespace settings.
+2.  One or more [Targets](/essentials/target-management) configured to receive the data.
+3.  A call to the `/publish` endpoint in our [Integration API](/api-reference/integration-introduction).
+
