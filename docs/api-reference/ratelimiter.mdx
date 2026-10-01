@@ -1,0 +1,56 @@
+---
+title: "Rate Limiting"
+description: "Information about rate limits for the Kyrazo Integration API"
+---
+
+Kyrazo applies rate limits per dedicated deployment. Limits are set in your Order Form, not by a public self-serve plan.
+
+## Rate Limit Tiers
+
+Default Professional deployments use the following unless your Order Form specifies otherwise:
+
+| Limit Type | Value |
+| :--- | :--- |
+| **Requests Per Second (RPS)** | Scoped in your Order Form |
+| **Event volume** | Scoped in your Order Form |
+| **Unauthenticated** | Rejected |
+
+<Note>
+  Need higher limits? Contact your Kyrazo account team — there is no in-product plan upgrade.
+</Note>
+
+## Resource Specific Limits
+
+### Events API
+
+The Events API endpoints (`/publish` and `/publish/batch`) use your workspace's RPS limit. 
+
+- **Single Event**: Each request counts as 1 against your RPS.
+- **Batch Events**: A batch request counts as 1 request against your RPS, regardless of the number of events in the batch. However, the individual events within the batch count toward your monthly event quota.
+
+### Targets API
+
+Management of webhook targets is also subject to the same RPS limits. This includes:
+- Listing and retrieving targets (Read)
+- Creating, updating, and deleting targets (Write)
+
+## Exceeding Limits
+
+If you exceed your rate limit, the API will respond with a `429 Too Many Requests` status code. The response body will include details on when you can retry:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "RATE_LIMIT_EXCEEDED",
+    "message": "Too many requests. Slow down or contact your Kyrazo account team.",
+    "retryAfter": 1
+  }
+}
+```
+
+### Response Headers
+
+When a rate limit is exceeded, the following header is included:
+
+- `Retry-After`: The number of seconds to wait before your next request will be accepted.

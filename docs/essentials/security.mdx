@@ -1,0 +1,55 @@
+---
+title: "Security & API Keys"
+description: "Manage access controls, API keys, and event integrity"
+---
+
+Kyrazo provides a granular security model to protect your data and ensure that only authorized systems can interact with your event infrastructure.
+
+## API Keys
+
+Your interaction with the Kyrazo Integration API is authenticated via **API Keys**. You can manage these in the **Secrets Page** of the Kyrazo Dashboard.
+
+### Creating a Key
+
+When you generate a new key, you can configure the following:
+
+-   **Name**: A descriptive label (e.g., "GitHub Actions CI", "Production Backend").
+-   **Scopes**: Fine-grained permissions that define what the key can do.
+-   **Expiration**: (Optional) A date when the key will automatically become invalid.
+
+### Scopes (Permissions)
+
+Kyrazo uses scopes to enforce the principle of least privilege. We recommend creating separate keys with limited scopes for different services.
+
+| Group | Scopes | Description |
+| :--- | :--- | :--- |
+| **Dispatch** | `dispatch:event`, `dispatch:event:batch` | Ability to publish single or batch events. |
+| **Targets** | `dispatch:target:*` | CRUD operations for outbound targets and key rotation. |
+| **Sources** | `ingest:source:*` | CRUD operations for inbound sources. |
+| **Endpoints** | `ingest:endpoint:*` | CRUD operations for internal endpoints. |
+
+## Idempotency
+
+To prevent accidental duplicate events during network retries, Kyrazo supports the `X-Idempotency-Key` header.
+
+When you include this header in a `POST` request, Kyrazo will:
+1.  Check if a request with that key was already processed in the last 24 hours.
+2.  If it's new, process the request and store the result.
+3.  If it's a duplicate, return the **original response** immediately without re-processing the event.
+
+<Tip>
+  We recommend using a UUID v4 or a combination of the event type and your internal entity ID as the idempotency key.
+</Tip>
+
+## Signature Verification
+
+When Kyrazo dispatches events to your **Targets** or **Endpoints**, it signs the payload using HMAC-SHA256. 
+
+### Rotating Secrets
+
+If a secret is compromised, you can rotate it via the dashboard or API:
+1.  Add a new secret to the target.
+2.  Both secrets will be valid for a transition period (if supported by your implementation).
+3.  Once your system is updated to use the new secret, remove the old one.
+
+For detailed verification steps, see the [Target Management](/essentials/target-management#security-hmac-signatures) guide.

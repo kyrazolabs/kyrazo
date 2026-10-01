@@ -1,0 +1,220 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "openapi": [
+    "api-reference/openapi/events.json",
+    "api-reference/openapi/targets.json",
+    "api-reference/openapi/sources.json",
+    "api-reference/openapi/endpoints.json",
+    "api-reference/openapi/transformers.json",
+    "api-reference/openapi/namespaces.json"
+  ],
+  "theme": "almond",
+  "name": "Kyrazo",
+  "colors": {
+    "primary": "#6366ee",
+    "dark": "#6366ee",
+    "light": "#6366ee"
+  },
+  "favicon": "/favicon.ico",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "index",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Essentials",
+            "pages": [
+              "essentials/concepts",
+              "essentials/architecture",
+              "essentials/use-cases",
+              "essentials/security"
+            ]
+          },
+          {
+            "group": "SDKs",
+            "pages": [
+              "sdks/nodejs",
+              "sdks/python",
+              "sdks/go"
+            ]
+          },
+          {
+            "group": "Dispatch",
+            "pages": [
+              "essentials/dispatch-overview",
+              "essentials/target",
+              "essentials/webhooks-verification",
+              "essentials/transformers"
+            ]
+          },
+          {
+            "group": "Ingest",
+            "pages": [
+              "essentials/ingest-overview",
+              "essentials/sources",
+              {
+                "group": "Destinations",
+                "pages": [
+                  "essentials/destinations",
+                  "essentials/endpoints",
+                  "essentials/s3bucket",
+                  "essentials/asqs"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api-reference/introduction",
+              "api-reference/ratelimiter"
+            ]
+          },
+          {
+            "group": "Namespaces",
+            "pages": [
+              "api-reference/integration/list-namespaces",
+              "api-reference/integration/create-namespace",
+              "api-reference/integration/get-namespace",
+              "api-reference/integration/update-namespace",
+              "api-reference/integration/delete-namespace",
+              "api-reference/integration/restore-namespace"
+            ]
+          },
+          {
+            "group": "Transformers",
+            "pages": [
+              "api-reference/integration/list-transforms",
+              "api-reference/integration/create-transform",
+              "api-reference/integration/get-transform",
+              "api-reference/integration/update-transform",
+              "api-reference/integration/delete-transform",
+              "api-reference/integration/list-transform-versions",
+              "api-reference/integration/rollback-transform",
+              "api-reference/integration/test-transform"
+            ]
+          },
+          {
+            "group": "Dispatch Events",
+            "pages": [
+              {
+                "group": "Events",
+                "pages": [
+                  "api-reference/integration/publish-event",
+                  "api-reference/integration/publish-events-batch"
+                ]
+              },
+              {
+                "group": "Targets",
+                "pages": [
+                  "api-reference/integration/list-targets",
+                  "api-reference/integration/create-target",
+                  "api-reference/integration/get-target",
+                  "api-reference/integration/update-target",
+                  "api-reference/integration/update-target-status",
+                  "api-reference/integration/delete-target",
+                  "api-reference/integration/get-target-secret"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Ingest",
+            "pages": [
+              {
+                "group": "Sources",
+                "pages": [
+                  "api-reference/integration/list-sources",
+                  "api-reference/integration/create-source",
+                  "api-reference/integration/get-source",
+                  "api-reference/integration/update-source",
+                  "api-reference/integration/delete-source"
+                ]
+              },
+              {
+                "group": "Endpoints",
+                "pages": [
+                  "api-reference/integration/list-endpoints",
+                  "api-reference/integration/create-endpoint",
+                  "api-reference/integration/get-endpoint",
+                  "api-reference/integration/update-endpoint",
+                  "api-reference/integration/delete-endpoint",
+                  "api-reference/integration/get-endpoint-secret"
+                ]
+              },
+              {
+                "group": "S3 Buckets",
+                "pages": [
+                  "api-reference/integration/list-s3",
+                  "api-reference/integration/create-s3",
+                  "api-reference/integration/get-s3",
+                  "api-reference/integration/update-s3",
+                  "api-reference/integration/delete-s3"
+                ]
+              },
+              {
+                "group": "Amazon ASQS",
+                "pages": [
+                  "api-reference/integration/list-asqs",
+                  "api-reference/integration/create-asqs",
+                  "api-reference/integration/get-asqs",
+                  "api-reference/integration/update-asqs",
+                  "api-reference/integration/delete-asqs"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "global": {}
+  },
+  "logo": {
+    "light": "/logo/light.png",
+    "dark": "/logo/dark.png"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "mailto:support@kyrazo.com"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Get access",
+      "href": "https://kyrazo.com"
+    }
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
+  },
+  "footer": {
+    "socials": {
+      "x": "https://x.com/kyrazohq",
+      "github": "https://github.com/kyrazo",
+      "linkedin": "https://linkedin.com/company/kyrazo"
+    }
+  }
+}

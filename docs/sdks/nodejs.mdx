@@ -1,0 +1,144 @@
+---
+title: "Node.js"
+description: "Official Kyrazo SDK for Node.js"
+---
+
+The Kyrazo Node.js SDK provides a type-safe, production-ready client for interacting with the Kyrazo API. It supports both CommonJS and ESM, and works in Node.js, Browsers, and Edge environments.
+
+## Installation
+
+Install the SDK using your preferred package manager:
+
+<CodeGroup>
+```bash bun
+bun add @kyrazo/sdk
+```
+```bash npm
+npm install @kyrazo/sdk
+```
+
+```bash yarn
+yarn add @kyrazo/sdk
+```
+
+```bash pnpm
+pnpm add @kyrazo/sdk
+```
+
+</CodeGroup>
+
+## Quickstart
+
+To get started, you'll need an **API Key** from your dedicated Kyrazo dashboard (hostname in your Order Form).
+
+```typescript
+import { Kyrazo } from "@kyrazo/sdk";
+
+// Initialize with your API key
+const kyrazo = new Kyrazo("your_api_key_here", {
+    baseURL: "https://{YOUR_HOST}",
+});
+```
+
+## Configuration
+
+The `Kyrazo` constructor accepts the following parameters:
+
+| Parameter | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `apiKey` | `string` | Yes | Your Kyrazo API key passed as the first argument. |
+| `config` | `object` | No | Optional configuration object for advanced settings. |
+
+### Configuration Object (`config`)
+
+| Property | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `baseURL` | `string` | — | Required. Your dedicated API host (`https://{YOUR_HOST}`). |
+| `timeout` | `number` | `30000` | Request timeout in milliseconds. |
+| `maxRetries` | `number` | `3` | Maximum number of retry attempts for failed requests. |
+| `headers` | `Record<string, string>` | `{}` | Custom headers to include in every request. |
+
+### Example with Config
+
+```typescript
+const kyrazo = new Kyrazo("your_api_key", {
+    baseURL: "https://{YOUR_HOST}",
+    timeout: 60000,
+    maxRetries: 5,
+});
+
+// Publish a single event
+const response = await kyrazo.events.single("namespace_id", {
+    event: "user.signup",
+    payload: {
+        userId: "123",
+        email: "user@example.com",
+    },
+    targets: ["target_id"],
+});
+
+console.log("Event dispatched:", response.id);
+```
+
+## Error Handling
+
+The SDK provides specific error classes to help you handle different failure scenarios gracefully.
+
+```typescript
+import {
+    Kyrazo,
+    RateLimitError,
+    ValidationError,
+    AuthenticationError,
+} from "@kyrazo/sdk";
+
+try {
+    await kyrazo.events.single(...);
+} catch (error) {
+    if (error instanceof RateLimitError) {
+        console.log(`Rate limited! Retry after ${error.retryAfter}s`);
+    } else if (error instanceof ValidationError) {
+        console.log("Invalid request data:", error.message);
+    } else if (error instanceof AuthenticationError) {
+        console.log("Invalid API Key");
+    }
+}
+```
+
+## Batch Publishing
+
+You can send up to 100 events in a single request to improve performance.
+
+```typescript
+const batchResponse = await kyrazo.events.batch("namespace_id", [
+    {
+        event: "user.login",
+        payload: { userId: "1" },
+        targets: ["target_A"],
+    },
+    {
+        event: "user.login",
+        payload: { userId: "2" },
+        targets: ["target_A"],
+    },
+]);
+
+console.log(`Sent ${batchResponse.length} events`);
+```
+
+## Webhook Verification
+
+When receiving webhooks from Kyrazo, you should verify the signature to ensure the request is authentic.
+
+```typescript
+import { Webhook } from "@kyrazo/sdk";
+
+// In your Express handler (or similar)
+const isValid = Webhook.verify(
+    rawRequestBody,
+    req.headers,
+    "your_target_secret"
+);
+```
+
+For more details on verification, see the [Signature Verification](/essentials/webhooks-verification) guide.
