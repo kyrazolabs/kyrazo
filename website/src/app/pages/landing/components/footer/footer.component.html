@@ -1,0 +1,144 @@
+<footer #footer
+    class="bg-surface-0 dark:bg-surface-950 pt-24 pb-12 px-6 relative overflow-hidden">
+
+    <!-- Premium Background Effects -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+        <!-- Mesh Grid -->
+        <div class="absolute inset-0 opacity-10 dark:opacity-20"
+             style="background-image: radial-gradient(circle at 2px 2px, var(--surface-300) 1px, transparent 0); background-size: 40px 40px;"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto relative z-10">
+        <!-- Main Bento Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-[minmax(180px,auto)] mb-20">
+
+            <!-- Brand Highlight Card -->
+            <div class="md:col-span-6 md:row-span-2 p-6 md:p-10 flex flex-col justify-between relative overflow-hidden rounded-2xl border border-surface-100 bg-surface-50/30 backdrop-blur-3xl transition-all duration-300 dark:border-surface-800/50 dark:bg-surface-900/20" appScrollReveal>
+
+                <!-- Massive Background Watermark -->
+                <div class="absolute -bottom-5 -right-12 select-none pointer-events-none opacity-[0.03] dark:opacity-[0.05] translate-y-1/4 hidden md:block" aria-hidden="true">
+                    <h1 class="text-[16rem] font-black tracking-tighter leading-none font-sansation!">Kyrazo</h1>
+                </div>
+
+                <div class="relative z-10 flex flex-col h-full justify-between">
+                    <div class="flex items-center gap-4 mb-8">
+                        <img [src]="isDarkMode() ? 'logo-dark.png' : 'logo-light.png'" alt="Kyrazo"
+                             width="48" height="48"
+                             class="h-10 w-10 md:h-12 md:w-12 p-1 rounded-xl bg-primary shadow-2xl shadow-primary-500/30">
+                        <h2 class="text-3xl md:text-4xl font-black bg-clip-text text-transparent bg-linear-to-r from-primary-500 to-primary-500 bg-size-[200%_auto] animate-gradient-shimmer tracking-tighter">Kyrazo</h2>
+                    </div>
+                    <div>
+                        <p class="text-lg md:text-xl font-bold text-surface-900 dark:text-surface-0 mb-6 leading-tight max-w-md">
+                            Developer-first infrastructure for the next generation of event-driven apps.
+                        </p>
+                        <!-- <nav class="flex gap-3" aria-label="Social links">
+                            <a href="https://x.com/nx_2io" target="_blank" class="flex items-center justify-center w-11 h-11 rounded-xl bg-transparent text-surface-600 dark:text-surface-400 transition-all duration-100 hover:bg-primary-500 hover:text-white hover:-translate-y-1 hover:rotate-6 hover:shadow-xl hover:shadow-primary-500/20" aria-label="Twitter/X">
+                                <i class="icon-[ri--twitter-x-line] text-lg" aria-hidden="true"></i>
+                            </a>
+                            <a href="https://www.producthunt.com/posts/kyrazo" target="_blank" class="flex items-center justify-center w-11 h-11 rounded-xl bg-transparent text-surface-600 dark:text-surface-400 transition-all duration-100 hover:bg-primary-500 hover:text-white hover:-translate-y-1 hover:rotate-6 hover:shadow-xl hover:shadow-primary-500/20" aria-label="Product Hunt">
+                                <i class="icon-[logos--producthunt] text-lg" aria-hidden="true"></i>
+                            </a>
+                        </nav> -->
+                    </div>
+                </div>
+
+                <!-- Contact Details -->
+                <div class="mt-8 flex flex-col gap-4 border-t border-surface-200/30 dark:border-surface-800/30 pt-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                    <div class="flex flex-col gap-3">
+                        <a href="mailto:support@kyrazo.com" class="group/contact flex items-center gap-3 text-surface-600 dark:text-surface-400 hover:text-primary-500 transition-all duration-200 w-fit">
+                            <div class="w-8 h-8 rounded-lg bg-surface-100 dark:bg-surface-800 flex items-center justify-center group-hover/contact:bg-primary-500/10 group-hover/contact:text-primary-500 transition-colors">
+                                <i class="icon-[hugeicons--mail-01] text-lg"></i>
+                            </div>
+                            <span class="font-medium tracking-tight text-sm md:text-base">support@kyrazo.com</span>
+                        </a>
+                        <!-- <a href="tel:+19176728572" class="group/contact flex items-center gap-3 text-surface-600 dark:text-surface-400 hover:text-primary-500 transition-all duration-200 w-fit">
+                            <div class="w-8 h-8 rounded-lg bg-surface-100 dark:bg-surface-800 flex items-center justify-center group-hover/contact:bg-primary-500/10 group-hover/contact:text-primary-500 transition-colors">
+                                <i class="icon-[hugeicons--smart-phone-01] text-lg"></i>
+                            </div>
+                            <span class="font-medium tracking-tight text-sm md:text-base">+1 (917) 672-8572 </span>
+                        </a> -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Bento -->
+            <div class="md:col-span-3 p-6 md:p-8 group/card relative overflow-hidden rounded-2xl border border-surface-100 bg-surface-50/30 backdrop-blur-3xl transition-all duration-300 dark:border-surface-800/50 dark:bg-surface-900/20" appScrollReveal delay="delay-100">
+                <div class="relative z-10 h-full flex flex-col">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary-500">
+                            <i class="icon-[hugeicons--blockchain-01] text-xl"></i>
+                        </div>
+                        <span class="font-black uppercase tracking-widest text-[10px] text-surface-400">Platform</span>
+                    </div>
+                    <ul class="space-y-1">
+                        <li><a href="https://docs.kyrazo.com" target="_blank" rel="noopener noreferrer" class="p-button p-button-text p-button-secondary">Documentation</a></li>
+                        <li><a href="https://docs.kyrazo.com/api-reference/introduction" target="_blank" rel="noopener noreferrer" class="p-button p-button-text p-button-secondary">API Reference</a></li>
+                        <li><p-button variant="text" severity="secondary" routerLink="/changelogs">Changelog</p-button></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Ecosystem Bento -->
+            <div class="md:col-span-3 p-6 md:p-8 group/card relative overflow-hidden rounded-2xl border border-surface-100 bg-surface-50/30 backdrop-blur-3xl transition-all duration-300 dark:border-surface-800/50 dark:bg-surface-900/20" appScrollReveal delay="delay-150">
+                <div class="relative z-10 h-full flex flex-col">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-9 h-9 rounded-xl bg-primary-500/10 flex items-center justify-center text-primary-500 dark:text-primary-400">
+                            <i class="icon-[hugeicons--bubble-chat-question] text-lg"></i>
+                        </div>
+                        <span class="font-black uppercase tracking-widest text-[10px] text-surface-400">Resources</span>
+                    </div>
+                    <ul class="space-y-1">
+                        <li><p-button variant="text" severity="secondary" routerLink="/blog">Blog</p-button></li>
+                        <li><a href="https://status.kyrazo.com" target="_blank" rel="noopener noreferrer" class="p-button p-button-text p-button-secondary">Network Status</a></li>
+                        <li><a href="mailto:support@kyrazo.com" class="p-button p-button-text p-button-secondary">Support</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Legal Bento -->
+            <div class="md:col-span-6 p-6 md:p-8 group/card relative overflow-hidden rounded-2xl border border-surface-100 bg-surface-50/30 backdrop-blur-3xl transition-all duration-300 dark:border-surface-800/50 dark:bg-surface-900/20" appScrollReveal delay="delay-200">
+                <div class="relative z-10 h-full flex flex-col">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-9 h-9 rounded-xl bg-primary-500/10 flex items-center justify-center text-primary-500 dark:text-primary-400">
+                            <i class="icon-[hugeicons--shield-01] text-lg"></i>
+                        </div>
+                        <span class="font-black uppercase tracking-widest text-[10px] text-surface-400">Privacy & Terms</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
+                        <p-button variant="text" severity="secondary" routerLink="/legal/privacy-policy">Privacy Policy</p-button>
+                        <p-button variant="text" severity="secondary" routerLink="/legal/terms-of-service">Terms of Service</p-button>
+                        <p-button variant="text" severity="secondary" routerLink="/legal/refund-policy">Refund Policy</p-button>
+                        <p-button variant="text" severity="secondary" routerLink="/legal/gdpr">GDPR Compliance</p-button>
+                        <p-button variant="text" severity="secondary" routerLink="/legal/dpa">Data Processing Agreement</p-button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats/Trust Bento -->
+            <!-- <div class="md:col-span-2 flex flex-col justify-center items-center text-center group/card relative overflow-hidden rounded-2xl border border-surface-100 bg-surface-50/30 backdrop-blur-3xl transition-all duration-300 dark:border-surface-800/50 dark:bg-surface-900/20 before:content-[''] before:absolute before:inset-0 before:opacity-0 before:transition-opacity before:duration-300 before:bg-linear-to-br before:from-white/10 before:to-transparent dark:before:from-white/5 hover:before:opacity-100 after:content-[''] after:absolute after:inset-0 after:opacity-0 after:transition-opacity after:duration-300 after:bg-[radial-gradient(circle_at_top_left,color-mix(in_srgb,var(--primary-500),transparent_98%),transparent)] hover:after:opacity-100" appScrollReveal delay="delay-400">
+                <div class="relative z-10 flex flex-col items-center">
+                    <span class="text-4xl font-black text-primary-500 mb-1">99.9%</span>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-surface-500">Uptime SLA</span>
+                </div>
+            </div> -->
+        </div>
+
+        <!-- Footer Bottom Section -->
+        <div class="flex flex-col md:flex-row justify-between items-center gap-8 pt-10 border-t border-surface-200/30 dark:border-surface-800/30">
+            <div class="flex flex-col gap-2 items-center md:items-start">
+                <p class="text-surface-500 font-medium text-sm">© 2026 Kyrazo LLC • All rights <span class="text-primary font-black font-sansation!">reserved</span>.</p>
+                <!-- <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-surface-100/50 dark:bg-surface-900/50 border border-surface-200/50 dark:border-surface-800/50">
+                    <div class="w-1.5 h-1.5 rounded-full bg-indigo-400 dark:bg-indigo-600"></div>
+                    <span class="text-[10px] font-black uppercase tracking-[.2em] text-surface-500">Secure Payments via <a href="https://stripe.com" target="_blank" class="text-indigo-500 text-shadow-indigo-500 font-black">Stripe</a></span>
+                </div> -->
+            </div>
+
+            <div class="flex items-center gap-6 text-surface-400 text-xs font-semibold uppercase tracking-widest">
+                <a href="https://status.kyrazo.com" target="_blank" class="hover:text-primary-500 transition-colors">Status</a>
+                <a [routerLink]="'/legal/gdpr'" class="hover:text-primary-500 transition-colors">GDPR</a>
+                <!-- <a href="/legal/privacy-policy" class="hover:text-primary-500 transition-colors">Security</a> -->
+                <a [routerLink]="'/legal/privacy-policy'" class="hover:text-primary-500 transition-colors">Privacy</a>
+            </div>
+        </div>
+    </div>
+</footer>

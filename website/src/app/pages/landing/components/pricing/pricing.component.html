@@ -1,0 +1,109 @@
+<section class="py-16 md:py-24 px-4 md:px-6 bg-surface-0 dark:bg-surface-950 relative overflow-hidden" id="pricing">
+    <div class="absolute top-0 inset-x-0 h-px bg-linear-to-r from-transparent via-surface-200 dark:via-surface-800 to-transparent"></div>
+
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-12 md:mb-16 max-w-2xl mx-auto px-4 md:px-0" appScrollReveal>
+            <h2 class="text-3xl md:text-6xl font-bold mb-6 leading-tight">
+                <span class="bg-linear-to-b from-black to-surface-600 bg-clip-text font-sansation! text-transparent">Flexible pricing that scales with <span class="text-primary-500 font-sansation!">you</span>.</span>
+            </h2>
+            <p class="text-base md:text-lg text-surface-600 dark:text-surface-300 mb-8">
+                Fair and transparent. Only pay for the performance you need.
+            </p>
+            <div class="flex flex-wrap justify-center items-center gap-4 mb-10">
+                <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-50 dark:bg-surface-900 border border-surface-200 dark:border-surface-800 shadow-xs">
+                    <i class="icon-[hugeicons--security-check] text-sm text-primary-500"></i>
+                    <span class="text-xs font-bold text-surface-700 dark:text-surface-300 uppercase tracking-wider">30-Day Money-Back Guarantee</span>
+                </div>
+                <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-50 dark:bg-surface-900 border border-surface-200 dark:border-surface-800 shadow-xs">
+                    <i class="icon-[hugeicons--finger-print] text-sm text-primary-500"></i>
+                    <span class="text-xs font-bold text-surface-700 dark:text-surface-300 uppercase tracking-wider">GDPR Ready</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 items-start">
+            @for (plan of plans(); track plan.name) {
+                <div
+                     appScrollReveal
+                     [delay]="'delay-' + ($index * 100 + 100)"
+                     [class]="'p-8 rounded-xl! border transition-all duration-300 relative ' + (plan.highlighted ? 'bg-surface-900 text-surface-0 border-surface-900 shadow-2xl scale-105 z-10' : 'bg-surface-0 dark:bg-surface-950! border-surface-200 dark:border-surface-900 hover:border-primary-500/50')">
+
+                    @if (plan.tag) {
+                        <div class="absolute -top-4 left-1/2 -translate-x-1/2">
+                            <p-tag [value]="plan.tag" severity="info" styleClass="rounded-xl! font-bold"></p-tag>
+                        </div>
+                    }
+
+                    <div class="flex items-baseline gap-1 mb-6">
+                        @if (plan.slug === 'custom') {
+                            <span class="text-4xl font-bold font-sansation!">Custom</span>
+                        } @else {
+                            <span class="text-base font-medium opacity-70 self-start mt-1">@if (plan.slug === 'enterprise') { from }</span>
+                            <span class="text-4xl font-bold font-sansation!">{{ formatPrice(plan.priceCentsMonthly) }}</span>
+                            <span class="opacity-70 text-sm">/month</span>
+                        }
+                    </div>
+
+                    <p-button
+                        [label]="plan.slug === 'enterprise' ? 'Contact Sales' : (plan.slug === 'free' ? 'Start Free' : 'Go ' + plan.name)"
+                        [outlined]="!plan.highlighted"
+                        [severity]="plan.highlighted ? 'primary' : 'secondary'"
+                        [ariaLabel]="'Select ' + plan.name + ' plan'"
+                        styleClass="w-full mb-8 font-bold! rounded-xl!">
+                    </p-button>
+
+                    <p class="text-sm opacity-70 mb-6 min-h-[48px]">{{ plan.description }}</p>
+
+                    <ul class="space-y-4">
+                        <li class="flex items-center gap-3 text-sm opacity-80">
+                            <i class="pi pi-check text-green-500" aria-hidden="true"></i>
+                            <span>
+                                @if (plan.limits.eventsPerMonth === 'Custom') {
+                                    Custom events / mo
+                                } @else {
+                                    {{ plan.limits.eventsPerMonth | number }} events / mo
+                                }
+                            </span>
+                        </li>
+                        <li class="flex items-center gap-3 text-sm opacity-80">
+                            <i class="pi pi-check text-green-500" aria-hidden="true"></i>
+                            <span>
+                                @if (plan.limits.eventsPerSecond === 'Custom') {
+                                    Custom events / sec
+                                } @else {
+                                    {{ plan.limits.eventsPerSecond }} events / sec
+                                }
+                            </span>
+                        </li>
+                        <li class="flex items-center gap-3 text-sm opacity-80">
+                            <i class="pi pi-check text-green-500" aria-hidden="true"></i>
+                            <span>
+                                @if (plan.features.workers === 0 || plan.features.workers === 'shared') {
+                                    Shared Workers
+                                } @else if (plan.features.workers === 'Custom') {
+                                    Custom Workers
+                                } @else {
+                                    {{ plan.features.workers }} Dedicated Workers
+                                }
+                            </span>
+                        </li>
+                        <li class="flex items-center gap-3 text-sm opacity-80">
+                            <i class="pi pi-check text-green-500" aria-hidden="true"></i>
+                            <span>
+                                @if (plan.features.retentionDays === 'Custom') {
+                                    Custom retention
+                                } @else {
+                                    {{ plan.features.retentionDays }} Days retention
+                                }
+                            </span>
+                        </li>
+                        <li class="flex items-center gap-3 text-sm opacity-80">
+                            <i class="pi pi-check text-green-500" aria-hidden="true"></i>
+                            <span>{{ plan.features.support }}</span>
+                        </li>
+                    </ul>
+                </div>
+            }
+        </div>
+    </div>
+</section>

@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=Dosis:wght@200..800&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Caveat:wght@400..700&family=Quicksand:wght@300..700&display=swap');
+@import "tailwindcss";
+@import "tailwindcss-primeui";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-dosis: "Dosis", sans-serif;
+  --font-nunito: "Nunito", sans-serif;
+  --font-sansation: "Sansation", sans-serif;
+  --font-caveat: "Caveat", sans-serif;
+  --font-quicksand: "Quicksand", sans-serif;
+  --animate-float-slow: float-slow 20s ease-in-out infinite;
+  --animate-pulse-soft: pulse-soft 10s ease-in-out infinite;
+  --animate-gradient-shimmer: gradient-shimmer 8s linear infinite;
+
+  @keyframes float-slow {
+    0%, 100% { transform: translate(0, 0); }
+    33% { transform: translate(30px, -50px); }
+    66% { transform: translate(-20px, 20px); }
+  }
+
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.2); }
+  }
+
+  --animate-bounce-slow: bounce-slow 3s infinite;
+  --animate-scroll: scroll 40s linear infinite;
+
+  @keyframes bounce-slow {
+    0%, 100% { transform: translateY(-5%); animation-timing-function: cubic-bezier(0.8, 0, 1, 1); }
+    50% { transform: translateY(0); animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }
+  }
+}
+
+@custom-variant dark (&:where(.p-dark, .p-dark *));
+
+
+@layer base {
+  html, :host {
+    font-family: "Quicksand", "sans-serif" !important;
+  }
+
+}
+.p-datatable-mask {
+  @apply backdrop-blur-sm! bg-surface-0/20! dark:bg-surface-900/20!;
+}
+
+.p-datatable-loading-icon {
+  @apply text-primary!;
+}

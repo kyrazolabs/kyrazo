@@ -1,0 +1,187 @@
+@use './tailwind.css';
+@use "primeicons/primeicons.css";
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+    @apply bg-surface-0 text-surface-900 dark:bg-surface-950/80 dark:text-surface-0 antialiased;
+}
+@layer components {
+  .p-popover::before,
+  .p-popover::after {
+    content: none !important;
+  }
+  .p-button, .click-effect, .p-select-option, .p-multiselect-option, .p-autocomplete-chip-item, .p-toggleswitch, .p-checkbox {
+        @apply transition-all! duration-300! ease-in-out!;
+
+        @media (prefers-reduced-motion: no-preference) {
+            &:hover {
+                transform: translateY(0px);
+            }
+
+            &:active {
+                transform: translateY(2px) scale(0.98);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            &:active {
+                transform: none;
+            }
+        }
+    }
+
+}
+@plugin "@iconify/tailwind4";
+
+@layer components {
+  /* Select & MultiSelect Alignment */
+  .p-select-sm .p-select-label {
+    --p-select-sm-font-size: 1rem !important;
+  }
+  .p-multiselect-sm .p-multiselect-label {
+    --p-multiselect-sm-font-size: 1rem !important;
+  }
+
+  :root, :host {
+      /* Density */
+      --p-inputtext-padding-y: 0.375rem !important; /* 6px */
+      --p-inputtext-padding-x: 0.625rem !important; /* 10px */
+
+      --p-button-padding-y: 0.375rem !important;
+      --p-button-padding-x: 0.75rem !important;
+
+      --p-card-content-padding: 1rem !important;
+      --p-panel-content-padding: 1rem !important;
+
+      --p-datatable-header-padding: 0.5rem 1rem !important;
+      --p-datatable-body-cell-padding: 0.5rem 1rem !important;
+
+      --p-menu-item-content-padding: 0.375rem 0.5rem !important;
+
+      --p-inputtext-border-radius: 12px !important;
+      --p-button-border-radius: 12px !important;
+      --p-card-border-radius: 16px !important;
+      --p-card-body-padding: 4px !important;
+
+      /* Font size adjustments if needed */
+      --p-content-detailed-line-height: 1.2 !important;
+
+      --p-tabs-tab-border-width: 0 0 1px 0 !important;
+      --p-tabs-tablist-border-width: 0 0 2px 0 !important;
+
+      --tooltip-bg: var(--p-surface-900);
+        --tooltip-text: var(--p-surface-0);
+        --tooltip-border: var(--p-surface-700);
+
+    }
+    .p-dark{
+      --p-select-border-color: var(--p-surface-800) !important;
+      --p-inputtext-border-color: var(--p-surface-800) !important;
+      --p-textarea-border-color: var(--p-surface-800) !important;
+      --p-inputtext-hover-border-color: var(--p-surface-700) !important;
+      --p-textarea-hover-border-color: var(--p-surface-700) !important;
+
+      --p-tabs-tabpanel-background: var(--p-surface-950) !important;
+      --p-tabs-tablist-background: var(--p-surface-950) !important;
+      --p-tabs-tablist-border-color: var(--p-surface-900) !important;
+      --p-tabs-tab-border-color: var(--p-surface-900) !important;
+
+      --p-dialog-background: var(--p-surface-950) !important;
+      --p-dialog-border-color: var(--p-surface-800) !important;
+
+      --p-datatable-header-cell-background: var(--p-surface-950) !important;
+      --p-datatable-header-cell-hover-background: var(--p-surface-950) !important;
+      --p-datatable-header-cell-hover-color: var(--p-surface-950) !important;
+      --p-datatable-row-background: var(--p-surface-950) !important;
+      --p-datatable-row-hover-background: var(--p-surface-900) !important;
+      --p-paginator-background: var(--p-surface-950) !important;
+
+      --tooltip-bg: var(--p-surface-900);
+        --tooltip-text: var(--p-surface-100);
+        --tooltip-border: var(--p-surface-700);
+  }
+  .p-tooltip {
+        .p-tooltip-text {
+            background-color: var(--tooltip-bg) !important;
+            color: var(--tooltip-text) !important;
+            border: 1px solid var(--tooltip-border) !important;
+
+            @apply text-xs/3 px-3 py-1! rounded-xl! shadow-xl;
+        }
+
+        .p-tooltip-arrow {
+            display: none !important;
+        }
+
+        &.p-tooltip-right {
+            @apply ml-1.5;
+        }
+
+        &.p-tooltip-left {
+            @apply mr-1.5;
+        }
+
+        &.p-tooltip-top {
+            @apply mb-1.5;
+        }
+
+        &.p-tooltip-bottom {
+            @apply mt-1.5;
+        }
+    }
+
+}
+
+// Global Animations
+
+// Fade In Up
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  opacity: 0; // Start invisible
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+// Fade In (Simple)
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.animate-fade-in {
+    opacity: 0;
+    animation: fadeIn 1s ease-out forwards;
+    will-change: opacity;
+}
+
+
+// Stagger delays
+.delay-100 { animation-delay: 50ms; }
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+.delay-600 { animation-delay: 600ms; }
+.delay-700 { animation-delay: 700ms; }
+.delay-800 { animation-delay: 800ms; }
+.delay-900 { animation-delay: 900ms; }
+.delay-1000 { animation-delay: 1000ms; }
+
+// Utilities
+.opacity-0 {
+    opacity: 0;
+}

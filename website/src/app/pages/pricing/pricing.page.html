@@ -1,0 +1,309 @@
+<section class="relative pt-32 overflow-hidden">
+    <!-- Hero Background gradient -->
+    <div
+        class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-(--breakpoint-2xl) h-full pointer-events-none -z-10"
+    >
+        <div
+            class="absolute top-0 left-1/4 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl animate-pulse"
+        ></div>
+        <div
+            class="absolute bottom-0 right-1/4 w-96 h-96 bg-primary-500/5 rounded-full blur-3xl animate-pulse delay-1000"
+        ></div>
+    </div>
+
+    <div class="max-w-[1500px] mx-auto px-6">
+        <div class="text-center mb-16 max-w-3xl mx-auto" appScrollReveal>
+            <h1
+                class="text-4xl md:text-6xl font-bold mb-6 text-surface-900 dark:text-surface-0 tracking-tight leading-tight"
+            >
+                Transparent Pricing, <br />
+                <span class="text-primary-500 font-sansation!"
+                    >Unmatched Reliability.</span
+                >
+            </h1>
+            <p
+                class="text-lg md:text-xl text-surface-600 dark:text-surface-400 mb-10"
+            >
+                Choose the plan that fits your scale. Start for free and upgrade
+                as you grow. No hidden fees, just pure performance.
+            </p>
+
+            <!-- Billing Toggle Hidden as only Monthly is supported -->
+        </div>
+
+        <!-- Pricing Cards Section -->
+        <div
+            class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 mb-24 relative z-10"
+            appScrollReveal
+            delay="delay-300"
+        >
+            @for (plan of plans(); track plan.slug) {
+            <app-pricing-card
+                [plan]="plan"
+                [isYearly]="false"
+                [delay]="'delay-' + ($index * 100 + 100)"
+            >
+            </app-pricing-card>
+            }
+        </div>
+
+        <!-- Social Proof / Trusted By -->
+        <!-- <div class="mb-32 text-center" appScrollReveal>
+            <p class="text-xs font-bold uppercase tracking-[0.3em] text-surface-400 dark:text-surface-500 mb-10">Trusted by modern engineering teams</p>
+            <div class="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
+                <span class="text-2xl font-black italic">VELOCITY</span>
+                <span class="text-2xl font-bold tracking-tighter">CLOUD.io</span>
+                <span class="text-2xl font-black">NEXUS</span>
+                <span class="text-2xl font-serif font-bold">Lumina</span>
+                <span class="text-2xl font-mono font-bold">PROTO_</span>
+            </div>
+        </div> -->
+
+        <!-- Value Proposition Wide Architecture Card -->
+        <div
+            class="relative bg-surface-950 dark:bg-surface-900 rounded-3xl p-10 md:p-16 mb-32 border border-surface-200 dark:border-surface-800 shadow-2xl shadow-primary-500/5 overflow-hidden ring-1 ring-white/10"
+            appScrollReveal
+        >
+            <!-- Background Matrix Decor -->
+            <div
+                class="absolute inset-0 opacity-5 pointer-events-none"
+                style="
+                    background-image: radial-gradient(
+                        white 1px,
+                        transparent 1px
+                    );
+                    background-size: 40px 40px;
+                "
+            ></div>
+            <div
+                class="absolute top-0 right-0 w-[400px] h-[400px] bg-primary-500/15 blur-[120px] rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none"
+            ></div>
+            <div
+                class="absolute bottom-0 left-0 w-[300px] h-[300px] bg-blue-500/10 blur-[100px] rounded-full -translate-x-1/2 translate-y-1/2 pointer-events-none"
+            ></div>
+
+            <div
+                class="relative z-10 grid xl:grid-cols-2 gap-12 items-center"
+                appScrollReveal
+            >
+                <div>
+                    <div class="flex items-center gap-3 mb-6">
+                        <span
+                            class="text-primary-400 font-bold uppercase tracking-widest text-[10px] px-3 py-1 bg-primary-500/10 rounded-full border border-primary-500/20"
+                        >
+                            Enterprise Infrastructure
+                        </span>
+                    </div>
+                    <h2
+                        class="text-3xl md:text-5xl font-black text-white tracking-tighter leading-[1.1] mb-6"
+                    >
+                        Built for Performance, <br />
+                        <span
+                            class="text-white font-black font-sansation! text-shadow-green-500 text-shadow-md!"
+                            >Secured for Scale.</span
+                        >
+                    </h2>
+                    <p
+                        class="text-lg text-surface-400 font-medium leading-relaxed max-w-xl"
+                    >
+                        Kyrazo isn't just a relay. It's a global event mesh
+                        designed to handle mission-critical webhooks with
+                        absolute isolation and zero-latency overhead.
+                    </p>
+                </div>
+
+                <!-- Matrix / Metrics Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div
+                        class="py-6 px-8 rounded-xl bg-surface-900/40 border border-surface-800 backdrop-blur-md group hover:border-primary-500/30 transition-all duration-500 relative overflow-hidden"
+                        appScrollReveal
+                        delay="delay-100"
+                    >
+                        <div
+                            class="text-4xl -ml-2 md:text-4xl font-black text-white tracking-tighter mb-2 font-sansation! decoration-primary-500/20 underline decoration-10 underline-offset-[-12px] decoration-skip-ink-none text-shadow-primary-500 text-shadow-md!"
+                        >
+                            SUB 1ms
+                        </div>
+                        <h4
+                            class="text-sm font-black text-primary-400 uppercase tracking-widest mb-2"
+                        >
+                            Global Latency
+                        </h4>
+                        <p
+                            class="text-sm text-surface-400 font-medium leading-relaxed"
+                        >
+                            Edge-optimized mesh ensures instant data relay
+                            worldwide.
+                        </p>
+                        <!-- Glow -->
+                        <div
+                            class="absolute -bottom-10 -right-10 w-24 h-24 bg-primary-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"
+                        ></div>
+                    </div>
+
+                    <div
+                        class="py-6 px-8 rounded-xl bg-surface-900/40 border border-surface-800 backdrop-blur-md group hover:border-blue-500/30 transition-all duration-500 relative overflow-hidden"
+                        appScrollReveal
+                        delay="delay-200"
+                    >
+                        <div
+                            class="text-4xl -ml-2 md:text-4xl font-black text-white tracking-tighter mb-2 font-sansation! decoration-blue-500/20 underline decoration-10 underline-offset-[-12px] decoration-skip-ink-none text-shadow-blue-500 text-shadow-md!"
+                        >
+                            READY
+                        </div>
+                        <h4
+                            class="text-sm font-black text-blue-400 uppercase tracking-widest mb-2"
+                        >
+                            Privacy Focus
+                        </h4>
+                        <p
+                            class="text-sm text-surface-400 font-medium leading-relaxed"
+                        >
+                            GDPR-aligned infrastructure with hardened isolation
+                            layers.
+                        </p>
+                        <!-- Glow -->
+                        <div
+                            class="absolute -bottom-10 -right-10 w-24 h-24 bg-blue-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"
+                        ></div>
+                    </div>
+
+                    <div
+                        class="py-6 px-8 rounded-xl bg-surface-900/40 border border-surface-800 backdrop-blur-md group hover:border-green-500/30 transition-all duration-500 relative overflow-hidden"
+                        appScrollReveal
+                        delay="delay-300"
+                    >
+                        <div
+                            class="text-4xl -ml-2 md:text-4xl font-black text-white tracking-tighter mb-2 font-sansation! decoration-green-500/20 underline decoration-10 underline-offset-[-12px] decoration-skip-ink-none text-shadow-green-500 text-shadow-md!"
+                        >
+                            ∞ SCALE
+                        </div>
+                        <h4
+                            class="text-sm font-black text-green-400 uppercase tracking-widest mb-2"
+                        >
+                            Burst Capacity
+                        </h4>
+                        <p
+                            class="text-sm text-surface-400 font-medium leading-relaxed"
+                        >
+                            Dedicated high-performance infrastructure handles
+                            millions of concurrent events without throttling.
+                        </p>
+                        <!-- Glow -->
+                        <div
+                            class="absolute -bottom-10 -right-10 w-24 h-24 bg-green-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"
+                        ></div>
+                    </div>
+
+                    <div
+                        class="py-6 px-8 rounded-xl bg-surface-900/40 border border-surface-800 backdrop-blur-md group hover:border-orange-500/30 transition-all duration-500 relative overflow-hidden"
+                        appScrollReveal
+                        delay="delay-400"
+                    >
+                        <div
+                            class="text-4xl -ml-2 md:text-4xl font-black text-white tracking-tighter mb-2 font-sansation! decoration-orange-500/20 underline decoration-10 underline-offset-[-12px] decoration-skip-ink-none text-shadow-orange-500 text-shadow-md!"
+                        >
+                            99.99%
+                        </div>
+                        <h4
+                            class="text-sm font-black text-orange-400 uppercase tracking-widest mb-2"
+                        >
+                            Delivery SLA
+                        </h4>
+                        <p
+                            class="text-sm text-surface-400 font-medium leading-relaxed"
+                        >
+                            Redundant multi-region mesh for mission-critical
+                            apps.
+                        </p>
+                        <!-- Glow -->
+                        <div
+                            class="absolute -bottom-10 -right-10 w-24 h-24 bg-orange-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"
+                        ></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk-Free Engineering Section -->
+        <div class="mb-32" appScrollReveal>
+            <div class="text-center mb-16">
+                <span class="text-primary-500 font-bold uppercase tracking-widest text-[10px] mb-4 block">Risk-Free Engineering</span>
+                <h2 class="text-3xl md:text-5xl font-black text-surface-900 dark:text-surface-0 tracking-tighter leading-tight mb-6">
+                    Peace of Mind by <span class="text-primary-500 font-sansation!">Design</span>
+                </h2>
+                <p class="text-lg text-surface-600 dark:text-surface-400 max-w-2xl mx-auto">
+                    We frame our guarantee as a commitment to excellence. If Kyrazo doesn't solve your webhook infrastructure problems within 30 days, we don't deserve your money. See our <a routerLink="/legal/refund-policy" class="text-primary-500 hover:underline">Refund Policy</a>.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                <!-- Step 1 -->
+                <div class="p-8 rounded-2xl bg-surface-50 dark:bg-surface-900/50 border border-surface-200 dark:border-surface-800 relative group overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-5 text-4xl font-black group-hover:opacity-10 transition-opacity">01</div>
+                    <div class="w-12 h-12 rounded-2xl bg-primary-500/10 flex items-center justify-center mb-6">
+                        <i class="icon-[hugeicons--setup-01] text-2xl text-primary-500"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-surface-900 dark:text-surface-0 mb-3">Choose Your Plan</h3>
+                    <p class="text-surface-600 dark:text-surface-400 text-sm leading-relaxed">Select the tier that fits your production workload. Start for free or scale with Pro.</p>
+                </div>
+                <!-- Step 2 -->
+                <div class="p-8 rounded-2xl bg-surface-50 dark:bg-surface-900/50 border border-surface-200 dark:border-surface-800 relative group overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-5 text-4xl font-black group-hover:opacity-10 transition-opacity">02</div>
+                    <div class="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center mb-6">
+                        <i class="icon-[hugeicons--chart-line-data-01] text-2xl text-blue-500"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-surface-900 dark:text-surface-0 mb-3">Experience Stability</h3>
+                    <p class="text-surface-600 dark:text-surface-400 text-sm leading-relaxed">Deploy your critical webhooks. Monitor the sub-1ms latency and dedicated isolation.</p>
+                </div>
+                <!-- Step 3 -->
+                <div class="p-8 rounded-2xl bg-surface-50 dark:bg-surface-900/50 border border-surface-200 dark:border-surface-800 relative group overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-5 text-4xl font-black group-hover:opacity-10 transition-opacity">03</div>
+                    <div class="w-12 h-12 rounded-2xl bg-green-500/10 flex items-center justify-center mb-6">
+                        <i class="icon-[hugeicons--sparkles] text-2xl text-green-500"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-surface-900 dark:text-surface-0 mb-3">Total Satisfaction</h3>
+                    <p class="text-surface-600 dark:text-surface-400 text-sm leading-relaxed">If Kyrazo isn't the right fit within 30 days, we'll refund every cent. No questions asked.</p>
+                </div>
+            </div>
+
+            <!-- Founder's Promise -->
+            <div class="relative overflow-hidden rounded-2xl border border-surface-200 dark:border-surface-800 bg-linear-to-br from-surface-50 to-surface-100 dark:from-surface-900 dark:to-surface-950 p-8 md:p-12 max-w-5xl mx-auto shadow-md">
+                <div class="flex flex-col md:flex-row gap-8 items-center relative z-10">
+                    <div class="grow">
+                        <div class="flex items-center gap-2 mb-4">
+                            <i class="icon-[hugeicons--quote-up] text-primary-500 text-2xl"></i>
+                            <span class="text-sm font-bold uppercase tracking-widest text-primary-500">The Founder's Promise</span>
+                        </div>
+                        <blockquote class="text-xl md:text-2xl text-surface-900 dark:text-surface-0 font-medium font-sansation! leading-relaxed mb-6 italic">
+                            "I'm so confident in our dedicated worker architecture that I'll personally ensure you get a full refund if Kyrazo isn't the right fit in your first month."
+                        </blockquote>
+                        <div class="flex items-center gap-4 text-left">
+                                <p-avatar image="/founder.webp" size="large" shape="circle" ariaLabel="Abdullah - Founder of Kyrazo" class="w-14 h-14" />
+                            <div>
+                                <span class="font-bold text-lg text-surface-900 dark:text-surface-0 block">Abdullah</span>
+                                <span class="text-sm text-surface-500 dark:text-surface-400">Founder, Kyrazo</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Background Decoration -->
+                <div class="absolute top-0 right-0 p-12 opacity-5 text-primary-500 -mr-12 -mt-12 pointer-events-none">
+                    <i class="icon-[hugeicons--shield-spark] text-[200px]"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Comparison Section -->
+
+        <app-pricing-comparison
+            [plans]="plans()"
+            [isYearly]="false"
+        ></app-pricing-comparison>
+
+        <!-- Global CTA -->
+    </div>
+    <div class="mt-24 md:mt-32">
+    </div>
+    <app-landing-cta></app-landing-cta>
+</section>
