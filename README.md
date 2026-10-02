@@ -16,7 +16,7 @@ The platform is built and owned by [Kyrazo LLC](https://kyrazo.com). This reposi
 
 `backend/` is organized as `api/` (dashboard, ingest, and integration), `services/` (load balancer, orchestrator, ingestor, mail, crons), `runtime/` (worker and deliver), and `shared/`. MongoDB holds accounts and configuration. ClickHouse holds event and delivery history. NATS moves work between services. Dragonfly is the cache and queue.
 
-Each directory has its own README for how that part is built and run.
+Every source folder under those five directories has its own `README.md` and `CONTRIBUTING.md`. The README says what that folder is. The contributing guide repeats the permission rule and names the command to run for that package.
 
 ## License
 
