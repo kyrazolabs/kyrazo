@@ -29,6 +29,7 @@ mock.module('@kyrazo/shared', () => ({
 mock.module('@/consumers/nats/nats.listener', () => ({
     WorkerConsumer: class {
         start = mock(() => Promise.resolve());
+        consume = mock(() => Promise.resolve());
     },
 }));
 mock.module('@/consumers/batch/dispatch.producer', () => ({

@@ -2,13 +2,16 @@ import {
     Component,
     ElementRef,
     forwardRef,
+    inject,
     Input,
     OnChanges,
     OnDestroy,
     AfterViewInit,
+    PLATFORM_ID,
     SimpleChanges,
     ViewChild,
 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { EditorState, Extension, Compartment, Prec } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
@@ -51,6 +54,11 @@ const nebulaTheme = EditorView.theme({
     ".cm-panels.cm-panels-bottom": { borderTop: "1px solid rgba(255,255,255,0.06)" },
     ".cm-tooltip": { backgroundColor: "#1a1a2e", border: "1px solid rgba(139,92,246,0.3)" },
     ".cm-tooltip-autocomplete ul li[aria-selected]": { backgroundColor: "rgba(139,92,246,0.2)" },
+    ".cm-scroller": {
+        overflow: "auto",
+        scrollbarWidth: "thin",
+        scrollbarColor: "rgba(99, 102, 241, 0.5) transparent",
+    },
 }, {dark: true});
 
 const nebulaHighlightStyle = HighlightStyle.define([
@@ -97,7 +105,24 @@ const nebulaHighlightStyle = HighlightStyle.define([
     {tag: [t.special(t.variableName)], color: "#e879f9"},
 ]);
 
-export const nebulaThemeBundle = [nebulaTheme, syntaxHighlighting(nebulaHighlightStyle)];
+const nebulaScrollbarStyle = EditorView.baseTheme({
+    ".cm-scroller::-webkit-scrollbar": {
+        width: "6px",
+        height: "6px",
+    },
+    ".cm-scroller::-webkit-scrollbar-track": {
+        background: "transparent",
+    },
+    ".cm-scroller::-webkit-scrollbar-thumb": {
+        background: "rgba(99, 102, 241, 0.5)",
+        borderRadius: "3px",
+    },
+    ".cm-scroller::-webkit-scrollbar-thumb:hover": {
+        background: "rgba(99, 102, 241, 0.8)",
+    },
+});
+
+export const nebulaThemeBundle = [nebulaTheme, nebulaScrollbarStyle, syntaxHighlighting(nebulaHighlightStyle)];
 
 import {
     autocompletion,
@@ -222,6 +247,7 @@ export class CodeEditorComponent
     @Input() readonly = false;
     @Input() showLineNumbers = true;
 
+    private readonly platformId = inject(PLATFORM_ID);
     private view: EditorView | null = null;
     private value = '';
     private formDisabled = false;
@@ -236,6 +262,7 @@ export class CodeEditorComponent
     private lineNumbersCompartment = new Compartment();
 
     ngAfterViewInit(): void {
+        if (!isPlatformBrowser(this.platformId)) return;
         this.initEditor();
     }
 

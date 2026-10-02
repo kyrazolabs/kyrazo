@@ -1,3 +1,5 @@
+import { ITransform } from './transform.types';
+
 // Namespace Interface
 export interface INamespace {
     id: string;
@@ -10,6 +12,14 @@ export interface INamespace {
     createdAt: Date;
     updatedAt: Date;
     whiteLabelHeaders?: string;
+    transformer?: ITransform;
+    isManagedTransform?: boolean;
+}
+
+export interface NamespaceTransformerData {
+    name?: string;
+    description?: string;
+    code: string;
 }
 
 // Namespace Request Types
@@ -17,12 +27,14 @@ export interface CreateNamespaceRequest {
     name: string;
     description?: string;
     whiteLabelHeaders?: string;
+    transformer?: NamespaceTransformerData;
 }
 
 export interface UpdateNamespaceRequest {
     name?: string;
     description?: string;
     whiteLabelHeaders?: string;
+    transformer?: NamespaceTransformerData | null;
 }
 
 // Namespace Response Types

@@ -51,9 +51,14 @@ import {
 import { IngestEvent } from '@core/services/delivery.service';
 import { SourceService } from '@core/services/source.service';
 import { DeliveryService } from '@core/services/delivery.service';
+import { IS3Bucket } from '@models/s3.types';
+import { IASQSQueue } from '@models/asqs.types';
+import { ITransform } from '@models/transform.types';
 import { environment } from 'environments/environment';
 import { SentryService } from '@core/3rd-party/sentry';
 import { CopyIdComponent } from '@shared/components/copy-id/copy-id.component';
+import { CodeEditorComponent } from '@shared/components/code-editor/code-editor.component';
+import { FloatLabelModule } from 'primeng/floatlabel';
 
 interface DeliveryStats {
     total: number;
@@ -86,6 +91,8 @@ interface DeliveryStats {
         ToastModule,
         DialogModule,
         CopyIdComponent,
+        FloatLabelModule,
+        CodeEditorComponent,
     ],
     providers: [MessageService],
     templateUrl: './source.page.html',
@@ -112,6 +119,9 @@ export class SourcePage implements OnInit, AfterViewInit {
     // Signals for reactive data
     source = signal<ISource | null>(null);
     endpoints = signal<IEndpoint[]>([]);
+    s3Buckets = signal<IS3Bucket[]>([]);
+    asqsQueues = signal<IASQSQueue[]>([]);
+    transformer = signal<ITransform | null>(null);
     ingestEvents = signal<IngestEvent[]>([]);
     ingestStats = signal<DeliveryStats>({
         total: 0,
@@ -164,11 +174,28 @@ export class SourcePage implements OnInit, AfterViewInit {
         // Load source details
         this.sourceService.get(sourceId).subscribe({
             next: (response) => {
-                this.source.set(response.data as any);
-                this.endpoints.set(response.data.endpoints || []);
+                const sourceData = response.data as ISource;
+                this.source.set(sourceData);
 
-                if (response.data.ingressUrl) {
-                    this.ingressUrl.set(response.data.ingressUrl);
+                // Extract populated destinations from V2 destination object
+                if (sourceData.destination) {
+                    this.endpoints.set((sourceData.destination.endpoints as IEndpoint[]) || []);
+                    this.s3Buckets.set((sourceData.destination.s3bucket as IS3Bucket[]) || []);
+                    this.asqsQueues.set((sourceData.destination.asqs as IASQSQueue[]) || []);
+                } else if (sourceData.endpoints) {
+                    // Fallback for legacy data
+                    this.endpoints.set(sourceData.endpoints as IEndpoint[]);
+                }
+
+                // Extract populated transformer
+                if (sourceData.transformer && typeof sourceData.transformer !== 'string') {
+                    this.transformer.set(sourceData.transformer as ITransform);
+                } else {
+                    this.transformer.set(null);
+                }
+
+                if (sourceData.ingressUrl) {
+                    this.ingressUrl.set(sourceData.ingressUrl);
                 }
 
                 if (this.hasForwarding()) {
@@ -204,7 +231,7 @@ export class SourcePage implements OnInit, AfterViewInit {
                 : SourceStatus.ACTIVE;
         this.sourceService.update(source.id, { status: newStatus }).subscribe({
             next: (updatedSource) => {
-                this.source.set(updatedSource.data.source);
+                this.source.set(updatedSource.data);
                 this.mes.add({
                     severity: 'success',
                     summary: 'Success',
@@ -517,7 +544,7 @@ export class SourcePage implements OnInit, AfterViewInit {
         if (currentEndpoints.includes(endpointId)) return;
 
         const newEndpoints = [...currentEndpoints, endpointId];
-        this.updateSourceEndpoints(source.id, newEndpoints);
+        this.updateSourceDestinations({ endpoints: newEndpoints });
     }
 
     unlinkEndpoint(endpointId: string) {
@@ -527,21 +554,53 @@ export class SourcePage implements OnInit, AfterViewInit {
         const newEndpoints = this.endpoints()
             .map((e) => e.id)
             .filter((id) => id !== endpointId);
-        this.updateSourceEndpoints(source.id, newEndpoints);
+        this.updateSourceDestinations({ endpoints: newEndpoints });
     }
 
-    private updateSourceEndpoints(sourceId: string, endpointIds: string[]) {
+    unlinkS3Bucket(bucketId: string) {
+        const source = this.source();
+        if (!source) return;
+
+        const newBuckets = this.s3Buckets()
+            .map((b) => b.id)
+            .filter((id) => id !== bucketId);
+        this.updateSourceDestinations({ s3bucket: newBuckets });
+    }
+
+    unlinkASQSQueue(queueId: string) {
+        const source = this.source();
+        if (!source) return;
+
+        const newQueues = this.asqsQueues()
+            .map((q) => q.id)
+            .filter((id) => id !== queueId);
+        this.updateSourceDestinations({ asqs: newQueues });
+    }
+
+    private updateSourceDestinations(destinations: Partial<ISource['destination']>) {
+        const source = this.source();
+        if (!source) return;
+
         this.loader.show();
+
+        // Prepare full destination payload
+        const currentPayload = {
+            endpoints: this.endpoints().map((e) => e.id),
+            s3bucket: this.s3Buckets().map((b) => b.id),
+            asqs: this.asqsQueues().map((q) => q.id),
+            ...destinations,
+        };
+
         this.sourceService
-            .update(sourceId, { endpoints: endpointIds })
+            .update(source.id, { destination: currentPayload })
             .subscribe({
                 next: () => {
                     this.mes.add({
                         severity: 'success',
                         summary: 'Success',
-                        detail: 'Source endpoints updated',
+                        detail: 'Source destinations updated',
                     });
-                    this.loadSourceData(sourceId);
+                    this.loadSourceData(source.id);
                     this.loader.hide();
                 },
                 error: (err) => {
@@ -549,7 +608,7 @@ export class SourcePage implements OnInit, AfterViewInit {
                     this.mes.add({
                         severity: 'error',
                         summary: 'Error',
-                        detail: 'Failed to update endpoints',
+                        detail: 'Failed to update destinations',
                     });
                     this.loader.hide();
                 },

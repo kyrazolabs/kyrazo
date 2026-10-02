@@ -43,7 +43,7 @@
                     placeholder="e.g., My Web App, E-commerce API, Mobile App"
                     class="w-full"
                     [class.ng-invalid]="namespaceForm.get('name')?.invalid && namespaceForm.get('name')?.touched"
-                />
+                 pSize="small" />
                 @if (namespaceForm.get('name')?.invalid && namespaceForm.get('name')?.touched) {
                     <small
                         class="p-error block"
@@ -63,7 +63,7 @@
                     formControlName="description"
                     placeholder="Brief description of your namespace..."
                     class="w-full"
-                />
+                 pSize="small" />
             </div>
 
             <div appScrollReveal delay="delay-450" class="space-y-2 text-left">
@@ -86,7 +86,7 @@
                     [readonly]="!hasWhiteLabelFeature"
                     [disabled]="!hasWhiteLabelFeature"
                     class="w-full"
-                />
+                 pSize="small" />
                 <p class="text-[11px] opacity-60">
                     {{ hasWhiteLabelFeature ? 'Custom prefix for outbound webhook headers.' : 'Standard "X-Webhook" prefix will be used.' }}
                 </p>
@@ -101,7 +101,7 @@
                 (click)="onCreate()"
                 class="flex-1"
                 fluid="true"
-                styleClass="rounded-xl! fluid!"
+                styleClass="rounded-xl! fluid! shadow-md shadow-primary/50 dark:shadow-primary/20"
                 [disabled]="namespaceForm.invalid || isCreating"
                 [loading]="isCreating"
             />

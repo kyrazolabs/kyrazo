@@ -1,6 +1,8 @@
 # Contributing to Kyrazo JavaScript SDK
 
-Welcome! This document provides an overview of the architecture, project structure, and guidelines for contributing to the Kyrazo JavaScript SDK.
+This SDK is part of the private Kyrazo repository, owned by Kyrazo LLC. Do not change it, and do not use it for a commercial or a non-commercial purpose, unless Kyrazo LLC has given you written permission. The repository [license](../../LICENSE) and [contributing guide](../../CONTRIBUTING.md) apply. Write to [legal@kyrazo.com](mailto:legal@kyrazo.com). A pull request is not permission.
+
+The notes below describe the architecture of the JavaScript SDK for people who already have that permission.
 
 ## Architecture
 
@@ -83,4 +85,4 @@ npm run test:coverage
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the MIT License.
+Code in this folder is covered by the repository [LICENSE](../../LICENSE). A contribution is not licensed to you under MIT or any other open-source license. Commercial use and non-commercial use both require prior written permission from Kyrazo LLC.

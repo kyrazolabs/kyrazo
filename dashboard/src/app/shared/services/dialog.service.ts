@@ -80,6 +80,20 @@ export class DialogService {
     }>({ visible: false, currentAvatar: null });
     avatarDialogState$ = this.avatarDialogStateSubject.asObservable();
 
+    // S3 Dialog State
+    private s3DialogStateSubject = new BehaviorSubject<{
+        visible: boolean;
+        s3Id: string | null;
+    }>({ visible: false, s3Id: null });
+    s3DialogState$ = this.s3DialogStateSubject.asObservable();
+
+    // ASQS Dialog State
+    private asqsDialogStateSubject = new BehaviorSubject<{
+        visible: boolean;
+        asqsId: string | null;
+    }>({ visible: false, asqsId: null });
+    asqsDialogState$ = this.asqsDialogStateSubject.asObservable();
+
 
     // Event Sources
     private sourceSavedSource = new Subject<any>();
@@ -105,6 +119,12 @@ export class DialogService {
 
     private avatarSelectedSource = new Subject<string>();
     avatarSelected$ = this.avatarSelectedSource.asObservable();
+
+    private s3SavedSource = new Subject<any>();
+    s3Saved$ = this.s3SavedSource.asObservable();
+
+    private asqsSavedSource = new Subject<any>();
+    asqsSaved$ = this.asqsSavedSource.asObservable();
 
 
     private router = inject(Router);
@@ -261,5 +281,31 @@ export class DialogService {
 
     notifyAvatarSelected(avatar: string) {
         this.avatarSelectedSource.next(avatar);
+    }
+
+    // S3 Dialog Methods
+    openS3Dialog(s3Id: string | null = null) {
+        this.s3DialogStateSubject.next({ visible: true, s3Id });
+    }
+
+    closeS3Dialog() {
+        this.s3DialogStateSubject.next({ visible: false, s3Id: null });
+    }
+
+    notifyS3Saved(data?: any) {
+        this.s3SavedSource.next(data);
+    }
+
+    // ASQS Dialog Methods
+    openASQSDialog(asqsId: string | null = null) {
+        this.asqsDialogStateSubject.next({ visible: true, asqsId });
+    }
+
+    closeASQSDialog() {
+        this.asqsDialogStateSubject.next({ visible: false, asqsId: null });
+    }
+
+    notifyASQSSaved(data?: any) {
+        this.asqsSavedSource.next(data);
     }
 }

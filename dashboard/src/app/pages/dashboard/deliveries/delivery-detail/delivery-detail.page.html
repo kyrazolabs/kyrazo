@@ -11,7 +11,7 @@
         <!-- Right section -->
         <div class="flex items-center gap-4">
             <p-button label="Back to Deliveries" icon="pi pi-arrow-left" [outlined]="true" severity="secondary"
-                routerLink="/deliveries" styleClass="rounded-xl!" />
+                routerLink="/deliveries" styleClass="rounded-xl!" size="small" />
         </div>
     </div>
 
@@ -26,14 +26,14 @@
                     <label class="block text-sm font-semibold text-surface-900 dark:text-surface-0 mb-1">Delivery
                         ID</label>
                     <input type="text" pInputText [value]="delivery.delivery_id" [readonly]="true"
-                        class="w-full font-mono rounded-xl!" />
+                        class="w-full font-mono rounded-xl!" pSize="small" />
                 </div>
 
                 <div>
                     <label class="block text-sm font-semibold text-surface-900 dark:text-surface-0 mb-1">Endpoint
                         URL</label>
                     <input type="text" pInputText [value]="delivery.target_url" [readonly]="true"
-                        class="w-full rounded-xl!" />
+                        class="w-full rounded-xl!" pSize="small" />
                 </div>
 
                 <div>
@@ -53,11 +53,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-semibold text-surface-900 dark:text-surface-0 mb-1">Scheduled At</label>
-                        <input type="text" pInputText [value]="delivery.scheduled_at" [readonly]="true" class="w-full rounded-xl!" />
+                        <input type="text" pInputText [value]="delivery.scheduled_at" [readonly]="true" class="w-full rounded-xl!" pSize="small" />
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-surface-900 dark:text-surface-0 mb-1">Processed At</label>
-                        <input type="text" pInputText [value]="delivery.processed_at" [readonly]="true" class="w-full rounded-xl!" />
+                        <input type="text" pInputText [value]="delivery.processed_at" [readonly]="true" class="w-full rounded-xl!" pSize="small" />
                     </div>
                 </div>
             </div>
@@ -71,14 +71,14 @@
                     <label class="block text-sm font-semibold text-surface-900 dark:text-surface-0 mb-2">Request
                         Headers</label>
                     <textarea pInputTextarea [value]="delivery.request_header | json" [readonly]="true" rows="6"
-                        class="w-full text-xs font-mono rounded-xl!">
+                        class="w-full text-xs font-mono rounded-xl!" pSize="small">
             </textarea>
                 </div>
 
                 <div>
                     <label class="block text-sm font-semibold text-surface-900 dark:text-surface-0 mb-2">Payload</label>
                     <textarea pInputTextarea [value]="delivery.request_body | json" [readonly]="true" rows="6"
-                        class="w-full text-xs font-mono rounded-xl!">
+                        class="w-full text-xs font-mono rounded-xl!" pSize="small">
             </textarea>
                 </div>
             </div>
@@ -93,7 +93,7 @@
                 <label class="block text-sm font-semibold text-surface-900 dark:text-surface-0 mb-2">Response
                     Headers</label>
                 <textarea pInputTextarea [value]="delivery.response_header | json" [readonly]="true" rows="8"
-                    class="w-full text-xs font-mono rounded-xl!">
+                    class="w-full text-xs font-mono rounded-xl!" pSize="small">
           </textarea>
             </div>
 
@@ -101,7 +101,7 @@
                 <label class="block text-sm font-semibold text-surface-900 dark:text-surface-0 mb-2">Response
                     Body</label>
                 <textarea pInputTextarea [value]="delivery.response_body | json" [readonly]="true" rows="8"
-                    class="w-full text-xs font-mono rounded-xl!">
+                    class="w-full text-xs font-mono rounded-xl!" pSize="small">
           </textarea>
             </div>
         </div>
@@ -111,8 +111,8 @@
         <!-- Additional Actions -->
         <div class="flex items-center justify-end gap-3">
             <p-button label="Retry Delivery" icon="pi pi-refresh" [outlined]="true" severity="secondary"
-                styleClass="rounded-xl!" [disabled]="delivery.status === 'delivered'" />
-            <p-button label="View Raw Data" icon="pi pi-file-o" [outlined]="true" styleClass="rounded-xl!" />
+                styleClass="rounded-xl!" [disabled]="delivery.status === 'delivered'" size="small" />
+            <p-button label="View Raw Data" icon="pi pi-file-o" [outlined]="true" styleClass="rounded-xl!" size="small" />
         </div>
     </p-card>
 </div>

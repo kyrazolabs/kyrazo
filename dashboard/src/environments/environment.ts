@@ -61,6 +61,18 @@ export const environment = {
         delete: (id: string) =>
             `https://api.kyrazo.com/dashboard/v1/endpoints/${id}`,
     },
+    endpointV2: {
+        create: `https://api.kyrazo.com/dashboard/v2/endpoints`,
+        get: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/endpoints/${id}`,
+        getSecret: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/endpoints/${id}/secret`,
+        gets: `https://api.kyrazo.com/dashboard/v2/endpoints`,
+        update: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/endpoints/${id}`,
+        delete: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/endpoints/${id}`,
+    },
     delivery: {
         get: (id: string) =>
             `https://api.kyrazo.com/dashboard/v1/deliveries/${id}`,
@@ -149,6 +161,18 @@ export const environment = {
         restore: (id: string) =>
             `https://api.kyrazo.com/dashboard/v1/namespaces/${id}/restore`,
     },
+    namespaceV2: {
+        create: `https://api.kyrazo.com/dashboard/v2/namespaces`,
+        gets: `https://api.kyrazo.com/dashboard/v2/namespaces`,
+        get: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/namespaces/${id}`,
+        update: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/namespaces/${id}`,
+        delete: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/namespaces/${id}`,
+        restore: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/namespaces/${id}/restore`,
+    },
     analytics: {
         dispatchUsage: `https://api.kyrazo.com/dashboard/v1/analytics/dispatch/usage`,
         ingestUsage: `https://api.kyrazo.com/dashboard/v1/analytics/ingest/usage`,
@@ -177,14 +201,50 @@ export const environment = {
     },
     transform: {
         gets: `https://api.kyrazo.com/dashboard/v2/transforms`,
-        get: (id: string) => `https://api.kyrazo.com/dashboard/v2/transforms/${id}`,
+        get: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/transforms/${id}`,
         create: `https://api.kyrazo.com/dashboard/v2/transforms`,
-        update: (id: string) => `https://api.kyrazo.com/dashboard/v2/transforms/${id}`,
-        delete: (id: string) => `https://api.kyrazo.com/dashboard/v2/transforms/${id}`,
-        test: (id?: string) => id 
-            ? `https://api.kyrazo.com/dashboard/v2/transforms/${id}/test` 
-            : `https://api.kyrazo.com/dashboard/v2/transforms/test`,
-        versions: (id: string) => `https://api.kyrazo.com/dashboard/v2/transforms/${id}/versions`,
-        rollback: (id: string, version: number) => `https://api.kyrazo.com/dashboard/v2/transforms/${id}/rollback/${version}`,
+        update: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/transforms/${id}`,
+        delete: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/transforms/${id}`,
+        test: (id?: string) =>
+            id
+                ? `https://api.kyrazo.com/dashboard/v2/transforms/${id}/test`
+                : `https://api.kyrazo.com/dashboard/v2/transforms/test`,
+        versions: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/transforms/${id}/versions`,
+        rollback: (id: string, version: number) =>
+            `https://api.kyrazo.com/dashboard/v2/transforms/${id}/rollback/${version}`,
+    },
+    sourceV2: {
+        create: `https://api.kyrazo.com/dashboard/v2/sources`,
+        get: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/sources/${id}`,
+        gets: `https://api.kyrazo.com/dashboard/v2/sources`,
+        update: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/sources/${id}`,
+        delete: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/sources/${id}`,
+    },
+    s3: {
+        create: `https://api.kyrazo.com/dashboard/v2/s3`, // Assuming v2 for storage for now as requested
+        get: (id: string) => `https://api.kyrazo.com/dashboard/v2/s3/${id}`,
+        gets: `https://api.kyrazo.com/dashboard/v2/s3`,
+        update: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/s3/${id}`,
+        delete: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/s3/${id}`,
+        test: `https://api.kyrazo.com/dashboard/v2/s3/test`,
+    },
+    asqs: {
+        create: `https://api.kyrazo.com/dashboard/v2/asqs`,
+        get: (id: string) => `https://api.kyrazo.com/dashboard/v2/asqs/${id}`,
+        gets: `https://api.kyrazo.com/dashboard/v2/asqs`,
+        update: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/asqs/${id}`,
+        delete: (id: string) =>
+            `https://api.kyrazo.com/dashboard/v2/asqs/${id}`,
+        test: `https://api.kyrazo.com/dashboard/v2/asqs/test`,
     },
 };

@@ -8,7 +8,7 @@
             <p class="opacity-80">Manage your event dispatch targets</p>
         </div>
         <div class="flex gap-2">
-            <p-button label="Add Target" icon="pi pi-plus" (onClick)="openCreateDialog()" size="small" styleClass="rounded-xl!" />
+            <p-button label="Add Target" icon="pi pi-plus" (onClick)="openCreateDialog()" size="small" styleClass="rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20" />
         </div>
     </div>
 
@@ -20,7 +20,7 @@
                     <i class="pi pi-search"></i>
                 </p-inputicon>
                 <input pInputText type="text" (input)="onSearchInput($event)" [value]="searchQuery"
-                    placeholder="Search targets..." class="w-full md:w-80 rounded-xl!" />
+                    placeholder="Search targets..." class="w-full md:w-80 rounded-xl!"  pSize="small" />
             </p-iconfield>
 
             <div class="flex gap-2">
@@ -133,7 +133,7 @@
                                         size="small" [outlined]="true" (onClick)="refreshTargets()"
                                         *ngIf="searchQuery || activeFilter !== undefined" />
                                     <p-button label="Create Target" icon="pi pi-plus"
-                                        (onClick)="openCreateDialog()" size="small" styleClass="rounded-xl!" />
+                                        (onClick)="openCreateDialog()" size="small" styleClass="rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20" />
                                 </div>
                             </div>
                         </div>

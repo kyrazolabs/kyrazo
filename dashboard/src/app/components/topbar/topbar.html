@@ -79,7 +79,7 @@
                         autocomplete="off"
                         placeholder="Search ..."
                         fluid
-                    />
+                     pSize="small" />
                 </div>
                 <div class="w-full h-48 flex justify-center">
                     <div class="justify-center items-center">
@@ -92,8 +92,9 @@
                         label="Cancel"
                         severity="secondary"
                         (click)="searchVisible = false"
+                        size="small"
                     />
-                    <p-button label="Save" (click)="searchVisible = false" />
+                    <p-button label="Save" (click)="searchVisible = false" size="small"  styleClass="shadow-md shadow-primary/50 dark:shadow-primary/20" />
                 </div>
             </p-dialog>
 
@@ -116,6 +117,7 @@
                     [text]="true"
                     icon="pi pi-palette"
                     pTooltip="Theme Settings" tooltipPosition="bottom"
+                    size="small"
                 />
                 <app-config *ngIf="showConfig" @dropdownAnimation />
             </div>
@@ -128,6 +130,7 @@
                 [icon]="isDarkMode()? 'pi pi-moon' : 'pi pi-sun'"
                 class="hidden lg:inline-flex"
                 pTooltip="Toggle Dark Mode" tooltipPosition="bottom"
+                size="small"
             />
             <p-button pRipple
                 [outlined]="true"
@@ -135,7 +138,8 @@
                 [raised]="false"
                 styleClass="p-0!"
                 rounded
-                (click)="op.toggle($event)" >
+                (click)="op.toggle($event)"
+                size="small" >
                 @if (avatarUrl()) {
                     <p-avatar [image]="avatarUrl()!" size="normal"/>
                 } @else {

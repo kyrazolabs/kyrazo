@@ -1,4 +1,7 @@
 import { IEndpoint } from './endpoint.types';
+import { IS3Bucket } from './s3.types';
+import { IASQSQueue } from './asqs.types';
+import { ITransform } from './transform.types';
 
 export enum SourceStatus {
     ACTIVE = 'active',
@@ -39,6 +42,7 @@ export interface ISource {
     // signatureAlgorithm: SignatureAlgorithm;
 
     ingressId?: string;
+    ingressUrl?: string;
     service?: string;
     forwarding?: boolean;
 
@@ -46,6 +50,15 @@ export interface ISource {
         maxAttempts: number;
         backoffStrategy: backoffStrategy;
         interval: number;
+    };
+
+    // V2 Fields
+    transformer?: string | ITransform;
+    isManagedTransform?: boolean;
+    destination?: {
+        endpoints?: string[] | IEndpoint[];
+        s3bucket?: string[] | IS3Bucket[];
+        asqs?: string[] | IASQSQueue[];
     };
 }
 
@@ -83,11 +96,25 @@ export interface CreateSourceRequest {
     };
 
     secret?: string;
+
+    // V2 Fields
+    transformer?: {
+        name?: string;
+        description?: string;
+        code: string;
+    };
+    destination?: {
+        endpoints?: string[] | IEndpoint[];
+        s3bucket?: string[] | IS3Bucket[];
+        asqs?: string[] | IASQSQueue[];
+    };
 }
 
 export interface CreateSourceResponse {
+    id: string;
     secret?: string;
     ingress?: string;
+    ingressUrl?: string; // Correct for V2
 }
 
 export interface UpdateSourceRequest {
@@ -105,6 +132,18 @@ export interface UpdateSourceRequest {
         backoffStrategy?: backoffStrategy;
         interval?: number;
     };
+
+    // V2 Fields
+    transformer?: {
+        name?: string;
+        description?: string;
+        code: string;
+    };
+    destination?: {
+        endpoints?: string[] | IEndpoint[];
+        s3bucket?: string[] | IS3Bucket[];
+        asqs?: string[] | IASQSQueue[];
+    };
 }
 
 export interface UpdateSourceAuthRequest {
@@ -117,9 +156,7 @@ export interface UpdateSourceAuthRequest {
     };
 }
 
-export interface UpdateSourceResponse {
-    source: ISource;
-}
+export interface UpdateSourceResponse extends ISource {}
 
 export interface GetSourceResponse {
     id: string;
@@ -136,6 +173,15 @@ export interface GetSourceResponse {
     ingressUrl?: string;
     service?: string;
     forwarding?: boolean;
+
+    // V2 Fields
+    transformer?: string | ITransform;
+    isManagedTransform?: boolean;
+    destination?: {
+        endpoints?: string[] | IEndpoint[];
+        s3bucket?: string[] | IS3Bucket[];
+        asqs?: string[] | IASQSQueue[];
+    };
 
     events: Array<string>;
     eventTypes: Array<string>;

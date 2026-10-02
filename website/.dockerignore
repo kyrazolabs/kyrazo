@@ -1,0 +1,13 @@
+# Keep the build context small and avoid clobbering the deps
+# installed inside the container
+node_modules
+dist
+.angular
+.git
+.github
+.vscode
+docs
+Dockerfile
+.dockerignore
+package-lock.json
+*.md

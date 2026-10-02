@@ -95,9 +95,9 @@ export class FeaturesComponent {
         {
             id: 'speed',
             icon: 'pi pi-bolt',
-            title: 'Extreme Speed',
+            title: 'Dedicated Speed',
             description:
-                'Global edge delivery that defies distance. Experience sub-millisecond processing times that keep your real-time applications truly real-time.',
+                'Delivery on workers reserved for your workload — no competing with other tenants for CPU, RAM, or queue capacity.',
             class: 'md:col-span-1 md:row-span-1',
         },
         {
@@ -111,9 +111,9 @@ export class FeaturesComponent {
         {
             id: 'resilience',
             icon: 'icon-[hugeicons--globe-02]',
-            title: 'Global Resilience',
+            title: 'Durable Delivery',
             description:
-                'Uptime you can bet your business on. Our multi-region active-active mesh guarantees delivery even during major provider outages.',
+                'Retries, dead-letter queues, and isolated workers designed so a downstream outage does not drop your ingest.',
             class: 'md:col-span-1 md:row-span-1',
         },
     ];
@@ -134,7 +134,7 @@ export class FeaturesComponent {
             title: 'Dispatch Events',
             subtitle: 'Guaranteed Delivery',
             description:
-                'Guarantee delivery to your internal services or customers. Built-in exponential backoff, dead-letter queues, and event scheduling ensure zero data loss.',
+                'Deliver to your internal services or customers with exponential backoff, dead-letter queues, and event scheduling.',
             icon: 'pi pi-send',
             color: 'text-emerald-600 dark:text-emerald-500',
             bg: 'border border-emerald-500/20 bg-emerald-500/10',
@@ -159,9 +159,9 @@ export class FeaturesComponent {
     ];
     items: TrustItem[] = [
         {
-            title: '99.99% Uptime SLA',
+            title: '99.9% Uptime SLA',
             description:
-                'Enterprise-grade infrastructure with redundant systems ensures your webhooks are always delivered without interruption.',
+                'Professional deployments include a 99.9% uptime SLA. Custom SLAs are available on Enterprise.',
             icon: 'dns',
             metric: 'Reliability',
             category: 'Scalability',
@@ -183,9 +183,9 @@ export class FeaturesComponent {
             category: 'Scalability',
         },
         {
-            title: 'SOC 2 Type II Certified',
+            title: 'Security Controls',
             description:
-                'Independently audited and certified to meet the highest security, availability, and confidentiality standards.',
+                'Access control, isolation, and encryption practices designed for enterprise webhook workloads. Formal certifications are scoped per Order Form.',
             icon: 'verified_user',
             category: 'Compliance',
         },

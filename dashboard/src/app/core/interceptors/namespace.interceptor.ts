@@ -9,7 +9,9 @@ export const namespaceInterceptor: HttpInterceptorFn = (req, next) => {
 
     if (
         req.url.includes('/v1/sources') ||
+        req.url.includes('/v2/sources') ||
         req.url.includes('/v1/endpoints') ||
+        req.url.includes('/v2/endpoints') ||
         req.url.includes('/v1/deliveries') ||
         req.url.includes('/v1/keys') ||
         req.url.includes('/v1/analytics') ||
@@ -18,8 +20,10 @@ export const namespaceInterceptor: HttpInterceptorFn = (req, next) => {
         req.url.includes('/v1/subscriptions') ||
         req.url.includes('/v1/payment') ||
         req.url.includes('/v1/ingest') ||
+        req.url.includes('/v1/support') ||
         req.url.includes('/v2/transforms') ||
-        req.url.includes('/v1/support')
+        req.url.includes('/v2/s3') ||
+        req.url.includes('/v2/asqs')
     ) {
         if (!workspace && !namespace) return next(req);
 

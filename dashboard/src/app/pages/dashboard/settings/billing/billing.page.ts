@@ -38,6 +38,7 @@ import { PricingPlan, MANUAL_CUSTOM_PLAN } from './pricing.model';
 import { PricingCardComponent } from './components/card/pricing-card.component';
 import { PricingComparisonComponent } from './components/comparison/pricing-comparison.component';
 import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directive';
+import { FloatLabelModule } from 'primeng/floatlabel';
 
 @Component({
     selector: 'app-billing-settings',
@@ -59,6 +60,7 @@ import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directiv
         MessageModule,
         PricingCardComponent,
         PricingComparisonComponent,
+        FloatLabelModule,
     ],
     templateUrl: './billing.page.html',
     styleUrl: './billing.page.scss',

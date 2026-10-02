@@ -27,6 +27,9 @@ import { IEndpoint } from '@models/endpoint.types';
 import { SentryService } from '@core/3rd-party/sentry';
 import { PostHogService } from '@core/3rd-party/posthog';
 import { CopyIdComponent } from '@shared/components/copy-id/copy-id.component';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { CodeEditorComponent } from '@shared/components/code-editor/code-editor.component';
+import { TransformService } from '@core/services/transform.service';
 
 // PrimeNG Imports
 import { CardModule } from 'primeng/card';
@@ -41,6 +44,7 @@ import { DividerModule } from 'primeng/divider';
 import { MessageService } from 'primeng/api';
 import { MessageModule } from 'primeng/message';
 import { SkeletonModule } from 'primeng/skeleton';
+import { FloatLabelModule } from 'primeng/floatlabel';
 
 @Component({
     selector: 'app-endpoint-form',
@@ -62,6 +66,9 @@ import { SkeletonModule } from 'primeng/skeleton';
         MessageModule,
         SkeletonModule,
         CopyIdComponent,
+        FloatLabelModule,
+        ToggleSwitchModule,
+        CodeEditorComponent,
     ],
     templateUrl: './endpoint-form.component.html',
     styleUrls: ['./endpoint-form.component.scss'],
@@ -75,6 +82,7 @@ export class EndpointFormComponent implements OnInit, OnChanges {
     public readonly subscriptionService = inject(SubscriptionService);
     private readonly sentry = inject(SentryService);
     private readonly posthog = inject(PostHogService);
+    private readonly transformService = inject(TransformService);
 
     public readonly hasCustomHeaders =
         this.subscriptionService.hasFeature('customHeaders');
@@ -92,6 +100,21 @@ export class EndpointFormComponent implements OnInit, OnChanges {
     initialLoading = signal(false);
     isEditing = signal(false);
     customHeaders: { key: string; value: string }[] = [{ key: '', value: '' }];
+
+    useTransformer = false;
+    transformerCode = this.getDefaultTransformerCode();
+
+    private getDefaultTransformerCode(): string {
+        return `/**
+ * Kyrazo Managed Transformer
+ * 
+ * @param {Object} payload - The incoming event
+ * @return {Object} The transformed payload
+ */
+return function transform(payload) {
+    return payload;
+}(payload);`;
+    }
 
     // Options
     statusOptions = [
@@ -155,6 +178,8 @@ export class EndpointFormComponent implements OnInit, OnChanges {
                     enabled: true,
                 });
                 this.customHeaders = [{ key: '', value: '' }];
+                this.useTransformer = false;
+                this.transformerCode = this.getDefaultTransformerCode();
             }
         }
     }
@@ -177,6 +202,20 @@ export class EndpointFormComponent implements OnInit, OnChanges {
                 } else {
                     this.customHeaders = [];
                 }
+
+                if (response.data.isManagedTransform && response.data.transformer) {
+                    this.useTransformer = true;
+                    this.transformService
+                        .get(response.data.transformer)
+                        .subscribe({
+                            next: (transformRes) => {
+                                this.transformerCode = transformRes.data.code;
+                            },
+                        });
+                } else {
+                    this.useTransformer = false;
+                }
+
                 this.initialLoading.set(false);
             },
             error: (error: any) => {
@@ -241,6 +280,13 @@ export class EndpointFormComponent implements OnInit, OnChanges {
                 rateLimit: formValue.rateLimit,
             },
             customHeaders: headersObject,
+            isManagedTransform: this.useTransformer,
+            transformer: this.useTransformer
+                ? {
+                      code: this.transformerCode,
+                      name: `${formValue.name} Transformer`,
+                  }
+                : null,
         };
 
         const request$ =

@@ -33,9 +33,6 @@ mock.module('@/services/analytics/dispatch.producer', () => ({
     dispatchAnalyticsProducer: { record: mock(() => Promise.resolve()) },
 }));
 
-mock.module('@/core/dispatcher/dispatcher.signature', () => ({
-    dispatcherSignature: { sign: mock(() => Promise.resolve({})) },
-}));
 
 describe('DispatchProducer', () => {
     let consumer: DispatchProducer;

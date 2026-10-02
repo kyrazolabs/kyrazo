@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PostHogService } from '@core/3rd-party/posthog';
+import { UmamiService } from '@core/3rd-party/umami';
 import { CtaComponent } from "@pages/landing/components/cta/cta.component";
 
 @Component({
@@ -11,9 +11,9 @@ import { CtaComponent } from "@pages/landing/components/cta/cta.component";
     styleUrl: './gdpr.page.scss',
 })
 export class GDPRPage implements OnInit {
-    private posthog = inject(PostHogService);
+    private umami = inject(UmamiService);
 
     ngOnInit() {
-        this.posthog.capture('gdpr_compliance_viewed');
+        this.umami.capture('gdpr_compliance_viewed');
     }
 }

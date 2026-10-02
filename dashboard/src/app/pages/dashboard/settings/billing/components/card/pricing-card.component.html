@@ -49,7 +49,7 @@
     <button pButton
         [label]="isCurrent ? 'Active Plan' : ((plan.slug === 'enterprise' || plan.slug === 'custom') ? 'Contact Sales' : 'Select Plan')"
         [severity]="plan.highlighted ? 'primary' : 'secondary'"
-        size="small"
+        pSize="small"
         [disabled]="isCurrent"
         [class]="'w-full py-4 font-bold! rounded-xl! transition-all duration-300 ' +
         (plan.highlighted ? 'shadow-lg shadow-primary-500/40' : 'hover:bg-primary-500/10 hover:border-primary-500/30 hover:text-primary-500')"

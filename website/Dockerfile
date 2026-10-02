@@ -1,41 +1,32 @@
-# Stage 1: Build the application
-FROM node:22-slim AS builder
+# syntax=docker/dockerfile:1
 
-# Install Bun
-RUN npm install -g bun
+# ---- Stage 1: Build the application ----------------------------------------
+# Bun is the package manager, but the Angular CLI's route extractor relies on
+# Node.js ESM loader hooks (`--import` in worker threads), which Bun does not
+# support yet. A real Node binary is provided so `bunx ng build` runs the CLI
+# under Node via its `#!/usr/bin/env node` shebang.
+FROM oven/bun:1 AS builder
+
+COPY --from=node:22-slim /usr/local/bin/node /usr/local/bin/node
 
 WORKDIR /app
 
-# Copy dependency definitions
+# Install dependencies from the lockfile (including devDependencies for the build)
 COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
 
-# Install dependencies including devDependencies
-RUN bun install
-
-# Copy source code
+# Copy source code and build
 COPY . .
-
-# Build the application
 RUN bun run build
 
-# Stage 2: Production runtime
-FROM node:22-slim
+# ---- Stage 2: Production runtime — static nginx ----------------------------
+FROM nginx:1.27-alpine
 
-# Install curl for healthcheck
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /app
-
-# Copy production build artifacts
-COPY --from=builder /app/dist ./dist
-
-# Expose the server port
-ENV PORT=4000
+ENV NODE_ENV=production
 EXPOSE 4000
 
-# Healthcheck
-HEALTHCHECK --start-period=20s --interval=30s --timeout=3s --retries=3 \
-    CMD curl -f http://localhost:${PORT}/health || exit 1
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /app/dist/website/browser /usr/share/nginx/html
 
-# Start the server using Node.js (more stable for SSR)
-CMD ["node", "dist/website/server/server.mjs"]
+HEALTHCHECK --start-period=10s --interval=30s --timeout=5s --retries=3 \
+    CMD wget -qO- http://127.0.0.1:4000/health || exit 1

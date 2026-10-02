@@ -27,12 +27,14 @@
 
                     <!-- First Name -->
                     <div class="flex flex-col gap-2">
-                        <label class="font-semibold text-surface-900 dark:text-surface-0">First Name</label>
-                        <input pInputText type="text" formControlName="firstName" placeholder="Enter your first name"
-                            class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
-                            [class.border-red-500]="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched" />
+                        <p-floatlabel variant="on">
+                            <input pInputText id="firstName" type="text" formControlName="firstName"
+                                class="w-full rounded-xl!" pSize="small"
+                                [class.border-red-500]="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched" />
+                            <label for="firstName">First Name</label>
+                        </p-floatlabel>
                         @if (profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched) {
-                        <small class="text-red-500 text-sm">
+                        <small class="text-red-500 text-xs italic ml-1">
                             First name is required and must be at least 2 characters
                         </small>
                         }
@@ -40,12 +42,14 @@
 
                     <!-- Last Name -->
                     <div class="flex flex-col gap-2">
-                        <label class="font-semibold text-surface-900 dark:text-surface-0">Last Name</label>
-                        <input pInputText type="text" formControlName="lastName" placeholder="Enter your last name"
-                            class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
-                            [class.border-red-500]="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched" />
+                        <p-floatlabel variant="on">
+                            <input pInputText id="lastName" type="text" formControlName="lastName"
+                                class="w-full rounded-xl!" pSize="small"
+                                [class.border-red-500]="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched" />
+                            <label for="lastName">Last Name</label>
+                        </p-floatlabel>
                         @if (profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched) {
-                        <small class="text-red-500 text-sm">
+                        <small class="text-red-500 text-xs italic ml-1">
                             Last name is required and at least 2 characters
                         </small>
                         }
@@ -53,12 +57,14 @@
 
                     <!-- Email Address -->
                     <div class="flex flex-col gap-2">
-                        <label class="font-semibold text-surface-900 dark:text-surface-0">Email Address</label>
-                        <input pInputText type="email" formControlName="email" placeholder="Enter your email address"
-                            class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
-                            [class.border-red-500]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched" />
+                        <p-floatlabel variant="on">
+                            <input pInputText id="email" type="email" formControlName="email"
+                                class="w-full rounded-xl!" pSize="small"
+                                [class.border-red-500]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched" />
+                            <label for="email">Email Address</label>
+                        </p-floatlabel>
                         @if (profileForm.get('email')?.invalid && profileForm.get('email')?.touched) {
-                        <small class="text-red-500 text-sm">
+                        <small class="text-red-500 text-xs italic ml-1">
                             Please enter a valid email address
                         </small>
                         }
@@ -67,9 +73,11 @@
 
                     <!-- Job Title -->
                     <div class="flex flex-col gap-2">
-                        <label class="font-semibold text-surface-900 dark:text-surface-0">Job Title</label>
-                        <input pInputText type="text" formControlName="jobTitle" placeholder="Enter your job title"
-                            class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800" />
+                        <p-floatlabel variant="on">
+                            <input pInputText id="jobTitle" type="text" formControlName="jobTitle"
+                                class="w-full rounded-xl!" pSize="small" />
+                            <label for="jobTitle">Job Title</label>
+                        </p-floatlabel>
                     </div>
                 </div>
             </div>
@@ -81,18 +89,22 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Time Zone -->
                 <div class="flex flex-col gap-2">
-                    <label class="font-semibold text-surface-900 dark:text-surface-0">Time Zone</label>
-                    <p-select formControlName="timeZone" [options]="timezoneOptions" optionLabel="label"
-                        optionValue="value" [filter]="true" filterBy="label" filterPlaceholder="Search ..."
-                        placeholder="Select timezone" class="w-full rounded-xl!" panelStyleClass="rounded-xl!" size="small" />
+                    <p-floatlabel variant="on">
+                        <p-select id="timeZone" formControlName="timeZone" [options]="timezoneOptions" optionLabel="label"
+                            optionValue="value" [filter]="true" filterBy="label"
+                            class="w-full rounded-xl!" panelStyleClass="rounded-xl!" size="small" appendTo="body" />
+                        <label for="timeZone">Time Zone</label>
+                    </p-floatlabel>
                 </div>
 
                 <!-- Language -->
                 <div class="flex flex-col gap-2">
-                    <label class="font-semibold text-surface-900 dark:text-surface-0">Language</label>
-                    <p-select formControlName="language" [options]="languageOptions" optionLabel="label"
-                        optionValue="value" placeholder="Select language" styleClass="w-full rounded-xl!"
-                        panelStyleClass="rounded-xl!" size="small" />
+                    <p-floatlabel variant="on">
+                        <p-select id="language" formControlName="language" [options]="languageOptions" optionLabel="label"
+                            optionValue="value" styleClass="w-full rounded-xl!"
+                            panelStyleClass="rounded-xl!" size="small" appendTo="body" />
+                        <label for="language">Language</label>
+                    </p-floatlabel>
                 </div>
 
                 <!-- Account Status -->
@@ -110,7 +122,7 @@
                     <label class="font-semibold text-surface-900 dark:text-surface-0">Member Since</label>
                     <input pInputText type="text" [value]="originalProfile?.createdAt ? formatDate(originalProfile!.createdAt) : 'N/A'" placeholder="Enter workspace name"
                         class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
-                        readonly disabled />
+                        readonly disabled  pSize="small" />
                 </div>
 
                 <!-- Last Login -->
@@ -118,7 +130,7 @@
                     <label class="font-semibold text-surface-900 dark:text-surface-0">Last Login</label>
                     <input pInputText type="text" [value]="originalProfile?.lastLogin ? formatDate(originalProfile!.lastLogin) : 'Never'" placeholder="Enter workspace name"
                         class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
-                        readonly disabled />
+                        readonly disabled  pSize="small" />
                 </div>
 
                 <!-- Account ID -->
@@ -127,7 +139,7 @@
                     <div class="flex items-center gap-2">
                         <input pInputText type="text" [value]="originalProfile?.id || 'N/A'" placeholder="Enter workspace name"
                             class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800"
-                            readonly disabled />
+                            readonly disabled  pSize="small" />
                         <p-button icon="pi pi-copy" [outlined]="true" size="small" styleClass="rounded-xl!"
                             pTooltip="Copy Account ID" tooltipStyleClass="text-xs! rounded-xl!" tooltipPosition="top"
                             (onClick)="copyToClipboard(originalProfile?.id || '')" />
@@ -141,23 +153,29 @@
             class="card-panel">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Change Password Form -->
-                <div [formGroup]="passwordForm" class="space-y-4">
-                    <div class="flex flex-col gap-2">
-                        <label class="font-semibold text-surface-900 dark:text-surface-0 text-sm">Update Password</label>
-                        <div class="space-y-4">
-                            <input pInputText type="password" formControlName="currentPassword" placeholder="Current Password"
+                <div [formGroup]="passwordForm" class="space-y-6">
+                    <div class="flex flex-col gap-4">
+                        <p-floatlabel variant="on">
+                            <input pInputText id="currentPassword" type="password" formControlName="currentPassword"
                                 (keydown.enter)="$event.preventDefault(); changePassword()"
-                                class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800 text-sm" />
-                            <input pInputText type="password" formControlName="newPassword" placeholder="New Password"
+                                class="w-full rounded-xl!" pSize="small" />
+                            <label for="currentPassword">Current Password</label>
+                        </p-floatlabel>
+                        <p-floatlabel variant="on">
+                            <input pInputText id="newPassword" type="password" formControlName="newPassword"
                                 (keydown.enter)="$event.preventDefault(); changePassword()"
-                                class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800 text-sm" />
-                            <input pInputText type="password" formControlName="confirmPassword" placeholder="Confirm New Password"
+                                class="w-full rounded-xl!" pSize="small" />
+                            <label for="newPassword">New Password</label>
+                        </p-floatlabel>
+                        <p-floatlabel variant="on">
+                            <input pInputText id="confirmPassword" type="password" formControlName="confirmPassword"
                                 (keydown.enter)="$event.preventDefault(); changePassword()"
-                                class="w-full p-3 rounded-xl! border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800 text-sm" />
-                            <p-button label="Change Password" icon="pi pi-lock" styleClass="rounded-xl! w-full"
-                                [disabled]="passwordForm.invalid || isChangingPassword" [loading]="isChangingPassword"
-                                (onClick)="changePassword()" />
-                        </div>
+                                class="w-full rounded-xl!" pSize="small" />
+                            <label for="confirmPassword">Confirm New Password</label>
+                        </p-floatlabel>
+                        <p-button label="Change Password" icon="pi pi-lock" styleClass="rounded-xl! w-full shadow-md shadow-primary/50 dark:shadow-primary/20"
+                            [disabled]="passwordForm.invalid || isChangingPassword" [loading]="isChangingPassword"
+                            (onClick)="changePassword()" />
                     </div>
                 </div>
 
@@ -177,7 +195,7 @@
                     <div class="mt-auto">
                         @if (!originalProfile?.is2FAEnabled) {
                         <p-button label="Enable 2FA" icon="pi pi-plus"
-                            styleClass="rounded-xl! w-full" size="small" (onClick)="start2FASetup()" />
+                            styleClass="rounded-xl! w-full shadow-md shadow-primary/50 dark:shadow-primary/20" size="small" (onClick)="start2FASetup()" />
                         }
                         @if (originalProfile?.is2FAEnabled) {
                         <p-button label="Disable 2FA" icon="pi pi-trash"

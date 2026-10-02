@@ -14,6 +14,8 @@ export * from './workspace.types';
 export * from './target.types';
 export * from './ingest.types';
 export * from './transform.types';
+export * from './s3.types';
+export * from './sqs.types';
 
 export interface IPagination {
     total: number;
@@ -30,6 +32,12 @@ export interface IErrorResponse {
         details?: unknown;
         requestId: string;
     };
+}
+
+export interface ISuccessResponse<D> {
+    success: true;
+    message: string;
+    data: D;
 }
 
 // Re-export common types that might be used across the application

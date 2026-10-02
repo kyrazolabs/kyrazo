@@ -19,13 +19,22 @@ export interface ISource extends Document {
 
     ingressId: string;
     ingressUrl: string;
+
     forwarding: boolean;
+    destination: {
+        endpoints: Types.ObjectId[];
+        s3bucket: Types.ObjectId[];
+        asqs: Types.ObjectId[];
+    };
+
     endpoints: Types.ObjectId[];
 
     eventTypes?: string[];
 
     // Authentication
     authentication?: ISourceAuthentication;
+    transformer?: Types.ObjectId;
+    isManagedTransform?: boolean;
 
     retryPolicy: {
         maxAttempts: number;

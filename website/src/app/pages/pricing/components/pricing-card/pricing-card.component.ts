@@ -4,7 +4,8 @@ import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { PricingPlan } from '../../pricing.model';
 import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directive';
-import { Router } from '@angular/router';
+import { UmamiService } from '@core/3rd-party/umami';
+import { CalendlyService } from '@shared/services/calendly.service';
 
 @Component({
     selector: 'app-pricing-card',
@@ -17,6 +18,26 @@ export class PricingCardComponent {
     @Input() plan!: PricingPlan;
     @Input() isYearly = false;
     @Input() delay = '';
+
+    private umami = inject(UmamiService);
+    private calendly = inject(CalendlyService);
+
+    get isContactSalesPlan(): boolean {
+        return this.plan.slug === 'enterprise' || this.plan.slug === 'custom';
+    }
+
+    onCta(): void {
+        if (this.isContactSalesPlan) {
+            this.umami.capture(
+                `pricing_${this.plan.slug}_contact_enterprise_sales_clicked`,
+            );
+            window.location.href =
+                'mailto:sales@kyrazo.com?subject=Enterprise%20Plan%20Inquiry';
+            return;
+        }
+        this.umami.capture(`pricing_${this.plan.slug}_cta_clicked`);
+        this.calendly.openDiscoveryPopup();
+    }
 
     get currentPrice(): number {
         return this.isYearly

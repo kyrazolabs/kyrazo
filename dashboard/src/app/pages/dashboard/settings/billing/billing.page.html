@@ -72,14 +72,17 @@
         <div class="flex flex-col gap-2">
             <p class="text-surface-600 dark:text-surface-400 text-sm">Select a new plan to upgrade or downgrade your
                 workspace.</p>
-            <p-select [formControl]="selectedPlanControl" [options]="upgradePlanOptions" size="small"
-                optionLabel="label" optionValue="value" placeholder="Choose Plan" class="w-full rounded-xl!"
-                panelStyleClass="rounded-xl!" appendTo="body" />
+            <p-floatlabel variant="on">
+                <p-select [formControl]="selectedPlanControl" [options]="upgradePlanOptions" size="small"
+                    optionLabel="label" optionValue="value" class="w-full rounded-xl!"
+                    panelStyleClass="rounded-xl!" appendTo="body" />
+                <label>Choose Plan</label>
+            </p-floatlabel>
         </div>
         <div class="flex justify-end gap-3 pt-2">
             <p-button label="Cancel" [outlined]="true" severity="secondary" styleClass="rounded-xl!" size="small"
                 (onClick)="showUpgradeDialog = false" />
-            <p-button label="Confirm" styleClass="rounded-xl!" size="small" (onClick)="confirmUpgrade()" />
+            <p-button label="Confirm" styleClass="rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20" size="small" (onClick)="confirmUpgrade()" />
         </div>
     </div>
 </p-dialog>
@@ -156,9 +159,11 @@
             <div class="flex flex-col gap-2 mt-2">
                 <label class="text-sm font-semibold text-surface-800 dark:text-surface-200">Any additional
                     feedback?</label>
-                <textarea pTextarea formControlName="comment" rows="3"
-                    class="w-full rounded-xl! p-3 text-sm bg-surface-50 dark:bg-surface-900 border-none! focus:ring-2 focus:ring-primary!"
-                    placeholder="Tell us more about your experience..."></textarea>
+                <p-floatlabel variant="on">
+                    <textarea pTextarea formControlName="comment" rows="3"
+                        class="w-full rounded-xl! p-3 text-sm bg-surface-50 dark:bg-surface-900 border-none! focus:ring-2 focus:ring-primary!" pSize="small"></textarea>
+                    <label>Tell us more about your experience...</label>
+                </p-floatlabel>
             </div>
         </div>
         }
@@ -197,7 +202,7 @@
                 <p-button label="Keep Subscription" [outlined]="true" severity="secondary"
                     styleClass="rounded-xl! border-none!" size="small" (onClick)="showCancelDialog = false" />
                 @if (cancellationStage !== 'final') {
-                <p-button label="Continue" styleClass="rounded-xl!" (onClick)="nextCancellationStep()" size="small" />
+                <p-button label="Continue" styleClass="rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20" (onClick)="nextCancellationStep()" size="small" />
                 }
                 @if (cancellationStage === 'final') {
                 <p-button label="Confirm Cancellation" severity="danger" styleClass="rounded-xl!"

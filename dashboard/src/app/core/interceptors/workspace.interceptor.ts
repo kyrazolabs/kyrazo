@@ -9,6 +9,7 @@ export const workspaceInterceptor: HttpInterceptorFn = (req, next) => {
     // Add workspace header for namespace workspace endpoints
     if (
         req.url.includes('/v1/namespaces') ||
+        req.url.includes('/v2/namespaces') ||
         req.url.includes('/v1/workers') ||
         req.url.includes('/v1/plans')
     ) {

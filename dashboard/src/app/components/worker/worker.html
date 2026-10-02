@@ -32,7 +32,7 @@
                                 [ngModel]="searchQuery()"
                                 (ngModelChange)="searchQuery.set($event)"
                                 placeholder="Search by ID, IP or Status..."
-                                class="w-full bg-surface-50 dark:bg-surface-900 border-surface-200 dark:border-surface-800 rounded-xl text-sm" />
+                                class="w-full bg-surface-50 dark:bg-surface-900 border-surface-200 dark:border-surface-800 rounded-xl text-sm"  pSize="small" />
                         </p-iconfield>
 
                         <p-button #sortBtn [outlined]="true"
@@ -49,7 +49,7 @@
                                     <p-select [options]="sortFieldOptions"
                                         [ngModel]="sortField()"
                                         (ngModelChange)="sortField.set($event)"
-                                        optionLabel="label" optionValue="value" size="small">
+                                        optionLabel="label" optionValue="value" size="small" appendTo="body">
                                         <ng-template #item let-item>
                                             <div class="flex items-center gap-2">
                                                 <span class="text-sm! font-medium!">{{item.label}}</span>

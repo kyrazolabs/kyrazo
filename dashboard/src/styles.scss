@@ -21,16 +21,6 @@ body {
 
 @layer components {
 
-    /* Select & MultiSelect Alignment */
-    .p-select-sm .p-select-label, .p-select-filter.p-inputtext-sm {
-        --p-select-sm-font-size: 1rem !important;
-        --p-inputtext-sm-font-size: 1rem !important;
-    }
-
-    .p-multiselect-sm .p-multiselect-label {
-        --p-multiselect-sm-font-size: 1rem !important;
-    }
-
     :root,
     :host {
         /* Density */
@@ -41,6 +31,9 @@ body {
         --p-inputtext-disabled-background: var(--p-surface-50) !important;
         --p-textarea-disabled-background: var(--p-surface-50) !important;
 
+        --p-select-sm-font-size: .925rem !important;
+        --p-inputtext-sm-font-size: .925rem !important;
+        --p-textarea-sm-font-size: .925rem !important;
 
 
 
@@ -82,6 +75,55 @@ body {
         --p-autocomplete-border-radius: var(--radius-xl) !important;
 
         --p-multiselect-chip-border-radius: var(--radius-xl) !important;
+
+
+        --p-tabs-tab-border-width: 0 0 0px 0 !important;
+        --p-tabs-tablist-border-width: 0 0 1px 0 !important;
+        --p-tabs-tabpanel-background: transparent !important;
+        --p-tabs-tablist-background: transparent !important;
+        --p-tabs-tab-padding: 0.525rem 1rem !important;
+
+        --p-tabs-tablist-border-color: transparent !important;
+        --p-tabs-tab-border-color: transparent !important;
+        --p-tabs-tablist-hover-border-color: transparent !important;
+        --p-tabs-tab-hover-border-color: transparent !important;
+
+        // Select and Multiselect Triggers
+  .p-select,
+  .p-multiselect,
+  .p-paginator .p-select {
+    border-radius: 0.75rem !important; // rounded-xl
+  }
+
+  // Options
+  .p-select-option{
+    border-radius: 0.75rem !important; // rounded-xl
+    margin: 4px 4px;
+
+  }
+  .p-multiselect-option {
+    border-radius: 0.75rem !important; // rounded-xl
+    margin: 2px 8px;
+  }
+
+  // Panels
+  .p-select-panel,
+  .p-multiselect-panel,
+  .p-select-list-container,
+  .p-select-overlay,
+  .p-select-list {
+    border-radius: 0.75rem !important; // rounded-xl
+  }
+
+  // Paginator
+  .p-paginator-page {
+    border-radius: 0.75rem !important; // rounded-xl
+    margin: 2px 8px !important;
+  }
+
+  .p-multiselect-chip {
+    border-radius: 0.75rem !important; // rounded-xl
+  }
     }
 
     .p-dark {
@@ -124,38 +166,6 @@ body {
             transform: translateY(2px) scale(0.99);
         }
     }
-
-    /* Keys */
-    .ngx-json-viewer .segment-key {
-        @apply text-blue-700! dark:text-blue-400! font-medium!;
-    }
-
-    /* String values */
-    .ngx-json-viewer .segment-string {
-        @apply text-emerald-700! dark:text-emerald-400!;
-    }
-
-    /* Numbers */
-    .ngx-json-viewer .segment-number {
-        @apply text-purple-700! dark:text-purple-400!;
-    }
-
-    /* Booleans */
-    .ngx-json-viewer .segment-boolean {
-        @apply text-rose-700! dark:text-rose-400!;
-    }
-
-    /* Null */
-    .ngx-json-viewer .segment-null {
-        @apply text-gray-500! dark:text-gray-400!;
-    }
-
-    /* Object / array braces */
-    .ngx-json-viewer .segment-object,
-    .ngx-json-viewer .segment-array {
-        @apply text-gray-700! dark:text-gray-300!;
-    }
-
     .p-tooltip {
         .p-tooltip-text {
             background-color: var(--tooltip-bg) !important;
@@ -185,10 +195,73 @@ body {
             @apply mt-1.5;
         }
     }
+    .p-tab {
+        border-radius: var(--radius-xl) !important;
+        gap: var(--p-tabs-tab-gap) !important;
+        background: var(--p-tabs-tab-background) !important;
+        border-width: var(--p-tabs-tab-border-width) !important;
+        border-color: var(--p-tabs-tab-border-color) !important;
+        color: var(--p-tabs-tab-color) !important;
+        padding: var(--p-tabs-tab-padding) !important;
+        font-weight: var(--p-tabs-tab-font-weight) !important;
+        &.p-tab-active {
+            border-bottom: none !important;
+        }
+    }
+
+    // ─── Dialog Content Expand/Collapse Animation ────────────────────────────
+    //
+    // PrimeNG v20 uses Angular [@animation] for dialog enter/leave.
+    // Animating height:auto (when @if blocks expand) requires the CSS grid trick:
+    //   grid-template-rows: 0fr → 1fr  (only this property can transition auto height)
+    //
+    // Usage in templates:
+    //   <div class="dialog-expand-row" [class.dialog-expand-row--open]="condition">
+    //       <div class="dialog-expand-content"> ... </div>
+    //   </div>
+    //
+    .dialog-expand-row {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+        &.dialog-expand-row--open {
+            grid-template-rows: 1fr;
+        }
+    }
+    .dialog-expand-content {
+        overflow: hidden;
+    }
+    // ─── Tab Panels Smooth Transition ────────────────────────────────────────
+    // Allows the tab container to smoothly resize when switching between
+    // tabs of different heights (e.g. source form config vs destinations).
+    .p-tabpanels {
+        interpolate-size: allow-keywords;
+        transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        // Ensure height is explicit so it can transition to/from auto
+        height: auto;
+    }
+
+    // Animate the newly active tab's content in
+    .p-tabpanel {
+        animation: fadeInTab 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    // ─────────────────────────────────────────────────────────────────────────
 
 }
 
 // Global Animations
+
+@keyframes fadeInTab {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
 // Fade In Up
 @keyframes fadeInUp {

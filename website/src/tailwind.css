@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=Dosis:wght@200..800&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Caveat:wght@400..700&family=Quicksand:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Comfortaa:wght@300..700&family=Dosis:wght@200..800&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Caveat:wght@400..700&family=Quicksand:wght@300..700&display=swap');
 @import "tailwindcss";
 @import "tailwindcss-primeui";
 @plugin "@tailwindcss/typography";
@@ -6,7 +6,7 @@
 @theme {
   --font-dosis: "Dosis", sans-serif;
   --font-nunito: "Nunito", sans-serif;
-  --font-sansation: "Sansation", sans-serif;
+  --font-sansation: "Bricolage Grotesque", sans-serif;
   --font-caveat: "Caveat", sans-serif;
   --font-quicksand: "Quicksand", sans-serif;
   --animate-float-slow: float-slow 20s ease-in-out infinite;

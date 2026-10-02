@@ -74,6 +74,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     currentRoute = '';
     dispatchDropdownOpen = false;
     ingestDropdownOpen = false;
+    destinationsDropdownOpen = false;
 
     items: MenuItem[] | undefined;
     avatarItem = [
@@ -230,6 +231,10 @@ export class SidebarComponent implements OnInit, AfterViewInit {
         if (this.isRouteActive('/events/ingest')) {
             this.ingestDropdownOpen = true;
         }
+
+        if (this.isRouteActive('/events/ingest/destinations')) {
+            this.destinationsDropdownOpen = true;
+        }
     }
 
     toggleDispatch() {
@@ -238,6 +243,10 @@ export class SidebarComponent implements OnInit, AfterViewInit {
 
     toggleIngest() {
         this.ingestDropdownOpen = !this.ingestDropdownOpen;
+    }
+
+    toggleDestinations() {
+        this.destinationsDropdownOpen = !this.destinationsDropdownOpen;
     }
 
     toggleHelp(event: Event) {

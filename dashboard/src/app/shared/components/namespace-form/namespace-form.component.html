@@ -16,6 +16,7 @@
             autofocus
             placeholder="e.g., My Web App, E-commerce API"
             class="rounded-xl!"
+            pSize="small"
         />
         @if (!namespaceForm.name && attemptedSave) {
         <small class="text-red-500">Name is required.</small>
@@ -31,6 +32,7 @@
             cols="20"
             placeholder="Brief description of your namespace..."
             class="rounded-xl!"
+            pSize="small"
         ></textarea>
     </div>
     <div class="flex flex-col gap-2">
@@ -61,12 +63,45 @@
             [placeholder]="hasWhiteLabelFeature ? 'e.g. X-Kyrazo' : 'X-Webhook (Default)'"
             [disabled]="!hasWhiteLabelFeature"
             class="rounded-xl!"
+            pSize="small"
         />
         @if (hasWhiteLabelFeature) {
         <small class="opacity-60 text-xs"
             >This will replace the default "X-Webhook" prefix.</small
         >
         }
+    </div>
+
+    <!-- Managed Transformer Section -->
+    <p-divider />
+
+    <div class="flex flex-col gap-4">
+        <div class="flex items-center justify-between">
+            <div class="flex flex-col gap-1">
+                <h3 class="text-sm font-bold m-0 p-0">Default Transformer</h3>
+                <p class="text-xs opacity-60 m-0 p-0">Applied to all events in this namespace by default.</p>
+            </div>
+            <p-toggleswitch
+                [(ngModel)]="namespaceForm.useTransformer"
+                class="scale-75"
+            />
+        </div>
+
+        <div class="dialog-expand-row" [class.dialog-expand-row--open]="namespaceForm.useTransformer">
+            <div class="dialog-expand-content">
+                <div class="flex flex-col gap-2 pt-2">
+                    <div class="h-[250px] overflow-hidden rounded-xl border border-surface-200 dark:border-surface-800">
+                        @if (namespaceForm.useTransformer) {
+                            <app-code-editor
+                                [(ngModel)]="namespaceForm.transformer.code"
+                                [ngModelOptions]="{standalone: true}"
+                                [language]="'javascript'"
+                            />
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="flex justify-end gap-2 mt-4">
@@ -77,6 +112,7 @@
             severity="secondary"
             (onClick)="onCancel.emit()"
             styleClass="rounded-xl!"
+            size="small"
         />
         <p-button
             label="Save"
@@ -84,7 +120,8 @@
             (onClick)="saveNamespace()"
             [loading]="isSaving"
             [disabled]="isSaving"
-            styleClass="rounded-xl!"
+            styleClass="rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20"
+            size="small"
         />
     </div>
 </div>

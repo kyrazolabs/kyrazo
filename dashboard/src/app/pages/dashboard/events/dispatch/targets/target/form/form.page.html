@@ -10,7 +10,7 @@
             <p-button label="Cancel" severity="secondary" [size]="'small'" [outlined]="true" routerLink="/events/dispatch/targets"
                 [disabled]="loading" styleClass="rounded-xl!"/>
             <p-button [label]="isEditMode ? 'Update' : 'Create'" [size]="'small'" [icon]="loading ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
-                (onClick)="onSubmit()" [loading]="loading" [disabled]="form.invalid || loading" styleClass="rounded-xl!"/>
+                (onClick)="onSubmit()" [loading]="loading" [disabled]="form.invalid || loading" styleClass="rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20"/>
         </div>
     </div>
 
@@ -22,7 +22,7 @@
                     <div class="flex flex-col gap-2">
                         <label for="name" class="font-medium text-surface-900 dark:text-surface-0">Name</label>
                         <input pInputText id="name" formControlName="name" placeholder="My Webhook Target"
-                            [ngClass]="{'ng-invalid ng-dirty': form.get('name')?.invalid && form.get('name')?.touched}" />
+                            [ngClass]="{'ng-invalid ng-dirty': form.get('name')?.invalid && form.get('name')?.touched}"  pSize="small" />
                         <small class="text-red-500" *ngIf="form.get('name')?.invalid && form.get('name')?.touched">
                             Name is required (3-100 chars)
                         </small>
@@ -39,7 +39,7 @@
                                 </p-inputicon>
                                 <input pInputText id="url" formControlName="url" placeholder="https://api.example.com/webhook"
                                     class="pl-10 w-full"
-                                    [ngClass]="{'ng-invalid ng-dirty': form.get('url')?.invalid && form.get('url')?.touched}" />
+                                    [ngClass]="{'ng-invalid ng-dirty': form.get('url')?.invalid && form.get('url')?.touched}"  pSize="small" />
                             </p-iconfield>
                         </div>
                         <small class="text-red-500" *ngIf="form.get('url')?.invalid && form.get('url')?.touched">
@@ -50,7 +50,7 @@
                     <div class="flex flex-col gap-2">
                         <label for="method" class="font-medium text-surface-900 dark:text-surface-0">HTTP Method</label>
                         <p-select [options]="methodOptions" formControlName="method" optionLabel="label"
-                            optionValue="value" placeholder="Select Method" styleClass="w-full rounded-xl!" />
+                            optionValue="value" placeholder="Select Method" styleClass="w-full rounded-xl!" appendTo="body" />
                         <small class="text-red-500" *ngIf="form.get('method')?.invalid && form.get('method')?.touched">
                             HTTP Method is required
                         </small>
@@ -60,7 +60,7 @@
                 <div class="flex flex-col gap-2">
                     <label for="description" class="font-medium text-surface-900 dark:text-surface-0">Description</label>
                     <textarea pInputTextarea id="description" formControlName="description" rows="3"
-                        placeholder="Optional description for this target" class="w-full rounded-xl!"></textarea>
+                        placeholder="Optional description for this target" class="w-full rounded-xl!" pSize="small"></textarea>
                 </div>
 
                 <div class="flex items-center gap-2">
@@ -103,10 +103,10 @@
                     <div *ngFor="let header of customHeaders.controls; let i=index" [formGroupName]="i"
                          class="flex gap-3 items-start">
                         <div class="flex-1">
-                            <input pInputText formControlName="key" placeholder="Header Key (e.g. X-API-Key)" class="w-full" />
+                            <input pInputText formControlName="key" placeholder="Header Key (e.g. X-API-Key)" class="w-full"  pSize="small" />
                         </div>
                         <div class="flex-1">
-                            <input pInputText formControlName="value" placeholder="Value" class="w-full" />
+                            <input pInputText formControlName="value" placeholder="Value" class="w-full"  pSize="small" />
                         </div>
                         <p-button icon="pi pi-trash" [text]="true" styleClass="rounded-xl!" severity="danger" (onClick)="removeHeader(i)" />
                     </div>

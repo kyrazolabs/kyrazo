@@ -28,9 +28,8 @@ export class SourceService {
     create(
         payload: CreateSourceRequest,
     ): Observable<ApiResponse<CreateSourceResponse>> {
-        const endpoint = environment.source.create;
         return this.http
-            .post<ApiResponse<CreateSourceResponse>>(endpoint, payload)
+            .post<ApiResponse<CreateSourceResponse>>(environment.sourceV2.create, payload)
             .pipe(catchError(this.handleError));
     }
 
@@ -38,12 +37,8 @@ export class SourceService {
         id: string,
         payload: UpdateSourceRequest,
     ): Observable<ApiResponse<UpdateSourceResponse>> {
-        // For updates, we need to determine the type. Since the payload might not have type,
-        // we'll use a generic update endpoint or fetch the webhook first to determine type
-        // For now, let's assume we pass the type or use a default approach
-        const endpoint = environment.source.update(id); // Default to receive for now
         return this.http
-            .patch<ApiResponse<UpdateSourceResponse>>(endpoint, payload)
+            .put<ApiResponse<UpdateSourceResponse>>(environment.sourceV2.update(id), payload)
             .pipe(catchError(this.handleError));
     }
 
@@ -59,7 +54,25 @@ export class SourceService {
 
     get(id: string): Observable<ApiResponse<GetSourceResponse>> {
         return this.http
-            .get<ApiResponse<GetSourceResponse>>(environment.source.get(id))
+            .get<ApiResponse<GetSourceResponse>>(environment.sourceV2.get(id))
+            .pipe(catchError(this.handleError));
+    }
+
+    createV2(payload: CreateSourceRequest): Observable<ApiResponse<CreateSourceResponse>> {
+        return this.http
+            .post<ApiResponse<CreateSourceResponse>>(environment.sourceV2.create, payload)
+            .pipe(catchError(this.handleError));
+    }
+
+    updateV2(id: string, payload: UpdateSourceRequest): Observable<ApiResponse<UpdateSourceResponse>> {
+        return this.http
+            .put<ApiResponse<UpdateSourceResponse>>(environment.sourceV2.update(id), payload)
+            .pipe(catchError(this.handleError));
+    }
+
+    getV2(id: string): Observable<ApiResponse<GetSourceResponse>> {
+        return this.http
+            .get<ApiResponse<GetSourceResponse>>(environment.sourceV2.get(id))
             .pipe(catchError(this.handleError));
     }
 
@@ -87,31 +100,15 @@ export class SourceService {
         }
 
         return this.http
-            .get<ApiResponse<any>>(environment.source.gets, {
+            .get<ApiResponse<GetSourcesResponse[]>>(environment.sourceV2.gets, {
                 params,
             })
-            .pipe(
-                map((response) => {
-                    if (response.success && Array.isArray(response.data)) {
-                        response.data = response.data.map((item: any) => {
-                            if (item.source) {
-                                return {
-                                    ...item.source,
-                                    ingress: item.ingress,
-                                };
-                            }
-                            return item;
-                        });
-                    }
-                    return response as ApiResponse<GetSourcesResponse[]>;
-                }),
-                catchError(this.handleError),
-            );
+            .pipe(catchError(this.handleError));
     }
 
     delete(id: string) {
         return this.http
-            .delete<ApiResponse<any>>(environment.source.delete(id))
+            .delete<ApiResponse<any>>(environment.sourceV2.delete(id))
             .pipe(catchError(this.handleError));
     }
 

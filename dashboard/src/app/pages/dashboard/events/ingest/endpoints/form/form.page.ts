@@ -25,6 +25,7 @@ import { IEndpoint } from '@models/endpoint.types';
 import { EndpointService } from '@core/services/endpoint.service';
 import { SentryService } from '@core/3rd-party/sentry';
 import { PostHogService } from '@core/3rd-party/posthog';
+import { FloatLabelModule } from 'primeng/floatlabel';
 
 export interface EndpointForm {
     name: string;
@@ -56,6 +57,7 @@ export interface EndpointForm {
         CheckboxModule,
         DividerModule,
         ToastModule,
+        FloatLabelModule,
     ],
     templateUrl: './form.page.html',
     styleUrl: './form.page.scss',

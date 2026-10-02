@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { ConnectOptions } from 'mongoose';
 import * as fs from 'fs';
 import { logger } from './logger';
 import config from './app';
@@ -61,11 +61,12 @@ export class DatabaseConfig {
                 uri: mongoUri.replace(/:([^@]+)@/, ':****@'), // Mask password
                 dbName: config.database.dbName,
                 ssl: isSslEnabled ? 'enabled' : 'disabled',
-                ...(isSslEnabled && { caFile: (config.database as any).caFile })
+                ...(isSslEnabled && { caFile: (config.database as any).caFile }),
             });
 
-            const mongooseOptions: any = {
+            const mongooseOptions: ConnectOptions = {
                 dbName: config.database.dbName!,
+                serverApi: { version: '1', strict: false, deprecationErrors: true },
                 maxPoolSize: config.database.maxPoolSize,
                 minPoolSize: config.database.minPoolSize,
                 serverSelectionTimeoutMS: config.database.serverSelectionTimeoutMS,
@@ -81,13 +82,21 @@ export class DatabaseConfig {
 
             if (isSslEnabled) {
                 mongooseOptions.rejectUnauthorized = true;
-                
-                if ((config.database as any).caFile && fs.existsSync((config.database as any).caFile)) {
+
+                if (
+                    (config.database as any).caFile &&
+                    fs.existsSync((config.database as any).caFile)
+                ) {
                     mongooseOptions.ca = fs.readFileSync((config.database as any).caFile);
                 }
-                
-                if ((config.database as any).tlsCertificateKeyFile && fs.existsSync((config.database as any).tlsCertificateKeyFile)) {
-                    mongooseOptions.tlsCertificateKeyFile = (config.database as any).tlsCertificateKeyFile;
+
+                if (
+                    (config.database as any).tlsCertificateKeyFile &&
+                    fs.existsSync((config.database as any).tlsCertificateKeyFile)
+                ) {
+                    mongooseOptions.tlsCertificateKeyFile = (
+                        config.database as any
+                    ).tlsCertificateKeyFile;
                 }
             } else {
                 mongooseOptions.tlsInsecure = true;
@@ -99,27 +108,27 @@ export class DatabaseConfig {
             this.isConnected = true;
             logger.info('Mongoose connected to MongoDB successfully');
 
-            // Check if the connected node is primary (important for replica sets with index syncing)
-            const adminDb = mongoose.connection.db?.admin();
-            const serverStatus = await adminDb?.serverStatus();
-            const isPrimary = serverStatus?.repl?.isWritablePrimary ?? true; // Default to true if not a replSet
+            // // Check if the connected node is primary (important for replica sets with index syncing)
+            // const adminDb = mongoose.connection.db?.admin();
+            // const serverStatus = await adminDb?.serverStatus();
+            // const isPrimary = serverStatus?.repl?.isWritablePrimary ?? true; // Default to true if not a replSet
 
-            if (serverStatus?.repl) {
-                logger.info('MongoDB Replica Set Status:', {
-                    set: serverStatus.repl.setName,
-                    isPrimary,
-                    me: serverStatus.repl.me,
-                });
+            // if (serverStatus?.repl) {
+            //     logger.info('MongoDB Replica Set Status:', {
+            //         set: serverStatus.repl.setName,
+            //         isPrimary,
+            //         me: serverStatus.repl.me,
+            //     });
 
-                if (!isPrimary) {
-                    logger.warn(
-                        '⚠️ Connected to a SECONDARY node. Index synchronization and writes will fail.'
-                    );
-                    logger.warn(
-                        'Tip: Ensure your replica set is initialized with rs.initiate() and your URI is correct.'
-                    );
-                }
-            }
+            //     if (!isPrimary) {
+            //         logger.warn(
+            //             '⚠️ Connected to a SECONDARY node. Index synchronization and writes will fail.'
+            //         );
+            //         logger.warn(
+            //             'Tip: Ensure your replica set is initialized with rs.initiate() and your URI is correct.'
+            //         );
+            //     }
+            // }
 
             // Handle connection events
             mongoose.connection.on('error', error => {

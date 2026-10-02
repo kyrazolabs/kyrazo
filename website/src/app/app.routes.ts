@@ -1,5 +1,10 @@
 import { Routes } from '@angular/router';
-import { pricingResolver } from '@core/resolvers/pricing.resolver';
+import {
+    ABOUT_SCHEMA,
+    HOME_SCHEMA,
+    PRICING_SCHEMA,
+    webPageSchema,
+} from '@core/seo/page-schemas';
 
 export const routes: Routes = [
     {
@@ -16,13 +21,14 @@ export const routes: Routes = [
                         (p) => p.LandingPage,
                     ),
                 data: {
-                    title: 'Reliable Webhooks as a Service',
+                    title: 'Dedicated Webhook Infrastructure for Enterprise B2B',
                     meta: {
                         description:
-                            'Simplify your event architecture with Kyrazo. A managed webhook platform offering signature verification, automatic retries, and dedicated workers.',
+                            'Kyrazo delivers dedicated webhook infrastructure for enterprise B2B: physically isolated compute, databases, and delivery workers with zero noisy-neighbor performance degradation and zero shared database memory.',
                         keywords:
-                            'Webhooks as a Service, Managed Webhook Infrastructure, Webhook Relay, Dedicated Workers, Webhook Isolation, Kyrazo, Webhook Retry',
+                            'Dedicated Webhook Infrastructure, Enterprise Webhooks, Webhooks as a Service, Isolated Infrastructure, Noisy Neighbor, BYOC, Private Cloud Webhooks, Kyrazo',
                     },
+                    schema: HOME_SCHEMA,
                 },
             },
             {
@@ -32,11 +38,16 @@ export const routes: Routes = [
                         (p) => p.PrivacyPage,
                     ),
                 data: {
-                    title: 'Privacy Policy - Kyrazo',
+                    title: 'Privacy Policy',
                     meta: {
                         description:
                             "Read Kyrazo's Privacy Policy to understand how we collect, use, and protect your data.",
                     },
+                    schema: webPageSchema(
+                        'Privacy Policy',
+                        '/legal/privacy-policy',
+                        "Read Kyrazo's Privacy Policy to understand how we collect, use, and protect your data.",
+                    ),
                 },
             },
             {
@@ -46,11 +57,16 @@ export const routes: Routes = [
                         (p) => p.RefundPage,
                     ),
                 data: {
-                    title: 'Refund Policy - Kyrazo',
+                    title: 'Refund Policy',
                     meta: {
                         description:
-                            "Kyrazo's Refund Policy. Understand our terms for refunds and cancellations.",
+                            'Kyrazo refund and cancellation terms for dedicated deployments: paid onboarding, annual contracts, and Order Form billing. No unpaid trial.',
                     },
+                    schema: webPageSchema(
+                        'Refund Policy',
+                        '/legal/refund-policy',
+                        'Kyrazo refund and cancellation terms for dedicated deployments: paid onboarding, annual contracts, and Order Form billing. No unpaid trial.',
+                    ),
                 },
             },
             {
@@ -60,11 +76,16 @@ export const routes: Routes = [
                         (p) => p.TermsOfService,
                     ),
                 data: {
-                    title: 'Terms of Service - Kyrazo',
+                    title: 'Terms of Service',
                     meta: {
                         description:
                             "Kyrazo's Terms of Service. Read the rules and regulations for using our platform.",
                     },
+                    schema: webPageSchema(
+                        'Terms of Service',
+                        '/legal/terms-of-service',
+                        "Kyrazo's Terms of Service. Read the rules and regulations for using our platform.",
+                    ),
                 },
             },
             {
@@ -74,11 +95,16 @@ export const routes: Routes = [
                         (p) => p.GDPRPage,
                     ),
                 data: {
-                    title: 'GDPR Compliance - Kyrazo',
+                    title: 'GDPR Compliance',
                     meta: {
                         description:
                             "Kyrazo's commitment to GDPR and data protection. Learn about your rights and how we handle your data.",
                     },
+                    schema: webPageSchema(
+                        'GDPR Compliance',
+                        '/legal/gdpr',
+                        "Kyrazo's commitment to GDPR and data protection. Learn about your rights and how we handle your data.",
+                    ),
                 },
             },
             {
@@ -88,143 +114,65 @@ export const routes: Routes = [
                         (p) => p.DPAPage,
                     ),
                 data: {
-                    title: 'Data Processing Agreement - Kyrazo',
+                    title: 'Data Processing Agreement',
                     meta: {
                         description:
                             "Kyrazo's Data Processing Agreement (DPA). Understand how we process personal data on your behalf.",
                     },
-                },
-            },
-            {
-                path: 'blog',
-                loadChildren: () =>
-                    import('./pages/blog/blog.routes').then(
-                        (m) => m.BLOG_ROUTES,
+                    schema: webPageSchema(
+                        'Data Processing Agreement',
+                        '/legal/dpa',
+                        "Kyrazo's Data Processing Agreement (DPA). Understand how we process personal data on your behalf.",
                     ),
-                data: {
-                    title: 'Blog',
-                    meta: {
-                        description:
-                            'Kyrazo Blog - Latest updates and articles.',
-                    },
                 },
             },
             {
-                path: 'features/ingest',
+                path: 'about',
                 loadComponent: () =>
-                    import('@pages/features/ingest/ingest.page').then(
-                        (p) => p.IngestPage,
+                    import('@pages/about/about.page').then(
+                        (p) => p.AboutPage,
                     ),
                 data: {
-                    title: 'Secure Webhook Ingestion & Verification',
+                    title: 'About',
                     meta: {
                         description:
-                            'Securely receive webhooks from any provider. Kyrazo handles HMAC signature verification, payload normalization, and event logging automatically.',
-                        keywords:
-                            'Webhook Ingestion, HMAC Verification, Webhook Receiver, Secure Webhooks, Stripe Webhooks, GitHub Webhooks, Event Normalization',
+                            'Learn about Kyrazo, the dedicated webhook infrastructure for enterprise B2B.',
                     },
+                    schema: ABOUT_SCHEMA,
                 },
             },
-            {
-                path: 'features/dispatch',
-                loadComponent: () =>
-                    import('@pages/features/dispatch/dispatch.page').then(
-                        (p) => p.DispatchPage,
-                    ),
-                data: {
-                    title: 'Reliable Webhook Dispatch & Retry Logic',
-                    meta: {
-                        description:
-                            'Guarantee webhook delivery with Kyrazo. Automatic retries with exponential backoff, dead-letter queues, and event scheduling.',
-                        keywords:
-                            'Webhook Dispatch, Webhook Retries, Exponential Backoff, Dead Letter Queue, Reliability, Event Scheduling, Webhook Delivery',
-                    },
-                },
-            },
-            {
-                path: 'features/architecture',
-                loadComponent: () =>
-                    import('@pages/features/architecture/architecture.page').then(
-                        (p) => p.ArchitecturePage,
-                    ),
-                data: {
-                    title: 'Dedicated Workers Architecture',
-                    meta: {
-                        description:
-                            'Eliminate noisy neighbor issues with Kyrazo’s dedicated workers. Isolated infrastructure ensures consistent latency and high throughput for your webhooks.',
-                        keywords:
-                            'Dedicated Workers, Webhook Isolation, Noisy Neighbor Problem, High Throughput Webhooks, Predictable Latency, Enterprise Webhooks',
-                    },
-                },
-            },
-            // {
-            //     path: 'features/privacy-by-design',
-            //     loadComponent: () =>
-            //         import(
-            //             '@pages/features/privacy-by-design/privacy-by-design.page'
-            //         ).then((p) => p.PrivacyByDesignPage),
-            //     data: {
-            //         title: 'Privacy by Design - Kyrazo',
-            //         meta: {
-            //             description:
-            //                 'Learn how Kyrazo implements privacy-first engineering in its webhook relay infrastructure.',
-            //         },
-            //     },
-            // },
-            // {
-            //     path: 'features/early-adopter',
-            //     loadComponent: () =>
-            //         import(
-            //             '@pages/features/early-adopter/early-adopter.page'
-            //         ).then((p) => p.EarlyAdopterPage),
-            //     data: {
-            //         title: 'Early Adopter Program - Kyrazo',
-            //         meta: {
-            //             description:
-            //                 'Join the Kyrazo Early Adopter program and get direct access to our founding engineering team.',
-            //         },
-            //     },
-            // },
             {
                 path: 'pricing',
                 loadComponent: () =>
                     import('@pages/pricing/pricing.page').then(
                         (p) => p.PricingPage,
                     ),
-                resolve: { plans: pricingResolver },
                 data: {
-                    title: 'Pricing - Kyrazo',
+                    title: 'Pricing',
                     meta: {
                         description:
-                            'Flexible and transparent pricing for managed webhook infrastructure. From free starter plans to mission-critical enterprise solutions.',
+                            'Dedicated webhook infrastructure pricing. Professional plans from $499/month on annual contracts; enterprise BYOC and private cloud deployments with custom billing.',
                     },
+                    schema: PRICING_SCHEMA,
                 },
             },
         ],
     },
-    // {
-    //     path: 'changelogs',
-    //     loadComponent: () =>
-    //         import('@pages/changelogs/changelogs.page').then(
-    //             (p) => p.ChangelogsPage,
-    //         ),
-    //     data: {
-    //         title: 'Changelogs & Updates',
-    //         meta: {
-    //             description:
-    //                 'Stay up to date with the latest features, improvements, and bug fixes in Kyrazo. Track our evolution as we build the best platform for SaaS engineering.',
-    //             keywords:
-    //                 'Kyrazo Changelog, SaaS Updates, Product News, Engineering Blog',
-    //         },
-    //     },
-    // },
+
     {
         path: 'not-found',
         loadComponent: () =>
             import('@shared/ui/not-found/not-found.component').then(
                 (p) => p.NotFoundComponent,
             ),
-        data: { animation: 'not-found' },
+        data: {
+            animation: 'not-found',
+            title: 'Page Not Found',
+            meta: {
+                description: 'The page you requested could not be found.',
+                robots: 'noindex, nofollow',
+            },
+        },
     },
     {
         path: '**',

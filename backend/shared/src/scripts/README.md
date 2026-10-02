@@ -1,0 +1,19 @@
+# Scripts
+
+`backend/shared/src/scripts`
+
+This folder holds maintenance scripts for the shared backend library.
+
+## Contents
+
+### Files
+
+- `list-workspaces.ts`
+- `migrate-user-workspaces.ts`
+- `verify-soft-delete.ts`
+
+## License
+
+Copyright (c) 2026 Kyrazo LLC. All rights reserved. You may not use this folder for a commercial or a non-commercial purpose without written permission from Kyrazo LLC. See the [repository license](../../../../LICENSE).
+
+The rules for changing this folder are in [CONTRIBUTING.md](CONTRIBUTING.md).

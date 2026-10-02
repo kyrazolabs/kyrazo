@@ -31,27 +31,32 @@ export class FaqComponent {
         {
             category: 'General',
             question: 'What is Kyrazo?',
-            answer: 'Kyrazo is a webhook gateway and event orchestration platform designed to help teams reliably receive, process, and route events between systems.',
+            answer: 'Kyrazo is dedicated webhook infrastructure for enterprise B2B. Each customer gets physically isolated compute, databases, and delivery workers to ingest, process, and dispatch events — with no noisy-neighbor sharing.',
         },
         {
-            category: 'Technical',
-            question: 'How does Kyrazo handle traffic spikes?',
-            answer: 'Kyrazo is built with scalability in mind. It uses asynchronous processing and horizontally scalable workers to handle increased event volume while maintaining stable ingestion.',
+            category: 'Sales',
+            question: 'Is Kyrazo self-serve?',
+            answer: 'No. Access is provisioned after a discovery meeting and an executed Order Form. There is no public signup or in-product checkout.',
         },
         {
-            category: 'Security',
-            question: 'Is my data protected during transmission?',
-            answer: 'Yes. All data is transmitted over secure TLS connections. Kyrazo also supports request verification mechanisms, such as signatures, to help ensure payload integrity.',
+            category: 'Pricing',
+            question: 'How much does Professional cost?',
+            answer: 'Professional is $499 per month on an annual contract. Enterprise is custom billed ($1,000–$5,000+ per month). A one-time onboarding and security setup fee ($500–$1,500) applies to new dedicated deployments.',
+        },
+        {
+            category: 'Trial',
+            question: 'Do you offer a free trial?',
+            answer: 'No. A discovery meeting is free and does not provision servers. Dedicated infrastructure is spun up only after an Order Form and the one-time onboarding fee ($500–$1,500), which is non-refundable once provisioning starts.',
         },
         {
             category: 'Reliability',
             question: 'What happens if a destination endpoint is unavailable?',
-            answer: 'If a delivery attempt fails, Kyrazo can retry delivery based on configurable retry policies. Failed attempts are recorded to help with troubleshooting and observability.',
+            answer: 'If a delivery attempt fails, Kyrazo retries based on configurable retry policies. Failed attempts are recorded to help with troubleshooting and observability.',
         },
         {
             category: 'Integration',
             question: 'Do I need to modify my existing code?',
-            answer: 'In many cases, no changes are required. You can point your existing webhooks to Kyrazo’s ingestion endpoint. For more advanced use cases, SDKs are available for Node.js, Python, and Go.',
+            answer: 'Often no. After provisioning you receive a dedicated hostname — a Kyrazo subdomain or your own domain — for the dashboard and API. Point existing webhooks at that ingest URL. There is no shared api.kyrazo.com or public signup. SDKs are available for Node.js, Python, and Go.',
         },
     ];
 }

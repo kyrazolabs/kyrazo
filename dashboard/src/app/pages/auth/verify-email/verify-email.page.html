@@ -26,7 +26,7 @@
                     </div>
                     <h3 class="text-xl font-semibold text-surface-900 dark:text-surface-0">Success!</h3>
                     <p class="text-surface-600 dark:text-surface-300 max-w-sm">Your email has been verified successfully. You can now log in to your account.</p>
-                    <p-button label="Back to Login" icon="pi pi-arrow-left" [routerLink]="'/auth/login'" styleClass="w-full! rounded-xl! mt-4" />
+                    <p-button label="Back to Login" icon="pi pi-arrow-left" [routerLink]="'/auth/login'" styleClass="w-full! rounded-xl! mt-4" size="small" />
                 </div>
 
                 <!-- Error State -->
@@ -37,8 +37,8 @@
                     <h3 class="text-xl font-semibold text-surface-900 dark:text-surface-0">Verification Failed</h3>
                     <p class="text-red-500 max-w-sm">{{ error() }}</p>
                     <div class="flex justify-between gap-2 mt-4">
-                        <p-button label="Try Again" icon="pi pi-refresh" (onClick)="ngOnInit()" severity="secondary" styleClass="w-full rounded-xl!" />
-                        <p-button label="Back to Login" [routerLink]="'/auth/login'" [outlined]="true" styleClass="w-full rounded-xl!" />
+                        <p-button label="Try Again" icon="pi pi-refresh" (onClick)="ngOnInit()" severity="secondary" styleClass="w-full rounded-xl!" size="small" />
+                        <p-button label="Back to Login" [routerLink]="'/auth/login'" [outlined]="true" styleClass="w-full rounded-xl!" size="small" />
                     </div>
                 </div>
             </div>

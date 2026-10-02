@@ -8,11 +8,13 @@ const mockRedis = {
 
 const mockTarget = {
     findOne: mock(() => ({
-        select: mock(() =>
-            Promise.resolve({
-                secrets: [{ active: true, value_enc: "enc", iv: "iv" }],
-            }),
-        ),
+        select: mock(() => ({
+            lean: mock(() =>
+                Promise.resolve({
+                    secrets: [{ active: true, value_enc: 'enc', iv: 'iv' }],
+                })
+            ),
+        })),
     })),
 };
 

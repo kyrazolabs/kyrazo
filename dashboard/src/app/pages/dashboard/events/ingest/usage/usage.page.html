@@ -11,10 +11,16 @@
         </div>
         <div class="flex gap-3">
             <p-select [(ngModel)]="selectedTimeRange" [options]="timeRangeOptions" optionLabel="label" [variant]="'outlined'"
-                optionValue="value" placeholder="Select time range" class="rounded-xl!"
-                (onChange)="onTimeRangeChange()" size="small" />
+                optionValue="value" class="rounded-xl!"
+                (onChange)="onTimeRangeChange()" size="small" appendTo="body">
+                <ng-template #header>
+                    <div class="px-3 py-2 border-b border-surface-200 dark:border-surface-800">
+                        <span class="text-xs font-bold uppercase tracking-wider text-surface-500">Select Time Range</span>
+                    </div>
+                </ng-template>
+            </p-select>
             <p-button label="Export" icon="pi pi-download" [outlined]="true" severity="secondary"
-                styleClass="rounded-xl!" />
+                styleClass="rounded-xl!" size="small" />
         </div>
     </div>
 
@@ -224,7 +230,7 @@
             <p class="text-surface-500 dark:text-surface-400 max-w-md mx-auto mb-6">
                 Your current plan does not include advanced analytics. Upgrade to see detailed insights about your data.
             </p>
-            <p-button label="Upgrade Plan" icon="pi pi-arrow-up" (click)="subscriptionService.refreshSubscription()" />
+            <p-button label="Upgrade Plan" icon="pi pi-arrow-up" (click)="subscriptionService.refreshSubscription()" size="small"  styleClass="shadow-md shadow-primary/50 dark:shadow-primary/20" />
         </div>
     }
 

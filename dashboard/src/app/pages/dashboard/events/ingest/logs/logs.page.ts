@@ -26,6 +26,7 @@ import { LoaderService } from '@core/services/loader.service';
 import { GetDAResponse, TargetStatus } from '@models/delivery.types';
 import { IngestEvent } from '@core/services/delivery.service';
 import { SourceType } from '@models/source.types';
+import { FloatLabelModule } from 'primeng/floatlabel';
 
 // Interface for display purposes (mapping GetDAResponse to display format)
 interface Delivery {
@@ -68,6 +69,7 @@ interface Delivery {
         SkeletonModule,
         ProgressBarModule,
         CopyIdComponent,
+        FloatLabelModule,
     ],
     templateUrl: './logs.page.html',
     styleUrl: './logs.page.scss',
@@ -113,10 +115,14 @@ export class IngestLogsPage implements OnInit {
 
     ngOnInit() {
         // Load from resolver
-        const resolvedData = this.route.snapshot.data['data'] as ApiResponse<IngestEvent[]>;
+        const resolvedData = this.route.snapshot.data['data'] as ApiResponse<
+            IngestEvent[]
+        >;
         if (resolvedData) {
             this.ingestEvents = resolvedData.data || [];
-            this.totalRecords = Number(resolvedData.pagination?.total) || this.ingestEvents.length;
+            this.totalRecords =
+                Number(resolvedData.pagination?.total) ||
+                this.ingestEvents.length;
             this.applyClientSideFiltering();
         } else {
             this.loadIngestEvents();

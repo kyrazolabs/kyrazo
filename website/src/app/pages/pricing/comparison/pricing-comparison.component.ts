@@ -17,35 +17,34 @@ export class PricingComparisonComponent {
 
     featureGroups = [
         {
-            name: 'Performance & Limits',
+            name: 'Dedicated Infrastructure',
             features: [
-                { label: 'Events per second', key: 'limits.eventsPerSecond' },
+                { label: 'Delivery Workers', key: 'features.workers' },
                 {
-                    label: 'Events per month',
-                    key: 'limits.eventsPerMonth',
-                    format: 'number',
+                    label: 'Dedicated Compute & Database',
+                    key: 'features.dedicatedInfrastructure',
+                    format: 'check',
                 },
                 {
-                    label: 'Max Namespaces',
-                    key: 'limits.maxNamespaces',
-                    format: 'unlimited',
+                    label: 'Isolated Database',
+                    key: 'features.isolatedDatabase',
+                    format: 'check',
                 },
                 {
-                    label: 'Max Members',
-                    key: 'limits.maxMembers',
-                    format: 'unlimited',
+                    label: 'BYOC / Private Cloud',
+                    key: 'features.byoc',
+                    format: 'check',
                 },
                 {
-                    label: 'Max Connectors',
-                    key: 'limits.maxConnectors',
-                    format: 'unlimited',
+                    label: 'Custom Domain',
+                    key: 'features.customDomain',
+                    format: 'check',
                 },
             ],
         },
         {
-            name: 'Features & Capabilities',
+            name: 'Platform Features',
             features: [
-                { label: 'Dedicated Workers', key: 'features.workers' },
                 {
                     label: 'Ingest Support',
                     key: 'features.ingest',
@@ -66,18 +65,8 @@ export class PricingComparisonComponent {
                     format: 'check',
                 },
                 {
-                    label: 'Custom Timeout',
-                    key: 'features.customTimeout',
-                    format: 'check',
-                },
-                {
                     label: 'Custom Retries',
                     key: 'features.customRetries',
-                    format: 'check',
-                },
-                {
-                    label: 'Forward Configuration',
-                    key: 'features.forwardConfiguration',
                     format: 'check',
                 },
                 {
@@ -91,38 +80,33 @@ export class PricingComparisonComponent {
                     format: 'check',
                 },
                 {
-                    label: 'IP Whitelisting',
-                    key: 'features.ipWhitelisting',
-                    format: 'check',
-                },
-                {
                     label: 'Header Prefix',
                     key: 'features.whiteLabelHeaders',
                     format: 'check',
                     tooltip:
                         'Customize outbound event headers. E.g., x-kyrazo-event',
                 },
-                {
-                    label: 'Custom Domain',
-                    key: 'features.customDomain',
-                    format: 'check',
-                },
-                { label: 'SAML/SSO', key: 'features.sso', format: 'check' },
             ],
         },
         {
-            name: 'Support & Infrastructure',
+            name: 'Security, Support & Compliance',
             features: [
                 { label: 'Uptime SLA', key: 'features.sla' },
                 { label: 'Support Level', key: 'features.support' },
                 {
-                    label: 'Dedicated Infrastructure',
-                    key: 'features.dedicatedInfrastructure',
+                    label: 'Custom SLA',
+                    key: 'features.customSla',
                     format: 'check',
                 },
                 {
-                    label: 'Custom SLA',
-                    key: 'features.customSla',
+                    label: 'IP Whitelisting',
+                    key: 'features.ipWhitelisting',
+                    format: 'check',
+                },
+                { label: 'SAML/SSO', key: 'features.sso', format: 'check' },
+                {
+                    label: 'Custom Compliance Setup',
+                    key: 'features.customCompliance',
                     format: 'check',
                 },
             ],

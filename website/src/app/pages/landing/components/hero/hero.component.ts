@@ -15,7 +15,8 @@ import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { Router, RouterLink } from '@angular/router';
-import { PostHogService } from '@core/3rd-party/posthog';
+import { UmamiService } from '@core/3rd-party/umami';
+import { CalendlyService } from '@shared/services/calendly.service';
 
 interface BlobState {
     element: HTMLElement;
@@ -49,7 +50,8 @@ export class HeroComponent implements AfterViewInit, OnDestroy {
     private mouseY = -9999;
     private isBrowser: boolean;
 
-    private posthog = inject(PostHogService);
+    private umami = inject(UmamiService);
+    private calendly = inject(CalendlyService);
 
     constructor(
         private ngZone: NgZone,
@@ -58,17 +60,13 @@ export class HeroComponent implements AfterViewInit, OnDestroy {
         this.isBrowser = isPlatformBrowser(platformId);
     }
 
-    trackEarlyAccess() {
-        this.posthog.capture('hero_early_access_clicked');
-        window.open(
-            'https://dash.kyrazo.com/auth/register',
-            '_top',
-            'noopener,noreferrer',
-        );
+    bookDiscovery() {
+        this.umami.capture('hero_book_discovery_clicked');
+        this.calendly.openDiscoveryPopup();
     }
 
     trackDocs() {
-        this.posthog.capture('hero_docs_clicked');
+        this.umami.capture('hero_docs_clicked');
         window.open('https://docs.kyrazo.com', '_blank', 'noopener,noreferrer');
     }
 

@@ -1,12 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 
 import { ScrollRevealDirective } from '@shared/directives/scroll-reveal.directive';
-import { PostHogService } from '@core/3rd-party/posthog';
+import { UmamiService } from '@core/3rd-party/umami';
+import { CalendlyService } from '@shared/services/calendly.service';
 
 @Component({
     selector: 'app-landing-cta',
@@ -14,8 +13,6 @@ import { PostHogService } from '@core/3rd-party/posthog';
     imports: [
         CommonModule,
         ButtonModule,
-        InputTextModule,
-        FormsModule,
         ScrollRevealDirective,
         RouterModule,
     ],
@@ -23,23 +20,17 @@ import { PostHogService } from '@core/3rd-party/posthog';
     styleUrl: './cta.component.scss',
 })
 export class CtaComponent {
-    private posthog = inject(PostHogService);
-    email: string = '';
+    private umami = inject(UmamiService);
+    private calendly = inject(CalendlyService);
 
-    onSubmit() {
-        this.posthog.capture('cta_signup', { email: this.email });
-        const url = this.email
-            ? `https://dash.kyrazo.com/auth/register?email=${encodeURIComponent(this.email)}`
-            : 'https://dash.kyrazo.com/auth/register';
-        window.open(url, '_top', 'noopener,noreferrer');
+    bookMeeting() {
+        this.umami.capture('cta_book_discovery_clicked');
+        this.calendly.openDiscoveryPopup();
     }
 
-    trackCta() {
-        this.posthog.capture('cta_early_access_clicked');
-        window.open(
-            'https://dash.kyrazo.com/auth/register',
-            '_top',
-            'noopener,noreferrer',
-        );
+    contactSales() {
+        this.umami.capture('cta_contact_sales_clicked');
+        window.location.href =
+            'mailto:sales@kyrazo.com?subject=Kyrazo%20Enterprise%20Inquiry';
     }
 }

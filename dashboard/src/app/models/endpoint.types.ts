@@ -13,6 +13,8 @@ export interface IEndpoint<T = string> {
     method: EndpointMethods;
     description: string;
     enabled: boolean;
+    transformer?: string | any;
+    isManagedTransform: boolean;
 
     userId: string;
 

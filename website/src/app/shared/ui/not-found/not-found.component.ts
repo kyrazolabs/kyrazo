@@ -48,11 +48,10 @@ import { ButtonModule } from 'primeng/button';
 
                 <div class="space-x-4">
                     <a
-                        href="https://dash.kyrazo.com"
-                        target="_top"
+                        routerLink="/"
                         class="w-full px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-xl transition-colors shadow-sm"
                     >
-                        Go to Dashboard
+                        Back to Home
                     </a>
 
                     <a

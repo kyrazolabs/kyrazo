@@ -31,6 +31,7 @@ import { DialogService } from '@shared/services/dialog.service';
 import { SentryService } from '@core/3rd-party/sentry';
 import { SubscriptionService } from '@core/services/subscription.service';
 import { TooltipModule } from 'primeng/tooltip';
+import { FloatLabelModule } from 'primeng/floatlabel';
 
 @Component({
     selector: 'app-secrets.page',
@@ -51,6 +52,7 @@ import { TooltipModule } from 'primeng/tooltip';
         Dialog,
         DividerModule,
         TooltipModule,
+        FloatLabelModule,
     ],
     templateUrl: './secrets.page.html',
     styleUrl: './secrets.page.scss',

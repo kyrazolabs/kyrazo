@@ -66,7 +66,7 @@ export interface SignatureResult {
 }
 
 export interface IConfiguredTarget {
-    type: 'target' | 'endpoint';
+    type: 'target' | 'endpoint' | 's3Bucket' | 'asqs';
     targetId: string;
     url: string;
     rateLimit?: number;
@@ -74,12 +74,17 @@ export interface IConfiguredTarget {
     retryCount?: number;
     customHeaders?: Record<string, string>;
     method?: string;
+    transform?: {
+        id: string;
+        code: string;
+    };
 }
 export interface IDispatchJobData {
     event: IDispatchedEvent;
     target: IConfiguredTarget;
     headers: IWebhookHeaders;
     deliveryId: string;
+    // Job-level default transform (fallback)
     transform?: {
         id: string;
         code: string;

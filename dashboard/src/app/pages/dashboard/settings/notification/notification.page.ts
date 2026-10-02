@@ -19,6 +19,7 @@ import { IUserPreference } from '@models/auth.types';
 import { PostHogService } from '@core/3rd-party/posthog';
 import { SentryService } from '@core/3rd-party/sentry';
 import { DialogService } from '@shared/services/dialog.service';
+import { FloatLabelModule } from 'primeng/floatlabel';
 
 @Component({
     selector: 'app-notification-settings',
@@ -32,6 +33,7 @@ import { DialogService } from '@shared/services/dialog.service';
         DividerModule,
         ToastModule,
         SelectModule,
+        FloatLabelModule,
     ],
     templateUrl: './notification.page.html',
     styleUrl: './notification.page.scss',

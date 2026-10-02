@@ -47,7 +47,7 @@ export class NamespaceService {
 
         return this.http
             .get<GetNamespacesResponse>(
-                environment.namespace.getWorkspaceNamespaces,
+                environment.namespaceV2.gets,
                 {
                     params,
                 },
@@ -64,7 +64,7 @@ export class NamespaceService {
     ): Observable<CreateNamespaceResponse> {
         return this.http
             .post<CreateNamespaceResponse>(
-                environment.namespace.create,
+                environment.namespaceV2.create,
                 payload,
             )
             .pipe(
@@ -76,7 +76,7 @@ export class NamespaceService {
     // Get namespace by ID
     get(namespaceId: string): Observable<GetNamespaceResponse> {
         return this.http
-            .get<GetNamespaceResponse>(environment.namespace.get(namespaceId))
+            .get<GetNamespaceResponse>(environment.namespaceV2.get(namespaceId))
             .pipe(catchError(this.handleError));
     }
 
@@ -86,8 +86,8 @@ export class NamespaceService {
         payload: UpdateNamespaceRequest,
     ): Observable<UpdateNamespaceResponse> {
         return this.http
-            .patch<UpdateNamespaceResponse>(
-                environment.namespace.update(namespaceId),
+            .put<UpdateNamespaceResponse>(
+                environment.namespaceV2.update(namespaceId),
                 payload,
             )
             .pipe(
@@ -100,7 +100,7 @@ export class NamespaceService {
     delete(namespaceId: string): Observable<DeleteNamespaceResponse> {
         return this.http
             .delete<DeleteNamespaceResponse>(
-                environment.namespace.delete(namespaceId),
+                environment.namespaceV2.delete(namespaceId),
             )
             .pipe(
                 tap(() => this.namespacesUpdated.next()),
@@ -112,7 +112,7 @@ export class NamespaceService {
     restore(namespaceId: string): Observable<RestoreNamespaceResponse> {
         return this.http
             .post<RestoreNamespaceResponse>(
-                environment.namespace.restore(namespaceId),
+                environment.namespaceV2.restore(namespaceId),
                 {},
             )
             .pipe(

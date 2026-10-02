@@ -22,12 +22,12 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Name Field -->
                 <div class="flex flex-col gap-2">
-                    <label for="name" class="font-semibold text-surface-900 dark:text-surface-0">
-                        Name <span class="text-red-500">*</span>
-                    </label>
-                    <input id="name" type="text" pInputText formControlName="name" placeholder="Enter endpoint name" class="rounded-xl!"
-                        [class.ng-invalid]="endpointForm.get('name')?.errors && endpointForm.get('name')?.touched" />
-                    <small class="text-red-500"
+                    <p-floatlabel variant="on">
+                        <input id="name" type="text" pInputText formControlName="name" class="w-full rounded-xl!" pSize="small"
+                            [class.ng-invalid]="endpointForm.get('name')?.errors && endpointForm.get('name')?.touched" />
+                        <label for="name">Name *</label>
+                    </p-floatlabel>
+                    <small class="text-xs text-red-500 italic ml-1"
                         *ngIf="endpointForm.get('name')?.errors?.['required'] && endpointForm.get('name')?.touched">
                         Name is required
                     </small>
@@ -35,11 +35,11 @@
 
                 <!-- Status Field -->
                 <div class="flex flex-col gap-2">
-                    <label for="status" class="font-semibold text-surface-900 dark:text-surface-0">
-                        Status
-                    </label>
-                    <p-select id="status" formControlName="status" [options]="statusOptions" placeholder="Select status"
-                        optionLabel="label" optionValue="value" class="w-full"  panelStyleClass="rounded-xl! custom-select-panel" size="small" />
+                    <p-floatlabel variant="on">
+                        <p-select id="status" formControlName="status" [options]="statusOptions"
+                            optionLabel="label" optionValue="value" class="w-full rounded-xl!" panelStyleClass="rounded-xl! custom-select-panel" size="small" appendTo="body" />
+                        <label for="status">Status</label>
+                    </p-floatlabel>
                 </div>
             </div>
 
@@ -47,17 +47,16 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
                 <!-- URL Field -->
                 <div class="flex flex-col gap-2 md:col-span-2">
-                    <label for="url" class="font-semibold text-surface-900 dark:text-surface-0">
-                        URL <span class="text-red-500">*</span>
-                    </label>
-                    <input id="url" type="url" pInputText formControlName="url" class="rounded-xl!"
-                        placeholder="https://api.example.com/callback"
-                        [class.ng-invalid]="endpointForm.get('url')?.errors && endpointForm.get('url')?.touched" />
-                    <small class="text-red-500"
+                    <p-floatlabel variant="on">
+                        <input id="url" type="url" pInputText formControlName="url" class="w-full rounded-xl!" pSize="small"
+                            [class.ng-invalid]="endpointForm.get('url')?.errors && endpointForm.get('url')?.touched" />
+                        <label for="url">URL *</label>
+                    </p-floatlabel>
+                    <small class="text-xs text-red-500 italic ml-1"
                         *ngIf="endpointForm.get('url')?.errors?.['required'] && endpointForm.get('url')?.touched">
                         URL is required
                     </small>
-                    <small class="text-red-500"
+                    <small class="text-xs text-red-500 italic ml-1"
                         *ngIf="endpointForm.get('url')?.errors?.['pattern'] && endpointForm.get('url')?.touched">
                         Please enter a valid URL
                     </small>
@@ -65,21 +64,21 @@
 
                 <!-- Method Field -->
                 <div class="flex flex-col gap-2">
-                    <label for="method" class="font-semibold text-surface-900 dark:text-surface-0">
-                        Method
-                    </label>
-                    <p-select id="method" formControlName="method" [options]="methodOptions" placeholder="Select method"
-                        optionLabel="label" optionValue="value" class="w-full rounded-xl!"  panelStyleClass="rounded-xl! custom-select-panel" size="small" />
+                    <p-floatlabel variant="on">
+                        <p-select id="method" formControlName="method" [options]="methodOptions"
+                            optionLabel="label" optionValue="value" class="w-full rounded-xl!" panelStyleClass="rounded-xl! custom-select-panel" size="small" appendTo="body" />
+                        <label for="method">Method</label>
+                    </p-floatlabel>
                 </div>
             </div>
 
             <!-- Description -->
             <div class="flex flex-col gap-2 mt-6">
-                <label for="description" class="font-semibold text-surface-900 dark:text-surface-0">
-                    Description
-                </label>
-                <textarea id="description" pInputTextarea formControlName="description" rows="3"
-                    placeholder="Describe this endpoint's purpose" class="w-full rounded-xl!"></textarea>
+                <p-floatlabel variant="on">
+                    <textarea id="description" pInputTextarea formControlName="description" rows="3"
+                        class="w-full rounded-xl!" pSize="small"></textarea>
+                    <label for="description">Description</label>
+                </p-floatlabel>
             </div>
 
             <!-- Enabled Checkbox -->
@@ -96,42 +95,36 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Timeout -->
                 <div class="flex flex-col gap-2">
-                    <label for="timeoutMs" class="font-semibold text-surface-900 dark:text-surface-0">
-                        Timeout (ms)
-                    </label>
-                    <p-inputNumber id="timeoutMs" formControlName="timeoutMs" [min]="100" [max]="30000" [step]="100"
-                        [showButtons]="true" buttonLayout="horizontal" spinnerMode="horizontal"
-                        decrementButtonClass="p-button-secondary" incrementButtonClass="p-button-secondary"
-                        incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" suffix=" ms" class="rounded-xl!" />
-                    <small class="text-surface-600 dark:text-surface-400">
+                    <p-floatlabel variant="on">
+                        <p-inputNumber id="timeoutMs" formControlName="timeoutMs" [min]="100" [max]="30000" [step]="100"
+                            [showButtons]="false" suffix=" ms" inputStyleClass="w-full rounded-xl!" size="small" />
+                        <label for="timeoutMs">Timeout (ms)</label>
+                    </p-floatlabel>
+                    <small class="text-xs text-surface-600 dark:text-surface-400 italic ml-1">
                         Request timeout in milliseconds
                     </small>
                 </div>
 
                 <!-- Retry Count -->
                 <div class="flex flex-col gap-2">
-                    <label for="retryCount" class="font-semibold text-surface-900 dark:text-surface-0">
-                        Retry Count
-                    </label>
-                    <p-inputNumber id="retryCount" formControlName="retryCount" [min]="0" [max]="10"
-                        [showButtons]="true" buttonLayout="horizontal" spinnerMode="horizontal"
-                        decrementButtonClass="p-button-secondary" incrementButtonClass="p-button-secondary"
-                        incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" class="rounded-xl!" />
-                    <small class="text-surface-600 dark:text-surface-400">
+                    <p-floatlabel variant="on">
+                        <p-inputNumber id="retryCount" formControlName="retryCount" [min]="0" [max]="10"
+                            [showButtons]="false" inputStyleClass="w-full rounded-xl!" size="small" />
+                        <label for="retryCount">Retry Count</label>
+                    </p-floatlabel>
+                    <small class="text-xs text-surface-600 dark:text-surface-400 italic ml-1">
                         Number of retry attempts on failure
                     </small>
                 </div>
 
                 <!-- Rate Limit -->
                 <div class="flex flex-col gap-2">
-                    <label for="rateLimit" class="font-semibold text-surface-900 dark:text-surface-0">
-                        Rate Limit (optional)
-                    </label>
-                    <p-inputNumber id="rateLimit" formControlName="rateLimit" [min]="1" [max]="1000"
-                        [showButtons]="true" buttonLayout="horizontal" spinnerMode="horizontal"
-                        decrementButtonClass="p-button-secondary" incrementButtonClass="p-button-secondary"
-                        incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" suffix="/min" class="rounded-xl!" />
-                    <small class="text-surface-600 dark:text-surface-400">
+                    <p-floatlabel variant="on">
+                        <p-inputNumber id="rateLimit" formControlName="rateLimit" [min]="1" [max]="1000"
+                            [showButtons]="false" suffix="/min" inputStyleClass="w-full rounded-xl!" size="small" />
+                        <label for="rateLimit">Rate Limit (optional)</label>
+                    </p-floatlabel>
+                    <small class="text-xs text-surface-600 dark:text-surface-400 italic ml-1">
                         Maximum requests per minute
                     </small>
                 </div>
@@ -142,11 +135,17 @@
         <p-card header="Custom Headers" class="mb-4 card-panel" *ngIf="customHeaders && (customHeaders | keyvalue)?.length !== 0">
             <div class="space-y-4">
                 <div *ngFor="let header of customHeaders; let i = index; trackBy: trackByIndex"
-                    class="flex gap-3 items-start">
-                    <input type="text" pInputText [(ngModel)]="header.key" [ngModelOptions]="{standalone: true}"
-                        placeholder="Header name" class="flex-1 rounded-xl!" />
-                    <input type="text" pInputText [(ngModel)]="header.value" [ngModelOptions]="{standalone: true}"
-                        placeholder="Header value" class="flex-1 rounded-xl!" />
+                    class="flex gap-3 items-center">
+                    <p-floatlabel variant="on" class="flex-1">
+                        <input type="text" pInputText [(ngModel)]="header.key" [ngModelOptions]="{standalone: true}"
+                            class="w-full rounded-xl!" pSize="small" />
+                        <label>Header name</label>
+                    </p-floatlabel>
+                    <p-floatlabel variant="on" class="flex-1">
+                        <input type="text" pInputText [(ngModel)]="header.value" [ngModelOptions]="{standalone: true}"
+                            class="w-full rounded-xl!" pSize="small" />
+                        <label>Header value</label>
+                    </p-floatlabel>
                     <p-button icon="pi pi-trash" severity="danger" [outlined]="true" size="small"
                         (onClick)="removeHeader(i)" [disabled]="customHeaders.length <= 0" styleClass="rounded-xl!" />
                 </div>
@@ -172,7 +171,7 @@
             <p-button label="Cancel" icon="pi pi-times" [outlined]="true" severity="secondary" styleClass="w-full sm:w-auto rounded-xl!"
                 routerLink="/events/ingest/endpoints" />
             <p-button type="submit" [label]="(isEdit ? 'Update' : 'Create') + ' Endpoint'"
-                [icon]="loading ? 'pi pi-spin pi-spinner' : (isEdit ? 'pi pi-check' : 'pi pi-plus')" styleClass="w-full sm:w-auto rounded-xl!"
+                [icon]="loading ? 'pi pi-spin pi-spinner' : (isEdit ? 'pi pi-check' : 'pi pi-plus')" styleClass="w-full sm:w-auto rounded-xl! shadow-md shadow-primary/50 dark:shadow-primary/20"
                 [disabled]="endpointForm.invalid || loading" [loading]="loading" />
         </div>
     </form>

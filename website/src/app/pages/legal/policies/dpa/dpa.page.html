@@ -4,7 +4,7 @@
             Data Processing <span class="text-primary-500">Agreement</span>
         </h1>
         <p class="text-surface-500 dark:text-surface-400 font-medium">
-            Last Updated: January 1, 2026
+            Last Updated: September 2, 2026
         </p>
     </div>
 
@@ -12,7 +12,7 @@
         <section>
             <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">1. Introduction</h2>
             <p class="leading-relaxed">
-                This Data Processing Agreement (“DPA”) forms part of the Terms of Service between <strong>Kyrazo LLC</strong> (“Processor”) and the customer using the Kyrazo platform (“Controller”). This DPA applies to the processing of Personal Data subject to Data Protection Laws (including GDPR and PDPL) in the course of providing our high-performance webhook relay services.
+                This Data Processing Agreement (“DPA”) forms part of the Terms of Service and the applicable Order Form between <strong>Kyrazo LLC</strong> (“Processor”) and the customer using Kyrazo (“Controller”). This DPA applies to the processing of Personal Data subject to Data Protection Laws (including GDPR and PDPL) in the course of providing dedicated, physically isolated webhook infrastructure. If an Order Form conflicts with this DPA, the Order Form controls for deployment location and retention.
             </p>
         </section>
 
@@ -20,9 +20,9 @@
             <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">2. Processing of Personal Data</h2>
             <p>Processor shall only process Personal Data for the following purposes:</p>
             <ul class="list-disc list-inside space-y-2 mt-4">
-                <li>Providing, maintaining, and improving the Services.</li>
-                <li>Processing in accordance with Controller’s documented instructions.</li>
-                <li>Ensuring the performance, security, and integrity of the Service infrastructure.</li>
+                <li>Provisioning and operating the Controller’s dedicated environment.</li>
+                <li>Processing in accordance with Controller’s documented instructions, including the Order Form.</li>
+                <li>Ensuring the performance, security, and integrity of the dedicated infrastructure.</li>
             </ul>
         </section>
 
@@ -31,17 +31,17 @@
             <p>Processor implements industry-standard measures to protect Personal Data, including:</p>
             <ul class="list-disc list-inside space-y-2 mt-4">
                 <li><strong>Encryption:</strong> Payload encryption using <strong>AES-256-GCM</strong> (at rest) and <strong>TLS 1.3</strong> (in transit).</li>
-                <li><strong>Data Residency:</strong> Primary processing and storage occur within the EEA (Netcup Germany/Austria).</li>
-                <li><strong>Backups:</strong> Securely encrypted snapshots stored within the <strong>EEA</strong>.</li>
-                <li><strong>Isolation:</strong> Logical separation of data between different Controller workspaces.</li>
-                <li><strong>Retention:</strong> Data is automatically deleted in accordance with the Controller's <strong>active subscription plan</strong> for all ingest and dispatch events.</li>
+                <li><strong>Physical isolation (Professional):</strong> Dedicated Spaceship virtual machines, databases, and delivery workers reserved exclusively for the Controller. No shared database memory and no multi-tenant worker pools.</li>
+                <li><strong>BYOC / private cloud (Enterprise):</strong> Where specified in the Order Form, payload processing remains inside the Controller’s cloud boundary.</li>
+                <li><strong>Data residency:</strong> Region is specified in the Order Form. Managed backups for Processor-hosted deployments are encrypted snapshots stored within the <strong>EEA</strong> via Cloudflare R2 unless the Order Form states otherwise.</li>
+                <li><strong>Retention:</strong> Data is deleted in accordance with the Controller’s Order Form for ingest and dispatch events, and the dedicated environment is decommissioned on contract end.</li>
             </ul>
         </section>
 
         <section>
             <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-4">4. Sub-processing</h2>
                 <p class="text-surface-600 dark:text-surface-400 leading-relaxed">
-                    We use a limited number of third-party sub-processors to providing our services. A current list and their processing locations can be found on our <a routerLink="/legal/gdpr" class="text-primary-500 hover:underline">GDPR Page</a>.
+                    We use a limited number of third-party sub-processors to provide our services, including Spaceship for dedicated virtual machines. A current list and their processing locations can be found on our <a routerLink="/legal/gdpr" class="text-primary-500 hover:underline">GDPR Page</a>. For Enterprise BYOC, infrastructure inside the Controller’s cloud is not a Kyrazo sub-processor.
                 </p>
         </section>
 

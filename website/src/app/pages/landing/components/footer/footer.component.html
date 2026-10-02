@@ -17,7 +17,7 @@
 
                 <!-- Massive Background Watermark -->
                 <div class="absolute -bottom-5 -right-12 select-none pointer-events-none opacity-[0.03] dark:opacity-[0.05] translate-y-1/4 hidden md:block" aria-hidden="true">
-                    <h1 class="text-[16rem] font-black tracking-tighter leading-none font-sansation!">Kyrazo</h1>
+                    <p class="text-[16rem] font-black tracking-tighter leading-none font-sansation!">Kyrazo</p>
                 </div>
 
                 <div class="relative z-10 flex flex-col h-full justify-between">
@@ -25,7 +25,7 @@
                         <img [src]="isDarkMode() ? 'logo-dark.png' : 'logo-light.png'" alt="Kyrazo"
                              width="48" height="48"
                              class="h-10 w-10 md:h-12 md:w-12 p-1 rounded-xl bg-primary shadow-2xl shadow-primary-500/30">
-                        <h2 class="text-3xl md:text-4xl font-black bg-clip-text text-transparent bg-linear-to-r from-primary-500 to-primary-500 bg-size-[200%_auto] animate-gradient-shimmer tracking-tighter">Kyrazo</h2>
+                        <h2 class="text-3xl md:text-4xl font-sansation! font-black bg-clip-text text-transparent bg-linear-to-r from-primary-500 to-primary-500 bg-size-[200%_auto] animate-gradient-shimmer tracking-tighter">Kyrazo</h2>
                     </div>
                     <div>
                         <p class="text-lg md:text-xl font-bold text-surface-900 dark:text-surface-0 mb-6 leading-tight max-w-md">
@@ -73,7 +73,6 @@
                     <ul class="space-y-1">
                         <li><a href="https://docs.kyrazo.com" target="_blank" rel="noopener noreferrer" class="p-button p-button-text p-button-secondary">Documentation</a></li>
                         <li><a href="https://docs.kyrazo.com/api-reference/introduction" target="_blank" rel="noopener noreferrer" class="p-button p-button-text p-button-secondary">API Reference</a></li>
-                        <li><p-button variant="text" severity="secondary" routerLink="/changelogs">Changelog</p-button></li>
                     </ul>
                 </div>
             </div>
@@ -88,8 +87,6 @@
                         <span class="font-black uppercase tracking-widest text-[10px] text-surface-400">Resources</span>
                     </div>
                     <ul class="space-y-1">
-                        <li><p-button variant="text" severity="secondary" routerLink="/blog">Blog</p-button></li>
-                        <li><a href="https://status.kyrazo.com" target="_blank" rel="noopener noreferrer" class="p-button p-button-text p-button-secondary">Network Status</a></li>
                         <li><a href="mailto:support@kyrazo.com" class="p-button p-button-text p-button-secondary">Support</a></li>
                     </ul>
                 </div>
@@ -134,7 +131,7 @@
             </div>
 
             <div class="flex items-center gap-6 text-surface-400 text-xs font-semibold uppercase tracking-widest">
-                <a href="https://status.kyrazo.com" target="_blank" class="hover:text-primary-500 transition-colors">Status</a>
+                <a href="https://docs.kyrazo.com" target="_blank" rel="noopener noreferrer" class="hover:text-primary-500 transition-colors">Docs</a>
                 <a [routerLink]="'/legal/gdpr'" class="hover:text-primary-500 transition-colors">GDPR</a>
                 <!-- <a href="/legal/privacy-policy" class="hover:text-primary-500 transition-colors">Security</a> -->
                 <a [routerLink]="'/legal/privacy-policy'" class="hover:text-primary-500 transition-colors">Privacy</a>

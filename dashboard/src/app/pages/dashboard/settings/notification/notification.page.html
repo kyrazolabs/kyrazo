@@ -85,18 +85,22 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Email Frequency -->
                 <div class="flex flex-col gap-2">
-                    <label class="font-semibold text-surface-900 dark:text-surface-0">Email Frequency</label>
-                    <p-select formControlName="emailFrequency" [options]="frequencyOptions" optionLabel="label"
-                        optionValue="value" placeholder="Select frequency" styleClass="w-full rounded-xl!"
-                        panelStyleClass="rounded-xl!" size="small" />
+                    <p-floatlabel variant="on">
+                        <p-select id="emailFrequency" formControlName="emailFrequency" [options]="frequencyOptions" optionLabel="label"
+                            optionValue="value" class="w-full rounded-xl!"
+                            panelStyleClass="rounded-xl!" size="small" appendTo="body" />
+                        <label for="emailFrequency">Email Frequency</label>
+                    </p-floatlabel>
                 </div>
 
                 <!-- Quiet Hours -->
                 <div class="flex flex-col gap-2">
-                    <label class="font-semibold text-surface-900 dark:text-surface-0">Quiet Hours</label>
-                    <p-select formControlName="quietHours" [options]="quietHoursOptions" optionLabel="label"
-                        optionValue="value" placeholder="Select quiet hours" styleClass="w-full rounded-xl!"
-                        panelStyleClass="rounded-xl!" size="small" />
+                    <p-floatlabel variant="on">
+                        <p-select id="quietHours" formControlName="quietHours" [options]="quietHoursOptions" optionLabel="label"
+                            optionValue="value" class="w-full rounded-xl!"
+                            panelStyleClass="rounded-xl!" size="small" appendTo="body" />
+                        <label for="quietHours">Quiet Hours</label>
+                    </p-floatlabel>
                 </div>
             </div>
         </p-card>
